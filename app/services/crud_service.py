@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Type, Optional
+from typing import Type
 from app.models.base import db
 import logging
 import traceback
@@ -11,7 +11,7 @@ class CRUDService:
     Separates business logic from presentation concerns.
     """
 
-    def __init__(self, model_class: Type = None):
+    def __init__(self, model_class: Type):
         self.model_class = model_class
 
     def get_all(self, page=1, per_page=15, sort_column='id', sort_direction='asc', filters=None):
@@ -89,7 +89,7 @@ class CRUDService:
             raise
 
     def validate_create(self, data):
-        return []  # Extend per model if needed
+        return []
 
     def validate_update(self, item, data):
-        return []  # Extend per model if needed
+        return []

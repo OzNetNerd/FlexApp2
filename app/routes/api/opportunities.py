@@ -6,13 +6,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# API routes
-opportunity_service = CRUDService()
 logger.debug("Instantiating GenericAPIRoutes for the Opportunity model.")
 opportunity_api_routes = GenericAPIRoutes(
     blueprint=api_opportunities_bp,
     model=Opportunity,
-    service=opportunity_service,
+    service=CRUDService(Opportunity),
     api_prefix='/api/opportunities',
     required_fields=['name'],
     unique_fields=[]

@@ -6,13 +6,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# API routes
-user_service = CRUDService()
 logger.debug("Instantiating GenericAPIRoutes for the User model.")
 user_api_routes = GenericAPIRoutes(
    blueprint=api_users_bp,
    model=User,
-   service=user_service,
+   service=CRUDService(User),
    api_prefix='/api/users',
    required_fields=['username', 'email', 'password'],
    unique_fields=['username', 'email']

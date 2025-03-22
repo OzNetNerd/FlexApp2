@@ -22,8 +22,8 @@ GENERIC_TEMPLATE = 'page.html'
 
 @dataclass
 class GenericWebRoutes(CRUDRoutesBase):
-    blueprint: Blueprint
     model: Type
+    blueprint: Blueprint
     required_fields: List[str] = field(default_factory=list)
     unique_fields: List[str] = field(default_factory=list)
     index_template: str = GENERIC_TEMPLATE

@@ -10,21 +10,15 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class CRUDRoutesBase:
-    """
-    Base class for CRUD routes - shared between web and API routes.
-    Contains core functionality but doesn't handle HTTP responses directly.
-    """
-    blueprint: Blueprint
     model: Type
-    service: CRUDService = field(default_factory=CRUDService)
+    blueprint: Blueprint
     required_fields: List[str] = field(default_factory=list)
     unique_fields: List[str] = field(default_factory=list)
+    service: CRUDService = field(init=False)
 
     def __post_init__(self):
-        """
-        Initialize base class.
-        """
         logger.debug(f"Initializing CRUD routes base for {self.model.__name__}")
+        self.service = CRUDService(self.model)  # Now we can pass model_class
 
     def _ensure_json_serializable(self, obj):
         """Ensure an object is JSON serializable by converting problematic types."""
