@@ -1,20 +1,22 @@
 import os
 import logging
 from datetime import datetime
-from flask import Flask, request, redirect, url_for
+from flask import Flask, request, redirect, url_for, session as flask_session, jsonify
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
-from flask_session import Session  # Added Flask-Session
+from flask_session import Session
 from config import Config
-from app.routes import register_blueprints
+from app.routes.web import register_web_blueprints  # ✅ Corrected import
 from app.routes.base.components.template_renderer import render_safely
 from app.models.base import db
-from app.models.user import User  # Required for user_loader
+from app.models.user import User
+
+logger = logging.getLogger(__name__)
 
 # Global extensions
 login_manager = LoginManager()
 migrate = Migrate()
-session = Session()  # Initialize Flask-Session
+session = Session()
 
 
 def configure_logging():
@@ -30,69 +32,81 @@ def create_app(config_class=Config):
     app = Flask(__name__, static_folder='static', static_url_path='/static')
     app.config.from_object(config_class)
 
-    # Set session configuration if not in config
     if 'SESSION_TYPE' not in app.config:
         app.config['SESSION_TYPE'] = 'filesystem'
-        app.config['PERMANENT_SESSION_LIFETIME'] = 60 * 60 * 24  # 24 hours
+        app.config['PERMANENT_SESSION_LIFETIME'] = 60 * 60 * 24
         app.config['SESSION_PERMANENT'] = True
         app.config['SESSION_USE_SIGNER'] = True
+        app.config['REMEMBER_COOKIE_DURATION'] = 60 * 60 * 24 * 30
+        app.config['REMEMBER_COOKIE_HTTPONLY'] = True
+        app.config['SESSION_COOKIE_HTTPONLY'] = True
 
-    # Init extensions
     db.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
-    session.init_app(app)  # Initialize Flask-Session with app
+    session.init_app(app)
+
     login_manager.login_view = 'auth_bp.login'
     login_manager.login_message = "Please log in to access this page."
     login_manager.login_message_category = "info"
 
-    # User loader for Flask-Login
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # Redirect all unauthenticated users unless whitelisted
     @app.before_request
     def require_login():
+        logger = logging.getLogger(__name__)
         whitelisted = [
             'auth_bp.login',
             'auth_bp.logout',
-            'static',  # Allow static files
+            'static',
+            'debug_session',
         ]
-        if not current_user.is_authenticated and request.endpoint not in whitelisted:
+
+        endpoint = request.endpoint
+        if endpoint is None:
+            return
+
+        logger.debug(f"Before request: {endpoint}, Authenticated: {current_user.is_authenticated}")
+        logger.debug(f"Session contents: {dict(flask_session) if flask_session else 'None'}")
+        logger.debug(f"User ID: {current_user.get_id() if current_user.is_authenticated else None}")
+        logger.debug(f"Cookies: {request.cookies}")
+
+        if not current_user.is_authenticated:
+            if (
+                endpoint in whitelisted or
+                endpoint.startswith('static') or
+                endpoint.startswith('api_') or
+                endpoint.endswith('.data')
+            ):
+                return
             return redirect(url_for('auth_bp.login', next=request.path))
 
-    # Setup logger
-    logger = logging.getLogger(__name__)
-    handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logger.addHandler(handler)
-    logger.setLevel(logging.DEBUG)
+    # ✅ Register all web routes
+    register_web_blueprints(app)
 
-    logger.debug(f"Flask app initialized with debug={app.debug}")
-    logger.debug(f"Database URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
-    logger.debug(f"Session type: {app.config['SESSION_TYPE']}")
-    logger.debug(f"Current working directory: {os.getcwd()}")
+    @app.route('/debug-session')
+    def debug_session():
+        result = {
+            'is_authenticated': current_user.is_authenticated,
+            'session_keys': list(flask_session.keys()) if flask_session else [],
+            'permanent': flask_session.permanent if flask_session else None,
+            'user_id': current_user.get_id() if current_user.is_authenticated else None,
+            'remember_token': request.cookies.get('remember_token') is not None,
+            'cookies': {k: v for k, v in request.cookies.items()}
+        }
+        return jsonify(result)
 
-    # Avoid circular imports
-    from app.services import init_db
-    init_db(app)
-
-    # Register blueprints
-    register_blueprints(app)
-
-    # Log registered routes
     with app.app_context():
         logger.debug("--- Registered URL Rules ---")
         for rule in sorted(app.url_map.iter_rules(), key=lambda r: r.endpoint):
             logger.debug(f"Endpoint: {rule.endpoint}, Methods: {rule.methods}, Rule: {rule}")
 
-    # Template context processor
     @app.context_processor
     def inject_now():
         return {'now': datetime.utcnow()}
 
-    # Error handlers
     @app.errorhandler(404)
     def page_not_found(e):
         context = {'error': e}
@@ -106,7 +120,7 @@ def create_app(config_class=Config):
     return app
 
 
-# Create app
+# Run app
 app = create_app()
 
 if __name__ == '__main__':

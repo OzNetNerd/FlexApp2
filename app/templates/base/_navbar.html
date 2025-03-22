@@ -1,8 +1,8 @@
 {% set nav_items = [
-  {'name': 'Companies', 'icon': 'fa-building'},
-  {'name': 'Contacts', 'icon': 'fa-address-card'},
-  {'name': 'Opportunities', 'icon': 'fa-chart-line'},
-  {'name': 'Users', 'icon': 'fa-users'}
+  {'name': 'companies', 'display_name': 'Companies', 'icon': 'fa-building'},
+  {'name': 'contacts', 'display_name': 'Contacts', 'icon': 'fa-address-card'},
+  {'name': 'opportunities', 'display_name': 'Opportunities', 'icon': 'fa-chart-line'},
+  {'name': 'users', 'display_name': 'Users', 'icon': 'fa-users'}
 ] %}
 
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top">
@@ -32,14 +32,14 @@
     <div class="collapse navbar-collapse" id="navbarContent">
       <ul class="navbar-nav me-auto mb-lg-0">
         {% for item in nav_items %}
-          {% set endpoint = item.name.lower() + '.index' %}
-          {% set is_active = request.endpoint.startswith(item.name.lower() + '.') %}
+          {% set endpoint = item.name + '.index' %}
+          {% set is_active = request.endpoint.startswith(item.name + '.') %}
           <li class="nav-item">
             <a class="nav-link {% if is_active %}active{% endif %}"
                href="{{ url_for(endpoint) }}"
                {% if is_active %}aria-current="page"{% endif %}>
               <i class="fas {{ item.icon }} nav-icon"></i>
-              <span>{{ item.name }}</span>
+              <span>{{ item.display_name }}</span>
               {% if is_active %}<span class="visually-hidden">(current)</span>{% endif %}
             </a>
           </li>

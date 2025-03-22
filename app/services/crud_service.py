@@ -1,6 +1,3 @@
-# Handles core database operations (query, create, update, delete)
-# Contains shared validation logic
-
 from typing import List, Dict, Any, Type, Optional
 from app.models.base import db
 import logging
@@ -8,26 +5,23 @@ import traceback
 
 logger = logging.getLogger(__name__)
 
-
 class CRUDService:
     """
     Service layer for CRUD operations on database models.
     Separates business logic from presentation concerns.
     """
 
-    @staticmethod
-    def get_all(model_class, page=1, per_page=15, sort_column='id', sort_direction='asc', filters=None):
-        """
-        Get all items with pagination, sorting, and filtering.
-        """
-        try:
-            query = model_class.query
+    def __init__(self, model_class: Type = None):
+        self.model_class = model_class
 
-            # Apply filters if they exist
+    def get_all(self, page=1, per_page=15, sort_column='id', sort_direction='asc', filters=None):
+        try:
+            query = self.model_class.query
+
             if filters:
                 for col_id, filter_config in filters.items():
-                    if hasattr(model_class, col_id):
-                        column = getattr(model_class, col_id)
+                    if hasattr(self.model_class, col_id):
+                        column = getattr(self.model_class, col_id)
                         filter_type = filter_config.get('type')
                         filter_value = filter_config.get('filter')
                         logger.debug(f"Applying filter on {col_id}: {filter_type}={filter_value}")
@@ -36,64 +30,45 @@ class CRUDService:
                         elif filter_type == 'equals':
                             query = query.filter(column == filter_value)
 
-            # Apply sorting
-            if hasattr(model_class, sort_column):
-                column = getattr(model_class, sort_column)
+            if hasattr(self.model_class, sort_column):
+                column = getattr(self.model_class, sort_column)
                 query = query.order_by(column.desc() if sort_direction == 'desc' else column)
 
-            # Apply pagination
             items = query.paginate(page=page, per_page=per_page, error_out=False)
-
             return items
+
         except Exception as e:
-            logger.error(f"Error in get_all for {model_class.__name__}: {str(e)}")
+            logger.error(f"Error in get_all for {self.model_class.__name__}: {str(e)}")
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
 
-    @staticmethod
-    def get_by_id(model_class, item_id):
-        """
-        Get a single item by ID.
-        """
+    def get_by_id(self, item_id):
         try:
-            return model_class.query.get_or_404(item_id)
+            return self.model_class.query.get_or_404(item_id)
         except Exception as e:
-            logger.error(f"Error in get_by_id for {model_class.__name__} with id {item_id}: {str(e)}")
+            logger.error(f"Error in get_by_id for {self.model_class.__name__} with id {item_id}: {str(e)}")
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
 
-    @staticmethod
-    def create(model_class, data):
-        """
-        Create a new item.
-        """
+    def create(self, data):
         try:
-            # Remove empty strings from data
             data = {k: v for k, v in data.items() if v != ''}
-
-            item = model_class(**data)
+            item = self.model_class(**data)
             db.session.add(item)
             db.session.commit()
             return item
         except Exception as e:
             db.session.rollback()
-            logger.error(f"Error creating {model_class.__name__}: {str(e)}")
+            logger.error(f"Error creating {self.model_class.__name__}: {str(e)}")
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
 
-    @staticmethod
-    def update(item, data):
-        """
-        Update an existing item.
-        """
+    def update(self, item, data):
         try:
-            # Remove empty strings from data
             data = {k: v for k, v in data.items() if v != ''}
-
             for key, value in data.items():
                 if hasattr(item, key):
                     setattr(item, key, value)
-
             db.session.commit()
             return item
         except Exception as e:
@@ -102,11 +77,7 @@ class CRUDService:
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
 
-    @staticmethod
-    def delete(item):
-        """
-        Delete an item.
-        """
+    def delete(self, item):
         try:
             db.session.delete(item)
             db.session.commit()
@@ -117,18 +88,8 @@ class CRUDService:
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
 
-    @staticmethod
-    def validate_create(model_class, data):
-        """
-        Validate data for create operation.
-        Returns a list of validation errors or empty list if valid.
-        """
-        return []  # Override in subclasses
+    def validate_create(self, data):
+        return []  # Extend per model if needed
 
-    @staticmethod
-    def validate_update(item, data):
-        """
-        Validate data for update operation.
-        Returns a list of validation errors or empty list if valid.
-        """
-        return []  # Override in subclasses
+    def validate_update(self, item, data):
+        return []  # Extend per model if needed

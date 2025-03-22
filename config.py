@@ -22,6 +22,14 @@ class Config:
     SESSION_PERMANENT = True
     SESSION_USE_SIGNER = True
 
+    # Add to your Config class
+    SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    REMEMBER_COOKIE_DURATION = 60 * 60 * 24 * 30  # 30 days
+    REMEMBER_COOKIE_SECURE = False  # Set to True in production with HTTPS
+    REMEMBER_COOKIE_HTTPONLY = True
+
     # Database configuration
     # Use absolute path to ensure database is created in the correct location
     SQLALCHEMY_DATABASE_URI = os.environ.get(

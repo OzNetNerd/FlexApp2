@@ -1,10 +1,8 @@
-from flask import Blueprint
 import logging
-from flask_login import LoginManager
-from app.routes.web.auth import login
-from app.routes.web.auth import logout
-from app.routes.web.auth import load_user
+from flask import Blueprint
 
+# Auth handlers must be imported early to register routes
+from app.routes.web.auth import login, logout
 
 logger = logging.getLogger(__name__)
 
@@ -17,22 +15,21 @@ opportunities_bp = Blueprint('opportunities', __name__, url_prefix='/opportuniti
 relationships_bp = Blueprint('relationships_bp', __name__, url_prefix='/relationships')
 crisp_scores_bp = Blueprint('crisp_scores_bp', __name__, url_prefix='/crisp-scores')
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
+
+# Register login/logout routes with auth blueprint
 auth_bp.add_url_rule('/login', view_func=login, methods=['GET', 'POST'])
 auth_bp.add_url_rule('/logout', view_func=logout, methods=['GET'])
 
-login_manager = LoginManager()
-login_manager.user_loader(load_user)
-
-
-# Import route definitions to register with blueprints
-from app.routes.web.main import main_bp
-from app.routes.web.users import users_bp
-from app.routes.web.companies import companies_bp
-from app.routes.web.contacts import contacts_bp
-from app.routes.web.opportunities import opportunities_bp
-from app.routes.web.relationship import relationships_bp
-from app.routes.web.crisp_score import crisp_scores_bp
-from app.routes.web.auth import load_user
+# Import modules to register routes after blueprints are created
+from app.routes.web import (
+    main,
+    users,
+    companies,
+    contacts,
+    opportunities,
+    relationship,
+    crisp_score,
+)
 
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""
