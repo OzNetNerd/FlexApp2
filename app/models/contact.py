@@ -1,5 +1,4 @@
 from models.base import db, BaseModel
-from sqlalchemy.orm import foreign
 
 
 import logging
@@ -16,6 +15,7 @@ class Contact(db.Model, BaseModel):
 
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     company = db.relationship("Company", back_populates="contacts")
+    relationships = db.relationship('Relationship', back_populates='contact', cascade='all, delete-orphan')
     notes = db.relationship(
         'Note',
         primaryjoin="and_(Note.notable_id == foreign(Contact.id), Note.notable_type == 'Contact')"
@@ -78,3 +78,20 @@ class Contact(db.Model, BaseModel):
     def full_name(self):
         logger.debug(f"Accessing full name for {self.first_name} {self.last_name}")
         return f"{self.first_name} {self.last_name}"
+
+    @property
+    def crisp_summary(self):
+        """
+        Returns the average CRISP total score across all user relationships for this contact.
+        """
+        all_scores = [
+            score.total_score
+            for relationship in self.relationships
+            for score in relationship.crisp_scores
+            if score.total_score is not None
+        ]
+
+        if not all_scores:
+            return None
+
+        return round(sum(all_scores) / len(all_scores), 2)

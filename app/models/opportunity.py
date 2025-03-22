@@ -43,3 +43,16 @@ class Opportunity(db.Model, BaseModel):
         logger.debug(f"Deleting opportunity with name {self.name}")
         super().delete()
         logger.info(f"Opportunity '{self.name}' deleted successfully.")
+
+    @property
+    def crisp_summary(self):
+        """
+        Average CRISP score across all contacts involved in this opportunity.
+        """
+        contacts = {rel.contact for note in self.notes for rel in note.author.relationships}
+        scores = [c.crisp_summary for c in contacts if c.crisp_summary is not None]
+
+        if not scores:
+            return None
+
+        return round(sum(scores) / len(scores), 2)

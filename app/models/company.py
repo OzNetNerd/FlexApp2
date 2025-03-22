@@ -73,3 +73,15 @@ class Company(db.Model, BaseModel):
         result = Company.query.filter(Company.name.ilike(f'{query}%')).all()
         logger.debug(f"Found {len(result)} companies matching the query '{query}'")
         return result
+
+    @property
+    def crisp_summary(self):
+        """
+        Average CRISP score across all contacts at this company.
+        """
+        scores = [c.crisp_summary for c in self.contacts if c.crisp_summary is not None]
+
+        if not scores:
+            return None
+
+        return round(sum(scores) / len(scores), 2)

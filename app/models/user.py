@@ -9,7 +9,7 @@ class User(db.Model, BaseModel):
     username = db.Column(db.String(50), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-
+    relationships = db.relationship('Relationship', back_populates='user', cascade='all, delete-orphan')
     notes = db.relationship('Note', backref='author', lazy='dynamic')
 
     __field_order__ = [

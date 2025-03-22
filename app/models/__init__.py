@@ -1,5 +1,6 @@
 import logging
 
+
 # Use the same logger as the Flask app
 logger = logging.getLogger(__name__)
 
@@ -18,19 +19,11 @@ from .contact import Contact
 from .opportunity import Opportunity
 from .note import Note
 from .table_config import TableConfig
+from .relationship import Relationship
+from .crisp_score import CRISPScore
 
-__all__ = [
-    'db',
-    'CapabilityCategory',
-    'Capability',
-    'CompanyCapability',
-    'User',
-    'Company',
-    'Contact',
-    'Opportunity',
-    'Note',
-    'TableConfig'
-]
+
+__all__ = ['db', 'User', 'Company', 'Contact', 'Opportunity', 'Note', 'TableConfig', 'Relationship', 'CRISPScore']
 
 # Log that the module is being loaded
 logger.debug(f"Loaded models: {', '.join(__all__)}")
