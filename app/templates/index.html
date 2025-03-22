@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Dashboard</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
+
+</head>
+<body>
+    <div class="header">
+        <h1>CRM Dashboard</h1>
+        <p>Welcome to your customer relationship management system</p>
+    </div>
+
+    <div class="navigation">
+        <a href="/companies" class="nav-card">
+            <h2>Companies</h2>
+            <p>Manage all your client companies</p>
+        </a>
+        <a href="/customers" class="nav-card">
+            <h2>Customers</h2>
+            <p>Manage individual customer contacts</p>
+        </a>
+        <a href="/opportunities" class="nav-card">
+            <h2>Opportunities</h2>
+            <p>Track sales opportunities and deals</p>
+        </a>
+    </div>
+
+    <div class="card">
+        <h2>Summary</h2>
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label">ACTIVE COMPANIES</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">9</div>
+                <div class="stat-label">ACTIVE CONTACTS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">7</div>
+                <div class="stat-label">OPEN OPPORTUNITIES</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">$925K</div>
+                <div class="stat-label">SALES PIPELINE</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Recent Activity</h2>
+        <p>This section could show recent updates, tasks, or notifications.</p>
+        <p>For now, this is a placeholder. In a real application, this would be populated with data from your backend.</p>
+    </div>
+</body>
+</html>

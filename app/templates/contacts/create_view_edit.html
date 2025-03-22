@@ -1,0 +1,96 @@
+{% extends "base/base-page.html" %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h3>{{ title }}</h3>
+    <div>
+      {% if not request.endpoint.endswith('.edit') %}
+      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', item_id=item.id) }}" class="btn btn-primary">
+        <i class="fas fa-edit"></i> Edit
+      </a>
+      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+        <i class="fas fa-trash"></i> Delete
+      </button>
+      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card-body">
+    <form method="POST">
+      <div class="row">
+        {% set fields = [
+          ('First Name', 'first_name', item.first_name),
+          ('Last Name', 'last_name', item.last_name),
+          ('Phone', 'phone', item.phone),
+          ('Email', 'email', item.email),
+          ('LinkedIn', 'linkedin', item.linkedin if 'linkedin' in item.__dict__ else None),
+          ('Company Name', 'company_name', item.company_name),
+          ('Created At', 'created_at', item.created_at),
+          ('Updated At', 'updated_at', item.updated_at)
+        ] %}
+        {% for label, name, value in fields %}
+        <div class="col-md-6 mb-3">
+          <div class="card">
+            <div class="card-header">
+              <strong>{{ label }}</strong>
+            </div>
+            <div class="card-body">
+              {% if request.endpoint.endswith('.edit') and name not in ['created_at', 'updated_at'] %}
+              <input type="text" name="{{ name }}" class="form-control" value="{{ value or '' }}">
+              {% else %}
+                {% if value is none %}
+                <span class="text-muted">None</span>
+                {% elif value is boolean %}
+                <span class="badge bg-{{ 'success' if value else 'danger' }}">{{ 'Yes' if value else 'No' }}</span>
+                {% elif value is mapping %}
+                <pre class="mb-0">{{ value|tojson(indent=2) }}</pre>
+                {% elif value is iterable and value is not string %}
+                <ul class="list-group">
+                  {% for v in value %}
+                  <li class="list-group-item">{{ v }}</li>
+                  {% endfor %}
+                </ul>
+                {% else %}
+                {{ value }}
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if request.endpoint.endswith('.edit') %}
+      <div class="d-flex justify-content-end mt-3">
+        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}" class="btn btn-secondary me-2">Cancel</a>
+        <button type="submit" class="btn btn-success">Save Changes</button>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this {{ entity_name|default('item') }}? This action cannot be undone.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form action="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.delete', item_id=item.id) }}" method="POST">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

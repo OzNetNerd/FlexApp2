@@ -1,0 +1,123 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.navigation {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.navbar {
+    margin: -20px -20px 0 -20px; /* Offset body padding */
+    padding: 10px 20px; /* Add internal padding if needed */
+}
+
+.nav-card {
+    background-color: #4a6fdc;
+    color: white;
+    text-align: center;
+    padding: 30px;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.nav-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.nav-card h2 {
+    margin-top: 0;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 10px 0;
+    color: #4a6fdc;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Navigation Styles */
+.active-link {
+    background-color: #70a1ff !important;
+    color: white !important;
+    border-radius: 5px;
+    padding: 8px 15px;
+}
+
+.hover-effect {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 8px 15px;
+    border-radius: 5px;
+}
+
+.hover-effect:hover {
+    background-color: #a5c8ff;
+    color: white !important;
+}
+
+.nav-item {
+    margin-right: 5px;
+}
+
+AG Grid Specific Styles
+.ag-root-wrapper {
+    height: 100vh;
+    width: 100%;
+}
+
+.ag-root {
+   height: 100%;
+}
+
+.ag-grid-container {
+    width: 100%;
+    height: 100vh;
+}
