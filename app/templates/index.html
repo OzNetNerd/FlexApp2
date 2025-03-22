@@ -4,193 +4,198 @@
   <body>
     {% include 'base/_navbar.html' %}
 
-    <div class="container mt-4">
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="bg-white p-4 rounded shadow-sm">
-          <h1 class="h3 mb-2">Welcome to your CRM</h1>
-          <p class="text-muted">Manage your customer relationships efficiently</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="row mb-4">
-      <div class="col-md-4 mb-3">
-        <a href="/companies" class="nav-card card h-100 border-0 shadow-sm">
-          <div class="card-body text-center p-4">
-            <div class="mb-3">
-              <i class="bi bi-building text-primary" style="font-size: 2.5rem;"></i>
-            </div>
-            <h2 class="h5 card-title">Companies</h2>
-            <p class="card-text text-muted">Manage all your client companies</p>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-4 mb-3">
-        <a href="/customers" class="nav-card card h-100 border-0 shadow-sm">
-          <div class="card-body text-center p-4">
-            <div class="mb-3">
-              <i class="bi bi-people text-success" style="font-size: 2.5rem;"></i>
-            </div>
-            <h2 class="h5 card-title">Customers</h2>
-            <p class="card-text text-muted">Manage individual customer contacts</p>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-4 mb-3">
-        <a href="/opportunities" class="nav-card card h-100 border-0 shadow-sm">
-          <div class="card-body text-center p-4">
-            <div class="mb-3">
-              <i class="bi bi-graph-up-arrow text-danger" style="font-size: 2.5rem;"></i>
-            </div>
-            <h2 class="h5 card-title">Opportunities</h2>
-            <p class="card-text text-muted">Track sales opportunities and deals</p>
-          </div>
-        </a>
-      </div>
-    </div>
-
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white">
-            <h2 class="h5 mb-0">Summary</h2>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-                <div class="stat-card card border-0 bg-light h-100">
-                  <div class="card-body text-center">
-                    <div class="display-4 text-primary mb-2">4</div>
-                    <div class="text-uppercase fw-bold small text-muted">Companies</div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-                <div class="stat-card card border-0 bg-light h-100">
-                  <div class="card-body text-center">
-                    <div class="display-4 text-success mb-2">9</div>
-                    <div class="text-uppercase fw-bold small text-muted">Contacts</div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-                <div class="stat-card card border-0 bg-light h-100">
-                  <div class="card-body text-center">
-                    <div class="display-4 text-danger mb-2">7</div>
-                    <div class="text-uppercase fw-bold small text-muted">Deals</div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3 col-sm-6">
-                <div class="stat-card card border-0 bg-light h-100">
-                  <div class="card-body text-center">
-                    <div class="display-4 text-info mb-2">$925K</div>
-                    <div class="text-uppercase fw-bold small text-muted">Pipeline</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
-              <div class="highlights-container">
-                <div class="highlight-item">
-                  <p class="h6 mb-0 fw-normal">
-                    <span class="text-primary fw-bold">4</span> companies ·
-                    <span class="text-success fw-bold">9</span> contacts ·
-                    <span class="text-danger fw-bold">7</span> deals =
-                    <span class="text-info fw-bold">$925K</span> pipeline
-                  </p>
-                </div>
-
-                <div class="highlight-item">
-                  <p class="h6 mb-0 fw-normal">
-                    <i class="fas fa-arrow-up text-success me-1"></i>
-                    <span class="fw-bold">$125K</span> added to pipeline this week
-                  </p>
-                </div>
-
-                <div class="highlight-item">
-                  <p class="h6 mb-0 fw-normal">
-                    <i class="fas fa-chart-line text-primary me-1"></i>
-                    <span class="fw-bold">3</span> deals progressed to next stage
-                  </p>
-                </div>
-
-                <div class="highlight-item">
-                  <p class="h6 mb-0 fw-normal">
-                    <i class="fas fa-percentage text-warning me-1"></i>
-                    CRIP score increased by <span class="fw-bold">12%</span> this month
-                  </p>
-                </div>
-
-                <div class="highlight-item">
-                  <p class="h6 mb-0 fw-normal">
-                    <i class="fas fa-trophy text-danger me-1"></i>
-                    <span class="fw-bold">2</span> net new logos added this quarter
-                  </p>
-                </div>
-              </div>
-
-              <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
-                <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
-                  <i class="fas fa-chevron-right"></i>
-                </button>
-              </div>
+    <main>
+      <div class="container py-4">
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="bg-white p-4 rounded shadow-sm">
+              <h1 class="h3 mb-2">Welcome to your CRM</h1>
+              <p class="text-muted">Manage your customer relationships efficiently</p>
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h2 class="h5 mb-0">Recent Activity</h2>
-            <button class="btn btn-sm btn-outline-primary">View All</button>
+        <!-- Navigation Cards -->
+        <div class="row mb-4">
+          <div class="col-md-4 mb-3">
+            <a href="/companies" class="nav-card card h-100 border-0 shadow-sm">
+              <div class="card-body text-center p-4">
+                <div class="mb-3">
+                  <i class="bi bi-building text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h2 class="h5 card-title">Companies</h2>
+                <p class="card-text text-muted">Manage all your client companies</p>
+              </div>
+            </a>
           </div>
-          <div class="card-body">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
-                <div class="bg-primary rounded-circle p-2 me-3">
-                  <i class="bi bi-person-plus text-white"></i>
+          <div class="col-md-4 mb-3">
+            <a href="/customers" class="nav-card card h-100 border-0 shadow-sm">
+              <div class="card-body text-center p-4">
+                <div class="mb-3">
+                  <i class="bi bi-people text-success" style="font-size: 2.5rem;"></i>
                 </div>
-                <div>
-                  <p class="mb-0">New contact added: <strong>John Smith</strong></p>
-                  <small class="text-muted">2 hours ago</small>
+                <h2 class="h5 card-title">Customers</h2>
+                <p class="card-text text-muted">Manage individual customer contacts</p>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-4 mb-3">
+            <a href="/opportunities" class="nav-card card h-100 border-0 shadow-sm">
+              <div class="card-body text-center p-4">
+                <div class="mb-3">
+                  <i class="bi bi-graph-up-arrow text-danger" style="font-size: 2.5rem;"></i>
                 </div>
-              </li>
-              <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
-                <div class="bg-success rounded-circle p-2 me-3">
-                  <i class="bi bi-currency-dollar text-white"></i>
+                <h2 class="h5 card-title">Opportunities</h2>
+                <p class="card-text text-muted">Track sales opportunities and deals</p>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white">
+                <h2 class="h5 mb-0">Summary</h2>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                    <div class="stat-card card border-0 bg-light h-100">
+                      <div class="card-body text-center">
+                        <div class="display-4 text-primary mb-2">4</div>
+                        <div class="text-uppercase fw-bold small text-muted">Companies</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                    <div class="stat-card card border-0 bg-light h-100">
+                      <div class="card-body text-center">
+                        <div class="display-4 text-success mb-2">9</div>
+                        <div class="text-uppercase fw-bold small text-muted">Contacts</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                    <div class="stat-card card border-0 bg-light h-100">
+                      <div class="card-body text-center">
+                        <div class="display-4 text-danger mb-2">7</div>
+                        <div class="text-uppercase fw-bold small text-muted">Deals</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-6">
+                    <div class="stat-card card border-0 bg-light h-100">
+                      <div class="card-body text-center">
+                        <div class="display-4 text-info mb-2">$925K</div>
+                        <div class="text-uppercase fw-bold small text-muted">Pipeline</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p class="mb-0">Deal closed: <strong>Acme Corp - $125,000</strong></p>
-                  <small class="text-muted">Yesterday</small>
+
+                <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
+                  <div class="highlights-container">
+                    <div class="highlight-item">
+                      <p class="h6 mb-0 fw-normal">
+                        <span class="text-primary fw-bold">4</span> companies ·
+                        <span class="text-success fw-bold">9</span> contacts ·
+                        <span class="text-danger fw-bold">7</span> deals =
+                        <span class="text-info fw-bold">$925K</span> pipeline
+                      </p>
+                    </div>
+
+                    <div class="highlight-item">
+                      <p class="h6 mb-0 fw-normal">
+                        <i class="fas fa-arrow-up text-success me-1"></i>
+                        <span class="fw-bold">$125K</span> added to pipeline this week
+                      </p>
+                    </div>
+
+                    <div class="highlight-item">
+                      <p class="h6 mb-0 fw-normal">
+                        <i class="fas fa-chart-line text-primary me-1"></i>
+                        <span class="fw-bold">3</span> deals progressed to next stage
+                      </p>
+                    </div>
+
+                    <div class="highlight-item">
+                      <p class="h6 mb-0 fw-normal">
+                        <i class="fas fa-percentage text-warning me-1"></i>
+                        CRIP score increased by <span class="fw-bold">12%</span> this month
+                      </p>
+                    </div>
+
+                    <div class="highlight-item">
+                      <p class="h6 mb-0 fw-normal">
+                        <i class="fas fa-trophy text-danger me-1"></i>
+                        <span class="fw-bold">2</span> net new logos added this quarter
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
+                    <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
+                      <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
+                      <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </div>
                 </div>
-              </li>
-              <li class="list-group-item d-flex align-items-center border-0 py-3">
-                <div class="bg-info rounded-circle p-2 me-3">
-                  <i class="bi bi-calendar-event text-white"></i>
-                </div>
-                <div>
-                  <p class="mb-0">Meeting scheduled with <strong>Tech Solutions Inc.</strong></p>
-                  <small class="text-muted">March 25, 2025</small>
-                </div>
-              </li>
-            </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Recent Activity</h2>
+                <button class="btn btn-sm btn-outline-primary">View All</button>
+              </div>
+              <div class="card-body">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
+                    <div class="bg-primary rounded-circle p-2 me-3">
+                      <i class="bi bi-person-plus text-white"></i>
+                    </div>
+                    <div>
+                      <p class="mb-0">New contact added: <strong>John Smith</strong></p>
+                      <small class="text-muted">2 hours ago</small>
+                    </div>
+                  </li>
+                  <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
+                    <div class="bg-success rounded-circle p-2 me-3">
+                      <i class="bi bi-currency-dollar text-white"></i>
+                    </div>
+                    <div>
+                      <p class="mb-0">Deal closed: <strong>Acme Corp - $125,000</strong></p>
+                      <small class="text-muted">Yesterday</small>
+                    </div>
+                  </li>
+                  <li class="list-group-item d-flex align-items-center border-0 py-3">
+                    <div class="bg-info rounded-circle p-2 me-3">
+                      <i class="bi bi-calendar-event text-white"></i>
+                    </div>
+                    <div>
+                      <p class="mb-0">Meeting scheduled with <strong>Tech Solutions Inc.</strong></p>
+                      <small class="text-muted">March 25, 2025</small>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </main>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{{ url_for('static', filename='js/pages/index.js') }}"></script>
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/pages/index.js') }}"></script>
+  </body>
 </html>

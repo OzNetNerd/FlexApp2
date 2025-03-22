@@ -5,7 +5,7 @@
   {'name': 'users', 'display_name': 'Users', 'icon': 'fa-users'}
 ] %}
 
-<nav class="navbar navbar-expand-lg shadow-sm sticky-top">
+<nav class="navbar navbar-expand-lg shadow-sm sticky-top bg-white">
   <div class="container">
     <!-- Logo and Brand -->
     <a class="navbar-brand d-flex align-items-center" href="/">
@@ -23,16 +23,16 @@
 
     <!-- Main Navigation Content -->
     <div class="collapse navbar-collapse" id="navbarContent">
-      <ul class="navbar-nav me-auto mb-lg-0">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         {% for item in nav_items %}
           {% set endpoint = item.name + '.index' %}
-          {% set is_active = request.endpoint.startswith(item.name + '.') %}
+          {% set is_active = request.endpoint and request.endpoint.startswith(item.name + '.') %}
           <li class="nav-item">
             <a class="nav-link {% if is_active %}active{% endif %}"
                href="{{ url_for(endpoint) }}"
                {% if is_active %}aria-current="page"{% endif %}>
-              <i class="fas {{ item.icon }} nav-icon"></i>
-              <span>{{ item.display_name }}</span>
+              <i class="fas {{ item.icon }} nav-icon me-1"></i>
+              {{ item.display_name }}
               {% if is_active %}<span class="visually-hidden">(current)</span>{% endif %}
             </a>
           </li>
@@ -63,12 +63,12 @@
       <!-- User Menu -->
       <div class="user-menu">
         <div class="dropdown">
-          <a class="user-dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            <div class="avatar-container">
+          <a class="user-dropdown-toggle d-flex align-items-center text-decoration-none" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="avatar-container me-2">
               {% if current_user.is_authenticated %}
                 <img src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=random" alt="User avatar" class="user-avatar">
               {% else %}
-                <i class="fas fa-user-circle"></i>
+                <i class="fas fa-user-circle fs-4"></i>
               {% endif %}
             </div>
             <div class="user-info d-none d-md-block">
