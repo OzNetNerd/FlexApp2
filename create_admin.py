@@ -9,20 +9,25 @@ def create_admin_user():
 
     with app.app_context():
         # Admin user properties
-        admin_email = "admin@admin.com"
+        admin_username = "admin"
+        admin_email = "admin@example.com"
         admin_data = {
-            "username": "admin",
+            "username": admin_username,
             "name": "Administrator",
             "password_hash": generate_password_hash("password"),  # Change this!
             "is_admin": True
         }
 
-        existing = User.query.filter_by(email=admin_email).first()
+        # Check for existing admin by username OR email
+        existing = User.query.filter(
+            (User.username == admin_username) | (User.email == admin_email)
+        ).first()
 
         if existing:
             # Update existing admin user
             for key, value in admin_data.items():
                 setattr(existing, key, value)
+            existing.email = admin_email  # Ensure email is updated too
             db.session.commit()
             print("✅ Admin user updated.")
         else:

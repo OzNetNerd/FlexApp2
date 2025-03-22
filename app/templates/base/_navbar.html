@@ -1,12 +1,21 @@
 {% set nav_items = [
-  {'name': 'Companies'},
-  {'name': 'Contacts'},
-  {'name': 'Opportunities'},
-  {'name': 'Users'}
+  {'name': 'Companies', 'icon': 'fa-building'},
+  {'name': 'Contacts', 'icon': 'fa-address-card'},
+  {'name': 'Opportunities', 'icon': 'fa-chart-line'},
+  {'name': 'Users', 'icon': 'fa-users'}
 ] %}
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container-fluid">
+<nav class="navbar navbar-expand-lg shadow-sm sticky-top">
+  <div class="container">
+    <!-- Logo and Brand -->
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <div class="brand-icon-container me-2">
+        <i class="fas fa-building"></i>
+      </div>
+      <span class="fw-bold">CRM Dashboard</span>
+    </a>
+
+    <!-- Mobile Toggle Button -->
     <button
       class="navbar-toggler"
       type="button"
@@ -16,24 +25,325 @@
       aria-expanded="false"
       aria-label="Toggle navigation"
     >
-      <span class="navbar-toggler-icon"></span>
+      <i class="fas fa-bars"></i>
     </button>
+
+    <!-- Main Navigation Content -->
     <div class="collapse navbar-collapse" id="navbarContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav me-auto mb-lg-0">
         {% for item in nav_items %}
           {% set endpoint = item.name.lower() + '.index' %}
-          {% set is_active = request.endpoint == endpoint %}
+          {% set is_active = request.endpoint.startswith(item.name.lower() + '.') %}
           <li class="nav-item">
-            <a class="nav-link {% if is_active %}active-link{% else %}hover-effect{% endif %}"
+            <a class="nav-link {% if is_active %}active{% endif %}"
                href="{{ url_for(endpoint) }}"
                {% if is_active %}aria-current="page"{% endif %}>
-              {{ item.name }}
+              <i class="fas {{ item.icon }} nav-icon"></i>
+              <span>{{ item.name }}</span>
+              {% if is_active %}<span class="visually-hidden">(current)</span>{% endif %}
             </a>
           </li>
         {% endfor %}
 
         {% block additional_nav_items %}{% endblock %}
       </ul>
+
+      <!-- Search Bar -->
+      <div class="d-none d-md-flex search-container me-3">
+        <div class="input-group">
+          <span class="input-group-text border-0 bg-transparent">
+            <i class="fas fa-search"></i>
+          </span>
+          <input type="search" class="form-control border-0 shadow-none" placeholder="Search..." aria-label="Search">
+        </div>
+      </div>
+
+      <!-- Notification Icon -->
+      <div class="notification-icon me-3 d-none d-md-block">
+        <a href="#" class="position-relative">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge position-absolute translate-middle p-1 rounded-circle">
+            <span class="visually-hidden">New notifications</span>
+          </span>
+        </a>
+      </div>
+
+      <!-- User Menu -->
+      <div class="user-menu">
+        <div class="dropdown">
+          <a class="user-dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="avatar-container">
+              {% if current_user.is_authenticated %}
+                <img src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=random" alt="User avatar" class="user-avatar">
+              {% else %}
+                <i class="fas fa-user-circle"></i>
+              {% endif %}
+            </div>
+            <div class="user-info d-none d-md-block">
+              <span class="user-name">
+                {% if current_user.is_authenticated %}
+                  {{ current_user.name }}
+                {% else %}
+                  Account
+                {% endif %}
+              </span>
+              <i class="fas fa-chevron-down ms-1 small"></i>
+            </div>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="userDropdown">
+            {% if current_user.is_authenticated %}
+              <li class="dropdown-user-details d-md-none">
+                <div class="d-flex align-items-center p-3">
+                  <div class="avatar-container me-3">
+                    <img src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=random" alt="User avatar" class="user-avatar">
+                  </div>
+                  <div>
+                    <div class="fw-bold">{{ current_user.name }}</div>
+                    <div class="text-muted small">{{ current_user.email }}</div>
+                  </div>
+                </div>
+                <hr class="dropdown-divider m-0">
+              </li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Settings</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i> Help Center</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item logout-item" href="{{ url_for('auth_bp.logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+            {% else %}
+              <li><a class="dropdown-item" href="{{ url_for('auth_bp.login') }}"><i class="fas fa-sign-in-alt me-2"></i> Login</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus me-2"></i> Register</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
+
+<style>
+/* Navbar Base Styles */
+.navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0.75rem 0;
+  transition: all 0.3s ease;
+}
+
+/* Brand Styles */
+.navbar-brand {
+  font-size: 1.3rem;
+  color: #2d3748;
+}
+
+.brand-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #4f46e5, #7e5bef);
+  border-radius: 12px;
+  color: white;
+  font-size: 1.1rem;
+}
+
+/* Nav Item Styles */
+.navbar-nav {
+  margin-left: 1.5rem;
+}
+
+.nav-item {
+  position: relative;
+  margin: 0 0.2rem;
+}
+
+.nav-link {
+  color: #6b7280;
+  font-weight: 500;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link:hover {
+  color: #4f46e5;
+  background-color: rgba(79, 70, 229, 0.06);
+}
+
+.nav-link.active {
+  color: #4f46e5;
+  background-color: rgba(79, 70, 229, 0.1);
+  font-weight: 600;
+}
+
+.nav-icon {
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+  width: 20px;
+  text-align: center;
+}
+
+/* Search Container */
+.search-container {
+  background-color: #f3f4f6;
+  border-radius: 100px;
+  padding: 0 0.75rem;
+  max-width: 250px;
+}
+
+.search-container .form-control {
+  background-color: transparent;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.25rem;
+}
+
+.search-container .input-group-text {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+/* Notification Icon */
+.notification-icon a {
+  color: #6b7280;
+  font-size: 1.2rem;
+  transition: color 0.2s ease;
+}
+
+.notification-icon a:hover {
+  color: #4f46e5;
+}
+
+.notification-badge {
+  background-color: #ef4444;
+  height: 8px;
+  width: 8px;
+  top: 12%;
+  right: -2px;
+  border: 2px solid white;
+}
+
+/* User Menu */
+.user-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #2d3748;
+  padding: 0.3rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.user-dropdown-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.avatar-container {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  color: #6b7280;
+  font-size: 1.5rem;
+}
+
+.user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  margin-left: 0.6rem;
+  display: flex;
+  align-items: center;
+}
+
+.user-name {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Dropdown Styles */
+.custom-dropdown {
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 0.5rem 0;
+  min-width: 220px;
+}
+
+.dropdown-item {
+  padding: 0.6rem 1.2rem;
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(79, 70, 229, 0.06);
+  color: #4f46e5;
+}
+
+.dropdown-item i {
+  width: 20px;
+  color: #6b7280;
+}
+
+.dropdown-item:hover i {
+  color: #4f46e5;
+}
+
+.logout-item {
+  color: #ef4444;
+}
+
+.logout-item:hover {
+  background-color: rgba(239, 68, 68, 0.06);
+  color: #ef4444;
+}
+
+.logout-item i {
+  color: #ef4444;
+}
+
+/* Mobile Styles */
+.navbar-toggler {
+  border: none;
+  padding: 0.6rem;
+  color: #4b5563;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+}
+
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: 0.5rem 1rem;
+    z-index: 1000;
+  }
+
+  .nav-link {
+    padding: 0.8rem 1rem;
+  }
+
+  .nav-item {
+    margin: 0.2rem 0;
+  }
+}
+</style>
