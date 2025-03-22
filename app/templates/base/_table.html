@@ -1,45 +1,71 @@
 {% block content %}
-<div class="card">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h3>{{ title }}</h3>
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <h3 class="h5 mb-0">{{ title }}</h3>
     <div>
       {% block table_actions %}
       <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}" class="btn btn-success">
-        <i class="fas fa-plus"></i> Add {{ entity_name|default('item') }}
+        <i class="fas fa-plus me-2"></i> Add {{ entity_name|default('item') }}
       </a>
       {% endblock %}
     </div>
   </div>
   <div class="card-body">
 
-    <!-- 🔍 Column Dropdown and Search Input: Same Row -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
       <!-- 📋 Column Selector Dropdown -->
       <div class="dropdown">
-        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-          Columns
+        <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <i class="fas fa-table me-2"></i> Columns
         </button>
-        <ul class="dropdown-menu p-3" style="min-width: 250px;" id="columnSelector">
-          <li class="mb-2">
-            <button class="btn btn-sm btn-outline-primary me-2" id="selectAllColumns">Select All</button>
-            <button class="btn btn-sm btn-outline-danger" id="clearAllColumns">Clear All</button>
+        <ul class="dropdown-menu" style="min-width: 280px;" id="columnSelector">
+          <li class="px-3 py-2">
+            <div class="d-flex align-items-center">
+              <button class="btn btn-sm btn-outline-primary me-2" id="selectAllColumns">Select All</button>
+              <button class="btn btn-sm btn-outline-danger" id="clearAllColumns">Clear</button>
+            </div>
           </li>
           <li><hr class="dropdown-divider" /></li>
-          <!-- JS will populate column checkboxes here -->
+          <li class="px-2">
+            <div class="column-list py-1">
+              <!-- Sample checkbox items (JS will populate these) -->
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="col-created" checked>
+                <label class="form-check-label" for="col-created">Created At</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="col-description" checked>
+                <label class="form-check-label" for="col-description">Description</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="col-id" checked>
+                <label class="form-check-label" for="col-id">Id</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="col-name" checked>
+                <label class="form-check-label" for="col-name">Name</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="col-updated">
+                <label class="form-check-label" for="col-updated">Updated At</label>
+              </div>
+            </div>
+          </li>
         </ul>
       </div>
 
       <!-- 🔍 Search Input -->
       <div class="input-group w-25">
-        <span class="input-group-text" id="search-label">Search</span>
-        <input type="text" class="form-control" id="globalSearch" placeholder="Type to search..." aria-label="Search" aria-describedby="search-label">
+        <span class="input-group-text">
+          <i class="fas fa-search"></i>
+        </span>
+        <input type="text" class="form-control" id="globalSearch" placeholder="Search..." aria-label="Search">
       </div>
     </div>
 
     <!-- AG Grid Table Container -->
-    <div id="table-container" class="ag-theme-alpine w-100" data-api-url="{{ data_url }}" style="min-height: 400px;"></div>
-
+    <div id="table-container" class="ag-theme-alpine w-100" data-api-url="{{ data_url }}" style="min-height: 420px;"></div>
 
   </div>
 </div>
