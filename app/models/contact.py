@@ -95,3 +95,7 @@ class Contact(db.Model, BaseModel):
             return None
 
         return round(sum(all_scores) / len(all_scores), 2)
+
+    def get_relationship_with(self, user):
+        """Returns the relationship between this contact and a given user, or None."""
+        return next((rel for rel in self.relationships if rel.user_id == user.id), None)

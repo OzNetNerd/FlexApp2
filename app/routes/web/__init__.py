@@ -3,12 +3,17 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 # Create blueprints for web UI
 main_bp = Blueprint('main', __name__)
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 companies_bp = Blueprint('companies', __name__, url_prefix='/companies')
 contacts_bp = Blueprint('contacts', __name__, url_prefix='/contacts')
 opportunities_bp = Blueprint('opportunities', __name__, url_prefix='/opportunities')
+relationships_bp = Blueprint('relationships_bp', __name__, url_prefix='/relationships')
+crisp_scores_bp = Blueprint('crisp_scores_bp', __name__, url_prefix='/crisp-scores')
+
+
 
 # Import route definitions to register with blueprints
 from routes.web.main import main_bp
@@ -16,7 +21,8 @@ from routes.web.users import users_bp
 from routes.web.companies import companies_bp
 from routes.web.contacts import contacts_bp
 from routes.web.opportunities import opportunities_bp
-
+from routes.web.relationship import relationships_bp
+from routes.web.crisp_score import crisp_scores_bp
 
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""
