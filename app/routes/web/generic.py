@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional, List, Type
-from flask import request, redirect, url_for, flash, Blueprint, json
-from flask_login import current_user
+from flask import request, redirect, url_for, flash, Blueprint
+from flask_login import current_user, login_required
 import logging
 import traceback
 
@@ -60,12 +60,14 @@ class GenericWebRoutes(CRUDRoutesBase):
         return form_handler
 
     def _register_routes(self):
-        self.blueprint.add_url_rule('/', 'index', self._index_route, methods=['GET'])
-        self.blueprint.add_url_rule('/<int:item_id>', 'view', self._view_route, methods=['GET'])
-        self.blueprint.add_url_rule('/create', 'create', self._create_route, methods=['GET', 'POST'])
-        self.blueprint.add_url_rule('/<int:item_id>/edit', 'edit', self._edit_route, methods=['GET', 'POST'])
-        self.blueprint.add_url_rule('/<int:item_id>/delete', 'delete', self._delete_route, methods=['POST'])
-        self.blueprint.add_url_rule('/data', 'data', self._data_route, methods=['GET'])
+        self.blueprint.add_url_rule('/', 'index', login_required(self._index_route), methods=['GET'])
+        self.blueprint.add_url_rule('/<int:item_id>', 'view', login_required(self._view_route), methods=['GET'])
+        self.blueprint.add_url_rule('/create', 'create', login_required(self._create_route), methods=['GET', 'POST'])
+        self.blueprint.add_url_rule('/<int:item_id>/edit', 'edit', login_required(self._edit_route),
+                                    methods=['GET', 'POST'])
+        self.blueprint.add_url_rule('/<int:item_id>/delete', 'delete', login_required(self._delete_route),
+                                    methods=['POST'])
+        self.blueprint.add_url_rule('/data', 'data', login_required(self._data_route), methods=['GET'])
 
     def _get_template_context(self, **kwargs):
         context = kwargs.get("context", {})

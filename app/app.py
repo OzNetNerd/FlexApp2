@@ -1,7 +1,7 @@
 import os
 import logging
 from datetime import datetime
-from flask import Flask, request, redirect, url_for, session as flask_session, jsonify
+from flask import Flask, request, redirect, url_for, session as flask_session, jsonify, make_response
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
 from flask_session import Session
@@ -17,6 +17,11 @@ logger = logging.getLogger(__name__)
 login_manager = LoginManager()
 migrate = Migrate()
 session = Session()
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    return make_response("🔒 Unauthorized - Please log in first", 401)
 
 
 def configure_logging():
