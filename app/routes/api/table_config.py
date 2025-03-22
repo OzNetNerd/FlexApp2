@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from routes.api import api_table_config_bp
-from models.table_config import TableConfig
+from app.models.table_config import TableConfig
 import logging
 
 logger = logging.getLogger(__name__)

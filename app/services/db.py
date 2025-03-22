@@ -2,6 +2,7 @@ from flask import Flask, current_app
 import json
 import os
 import logging
+from werkzeug.security import generate_password_hash
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ def init_db(app: Flask):
 def _create_default_table_configs(db):
     """Create default table configurations."""
     # Import here to avoid circular imports
-    from models.table_config import TableConfig
+    from app.models.table_config import TableConfig
 
     logger.debug("Creating default table configurations.")
     # Your table config code here (commented out in your original)
@@ -48,25 +49,23 @@ def _create_default_table_configs(db):
 
 def _create_sample_data(db):
     """Create sample data for development environment."""
-    # Import models here to avoid circular imports
-    from models.user import User
-    from models.company import Company
-    from models.contact import Contact
-    from models.opportunity import Opportunity
+    from app.models.user import User
+    from app.models.company import Company
+    from app.models.contact import Contact
+    from app.models.opportunity import Opportunity
 
     logger.debug("Creating sample data for development environment.")
     if User.query.count() == 0:
         logger.debug("Creating sample users...")
-        # Create sample users
+        password = generate_password_hash("password123")
         users = [
-            User(username='john', name='John Doe', email='john@example.com'),
-            User(username='jane', name='Jane Smith', email='jane@example.com')
+            User(username='john', name='John Doe', email='john@example.com', password_hash=password),
+            User(username='jane', name='Jane Smith', email='jane@example.com', password_hash=password)
         ]
         db.session.add_all(users)
         db.session.commit()
 
         logger.debug("Creating sample companies...")
-        # Create sample companies
         companies = [
             Company(name='Acme Inc', description='Technology company'),
             Company(name='Beta Corp', description='Manufacturing company')
@@ -75,17 +74,14 @@ def _create_sample_data(db):
         db.session.commit()
 
         logger.debug("Creating sample contacts...")
-        # Create sample contacts
         contacts = [
             Contact(id=1, first_name='Test', last_name='User'),
             Contact(id=2, first_name='Test2', last_name='User2')
         ]
-
         db.session.add_all(contacts)
         db.session.commit()
 
         logger.debug("Creating sample opportunities...")
-        # Create sample opportunities
         opportunities = [
             Opportunity(name='New Website', description='Build a new website', status='New',
                         stage='Prospecting', value=10000, company_id=1),

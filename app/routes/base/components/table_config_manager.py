@@ -15,7 +15,7 @@ class TableConfigManager:
     def get_table_config(self, table_name):
         """Retrieve and validate table configuration."""
         try:
-            from models.table_config import TableConfig
+            from app.models.table_config import TableConfig
             table_config = TableConfig.get_config(table_name)
             logger.debug(f"Retrieved table config for {table_name}")
 
