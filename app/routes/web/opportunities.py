@@ -41,9 +41,6 @@ opportunity_routes = OpportunityCRUDRoutes(
     model=Opportunity,
     service=CRUDService(),
     index_template='opportunities.html',
-    create_template='opportunities/create.html',
-    edit_template='opportunities/edit.html',
-    view_template='base/base-view.html',
     required_fields=['name'],
     unique_fields=[]
 )

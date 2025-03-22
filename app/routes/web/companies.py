@@ -14,7 +14,4 @@ company_routes = CompanyCRUDRoutes(
     required_fields=['name'],
     unique_fields=['name'],  # ✅ Prevent duplicates
     index_template='companies.html',
-    view_template='base/base-view.html',
-    create_template='companies/create.html',
-    edit_template='companies/edit.html',
 )

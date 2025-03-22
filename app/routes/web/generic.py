@@ -17,7 +17,7 @@ from models import Company
 
 logger = logging.getLogger(__name__)
 
-GENERIC_TEMPLATE = 'base-page.html'
+GENERIC_TEMPLATE = 'page.html'
 
 
 @dataclass
@@ -44,8 +44,8 @@ class GenericWebRoutes(CRUDRoutesBase):
         """
         super().__post_init__()
 
-        prefix = self.blueprint.name.replace('_bp', '')
-        template_file_path = f"{prefix}/create_view_edit.html"
+        # prefix = self.blueprint.name.replace('_bp', '')
+        template_file_path = f"base/create_view_edit.html"
 
         if not self.create_template:
             self.create_template = template_file_path
