@@ -28,6 +28,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
         Initialize and register API routes.
         """
         super().__post_init__()
+        self.service = CRUDService(model_class=self.model)  # ✅ FIXED HERE
         self._register_routes()
         logger.debug(f"API routes registered for {self.model.__name__} model.")
 
@@ -105,7 +106,6 @@ class GenericAPIRoutes(CRUDRoutesBase):
 
             # Get items using service layer
             items = self.service.get_all(
-                self.model,
                 page=page,
                 per_page=per_page,
                 sort_column=sort_column,

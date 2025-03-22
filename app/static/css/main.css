@@ -1,5 +1,7 @@
 @import url("navbar.css");
 
+html { overflow-y: scroll; }
+
 body {
   font-family: 'Poppins', sans-serif;
   font-size: 0.93rem;

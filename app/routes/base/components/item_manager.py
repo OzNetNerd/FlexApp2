@@ -30,7 +30,7 @@ class ItemManager:
         """Create a new item from form data."""
         try:
             logger.debug(f"Creating new {self.model.__name__} with data: {list(form_data.keys())}")
-            item = self.service.create(self.model, form_data)
+            item = self.service.create(form_data)
             logger.info(f"{self.model.__name__} created successfully with id {item.id}")
             flash(f'{self.model.__name__} created successfully', 'success')
             return redirect(url_for(f'{self.blueprint_name}.index')), None

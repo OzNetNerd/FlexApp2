@@ -68,12 +68,11 @@ class DataRouteHandler:
 
             # Get data using service layer
             items = self.service.get_all(
-                self.model,
                 page=page,
-                per_page=page_size,
+                per_page=page_size,  # ✅ use per_page to match the method signature
                 sort_column=sort_column,
                 sort_direction=sort_direction,
-                filters=filter_model
+                filters=dict()
             )
 
             logger.debug(f"Found {len(items.items)} items out of {items.total} total")

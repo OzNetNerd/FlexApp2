@@ -1,4 +1,3 @@
-import os
 import logging
 from datetime import datetime
 from flask import Flask, request, redirect, url_for, session as flask_session, jsonify, make_response
@@ -10,6 +9,7 @@ from app.routes.web import register_web_blueprints  # ✅ Corrected import
 from app.routes.base.components.template_renderer import render_safely
 from app.models.base import db
 from app.models.user import User
+from flask import current_app
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,9 @@ def create_app(config_class=Config):
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        with current_app.app_context():
+            user = db.session.get(User, int(user_id))
+            return user
 
     @app.before_request
     def require_login():
