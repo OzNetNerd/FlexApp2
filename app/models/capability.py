@@ -1,5 +1,5 @@
-from models.base import db, BaseModel
-from models.company_capability import CompanyCapability
+from app.models.base import db, BaseModel
+from app.models.company_capability import CompanyCapability
 
 class Capability(db.Model, BaseModel):
     __tablename__ = 'capabilities'

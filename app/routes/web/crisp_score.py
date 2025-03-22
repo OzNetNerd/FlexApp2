@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, flash, url_for
 from flask_login import login_required
-from models import db, CRISPScore, Relationship
+from app.models import db, CRISPScore, Relationship
 
 crisp_scores_bp = Blueprint("crisp_scores", __name__)
 

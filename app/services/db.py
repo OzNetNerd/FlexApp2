@@ -9,9 +9,7 @@ logger = logging.getLogger(__name__)
 def init_db(app: Flask):
     """Initialize the database and create default data if needed."""
     # Import here to avoid circular imports
-    from models.base import db
-
-    db.init_app(app)
+    from app.models.base import db
 
     with app.app_context():
         # Log the database URI for debugging

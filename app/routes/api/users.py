@@ -1,4 +1,4 @@
-from models import User
+from app.models import User
 from routes.api import api_users_bp
 from routes.api.generic import GenericAPIRoutes
 from services.crud_service import CRUDService

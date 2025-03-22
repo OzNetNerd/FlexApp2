@@ -11,3 +11,4 @@ markupsafe==2.1.3
 blinker==1.6.3
 typing-extensions==4.8.0
 flask-login
+Flask-Migrate

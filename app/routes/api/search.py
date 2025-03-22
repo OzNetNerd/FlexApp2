@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models import User, Company, Opportunity
+from app.models import User, Company, Opportunity
 from services.mention import search_mentions
 import logging
 

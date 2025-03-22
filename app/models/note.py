@@ -1,4 +1,4 @@
-from models.base import db, BaseModel
+from app.models.base import db, BaseModel
 import logging
 
 logger = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ class Note(db.Model, BaseModel):
     @property
     def notable(self):
         """Return the related object based on notable_type and notable_id."""
-        from models import Company, Contact, Opportunity  # Lazy import avoids circular
+        from app.models import Company, Contact, Opportunity  # Lazy import avoids circular
         mapping = {
             'Company': Company,
             'Contact': Contact,

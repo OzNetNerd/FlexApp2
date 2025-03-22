@@ -1,7 +1,7 @@
-from models import db
-from models.company import Company
-from models.capability import Capability
-from models.company_capability import CompanyCapability
+from app.models import db
+from app.models.company import Company
+from app.models.capability import Capability
+from app.models.company_capability import CompanyCapability
 import logging
 
 logger = logging.getLogger(__name__)

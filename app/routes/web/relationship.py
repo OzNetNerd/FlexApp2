@@ -1,5 +1,5 @@
 import logging
-from models import Relationship
+from app.models import Relationship
 from routes.web import relationships_bp
 from routes.web.generic import GenericWebRoutes
 

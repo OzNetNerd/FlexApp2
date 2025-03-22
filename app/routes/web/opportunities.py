@@ -1,4 +1,4 @@
-from models import Opportunity, Company, db
+from app.models import Opportunity, Company, db
 from routes.web import opportunities_bp
 from routes.web.generic import GenericWebRoutes
 from services.crud_service import CRUDService

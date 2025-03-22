@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, List
 from flask_login import current_user
-from models import User
+from app.models import User
 
 logger = logging.getLogger(__name__)
 

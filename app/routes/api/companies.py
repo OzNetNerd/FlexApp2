@@ -1,4 +1,4 @@
-from models import Company
+from app.models import Company
 from routes.api import api_companies_bp
 from routes.api.generic import GenericAPIRoutes
 from services.crud_service import CRUDService

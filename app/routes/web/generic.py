@@ -13,7 +13,7 @@ from routes.base.components.table_config_manager import TableConfigManager
 from routes.base.components.data_route_handler import DataRouteHandler
 from routes.base.components.form_handler import FormHandler
 from routes.base.components.item_manager import ItemManager
-from models import Company, CRISPScore, Note
+from app.models import Company, CRISPScore, Note
 
 logger = logging.getLogger(__name__)
 

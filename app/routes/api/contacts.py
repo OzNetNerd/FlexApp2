@@ -1,4 +1,4 @@
-from models import Contact
+from app.models import Contact
 from routes.api import api_contacts_bp
 from routes.api.generic import GenericAPIRoutes
 from services.crud_service import CRUDService

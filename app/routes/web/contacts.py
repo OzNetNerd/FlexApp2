@@ -1,5 +1,5 @@
 import re
-from models import Contact, Company, db
+from app.models import Contact, Company, db
 from routes.web import contacts_bp
 from routes.web.generic import GenericWebRoutes
 import logging
@@ -13,7 +13,7 @@ class ContactCRUDRoutes(GenericWebRoutes):
     Custom CRUD routes for Contacts model that extends the generic implementation
     """
     def add_view_context(self, item, context):
-        from models import Relationship
+        from app.models import Relationship
 
         # Add the current user's relationship (if any)
         user = current_user  # however you're managing session auth

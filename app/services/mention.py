@@ -1,5 +1,5 @@
 import re
-from models import User, Company
+from app.models import User, Company
 from flask import current_app
 import logging
 

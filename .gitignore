@@ -1,2 +1,3 @@
-.idea/
-*.db
+*pycache*
+node*
+app/package.json

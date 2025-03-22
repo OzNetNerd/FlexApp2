@@ -1,4 +1,4 @@
-from models.base import db, BaseModel
+from app.models.base import db, BaseModel
 
 class CapabilityCategory(db.Model, BaseModel):
     __tablename__ = 'capability_categories'

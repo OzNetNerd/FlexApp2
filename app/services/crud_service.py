@@ -2,7 +2,7 @@
 # Contains shared validation logic
 
 from typing import List, Dict, Any, Type, Optional
-from models.base import db
+from app.models.base import db
 import logging
 import traceback
 

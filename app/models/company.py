@@ -1,6 +1,6 @@
-from models.base import db, BaseModel
+from app.models.base import db, BaseModel
 from sqlalchemy.orm import foreign
-from models.note import Note
+from app.models.note import Note
 import logging
 
 logger = logging.getLogger(__name__)

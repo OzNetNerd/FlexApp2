@@ -1,5 +1,5 @@
 import json
-from models.base import db, BaseModel
+from app.models.base import db, BaseModel
 import logging
 
 logger = logging.getLogger(__name__)

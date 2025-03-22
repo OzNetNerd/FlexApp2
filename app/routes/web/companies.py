@@ -1,5 +1,5 @@
 import logging
-from models import Company
+from app.models import Company
 from routes.web import companies_bp
 from routes.web.generic import GenericWebRoutes
 
