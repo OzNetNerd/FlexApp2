@@ -12,55 +12,6 @@ class OpportunityCRUDRoutes(GenericWebRoutes):
     """
     Custom CRUD routes for Opportunity model.
     """
-
-    def _build_fields(self, item=None):
-        logger.debug("Building fields for opportunity form")
-        fields = [
-            {
-                'name': 'name',
-                'label': 'Name',
-                'type': 'text',
-                'value': getattr(item, 'name', '') if item else '',
-                'required': True,
-                'section': 'Basic Info'
-            },
-            {
-                'name': 'description',
-                'label': 'Description',
-                'type': 'textarea',
-                'value': getattr(item, 'description', '') if item else '',
-                'section': 'Details'
-            },
-            {
-                'name': 'value',
-                'label': 'Value',
-                'type': 'number',
-                'value': getattr(item, 'value', '') if item else '',
-                'section': 'Details'
-            },
-            {
-                'name': 'status',
-                'label': 'Status',
-                'type': 'select',
-                'value': getattr(item, 'status', '') if item else '',
-                'options': [
-                    {'value': 'new', 'label': 'New'},
-                    {'value': 'qualified', 'label': 'Qualified'},
-                    {'value': 'won', 'label': 'Won'},
-                    {'value': 'lost', 'label': 'Lost'}
-                ],
-                'section': 'Details'
-            },
-            {
-                'name': 'company_name',
-                'label': 'Company',
-                'type': 'text',
-                'value': item.company.name if item and item.company else '',
-                'section': 'Company Info'
-            }
-        ]
-        return fields
-
     def _preprocess_form_data(self, form_data):
         company_name = form_data.get('company_name', '').strip()
         if company_name:

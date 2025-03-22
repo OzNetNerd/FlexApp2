@@ -1,6 +1,5 @@
 import logging
 from typing import Dict, List
-from flask import url_for
 
 logger = logging.getLogger(__name__)
 

@@ -69,8 +69,6 @@ class GenericWebRoutes(CRUDRoutesBase):
     def _create_form_handler(self):
         """Create and initialize form handler with model-specific logic."""
         form_handler = FormHandler(self.model, self.service, self.json_validator)
-        # Override methods with our implementations
-        form_handler.build_fields = self._build_fields
         form_handler.validate_create = self._validate_create
         form_handler.validate_edit = self._validate_edit
         return form_handler
@@ -363,16 +361,14 @@ class GenericWebRoutes(CRUDRoutesBase):
             fields = self.json_validator.ensure_json_serializable(fields)
 
             context = self.form_handler.prepare_form_context(
-                title=f"Edit {self.model.__name__}",
-                submit_url=url_for(f'{self.blueprint.name}.edit', item_id=item.id),
-                cancel_url=url_for(f'{self.blueprint.name}.view', item_id=item.id),
-                edit_url=url_for(f'{self.blueprint.name}.edit', item_id=item.id),
+                title=f"Create {self.model.__name__}",
+                submit_url=url_for(f'{self.blueprint.name}.create'),
+                cancel_url=url_for(f'{self.blueprint.name}.index'),
                 fields=fields,
-                button_text=f"Update {self.model.__name__}",
-                item=item,
-                read_only=False  # Set to True if rendering for view only
+                button_text=f"Create {self.model.__name__}",
+                read_only=False
             )
-
+            
             return render_safely(
                 self.edit_template or self.index_template,
                 context,
@@ -391,11 +387,6 @@ class GenericWebRoutes(CRUDRoutesBase):
 
     # These methods need to be implemented in the main class
     # as they're specific to the model and will be passed to the form handler
-
-    def _build_fields(self, item=None):
-        """Build form fields based on model properties."""
-        # This should be implemented by subclasses
-        raise NotImplementedError("Subclasses must implement _build_fields method")
 
     def _validate_create(self, form_data):
         """Validate form data for create operation."""

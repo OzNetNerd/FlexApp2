@@ -87,14 +87,6 @@ class CRUDRoutesBase:
 
         return errors
 
-    def _build_fields(self, item=None):
-        """
-        Build form fields based on model structure.
-        Must be implemented by subclasses.
-        """
-        logger.debug(f"Base _build_fields called for {self.model.__name__}")
-        return []
-
     def _validate_json_serializable(self, data: Dict[str, Any], path: str = '') -> List[str]:
         """
         Validate if a dictionary is fully JSON serializable and log any issues.

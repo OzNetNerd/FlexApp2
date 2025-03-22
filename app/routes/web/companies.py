@@ -6,26 +6,7 @@ from routes.web.generic import GenericWebRoutes
 logger = logging.getLogger(__name__)
 
 class CompanyCRUDRoutes(GenericWebRoutes):
-    def _build_fields(self, item=None):
-        logger.debug("Building fields for company form")
-        return [
-            {
-                'name': 'name',
-                'label': 'Company Name',
-                'type': 'text',
-                'value': getattr(item, 'name', '') if item else '',
-                'required': True,
-                'section': 'Basic Info'
-            },
-            {
-                'name': 'description',
-                'label': 'Description',
-                'type': 'textarea',
-                'value': getattr(item, 'description', '') if item else '',
-                'required': False,
-                'section': 'Basic Info'
-            }
-        ]
+    pass
 
 company_routes = CompanyCRUDRoutes(
     blueprint=companies_bp,
