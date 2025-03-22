@@ -69,6 +69,11 @@ class GenericWebRoutes(CRUDRoutesBase):
     def _create_form_handler(self):
         """Create and initialize form handler with model-specific logic."""
         form_handler = FormHandler(self.model, self.service, self.json_validator)
+
+        # Safely override only if method exists
+        if hasattr(self, '_build_fields'):
+            form_handler.build_fields = self._build_fields
+
         form_handler.validate_create = self._validate_create
         form_handler.validate_edit = self._validate_edit
         return form_handler
@@ -215,16 +220,24 @@ class GenericWebRoutes(CRUDRoutesBase):
         """Render view page for a single item."""
         self.request_logger.log_request_info(self.model.__name__, 'view', item_id)
 
-        # Get the item
         item, error = self.item_manager.get_item_by_id(item_id)
         if error:
             flash(error, 'error')
             return redirect(url_for(f'{self.blueprint.name}.index'))
 
-        # Prepare template context
-        context = self._prepare_view_context(item)
+        fields = self.form_handler.build_fields(item)
 
-        # Render template
+        context = self.form_handler.prepare_form_context(
+            title=f"View {self.model.__name__}",
+            submit_url="",
+            cancel_url=url_for(f'{self.blueprint.name}.index'),
+            fields=fields,
+            item=item,
+            read_only=True
+        )
+
+        context.update(self._get_template_context(context=context))
+
         return render_safely(
             self.view_template,
             context,
@@ -368,7 +381,7 @@ class GenericWebRoutes(CRUDRoutesBase):
                 button_text=f"Create {self.model.__name__}",
                 read_only=False
             )
-            
+
             return render_safely(
                 self.edit_template or self.index_template,
                 context,
