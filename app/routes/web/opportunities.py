@@ -39,7 +39,6 @@ class OpportunityCRUDRoutes(GenericWebRoutes):
 opportunity_routes = OpportunityCRUDRoutes(
     blueprint=opportunities_bp,
     model=Opportunity,
-    service=CRUDService(Opportunity),
     index_template='opportunities.html',
     required_fields=['name'],
     unique_fields=[]
