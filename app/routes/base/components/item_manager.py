@@ -17,7 +17,7 @@ class ItemManager:
     def get_item_by_id(self, item_id) -> Tuple[Optional[Any], Optional[str]]:
         """Fetch an item by ID with error handling."""
         try:
-            item = self.service.get_by_id(self.model, item_id)
+            item = self.service.get_by_id(item_id)
             logger.debug(f"Item found with id {item_id}")
             return item, None
         except Exception as e:
