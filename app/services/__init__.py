@@ -10,7 +10,7 @@ logger.debug("Initializing services module.")
 def init_db(app):
     """Initialize the database with the Flask app"""
     # Import here to avoid circular imports
-    from .db import init_db as setup_db
+    from create_db import init_db as setup_db
 
     # Call the actual setup function
     setup_db(app)
