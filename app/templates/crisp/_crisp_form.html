@@ -1,0 +1,18 @@
+<form method="POST" action="{{ url_for('crisp_scores.submit', relationship_id=relationship.id) }}">
+    <div class="row">
+      {% for field in ['credibility', 'reliability', 'intimacy', 'self_orientation'] %}
+      <div class="col-md-3 mb-3">
+        <label for="{{ field }}" class="form-label text-capitalize">{{ field.replace('_', ' ') }}</label>
+        <input type="number"
+               class="form-control"
+               name="{{ field }}"
+               id="{{ field }}"
+               min="1"
+               max="10"
+               step="1"
+               required>
+      </div>
+      {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-success mt-2">Submit CRISP Score</button>
+  </form>

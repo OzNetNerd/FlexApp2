@@ -7,13 +7,11 @@ class CRISPScore(db.Model, BaseModel):
     __tablename__ = 'crisp_scores'
 
     relationship_id = db.Column(db.Integer, db.ForeignKey('relationships.id'), nullable=False)
-    relationship = db.relationship('Relationship', back_populates='crisp_scores')
-
-    c_score = db.Column(db.Integer, nullable=False)  # Credibility
-    r_score = db.Column(db.Integer, nullable=False)  # Reliability
-    i_score = db.Column(db.Integer, nullable=False)  # Intimacy
-    s_score = db.Column(db.Integer, nullable=False)  # Self-orientation
-    p_score = db.Column(db.Integer, nullable=False)  # Personalization
+    relationship = db.relationship("Relationship", back_populates="crisp_scores")
+    credibility = db.Column(db.Integer, nullable=False)
+    reliability = db.Column(db.Integer, nullable=False)
+    intimacy = db.Column(db.Integer, nullable=False)
+    self_orientation = db.Column(db.Integer, nullable=False)
 
     notes = db.Column(db.Text)
     total_score = db.Column(db.Float)

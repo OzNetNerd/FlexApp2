@@ -1,14 +1,18 @@
+from flask_login import UserMixin
 from models.base import db, BaseModel
 import logging
 
 logger = logging.getLogger(__name__)
 
-class User(db.Model, BaseModel):
+class User(db.Model, BaseModel, UserMixin):  # Add UserMixin
     __tablename__ = 'users'
 
     username = db.Column(db.String(50), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)  # Required for login
+    is_admin = db.Column(db.Boolean, default=False)            # Used for CRISP user linking
+
     relationships = db.relationship('Relationship', back_populates='user', cascade='all, delete-orphan')
     notes = db.relationship('Note', backref='author', lazy='dynamic')
 

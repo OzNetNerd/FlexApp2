@@ -13,7 +13,7 @@ from routes.base.components.table_config_manager import TableConfigManager
 from routes.base.components.data_route_handler import DataRouteHandler
 from routes.base.components.form_handler import FormHandler
 from routes.base.components.item_manager import ItemManager
-from models import Company
+from models import Company, CRISPScore, Note
 
 logger = logging.getLogger(__name__)
 
@@ -245,9 +245,30 @@ class GenericWebRoutes(CRUDRoutesBase):
         )
 
     def add_view_context(self, item, context):
-        """Hook for subclasses to add additional context to view template."""
-        logger.debug(f"Base add_view_context called for {self.model.__name__}.")
-        pass
+        """Base view context logic shared across all models."""
+        logger.debug(f"Generic add_view_context for {self.model.__name__} with ID {item.id}")
+
+        # CRISP support
+        relationship = None
+        crisp_scores = []
+        crisp_type = self.model.__tablename__.rstrip('s')
+
+        if hasattr(item, "relationships"):
+            relationship = next(
+                (rel for rel in item.relationships if rel.user_id == current_user.id),
+                None
+            )
+            if relationship:
+                crisp_scores = relationship.crisp_scores.order_by(CRISPScore.created_at.desc()).all()
+
+        context['relationship'] = relationship
+        context['crisp_scores'] = crisp_scores
+        context['crisp_type'] = crisp_type
+
+        # Notes support
+        if hasattr(item, "notes"):
+            logger.debug(f"Adding 'notes_model' to context for {self.model.__name__}")
+            context['notes_model'] = Note
 
     def _handle_create_form_submission(self):
         """Process create form submission."""

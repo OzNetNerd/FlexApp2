@@ -98,4 +98,14 @@
   </div>
 </div>
 {% endif %}
+
+{% if item %}
+  {% include 'crisp/_crisp_summary.html' with context %}
+{% endif %}
+
+{% if relationship %}
+  {% include 'crisp/_crisp_form.html' with context %}
+{% endif %}
+
+
 {% endblock %}

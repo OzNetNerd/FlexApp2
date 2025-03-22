@@ -1,5 +1,7 @@
 import logging
 from typing import Dict, List
+from flask_login import current_user
+from models import User
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +48,18 @@ class FormHandler:
             # Populate value if item is provided
             field_copy["value"] = self.resolve_value(item, name) if item else ""
             fields.append(field_copy)
+
+        if current_user.is_authenticated and current_user.is_admin:
+            all_users = User.query.order_by(User.name).all()
+            selected_user_ids = [str(r.user_id) for r in getattr(item, 'relationships', [])]
+
+            fields.append({
+                'name': 'linked_users',
+                'label': 'Linked Users',
+                'type': 'multiselect',
+                'options': [{'label': u.name, 'value': str(u.id)} for u in all_users],
+                'value': selected_user_ids
+            })
 
         return fields
 

@@ -3,9 +3,11 @@ from datetime import datetime
 from config import Config
 from routes import register_blueprints
 from routes.base.components.template_renderer import render_safely
+from flask_login import LoginManager
 import os
 import logging
 
+login_manager = LoginManager()
 
 def configure_logging():
     logging.basicConfig(
@@ -13,15 +15,17 @@ def configure_logging():
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
 
-
 def create_app(config_class=Config):
     configure_logging()
 
-    """Create and configure the Flask application."""
     app = Flask(__name__,
                 static_folder='static',
                 static_url_path='/static')
     app.config.from_object(config_class)
+
+    # Init login manager
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth_bp.login'
 
     # Set up logger
     logger = logging.getLogger(__name__)
@@ -32,7 +36,6 @@ def create_app(config_class=Config):
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-    # Log application configuration details
     logger.debug(f"Flask app initialized with debug={app.debug}")
     logger.debug(f"Database URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
     logger.debug(f"Current working directory: {os.getcwd()}")
@@ -55,7 +58,7 @@ def create_app(config_class=Config):
     def inject_now():
         return {'now': datetime.utcnow()}
 
-    # Define error handlers
+    # Error handlers
     @app.errorhandler(404)
     def page_not_found(e):
         context = {'error': e}
