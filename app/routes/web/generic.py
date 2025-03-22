@@ -27,19 +27,14 @@ class GenericWebRoutes(CRUDRoutesBase):
     required_fields: List[str] = field(default_factory=list)
     unique_fields: List[str] = field(default_factory=list)
     index_template: str = GENERIC_TEMPLATE
-    view_template: Optional[str] = None
-    create_template: Optional[str] = None
-    edit_template: Optional[str] = None
+    view_template: Optional[str] = "base/create_view_edit.html"
+    create_template: Optional[str] = "base/create_view_edit.html"
+    edit_template: Optional[str] = "base/create_view_edit.html"
     api_url_prefix: Optional[str] = None
 
     def __post_init__(self):
         super().__post_init__()
         self.service = CRUDService(self.model)
-
-        template_file_path = "base/create_view_edit.html"
-        self.create_template = self.create_template or template_file_path
-        self.edit_template = self.edit_template or template_file_path
-        self.view_template = self.view_template or template_file_path
 
         self.json_validator = JSONValidator()
         self.request_logger = RequestLogger()

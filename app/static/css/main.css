@@ -1,0 +1,56 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.93rem;
+  background-color: #f0f4f8;
+  margin: 0;
+}
+
+.stat-card {
+  transition: transform 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.nav-card {
+  transition: all 0.3s;
+  text-decoration: none;
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.highlights-container {
+  position: relative;
+  height: 24px;
+  overflow: hidden;
+}
+
+.highlight-item {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.highlight-item.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
