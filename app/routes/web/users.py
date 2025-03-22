@@ -1,6 +1,6 @@
 from app.models import User, Note
-from routes.web import users_bp
-from routes.web.generic import GenericWebRoutes
+from app.routes.web import users_bp
+from app.routes.web.generic import GenericWebRoutes
 import logging
 
 logger = logging.getLogger(__name__)

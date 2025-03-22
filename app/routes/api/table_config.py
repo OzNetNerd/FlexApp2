@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from routes.api import api_table_config_bp
+from app.routes.api import api_table_config_bp
 from app.models.table_config import TableConfig
 import logging
 

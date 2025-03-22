@@ -8,8 +8,8 @@ def register_blueprints(app):
     logger.info("Registering all application blueprints...")
 
     # Import here to avoid circular imports
-    from routes.web import register_web_blueprints
-    from routes.api import register_api_blueprints
+    from app.routes.web import register_web_blueprints
+    from app.routes.api import register_api_blueprints
 
     # Register web blueprints
     register_web_blueprints(app)

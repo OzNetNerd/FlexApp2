@@ -1,9 +1,9 @@
 from flask import Blueprint
 import logging
 from flask_login import LoginManager
-from routes.web.auth import login
-from routes.web.auth import logout
-from routes.web.auth import load_user
+from app.routes.web.auth import login
+from app.routes.web.auth import logout
+from app.routes.web.auth import load_user
 
 
 logger = logging.getLogger(__name__)
@@ -25,14 +25,14 @@ login_manager.user_loader(load_user)
 
 
 # Import route definitions to register with blueprints
-from routes.web.main import main_bp
-from routes.web.users import users_bp
-from routes.web.companies import companies_bp
-from routes.web.contacts import contacts_bp
-from routes.web.opportunities import opportunities_bp
-from routes.web.relationship import relationships_bp
-from routes.web.crisp_score import crisp_scores_bp
-from routes.web.auth import load_user
+from app.routes.web.main import main_bp
+from app.routes.web.users import users_bp
+from app.routes.web.companies import companies_bp
+from app.routes.web.contacts import contacts_bp
+from app.routes.web.opportunities import opportunities_bp
+from app.routes.web.relationship import relationships_bp
+from app.routes.web.crisp_score import crisp_scores_bp
+from app.routes.web.auth import load_user
 
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""

@@ -5,8 +5,8 @@ from flask import Flask, request, redirect, url_for
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
 from config import Config
-from routes import register_blueprints
-from routes.base.components.template_renderer import render_safely
+from app.routes import register_blueprints
+from app.routes.base.components.template_renderer import render_safely
 from app.models.base import db
 from app.models.user import User  # Required for user_loader
 
@@ -62,7 +62,7 @@ def create_app(config_class=Config):
     logger.debug(f"Current working directory: {os.getcwd()}")
 
     # Avoid circular imports
-    from services import init_db
+    from app.services import init_db
     init_db(app)
 
     # Register blueprints

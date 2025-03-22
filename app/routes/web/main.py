@@ -1,5 +1,5 @@
-from routes.web import main_bp
-from routes.base.components.template_renderer import render_safely
+from app.routes.web import main_bp
+from app.routes.base.components.template_renderer import render_safely
 
 @main_bp.route('/')
 def index():

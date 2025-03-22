@@ -1,7 +1,7 @@
 import logging
 from app.models import Relationship
-from routes.web import relationships_bp
-from routes.web.generic import GenericWebRoutes
+from app.routes.web import relationships_bp
+from app.routes.web.generic import GenericWebRoutes
 
 logger = logging.getLogger(__name__)
 

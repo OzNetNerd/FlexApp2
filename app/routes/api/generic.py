@@ -3,7 +3,7 @@ from typing import  List, Type
 from flask import  request, jsonify, Blueprint
 import logging
 import traceback
-from routes.base.crud_base import CRUDRoutesBase, CRUDService
+from app.routes.base.crud_base import CRUDRoutesBase, CRUDService
 
 
 logger = logging.getLogger(__name__)

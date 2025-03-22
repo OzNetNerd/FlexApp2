@@ -1,7 +1,7 @@
 from app.models import Contact
-from routes.api import api_contacts_bp
-from routes.api.generic import GenericAPIRoutes
-from services.crud_service import CRUDService
+from app.routes.api import api_contacts_bp
+from app.routes.api.generic import GenericAPIRoutes
+from app.services.crud_service import CRUDService
 import logging
 
 logger = logging.getLogger(__name__)

@@ -1,6 +1,6 @@
 from flask import Blueprint
 import logging
-from routes.base.components.template_renderer import render_safely
+from app.routes.base.components.template_renderer import render_safely
 
 logger = logging.getLogger(__name__)
 web_bp = Blueprint("web", __name__)

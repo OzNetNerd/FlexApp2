@@ -1,7 +1,7 @@
 import re
 from app.models import Contact, Company, db
-from routes.web import contacts_bp
-from routes.web.generic import GenericWebRoutes
+from app.routes.web import contacts_bp
+from app.routes.web.generic import GenericWebRoutes
 import logging
 from flask_login import current_user  # Or however you're accessing logged-in user
 

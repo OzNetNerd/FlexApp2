@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Type
 from flask import Blueprint
 import logging
 
-from services.crud_service import CRUDService
+from app.services.crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 

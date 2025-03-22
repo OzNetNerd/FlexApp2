@@ -10,11 +10,11 @@ api_contacts_bp = Blueprint('api_contacts', __name__, url_prefix='/api/contacts'
 api_opportunities_bp = Blueprint('api_opportunities', __name__, url_prefix='/api/opportunities')
 api_table_config_bp = Blueprint('api_table_config', __name__, url_prefix='/api/table-config')
 
-from routes.api.table_config import api_table_config_bp
-from routes.api.opportunities import api_opportunities_bp
-from routes.api.contacts import api_contacts_bp
-from routes.api.companies import api_companies_bp
-from routes.api.users import api_users_bp
+from app.routes.api.table_config import api_table_config_bp
+from app.routes.api.opportunities import api_opportunities_bp
+from app.routes.api.contacts import api_contacts_bp
+from app.routes.api.companies import api_companies_bp
+from app.routes.api.users import api_users_bp
 
 
 def register_api_blueprints(app):

@@ -3,16 +3,16 @@ from typing import Optional, List, Type
 from flask import request, redirect, url_for, flash, Blueprint, json
 import logging
 import traceback
-from routes.base.crud_base import CRUDRoutesBase
-from services.crud_service import CRUDService
+from app.services.crud_service import CRUDService
 
-from routes.base.components.template_renderer import render_safely
-from routes.base.components.json_validator import JSONValidator
-from routes.base.components.request_logger import RequestLogger
-from routes.base.components.table_config_manager import TableConfigManager
-from routes.base.components.data_route_handler import DataRouteHandler
-from routes.base.components.form_handler import FormHandler
-from routes.base.components.item_manager import ItemManager
+from app.routes.base.crud_base import CRUDRoutesBase
+from app.routes.base.components.template_renderer import render_safely
+from app.routes.base.components.json_validator import JSONValidator
+from app.routes.base.components.request_logger import RequestLogger
+from app.routes.base.components.table_config_manager import TableConfigManager
+from app.routes.base.components.data_route_handler import DataRouteHandler
+from app.routes.base.components.form_handler import FormHandler
+from app.routes.base.components.item_manager import ItemManager
 from app.models import Company, CRISPScore, Note
 
 logger = logging.getLogger(__name__)
