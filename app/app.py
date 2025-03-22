@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import Flask, request, redirect, url_for
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
+from flask_session import Session  # Added Flask-Session
 from config import Config
 from app.routes import register_blueprints
 from app.routes.base.components.template_renderer import render_safely
@@ -13,6 +14,7 @@ from app.models.user import User  # Required for user_loader
 # Global extensions
 login_manager = LoginManager()
 migrate = Migrate()
+session = Session()  # Initialize Flask-Session
 
 
 def configure_logging():
@@ -28,11 +30,21 @@ def create_app(config_class=Config):
     app = Flask(__name__, static_folder='static', static_url_path='/static')
     app.config.from_object(config_class)
 
+    # Set session configuration if not in config
+    if 'SESSION_TYPE' not in app.config:
+        app.config['SESSION_TYPE'] = 'filesystem'
+        app.config['PERMANENT_SESSION_LIFETIME'] = 60 * 60 * 24  # 24 hours
+        app.config['SESSION_PERMANENT'] = True
+        app.config['SESSION_USE_SIGNER'] = True
+
     # Init extensions
     db.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
+    session.init_app(app)  # Initialize Flask-Session with app
     login_manager.login_view = 'auth_bp.login'
+    login_manager.login_message = "Please log in to access this page."
+    login_manager.login_message_category = "info"
 
     # User loader for Flask-Login
     @login_manager.user_loader
@@ -59,6 +71,7 @@ def create_app(config_class=Config):
 
     logger.debug(f"Flask app initialized with debug={app.debug}")
     logger.debug(f"Database URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
+    logger.debug(f"Session type: {app.config['SESSION_TYPE']}")
     logger.debug(f"Current working directory: {os.getcwd()}")
 
     # Avoid circular imports

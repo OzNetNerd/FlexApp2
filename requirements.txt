@@ -12,3 +12,4 @@ blinker==1.6.3
 typing-extensions==4.8.0
 flask-login
 Flask-Migrate
+Flask-Session>=0.4.0

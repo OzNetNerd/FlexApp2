@@ -11,9 +11,21 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if user and check_password_hash(user.password_hash, password):
-            login_user(user)
+            # Make session permanent
+            from flask import session
+            session.permanent = True
+
+            # Remember user setting (optional)
+            remember = request.form.get('remember', False)
+            login_user(user, remember=remember)
+
+            # Redirect to the next page or default
+            next_page = request.args.get('next')
+            if not next_page or not next_page.startswith('/'):
+                next_page = url_for('main.index')
+
             flash('Logged in successfully.', 'success')
-            return redirect(url_for('main.index'))  # Adjust as needed
+            return redirect(next_page)
 
         flash('Invalid email or password.', 'danger')
 

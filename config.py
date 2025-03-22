@@ -17,6 +17,11 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev_key_for_development')
     logger.debug(f"SECRET_KEY set to: {SECRET_KEY}")
 
+    SESSION_TYPE = 'filesystem'
+    PERMANENT_SESSION_LIFETIME = 60 * 60 * 24  # 24 hours in seconds
+    SESSION_PERMANENT = True
+    SESSION_USE_SIGNER = True
+
     # Database configuration
     # Use absolute path to ensure database is created in the correct location
     SQLALCHEMY_DATABASE_URI = os.environ.get(
