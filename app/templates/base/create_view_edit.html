@@ -1,4 +1,5 @@
 {% extends "base/page.html" %}
+{% import "macros/form_fields.html" as macros %}
 
 {% block content %}
 <div class="card border-0 shadow-sm">
@@ -34,98 +35,17 @@
 
   <div class="card-body">
     <form method="POST">
-      <div class="row">
-        {% for field in fields if item or field.name not in ['created_at', 'updated_at'] %}
-        <div class="col-md-6 mb-3">
-          <div class="card border-light h-100 shadow-sm">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-              <span class="fw-bold">{{ field.label }}</span>
-              {% if field.required and not read_only %}
-                <span class="badge bg-danger text-white ms-2">Required</span>
-              {% endif %}
-            </div>
-            <div class="card-body">
-              {% if not read_only and not field.readonly %}
-                {% if field.type == 'textarea' %}
-                  <textarea name="{{ field.name }}" class="form-control" rows="4" {% if field.required %}required{% endif %}>{{ field.value or '' }}</textarea>
-                {% elif field.type == 'select' %}
-                  <select name="{{ field.name }}" class="form-select" {% if field.required %}required{% endif %}>
-                    <option value="">-- Select {{ field.label }} --</option>
-                    {% for option in field.options %}
-                      <option value="{{ option.value }}" {% if option.value == field.value %}selected{% endif %}>{{ option.label }}</option>
-                    {% endfor %}
-                  </select>
-                {% elif field.type == 'checkbox' %}
-                  <div class="form-check">
-                    <input type="checkbox" name="{{ field.name }}" id="{{ field.name }}" class="form-check-input" value="true" {% if field.value %}checked{% endif %}>
-                    <label class="form-check-label" for="{{ field.name }}">{{ field.checkbox_label }}</label>
-                  </div>
-                {% elif field.type in ['date', 'datetime-local'] %}
-                  <input type="{{ field.type }}" name="{{ field.name }}" class="form-control" value="{{ field.value or '' }}" {% if field.required %}required{% endif %}>
-                {% else %}
-                  <input type="{{ field.type or 'text' }}" name="{{ field.name }}" class="form-control" value="{{ field.value or '' }}" {% if field.required %}required{% endif %} placeholder="{{ field.placeholder or 'Enter ' + field.label }}">
-                {% endif %}
+      {{ macros.render_sections(fields, read_only) }}
 
-                {% if field.help_text %}
-                  <div class="form-text text-muted mt-2">
-                    <i class="fas fa-info-circle me-1"></i> {{ field.help_text }}
-                  </div>
-                {% endif %}
-              {% else %}
-                {% if field.value is none %}
-                  <span class="text-muted fst-italic">None</span>
-                {% elif field.value is boolean %}
-                  <span class="badge bg-{{ 'success' if field.value else 'danger' }} text-white px-3 py-2">
-                    <i class="fas fa-{{ 'check' if field.value else 'times' }} me-1"></i> {{ 'Yes' if field.value else 'No' }}
-                  </span>
-                {% elif field.value is mapping %}
-                  <div class="bg-light p-3 rounded border">
-                    <pre class="mb-0 code-preview">{{ field.value | tojson(indent=2) }}</pre>
-                  </div>
-                {% elif field.value is iterable and field.value is not string %}
-                  <ul class="list-group">
-                    {% for v in field.value %}
-                      <li class="list-group-item d-flex align-items-center">
-                        <i class="fas fa-angle-right text-muted me-2"></i> {{ v }}
-                      </li>
-                    {% endfor %}
-                  </ul>
-                {% elif field.type == 'datetime-local' or field.type == 'date' %}
-                  <div class="d-flex align-items-center">
-                    <i class="far fa-calendar-alt me-2 text-muted"></i> {{ field.value }}
-                  </div>
-                {% elif field.type == 'email' %}
-                  <div class="d-flex align-items-center">
-                    <i class="far fa-envelope me-2 text-muted"></i> <a href="mailto:{{ field.value }}">{{ field.value }}</a>
-                  </div>
-                {% elif field.type == 'url' %}
-                  <div class="d-flex align-items-center">
-                    <i class="fas fa-link me-2 text-muted"></i> <a href="{{ field.value }}" target="_blank">{{ field.value }}</a>
-                  </div>
-                {% elif field.type == 'tel' %}
-                  <div class="d-flex align-items-center">
-                    <i class="fas fa-phone me-2 text-muted"></i> <a href="tel:{{ field.value }}">{{ field.value }}</a>
-                  </div>
-                {% else %}
-                  <div class="d-flex align-items-center">
-                    <span>{{ field.value }}</span>
-                  </div>
-                {% endif %}
-              {% endif %}
-            </div>
-          </div>
-        </div>
-        {% endfor %}
+      <!-- Custom Autocomplete Fields -->
+      <div class="mb-3">
+        <label for="users-input" class="form-label">Users</label>
+        <input type="text" id="users-input" class="form-control" placeholder="Type to search users...">
+      </div>
 
-        {# --- Tagify user selector --- #}
-        {% if not read_only %}
-        <div class="col-md-12 mb-3">
-          <label for="users-input" class="form-label fw-bold">Assigned Users</label>
-          <input name="users" id="users-input" class="form-control"
-            placeholder="Start typing a user..."
-            value='{{ item and item.users | map(attribute="email") | list | tojson }}'>
-        </div>
-        {% endif %}
+      <div class="mb-3">
+        <label for="companies-input" class="form-label">Companies</label>
+        <input type="text" id="companies-input" class="form-control" placeholder="Type to search companies...">
       </div>
 
       {% if not read_only %}
@@ -133,10 +53,10 @@
         <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + ('.view' if item else '.index'), item_id=item.id if item else None) }}" class="btn btn-outline-secondary me-2">
           <i class="fas fa-times me-1"></i> Cancel
         </a>
-        <button type="submit" class="btn btn-{{ 'success' if item else 'primary' }}">
-          <i class="fas fa-{{ 'save' if item else 'plus-circle' }} me-1"></i>
-          {{ 'Save Changes' if item else 'Create' }}
-        </button>
+          <button type="submit" class="btn btn-{{ 'success' if item and not read_only else 'primary' }}">
+            <i class="fas fa-{{ 'save' if item and not read_only else 'plus-circle' }} me-1"></i>
+            {{ button_text or ('Save Changes' if item and not read_only else 'Create') }}
+          </button>
       </div>
       {% endif %}
     </form>
@@ -151,5 +71,19 @@
 
 {% block scripts %}
   {{ super() }}
-  <script type="module" src="{{ url_for('static', filename='js/contact_user_tagify.js') }}"></script>
+  <script type="module">
+    import { setupAutoComplete } from "{{ url_for('static', filename='js/autoComplete.js') }}";
+
+    setupAutoComplete({
+      inputSelector: '#users-input',
+      dataUrl: '/contacts/data',
+      inputName: 'users'
+    });
+
+    setupAutoComplete({
+      inputSelector: '#companies-input',
+      dataUrl: '/companies/data',
+      inputName: 'companies'
+    });
+  </script>
 {% endblock %}

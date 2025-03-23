@@ -1,6 +1,14 @@
+'edit' user actually looks like it goes to the 'create' backend
+I want to be able to edit individual fields without having to edit whole form (pencil icon)
+create form compeltely broken
+linked contacts do not show email address in brackets
+add 'associates' field to map friendships/contacts outside of the business - they should be stored as regular 'contacts' too and draw 6 degree of separation diagrams to/from them between businesses and internal employees
+
 forecast Q
 user profile
 update feed/notificaiton box for each notable change
+
+edit history in admin view
 
 synergy grpahs, node sizes, etc - varying lebel of detailed graphs of fliterable and group by graps
 

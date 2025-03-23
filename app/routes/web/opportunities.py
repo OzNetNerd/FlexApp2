@@ -1,7 +1,6 @@
 from app.models import Opportunity, Company, db
 from app.routes.web import opportunities_bp
 from app.routes.web.generic import GenericWebRoutes
-from app.services.crud_service import CRUDService
 import logging
 import re
 

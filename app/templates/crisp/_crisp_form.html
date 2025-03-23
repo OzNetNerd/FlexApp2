@@ -1,18 +1,28 @@
-<form method="POST" action="{{ url_for('crisp_scores.submit', relationship_id=relationship.id) }}">
+{% if relationship %}
+  <form method="POST" action="{{ url_for('crisp_scores.submit', relationship_id=relationship.id) }}">
+{% else %}
+  <div class="alert alert-warning">
+    Relationship data is missing. CRISP score submission is disabled.
+  </div>
+  <form method="POST" action="#" onsubmit="return false;">
+{% endif %}
     <div class="row">
       {% for field in ['credibility', 'reliability', 'intimacy', 'self_orientation'] %}
-      <div class="col-md-3 mb-3">
-        <label for="{{ field }}" class="form-label text-capitalize">{{ field.replace('_', ' ') }}</label>
-        <input type="number"
-               class="form-control"
-               name="{{ field }}"
-               id="{{ field }}"
-               min="1"
-               max="10"
-               step="1"
-               required>
-      </div>
+        <div class="col-md-3 mb-3">
+          <label for="{{ field }}" class="form-label text-capitalize">{{ field.replace('_', ' ') }}</label>
+          <input type="number"
+                 class="form-control"
+                 name="{{ field }}"
+                 id="{{ field }}"
+                 min="1"
+                 max="10"
+                 step="1"
+                 required
+                 {% if not relationship %}disabled{% endif %}>
+        </div>
       {% endfor %}
     </div>
-    <button type="submit" class="btn btn-success mt-2">Submit CRISP Score</button>
+    <button type="submit" class="btn btn-success mt-2" {% if not relationship %}disabled{% endif %}>
+      Submit CRISP Score
+    </button>
   </form>

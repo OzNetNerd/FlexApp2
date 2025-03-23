@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
 from flask_session import Session
 from config import Config
-from app.routes.web import register_web_blueprints  # ✅ Corrected import
+from app.routes.web import register_web_blueprints
 from app.routes.base.components.template_renderer import render_safely
 from app.models.base import db
 from app.models.user import User

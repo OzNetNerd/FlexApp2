@@ -1,6 +1,3 @@
-/**
- * static/js/toasts.js
- */
 import log from './logger.js';
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -9,20 +6,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     log("debug", scriptName, functionName, "🔄 Initializing toast notifications");
 
-    // Initialize all .toast elements but don't show them yet
+    // Initialize all .toast elements with 10s auto-dismiss
     const toasts = document.querySelectorAll('.toast');
     toasts.forEach(toast => {
-        new bootstrap.Toast(toast);
+        new bootstrap.Toast(toast, { delay: 10000 });
     });
 
     log("info", scriptName, functionName, `✅🔄 Initialized ${toasts.length} toast notifications`);
 });
 
-/**
- * Dynamically show a toast with a given message and type.
- * @param {string} message - The text to display in the toast.
- * @param {string} type - Bootstrap background type: success, danger, warning, info.
- */
 export function showToast(message, type = 'success') {
     const toastEl = document.getElementById('liveToast');
     const toastMsg = document.getElementById('toastMessage');
@@ -35,6 +27,11 @@ export function showToast(message, type = 'success') {
     toastMsg.textContent = message;
     toastEl.className = `toast align-items-center text-bg-${type} border-0`;
 
-    const toast = new bootstrap.Toast(toastEl);
+    const existingToast = bootstrap.Toast.getInstance(toastEl);
+    if (existingToast) {
+        existingToast.hide();
+    }
+
+    const toast = new bootstrap.Toast(toastEl, { delay: 10000 });
     toast.show();
 }

@@ -1,9 +1,10 @@
 import re
-from app.models import Contact, Company, db
+import logging
+from flask import request
+from flask_login import current_user
+from app.models import Contact, Company, db, User
 from app.routes.web import contacts_bp
 from app.routes.web.generic import GenericWebRoutes
-import logging
-from flask_login import current_user  # Or however you're accessing logged-in user
 
 logger = logging.getLogger(__name__)
 
@@ -12,11 +13,11 @@ class ContactCRUDRoutes(GenericWebRoutes):
     """
     Custom CRUD routes for Contacts model that extends the generic implementation
     """
-    def add_view_context(self, item, context):
-        from app.models import Relationship
 
-        # Add the current user's relationship (if any)
-        user = current_user  # however you're managing session auth
+    def add_view_context(self, item, context):
+        from app.models import Relationship, CRISPScore
+
+        user = current_user
         relationship = item.get_relationship_with(user)
         context['relationship'] = relationship
 
@@ -25,17 +26,25 @@ class ContactCRUDRoutes(GenericWebRoutes):
                 CRISPScore.created_at.desc()
             ).all()
 
+    def _preprocess_form_data(self, request_obj):
+        """
+        Convert company_name to company_id, create company if needed,
+        and extract user associations using request.form.getlist().
 
-    def _preprocess_form_data(self, form_data):
+        Args:
+            request_obj (flask.Request): The full Flask request object.
+
+        Returns:
+            dict: Preprocessed form data with company_id and user objects.
         """
-        Convert company_name to company_id, create company if it doesn't exist,
-        and remove company_name from the data passed to the model.
-        """
+        form_data = request_obj.form.to_dict(flat=True)
+
+        # Handle company name → ID
         company_name = form_data.get('company_name', '').strip()
         if company_name:
             company = Company.query.filter_by(name=company_name).first()
             if not company:
-                logger.info(f"Creating new company: {company_name}")
+                logger.info(f"🏢 Creating new company: {company_name}")
                 company = Company(name=company_name)
                 db.session.add(company)
                 db.session.commit()
@@ -43,23 +52,31 @@ class ContactCRUDRoutes(GenericWebRoutes):
         else:
             form_data['company_id'] = None
 
-        # 🔥 Remove the field that does not exist on the model
         form_data.pop('company_name', None)
 
-    def _validate_create(self, form_data):
+        # Handle user IDs from multi-select
+        user_ids = request_obj.form.getlist('users')
+        if user_ids:
+            users = User.query.filter(User.id.in_(user_ids)).all()
+            form_data['users'] = users
+            logger.info(f"👥 Linked users: {[u.email for u in users]}")
+
+        return form_data
+
+    def _validate_create(self, request_obj):
         """
         Override validation for creating a contact
         """
-        self._preprocess_form_data(form_data)
+        form_data = self._preprocess_form_data(request_obj)
         errors = super()._validate_create(form_data)
         self._validate_contact_data(form_data, errors)
         return errors
 
-    def _validate_edit(self, item, form_data):
+    def _validate_edit(self, item, request_obj):
         """
         Override validation for editing a contact
         """
-        self._preprocess_form_data(form_data)
+        form_data = self._preprocess_form_data(request_obj)
         errors = super()._validate_edit(item, form_data)
         self._validate_contact_data(form_data, errors)
         return errors
@@ -68,16 +85,15 @@ class ContactCRUDRoutes(GenericWebRoutes):
         """
         Common validation for contact data
         """
-        # Email validation
         if form_data.get('email'):
             email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             if not re.match(email_regex, form_data['email']):
                 errors.append('Invalid email format')
-                logger.warning(f"Invalid email format: {form_data['email']}")
+                logger.warning(f"❌ Invalid email format: {form_data['email']}")
 
 
 # Set up the CRUD routes for contacts
-logger.debug("Setting up CRUD routes for contacts.")
+logger.debug("⚙️ Setting up CRUD routes for contacts.")
 contact_routes = ContactCRUDRoutes(
     blueprint=contacts_bp,
     model=Contact,
@@ -85,4 +101,3 @@ contact_routes = ContactCRUDRoutes(
     required_fields=['first_name', 'last_name'],
     unique_fields=['email']
 )
-

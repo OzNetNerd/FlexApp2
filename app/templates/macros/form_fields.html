@@ -1,0 +1,96 @@
+{% macro render_sections(fields, read_only=False) %}
+  {% set grouped = {} %}
+  {% for field in fields %}
+    {% set section = field.section or "Other" %}
+    {% if section not in grouped %}
+      {% set _ = grouped.update({section: []}) %}
+    {% endif %}
+    {% set _ = grouped[section].append(field) %}
+  {% endfor %}
+
+  {% for section, section_fields in grouped.items() %}
+    <div class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="text-primary mb-0">{{ section }}</h5>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse"
+                data-bs-target="#section-{{ loop.index }}" aria-expanded="true">
+          Toggle
+        </button>
+      </div>
+      <div class="row collapse show" id="section-{{ loop.index }}">
+        {% for field in section_fields %}
+          {{ render_field(field, read_only) }}
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+{% endmacro %}
+
+{% macro render_field(field, read_only=False) %}
+  <div class="col-md-6 mb-3">
+    <div class="card border-light h-100 shadow-sm">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+        <span class="fw-bold">{{ field.label }}</span>
+        {% if field.required and not read_only %}
+          <span class="badge bg-danger text-white ms-2">Required</span>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        {% if not read_only and not field.readonly %}
+          {{ render_input(field) }}
+          {% if field.help_text %}
+            <div class="form-text text-muted mt-2">
+              <i class="fas fa-info-circle me-1"></i> {{ field.help_text }}
+            </div>
+          {% endif %}
+        {% else %}
+          {{ render_value(field) }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro render_input(field) %}
+  {% if field.type == 'textarea' %}
+    <textarea name="{{ field.name }}" class="form-control" rows="4">{{ field.value or '' }}</textarea>
+  {% elif field.type == 'select' %}
+    <select name="{{ field.name }}" class="form-select">
+      <option value="">-- Select {{ field.label }} --</option>
+      {% for opt in field.options %}
+        <option value="{{ opt.value }}" {% if opt.value == field.value %}selected{% endif %}>
+          {{ opt.label }}
+        </option>
+      {% endfor %}
+    </select>
+  {% elif field.type == 'checkbox' %}
+    <div class="form-check">
+      <input type="checkbox" name="{{ field.name }}" id="{{ field.name }}"
+             class="form-check-input" value="true" {% if field.value %}checked{% endif %}>
+      <label class="form-check-label" for="{{ field.name }}">{{ field.checkbox_label }}</label>
+    </div>
+  {% else %}
+    <input type="{{ field.type or 'text' }}" name="{{ field.name }}"
+           class="form-control" value="{{ field.value or '' }}">
+  {% endif %}
+{% endmacro %}
+
+{% macro render_value(field) %}
+  {% if field.value is none %}
+    <span class="text-muted fst-italic">None</span>
+  {% elif field.value is boolean %}
+    <span class="badge bg-{{ 'success' if field.value else 'danger' }}">
+      <i class="fas fa-{{ 'check' if field.value else 'times' }}"></i> {{ 'Yes' if field.value else 'No' }}
+    </span>
+  {% elif field.value is mapping %}
+    <pre class="bg-light p-2 rounded">{{ field.value | tojson(indent=2) }}</pre>
+  {% elif field.value is iterable and field.value is not string %}
+    <ul class="list-group">
+      {% for v in field.value %}
+        <li class="list-group-item">{{ v }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    {{ field.value }}
+  {% endif %}
+{% endmacro %}

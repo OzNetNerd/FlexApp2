@@ -77,9 +77,23 @@ class FormHandler:
             return ""
 
     def validate_create(self, form_data: Dict) -> List[str]:
-        """Validate form data for create operation."""
+        users = form_data.getlist("users")
+        companies = form_data.getlist("companies")
+
+        logger.info(f"👥 Selected user IDs: {users}")
+        logger.info(f"🏢 Selected company IDs: {companies}")
+
+        # Optional: perform validation here (e.g. check if IDs exist)
+
         return []
 
     def validate_edit(self, item, form_data: Dict) -> List[str]:
-        """Validate form data for edit operation."""
+        users = form_data.getlist("users")
+        companies = form_data.getlist("companies")
+
+        logger.info(f"✏️ [Edit] Selected user IDs: {users}")
+        logger.info(f"✏️ [Edit] Selected company IDs: {companies}")
+
+        # Optional: perform validation here
+
         return []

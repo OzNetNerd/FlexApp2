@@ -1,12 +1,14 @@
 <!-- templates/_toast.html -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3 z-9999">
-  <div id="liveToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="toastMessage">Success</div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+{% if template_render_error or get_flashed_messages(with_categories=true) %}
+  <div class="toast-container position-fixed bottom-0 end-0 p-3 z-9999">
+    <div id="liveToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastMessage">Loading...</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
     </div>
   </div>
-</div>
+{% endif %}
 
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% for category, message in messages %}
@@ -18,3 +20,12 @@
     </script>
   {% endfor %}
 {% endwith %}
+
+{% if template_render_error %}
+  <script type="module">
+    import { showToast } from "{{ url_for('static', filename='js/toasts.js') }}";
+    document.addEventListener('DOMContentLoaded', () => {
+      showToast("{{ template_render_error | escape }}", "danger");
+    });
+  </script>
+{% endif %}

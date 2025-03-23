@@ -1,6 +1,5 @@
 from app.models.base import db, BaseModel
-
-
+from app.models import contact_user_association
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,10 +14,18 @@ class Contact(db.Model, BaseModel):
 
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     company = db.relationship("Company", back_populates="contacts")
+
     relationships = db.relationship('Relationship', back_populates='contact', cascade='all, delete-orphan')
     notes = db.relationship(
         'Note',
         primaryjoin="and_(Note.notable_id == foreign(Contact.id), Note.notable_type == 'Contact')"
+    )
+
+    users = db.relationship(
+        'User',
+        secondary=contact_user_association,
+        backref='assigned_contacts',
+        lazy='dynamic'
     )
 
     __field_order__ = [
@@ -67,7 +74,6 @@ class Contact(db.Model, BaseModel):
             'type': 'text',
             'section': 'Record Info',
             "readonly": True,
-
         }
     ]
 
@@ -81,21 +87,13 @@ class Contact(db.Model, BaseModel):
 
     @property
     def crisp_summary(self):
-        """
-        Returns the average CRISP total score across all user relationships for this contact.
-        """
         all_scores = [
             score.total_score
             for relationship in self.relationships
             for score in relationship.crisp_scores
             if score.total_score is not None
         ]
-
-        if not all_scores:
-            return None
-
-        return round(sum(all_scores) / len(all_scores), 2)
+        return round(sum(all_scores) / len(all_scores), 2) if all_scores else None
 
     def get_relationship_with(self, user):
-        """Returns the relationship between this contact and a given user, or None."""
         return next((rel for rel in self.relationships if rel.user_id == user.id), None)
