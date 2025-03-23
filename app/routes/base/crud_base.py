@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Any, Type
 from flask import Blueprint
 import logging
-
+import json
 from app.services.crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
@@ -10,6 +10,17 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class CRUDRoutesBase:
+    """
+    Base class for CRUD route handlers.
+
+    Attributes:
+        model (Type): SQLAlchemy model class.
+        blueprint (Blueprint): Flask blueprint to register routes to.
+        required_fields (List[str]): Fields required for creation.
+        unique_fields (List[str]): Fields that must be unique.
+        service (CRUDService): CRUD service instance for data access.
+    """
+
     model: Type
     blueprint: Blueprint
     required_fields: List[str] = field(default_factory=list)
@@ -17,11 +28,20 @@ class CRUDRoutesBase:
     service: CRUDService = field(init=False)
 
     def __post_init__(self):
+        """Initialize the service with the model."""
         logger.debug(f"Initializing CRUD routes base for {self.model.__name__}")
-        self.service = CRUDService(self.model)  # Now we can pass model_class
+        self.service = CRUDService(self.model)
 
-    def _ensure_json_serializable(self, obj):
-        """Ensure an object is JSON serializable by converting problematic types."""
+    def _ensure_json_serializable(self, obj: Any) -> Any:
+        """
+        Recursively ensure that a value is JSON serializable.
+
+        Args:
+            obj (Any): The object to serialize.
+
+        Returns:
+            Any: A JSON-serializable version of the object.
+        """
         if obj is None or isinstance(obj, (str, int, float, bool)):
             return obj
         elif hasattr(obj, "__dict__"):
@@ -40,18 +60,24 @@ class CRUDRoutesBase:
             )
             return str(obj)
 
-    def _validate_create(self, form_data):
-        """Validate form data for creating a new item."""
+    def _validate_create(self, form_data: Dict[str, Any]) -> List[str]:
+        """
+        Validate data for creating a new item.
+
+        Args:
+            form_data (Dict[str, Any]): Submitted form or JSON data.
+
+        Returns:
+            List[str]: A list of validation error messages.
+        """
         logger.debug(f"Validating create data for {self.model.__name__}")
         errors = []
 
-        # Check required fields
         for field in self.required_fields:
             if field not in form_data or not form_data[field]:
                 logger.warning(f"Required field '{field}' is missing or empty")
                 errors.append(f"{field} is required.")
 
-        # Check unique fields
         for field in self.unique_fields:
             if field in form_data and form_data[field]:
                 existing = self.model.query.filter(
@@ -67,23 +93,29 @@ class CRUDRoutesBase:
 
         return errors
 
-    def _validate_edit(self, item, form_data):
-        """Validate form data for editing an existing item."""
+    def _validate_edit(self, item: Any, form_data: Dict[str, Any]) -> List[str]:
+        """
+        Validate data for editing an existing item.
+
+        Args:
+            item (Any): The existing model instance.
+            form_data (Dict[str, Any]): Submitted form or JSON data.
+
+        Returns:
+            List[str]: A list of validation error messages.
+        """
         logger.debug(
             f"Validating edit data for {self.model.__name__} with id {item.id}"
         )
         errors = []
 
-        # Check required fields
         for field in self.required_fields:
             if field not in form_data or not form_data[field]:
                 logger.warning(f"Required field '{field}' is missing or empty")
                 errors.append(f"{field} is required.")
 
-        # Check unique fields, excluding the current item
         for field in self.unique_fields:
             if field in form_data and form_data[field]:
-                # Skip if the value hasn't changed
                 if getattr(item, field) == form_data[field]:
                     continue
 
@@ -104,17 +136,21 @@ class CRUDRoutesBase:
         self, data: Dict[str, Any], path: str = ""
     ) -> List[str]:
         """
-        Validate if a dictionary is fully JSON serializable and log any issues.
-        Returns a list of problematic paths in the data structure.
+        Validate if the given dictionary is fully JSON serializable.
+
+        Args:
+            data (Dict[str, Any]): The data to validate.
+            path (str, optional): Used to track nested paths during recursion.
+
+        Returns:
+            List[str]: A list of paths where JSON serialization fails.
         """
         issues = []
+
         if isinstance(data, dict):
             for key, value in data.items():
                 current_path = f"{path}.{key}" if path else key
                 try:
-                    # Test if this particular value is JSON serializable
-                    import json
-
                     json.dumps({key: value})
                 except TypeError as e:
                     logger.error(
@@ -122,17 +158,15 @@ class CRUDRoutesBase:
                     )
                     issues.append(f"{current_path}: {type(value).__name__}")
 
-                # Recursively check nested dictionaries
                 if isinstance(value, dict):
-                    nested_issues = self._validate_json_serializable(
-                        value, current_path
+                    issues.extend(
+                        self._validate_json_serializable(value, current_path)
                     )
-                    issues.extend(nested_issues)
                 elif isinstance(value, list):
                     for i, item in enumerate(value):
                         if isinstance(item, dict):
-                            nested_issues = self._validate_json_serializable(
-                                item, f"{current_path}[{i}]"
+                            issues.extend(
+                                self._validate_json_serializable(item, f"{current_path}[{i}]")
                             )
-                            issues.extend(nested_issues)
+
         return issues
