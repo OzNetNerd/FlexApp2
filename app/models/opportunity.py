@@ -3,8 +3,22 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class Opportunity(db.Model, BaseModel):
+    """Represents a sales opportunity linked to a company.
+
+    Opportunities track deal stages, potential value, and related notes.
+
+    Attributes:
+        name (str): Title of the opportunity.
+        description (str): Summary or notes about the opportunity.
+        status (str): Current status (e.g., New, Won, Lost).
+        stage (str): Sales pipeline stage (e.g., Prospecting).
+        value (float): Estimated deal value.
+        company_id (int): FK to the related company.
+        notes (list[Note]): Notes linked via polymorphic relationship.
+        __field_order__ (list[dict]): Field metadata for UI rendering.
+    """
+
     __tablename__ = "opportunities"
 
     name = db.Column(db.String(100), nullable=False)
@@ -21,64 +35,53 @@ class Opportunity(db.Model, BaseModel):
     )
 
     __field_order__ = [
-        {
-            "name": "name",
-            "label": "Name",
-            "type": "text",
-            "required": True,
-            "section": "Opportunity Info",
-        },
-        {
-            "name": "description",
-            "label": "Description",
-            "type": "textarea",
-            "section": "Opportunity Info",
-        },
-        {
-            "name": "company.name",
-            "label": "Company Name",
-            "type": "text",
-            "readonly": True,
-            "section": "Opportunity Info",
-        },
+        {"name": "name", "label": "Name", "type": "text", "required": True, "section": "Opportunity Info"},
+        {"name": "description", "label": "Description", "type": "textarea", "section": "Opportunity Info"},
+        {"name": "company.name", "label": "Company Name", "type": "text", "readonly": True, "section": "Opportunity Info"},
         {"name": "stage", "label": "Stage", "type": "text", "section": "Details"},
         {"name": "status", "label": "Status", "type": "text", "section": "Details"},
         {"name": "value", "label": "Value", "type": "number", "section": "Details"},
-        {
-            "name": "created_at",
-            "label": "Created At",
-            "type": "datetime",
-            "readonly": True,
-            "section": "Record Info",
-        },
-        {
-            "name": "updated_at",
-            "label": "Updated At",
-            "type": "datetime",
-            "readonly": True,
-            "section": "Record Info",
-        },
+        {"name": "created_at", "label": "Created At", "type": "datetime", "readonly": True, "section": "Record Info"},
+        {"name": "updated_at", "label": "Updated At", "type": "datetime", "readonly": True, "section": "Record Info"},
     ]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """Readable string representation.
+
+        Returns:
+            str: Identifier showing the opportunity name.
+        """
         return f"<Opportunity {self.name}>"
 
     def save(self):
+        """Persist opportunity to the database with logging.
+
+        Returns:
+            Opportunity: The saved instance.
+        """
         logger.debug(
             f"Saving opportunity with name {self.name} and status {self.status}"
         )
         super().save()
         logger.info(f"Opportunity '{self.name}' saved successfully.")
+        return self
 
     def delete(self):
+        """Remove opportunity from the database with logging.
+
+        Returns:
+            None
+        """
         logger.debug(f"Deleting opportunity with name {self.name}")
         super().delete()
         logger.info(f"Opportunity '{self.name}' deleted successfully.")
 
     @property
-    def crisp_summary(self):
-        """
-        Average CRISP score across all contacts involved in this opportunity.
+    def crisp_summary(self) -> float | None:
+        """Compute average CRISP score for all related contacts.
+
+        Returns:
+            float | None: Average CRISP score across all involved contacts.
         """
         contacts = {
             rel.contact for note in self.notes for rel in note.author.relationships

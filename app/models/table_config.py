@@ -4,60 +4,75 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class TableConfig(db.Model, BaseModel):
+    """Stores and manages dynamic table configuration for frontend tables.
+
+    This model enables saving, retrieving, and upgrading AG Grid-compatible
+    column configurations for each table in the CRM.
+
+    Attributes:
+        table_name (str): Unique table identifier.
+        column_config (str): JSON string of configuration metadata.
+    """
+
     __tablename__ = "table_configs"
 
     table_name = db.Column(db.String(50), unique=True, nullable=False)
-    column_config = db.Column(db.Text, nullable=False)  # JSON string
+    column_config = db.Column(db.Text, nullable=False)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """Return string representation of the table config.
+
+        Returns:
+            str: TableConfig instance name.
+        """
         return f"<TableConfig {self.table_name}>"
 
     @property
-    def config(self):
-        """Return the column configuration as a Python dictionary."""
+    def config(self) -> dict:
+        """Return the column configuration as a Python dictionary.
+
+        Returns:
+            dict: Parsed JSON configuration.
+        """
         logger.debug(f"Getting configuration for table '{self.table_name}'")
         return json.loads(self.column_config)
 
     @config.setter
-    def config(self, value):
-        """Set the column configuration from a Python dictionary."""
+    def config(self, value: dict):
+        """Set the column configuration from a Python dictionary.
+
+        Args:
+            value (dict): Dictionary representing table config.
+        """
         logger.debug(f"Setting configuration for table '{self.table_name}'")
         self.column_config = json.dumps(value)
 
     @classmethod
-    def get_config(cls, table_name, default=None):
-        """
-        Get configuration for a specific table.
+    def get_config(cls, table_name: str, default: dict | None = None) -> dict:
+        """Retrieve a table's configuration, upgrading old formats if needed.
 
-        If the table has an existing configuration in the old format (array of columns),
-        it will be converted to the new format with autoGenerateColumns and columnOverrides.
+        Args:
+            table_name (str): The name of the table.
+            default (dict | None): Optional fallback config.
+
+        Returns:
+            dict: Normalized table config.
         """
         logger.debug(f"Fetching configuration for table '{table_name}'")
         config = cls.query.filter_by(table_name=table_name).first()
         if config:
             config_dict = config.config
 
-            # Check if this is an old-style config (just an array of column objects)
             if isinstance(config_dict, list):
                 logger.debug(
                     f"Converting old configuration format for table '{table_name}'"
                 )
-                column_overrides = {}
-                for column in config_dict:
-                    field = column.get("field")
-                    if field:
-                        # Extract special properties that should be overrides
-                        override = {}
-                        for key, value in column.items():
-                            if key != "field":
-                                override[key] = value
-                        if override:
-                            column_overrides[field] = override
-
-                # Create new format
-                new_config = {
+                column_overrides = {
+                    col["field"]: {k: v for k, v in col.items() if k != "field"}
+                    for col in config_dict if "field" in col
+                }
+                return {
                     "autoGenerateColumns": True,
                     "columnOverrides": column_overrides,
                     "defaultColDef": {
@@ -69,37 +84,33 @@ class TableConfig(db.Model, BaseModel):
                     "columns": config_dict,
                 }
 
-                # Keep original columns for backward compatibility
-                return new_config
-
-            # If it's already in the new format, return as is
             return config_dict
 
-        # Return default config if no config exists
-        logger.debug(
-            f"No existing configuration found for table '{table_name}', returning default."
-        )
-        if default is None:
-            default = {
-                "autoGenerateColumns": True,
-                "columnOverrides": {},
-                "defaultColDef": {
-                    "flex": 1,
-                    "sortable": True,
-                    "filter": True,
-                    "resizable": True,
-                },
-            }
-        return default
+        logger.debug(f"No existing configuration found for table '{table_name}', returning default.")
+        return default or {
+            "autoGenerateColumns": True,
+            "columnOverrides": {},
+            "defaultColDef": {
+                "flex": 1,
+                "sortable": True,
+                "filter": True,
+                "resizable": True,
+            },
+        }
 
     @classmethod
-    def set_config(cls, table_name, config_dict):
-        """Set configuration for a specific table."""
-        logger.debug(f"Setting configuration for table '{table_name}'")
-        config = cls.query.filter_by(table_name=table_name).first()
-        if not config:
-            config = cls(table_name=table_name)
+    def set_config(cls, table_name: str, config_dict: dict) -> "TableConfig":
+        """Set configuration for a specific table.
 
+        Args:
+            table_name (str): Name of the table.
+            config_dict (dict): New configuration data.
+
+        Returns:
+            TableConfig: The updated or created instance.
+        """
+        logger.debug(f"Setting configuration for table '{table_name}'")
+        config = cls.query.filter_by(table_name=table_name).first() or cls(table_name=table_name)
         config.config = config_dict
         db.session.add(config)
         db.session.commit()
@@ -107,49 +118,66 @@ class TableConfig(db.Model, BaseModel):
         return config
 
     @classmethod
-    def set_column_overrides(cls, table_name, column_overrides):
-        """
-        Set only the column overrides for a specific table.
-        This preserves other configuration parameters.
+    def set_column_overrides(cls, table_name: str, column_overrides: dict) -> "TableConfig":
+        """Set column overrides while preserving the rest of the config.
+
+        Args:
+            table_name (str): Table identifier.
+            column_overrides (dict): Overrides per field.
+
+        Returns:
+            TableConfig: Updated instance.
         """
         logger.debug(f"Setting column overrides for table '{table_name}'")
-        current_config = cls.get_config(table_name)
-        current_config["columnOverrides"] = column_overrides
-        return cls.set_config(table_name, current_config)
+        config = cls.get_config(table_name)
+        config["columnOverrides"] = column_overrides
+        return cls.set_config(table_name, config)
 
     @classmethod
-    def add_column_override(cls, table_name, field_name, override_properties):
-        """
-        Add or update a single column override.
-        """
-        logger.debug(
-            f"Adding/updating column override for field '{field_name}' in table '{table_name}'"
-        )
-        current_config = cls.get_config(table_name)
-        if "columnOverrides" not in current_config:
-            current_config["columnOverrides"] = {}
+    def add_column_override(cls, table_name: str, field_name: str, override_properties: dict) -> "TableConfig":
+        """Add or update a single column override.
 
-        current_config["columnOverrides"][field_name] = override_properties
-        return cls.set_config(table_name, current_config)
+        Args:
+            table_name (str): Target table.
+            field_name (str): Column field name.
+            override_properties (dict): New properties.
 
-    @classmethod
-    def set_auto_generate_columns(cls, table_name, auto_generate=True):
+        Returns:
+            TableConfig: Updated instance.
         """
-        Enable or disable automatic column generation.
-        """
-        logger.debug(
-            f"Setting autoGenerateColumns for table '{table_name}' to {auto_generate}"
-        )
-        current_config = cls.get_config(table_name)
-        current_config["autoGenerateColumns"] = auto_generate
-        return cls.set_config(table_name, current_config)
+        logger.debug(f"Adding/updating column override for field '{field_name}' in table '{table_name}'")
+        config = cls.get_config(table_name)
+        config.setdefault("columnOverrides", {})[field_name] = override_properties
+        return cls.set_config(table_name, config)
 
     @classmethod
-    def set_default_col_def(cls, table_name, default_col_def):
+    def set_auto_generate_columns(cls, table_name: str, auto_generate: bool = True) -> "TableConfig":
+        """Toggle automatic column generation.
+
+        Args:
+            table_name (str): Table name.
+            auto_generate (bool): Whether to auto-generate.
+
+        Returns:
+            TableConfig: Updated instance.
         """
-        Set the default column definition for a table.
+        logger.debug(f"Setting autoGenerateColumns for table '{table_name}' to {auto_generate}")
+        config = cls.get_config(table_name)
+        config["autoGenerateColumns"] = auto_generate
+        return cls.set_config(table_name, config)
+
+    @classmethod
+    def set_default_col_def(cls, table_name: str, default_col_def: dict) -> "TableConfig":
+        """Set default column definition for a table.
+
+        Args:
+            table_name (str): Table identifier.
+            default_col_def (dict): Column definition.
+
+        Returns:
+            TableConfig: Updated instance.
         """
         logger.debug(f"Setting default column definition for table '{table_name}'")
-        current_config = cls.get_config(table_name)
-        current_config["defaultColDef"] = default_col_def
-        return cls.set_config(table_name, current_config)
+        config = cls.get_config(table_name)
+        config["defaultColDef"] = default_col_def
+        return cls.set_config(table_name, config)
