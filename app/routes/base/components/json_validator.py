@@ -6,48 +6,54 @@ logger = logging.getLogger(__name__)
 
 
 class JSONValidator:
-    """Validates and ensures JSON serializable data."""
+    """Validates and ensures data is JSON serializable."""
 
-    def validate_json_serializable(
-        self, data: Dict[str, Any], path: str = ""
-    ) -> List[str]:
+    def validate_json_serializable(self, data: Dict[str, Any], path: str = "") -> List[str]:
         """
-        Validate if a dictionary is fully JSON serializable and log any issues.
-        Returns a list of problematic paths in the data structure.
+        Recursively validate that a dictionary is JSON serializable.
+
+        Args:
+            data: The dictionary to validate.
+            path: The dot-path representing current traversal (for error reporting).
+
+        Returns:
+            List[str]: List of paths where serialization errors were found.
         """
         issues = []
+
         if isinstance(data, dict):
             for key, value in data.items():
                 current_path = f"{path}.{key}" if path else key
                 try:
-                    # Test if this particular value is JSON serializable
                     json.dumps({key: value})
                 except TypeError as e:
-                    logger.error(
-                        f"JSON serialization error at {current_path}: {str(e)}"
-                    )
+                    logger.error(f"JSON serialization error at {current_path}: {str(e)}")
                     issues.append(f"{current_path}: {type(value).__name__}")
 
-                # Recursively check nested dictionaries
+                # Recursively check nested values
                 if isinstance(value, dict):
-                    nested_issues = self.validate_json_serializable(value, current_path)
-                    issues.extend(nested_issues)
+                    issues.extend(self.validate_json_serializable(value, current_path))
                 elif isinstance(value, list):
                     for i, item in enumerate(value):
                         if isinstance(item, dict):
-                            nested_issues = self.validate_json_serializable(
-                                item, f"{current_path}[{i}]"
-                            )
-                            issues.extend(nested_issues)
+                            issues.extend(self.validate_json_serializable(item, f"{current_path}[{i}]"))
+
         return issues
 
     def ensure_json_serializable(self, data):
-        """Convert data to a JSON serializable format."""
+        """
+        Recursively convert complex objects to JSON-safe formats.
+
+        Args:
+            data: Any object or structure to convert.
+
+        Returns:
+            A version of the input data that is JSON serializable.
+        """
         if isinstance(data, dict):
             return {k: self.ensure_json_serializable(v) for k, v in data.items()}
         elif isinstance(data, list):
             return [self.ensure_json_serializable(item) for item in data]
         elif hasattr(data, "__dict__"):
             return self.ensure_json_serializable(data.__dict__)
-        # Add other type conversions as needed
         return data

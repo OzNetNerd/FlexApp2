@@ -7,22 +7,22 @@ logger = logging.getLogger(__name__)
 
 
 def render_safely(
-    template_name,
-    context,
-    fallback_error_message="An error occurred while rendering the page",
-    endpoint_name=None,
+    template_name: str,
+    context: dict,
+    fallback_error_message: str = "An error occurred while rendering the page",
+    endpoint_name: str = None,
 ):
     """
-    Render template with improved error handling and toast fallback.
+    Render a Jinja2 template with error handling and fallback logic.
 
     Args:
-        template_name: Name of the template to render
-        context: Dictionary of variables to pass to the template
-        fallback_error_message: User-friendly message to display on error
-        endpoint_name: Optional endpoint name for logging
+        template_name (str): The name of the template to render.
+        context (dict): Context dictionary for the template.
+        fallback_error_message (str): Message to display if rendering fails.
+        endpoint_name (str, optional): The name of the endpoint for logging context.
 
     Returns:
-        Rendered template with error toast or fallback HTML
+        Response: A rendered HTML template or error fallback response.
     """
     try:
         return render_template(template_name, **context)
@@ -49,13 +49,11 @@ def render_safely(
         if current_app.debug:
             logger.debug(f"Traceback: {traceback.format_exc()}")
 
-        # Add error message to context
         context["template_render_error"] = (
             f"{error_type}: {details}" if current_app.debug else fallback_error_message
         )
 
         try:
-            # ✅ Retry rendering the *same* template with toast message injected
             return render_template(template_name, **context), status_code
         except Exception as e2:
             logger.critical(
