@@ -11,8 +11,9 @@ class OpportunityCRUDRoutes(GenericWebRoutes):
     """
     Custom CRUD routes for Opportunity model.
     """
+
     def _preprocess_form_data(self, form_data):
-        company_name = form_data.get('company_name', '').strip()
+        company_name = form_data.get("company_name", "").strip()
         if company_name:
             company = Company.query.filter_by(name=company_name).first()
             if not company:
@@ -20,12 +21,12 @@ class OpportunityCRUDRoutes(GenericWebRoutes):
                 company = Company(name=company_name)
                 db.session.add(company)
                 db.session.commit()
-            form_data['company_id'] = company.id
+            form_data["company_id"] = company.id
         else:
-            form_data['company_id'] = None
+            form_data["company_id"] = None
 
         # Remove 'company_name' as it's not a valid model field
-        form_data.pop('company_name', None)
+        form_data.pop("company_name", None)
 
     def _validate_create(self, form_data):
         self._preprocess_form_data(form_data)
@@ -35,10 +36,11 @@ class OpportunityCRUDRoutes(GenericWebRoutes):
         self._preprocess_form_data(form_data)
         return super()._validate_edit(item, form_data)
 
+
 opportunity_routes = OpportunityCRUDRoutes(
     blueprint=opportunities_bp,
     model=Opportunity,
-    index_template='opportunities.html',
-    required_fields=['name'],
-    unique_fields=[]
+    index_template="opportunities.html",
+    required_fields=["name"],
+    unique_fields=[],
 )

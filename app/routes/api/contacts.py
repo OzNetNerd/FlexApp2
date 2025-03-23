@@ -11,8 +11,8 @@ contact_api_routes = GenericAPIRoutes(
     blueprint=api_contacts_bp,
     model=Contact,
     service=CRUDService(Contact),
-    api_prefix='/api/contacts',
-    required_fields=['name', 'email'],
-    unique_fields=['email']
+    api_prefix="/api/contacts",
+    required_fields=["name", "email"],
+    unique_fields=["email"],
 )
 logger.info("Contact API routes instantiated successfully.")

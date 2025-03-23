@@ -15,7 +15,7 @@ def init_db(app):
     from app.models.base import db
 
     with app.app_context():
-        db_path = current_app.config['SQLALCHEMY_DATABASE_URI']
+        db_path = current_app.config["SQLALCHEMY_DATABASE_URI"]
         logger.info(f"Initializing database at: {db_path}")
 
         db.create_all()
@@ -26,7 +26,7 @@ def init_db(app):
             logger.info("Debug mode detected, creating sample data...")
             _create_sample_data(db)
 
-        db_file = db_path.replace('sqlite:///', '')
+        db_file = db_path.replace("sqlite:///", "")
         if os.path.exists(db_file):
             logger.info(f"✅ Database created at: {db_file}")
         else:
@@ -35,6 +35,7 @@ def init_db(app):
 
 def _create_default_table_configs(db):
     from app.models.table_config import TableConfig
+
     logger.info("Creating default table configurations...")
     # Add any default table config creation logic here
     logger.info("✅ Default table configurations processed.")
@@ -53,34 +54,56 @@ def _create_sample_data(db):
     logger.info("Creating sample users...")
     password = generate_password_hash("password123")
     users = [
-        User(username='john', name='John Doe', email='john@example.com', password_hash=password),
-        User(username='jane', name='Jane Smith', email='jane@example.com', password_hash=password)
+        User(
+            username="john",
+            name="John Doe",
+            email="john@example.com",
+            password_hash=password,
+        ),
+        User(
+            username="jane",
+            name="Jane Smith",
+            email="jane@example.com",
+            password_hash=password,
+        ),
     ]
     db.session.add_all(users)
     db.session.commit()
 
     logger.info("Creating sample companies...")
     companies = [
-        Company(name='Acme Inc', description='Technology company'),
-        Company(name='Beta Corp', description='Manufacturing company')
+        Company(name="Acme Inc", description="Technology company"),
+        Company(name="Beta Corp", description="Manufacturing company"),
     ]
     db.session.add_all(companies)
     db.session.commit()
 
     logger.info("Creating sample contacts...")
     contacts = [
-        Contact(id=1, first_name='Test', last_name='User'),
-        Contact(id=2, first_name='Test2', last_name='User2')
+        Contact(id=1, first_name="Test", last_name="User"),
+        Contact(id=2, first_name="Test2", last_name="User2"),
     ]
     db.session.add_all(contacts)
     db.session.commit()
 
     logger.info("Creating sample opportunities...")
     opportunities = [
-        Opportunity(name='New Website', description='Build a new website', status='New',
-                    stage='Prospecting', value=10000, company_id=1),
-        Opportunity(name='Software Upgrade', description='Upgrade ERP system', status='In Progress',
-                    stage='Negotiation', value=25000, company_id=2)
+        Opportunity(
+            name="New Website",
+            description="Build a new website",
+            status="New",
+            stage="Prospecting",
+            value=10000,
+            company_id=1,
+        ),
+        Opportunity(
+            name="Software Upgrade",
+            description="Upgrade ERP system",
+            status="In Progress",
+            stage="Negotiation",
+            value=25000,
+            company_id=2,
+        ),
     ]
     db.session.add_all(opportunities)
     db.session.commit()

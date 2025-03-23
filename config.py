@@ -14,10 +14,10 @@ logger.debug(f"Base directory set to: {BASE_DIR}")
 
 class Config:
     # Basic configuration
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev_key_for_development')
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev_key_for_development")
     logger.debug(f"SECRET_KEY set to: {SECRET_KEY}")
 
-    SESSION_TYPE = 'filesystem'
+    SESSION_TYPE = "filesystem"
     PERMANENT_SESSION_LIFETIME = 60 * 60 * 24  # 24 hours in seconds
     SESSION_PERMANENT = True
     SESSION_USE_SIGNER = True
@@ -25,7 +25,7 @@ class Config:
     # Add to your Config class
     SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SAMESITE = "Lax"
     REMEMBER_COOKIE_DURATION = 60 * 60 * 24 * 30  # 30 days
     REMEMBER_COOKIE_SECURE = False  # Set to True in production with HTTPS
     REMEMBER_COOKIE_HTTPONLY = True
@@ -33,8 +33,7 @@ class Config:
     # Database configuration
     # Use absolute path to ensure database is created in the correct location
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'DATABASE_URL',
-        f'sqlite:///{BASE_DIR}/crm.db'
+        "DATABASE_URL", f"sqlite:///{BASE_DIR}/crm.db"
     )
     logger.debug(f"SQLALCHEMY_DATABASE_URI set to: {SQLALCHEMY_DATABASE_URI}")
 
@@ -45,5 +44,5 @@ class Config:
     ITEMS_PER_PAGE = 15
 
     # Default to development mode unless specified
-    DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() in ('true', '1', 't')
+    DEBUG = os.environ.get("FLASK_DEBUG", "True").lower() in ("true", "1", "t")
     logger.debug(f"DEBUG mode set to: {DEBUG}")

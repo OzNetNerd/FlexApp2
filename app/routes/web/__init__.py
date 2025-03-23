@@ -7,18 +7,18 @@ from app.routes.web.auth import login, logout
 logger = logging.getLogger(__name__)
 
 # Create blueprints for web UI
-main_bp = Blueprint('main', __name__)
-users_bp = Blueprint('users', __name__, url_prefix='/users')
-companies_bp = Blueprint('companies', __name__, url_prefix='/companies')
-contacts_bp = Blueprint('contacts', __name__, url_prefix='/contacts')
-opportunities_bp = Blueprint('opportunities', __name__, url_prefix='/opportunities')
-relationships_bp = Blueprint('relationships_bp', __name__, url_prefix='/relationships')
-crisp_scores_bp = Blueprint('crisp_scores_bp', __name__, url_prefix='/crisp-scores')
-auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
+main_bp = Blueprint("main", __name__)
+users_bp = Blueprint("users", __name__, url_prefix="/users")
+companies_bp = Blueprint("companies", __name__, url_prefix="/companies")
+contacts_bp = Blueprint("contacts", __name__, url_prefix="/contacts")
+opportunities_bp = Blueprint("opportunities", __name__, url_prefix="/opportunities")
+relationships_bp = Blueprint("relationships_bp", __name__, url_prefix="/relationships")
+crisp_scores_bp = Blueprint("crisp_scores_bp", __name__, url_prefix="/crisp-scores")
+auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth")
 
 # Register login/logout routes with auth blueprint
-auth_bp.add_url_rule('/login', view_func=login, methods=['GET', 'POST'])
-auth_bp.add_url_rule('/logout', view_func=logout, methods=['GET'])
+auth_bp.add_url_rule("/login", view_func=login, methods=["GET", "POST"])
+auth_bp.add_url_rule("/logout", view_func=logout, methods=["GET"])
 
 # Import modules to register routes after blueprints are created
 from app.routes.web import (
@@ -30,6 +30,7 @@ from app.routes.web import (
     relationship,
     crisp_score,
 )
+
 
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""

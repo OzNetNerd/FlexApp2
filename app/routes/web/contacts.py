@@ -19,10 +19,10 @@ class ContactCRUDRoutes(GenericWebRoutes):
 
         user = current_user
         relationship = item.get_relationship_with(user)
-        context['relationship'] = relationship
+        context["relationship"] = relationship
 
         if relationship:
-            context['crisp_scores'] = relationship.crisp_scores.order_by(
+            context["crisp_scores"] = relationship.crisp_scores.order_by(
                 CRISPScore.created_at.desc()
             ).all()
 
@@ -40,7 +40,7 @@ class ContactCRUDRoutes(GenericWebRoutes):
         form_data = request_obj.form.to_dict(flat=True)
 
         # Handle company name → ID
-        company_name = form_data.get('company_name', '').strip()
+        company_name = form_data.get("company_name", "").strip()
         if company_name:
             company = Company.query.filter_by(name=company_name).first()
             if not company:
@@ -48,17 +48,17 @@ class ContactCRUDRoutes(GenericWebRoutes):
                 company = Company(name=company_name)
                 db.session.add(company)
                 db.session.commit()
-            form_data['company_id'] = company.id
+            form_data["company_id"] = company.id
         else:
-            form_data['company_id'] = None
+            form_data["company_id"] = None
 
-        form_data.pop('company_name', None)
+        form_data.pop("company_name", None)
 
         # Handle user IDs from multi-select
-        user_ids = request_obj.form.getlist('users')
+        user_ids = request_obj.form.getlist("users")
         if user_ids:
             users = User.query.filter(User.id.in_(user_ids)).all()
-            form_data['users'] = users
+            form_data["users"] = users
             logger.info(f"👥 Linked users: {[u.email for u in users]}")
 
         return form_data
@@ -85,10 +85,10 @@ class ContactCRUDRoutes(GenericWebRoutes):
         """
         Common validation for contact data
         """
-        if form_data.get('email'):
-            email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-            if not re.match(email_regex, form_data['email']):
-                errors.append('Invalid email format')
+        if form_data.get("email"):
+            email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+            if not re.match(email_regex, form_data["email"]):
+                errors.append("Invalid email format")
                 logger.warning(f"❌ Invalid email format: {form_data['email']}")
 
 
@@ -97,7 +97,7 @@ logger.debug("⚙️ Setting up CRUD routes for contacts.")
 contact_routes = ContactCRUDRoutes(
     blueprint=contacts_bp,
     model=Contact,
-    index_template='contacts.html',
-    required_fields=['first_name', 'last_name'],
-    unique_fields=['email']
+    index_template="contacts.html",
+    required_fields=["first_name", "last_name"],
+    unique_fields=["email"],
 )

@@ -14,20 +14,29 @@ class FormHandler:
         self.service = service
         self.json_validator = json_validator
 
-    def prepare_form_context(self, title, submit_url, cancel_url, fields, button_text=None, item=None, read_only=False,
-                             edit_url=None):
+    def prepare_form_context(
+        self,
+        title,
+        submit_url,
+        cancel_url,
+        fields,
+        button_text=None,
+        item=None,
+        read_only=False,
+        edit_url=None,
+    ):
         """
         Builds the context dictionary for rendering form templates.
         """
         context = {
-            'title': title,
-            'submit_url': submit_url,
-            'cancel_url': cancel_url,
-            'fields': fields,
-            'button_text': button_text,
-            'item': item,
-            'read_only': read_only,
-            'edit_url': edit_url
+            "title": title,
+            "submit_url": submit_url,
+            "cancel_url": cancel_url,
+            "fields": fields,
+            "button_text": button_text,
+            "item": item,
+            "read_only": read_only,
+            "edit_url": edit_url,
         }
         return context
 
@@ -38,7 +47,7 @@ class FormHandler:
         Returns:
             List[Dict]: A list of dictionaries defining the form fields.
         """
-        field_definitions = getattr(self.model, '__field_order__', [])
+        field_definitions = getattr(self.model, "__field_order__", [])
         fields = []
 
         for field in field_definitions:
@@ -51,15 +60,21 @@ class FormHandler:
 
         if current_user.is_authenticated and current_user.is_admin:
             all_users = User.query.order_by(User.name).all()
-            selected_user_ids = [str(r.user_id) for r in getattr(item, 'relationships', [])]
+            selected_user_ids = [
+                str(r.user_id) for r in getattr(item, "relationships", [])
+            ]
 
-            fields.append({
-                'name': 'linked_users',
-                'label': 'Linked Users',
-                'type': 'multiselect',
-                'options': [{'label': u.name, 'value': str(u.id)} for u in all_users],
-                'value': selected_user_ids
-            })
+            fields.append(
+                {
+                    "name": "linked_users",
+                    "label": "Linked Users",
+                    "type": "multiselect",
+                    "options": [
+                        {"label": u.name, "value": str(u.id)} for u in all_users
+                    ],
+                    "value": selected_user_ids,
+                }
+            )
 
         return fields
 
@@ -69,7 +84,7 @@ class FormHandler:
         Example: 'company.name' -> item.company.name
         """
         try:
-            for part in name.split('.'):
+            for part in name.split("."):
                 item = getattr(item, part)
             return item
         except AttributeError:

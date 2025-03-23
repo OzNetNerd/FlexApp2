@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 class Company(db.Model, BaseModel):
-    __tablename__ = 'companies'
+    __tablename__ = "companies"
 
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
@@ -16,8 +16,8 @@ class Company(db.Model, BaseModel):
     contacts = db.relationship("Contact", back_populates="company")
     opportunities = db.relationship("Opportunity", backref="company", lazy="dynamic")
     notes = db.relationship(
-        'Note',
-        primaryjoin="and_(Note.notable_id == foreign(Company.id), Note.notable_type == 'Company')"
+        "Note",
+        primaryjoin="and_(Note.notable_id == foreign(Company.id), Note.notable_type == 'Company')",
     )
 
     # New relationship for capabilities
@@ -25,7 +25,7 @@ class Company(db.Model, BaseModel):
         "CompanyCapability",
         back_populates="company",
         cascade="all, delete-orphan",
-        lazy="dynamic"
+        lazy="dynamic",
     )
 
     @property
@@ -35,42 +35,42 @@ class Company(db.Model, BaseModel):
 
     __field_order__ = [
         {
-            'name': 'name',
-            'label': 'Name',
-            'type': 'text',
-            'section': 'About',
-            'required': True
+            "name": "name",
+            "label": "Name",
+            "type": "text",
+            "section": "About",
+            "required": True,
         },
         {
-            'name': 'description',
-            'label': 'Description',
-            'type': 'text',
-            'section': 'About'
+            "name": "description",
+            "label": "Description",
+            "type": "text",
+            "section": "About",
         },
         {
-            'name': 'created_at',
-            'label': 'Created At',
-            'type': 'text',
+            "name": "created_at",
+            "label": "Created At",
+            "type": "text",
             "readonly": True,
-            'section': 'Record Info'
+            "section": "Record Info",
         },
         {
-            'name': 'updated_at',
-            'label': 'Updated At',
-            'type': 'text',
+            "name": "updated_at",
+            "label": "Updated At",
+            "type": "text",
             "readonly": True,
-            'section': 'Record Info'
-        }
+            "section": "Record Info",
+        },
     ]
 
     def __repr__(self):
-        return f'<Company {self.name}>'
+        return f"<Company {self.name}>"
 
     @staticmethod
     def search_by_name(query):
         """Search companies by name for mentions."""
         logger.debug(f"Searching for companies with name starting with '{query}'")
-        result = Company.query.filter(Company.name.ilike(f'{query}%')).all()
+        result = Company.query.filter(Company.name.ilike(f"{query}%")).all()
         logger.debug(f"Found {len(result)} companies matching the query '{query}'")
         return result
 

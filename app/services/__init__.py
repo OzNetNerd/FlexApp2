@@ -19,4 +19,4 @@ def init_db(app):
 # Expose other functions that don't cause circular imports
 from .mention import process_mentions
 
-__all__ = ['init_db', 'process_mentions']
+__all__ = ["init_db", "process_mentions"]

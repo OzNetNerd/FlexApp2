@@ -4,14 +4,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class TableConfig(db.Model, BaseModel):
-    __tablename__ = 'table_configs'
+    __tablename__ = "table_configs"
 
     table_name = db.Column(db.String(50), unique=True, nullable=False)
     column_config = db.Column(db.Text, nullable=False)  # JSON string
 
     def __repr__(self):
-        return f'<TableConfig {self.table_name}>'
+        return f"<TableConfig {self.table_name}>"
 
     @property
     def config(self):
@@ -40,26 +41,33 @@ class TableConfig(db.Model, BaseModel):
 
             # Check if this is an old-style config (just an array of column objects)
             if isinstance(config_dict, list):
-                logger.debug(f"Converting old configuration format for table '{table_name}'")
+                logger.debug(
+                    f"Converting old configuration format for table '{table_name}'"
+                )
                 column_overrides = {}
                 for column in config_dict:
-                    field = column.get('field')
+                    field = column.get("field")
                     if field:
                         # Extract special properties that should be overrides
                         override = {}
                         for key, value in column.items():
-                            if key != 'field':
+                            if key != "field":
                                 override[key] = value
                         if override:
                             column_overrides[field] = override
 
                 # Create new format
-                new_config = {'autoGenerateColumns': True, 'columnOverrides': column_overrides, 'defaultColDef': {
-                    'flex': 1,
-                    'sortable': True,
-                    'filter': True,
-                    'resizable': True
-                }, 'columns': config_dict}
+                new_config = {
+                    "autoGenerateColumns": True,
+                    "columnOverrides": column_overrides,
+                    "defaultColDef": {
+                        "flex": 1,
+                        "sortable": True,
+                        "filter": True,
+                        "resizable": True,
+                    },
+                    "columns": config_dict,
+                }
 
                 # Keep original columns for backward compatibility
                 return new_config
@@ -68,17 +76,19 @@ class TableConfig(db.Model, BaseModel):
             return config_dict
 
         # Return default config if no config exists
-        logger.debug(f"No existing configuration found for table '{table_name}', returning default.")
+        logger.debug(
+            f"No existing configuration found for table '{table_name}', returning default."
+        )
         if default is None:
             default = {
-                'autoGenerateColumns': True,
-                'columnOverrides': {},
-                'defaultColDef': {
-                    'flex': 1,
-                    'sortable': True,
-                    'filter': True,
-                    'resizable': True
-                }
+                "autoGenerateColumns": True,
+                "columnOverrides": {},
+                "defaultColDef": {
+                    "flex": 1,
+                    "sortable": True,
+                    "filter": True,
+                    "resizable": True,
+                },
             }
         return default
 
@@ -104,7 +114,7 @@ class TableConfig(db.Model, BaseModel):
         """
         logger.debug(f"Setting column overrides for table '{table_name}'")
         current_config = cls.get_config(table_name)
-        current_config['columnOverrides'] = column_overrides
+        current_config["columnOverrides"] = column_overrides
         return cls.set_config(table_name, current_config)
 
     @classmethod
@@ -112,12 +122,14 @@ class TableConfig(db.Model, BaseModel):
         """
         Add or update a single column override.
         """
-        logger.debug(f"Adding/updating column override for field '{field_name}' in table '{table_name}'")
+        logger.debug(
+            f"Adding/updating column override for field '{field_name}' in table '{table_name}'"
+        )
         current_config = cls.get_config(table_name)
-        if 'columnOverrides' not in current_config:
-            current_config['columnOverrides'] = {}
+        if "columnOverrides" not in current_config:
+            current_config["columnOverrides"] = {}
 
-        current_config['columnOverrides'][field_name] = override_properties
+        current_config["columnOverrides"][field_name] = override_properties
         return cls.set_config(table_name, current_config)
 
     @classmethod
@@ -125,9 +137,11 @@ class TableConfig(db.Model, BaseModel):
         """
         Enable or disable automatic column generation.
         """
-        logger.debug(f"Setting autoGenerateColumns for table '{table_name}' to {auto_generate}")
+        logger.debug(
+            f"Setting autoGenerateColumns for table '{table_name}' to {auto_generate}"
+        )
         current_config = cls.get_config(table_name)
-        current_config['autoGenerateColumns'] = auto_generate
+        current_config["autoGenerateColumns"] = auto_generate
         return cls.set_config(table_name, current_config)
 
     @classmethod
@@ -137,5 +151,5 @@ class TableConfig(db.Model, BaseModel):
         """
         logger.debug(f"Setting default column definition for table '{table_name}'")
         current_config = cls.get_config(table_name)
-        current_config['defaultColDef'] = default_col_def
+        current_config["defaultColDef"] = default_col_def
         return cls.set_config(table_name, current_config)

@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def process_mentions(text):
     """
     Process text content to replace mentions with HTML links.
@@ -43,8 +44,8 @@ def process_mentions(text):
         return match.group(0)
 
     # Apply replacements
-    processed = re.sub(r'@(\w+)', replace_user, text)
-    processed = re.sub(r'#(\w+)', replace_company, processed)
+    processed = re.sub(r"@(\w+)", replace_user, text)
+    processed = re.sub(r"#(\w+)", replace_company, processed)
 
     logger.info(f"Processed text: {processed}")
     return processed, mentioned_users, mentioned_companies
@@ -65,11 +66,13 @@ def search_mentions(query, mention_type):
         logger.warning("Empty query provided to search_mentions.")
         return []
 
-    logger.debug(f"Searching for mentions of type '{mention_type}' with query '{query}'.")
+    logger.debug(
+        f"Searching for mentions of type '{mention_type}' with query '{query}'."
+    )
 
-    if mention_type == 'user':
+    if mention_type == "user":
         return User.search_by_username(query)
-    elif mention_type == 'company':
+    elif mention_type == "company":
         return Company.search_by_name(query)
 
     logger.error(f"Invalid mention_type: '{mention_type}'")

@@ -9,9 +9,12 @@ db = SQLAlchemy()
 
 class BaseModel:
     """Base model class that includes common columns and methods."""
+
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     def to_dict(self):
         """Convert model to dictionary."""

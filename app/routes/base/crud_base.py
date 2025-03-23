@@ -24,15 +24,20 @@ class CRUDRoutesBase:
         """Ensure an object is JSON serializable by converting problematic types."""
         if obj is None or isinstance(obj, (str, int, float, bool)):
             return obj
-        elif hasattr(obj, '__dict__'):
-            return {k: self._ensure_json_serializable(v) for k, v in obj.__dict__.items()
-                    if not k.startswith('_') and not callable(v)}
+        elif hasattr(obj, "__dict__"):
+            return {
+                k: self._ensure_json_serializable(v)
+                for k, v in obj.__dict__.items()
+                if not k.startswith("_") and not callable(v)
+            }
         elif isinstance(obj, dict):
             return {k: self._ensure_json_serializable(v) for k, v in obj.items()}
         elif isinstance(obj, (list, tuple)):
             return [self._ensure_json_serializable(item) for item in obj]
         else:
-            logger.warning(f"Converting {type(obj).__name__} to string for JSON serialization")
+            logger.warning(
+                f"Converting {type(obj).__name__} to string for JSON serialization"
+            )
             return str(obj)
 
     def _validate_create(self, form_data):
@@ -49,16 +54,24 @@ class CRUDRoutesBase:
         # Check unique fields
         for field in self.unique_fields:
             if field in form_data and form_data[field]:
-                existing = self.model.query.filter(getattr(self.model, field) == form_data[field]).first()
+                existing = self.model.query.filter(
+                    getattr(self.model, field) == form_data[field]
+                ).first()
                 if existing:
-                    logger.warning(f"Unique field '{field}' with value '{form_data[field]}' already exists")
-                    errors.append(f"{field} must be unique. '{form_data[field]}' is already in use.")
+                    logger.warning(
+                        f"Unique field '{field}' with value '{form_data[field]}' already exists"
+                    )
+                    errors.append(
+                        f"{field} must be unique. '{form_data[field]}' is already in use."
+                    )
 
         return errors
 
     def _validate_edit(self, item, form_data):
         """Validate form data for editing an existing item."""
-        logger.debug(f"Validating edit data for {self.model.__name__} with id {item.id}")
+        logger.debug(
+            f"Validating edit data for {self.model.__name__} with id {item.id}"
+        )
         errors = []
 
         # Check required fields
@@ -74,14 +87,22 @@ class CRUDRoutesBase:
                 if getattr(item, field) == form_data[field]:
                     continue
 
-                existing = self.model.query.filter(getattr(self.model, field) == form_data[field]).first()
+                existing = self.model.query.filter(
+                    getattr(self.model, field) == form_data[field]
+                ).first()
                 if existing and existing.id != item.id:
-                    logger.warning(f"Unique field '{field}' with value '{form_data[field]}' already exists")
-                    errors.append(f"{field} must be unique. '{form_data[field]}' is already in use.")
+                    logger.warning(
+                        f"Unique field '{field}' with value '{form_data[field]}' already exists"
+                    )
+                    errors.append(
+                        f"{field} must be unique. '{form_data[field]}' is already in use."
+                    )
 
         return errors
 
-    def _validate_json_serializable(self, data: Dict[str, Any], path: str = '') -> List[str]:
+    def _validate_json_serializable(
+        self, data: Dict[str, Any], path: str = ""
+    ) -> List[str]:
         """
         Validate if a dictionary is fully JSON serializable and log any issues.
         Returns a list of problematic paths in the data structure.
@@ -93,18 +114,25 @@ class CRUDRoutesBase:
                 try:
                     # Test if this particular value is JSON serializable
                     import json
+
                     json.dumps({key: value})
                 except TypeError as e:
-                    logger.error(f"JSON serialization error at {current_path}: {str(e)}")
+                    logger.error(
+                        f"JSON serialization error at {current_path}: {str(e)}"
+                    )
                     issues.append(f"{current_path}: {type(value).__name__}")
 
                 # Recursively check nested dictionaries
                 if isinstance(value, dict):
-                    nested_issues = self._validate_json_serializable(value, current_path)
+                    nested_issues = self._validate_json_serializable(
+                        value, current_path
+                    )
                     issues.extend(nested_issues)
                 elif isinstance(value, list):
                     for i, item in enumerate(value):
                         if isinstance(item, dict):
-                            nested_issues = self._validate_json_serializable(item, f"{current_path}[{i}]")
+                            nested_issues = self._validate_json_serializable(
+                                item, f"{current_path}[{i}]"
+                            )
                             issues.extend(nested_issues)
         return issues

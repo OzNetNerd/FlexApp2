@@ -8,11 +8,11 @@ logger = logging.getLogger(__name__)
 
 logger.debug("Instantiating GenericAPIRoutes for the Company model.")
 company_api_routes = GenericAPIRoutes(
-   blueprint=api_companies_bp,
-   model=Company,
-   service=CRUDService(Company),
-   api_prefix='/api/companies',
-   required_fields=['name'],
-   unique_fields=['name']
+    blueprint=api_companies_bp,
+    model=Company,
+    service=CRUDService(Company),
+    api_prefix="/api/companies",
+    required_fields=["name"],
+    unique_fields=["name"],
 )
 logger.info("Company API routes instantiated successfully.")

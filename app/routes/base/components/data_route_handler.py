@@ -18,14 +18,14 @@ class DataRouteHandler:
     def parse_request_params(self) -> Tuple[int, int, int, str, str, Dict]:
         """Parse and validate data request parameters."""
         # Parse pagination parameters
-        start_row = request.args.get('startRow', 0, type=int)
-        end_row = request.args.get('endRow', 15, type=int)
+        start_row = request.args.get("startRow", 0, type=int)
+        end_row = request.args.get("endRow", 15, type=int)
         page_size = end_row - start_row
         page = (start_row // page_size) + 1 if page_size > 0 else 1
         logger.debug(f"Pagination: page={page}, page_size={page_size}")
 
         # Parse sorting parameters
-        sort_model = request.args.get('sortModel', '[]')
+        sort_model = request.args.get("sortModel", "[]")
         try:
             sort_model = json.loads(sort_model)
         except (TypeError, json.JSONDecodeError) as e:
@@ -33,7 +33,7 @@ class DataRouteHandler:
             sort_model = []
 
         # Parse filtering parameters
-        filter_model = request.args.get('filterModel', '{}')
+        filter_model = request.args.get("filterModel", "{}")
         try:
             filter_model = json.loads(filter_model)
         except (TypeError, json.JSONDecodeError) as e:
@@ -41,11 +41,11 @@ class DataRouteHandler:
             filter_model = {}
 
         # Get sort parameters
-        sort_column = 'id'
-        sort_direction = 'asc'
+        sort_column = "id"
+        sort_direction = "asc"
         if sort_model and len(sort_model) > 0:
-            sort_column = sort_model[0].get('colId', 'id')
-            sort_direction = sort_model[0].get('sort', 'asc')
+            sort_column = sort_model[0].get("colId", "id")
+            sort_direction = sort_model[0].get("sort", "asc")
 
         return page, page_size, start_row, sort_column, sort_direction, filter_model
 
@@ -53,10 +53,12 @@ class DataRouteHandler:
         """Convert model objects to JSON-serializable dictionaries."""
         data = []
         for item in items:
-            if hasattr(item, 'to_dict') and callable(getattr(item, 'to_dict')):
+            if hasattr(item, "to_dict") and callable(getattr(item, "to_dict")):
                 item_dict = item.to_dict()
             else:
-                item_dict = {k: v for k, v in item.__dict__.items() if not k.startswith('_')}
+                item_dict = {
+                    k: v for k, v in item.__dict__.items() if not k.startswith("_")
+                }
             data.append(self.json_validator.ensure_json_serializable(item_dict))
         return data
 
@@ -64,7 +66,9 @@ class DataRouteHandler:
         """Process data request and return JSON response."""
         try:
             # Parse request parameters
-            page, page_size, start_row, sort_column, sort_direction, filter_model = self.parse_request_params()
+            page, page_size, start_row, sort_column, sort_direction, filter_model = (
+                self.parse_request_params()
+            )
 
             # Get data using service layer
             items = self.service.get_all(
@@ -72,7 +76,7 @@ class DataRouteHandler:
                 per_page=page_size,  # ✅ use per_page to match the method signature
                 sort_column=sort_column,
                 sort_direction=sort_direction,
-                filters=dict()
+                filters=dict(),
             )
 
             logger.debug(f"Found {len(items.items)} items out of {items.total} total")
@@ -82,10 +86,10 @@ class DataRouteHandler:
 
             # Prepare response
             result = {
-                'data': data,
-                'total': items.total if hasattr(items, 'total') else len(data),
-                'page': page,
-                'per_page': page_size
+                "data": data,
+                "total": items.total if hasattr(items, "total") else len(data),
+                "page": page,
+                "per_page": page_size,
             }
 
             logger.debug(f"Returning {len(data)} items in the data route.")
@@ -93,10 +97,9 @@ class DataRouteHandler:
         except Exception as e:
             logger.error(f"Error in data route: {str(e)}")
             logger.error(f"Traceback: {traceback.format_exc()}")
-            return jsonify({
-                'error': str(e),
-                'data': [],
-                'total': 0,
-                'page': 1,
-                'per_page': 15
-            }), 500
+            return (
+                jsonify(
+                    {"error": str(e), "data": [], "total": 0, "page": 1, "per_page": 15}
+                ),
+                500,
+            )

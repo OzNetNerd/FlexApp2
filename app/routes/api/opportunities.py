@@ -11,8 +11,8 @@ opportunity_api_routes = GenericAPIRoutes(
     blueprint=api_opportunities_bp,
     model=Opportunity,
     service=CRUDService(Opportunity),
-    api_prefix='/api/opportunities',
-    required_fields=['name'],
-    unique_fields=[]
+    api_prefix="/api/opportunities",
+    required_fields=["name"],
+    unique_fields=[],
 )
 logger.info("Opportunity API routes instantiated successfully.")

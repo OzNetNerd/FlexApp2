@@ -3,10 +3,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class CRISPScore(db.Model, BaseModel):
-    __tablename__ = 'crisp_scores'
 
-    relationship_id = db.Column(db.Integer, db.ForeignKey('relationships.id'), nullable=False)
+class CRISPScore(db.Model, BaseModel):
+    __tablename__ = "crisp_scores"
+
+    relationship_id = db.Column(
+        db.Integer, db.ForeignKey("relationships.id"), nullable=False
+    )
     relationship = db.relationship("Relationship", back_populates="crisp_scores")
     credibility = db.Column(db.Integer, nullable=False)
     reliability = db.Column(db.Integer, nullable=False)
@@ -17,14 +20,21 @@ class CRISPScore(db.Model, BaseModel):
     total_score = db.Column(db.Float)
 
     def __repr__(self):
-        return f'<CRISPScore Relationship={self.relationship_id} Total={self.total_score}>'
+        return (
+            f"<CRISPScore Relationship={self.relationship_id} Total={self.total_score}>"
+        )
 
     def calculate_total(self):
         """Calculate the total CRISP score."""
         if self.s_score == 0:
-            self.total_score = float(self.c_score + self.r_score + self.i_score + self.p_score)
+            self.total_score = float(
+                self.c_score + self.r_score + self.i_score + self.p_score
+            )
         else:
-            self.total_score = float(self.c_score + self.r_score + self.i_score + self.p_score) / self.s_score
+            self.total_score = (
+                float(self.c_score + self.r_score + self.i_score + self.p_score)
+                / self.s_score
+            )
 
     def save(self):
         """Save with calculated total score."""

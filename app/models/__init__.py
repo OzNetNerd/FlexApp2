@@ -8,9 +8,9 @@ from .base import db
 
 # Association Table for Many-to-Many relationship between Contact and User
 contact_user_association = db.Table(
-    'contact_user_association',
-    db.Column('contact_id', db.Integer, db.ForeignKey('contacts.id')),
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
+    "contact_user_association",
+    db.Column("contact_id", db.Integer, db.ForeignKey("contacts.id")),
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
 )
 
 # Import dependent models first
@@ -29,16 +29,16 @@ from .relationship import Relationship
 from .crisp_score import CRISPScore
 
 __all__ = [
-    'db',
-    'User',
-    'Company',
-    'Contact',
-    'Opportunity',
-    'Note',
-    'TableConfig',
-    'Relationship',
-    'CRISPScore',
-    'contact_user_association'
+    "db",
+    "User",
+    "Company",
+    "Contact",
+    "Opportunity",
+    "Note",
+    "TableConfig",
+    "Relationship",
+    "CRISPScore",
+    "contact_user_association",
 ]
 
 # Log that the models module has been loaded

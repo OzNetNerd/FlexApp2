@@ -15,7 +15,7 @@ def create_admin_user():
             "username": admin_username,
             "name": "Administrator",
             "password_hash": generate_password_hash("password"),  # Change this!
-            "is_admin": True
+            "is_admin": True,
         }
 
         # Check for existing admin by username OR email

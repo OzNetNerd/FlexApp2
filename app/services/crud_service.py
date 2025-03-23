@@ -5,6 +5,7 @@ import traceback
 
 logger = logging.getLogger(__name__)
 
+
 class CRUDService:
     """
     Service layer for CRUD operations on database models.
@@ -14,7 +15,9 @@ class CRUDService:
     def __init__(self, model_class: Type):
         self.model_class = model_class
 
-    def get_all(self, page=1, per_page=15, sort_column='id', sort_direction='asc', filters=None):
+    def get_all(
+        self, page=1, per_page=15, sort_column="id", sort_direction="asc", filters=None
+    ):
         try:
             query = self.model_class.query
 
@@ -22,17 +25,21 @@ class CRUDService:
                 for col_id, filter_config in filters.items():
                     if hasattr(self.model_class, col_id):
                         column = getattr(self.model_class, col_id)
-                        filter_type = filter_config.get('type')
-                        filter_value = filter_config.get('filter')
-                        logger.debug(f"Applying filter on {col_id}: {filter_type}={filter_value}")
-                        if filter_type == 'contains':
-                            query = query.filter(column.ilike(f'%{filter_value}%'))
-                        elif filter_type == 'equals':
+                        filter_type = filter_config.get("type")
+                        filter_value = filter_config.get("filter")
+                        logger.debug(
+                            f"Applying filter on {col_id}: {filter_type}={filter_value}"
+                        )
+                        if filter_type == "contains":
+                            query = query.filter(column.ilike(f"%{filter_value}%"))
+                        elif filter_type == "equals":
                             query = query.filter(column == filter_value)
 
             if hasattr(self.model_class, sort_column):
                 column = getattr(self.model_class, sort_column)
-                query = query.order_by(column.desc() if sort_direction == 'desc' else column)
+                query = query.order_by(
+                    column.desc() if sort_direction == "desc" else column
+                )
 
             items = query.paginate(page=page, per_page=per_page, error_out=False)
             return items
@@ -46,13 +53,15 @@ class CRUDService:
         try:
             return self.model_class.query.get_or_404(item_id)
         except Exception as e:
-            logger.error(f"Error in get_by_id for {self.model_class.__name__} with id {item_id}: {str(e)}")
+            logger.error(
+                f"Error in get_by_id for {self.model_class.__name__} with id {item_id}: {str(e)}"
+            )
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
 
     def create(self, data):
         try:
-            data = {k: v for k, v in data.items() if v != ''}
+            data = {k: v for k, v in data.items() if v != ""}
             item = self.model_class(**data)
             db.session.add(item)
             db.session.commit()
@@ -65,7 +74,7 @@ class CRUDService:
 
     def update(self, item, data):
         try:
-            data = {k: v for k, v in data.items() if v != ''}
+            data = {k: v for k, v in data.items() if v != ""}
             for key, value in data.items():
                 if hasattr(item, key):
                     setattr(item, key, value)
@@ -73,7 +82,9 @@ class CRUDService:
             return item
         except Exception as e:
             db.session.rollback()
-            logger.error(f"Error updating {item.__class__.__name__} with id {item.id}: {str(e)}")
+            logger.error(
+                f"Error updating {item.__class__.__name__} with id {item.id}: {str(e)}"
+            )
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
 
@@ -84,7 +95,9 @@ class CRUDService:
             return True
         except Exception as e:
             db.session.rollback()
-            logger.error(f"Error deleting {item.__class__.__name__} with id {item.id}: {str(e)}")
+            logger.error(
+                f"Error deleting {item.__class__.__name__} with id {item.id}: {str(e)}"
+            )
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
 
