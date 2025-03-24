@@ -3,7 +3,6 @@ from typing import Optional, List, Type
 from flask import request, redirect, url_for, flash, Blueprint
 from flask_login import current_user, login_required
 import logging
-import traceback
 
 from app.services.crud_service import CRUDService
 from app.routes.base.crud_base import CRUDRoutesBase
@@ -52,8 +51,8 @@ class GenericWebRoutes(CRUDRoutesBase):
         form_handler = FormHandler(self.model, self.service, self.json_validator)
         if hasattr(self, "_build_fields"):
             form_handler.build_fields = self._build_fields
-        form_handler.validate_create = self._validate_create
-        form_handler.validate_edit = self._validate_edit
+        form_handler.validate_create = self._validate_create_from_request
+        form_handler.validate_edit = self._validate_edit_from_request
         return form_handler
 
     def _register_routes(self):
@@ -151,17 +150,18 @@ class GenericWebRoutes(CRUDRoutesBase):
         return self._render_create_form()
 
     def _handle_create_form_submission(self):
-        form_data = request.form.to_dict()
-        errors = self.form_handler.validate_create(form_data)
+        errors = self.form_handler.validate_create(request)
         if errors:
             for e in errors:
                 flash(e, "error")
             return self._render_create_form()
 
+        form_data = self._preprocess_form_data(request)
         result, error = self.item_manager.create_item(form_data)
         if error:
             flash(error, "error")
             return self._render_create_form()
+        flash(f"{self.model.__name__} created successfully", "success")
         return result
 
     def _edit_route(self, item_id):
@@ -175,17 +175,18 @@ class GenericWebRoutes(CRUDRoutesBase):
         return self._render_edit_form(item)
 
     def _handle_edit_form_submission(self, item):
-        form_data = request.form.to_dict()
-        errors = self.form_handler.validate_edit(item, form_data)
+        errors = self.form_handler.validate_edit(item, request)
         if errors:
             for e in errors:
                 flash(e, "error")
             return self._render_edit_form(item)
 
+        form_data = self._preprocess_form_data(request)
         result, error = self.item_manager.update_item(item, form_data)
         if error:
             flash(error, "error")
             return self._render_edit_form(item)
+        flash(f"{self.model.__name__} updated successfully", "success")
         return result
 
     def _render_create_form(self):
@@ -235,41 +236,16 @@ class GenericWebRoutes(CRUDRoutesBase):
             success, error = self.item_manager.delete_item(item)
             if error:
                 flash(error, "error")
+            else:
+                flash(f"{self.model.__name__} deleted successfully", "success")
         return redirect(url_for(f"{self.blueprint.name}.index"))
 
     def _data_route(self):
         self.request_logger.log_request_info(self.model.__name__, "data")
         return self.data_handler.handle_data_request()
 
-    def _validate_create(self, form_data):
-        return [
-            f"{field} is required"
-            for field in self.required_fields
-            if not form_data.get(field)
-        ]
+    def _validate_create_from_request(self, request_obj):
+        return self._validate_create(request_obj.form.to_dict())
 
-    def _validate_edit(self, item, form_data):
-        return self._validate_create(form_data)
-
-    def add_view_context(self, item, context):
-        logger.debug(
-            f"Generic add_view_context for {self.model.__name__} with ID {item.id}"
-        )
-        crisp_type = self.model.__tablename__.rstrip("s")
-        relationship = next(
-            (
-                rel
-                for rel in getattr(item, "relationships", [])
-                if rel.user_id == current_user.id
-            ),
-            None,
-        )
-        context["relationship"] = relationship
-        context["crisp_scores"] = (
-            relationship.crisp_scores.order_by(CRISPScore.created_at.desc()).all()
-            if relationship
-            else []
-        )
-        context["crisp_type"] = crisp_type
-        if hasattr(item, "notes"):
-            context["notes_model"] = Note
+    def _validate_edit_from_request(self, item, request_obj):
+        return self._validate_edit(item, request_obj)

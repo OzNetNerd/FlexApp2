@@ -32,12 +32,25 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName }) {
     let suggestions = [];
     let highlightIndex = -1;
 
-    // Load suggestions once
+    // Get pre-selected IDs from data-initial attribute
+    let initialIds = [];
+    try {
+        initialIds = JSON.parse(input.dataset.initial || '[]');
+        log('debug', scriptName, functionName, `📌 Initial IDs:`, initialIds);
+    } catch (e) {
+        log('warn', scriptName, functionName, `⚠️ Invalid JSON in data-initial`, e);
+    }
+
+    // Load suggestions and set initial selections
     fetch(dataUrl)
         .then(res => res.json())
         .then(json => {
             suggestions = json.data;
             log('info', scriptName, functionName, `📦 Loaded ${suggestions.length} suggestions`, suggestions);
+
+            // Select items by initial ID
+            selected = suggestions.filter(s => initialIds.includes(s.id));
+            renderBadges();
         })
         .catch(err => {
             log('error', scriptName, functionName, `❌ Failed to fetch suggestions`, err);

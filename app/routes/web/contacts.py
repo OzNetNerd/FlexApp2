@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class ContactCRUDRoutes(GenericWebRoutes):
     """
-    Custom CRUD routes for Contacts model that extends the generic implementation
+    Custom CRUD routes for Contacts model that extends the generic implementation.
     """
 
     def add_view_context(self, item, context):
@@ -63,27 +63,33 @@ class ContactCRUDRoutes(GenericWebRoutes):
 
         return form_data
 
-    def _validate_create(self, request_obj):
+    def _validate_create(self, form_data):
         """
-        Override validation for creating a contact
+        Core validation for creating a contact from dict form data.
         """
-        form_data = self._preprocess_form_data(request_obj)
         errors = super()._validate_create(form_data)
         self._validate_contact_data(form_data, errors)
         return errors
 
     def _validate_edit(self, item, request_obj):
         """
-        Override validation for editing a contact
+        Entry point from GenericWebRoutes that expects a Flask request object.
+        Converts to dict before calling actual validation logic.
         """
         form_data = self._preprocess_form_data(request_obj)
+        return self._validate_edit_data(item, form_data)
+
+    def _validate_edit_data(self, item, form_data):
+        """
+        Core validation for editing a contact from preprocessed form data.
+        """
         errors = super()._validate_edit(item, form_data)
         self._validate_contact_data(form_data, errors)
         return errors
 
     def _validate_contact_data(self, form_data, errors):
         """
-        Common validation for contact data
+        Common validation for contact data.
         """
         if form_data.get("email"):
             email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"

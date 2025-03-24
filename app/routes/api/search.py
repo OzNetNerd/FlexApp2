@@ -10,19 +10,6 @@ search_bp = Blueprint("search", __name__, url_prefix="/api/search")
 
 @search_bp.route("/")
 def search():
-    """
-    Perform a global search across users, companies, and opportunities.
-
-    Query Parameters:
-        q (str): The search string (must be at least 2 characters).
-
-    Returns:
-        Response: A JSON array of results. Each result includes:
-            - id (int): The entity's ID.
-            - text (str): The display name.
-            - type (str): One of 'user', 'company', or 'opportunity'.
-            - url (str): A URL to the entity's detail page.
-    """
     query = request.args.get("q", "").strip()
     if not query or len(query) < 2:
         logger.warning("Search query is too short or empty.")
@@ -78,16 +65,6 @@ def search():
 
 @search_bp.route("/mentions")
 def mentions_search():
-    """
-    Search for users or companies to mention using @ or #.
-
-    Query Parameters:
-        q (str): The partial search query.
-        type (str): 'user' or 'company'. Defaults to 'user'.
-
-    Returns:
-        Response: A JSON array of mention suggestions.
-    """
     query = request.args.get("q", "").strip()
     mention_type = request.args.get("type", "user")
 
@@ -112,3 +89,32 @@ def mentions_search():
 
     logger.info(f"Returning {len(results)} mention results.")
     return jsonify(results)
+
+
+@search_bp.route("/users/data")
+def users_data():
+    users = User.query.order_by(User.name).all()
+    data = [
+        {
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "name": user.name or f"{user.first_name} {user.last_name}".strip(),
+        }
+        for user in users
+    ]
+    return jsonify({"data": data})
+
+
+@search_bp.route("/companies/data")
+def companies_data():
+    companies = Company.query.order_by(Company.name).all()
+    data = [
+        {
+            "id": company.id,
+            "name": company.name,
+        }
+        for company in companies
+    ]
+    return jsonify({"data": data})

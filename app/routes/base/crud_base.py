@@ -32,6 +32,10 @@ class CRUDRoutesBase:
         logger.debug(f"Initializing CRUD routes base for {self.model.__name__}")
         self.service = CRUDService(self.model)
 
+    def _preprocess_form_data(self, request_obj):
+        """Optional hook for subclasses. Returns raw form by default."""
+        return request_obj.form.to_dict()
+
     def _ensure_json_serializable(self, obj: Any) -> Any:
         """
         Recursively ensure that a value is JSON serializable.

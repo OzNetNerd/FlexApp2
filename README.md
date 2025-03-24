@@ -1,4 +1,3 @@
-'edit' user actually looks like it goes to the 'create' backend
 I want to be able to edit individual fields without having to edit whole form (pencil icon)
 create form compeltely broken
 linked contacts do not show email address in brackets
