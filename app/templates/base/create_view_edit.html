@@ -38,15 +38,17 @@
       {{ macros.render_sections(fields, read_only) }}
 
       {% if not read_only %}
-        <!-- Editable Autocomplete Fields -->
-        <div class="mb-3">
-          <label for="users-input" class="form-label">Users</label>
-          <input type="text"
-                 id="users-input"
-                 class="form-control"
-                 placeholder="Type to search users..."
-                 data-initial='{{ item.users | map(attribute="id") | list | tojson }}'>
-        </div>
+      <!-- Editable Autocomplete Fields -->
+      <div class="mb-3">
+        <label for="users-input" class="form-label">Users</label>
+        <input
+          type="text"
+          id="users-input"
+          class="form-control"
+          placeholder="Type to search users..."
+          data-initial='{{ item.users | map(attribute="id") | list | tojson }}'
+        >
+      </div>
 
         <div class="mb-3">
           <label for="companies-input" class="form-label">Company</label>

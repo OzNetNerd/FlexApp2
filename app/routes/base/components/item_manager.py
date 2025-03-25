@@ -2,6 +2,8 @@ import logging
 import traceback
 from flask import flash, redirect, url_for
 from typing import Tuple, Any, Optional
+from sqlalchemy.orm import joinedload, class_mapper, RelationshipProperty
+
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +26,7 @@ class ItemManager:
 
     def get_item_by_id(self, item_id) -> Tuple[Optional[Any], Optional[str]]:
         """
-        Fetch an item by ID with error handling.
+        Fetch an item by ID with eager loading for supported relationships.
 
         Args:
             item_id: The primary key of the item.
@@ -33,9 +35,23 @@ class ItemManager:
             Tuple containing the item (or None) and an error message (or None).
         """
         try:
-            item = self.service.get_by_id(item_id)
+            query = self.model.query
+            mapper = class_mapper(self.model)
+
+            for rel in ("users", "company", "notes", "relationships"):
+                if hasattr(self.model, rel):
+                    prop = mapper.get_property(rel)
+                    if isinstance(prop, RelationshipProperty) and prop.lazy != "dynamic":
+                        query = query.options(joinedload(getattr(self.model, rel)))
+
+            item = query.filter_by(id=item_id).first()
+
+            if not item:
+                return None, f"{self.model.__name__} not found"
+
             logger.debug(f"Item found with id {item_id}")
             return item, None
+
         except Exception as e:
             error_msg = f"Error accessing {self.model.__name__} with id {item_id}: {str(e)}"
             logger.error(error_msg)

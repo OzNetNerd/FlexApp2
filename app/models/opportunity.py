@@ -35,9 +35,9 @@ class Opportunity(db.Model, BaseModel):
     )
 
     __field_order__ = [
-        {"name": "name", "label": "Name", "type": "text", "required": True, "section": "Opportunity Info"},
-        {"name": "description", "label": "Description", "type": "textarea", "section": "Opportunity Info"},
-        {"name": "company.name", "label": "Company Name", "type": "text", "readonly": True, "section": "Opportunity Info"},
+        {"name": "name", "label": "Name", "type": "text", "required": True, "section": "About"},
+        {"name": "description", "label": "Description", "type": "textarea", "section": "About"},
+        {"name": "company.name", "label": "Company Name", "type": "text", "readonly": True, "section": "About"},
         {"name": "stage", "label": "Stage", "type": "text", "section": "Details"},
         {"name": "status", "label": "Status", "type": "text", "section": "Details"},
         {"name": "value", "label": "Value", "type": "number", "section": "Details"},
