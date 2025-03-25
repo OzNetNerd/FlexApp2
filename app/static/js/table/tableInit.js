@@ -61,7 +61,11 @@ function setupColumnSelector(api, scriptName, functionName) {
     allColumns.forEach(col => {
         const colId = col.getColId ? col.getColId() : col.getId();
         const colDef = col.getColDef();
-        const colName = colDef.headerName || colId;
+        // Format column name with special case handling for "ID" and "at"
+        const colName = (colDef.headerName || colId)
+            .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
+            .replace(/\bId\b/g, 'ID')
+            .replace(/\bAt\b/g, 'at');
 
         const div = document.createElement('div');
         div.classList.add('form-check', 'mb-1');
@@ -139,11 +143,20 @@ export default async function initTable() {
         const sampleRow = data.data[0];
         const columnDefs = Object.keys(sampleRow).map(key => ({
             field: key,
-            headerName: key.replace(/_/g, ' ').toUpperCase(),
+            headerName: formatColumnHeader(key),
             sortable: true,
             filter: true
         }));
         gridOptions.columnDefs = columnDefs;
+    }
+
+    // Function to format column header text consistently
+    function formatColumnHeader(headerText) {
+        return headerText
+            .replace(/_/g, ' ') // Replace underscores with spaces
+            .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()) // Capitalize first letter
+            .replace(/\bId\b/g, 'ID') // Make "Id" into "ID"
+            .replace(/\bAt\b/g, 'at'); // Make "At" into "at"
     }
 
     const originalOnGridReady = gridOptions.onGridReady;
