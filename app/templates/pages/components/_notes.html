@@ -1,0 +1,140 @@
+<!-- Notes Section -->
+<div class="card shadow-sm border-0">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <h3 class="h5 text-primary fw-semibold mb-0"><i class="fas fa-comments me-2"></i>Notes</h3>
+    <button class="btn btn-sm btn-outline-primary">
+      <i class="fas fa-plus me-1"></i> Add Note
+    </button>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="card-body border-bottom pb-3">
+    <div class="row g-3">
+      <!-- Text Search -->
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0">
+            <i class="fas fa-search text-muted"></i>
+          </span>
+          <input type="text" class="form-control border-start-0" id="noteSearch" placeholder="Search notes...">
+        </div>
+      </div>
+
+      <!-- Date Range -->
+      <div class="col-md-5">
+        <div class="d-flex align-items-center">
+          <div class="input-group me-2">
+            <span class="input-group-text bg-light">From</span>
+            <input type="date" class="form-control" id="dateFrom">
+          </div>
+          <div class="input-group">
+            <span class="input-group-text bg-light">To</span>
+            <input type="date" class="form-control" id="dateTo">
+          </div>
+        </div>
+      </div>
+
+      <!-- Author Filter Dropdown -->
+      <div class="col-md-3">
+        <select class="form-select" id="authorFilter">
+          <option value="">All Authors</option>
+          {% set authors = [] %}
+          {% for note in notes %}
+            {% if note.author not in authors %}
+              {% set authors = authors + [note.author] %}
+              <option value="{{ note.author }}">{{ note.author }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="list-group">
+      {% for note in notes|default([
+        {
+          'avatar': 'https://i.pravatar.cc/40?img=1',
+          'author': 'Jess Robinson',
+          'timestamp': '22/03/25 09:11 AM',
+          'content': 'Had a great conversation with the client. They\'re leaning toward option B, but want pricing first.'
+        },
+        {
+          'avatar': 'https://i.pravatar.cc/40?img=2',
+          'author': 'Will Tran',
+          'timestamp': '21/03/25 04:28 PM',
+          'content': 'Reminder: update internal documentation after the handoff meeting next week.'
+        },
+        {
+          'avatar': 'https://i.pravatar.cc/40?img=3',
+          'author': 'Ava Johnson',
+          'timestamp': '20/03/25 01:02 PM',
+          'content': 'Spoke to legal—contract changes should be finalized by EOD Friday.'
+        }
+      ], true) %}
+        <div class="list-group-item d-flex align-items-start gap-3">
+          <img src="{{ note.avatar }}" alt="{{ note.author }}" class="rounded-circle" width="40" height="40">
+          <div>
+            <div class="fw-semibold">{{ note.author }} <small class="text-muted ms-2">{{ note.timestamp }}</small></div>
+            <div class="text-muted small">{{ note.content }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Add this script to make the filters functional -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const noteSearch = document.getElementById('noteSearch');
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
+    const authorFilter = document.getElementById('authorFilter');
+    const noteItems = document.querySelectorAll('.list-group-item');
+
+    function applyFilters() {
+      const searchText = noteSearch.value.toLowerCase();
+      const fromDate = dateFrom.value ? new Date(dateFrom.value) : null;
+      const toDate = dateTo.value ? new Date(dateTo.value) : null;
+      const author = authorFilter.value;
+
+      noteItems.forEach(item => {
+        const content = item.querySelector('.text-muted.small').textContent.toLowerCase();
+        const noteAuthor = item.querySelector('.fw-semibold').textContent.split(' ').slice(0, 2).join(' ');
+        const timeString = item.querySelector('.text-muted.ms-2').textContent;
+
+        // Parse date from format DD/MM/YY HH:MM AM/PM
+        const dateParts = timeString.split(' ')[0].split('/');
+        const timeParts = timeString.split(' ')[1].split(':');
+        const ampm = timeString.split(' ')[2];
+
+        let hours = parseInt(timeParts[0]);
+        if (ampm === 'PM' && hours < 12) hours += 12;
+        if (ampm === 'AM' && hours === 12) hours = 0;
+
+        const noteDate = new Date(
+          2000 + parseInt(dateParts[2]), // Year (assuming 20xx)
+          parseInt(dateParts[1]) - 1,    // Month (0-indexed)
+          parseInt(dateParts[0]),        // Day
+          hours,                         // Hours
+          parseInt(timeParts[1])         // Minutes
+        );
+
+        // Apply filters
+        const matchesSearch = !searchText || content.includes(searchText);
+        const matchesDateFrom = !fromDate || noteDate >= fromDate;
+        const matchesDateTo = !toDate || noteDate <= toDate;
+        const matchesAuthor = !author || noteAuthor.includes(author);
+
+        item.style.display = (matchesSearch && matchesDateFrom && matchesDateTo && matchesAuthor) ? '' : 'none';
+      });
+    }
+
+    // Add event listeners to all filter controls
+    noteSearch.addEventListener('input', applyFilters);
+    dateFrom.addEventListener('change', applyFilters);
+    dateTo.addEventListener('change', applyFilters);
+    authorFilter.addEventListener('change', applyFilters);
+  });
+</script>

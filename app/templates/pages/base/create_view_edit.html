@@ -1,4 +1,4 @@
-{% extends "base/page.html" %}
+{% extends "pages/base/page.html" %}
 {% import "macros/form_fields.html" as macros %}
 
 {% block content %}
@@ -21,6 +21,7 @@
           <button class="btn btn-outline-primary btn-sm active" type="button" data-bs-toggle="tab" data-bs-target="#tab-about">About</button>
           <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="tab" data-bs-target="#tab-notes">Notes</button>
           <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="tab" data-bs-target="#tab-crisp">CRISP</button>
+          <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="tab" data-bs-target="#tab-company-about">Company</button>
         </div>
       {% endif %}
     </div>
@@ -48,24 +49,18 @@
       <!-- Tab Content -->
       <div class="tab-content" id="opportunityTabContent">
         <div class="tab-pane fade show active" id="tab-about" role="tabpanel">
-          <div class="row">
-            {% for field in fields %}
-              {% if field.section == 'About' %}
-                {{ macros.render_field(field, read_only) }}
-              {% endif %}
-            {% endfor %}
-          </div>
+          {% include 'pages/components/_about.html' %}
         </div>
 
         <div class="tab-pane fade" id="tab-notes" role="tabpanel">
-          {% include 'details/_summary.html' %}
-          {% include 'details/_notes.html' %}
+          {% include 'pages/components/_summary.html' %}
+          {% include 'pages/components/_notes.html' %}
         </div>
 
         {% if item and read_only %}
         <div class="tab-pane fade" id="tab-crisp" role="tabpanel">
-          {% include 'crisp/_crisp_summary.html' with context %}
-          {% include 'crisp/_crisp_form.html' with context %}
+          {% include 'pages/crisp/_crisp_summary.html' with context %}
+          {% include 'pages/crisp/_crisp_form.html' with context %}
         </div>
         {% endif %}
       </div>
