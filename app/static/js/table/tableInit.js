@@ -1,15 +1,16 @@
 // table/tableInit.js
 
+const scriptName = "tableInit.js";
+
+import log from '../logger.js';
+import { getDatasetVariables, getDatasetValue, fetchApiData } from '../utils.js';
+import getGridOptions, { setGridApi } from './tableConfig.js';
+
 import { createGrid, ModuleRegistry } from 'https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.esm.min.js';
 import { ClientSideRowModelModule } from 'https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.esm.min.js';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
-const scriptName = "tableInit";
-
-import log from '../logger.js';
-import { getDatasetVariables, getDatasetValue, fetchApiData } from '../utils.js';
-import getGridOptions, { setGridApi } from './tableConfig.js';
 
 const tableContainerId = "table-container";
 const gridDiv = document.querySelector(`#${tableContainerId}`);

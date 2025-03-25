@@ -1,6 +1,7 @@
-// static/js/dropDown/columnSelector.js
+// static/js/table/columnSelector.js
 
 const scriptName = "columnSelector.js";
+import log from '../logger.js';
 
 /**
  * Initializes the column selector by populating options and setting up event listeners.
@@ -19,12 +20,11 @@ export function initColumnSelector() {
  */
 export function populateColumnSelectorOptions() {
   const functionName = "populateColumnSelectorOptions";
-  window.logger.group(`${scriptName}:${functionName}`, "📋 Populating column selector options");
+  log("info", `${scriptName}:${functionName}`, "📋 Populating column selector options");
 
   const container = document.getElementById('columnSelectorItems');
   if (!container) {
     log("warn", `${scriptName}:${functionName}`, "❌ Column selector container not found");
-    window.logger.groupEnd(`${scriptName}:${functionName}`);
     return;
   }
 
@@ -34,7 +34,6 @@ export function populateColumnSelectorOptions() {
   const gridApi = getGridApi();
   if (!gridApi) {
     log("warn", `${scriptName}:${functionName}`, "❌ Grid API not available");
-    window.logger.groupEnd(`${scriptName}:${functionName}`);
     return;
   }
 
@@ -42,7 +41,6 @@ export function populateColumnSelectorOptions() {
   const columnName = container.getAttribute('data-column-name');
   if (!columnName) {
     log("error", `${scriptName}:${functionName}`, "❌ No data-column-name attribute found on container");
-    window.logger.groupEnd(`${scriptName}:${functionName}`);
     return;
   }
 
@@ -50,7 +48,6 @@ export function populateColumnSelectorOptions() {
   const rowData = gridApi.getModel().rowsToDisplay.map(row => row.data);
   if (!rowData || rowData.length === 0) {
     log("warn", `${scriptName}:${functionName}`, "❌ No row data available");
-    window.logger.groupEnd(`${scriptName}:${functionName}`);
     return;
   }
 
@@ -96,8 +93,7 @@ export function populateColumnSelectorOptions() {
 
   // Update UI elements like counters without immediately applying the filter
   updateColumnSelector(false);
-  window.logger.success(`${scriptName}:${functionName}`, `✅ Created ${options.length} column selector options`);
-  window.logger.groupEnd(`${scriptName}:${functionName}`);
+  log("success", `${scriptName}:${functionName}`, `✅ Created ${options.length} column selector options`);
 }
 
 /**
@@ -106,7 +102,7 @@ export function populateColumnSelectorOptions() {
  */
 export function setupColumnSelector() {
   const functionName = "setupColumnSelector";
-  window.logger.group(`${scriptName}:${functionName}`, "🔄 Setting up column selector");
+  log("info", `${scriptName}:${functionName}`, "🔄 Setting up column selector");
 
   const container = document.getElementById('columnSelectorItems');
   const searchInput = document.getElementById('columnSelectorSearch');
@@ -147,8 +143,7 @@ export function setupColumnSelector() {
 
   // Initialize the counter and dropdown toggle text
   updateColumnSelector(false);
-  window.logger.success(`${scriptName}:${functionName}`, "✅ Column selector setup complete");
-  window.logger.groupEnd(`${scriptName}:${functionName}`);
+  log("success", `${scriptName}:${functionName}`, "✅ Column selector setup complete");
 }
 
 /**
@@ -187,13 +182,12 @@ export function updateColumnSelector(applyFilter = true) {
  */
 export function applyColumnSelector(selectedValues) {
   const functionName = "applyColumnSelector";
-  window.logger.group(`${scriptName}:${functionName}`, "🔄 Applying column selector filter");
+  log("info", `${scriptName}:${functionName}`, "🔄 Applying column selector filter");
   log("debug", `${scriptName}:${functionName}`, "🔍 With values:", selectedValues);
 
   const gridApi = getGridApi();
   if (!gridApi) {
     log("warn", `${scriptName}:${functionName}`, "❌ Grid API not available");
-    window.logger.groupEnd(`${scriptName}:${functionName}`);
     return;
   }
 
@@ -214,8 +208,7 @@ export function applyColumnSelector(selectedValues) {
 
   log("debug", `${scriptName}:${functionName}`, "🔍 Setting filter model:", filterModel);
   gridApi.setFilterModel(filterModel);
-  window.logger.success(`${scriptName}:${functionName}`, "✅ Filter applied successfully");
-  window.logger.groupEnd(`${scriptName}:${functionName}`);
+  log("success", `${scriptName}:${functionName}`, "✅ Filter applied successfully");
 }
 
 /**

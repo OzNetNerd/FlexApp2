@@ -1,4 +1,4 @@
-const scriptName = "utils";
+const scriptName = "utils.js";
 
 import log from './logger.js';
 

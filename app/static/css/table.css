@@ -1,0 +1,66 @@
+/* =========================
+   table.css
+   ========================= */
+
+/* Column selector */
+.column-list {
+    max-height: 250px;
+    overflow-y: auto;
+  }
+
+  .column-list .form-check {
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    margin-left: 20px;
+  }
+
+  .form-check-input {
+    margin-right: 8px;
+  }
+
+  .form-check-label {
+    font-weight: 500;
+  }
+
+  .column-list .form-check:hover {
+    background-color: #f1f5f9;
+  }
+
+  /* Search input */
+  .input-group {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .input-group-text {
+    background-color: #fff;
+    border-right: none;
+    color: #718096;
+    font-weight: 500;
+  }
+
+  .form-control {
+    border-left: none;
+    padding: 0.6rem 1rem;
+    font-size: 0.93rem;
+  }
+
+  .form-control:focus {
+    box-shadow: none;
+    border-color: #a0aec0;
+  }
+
+  /* AG Grid custom theme */
+  .ag-theme-alpine {
+    --ag-header-background-color: #f8fafc;
+    --ag-odd-row-background-color: #f9fafb;
+    --ag-row-hover-color: #edf2f7;
+    --ag-selected-row-background-color: #e6f7ff;
+    --ag-font-family: 'Poppins', sans-serif;
+    --ag-font-size: 0.93rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }

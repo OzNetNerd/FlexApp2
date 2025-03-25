@@ -1,7 +1,7 @@
 import log from './logger.js';
 
 document.addEventListener('DOMContentLoaded', function () {
-    const scriptName = "toastInit";
+    const scriptName = "toasts.js";
     const functionName = "DOMContentLoaded";
 
     log("debug", scriptName, functionName, "🔄 Initializing toast notifications");

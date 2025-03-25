@@ -1,5 +1,6 @@
-import log from '../logger.js';
 const scriptName = "tableConfig.js";
+import log from '../logger.js';
+import { initColumnSelector } from '../table/columnSelector.js';
 
 // Create variables to store the grid API outside the gridOptions
 let gridApiReference = null;
@@ -20,6 +21,9 @@ export function setGridApi(api, columnApi) {
 
     // Try to restore column state
     restoreColumnState();
+
+    // Initialize the column selector now that the grid is ready.
+    initColumnSelector();
 }
 
 /**
