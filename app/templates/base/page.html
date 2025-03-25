@@ -3,7 +3,10 @@
   {% include 'base/_head.html' %}
   <body>
     {% include "base/_toasts.html" %}
-    {% include 'base/_navbar.html' %}
+
+    {% if show_navbar is not defined or show_navbar %}
+      {% include 'base/_navbar.html' %}
+    {% endif %}
 
     <main class="py-4">
       <div class="container">

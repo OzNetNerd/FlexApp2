@@ -4,16 +4,26 @@
 {% block content %}
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-    <h3 class="h4 mb-0 text-primary">
-      {% if read_only %}
-        <i class="fas fa-eye me-2"></i>
-      {% elif item %}
-        <i class="fas fa-edit me-2"></i>
-      {% else %}
-        <i class="fas fa-plus-circle me-2"></i>
+    <div class="d-flex flex-wrap align-items-center gap-3">
+      <h3 class="h4 mb-0 text-primary">
+        {% if read_only %}
+          <i class="fas fa-eye me-2"></i>
+        {% elif item %}
+          <i class="fas fa-edit me-2"></i>
+        {% else %}
+          <i class="fas fa-plus-circle me-2"></i>
+        {% endif %}
+        {{ title }}
+      </h3>
+
+      {% if item and read_only %}
+        <div class="btn-group ms-2" role="group" aria-label="View Sections">
+          <button class="btn btn-outline-primary btn-sm active" type="button" data-bs-toggle="tab" data-bs-target="#tab-about">About</button>
+          <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="tab" data-bs-target="#tab-notes">Notes</button>
+          <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="tab" data-bs-target="#tab-crisp">CRISP</button>
+        </div>
       {% endif %}
-      {{ title }}
-    </h3>
+    </div>
     <div class="d-flex gap-2">
       {% if item and not read_only %}
         <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}" class="btn btn-outline-secondary">
@@ -35,59 +45,27 @@
 
   <div class="card-body">
     <form method="POST">
-      <!-- Bootstrap Tabs -->
-      <ul class="nav nav-tabs mb-3 border-bottom" id="opportunityTab" role="tablist" style="border-radius: 0 !important;">
-        {% set sections = fields | map(attribute='section') | unique | list %}
-        {% for section in sections %}
-          <li class="nav-item" role="presentation">
-            <button class="nav-link {% if loop.first %}active{% endif %} text-nowrap px-3 rounded-0" id="tab-{{ section | lower | replace(' ', '-') }}-tab"
-                    data-bs-toggle="tab" data-bs-target="#tab-{{ section | lower | replace(' ', '-') }}"
-                    type="button" role="tab" aria-controls="tab-{{ section | lower | replace(' ', '-') }}"
-                    aria-selected="{{ 'true' if loop.first else 'false' }}">
-              {{ section }}
-            </button>
-          </li>
-        {% endfor %}
-        <li class="nav-item" role="presentation">
-          <button class="nav-link text-nowrap px-3 rounded-0" id="tab-notes-tab" data-bs-toggle="tab" data-bs-target="#tab-notes"
-                  type="button" role="tab" aria-controls="tab-notes" aria-selected="false">
-            Notes
-          </button>
-        </li>
-        {% if item and read_only %}
-          <li class="nav-item" role="presentation">
-            <button class="nav-link text-nowrap px-3 rounded-0" id="tab-crisp-tab" data-bs-toggle="tab" data-bs-target="#tab-crisp"
-                    type="button" role="tab" aria-controls="tab-crisp" aria-selected="false">
-              CRISP
-            </button>
-          </li>
-        {% endif %}
-      </ul>
-
       <!-- Tab Content -->
       <div class="tab-content" id="opportunityTabContent">
-        {% for section in sections %}
-          <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="tab-{{ section | lower | replace(' ', '-') }}" role="tabpanel" aria-labelledby="tab-{{ section | lower | replace(' ', '-') }}-tab">
-            <div class="row">
-              {% for field in fields if field.section == section %}
+        <div class="tab-pane fade show active" id="tab-about" role="tabpanel">
+          <div class="row">
+            {% for field in fields %}
+              {% if field.section == 'About' %}
                 {{ macros.render_field(field, read_only) }}
-              {% endfor %}
-            </div>
-          </div>
-        {% endfor %}
-
-        <div class="tab-pane fade" id="tab-notes" role="tabpanel" aria-labelledby="tab-notes-tab">
-          <div class="form-group">
-            <label for="notes">Notes</label>
-            <textarea class="form-control" name="notes" id="notes" rows="5" {% if read_only %}readonly{% endif %}>{{ item.notes if item and item.notes else '' }}</textarea>
+              {% endif %}
+            {% endfor %}
           </div>
         </div>
 
+        <div class="tab-pane fade" id="tab-notes" role="tabpanel">
+          {% include 'notes.html' %}
+        </div>
+
         {% if item and read_only %}
-          <div class="tab-pane fade" id="tab-crisp" role="tabpanel" aria-labelledby="tab-crisp-tab">
-            {% include 'crisp/_crisp_summary.html' with context %}
-            {% include 'crisp/_crisp_form.html' with context %}
-          </div>
+        <div class="tab-pane fade" id="tab-crisp" role="tabpanel">
+          {% include 'crisp/_crisp_summary.html' with context %}
+          {% include 'crisp/_crisp_form.html' with context %}
+        </div>
         {% endif %}
       </div>
 
@@ -145,4 +123,19 @@
     });
   </script>
   {% endif %}
+
+  <script>
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(button => {
+      button.addEventListener('click', function () {
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('show', 'active'));
+        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(b => b.classList.remove('active'));
+
+        const target = document.querySelector(this.dataset.bsTarget);
+        if (target) {
+          this.classList.add('active');
+          target.classList.add('show', 'active');
+        }
+      });
+    });
+  </script>
 {% endblock %}
