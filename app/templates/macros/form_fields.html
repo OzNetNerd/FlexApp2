@@ -1,3 +1,4 @@
+{# app/templates/macros/form_fields.html #}
 {% macro render_sections(fields, read_only=False) %}
   {% set grouped = {} %}
   {% for field in fields %}
@@ -8,22 +9,31 @@
     {% set _ = grouped[section].append(field) %}
   {% endfor %}
 
-  {% for section, section_fields in grouped.items() %}
-    <div class="mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="text-primary mb-0">{{ section }}</h5>
-        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse"
-                data-bs-target="#section-{{ loop.index }}" aria-expanded="true">
-          Toggle
+  <ul class="nav nav-tabs" id="form-tabs" role="tablist">
+    {% for section in grouped.keys() %}
+      <li class="nav-item" role="presentation">
+        <button class="nav-link {% if loop.first %}active{% endif %}" id="tab-{{ section | lower | replace(' ', '-') }}-tab"
+                data-bs-toggle="tab" data-bs-target="#tab-{{ section | lower | replace(' ', '-') }}" type="button"
+                role="tab" aria-controls="tab-{{ section | lower | replace(' ', '-') }}"
+                aria-selected="{{ 'true' if loop.first else 'false' }}">
+          {{ section }}
         </button>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div class="tab-content mt-3">
+    {% for section, section_fields in grouped.items() %}
+      <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="tab-{{ section | lower | replace(' ', '-') }}"
+           role="tabpanel" aria-labelledby="tab-{{ section | lower | replace(' ', '-') }}-tab">
+        <div class="row">
+          {% for field in section_fields %}
+            {{ render_field(field, read_only) }}
+          {% endfor %}
+        </div>
       </div>
-      <div class="row collapse show" id="section-{{ loop.index }}">
-        {% for field in section_fields %}
-          {{ render_field(field, read_only) }}
-        {% endfor %}
-      </div>
-    </div>
-  {% endfor %}
+    {% endfor %}
+  </div>
 {% endmacro %}
 
 {% macro render_field(field, read_only=False) %}

@@ -35,65 +35,87 @@
 
   <div class="card-body">
     <form method="POST">
-      {{ macros.render_sections(fields, read_only) }}
+      <!-- Bootstrap Tabs -->
+      <ul class="nav nav-tabs mb-3 border-bottom" id="opportunityTab" role="tablist" style="border-radius: 0 !important;">
+        {% set sections = fields | map(attribute='section') | unique | list %}
+        {% for section in sections %}
+          <li class="nav-item" role="presentation">
+            <button class="nav-link {% if loop.first %}active{% endif %} text-nowrap px-3 rounded-0" id="tab-{{ section | lower | replace(' ', '-') }}-tab"
+                    data-bs-toggle="tab" data-bs-target="#tab-{{ section | lower | replace(' ', '-') }}"
+                    type="button" role="tab" aria-controls="tab-{{ section | lower | replace(' ', '-') }}"
+                    aria-selected="{{ 'true' if loop.first else 'false' }}">
+              {{ section }}
+            </button>
+          </li>
+        {% endfor %}
+        <li class="nav-item" role="presentation">
+          <button class="nav-link text-nowrap px-3 rounded-0" id="tab-notes-tab" data-bs-toggle="tab" data-bs-target="#tab-notes"
+                  type="button" role="tab" aria-controls="tab-notes" aria-selected="false">
+            Notes
+          </button>
+        </li>
+        {% if item and read_only %}
+          <li class="nav-item" role="presentation">
+            <button class="nav-link text-nowrap px-3 rounded-0" id="tab-crisp-tab" data-bs-toggle="tab" data-bs-target="#tab-crisp"
+                    type="button" role="tab" aria-controls="tab-crisp" aria-selected="false">
+              CRISP
+            </button>
+          </li>
+        {% endif %}
+      </ul>
 
-      {% if not read_only %}
-      <!-- Editable Autocomplete Fields -->
-      <div class="mb-3">
-        <label for="users-input" class="form-label">Users</label>
-        <input
-          type="text"
-          id="users-input"
-          class="form-control"
-          placeholder="Type to search users..."
-          data-initial='{{ item.users | map(attribute="id") | list | tojson }}'
-        >
+      <!-- Tab Content -->
+      <div class="tab-content" id="opportunityTabContent">
+        {% for section in sections %}
+          <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="tab-{{ section | lower | replace(' ', '-') }}" role="tabpanel" aria-labelledby="tab-{{ section | lower | replace(' ', '-') }}-tab">
+            <div class="row">
+              {% for field in fields if field.section == section %}
+                {{ macros.render_field(field, read_only) }}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+
+        <div class="tab-pane fade" id="tab-notes" role="tabpanel" aria-labelledby="tab-notes-tab">
+          <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea class="form-control" name="notes" id="notes" rows="5" {% if read_only %}readonly{% endif %}>{{ item.notes if item and item.notes else '' }}</textarea>
+          </div>
+        </div>
+
+        {% if item and read_only %}
+          <div class="tab-pane fade" id="tab-crisp" role="tabpanel" aria-labelledby="tab-crisp-tab">
+            {% include 'crisp/_crisp_summary.html' with context %}
+            {% include 'crisp/_crisp_form.html' with context %}
+          </div>
+        {% endif %}
       </div>
 
-        <div class="mb-3">
-          <label for="companies-input" class="form-label">Company</label>
-          <input type="text"
-                 id="companies-input"
-                 class="form-control"
-                 placeholder="Type to search companies..."
-                 data-initial='[{{ item.company.id if item and item.company else "" }}]'>
-        </div>
-      {% else %}
-        <!-- Read-only display -->
-        <div class="mb-3">
-          <label class="form-label">Users</label>
-          <p class="form-control-plaintext">
-            {{ item.users | map(attribute='email') | join(', ') if item.users else '—' }}
-          </p>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Company</label>
-          <p class="form-control-plaintext">
-            {{ item.company.name if item.company else '—' }}
-          </p>
-        </div>
-      {% endif %}
-
       {% if not read_only %}
-        <div class="d-flex justify-content-end mt-4">
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + ('.view' if item else '.index'), item_id=item.id if item else None) }}" class="btn btn-outline-secondary me-2">
-            <i class="fas fa-times me-1"></i> Cancel
-          </a>
-          <button type="submit" class="btn btn-{{ 'success' if item and not read_only else 'primary' }}">
-            <i class="fas fa-{{ 'save' if item and not read_only else 'plus-circle' }} me-1"></i>
-            {{ button_text or ('Save Changes' if item and not read_only else 'Create') }}
-          </button>
-        </div>
+      <div class="d-flex justify-content-end mt-4">
+        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + ('.view' if item else '.index'), item_id=item.id if item else None) }}" class="btn btn-outline-secondary me-2">
+          <i class="fas fa-times me-1"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-{{ 'success' if item and not read_only else 'primary' }}">
+          <i class="fas fa-{{ 'save' if item and not read_only else 'plus-circle' }} me-1"></i>
+          {{ button_text or ('Save Changes' if item and not read_only else 'Create') }}
+        </button>
+      </div>
       {% endif %}
     </form>
   </div>
-</div>
 
-{% if item and read_only %}
-  {% include 'crisp/_crisp_summary.html' with context %}
-  {% include 'crisp/_crisp_form.html' with context %}
-{% endif %}
+  {% if item and read_only %}
+  <div class="card-footer bg-light py-2 px-3 border-top">
+    <small class="text-muted">
+      <strong class="text-dark">Table:</strong> <span class="text-primary fw-bold">opportunities</span> |
+      <strong class="text-dark">Record ID:</strong> <span class="text-primary fw-bold">{{ item.id }}</span> |
+      <strong class="text-dark">Created:</strong> <span class="text-primary fw-bold">{{ item.created_at.strftime('%d/%m/%y %I:%M %p') }}</span> |
+      <strong class="text-dark">Updated:</strong> <span class="text-primary fw-bold">{{ item.updated_at.strftime('%d/%m/%y %I:%M %p') }}</span>
+    </small>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}
 
 {% block scripts %}

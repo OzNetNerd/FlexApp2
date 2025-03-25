@@ -41,8 +41,6 @@ class Opportunity(db.Model, BaseModel):
         {"name": "stage", "label": "Stage", "type": "text", "section": "Details"},
         {"name": "status", "label": "Status", "type": "text", "section": "Details"},
         {"name": "value", "label": "Value", "type": "number", "section": "Details"},
-        {"name": "created_at", "label": "Created At", "type": "datetime", "readonly": True, "section": "Record Info"},
-        {"name": "updated_at", "label": "Updated At", "type": "datetime", "readonly": True, "section": "Record Info"},
     ]
 
     def __repr__(self) -> str:
