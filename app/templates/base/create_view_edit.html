@@ -58,7 +58,8 @@
         </div>
 
         <div class="tab-pane fade" id="tab-notes" role="tabpanel">
-          {% include 'notes.html' %}
+          {% include 'details/_summary.html' %}
+          {% include 'details/_notes.html' %}
         </div>
 
         {% if item and read_only %}
