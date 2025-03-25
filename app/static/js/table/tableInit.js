@@ -11,7 +11,6 @@ import { ClientSideRowModelModule } from 'https://cdnjs.cloudflare.com/ajax/libs
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
-
 const tableContainerId = "table-container";
 const gridDiv = document.querySelector(`#${tableContainerId}`);
 
@@ -22,7 +21,8 @@ function setupGlobalSearch(api, scriptName, functionName) {
     const input = document.getElementById('globalSearch');
     if (input) {
         input.addEventListener('input', () => {
-            api.setGridOption('quickFilterText', input.value);
+            // Use the AG Grid quick filter method
+            api.setQuickFilter(input.value);
         });
     } else {
         log("warn", scriptName, functionName, "🔍 Search input (#globalSearch) not found.");
@@ -33,60 +33,78 @@ function setupGlobalSearch(api, scriptName, functionName) {
  * Sets up the column selector dropdown for toggling column visibility.
  */
 function setupColumnSelector(api, scriptName, functionName) {
-    const columnSelector = document.getElementById('columnSelector');
+    const columnSelector = document.getElementById('columnSelectorItems');
     const selectAllBtn = document.getElementById('selectAllColumns');
     const clearAllBtn = document.getElementById('clearAllColumns');
 
-    if (!columnSelector || !api) {
-        log("warn", scriptName, functionName, "📋 Column selector or grid API not available");
+    if (!columnSelector) {
+        log("warn", scriptName, functionName, "📋 Column selector (#columnSelectorItems) not found");
+        return;
+    }
+
+    if (!api) {
+        log("warn", scriptName, functionName, "📋 Grid API not available");
         return;
     }
 
     // Clear any previously inserted checkboxes
-    columnSelector.querySelectorAll('li.form-check').forEach(el => el.remove());
+    columnSelector.querySelectorAll('.form-check').forEach(el => el.remove());
 
+    // In AG Grid 31.0.1, columnApi was merged into the main api
     const allColumns = api.getColumns();
 
+    if (!allColumns || allColumns.length === 0) {
+        log("warn", scriptName, functionName, "No columns found in the grid");
+        return;
+    }
+
     allColumns.forEach(col => {
-        const colId = col.colId;
-        const colName = col.colDef.headerName || colId;
+        const colId = col.getColId ? col.getColId() : col.getId();
+        const colDef = col.getColDef();
+        const colName = colDef.headerName || colId;
 
-        const li = document.createElement('li');
-        li.classList.add('form-check');
+        const div = document.createElement('div');
+        div.classList.add('form-check', 'mb-1');
 
-        li.innerHTML = `
+        div.innerHTML = `
             <input class="form-check-input" type="checkbox" value="${colId}" id="chk-${colId}" ${
-            col.visible ? 'checked' : ''
+            api.getColumnState().find(c => c.colId === colId)?.hide === true ? '' : 'checked'
         }>
             <label class="form-check-label" for="chk-${colId}">${colName}</label>
         `;
 
-        const input = li.querySelector('input');
-        input.addEventListener('change', (e) => {
+        const checkbox = div.querySelector('input');
+        checkbox.addEventListener('change', (e) => {
             api.setColumnVisible(colId, e.target.checked);
         });
 
-        columnSelector.appendChild(li);
+        columnSelector.appendChild(div);
     });
 
     if (selectAllBtn) {
         selectAllBtn.addEventListener('click', () => {
             allColumns.forEach(col => {
-                api.setColumnVisible(col.colId, true);
-                const checkbox = document.getElementById(`chk-${col.colId}`);
+                const colId = col.getColId ? col.getColId() : col.getId();
+                api.setColumnVisible(colId, true);
+                const checkbox = document.getElementById(`chk-${colId}`);
                 if (checkbox) checkbox.checked = true;
             });
         });
+    } else {
+        log("warn", scriptName, functionName, "📋 Select all button (#selectAllColumns) not found");
     }
 
     if (clearAllBtn) {
         clearAllBtn.addEventListener('click', () => {
             allColumns.forEach(col => {
-                api.setColumnVisible(col.colId, false);
-                const checkbox = document.getElementById(`chk-${col.colId}`);
+                const colId = col.getColId ? col.getColId() : col.getId();
+                api.setColumnVisible(colId, false);
+                const checkbox = document.getElementById(`chk-${colId}`);
                 if (checkbox) checkbox.checked = false;
             });
         });
+    } else {
+        log("warn", scriptName, functionName, "📋 Clear all button (#clearAllColumns) not found");
     }
 }
 
@@ -107,6 +125,7 @@ export default async function initTable() {
 
     let data;
     try {
+        log("info", scriptName, functionName, `🔄 Fetching data from API: ${apiUrl}`);
         data = await fetchApiData(scriptName, functionName, apiUrl);
         log("info", scriptName, functionName, `✅📥 API data received: `, data);
     } catch (error) {
@@ -134,11 +153,22 @@ export default async function initTable() {
             originalOnGridReady(params);
         }
 
-        setGridApi(params.api, params.api); // passing api as both gridApi and columnApi for compatibility
+        // Pass the correct grid and column APIs
+        setGridApi(params.api, params.columnApi);
+
+        // Update rowData using the recommended setGridOption
         params.api.setGridOption('rowData', data.data || data);
 
         setupGlobalSearch(params.api, scriptName, functionName);
-        setupColumnSelector(params.api, scriptName, functionName);
+
+        // Check if the column selector element exists in the DOM
+        const columnSelectorExists = document.getElementById('columnSelectorItems');
+        if (columnSelectorExists) {
+            // In AG Grid 31.0.1, we pass the main grid API instead of columnApi
+            setupColumnSelector(params.api, scriptName, functionName);
+        } else {
+            log("warn", scriptName, functionName, "📋 Column selector element (#columnSelectorItems) not found. Skipping column selector setup.");
+        }
 
         log("info", scriptName, functionName, "✅ Table data initialized successfully");
     };
