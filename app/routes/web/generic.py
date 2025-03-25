@@ -60,7 +60,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             "/", "index", login_required(self._index_route), methods=["GET"]
         )
         self.blueprint.add_url_rule(
-            "/<int:item_id>", "view", login_required(self._view_route), methods=["GET"]
+            "/<int:item_id>", "view", login_required(self._view_route), methods=["GET", "POST"]
         )
         self.blueprint.add_url_rule(
             "/create",
@@ -127,6 +127,10 @@ class GenericWebRoutes(CRUDRoutesBase):
             flash(error, "error")
             return redirect(url_for(f"{self.blueprint.name}.index"))
 
+        if request.method == "POST":
+            # Optional: handle comment submission, audit log, etc.
+            return self._handle_view_post(item)
+
         fields = self.form_handler.build_fields(item)
         context = self.form_handler.prepare_form_context(
             title=f"View {self.model.__name__}",
@@ -142,6 +146,27 @@ class GenericWebRoutes(CRUDRoutesBase):
             context,
             f"Error viewing {self.model.__name__} with id {item_id}",
         )
+
+    def _handle_view_post(self, item):
+        note_content = request.form.get("note")
+        if not note_content:
+            flash("Note content is required.", "error")
+            return redirect(url_for(f"{self.blueprint.name}.view", item_id=item.id))
+
+        note = Note(
+            content=note_content,
+            user_id=current_user.id,
+            parent_type=self.model.__name__,
+            parent_id=item.id,
+        )
+        try:
+            note.save()  # assuming your Note model has a `save()` method
+            flash("Note added successfully", "success")
+        except Exception as e:
+            logger.exception(f"Error saving note: {e}")
+            flash("Failed to save note", "error")
+
+        return redirect(url_for(f"{self.blueprint.name}.view", item_id=item.id))
 
     def _create_route(self):
         self.request_logger.log_request_info(self.model.__name__, "create")
