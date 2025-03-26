@@ -1,0 +1,14 @@
+<h3 class="h4 mb-0 text-primary">
+    {% if read_only %}
+      <i class="fas fa-eye me-2"></i>
+    {% elif item %}
+      <i class="fas fa-edit me-2"></i>
+    {% else %}
+      <i class="fas fa-plus-circle me-2"></i>
+    {% endif %}
+    {{ title }}
+  </h3>
+
+  {% if fields %}
+    {% include 'pages/components/_pills_nav.html' %}
+  {% endif %}

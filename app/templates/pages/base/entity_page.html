@@ -7,51 +7,17 @@
     <div class="row align-items-center">
       <div class="col">
         <div class="d-flex align-items-center">
-          <h3 class="h4 mb-0 text-primary me-3">
-            {% if read_only %}
-              <i class="fas fa-eye me-2"></i>
-            {% elif item %}
-              <i class="fas fa-edit me-2"></i>
-            {% else %}
-              <i class="fas fa-plus-circle me-2"></i>
-            {% endif %}
-            {{ title }}
-          </h3>
-
-          {# Pills Navigation #}
-          {% if fields %}
-            {% include 'pages/components/_pills_nav.html' %}
-          {% endif %}
+          {% include 'pages/form/_header.html' %}
         </div>
       </div>
       <div class="col-auto">
-        <div class="d-flex justify-content-end align-items-center gap-2">
-          {% if item and not read_only %}
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
-            <i class="fas fa-times me-1"></i> Cancel
-          </a>
-          {% elif item and read_only %}
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}" class="btn btn-primary fw-bold">
-            <i class="fas fa-plus me-1"></i> Add
-          </a>
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', item_id=item.id) }}" class="btn btn-warning text-dark fw-bold">
-            <i class="fas fa-edit me-1"></i> Edit
-          </a>
-          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-            <i class="fas fa-trash me-1"></i> Delete
-          </button>
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
-            <i class="fas fa-arrow-left me-1"></i> Back
-          </a>
-          {% endif %}
-        </div>
+        {% include 'pages/form/_buttons.html' %}
       </div>
     </div>
   </div>
 
   <div class="card-body">
     <form method="POST">
-      {# Tab Content #}
       {% if fields %}
         {% set tabs = {} %}
         {% for field in fields %}
@@ -94,7 +60,6 @@
             {% endfor %}
           </div>
         {% else %}
-          {# Single tab - no tab wrapper needed #}
           {% for tab, tab_fields in tabs.items() %}
             {% set grouped_by_section = tab_fields | groupby('section') %}
             {% for section, section_fields in grouped_by_section %}
@@ -126,7 +91,6 @@
       {% if not read_only %}
         {% include 'pages/base/common/_form_autocomplete.html' %}
       {% else %}
-        <!-- Read-only display -->
         <div class="mb-3">
           <label class="form-label">Users</label>
           <p class="form-control-plaintext">
