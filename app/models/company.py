@@ -50,9 +50,10 @@ class Company(db.Model, BaseModel):
         return [cc.capability for cc in self.company_capabilities]
 
     __field_order__ = [
-        {"name": "name", "label": "Name", "type": "text", "section": "About", "required": True},
-        {"name": "description", "label": "Description", "type": "text", "section": "About"},
-        {"name": "crisp", "label": "CRISP", "type": "custom", "section": "CRISP"},
+        {"name": "name", "label": "Name", "type": "text", "tab": "About", "section": "Company Details",
+         "required": True},
+        {"name": "description", "label": "Description", "type": "text", "tab": "About", "section": "Company Details"},
+        {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
     ]
 
     def __repr__(self) -> str:

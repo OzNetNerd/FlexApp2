@@ -48,14 +48,18 @@ class Contact(db.Model, BaseModel):
     )
 
     __field_order__ = [
-        {"name": "first_name", "label": "First Name", "type": "text", "required": True, "section": "Basic Info"},
-        {"name": "last_name", "label": "Last Name", "type": "text", "required": True, "section": "Basic Info"},
-        {"name": "email", "label": "Email", "type": "email", "section": "Contact"},
-        {"name": "phone", "label": "Phone", "type": "text", "section": "Contact"},
-        {"name": "company_name", "label": "Company", "type": "text", "section": "Company Info"},
-        {"name": "created_at", "label": "Created At", "type": "text", "section": "Record Info", "readonly": True},
-        {"name": "updated_at", "label": "Updated At", "type": "text", "section": "Record Info", "readonly": True},
-        {"name": "crisp", "label": "CRISP", "type": "custom", "section": "CRISP"},
+        {"name": "first_name", "label": "First Name", "type": "text", "required": True, "tab": "About",
+         "section": "Identity"},
+        {"name": "last_name", "label": "Last Name", "type": "text", "required": True, "tab": "About",
+         "section": "Identity"},
+        {"name": "email", "label": "Email", "type": "email", "tab": "About", "section": "Contact Info"},
+        {"name": "phone", "label": "Phone", "type": "text", "tab": "About", "section": "Contact Info"},
+        {"name": "company_name", "label": "Company", "type": "text", "tab": "About", "section": "Company Info"},
+        {"name": "created_at", "label": "Created At", "type": "text", "tab": "About", "section": "Record Info",
+         "readonly": True},
+        {"name": "updated_at", "label": "Updated At", "type": "text", "tab": "About", "section": "Record Info",
+         "readonly": True},
+        {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
     ]
 
     def __repr__(self) -> str:

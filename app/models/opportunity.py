@@ -35,13 +35,16 @@ class Opportunity(db.Model, BaseModel):
     )
 
     __field_order__ = [
-        {"name": "name", "label": "Name", "type": "text", "required": True, "section": "About"},
-        {"name": "description", "label": "Description", "type": "textarea", "section": "About"},
-        {"name": "company.name", "label": "Company Name", "type": "text", "readonly": True, "section": "About"},
-        {"name": "stage", "label": "Stage", "type": "text", "section": "Details"},
-        {"name": "status", "label": "Status", "type": "text", "section": "Details"},
-        {"name": "value", "label": "Value", "type": "number", "section": "Details"},
-        {"name": "crisp", "label": "CRISP", "type": "custom", "section": "CRISP"},
+        {"name": "name", "label": "Name", "type": "text", "tab": "About", "section": "Opportunity Info",
+         "required": True},
+        {"name": "description", "label": "Description", "type": "textarea", "tab": "About",
+         "section": "Opportunity Info"},
+        {"name": "company.name", "label": "Company Name", "type": "text", "readonly": True, "tab": "About",
+         "section": "Opportunity Info"},
+        {"name": "stage", "label": "Stage", "type": "text", "tab": "Details", "section": "Pipeline"},
+        {"name": "status", "label": "Status", "type": "text", "tab": "Details", "section": "Pipeline"},
+        {"name": "value", "label": "Value", "type": "number", "tab": "Details", "section": "Financials"},
+        {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
     ]
 
     def __repr__(self) -> str:

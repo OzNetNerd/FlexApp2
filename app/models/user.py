@@ -34,12 +34,15 @@ class User(db.Model, BaseModel, UserMixin):
     notes = db.relationship("Note", backref="author", lazy="dynamic")
 
     __field_order__ = [
-        {"name": "username", "label": "Username", "type": "text", "required": True, "section": "Basic Info"},
-        {"name": "name", "label": "Name", "type": "text", "required": True, "section": "Basic Info"},
-        {"name": "email", "label": "Email", "type": "email", "required": True, "section": "Contact"},
-        {"name": "created_at", "label": "Created At", "type": "datetime", "readonly": True, "section": "Record Info"},
-        {"name": "updated_at", "label": "Updated At", "type": "datetime", "readonly": True, "section": "Record Info"},
-        {"name": "crisp", "label": "CRISP", "type": "custom", "section": "CRISP"},
+        {"name": "username", "label": "Username", "type": "text", "tab": "About", "section": "Basic Info",
+         "required": True},
+        {"name": "name", "label": "Name", "type": "text", "tab": "About", "section": "Basic Info", "required": True},
+        {"name": "email", "label": "Email", "type": "email", "tab": "About", "section": "Contact", "required": True},
+        {"name": "created_at", "label": "Created At", "type": "datetime", "readonly": True, "tab": "About",
+         "section": "Record Info"},
+        {"name": "updated_at", "label": "Updated At", "type": "datetime", "readonly": True, "tab": "About",
+         "section": "Record Info"},
+        {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
     ]
 
     def __repr__(self) -> str:

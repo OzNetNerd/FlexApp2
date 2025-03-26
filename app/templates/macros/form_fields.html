@@ -1,41 +1,50 @@
 {# app/templates/macros/form_fields.html #}
 
 {% macro render_sections(fields, read_only=False) %}
-  {% set grouped = {} %}
+  {% set tabs = {} %}
   {% for field in fields %}
-    {% set section = field.section or "Other" %}
-    {% if section not in grouped %}
-      {% set _ = grouped.update({section: []}) %}
+    {% set tab = field.tab or "Other" %}
+    {% if tab not in tabs %}
+      {% set _ = tabs.update({tab: []}) %}
     {% endif %}
-    {% set _ = grouped[section].append(field) %}
+    {% set _ = tabs[tab].append(field) %}
   {% endfor %}
 
   <ul class="nav nav-tabs" id="form-tabs" role="tablist">
-    {% for section in grouped.keys() %}
+    {% for tab in tabs.keys() %}
       <li class="nav-item" role="presentation">
-        <button class="nav-link {% if loop.first %}active{% endif %}" id="tab-{{ section | lower | replace(' ', '-') }}-tab"
-                data-bs-toggle="tab" data-bs-target="#tab-{{ section | lower | replace(' ', '-') }}" type="button"
-                role="tab" aria-controls="tab-{{ section | lower | replace(' ', '-') }}"
+        <button class="nav-link {% if loop.first %}active{% endif %}" id="tab-{{ tab | lower | replace(' ', '-') }}-tab"
+                data-bs-toggle="tab" data-bs-target="#tab-{{ tab | lower | replace(' ', '-') }}" type="button"
+                role="tab" aria-controls="tab-{{ tab | lower | replace(' ', '-') }}"
                 aria-selected="{{ 'true' if loop.first else 'false' }}">
-          {{ section }}
+          {{ tab }}
         </button>
       </li>
     {% endfor %}
   </ul>
 
   <div class="tab-content mt-3">
-    {% for section, section_fields in grouped.items() %}
-      <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="tab-{{ section | lower | replace(' ', '-') }}"
-           role="tabpanel" aria-labelledby="tab-{{ section | lower | replace(' ', '-') }}-tab">
-        <div class="row">
-          {% for field in section_fields %}
-            {{ render_field(field, read_only) }}
-          {% endfor %}
-        </div>
+    {% for tab, tab_fields in tabs.items() %}
+      <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="tab-{{ tab | lower | replace(' ', '-') }}"
+           role="tabpanel" aria-labelledby="tab-{{ tab | lower | replace(' ', '-') }}-tab">
+
+        {% set grouped_by_section = tab_fields | groupby('section') %}
+        {% for section, fields_in_section in grouped_by_section %}
+          {% if section %}
+            <h5 class="mt-4 mb-3 border-bottom pb-1">{{ section }}</h5>
+          {% endif %}
+          <div class="row">
+            {% for field in fields_in_section %}
+              {{ render_field(field, read_only) }}
+            {% endfor %}
+          </div>
+        {% endfor %}
+
       </div>
     {% endfor %}
   </div>
 {% endmacro %}
+
 
 {% macro render_field(field, read_only=False) %}
   <div class="col-md-6 mb-3">
