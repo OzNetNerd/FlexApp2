@@ -3,6 +3,8 @@ EoQ m, w, d - Target %
 EoY m, w, d - Target %
 
 
+add 'relationships' tab - it'll show diagrams 
+
 I want to be able to edit individual fields without having to edit whole form (pencil icon)
 create form compeltely broken
 linked contacts do not show email address in brackets

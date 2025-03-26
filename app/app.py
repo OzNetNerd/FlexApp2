@@ -11,7 +11,6 @@ from flask import (
 )
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
-from flask_session import Session
 from config import Config
 from app.routes.web import register_web_blueprints
 from app.routes.base.components.template_renderer import render_safely
@@ -24,7 +23,6 @@ logger = logging.getLogger(__name__)
 # Global extensions
 login_manager = LoginManager()
 migrate = Migrate()
-session = Session()
 
 
 @login_manager.unauthorized_handler
@@ -45,19 +43,20 @@ def create_app(config_class=Config):
     app = Flask(__name__, static_folder="static", static_url_path="/static")
     app.config.from_object(config_class)
 
-    if "SESSION_TYPE" not in app.config:
-        app.config["SESSION_TYPE"] = "filesystem"
-        app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 24
-        app.config["SESSION_PERMANENT"] = True
-        app.config["SESSION_USE_SIGNER"] = True
-        app.config["REMEMBER_COOKIE_DURATION"] = 60 * 60 * 24 * 30
-        app.config["REMEMBER_COOKIE_HTTPONLY"] = True
-        app.config["SESSION_COOKIE_HTTPONLY"] = True
+    # ✅ Secure session configuration using Flask's built-in session management
+    app.config.update(
+        PERMANENT_SESSION_LIFETIME=60 * 60 * 24,     # 1 day
+        SESSION_PERMANENT=True,
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SECURE=True,                  # Set to False for local dev if needed
+        SESSION_COOKIE_SAMESITE="Lax",
+        REMEMBER_COOKIE_DURATION=60 * 60 * 24 * 30,   # 30 days
+        REMEMBER_COOKIE_HTTPONLY=True,
+    )
 
     db.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
-    session.init_app(app)
 
     login_manager.login_view = "auth_bp.login"
     login_manager.login_message = "Please log in to access this page."
@@ -66,8 +65,7 @@ def create_app(config_class=Config):
     @login_manager.user_loader
     def load_user(user_id):
         with current_app.app_context():
-            user = db.session.get(User, int(user_id))
-            return user
+            return db.session.get(User, int(user_id))
 
     @app.before_request
     def require_login():
