@@ -1,3 +1,5 @@
 *pycache*
 node*
 app/package.json
+flask_session/
+migrations/
