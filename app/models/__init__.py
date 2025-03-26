@@ -24,6 +24,7 @@ from .company import Company
 from .contact import Contact
 from .opportunity import Opportunity
 from .note import Note
+from .task import Task  # ✅ Add Task model here
 from .table_config import TableConfig
 from .relationship import Relationship
 from .crisp_score import CRISPScore
@@ -35,6 +36,7 @@ __all__ = [
     "Contact",
     "Opportunity",
     "Note",
+    "Task",  # ✅ Add to __all__
     "TableConfig",
     "Relationship",
     "CRISPScore",

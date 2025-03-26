@@ -15,6 +15,7 @@ opportunities_bp = Blueprint("opportunities", __name__, url_prefix="/opportuniti
 relationships_bp = Blueprint("relationships_bp", __name__, url_prefix="/relationships")
 crisp_scores_bp = Blueprint("crisp_scores_bp", __name__, url_prefix="/crisp-scores")
 auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth")
+tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")  # ✅ Add this line
 
 # Register login/logout routes with auth blueprint
 auth_bp.add_url_rule("/login", view_func=login, methods=["GET", "POST"])
@@ -29,8 +30,8 @@ from app.routes.web import (
     opportunities,
     relationship,
     crisp_score,
+    tasks  # ✅ Import this too so the routes get registered
 )
-
 
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""
@@ -44,5 +45,6 @@ def register_web_blueprints(app):
     app.register_blueprint(relationships_bp)
     app.register_blueprint(crisp_scores_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(tasks_bp)  # ✅ Register tasks blueprint
 
     logger.debug("Web blueprints registered successfully.")
