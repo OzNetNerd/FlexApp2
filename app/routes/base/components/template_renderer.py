@@ -49,7 +49,8 @@ def render_safely(
         if current_app.debug:
             logger.debug(f"Traceback: {traceback.format_exc()}")
 
-        context["template_render_error"] = (
+        # ✅ Provide error_message consistently to the template
+        context["error_message"] = (
             f"{error_type}: {details}" if current_app.debug else fallback_error_message
         )
 

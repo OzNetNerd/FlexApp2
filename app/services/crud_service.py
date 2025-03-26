@@ -2,6 +2,7 @@ from typing import Type
 from app.models.base import db
 import logging
 import traceback
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -59,9 +60,28 @@ class CRUDService:
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
 
+    def _convert_dates(self, data: dict) -> dict:
+        """
+        Converts string-formatted dates (e.g. '2025-03-27') into Python datetime objects.
+
+        Args:
+            data (dict): Form data
+
+        Returns:
+            dict: Transformed data
+        """
+        if "due_date" in data and isinstance(data["due_date"], str):
+            try:
+                data["due_date"] = datetime.strptime(data["due_date"], "%Y-%m-%d")
+            except ValueError:
+                logger.warning("Invalid due_date format; setting to None")
+                data["due_date"] = None
+        return data
+
     def create(self, data):
         try:
             data = {k: v for k, v in data.items() if v != ""}
+            data = self._convert_dates(data)  # ✅ Fix for Task due_date
             item = self.model_class(**data)
             db.session.add(item)
             db.session.commit()
@@ -75,6 +95,7 @@ class CRUDService:
     def update(self, item, data):
         try:
             data = {k: v for k, v in data.items() if v != ""}
+            data = self._convert_dates(data)  # ✅ Fix for Task due_date
             for key, value in data.items():
                 if hasattr(item, key):
                     setattr(item, key, value)

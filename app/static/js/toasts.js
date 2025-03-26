@@ -24,7 +24,12 @@ export function showToast(message, type = 'success') {
         return;
     }
 
-    toastMsg.textContent = message;
+    // Escape newlines and long text
+    const cleanMessage = typeof message === "string"
+        ? message.replace(/\n/g, ' ').slice(0, 500)
+        : JSON.stringify(message).slice(0, 500);
+
+    toastMsg.textContent = cleanMessage;
     toastEl.className = `toast align-items-center text-bg-${type} border-0`;
 
     const existingToast = bootstrap.Toast.getInstance(toastEl);
