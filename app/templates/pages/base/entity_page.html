@@ -1,0 +1,198 @@
+{% extends "pages/base/page.html" %}
+{% import "macros/form_fields.html" as macros %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white py-3">
+    <div class="row align-items-center">
+      <div class="col">
+        <div class="d-flex align-items-center">
+          <h3 class="h4 mb-0 text-primary me-3">
+            {% if read_only %}
+              <i class="fas fa-eye me-2"></i>
+            {% elif item %}
+              <i class="fas fa-edit me-2"></i>
+            {% else %}
+              <i class="fas fa-plus-circle me-2"></i>
+            {% endif %}
+            {{ title }}
+          </h3>
+
+          {# Pills Navigation #}
+          {% if fields %}
+            {% set tabs = {} %}
+            {% for field in fields %}
+              {% set tab = field.tab or 'Other' %}
+              {% if tab not in tabs %}
+                {% set _ = tabs.update({tab: []}) %}
+              {% endif %}
+              {% set _ = tabs[tab].append(field) %}
+            {% endfor %}
+
+            {% if tabs|length > 1 %}
+              <div class="btn-group ms-3" role="tablist">
+                {% for tab in tabs.keys() %}
+                  <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
+                          id="tab-{{ tab | lower | replace(' ', '-') }}-tab"
+                          data-bs-toggle="pill"
+                          data-bs-target="#tab-{{ tab | lower | replace(' ', '-') }}"
+                          type="button"
+                          role="tab"
+                          aria-controls="tab-{{ tab | lower | replace(' ', '-') }}"
+                          aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+                    {{ tab }}
+                  </button>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="d-flex justify-content-end align-items-center gap-2">
+          {% if item and not read_only %}
+          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+            <i class="fas fa-times me-1"></i> Cancel
+          </a>
+          {% elif item and read_only %}
+          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}" class="btn btn-primary fw-bold">
+            <i class="fas fa-plus me-1"></i> Add
+          </a>
+          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', item_id=item.id) }}" class="btn btn-warning text-dark fw-bold">
+            <i class="fas fa-edit me-1"></i> Edit
+          </a>
+          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="fas fa-trash me-1"></i> Delete
+          </button>
+          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+            <i class="fas fa-arrow-left me-1"></i> Back
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <form method="POST">
+      {# Tab Content #}
+      {% if fields %}
+        {% set tabs = {} %}
+        {% for field in fields %}
+          {% set tab = field.tab or 'Other' %}
+          {% if tab not in tabs %}
+            {% set _ = tabs.update({tab: []}) %}
+          {% endif %}
+          {% set _ = tabs[tab].append(field) %}
+        {% endfor %}
+
+        {% if tabs|length > 1 %}
+          <div class="tab-content" id="formTabsContent">
+            {% for tab, tab_fields in tabs.items() %}
+              <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+                   id="tab-{{ tab | lower | replace(' ', '-') }}"
+                   role="tabpanel"
+                   aria-labelledby="tab-{{ tab | lower | replace(' ', '-') }}-tab">
+                {% set grouped_by_section = tab_fields | groupby('section') %}
+                {% for section, section_fields in grouped_by_section %}
+                  <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white">
+                      <h5 class="h6 text-primary fw-semibold mb-0">
+                        {{ section or 'General' }}
+                      </h5>
+                    </div>
+                    <div class="card-body">
+                      <div class="row g-3">
+                        {% for field in section_fields %}
+                          {% if field.name == 'crisp' and read_only %}
+                            {% include 'pages/components/_crisp.html' with context %}
+                          {% else %}
+                            {{ macros.render_field(field, read_only) }}
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          {# Single tab - no tab wrapper needed #}
+          {% for tab, tab_fields in tabs.items() %}
+            {% set grouped_by_section = tab_fields | groupby('section') %}
+            {% for section, section_fields in grouped_by_section %}
+              <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white">
+                  <h5 class="h6 text-primary fw-semibold mb-0">
+                    {{ section or 'General' }}
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    {% for field in section_fields %}
+                      {% if field.name == 'crisp' and read_only %}
+                        {% include 'pages/components/_crisp.html' with context %}
+                      {% else %}
+                        {{ macros.render_field(field, read_only) }}
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+      {% else %}
+        {# Fallback to section layout if no fields are provided #}
+        {% include 'pages/base/common/_section_layout.html' %}
+      {% endif %}
+
+      {% if not read_only %}
+        {% include 'pages/base/common/_form_autocomplete.html' %}
+      {% else %}
+        <!-- Read-only display -->
+        <div class="mb-3">
+          <label class="form-label">Users</label>
+          <p class="form-control-plaintext">
+            {{ item.users | map(attribute='email') | join(', ') if item.users else '—' }}
+          </p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Company</label>
+          <p class="form-control-plaintext">
+            {{ item.company.name if item.company else '—' }}
+          </p>
+        </div>
+      {% endif %}
+
+      {% if not read_only %}
+        {% include 'pages/base/common/_form_footer.html' %}
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tabs
+    var tabTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="pill"]'))
+    var tabList = tabTriggerList.map(function (tabTriggerEl) {
+      return new bootstrap.Tab(tabTriggerEl)
+    });
+
+    // Add event listener for tab changes
+    tabTriggerList.forEach(function(tabTriggerEl) {
+      tabTriggerEl.addEventListener('click', function(event) {
+        event.preventDefault();
+        var tab = bootstrap.Tab.getInstance(event.currentTarget);
+        tab.show();
+      });
+    });
+  });
+</script>
+{% endblock %}
+{% endblock %}
