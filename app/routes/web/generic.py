@@ -120,6 +120,14 @@ class GenericWebRoutes(CRUDRoutesBase):
             self.index_template, context, f"Error rendering {self.model.__name__} index"
         )
 
+    def _get_item_display_name(self, item):
+        for attr in ["name", "title", "email", "username"]:
+            if hasattr(item, attr) and getattr(item, attr):
+                return getattr(item, attr)
+        if hasattr(item, "first_name") and hasattr(item, "last_name"):
+            return f"{item.first_name} {item.last_name}".strip()
+        return str(item.id)
+
     def _view_route(self, item_id):
         self.request_logger.log_request_info(self.model.__name__, "view", item_id)
         item, error = self.item_manager.get_item_by_id(item_id)
@@ -133,7 +141,8 @@ class GenericWebRoutes(CRUDRoutesBase):
 
         fields = self.form_handler.build_fields(item)
         context = self.form_handler.prepare_form_context(
-            title=f"View {self.model.__name__}",
+            # title=f"View {self.model.__name__}: {getattr(item, 'name', item.id)}",
+            title=f"Viewing {self.model.__name__}: {self._get_item_display_name(item)}",
             submit_url="",
             cancel_url=url_for(f"{self.blueprint.name}.index"),
             fields=fields,
@@ -219,7 +228,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             self.form_handler.build_fields()
         )
         context = self.form_handler.prepare_form_context(
-            title=f"Create {self.model.__name__}",
+            title=f"Create a {self.model.__name__}",
             submit_url=url_for(f"{self.blueprint.name}.create"),
             cancel_url=url_for(f"{self.blueprint.name}.index"),
             fields=fields,
