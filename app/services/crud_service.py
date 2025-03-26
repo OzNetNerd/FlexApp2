@@ -3,6 +3,7 @@ import traceback
 from typing import Type, Any
 from datetime import datetime
 from app.models.base import db
+from app.models.mixins import ValidatorMixin
 
 logger = logging.getLogger(__name__)
 
@@ -120,6 +121,12 @@ class CRUDService:
         try:
             data = {k: v for k, v in data.items() if v != ""}
             data = self._convert_dates(data)
+
+            if issubclass(self.model_class, ValidatorMixin):
+                errors = self.model_class().validate_create(data)
+                if errors:
+                    raise ValueError(f"Validation failed: {errors}")
+
             item = self.model_class(**data)
             db.session.add(item)
             db.session.commit()
@@ -144,6 +151,12 @@ class CRUDService:
         try:
             data = {k: v for k, v in data.items() if v != ""}
             data = self._convert_dates(data)
+
+            if isinstance(item, ValidatorMixin):
+                errors = item.validate_update(data)
+                if errors:
+                    raise ValueError(f"Validation failed: {errors}")
+
             for key, value in data.items():
                 if hasattr(item, key):
                     setattr(item, key, value)

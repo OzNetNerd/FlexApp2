@@ -74,9 +74,13 @@ class ItemManager:
             logger.info(f"{self.model.__name__} created successfully with id {item.id}")
             flash(f"{self.model.__name__} created successfully", "success")
             return redirect(url_for(f"{self.blueprint_name}.index")), None
+        except ValueError as ve:
+            # Specific handling for validation failures
+            logger.warning(f"Validation error during create: {ve}")
+            return None, str(ve)
         except Exception as e:
-            logger.error(f"Error creating {self.model.__name__}: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            logger.error(f"Error creating {self.model.__name__}: {e}")
+            logger.error(traceback.format_exc())
             return None, f"Error creating {self.model.__name__}: {str(e)}"
 
     def update_item(self, item, form_data):
@@ -96,9 +100,12 @@ class ItemManager:
             logger.info(f"{self.model.__name__} with id {item.id} updated successfully")
             flash(f"{self.model.__name__} updated successfully", "success")
             return redirect(url_for(f"{self.blueprint_name}.view", item_id=item.id)), None
+        except ValueError as ve:
+            logger.warning(f"Validation error during update: {ve}")
+            return None, str(ve)
         except Exception as e:
-            logger.error(f"Error updating {self.model.__name__} with id {item.id}: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            logger.error(f"Error updating {self.model.__name__} with id {item.id}: {e}")
+            logger.error(traceback.format_exc())
             return None, f"Error updating {self.model.__name__}: {str(e)}"
 
     def delete_item(self, item):

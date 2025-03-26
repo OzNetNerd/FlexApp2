@@ -1,6 +1,8 @@
 import logging
 from flask_login import UserMixin
+from werkzeug.security import generate_password_hash
 from app.models.base import db, BaseModel
+from werkzeug.security import generate_password_hash, check_password_hash
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +63,14 @@ class User(BaseModel, UserMixin):
         },
     ]
 
+    def __init__(self, *args, **kwargs):
+        """Initialize user, allowing plain-text 'password' for hashing."""
+        password = kwargs.pop("password", None)
+        super().__init__(*args, **kwargs)
+        if password:
+            logger.debug("Hashing password before saving user.")
+            self.password_hash = generate_password_hash(password)
+
     def __repr__(self) -> str:
         """Readable string representation.
 
@@ -83,3 +93,14 @@ class User(BaseModel, UserMixin):
         result = User.query.filter(User.username.ilike(f"{query}%")).all()
         logger.debug(f"Found {len(result)} users matching the query '{query}'")
         return result
+
+    def check_password(self, password: str) -> bool:
+        """Verify a plaintext password against the stored hash.
+
+        Args:
+            password (str): Plaintext password to verify.
+
+        Returns:
+            bool: True if password is valid, False otherwise.
+        """
+        return check_password_hash(self.password_hash, password)
