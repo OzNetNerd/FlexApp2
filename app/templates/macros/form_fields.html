@@ -1,4 +1,5 @@
 {# app/templates/macros/form_fields.html #}
+
 {% macro render_sections(fields, read_only=False) %}
   {% set grouped = {} %}
   {% for field in fields %}
@@ -103,4 +104,12 @@
   {% else %}
     {{ field.value }}
   {% endif %}
+{% endmacro %}
+
+{% macro render_section_fields(fields, read_only=False) %}
+  <div class="row">
+    {% for field in fields %}
+      {{ render_field(field, read_only) }}
+    {% endfor %}
+  </div>
 {% endmacro %}

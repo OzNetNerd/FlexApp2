@@ -52,6 +52,7 @@ class Company(db.Model, BaseModel):
     __field_order__ = [
         {"name": "name", "label": "Name", "type": "text", "section": "About", "required": True},
         {"name": "description", "label": "Description", "type": "text", "section": "About"},
+        {"name": "crisp", "label": "CRISP", "type": "custom", "section": "CRISP"},
     ]
 
     def __repr__(self) -> str:

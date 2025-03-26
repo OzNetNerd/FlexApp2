@@ -55,6 +55,7 @@ class Contact(db.Model, BaseModel):
         {"name": "company_name", "label": "Company", "type": "text", "section": "Company Info"},
         {"name": "created_at", "label": "Created At", "type": "text", "section": "Record Info", "readonly": True},
         {"name": "updated_at", "label": "Updated At", "type": "text", "section": "Record Info", "readonly": True},
+        {"name": "crisp", "label": "CRISP", "type": "custom", "section": "CRISP"},
     ]
 
     def __repr__(self) -> str:

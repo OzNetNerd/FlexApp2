@@ -39,6 +39,7 @@ class User(db.Model, BaseModel, UserMixin):
         {"name": "email", "label": "Email", "type": "email", "required": True, "section": "Contact"},
         {"name": "created_at", "label": "Created At", "type": "datetime", "readonly": True, "section": "Record Info"},
         {"name": "updated_at", "label": "Updated At", "type": "datetime", "readonly": True, "section": "Record Info"},
+        {"name": "crisp", "label": "CRISP", "type": "custom", "section": "CRISP"},
     ]
 
     def __repr__(self) -> str:
