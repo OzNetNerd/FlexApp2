@@ -135,32 +135,3 @@
   </div>
 </div>
 {% endblock %}
-
-{% block scripts %}
-  {{ super() }}
-  {% if not read_only %}
-  <script type="module">
-    import { setupAutoComplete } from "{{ url_for('static', filename='js/autoComplete.js') }}";
-
-    const usersInput = document.querySelector('#users-input');
-    const usersInitial = JSON.parse(usersInput?.dataset.initial || '[]');
-
-    setupAutoComplete({
-      inputSelector: '#users-input',
-      dataUrl: '/users/data',
-      inputName: 'users',
-      initialIds: usersInitial
-    });
-
-    const companiesInput = document.querySelector('#companies-input');
-    const companiesInitial = JSON.parse(companiesInput?.dataset.initial || '[]');
-
-    setupAutoComplete({
-      inputSelector: '#companies-input',
-      dataUrl: '/companies/data',
-      inputName: 'company_id',
-      initialIds: companiesInitial
-    });
-  </script>
-  {% endif %}
-{% endblock %}
