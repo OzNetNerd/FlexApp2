@@ -1,9 +1,11 @@
-from app.models.base import db, BaseModel
 import logging
+from sqlalchemy.orm import foreign
+from app.models.base import db, BaseModel
 
 logger = logging.getLogger(__name__)
 
-class Opportunity(db.Model, BaseModel):
+
+class Opportunity(BaseModel):
     """Represents a sales opportunity linked to a company.
 
     Opportunities track deal stages, potential value, and related notes.
@@ -35,8 +37,8 @@ class Opportunity(db.Model, BaseModel):
     )
 
     __field_order__ = [
-        {"name": "name", "label": "Name", "type": "text", "tab": "About", "section": "Opportunity Info",
-         "required": True},
+        {"name": "name", "label": "Name", "type": "text", "tab": "About",
+         "section": "Opportunity Info", "required": True},
         {"name": "description", "label": "Description", "type": "textarea", "tab": "About",
          "section": "Opportunity Info"},
         {"name": "company.name", "label": "Company Name", "type": "text", "readonly": True, "tab": "About",
@@ -55,25 +57,19 @@ class Opportunity(db.Model, BaseModel):
         """
         return f"<Opportunity {self.name}>"
 
-    def save(self):
+    def save(self) -> "Opportunity":
         """Persist opportunity to the database with logging.
 
         Returns:
             Opportunity: The saved instance.
         """
-        logger.debug(
-            f"Saving opportunity with name {self.name} and status {self.status}"
-        )
+        logger.debug(f"Saving opportunity with name {self.name} and status {self.status}")
         super().save()
         logger.info(f"Opportunity '{self.name}' saved successfully.")
         return self
 
-    def delete(self):
-        """Remove opportunity from the database with logging.
-
-        Returns:
-            None
-        """
+    def delete(self) -> None:
+        """Remove opportunity from the database with logging."""
         logger.debug(f"Deleting opportunity with name {self.name}")
         super().delete()
         logger.info(f"Opportunity '{self.name}' deleted successfully.")

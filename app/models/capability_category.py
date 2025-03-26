@@ -1,6 +1,7 @@
 from app.models.base import db, BaseModel
 
-class CapabilityCategory(db.Model, BaseModel):
+
+class CapabilityCategory(BaseModel):
     """Represents a category used to group capabilities in the CRM.
 
     Categories help classify capabilities into logical buckets (e.g. Security, Data).

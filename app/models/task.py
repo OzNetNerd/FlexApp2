@@ -1,10 +1,23 @@
-from app.models.base import db, BaseModel
 import logging
+from app.models.base import db, BaseModel
 
 logger = logging.getLogger(__name__)
 
-class Task(db.Model, BaseModel):
-    """Represents a task associated with a company, contact, opportunity, etc."""
+
+class Task(BaseModel):
+    """Represents a task associated with an entity like a company, contact, or opportunity.
+
+    Tasks store details for tracking progress, due dates, and ownership.
+
+    Attributes:
+        title (str): Short summary of the task.
+        description (str): Detailed explanation of the task.
+        due_date (datetime): Deadline for task completion.
+        status (str): Current task status (Pending, In Progress, Completed).
+        priority (str): Priority level (Low, Medium, High).
+        notable_type (str): The type of object this task is linked to.
+        notable_id (int): The ID of the object this task is linked to.
+    """
 
     __tablename__ = "tasks"
 
@@ -84,15 +97,26 @@ class Task(db.Model, BaseModel):
     ]
 
     def __repr__(self) -> str:
+        """Readable string representation.
+
+        Returns:
+            str: Summary with task title.
+        """
         return f"<Task {self.title}>"
 
-    def save(self):
+    def save(self) -> "Task":
+        """Persist task to the database with logging.
+
+        Returns:
+            Task: The saved task instance.
+        """
         logger.debug(f"Saving task '{self.title}' with status {self.status}")
         super().save()
         logger.info(f"Task '{self.title}' saved successfully.")
         return self
 
-    def delete(self):
+    def delete(self) -> None:
+        """Remove task from the database with logging."""
         logger.debug(f"Deleting task '{self.title}'")
         super().delete()
         logger.info(f"Task '{self.title}' deleted successfully.")

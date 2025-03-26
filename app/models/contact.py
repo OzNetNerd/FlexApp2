@@ -1,10 +1,12 @@
+import logging
+from sqlalchemy.orm import foreign
 from app.models.base import db, BaseModel
 from app.models import contact_user_association
-import logging
 
 logger = logging.getLogger(__name__)
 
-class Contact(db.Model, BaseModel):
+
+class Contact(BaseModel):
     """Represents a contact within a company in the CRM.
 
     Stores individual user details and links to relationships,
@@ -48,17 +50,17 @@ class Contact(db.Model, BaseModel):
     )
 
     __field_order__ = [
-        {"name": "first_name", "label": "First Name", "type": "text", "required": True, "tab": "About",
-         "section": "Identity"},
-        {"name": "last_name", "label": "Last Name", "type": "text", "required": True, "tab": "About",
-         "section": "Identity"},
+        {"name": "first_name", "label": "First Name", "type": "text", "required": True,
+         "tab": "About", "section": "Identity"},
+        {"name": "last_name", "label": "Last Name", "type": "text", "required": True,
+         "tab": "About", "section": "Identity"},
         {"name": "email", "label": "Email", "type": "email", "tab": "About", "section": "Contact Info"},
         {"name": "phone", "label": "Phone", "type": "text", "tab": "About", "section": "Contact Info"},
         {"name": "company_name", "label": "Company", "type": "text", "tab": "About", "section": "Company Info"},
-        {"name": "created_at", "label": "Created At", "type": "text", "tab": "About", "section": "Record Info",
-         "readonly": True},
-        {"name": "updated_at", "label": "Updated At", "type": "text", "tab": "About", "section": "Record Info",
-         "readonly": True},
+        {"name": "created_at", "label": "Created At", "type": "text", "tab": "About",
+         "section": "Record Info", "readonly": True},
+        {"name": "updated_at", "label": "Updated At", "type": "text", "tab": "About",
+         "section": "Record Info", "readonly": True},
         {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
     ]
 

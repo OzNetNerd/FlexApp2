@@ -1,9 +1,10 @@
-from app.models.base import db, BaseModel
 import logging
+from app.models.base import db, BaseModel
 
 logger = logging.getLogger(__name__)
 
-class Relationship(db.Model, BaseModel):
+
+class Relationship(BaseModel):
     """Represents a trust relationship between a user and a contact.
 
     This model allows the CRM to track interactions and trust metrics
@@ -26,7 +27,9 @@ class Relationship(db.Model, BaseModel):
     contact = db.relationship("Contact", back_populates="relationships")
 
     crisp_scores = db.relationship(
-        "CRISPScore", back_populates="relationship", cascade="all, delete-orphan"
+        "CRISPScore",
+        back_populates="relationship",
+        cascade="all, delete-orphan"
     )
 
     __table_args__ = (

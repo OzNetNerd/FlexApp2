@@ -1,9 +1,10 @@
-from app.models.base import db, BaseModel
 import logging
+from app.models.base import db, BaseModel
 
 logger = logging.getLogger(__name__)
 
-class CompanyCapability(db.Model, BaseModel):
+
+class CompanyCapability(BaseModel):
     """Association table mapping companies to capabilities.
 
     Defines a many-to-many relationship between Company and Capability

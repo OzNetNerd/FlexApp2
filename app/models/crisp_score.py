@@ -1,9 +1,10 @@
-from app.models.base import db, BaseModel
 import logging
+from app.models.base import db, BaseModel
 
 logger = logging.getLogger(__name__)
 
-class CRISPScore(db.Model, BaseModel):
+
+class CRISPScore(BaseModel):
     """Represents a CRISP trust metric for a contact-user relationship.
 
     CRISP = Credibility, Reliability, Intimacy, Self-Orientation.
@@ -62,7 +63,7 @@ class CRISPScore(db.Model, BaseModel):
         else:
             self.total_score = float(c + r + i) / s
 
-    def save(self):
+    def save(self) -> "CRISPScore":
         """Override save to compute total score before persisting.
 
         Returns:

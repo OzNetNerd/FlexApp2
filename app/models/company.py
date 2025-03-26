@@ -1,11 +1,12 @@
-from app.models.base import db, BaseModel
-from sqlalchemy.orm import foreign
-from app.models.note import Note
 import logging
+from sqlalchemy.orm import foreign
+from app.models.base import db, BaseModel
+from app.models.note import Note
 
 logger = logging.getLogger(__name__)
 
-class Company(db.Model, BaseModel):
+
+class Company(BaseModel):
     """Represents a company in the CRM system.
 
     Stores metadata about a company and links to its contacts, opportunities,
@@ -28,6 +29,7 @@ class Company(db.Model, BaseModel):
 
     contacts = db.relationship("Contact", back_populates="company")
     opportunities = db.relationship("Opportunity", backref="company", lazy="dynamic")
+
     notes = db.relationship(
         "Note",
         primaryjoin="and_(Note.notable_id == foreign(Company.id), Note.notable_type == 'Company')",
@@ -49,11 +51,31 @@ class Company(db.Model, BaseModel):
         """
         return [cc.capability for cc in self.company_capabilities]
 
+    @property
+    def crisp_summary(self) -> float | None:
+        """Average CRISP score across all contacts at this company.
+
+        Returns:
+            float | None: Rounded average score, or None if no scores exist.
+        """
+        scores = [c.crisp_summary for c in self.contacts if c.crisp_summary is not None]
+        if not scores:
+            return None
+        return round(sum(scores) / len(scores), 2)
+
     __field_order__ = [
-        {"name": "name", "label": "Name", "type": "text", "tab": "About", "section": "Company Details",
-         "required": True},
-        {"name": "description", "label": "Description", "type": "text", "tab": "About", "section": "Company Details"},
-        {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
+        {
+            "name": "name", "label": "Name", "type": "text",
+            "tab": "About", "section": "Company Details", "required": True
+        },
+        {
+            "name": "description", "label": "Description", "type": "text",
+            "tab": "About", "section": "Company Details"
+        },
+        {
+            "name": "crisp", "label": "CRISP", "type": "custom",
+            "tab": "Insights", "section": "CRISP Score"
+        },
     ]
 
     def __repr__(self) -> str:
@@ -78,15 +100,3 @@ class Company(db.Model, BaseModel):
         result = Company.query.filter(Company.name.ilike(f"{query}%")).all()
         logger.debug(f"Found {len(result)} companies matching the query '{query}'")
         return result
-
-    @property
-    def crisp_summary(self) -> float | None:
-        """Average CRISP score across all contacts at this company.
-
-        Returns:
-            float | None: Rounded average score, or None if no scores exist.
-        """
-        scores = [c.crisp_summary for c in self.contacts if c.crisp_summary is not None]
-        if not scores:
-            return None
-        return round(sum(scores) / len(scores), 2)

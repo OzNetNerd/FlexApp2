@@ -1,7 +1,8 @@
 from app.models.base import db, BaseModel
 from app.models.company_capability import CompanyCapability
 
-class Capability(db.Model, BaseModel):
+
+class Capability(BaseModel):
     """Represents a capability offered by companies in the CRM.
 
     Used to categorize what a company can do, linked through
