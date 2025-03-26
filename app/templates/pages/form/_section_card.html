@@ -1,0 +1,18 @@
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white">
+      <h5 class="h6 text-primary fw-semibold mb-0">
+        {{ section or 'General' }}
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        {% for field in section_fields %}
+          {% if field.name == 'crisp' and read_only %}
+            {% include 'pages/components/_crisp.html' with context %}
+          {% else %}
+            {{ macros.render_field(field, read_only) }}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>

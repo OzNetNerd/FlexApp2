@@ -19,71 +19,7 @@
   <div class="card-body">
     <form method="POST">
       {% if fields %}
-        {% set tabs = {} %}
-        {% for field in fields %}
-          {% set tab = field.tab or 'Other' %}
-          {% if tab not in tabs %}
-            {% set _ = tabs.update({tab: []}) %}
-          {% endif %}
-          {% set _ = tabs[tab].append(field) %}
-        {% endfor %}
-
-        {% if tabs|length > 1 %}
-          <div class="tab-content" id="formTabsContent">
-            {% for tab, tab_fields in tabs.items() %}
-              <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
-                   id="tab-{{ tab | lower | replace(' ', '-') }}"
-                   role="tabpanel"
-                   aria-labelledby="tab-{{ tab | lower | replace(' ', '-') }}-tab">
-                {% set grouped_by_section = tab_fields | groupby('section') %}
-                {% for section, section_fields in grouped_by_section %}
-                  <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white">
-                      <h5 class="h6 text-primary fw-semibold mb-0">
-                        {{ section or 'General' }}
-                      </h5>
-                    </div>
-                    <div class="card-body">
-                      <div class="row g-3">
-                        {% for field in section_fields %}
-                          {% if field.name == 'crisp' and read_only %}
-                            {% include 'pages/components/_crisp.html' with context %}
-                          {% else %}
-                            {{ macros.render_field(field, read_only) }}
-                          {% endif %}
-                        {% endfor %}
-                      </div>
-                    </div>
-                  </div>
-                {% endfor %}
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          {% for tab, tab_fields in tabs.items() %}
-            {% set grouped_by_section = tab_fields | groupby('section') %}
-            {% for section, section_fields in grouped_by_section %}
-              <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white">
-                  <h5 class="h6 text-primary fw-semibold mb-0">
-                    {{ section or 'General' }}
-                  </h5>
-                </div>
-                <div class="card-body">
-                  <div class="row g-3">
-                    {% for field in section_fields %}
-                      {% if field.name == 'crisp' and read_only %}
-                        {% include 'pages/components/_crisp.html' with context %}
-                      {% else %}
-                        {{ macros.render_field(field, read_only) }}
-                      {% endif %}
-                    {% endfor %}
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          {% endfor %}
-        {% endif %}
+        {% include 'pages/form/_tabs_and_sections.html' %}
       {% else %}
         {% include 'pages/base/common/_section_layout.html' %}
       {% endif %}
@@ -91,19 +27,7 @@
       {% if not read_only %}
         {% include 'pages/base/common/_form_autocomplete.html' %}
       {% else %}
-        <div class="mb-3">
-          <label class="form-label">Users</label>
-          <p class="form-control-plaintext">
-            <span class="text-success fw-semibold">{{ item.users | map(attribute='email') | join(', ') if item.users else '—' }}</span>
-          </p>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Company</label>
-          <p class="form-control-plaintext">
-            <span class="text-success fw-semibold">{{ item.company.name if item.company else '—' }}</span>
-          </p>
-        </div>
+        {% include 'pages/form/_readonly_summary.html' %}
       {% endif %}
 
       {% if not read_only %}
@@ -112,23 +36,8 @@
     </form>
   </div>
 </div>
+{% endblock %}
 
 {% block extra_scripts %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var tabTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="pill"]'))
-    var tabList = tabTriggerList.map(function (tabTriggerEl) {
-      return new bootstrap.Tab(tabTriggerEl)
-    });
-
-    tabTriggerList.forEach(function(tabTriggerEl) {
-      tabTriggerEl.addEventListener('click', function(event) {
-        event.preventDefault();
-        var tab = bootstrap.Tab.getInstance(event.currentTarget);
-        tab.show();
-      });
-    });
-  });
-</script>
-{% endblock %}
+  <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
 {% endblock %}
