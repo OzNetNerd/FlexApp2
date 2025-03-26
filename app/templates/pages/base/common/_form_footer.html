@@ -1,0 +1,10 @@
+<div class="d-flex justify-content-end mt-4">
+    <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + ('.view' if item else '.index'), item_id=item.id if item else None) }}"
+       class="btn btn-secondary bg-opacity-75 fw-semibold text-white me-2">
+      <i class="fas fa-times me-1"></i> Cancel
+    </a>
+    <button type="submit" class="btn btn-{{ 'success' if item else 'primary' }}">
+      <i class="fas fa-{{ 'save' if item else 'plus-circle' }} me-1"></i>
+      {{ button_text or ('Save Changes' if item else 'Create') }}
+    </button>
+  </div>

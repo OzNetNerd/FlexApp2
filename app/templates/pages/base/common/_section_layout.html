@@ -1,0 +1,49 @@
+{% import "macros/form_fields.html" as macros %}
+
+{% set tabs = {} %}
+{% for field in fields %}
+  {% set tab = field.tab or 'Other' %}
+  {% if tab not in tabs %}
+    {% set _ = tabs.update({tab: []}) %}
+  {% endif %}
+  {% set _ = tabs[tab].append(field) %}
+{% endfor %}
+
+<ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
+  {% for tab in tabs.keys() %}
+    <li class="nav-item" role="presentation">
+      <button class="nav-link {% if loop.first %}active{% endif %}"
+              id="tab-{{ tab | lower | replace(' ', '-') }}-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#tab-{{ tab | lower | replace(' ', '-') }}"
+              type="button"
+              role="tab">
+        {{ tab }}
+      </button>
+    </li>
+  {% endfor %}
+</ul>
+
+<div class="tab-content" id="formTabsContent">
+  {% for tab, tab_fields in tabs.items() %}
+    <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+         id="tab-{{ tab | lower | replace(' ', '-') }}"
+         role="tabpanel">
+      {% set grouped_by_section = tab_fields | groupby('section') %}
+      {% for section, section_fields in grouped_by_section %}
+        {% if section %}
+          <h5 class="mt-4 mb-3 border-bottom pb-1">{{ section }}</h5>
+        {% endif %}
+        <div class="row">
+          {% for field in section_fields %}
+            {% if field.name == 'crisp' and read_only %}
+              {% include 'pages/components/_crisp.html' with context %}
+            {% else %}
+              {{ macros.render_field(field, read_only) }}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>
