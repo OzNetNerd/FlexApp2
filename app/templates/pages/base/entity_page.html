@@ -20,31 +20,7 @@
 
           {# Pills Navigation #}
           {% if fields %}
-            {% set tabs = {} %}
-            {% for field in fields %}
-              {% set tab = field.tab or 'Other' %}
-              {% if tab not in tabs %}
-                {% set _ = tabs.update({tab: []}) %}
-              {% endif %}
-              {% set _ = tabs[tab].append(field) %}
-            {% endfor %}
-
-            {% if tabs|length > 1 %}
-              <div class="btn-group ms-3" role="tablist">
-                {% for tab in tabs.keys() %}
-                  <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
-                          id="tab-{{ tab | lower | replace(' ', '-') }}-tab"
-                          data-bs-toggle="pill"
-                          data-bs-target="#tab-{{ tab | lower | replace(' ', '-') }}"
-                          type="button"
-                          role="tab"
-                          aria-controls="tab-{{ tab | lower | replace(' ', '-') }}"
-                          aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
-                    {{ tab }}
-                  </button>
-                {% endfor %}
-              </div>
-            {% endif %}
+            {% include 'pages/components/_pills_nav.html' %}
           {% endif %}
         </div>
       </div>
@@ -144,7 +120,6 @@
           {% endfor %}
         {% endif %}
       {% else %}
-        {# Fallback to section layout if no fields are provided #}
         {% include 'pages/base/common/_section_layout.html' %}
       {% endif %}
 
@@ -155,14 +130,14 @@
         <div class="mb-3">
           <label class="form-label">Users</label>
           <p class="form-control-plaintext">
-            {{ item.users | map(attribute='email') | join(', ') if item.users else '—' }}
+            <span class="text-success fw-semibold">{{ item.users | map(attribute='email') | join(', ') if item.users else '—' }}</span>
           </p>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Company</label>
           <p class="form-control-plaintext">
-            {{ item.company.name if item.company else '—' }}
+            <span class="text-success fw-semibold">{{ item.company.name if item.company else '—' }}</span>
           </p>
         </div>
       {% endif %}
@@ -174,17 +149,14 @@
   </div>
 </div>
 
-
 {% block extra_scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Bootstrap tabs
     var tabTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="pill"]'))
     var tabList = tabTriggerList.map(function (tabTriggerEl) {
       return new bootstrap.Tab(tabTriggerEl)
     });
 
-    // Add event listener for tab changes
     tabTriggerList.forEach(function(tabTriggerEl) {
       tabTriggerEl.addEventListener('click', function(event) {
         event.preventDefault();
