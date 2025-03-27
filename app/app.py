@@ -18,24 +18,29 @@ from app.models.base import db
 from app.models.user import User
 from flask import current_app
 
+def configure_logging():
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    logger.handlers.clear()
+
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(filename)s - %(funcName)s - %(lineno)d - %(levelname)s - %(message)s"
+    )
+    handler.setFormatter(formatter)
+
+    logger.addHandler(handler)
+
+# Top-level logger
 logger = logging.getLogger(__name__)
 
 # Global extensions
 login_manager = LoginManager()
 migrate = Migrate()
 
-
 @login_manager.unauthorized_handler
 def unauthorized():
     return make_response("🔒 Unauthorized - Please log in first", 401)
-
-
-def configure_logging():
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
-
 
 def create_app(config_class=Config):
     configure_logging()
@@ -69,7 +74,6 @@ def create_app(config_class=Config):
 
     @app.before_request
     def require_login():
-        logger = logging.getLogger(__name__)
         whitelisted = [
             "auth_bp.login",
             "auth_bp.logout",
@@ -126,7 +130,6 @@ def create_app(config_class=Config):
         return render_safely("errors/500.html", context, "Internal server error."), 500
 
     return app
-
 
 # Run app
 app = create_app()

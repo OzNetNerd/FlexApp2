@@ -7,9 +7,13 @@
     or as stacked sections (if only one tab or none).
 
   Inputs (expected in context):
-    - fields : List of field objects, each supporting:
-        • field.tab     : Optional. Logical group used to separate content into tabs.
-        • field.section : Optional. Label for the section group within a tab.
+    - field_entries : Dictionary with sections as keys, and a list of field objects
+                    as values. Each field object should support:
+        • name       : Field name.
+        • label      : Field label.
+        • type       : Field type.
+        • tab        : Tab the field belongs to.
+        • section    : Optional. Label for the section group within a tab.
 
   Dependencies:
     - Includes:
@@ -37,12 +41,14 @@
 #}
 
 {% set tabs = {} %}
-{% for field in fields %}
-  {% set tab = field.tab or 'Other' %}
-  {% if tab not in tabs %}
-    {% set _ = tabs.update({tab: []}) %}
-  {% endif %}
-  {% set _ = tabs[tab].append(field) %}
+{% for section, fields in field_entries.items() %}
+  {% for field in fields %}
+    {% set tab = field.tab or 'Other' %}
+    {% if tab not in tabs %}
+      {% set _ = tabs.update({tab: []}) %}
+    {% endif %}
+    {% set _ = tabs[tab].append(field) %}
+  {% endfor %}
 {% endfor %}
 
 {% if tabs|length > 1 %}

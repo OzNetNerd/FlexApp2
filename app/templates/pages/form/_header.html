@@ -43,6 +43,9 @@
   {{ title }}
 </h3>
 
+<!-- DEBUG: fields = {{ fields | length if fields else 'None' }} -->
+
+
 {% if fields %}
-  {% include 'pages/components/_pills_nav.html' %}
+  {% include 'pages/form/_pills_nav.html' %}
 {% endif %}

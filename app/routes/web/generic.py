@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional, List, Type
+from typing import Optional, List, Type, Any
 from flask import request, redirect, url_for, flash, Blueprint
 from flask_login import current_user, login_required
 import logging
@@ -26,9 +26,9 @@ class GenericWebRoutes(CRUDRoutesBase):
     required_fields: List[str] = field(default_factory=list)
     unique_fields: List[str] = field(default_factory=list)
     index_template: str = GENERIC_TEMPLATE
-    view_template: Optional[str] = "view.html"
-    create_template: Optional[str] = "create.html"
-    edit_template: Optional[str] = "edit.html"
+    view_template: Optional[str] = "shared/view.html"
+    create_template: Optional[str] = "shared/create.html"
+    edit_template: Optional[str] = "shared/edit.html"
     api_url_prefix: Optional[str] = None
 
     def __post_init__(self):
@@ -41,6 +41,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         self.item_manager = ItemManager(self.model, self.service, self.blueprint.name)
         self.form_handler = self._create_form_handler()
         self._register_routes()
+
         logger.debug(f"Web CRUD routes registered for {self.model.__name__} model.")
 
     def _create_form_handler(self):
@@ -59,10 +60,32 @@ class GenericWebRoutes(CRUDRoutesBase):
         self.blueprint.add_url_rule("/<int:item_id>/delete", "delete", login_required(self._delete_route), methods=["POST"])
         self.blueprint.add_url_rule("/data", "data", login_required(self._data_route), methods=["GET"])
 
-    def _get_template_context(self, **kwargs):
+    def _get_template_context(self, **kwargs) -> dict:
+        """
+        Retrieves the context for rendering a template.
+
+        This method prepares the context dictionary used to render a template, including
+        additional context like companies, autocomplete usage, and fields ordered as per
+        the model's field order for the page. It ensures that necessary data is available
+        for the template rendering process.
+
+        Args:
+            **kwargs: Arbitrary keyword arguments that may include an existing context to extend.
+
+        Returns:
+            dict: The context dictionary that includes companies, use_autocomplete flag, and fields.
+                The fields are fetched from the model's `__field_order__`.
+
+        Raises:
+            AttributeError: If `__field_order__` is not defined on the model.
+        """
         context = kwargs.get("context", {})
         context["companies"] = Company.query.order_by(Company.name).all()
         context["use_autocomplete"] = True
+        context["field_entries"] = self.model.__field_order__
+
+        return context
+
         return context
 
     def _determine_data_url(self):
@@ -98,16 +121,30 @@ class GenericWebRoutes(CRUDRoutesBase):
         return str(item.id)
 
     def _view_route(self, item_id):
+        logger.debug(f"Request to view item with ID {item_id} for model {self.model.__name__}")
+
+        # Log the initial request information
         self.request_logger.log_request_info(self.model.__name__, "view", item_id)
+
+        # Attempt to fetch the item by ID
         item, error = self.item_manager.get_item_by_id(item_id)
         if error:
+            logger.error(f"Error retrieving item with ID {item_id}: {error}")
             flash(error, "error")
             return redirect(url_for(f"{self.blueprint.name}.index"))
 
+        logger.debug(f"Item with ID {item_id} fetched successfully: {item}")
+
+        # Handle POST requests
         if request.method == "POST":
+            logger.debug(f"POST request received for item with ID {item_id}. Handling view post.")
             return self._handle_view_post(item)
 
+        # Build fields grouped by section
         fields_by_section = self.form_handler.build_fields(item)
+        logger.debug(f"Fields grouped by section for item with ID {item_id}: {fields_by_section}")
+
+        # Prepare the form context
         context = self.form_handler.prepare_form_context(
             title=f"Viewing {self.model.__name__}: {self._get_item_display_name(item)}",
             submit_url="",
@@ -116,7 +153,13 @@ class GenericWebRoutes(CRUDRoutesBase):
             item=item,
             read_only=True,
         )
+        logger.debug(f"Prepared form context for item with ID {item_id}: {context}")
+
+        # Update the context with additional data
         context.update(self._get_template_context(context=context))
+        logger.debug(f"Context updated with template data for item with ID {item_id}: {context}")
+
+        # Render the template
         logger.debug(f"Rendering view template: {self.view_template}")
         return render_safely(self.view_template, context, f"Error viewing {self.model.__name__} with id {item_id}")
 

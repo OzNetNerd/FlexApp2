@@ -1,3 +1,51 @@
+{#
+  ------------------------------------------------------------------------------
+  File: page.html
+  Purpose:
+    This is the base HTML layout for all standard pages in the app. It includes
+    a standard HTML5 document structure, global JavaScript/CSS includes,
+    navigation, and common page layout blocks.
+
+  Template Structure:
+    - Uses standard DOCTYPE and <html>/<body> structure
+    - Includes global head and navbar partials
+    - Defines page regions using `{% block %}` for content and footer
+    - Includes shared toast messages component
+
+  Inputs (expected in context):
+    - show_navbar : Optional Boolean. If False, skips navbar rendering.
+    - Static assets:
+        • Bootstrap (via CDN)
+        • AG Grid
+        • Custom JS modules (table.js, autoComplete.js)
+
+  Blocks:
+    - content : Main page content (inside a padded container)
+    - footer  : Optional footer block (empty by default)
+
+  Included Partials:
+    - pages/base/common/_head.html       → Head section with meta and CSS links
+    - pages/base/common/_navbar.html     → Navigation bar (conditionally shown)
+    - pages/base/common/_toasts.html     → Toast messages
+    - JS modules:
+        • Bootstrap JS
+        • AG Grid (grid functionality)
+        • Table.js (custom table behavior)
+        • autoComplete.js (search/autocomplete logic)
+
+  Example usage:
+    {% extends "pages/base/page.html" %}
+    {% block content %}
+      <h1>Hello, World!</h1>
+    {% endblock %}
+
+  Notes:
+    - Serves as the primary layout extended by `entity_page.html` and others.
+    - Commented-out Tagify block included for future use.
+
+  ------------------------------------------------------------------------------
+#}
+
 <!DOCTYPE html>
 <html lang="en">
   {% include 'pages/base/common/_head.html' %}

@@ -1,5 +1,59 @@
+{#
+  ------------------------------------------------------------------------------
+  File: entity_page.html
+  Purpose:
+    Serves as a generic, reusable base layout for create/edit/view entity forms.
+    Handles rendering of headers, buttons, tabbed field sections, autocomplete
+    inputs, and the form footer.
+
+  Template Structure:
+    - Extends:
+        • pages/base/page.html
+    - Imports:
+        • macros/form_fields.html (for use within included components)
+    - Blocks:
+        • content: Main form UI with header, fields, and buttons
+        • extra_scripts: Loads JS for tab behavior
+
+  Inputs (expected in context):
+    - title        : String. The title to display in the header.
+    - item         : Object (optional). Used to determine form mode (edit/view).
+    - read_only    : Boolean. True if rendering a view-only version of the form.
+    - fields       : List of field definitions with `tab` and `section` metadata.
+    - macros       : Macro namespace (typically `macros.field.render_field`).
+    - csrf_token() : Function to render CSRF token (in POST mode).
+
+  Included Partials:
+    - pages/form/_header.html          → Displays the title and context-aware icon
+    - pages/form/_buttons.html         → Renders edit/delete/create/cancel buttons
+    - pages/form/_tabs_and_sections.html → Groups fields into tab/section layouts
+    - pages/base/common/_section_layout.html → Fallback for unstructured fields
+    - pages/base/common/_form_autocomplete.html → JavaScript-enhanced inputs
+    - pages/base/common/_form_footer.html → Submit/cancel buttons for non-read-only
+
+  Output:
+    - A responsive card-based form layout that dynamically adapts to:
+        • Read-only mode
+        • Create/edit mode
+        • Number of tabs/sections
+        • Presence of autocomplete fields
+
+  Example:
+    {% extends "pages/base/entity_page.html" %}
+
+  Notes:
+    - Requires Bootstrap 5 and supporting JS for tab behavior.
+    - Use `read_only` in the context to control the behavior of all child components.
+    - Fields must be structured with tab/section metadata for full functionality.
+
+  ------------------------------------------------------------------------------
+#}
+
 {% extends "pages/base/page.html" %}
 {% import "macros/form_fields.html" as macros %}
+
+<p style="color:red">[DEBUG: entity_page.html loaded]</p>
+
 
 {% block content %}
 <div class="card border-0 shadow-sm">

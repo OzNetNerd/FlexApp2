@@ -6,7 +6,7 @@
     the `tab` attribute of fields defined in `__field_order__`.
 
   Inputs (expected in context):
-    - __field_order__ : OrderedDict mapping section names to lists of fields.
+    - field_entries : OrderedDict mapping section names to lists of fields.
                         Each field can optionally define a `tab` attribute.
                         Used to group fields by tab labels.
 
@@ -17,7 +17,7 @@
         • Displays each field name inside its respective tab pane (placeholder)
 
   Example:
-    {% include 'pages/components/_pills_nav.html' %}
+    {% include 'pages/form/_pills_nav.html' %}
 
   Notes:
     - This is meant as a navigation UI component.
@@ -30,7 +30,7 @@
 #}
 
 {% set tabs = {} %}
-{% for group_fields in __field_order__.values() %}
+{% for group_fields in fields.values() %}
   {% for field in group_fields %}
     {% set tab = field.tab or 'Other' %}
     {% if tab not in tabs %}
