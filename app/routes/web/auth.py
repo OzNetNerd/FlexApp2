@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash
 from app.models import User
 import logging
+from app.routes.base.components.template_renderer import render_safely  # Updated import
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +47,8 @@ def login():
         flash("Invalid email or password.", "danger")
         logger.warning(f"Failed login attempt for email: {email}")
 
-    return render_template("login.html")
+    context = {}
+    return render_safely("login.html", context)  # Use render_safely for safe rendering
 
 
 @auth_bp.route("/logout")

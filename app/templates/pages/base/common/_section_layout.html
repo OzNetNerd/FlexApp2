@@ -43,7 +43,7 @@
                 {% if field.name == 'crisp' and read_only %}
                   {% include 'pages/components/_crisp.html' with context %}
                 {% else %}
-                  {{ macros.render_field(field, read_only) }}
+                  {{ macros.field.render_field(field, read_only) }}
                 {% endif %}
               {% endfor %}
             </div>

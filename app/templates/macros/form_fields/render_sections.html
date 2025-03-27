@@ -1,0 +1,32 @@
+{% macro render_sections(fields_by_section, read_only=False) %}
+<ul class="nav nav-tabs" id="form-tabs" role="tablist">
+  {% for section, fields in fields_by_section.items() %}
+    <li class="nav-item" role="presentation">
+      <button class="nav-link {% if loop.first %}active{% endif %}"
+              id="tab-{{ section | lower | replace(' ', '-') }}-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#tab-{{ section | lower | replace(' ', '-') }}"
+              type="button"
+              role="tab"
+              aria-controls="tab-{{ section | lower | replace(' ', '-') }}"
+              aria-selected="{{ 'true' if loop.first else 'false' }}">
+        {{ section }}
+      </button>
+    </li>
+  {% endfor %}
+</ul>
+<div class="tab-content mt-3">
+  {% for section, fields in fields_by_section.items() %}
+    <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+         id="tab-{{ section | lower | replace(' ', '-') }}"
+         role="tabpanel"
+         aria-labelledby="tab-{{ section | lower | replace(' ', '-') }}-tab">
+      <div class="row">
+        {% for field in fields %}
+          {{ render_field(field, read_only) }}
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endmacro %}

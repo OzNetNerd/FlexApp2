@@ -1,0 +1,27 @@
+{% import "macros/form_fields/render_input.html" as input_macros %}
+{% import "macros/form_fields/render_value.html" as value_macros %}
+
+{% macro render_field(field, read_only=False) %}
+<div class="col-md-6 mb-3">
+  <div class="card border-light h-100 shadow-sm">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+      <span class="fw-bold">{{ field.label }}</span>
+      {% if field.required and not read_only %}
+        <span class="badge bg-danger text-white ms-2">Required</span>
+      {% endif %}
+    </div>
+    <div class="card-body">
+      {% if not read_only and not field.readonly %}
+        {{ input_macros.render_input(field) }}
+        {% if field.help_text %}
+          <div class="form-text text-muted mt-2">
+            <i class="fas fa-info-circle me-1"></i> {{ field.help_text }}
+          </div>
+        {% endif %}
+      {% else %}
+        {{ value_macros.render_value(field) }}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endmacro %}

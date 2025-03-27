@@ -1,0 +1,19 @@
+{% macro render_value(field) %}
+{% if field.value is none %}
+  <span class="text-muted fst-italic">None</span>
+{% elif field.value is boolean %}
+  <span class="badge bg-{{ 'success' if field.value else 'danger' }}">
+    <i class="fas fa-{{ 'check' if field.value else 'times' }}"></i> {{ 'Yes' if field.value else 'No' }}
+  </span>
+{% elif field.value is mapping %}
+  <pre class="bg-light p-2 rounded">{{ field.value | tojson(indent=2) }}</pre>
+{% elif field.value is iterable and field.value is not string %}
+  <ul class="list-group">
+    {% for v in field.value %}
+      <li class="list-group-item">{{ v }}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  {{ field.value }}
+{% endif %}
+{% endmacro %}

@@ -3,6 +3,7 @@ import traceback
 from flask import render_template, current_app, request
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -25,6 +26,8 @@ def render_safely(
 
     try:
         logger.debug(f"🔍 Rendering template: {template_name} for {current_endpoint} ({current_path})")
+        # Log the successful pageview here
+        logger.info(f"Pageview: Successfully rendered template: {template_name} for {current_endpoint} ({current_path})")
         return render_template(template_name, **context)
     except (TemplateNotFound, TemplateSyntaxError, Exception) as e:
         if isinstance(e, TemplateNotFound):
@@ -54,6 +57,7 @@ def render_safely(
             return render_template(template_name, **context), status_code
         except Exception as e2:
             logger.critical(
-                f"{__name__} - CRITICAL - Failed to re-render '{template_name}' with error context: {e2}"
+                f"{__name__} - CRITICAL - Failed to re-render '{template_name}' with error context: {e2} "
+                "for {current_endpoint} ({current_path})"
             )
             return f"<h1>{fallback_error_message}</h1><p>{error_type}</p>", status_code

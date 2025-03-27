@@ -1,0 +1,23 @@
+{% macro render_input(field) %}
+{% if field.type == 'textarea' %}
+  <textarea name="{{ field.name }}" class="form-control" rows="4">{{ field.value or '' }}</textarea>
+{% elif field.type == 'select' %}
+  <select name="{{ field.name }}" class="form-select">
+    <option value="">-- Select {{ field.label }} --</option>
+    {% for opt in field.options %}
+      <option value="{{ opt.value }}" {% if opt.value == field.value %}selected{% endif %}>
+        {{ opt.label }}
+      </option>
+    {% endfor %}
+  </select>
+{% elif field.type == 'checkbox' %}
+  <div class="form-check">
+    <input type="checkbox" name="{{ field.name }}" id="{{ field.name }}"
+           {% if field.value %} checked{% endif %} class="form-check-input" value="true">
+    <label class="form-check-label" for="{{ field.name }}">{{ field.checkbox_label }}</label>
+  </div>
+{% else %}
+  <input type="{{ field.type or 'text' }}" name="{{ field.name }}"
+         class="form-control" value="{{ field.value or '' }}">
+{% endif %}
+{% endmacro %}
