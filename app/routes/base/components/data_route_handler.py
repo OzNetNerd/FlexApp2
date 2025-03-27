@@ -74,11 +74,7 @@ class DataRouteHandler:
         """
         data = []
         for item in items:
-            item_dict = (
-                item.to_dict()
-                if hasattr(item, "to_dict")
-                else {k: v for k, v in item.__dict__.items() if not k.startswith("_")}
-            )
+            item_dict = item.to_dict() if hasattr(item, "to_dict") else {k: v for k, v in item.__dict__.items() if not k.startswith("_")}
             data.append(self.json_validator.ensure_json_serializable(item_dict))
         return data
 

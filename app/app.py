@@ -87,12 +87,7 @@ def create_app(config_class=Config):
         logger.debug(f"Cookies: {request.cookies}")
 
         if not current_user.is_authenticated:
-            if (
-                endpoint in whitelisted
-                or endpoint.startswith("static")
-                or endpoint.startswith("api_")
-                or endpoint.endswith(".data")
-            ):
+            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
                 return
             return redirect(url_for("auth_bp.login", next=request.path))
 

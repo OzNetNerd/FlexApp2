@@ -5,7 +5,6 @@ from app.models import User
 
 logger = logging.getLogger(__name__)
 
-
 class FormHandler:
     """Handles preparation and validation of dynamic form inputs for web routes."""
 
@@ -64,10 +63,14 @@ class FormHandler:
         fields = []
 
         for field in field_definitions:
-            field_copy = field.copy()
-            name = field_copy.get("name")
-            field_copy["value"] = self.resolve_value(item, name) if item else ""
-            fields.append(field_copy)
+            # Ensure field is a dictionary before copying
+            if isinstance(field, dict):
+                field_copy = field.copy()
+                name = field_copy.get("name")
+                field_copy["value"] = self.resolve_value(item, name) if item else ""
+                fields.append(field_copy)
+            else:
+                logger.warning(f"Skipping field because it's not a dictionary: {field}")
 
         if current_user.is_authenticated and current_user.is_admin:
             all_users = User.query.order_by(User.name).all()

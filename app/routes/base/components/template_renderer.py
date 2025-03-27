@@ -43,9 +43,7 @@ def render_safely(
             details = str(e)
             status_code = 500
 
-        logger.error(
-            f"{__name__} - ERROR - {error_type} in '{template_name}' for {current_endpoint} ({current_path}): {details}"
-        )
+        logger.error(f"{__name__} - ERROR - {error_type} in '{template_name}' for {current_endpoint} ({current_path}): {details}")
         if current_app.debug:
             logger.debug(f"Traceback: {traceback.format_exc()}")
 

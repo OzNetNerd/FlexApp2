@@ -49,11 +49,7 @@ class CRUDRoutesBase:
         if obj is None or isinstance(obj, (str, int, float, bool)):
             return obj
         elif hasattr(obj, "__dict__"):
-            return {
-                k: self._ensure_json_serializable(v)
-                for k, v in obj.__dict__.items()
-                if not k.startswith("_") and not callable(v)
-            }
+            return {k: self._ensure_json_serializable(v) for k, v in obj.__dict__.items() if not k.startswith("_") and not callable(v)}
         elif isinstance(obj, dict):
             return {k: self._ensure_json_serializable(v) for k, v in obj.items()}
         elif isinstance(obj, (list, tuple)):

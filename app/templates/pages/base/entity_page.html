@@ -24,11 +24,7 @@
         {% include 'pages/base/common/_section_layout.html' %}
       {% endif %}
 
-      {% if not read_only %}
-        {% include 'pages/base/common/_form_autocomplete.html' %}
-      {% else %}
-        {% include 'pages/form/_readonly_summary.html' %}
-      {% endif %}
+
 
       {% if not read_only %}
         {% include 'pages/base/common/_form_footer.html' %}

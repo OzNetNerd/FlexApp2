@@ -58,11 +58,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
             per_page = request.args.get("per_page", 25, type=int)
             sort_column = request.args.get("sort_by", "id")
             sort_direction = request.args.get("order", "asc")
-            filters = {
-                k.split(".")[1]: {"type": "contains", "filter": v}
-                for k, v in request.args.items()
-                if k.startswith("filter.")
-            }
+            filters = {k.split(".")[1]: {"type": "contains", "filter": v} for k, v in request.args.items() if k.startswith("filter.")}
 
             items = self.service.get_all(
                 page=page,

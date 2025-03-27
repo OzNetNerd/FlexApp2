@@ -1,50 +1,46 @@
-{# app/templates/macros/form_fields.html #}
+{# IMPORTANT: DO NOT IMPORT THIS FILE INTO ITSELF #}
+{# This file contains macros for rendering form fields in different layouts #}
 
 {% macro render_sections(fields, read_only=False) %}
-  {% set tabs = {} %}
+  {% set grouped_by_section = {} %}
+
+  {# Group fields by their sections #}
   {% for field in fields %}
-    {% set tab = field.tab or "Other" %}
-    {% if tab not in tabs %}
-      {% set _ = tabs.update({tab: []}) %}
+    {% set section = field.section or "Other" %}
+    {% if section not in grouped_by_section %}
+      {% set _ = grouped_by_section.update({section: []}) %}
     {% endif %}
-    {% set _ = tabs[tab].append(field) %}
+    {% set _ = grouped_by_section[section].append(field) %}
   {% endfor %}
 
   <ul class="nav nav-tabs" id="form-tabs" role="tablist">
-    {% for tab in tabs.keys() %}
+    {% for section in grouped_by_section.keys() %}
       <li class="nav-item" role="presentation">
-        <button class="nav-link {% if loop.first %}active{% endif %}" id="tab-{{ tab | lower | replace(' ', '-') }}-tab"
-                data-bs-toggle="tab" data-bs-target="#tab-{{ tab | lower | replace(' ', '-') }}" type="button"
-                role="tab" aria-controls="tab-{{ tab | lower | replace(' ', '-') }}"
+        <button class="nav-link {% if loop.first %}active{% endif %}" id="tab-{{ section | lower | replace(' ', '-') }}-tab"
+                data-bs-toggle="tab" data-bs-target="#tab-{{ section | lower | replace(' ', '-') }}" type="button"
+                role="tab" aria-controls="tab-{{ section | lower | replace(' ', '-') }}"
                 aria-selected="{{ 'true' if loop.first else 'false' }}">
-          {{ tab }}
+          {{ section }}
         </button>
       </li>
     {% endfor %}
   </ul>
 
   <div class="tab-content mt-3">
-    {% for tab, tab_fields in tabs.items() %}
-      <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="tab-{{ tab | lower | replace(' ', '-') }}"
-           role="tabpanel" aria-labelledby="tab-{{ tab | lower | replace(' ', '-') }}-tab">
+    {% for section, section_fields in grouped_by_section.items() %}
+      <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="tab-{{ section | lower | replace(' ', '-') }}"
+           role="tabpanel" aria-labelledby="tab-{{ section | lower | replace(' ', '-') }}-tab">
 
-        {% set grouped_by_section = tab_fields | groupby('section') %}
-        {% for section, fields_in_section in grouped_by_section %}
-          {% if section %}
-            <h5 class="mt-4 mb-3 border-bottom pb-1">{{ section }}</h5>
-          {% endif %}
-          <div class="row">
-            {% for field in fields_in_section %}
-              {{ render_field(field, read_only) }}
-            {% endfor %}
-          </div>
-        {% endfor %}
-
+        {# Render each field in the section #}
+        <div class="row">
+          {% for field in section_fields %}
+            {{ render_field(field, read_only) }}
+          {% endfor %}
+        </div>
       </div>
     {% endfor %}
   </div>
 {% endmacro %}
-
 
 {% macro render_field(field, read_only=False) %}
   <div class="col-md-6 mb-3">
@@ -85,8 +81,7 @@
     </select>
   {% elif field.type == 'checkbox' %}
     <div class="form-check">
-      <input type="checkbox" name="{{ field.name }}" id="{{ field.name }}"
-             class="form-check-input" value="true" {% if field.value %}checked{% endif %}>
+      <input type="checkbox" name="{{ field.name }}" id="{{ field.name }}"{% if field.value %} checked{% endif %} class="form-check-input" value="true">
       <label class="form-check-label" for="{{ field.name }}">{{ field.checkbox_label }}</label>
     </div>
   {% else %}
@@ -115,10 +110,31 @@
   {% endif %}
 {% endmacro %}
 
-{% macro render_section_fields(fields, read_only=False) %}
-  <div class="row">
-    {% for field in fields %}
-      {{ render_field(field, read_only) }}
-    {% endfor %}
-  </div>
+{% macro render_form(fields, submit_url, cancel_url, button_text="Submit", read_only=False) %}
+  <form action="{{ submit_url }}" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {{ render_sections(fields, read_only) }}
+
+    {% if not read_only %}
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
+          <i class="fas fa-times me-1"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save me-1"></i> {{ button_text }}
+        </button>
+      </div>
+    {% else %}
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-1"></i> Back
+        </a>
+        {% if not read_only %}
+        <a href="{{ edit_url }}" class="btn btn-primary">
+          <i class="fas fa-edit me-1"></i> Edit
+        </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </form>
 {% endmacro %}

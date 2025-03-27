@@ -47,44 +47,26 @@ class Contact(BaseModel):
         lazy="dynamic",
     )
 
-    __field_order__ = [
-        {
-            "name": "first_name",
-            "label": "First Name",
-            "type": "text",
-            "required": True,
-            "tab": "About",
-            "section": "Identity",
-        },
-        {
-            "name": "last_name",
-            "label": "Last Name",
-            "type": "text",
-            "required": True,
-            "tab": "About",
-            "section": "Identity",
-        },
-        {"name": "email", "label": "Email", "type": "email", "tab": "About", "section": "Contact Info"},
-        {"name": "phone", "label": "Phone", "type": "text", "tab": "About", "section": "Contact Info"},
-        {"name": "company_name", "label": "Company", "type": "text", "tab": "About", "section": "Company Info"},
-        {
-            "name": "created_at",
-            "label": "Created At",
-            "type": "text",
-            "tab": "About",
-            "section": "Record Info",
-            "readonly": True,
-        },
-        {
-            "name": "updated_at",
-            "label": "Updated At",
-            "type": "text",
-            "tab": "About",
-            "section": "Record Info",
-            "readonly": True,
-        },
-        {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
-    ]
+    __field_order__ = {
+        "Identity": [
+            {"name": "first_name", "label": "First Name", "type": "text", "required": True, "tab": "About"},
+            {"name": "last_name", "label": "Last Name", "type": "text", "required": True, "tab": "About"},
+        ],
+        "Contact Info": [
+            {"name": "email", "label": "Email", "type": "email", "tab": "About"},
+            {"name": "phone", "label": "Phone", "type": "text", "tab": "About"},
+        ],
+        "Company Info": [
+            {"name": "company_name", "label": "Company", "type": "text", "tab": "About"},
+        ],
+        "Record Info": [
+            {"name": "created_at", "label": "Created At", "type": "text", "tab": "About", "readonly": True},
+            {"name": "updated_at", "label": "Updated At", "type": "text", "tab": "About", "readonly": True},
+        ],
+        "Insights": [
+            {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
+        ]
+    }
 
     def __repr__(self) -> str:
         """String representation for debugging purposes.
@@ -112,10 +94,7 @@ class Contact(BaseModel):
             float | None: Average score or None if unavailable.
         """
         all_scores = [
-            score.total_score
-            for relationship in self.relationships
-            for score in relationship.crisp_scores
-            if score.total_score is not None
+            score.total_score for relationship in self.relationships for score in relationship.crisp_scores if score.total_score is not None
         ]
         return round(sum(all_scores) / len(all_scores), 2) if all_scores else None
 
