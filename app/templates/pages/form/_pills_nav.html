@@ -1,10 +1,12 @@
 {% set tabs = {} %}
-{% for field in fields %}
-  {% set tab = field.tab or 'Other' %}
-  {% if tab not in tabs %}
-    {% set _ = tabs.update({tab: []}) %}
-  {% endif %}
-  {% set _ = tabs[tab].append(field) %}
+{% for group_fields in __field_order__.values() %}
+  {% for field in group_fields %}
+    {% set tab = field.tab or 'Other' %}
+    {% if tab not in tabs %}
+      {% set _ = tabs.update({tab: []}) %}
+    {% endif %}
+    {% set _ = tabs[tab].append(field) %}
+  {% endfor %}
 {% endfor %}
 
 {% if tabs|length > 1 %}
@@ -17,7 +19,7 @@
               type="button"
               role="tab"
               aria-controls="tab-{{ tab | lower | replace(' ', '-') }}"
-              aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+              aria-selected="{{ 'true' if loop.first else 'false' }}">
         {{ tab }}
       </button>
     {% endfor %}

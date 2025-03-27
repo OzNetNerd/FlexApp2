@@ -34,14 +34,12 @@ class GenericWebRoutes(CRUDRoutesBase):
     def __post_init__(self):
         super().__post_init__()
         self.service = CRUDService(self.model)
-
         self.json_validator = JSONValidator()
         self.request_logger = RequestLogger()
         self.table_config_manager = TableConfigManager(self.json_validator)
         self.data_handler = DataRouteHandler(self.service, self.model, self.json_validator)
         self.item_manager = ItemManager(self.model, self.service, self.blueprint.name)
         self.form_handler = self._create_form_handler()
-
         self._register_routes()
         logger.debug(f"Web CRUD routes registered for {self.model.__name__} model.")
 
@@ -56,24 +54,9 @@ class GenericWebRoutes(CRUDRoutesBase):
     def _register_routes(self):
         self.blueprint.add_url_rule("/", "index", login_required(self._index_route), methods=["GET"])
         self.blueprint.add_url_rule("/<int:item_id>", "view", login_required(self._view_route), methods=["GET", "POST"])
-        self.blueprint.add_url_rule(
-            "/create",
-            "create",
-            login_required(self._create_route),
-            methods=["GET", "POST"],
-        )
-        self.blueprint.add_url_rule(
-            "/<int:item_id>/edit",
-            "edit",
-            login_required(self._edit_route),
-            methods=["GET", "POST"],
-        )
-        self.blueprint.add_url_rule(
-            "/<int:item_id>/delete",
-            "delete",
-            login_required(self._delete_route),
-            methods=["POST"],
-        )
+        self.blueprint.add_url_rule("/create", "create", login_required(self._create_route), methods=["GET", "POST"])
+        self.blueprint.add_url_rule("/<int:item_id>/edit", "edit", login_required(self._edit_route), methods=["GET", "POST"])
+        self.blueprint.add_url_rule("/<int:item_id>/delete", "delete", login_required(self._delete_route), methods=["POST"])
         self.blueprint.add_url_rule("/data", "data", login_required(self._data_route), methods=["GET"])
 
     def _get_template_context(self, **kwargs):
@@ -103,6 +86,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         self.request_logger.log_request_info(self.model.__name__, "index")
         table_config = self.table_config_manager.get_table_config(self.model.__tablename__)
         context = self._prepare_index_context(table_config)
+        logger.debug(f"Rendering index template: {self.index_template}")
         return render_safely(self.index_template, context, f"Error rendering {self.model.__name__} index")
 
     def _get_item_display_name(self, item):
@@ -120,8 +104,10 @@ class GenericWebRoutes(CRUDRoutesBase):
             flash(error, "error")
             return redirect(url_for(f"{self.blueprint.name}.index"))
 
-        fields_by_section = self.form_handler.build_fields(item)
+        if request.method == "POST":
+            return self._handle_view_post(item)
 
+        fields_by_section = self.form_handler.build_fields(item)
         context = self.form_handler.prepare_form_context(
             title=f"Viewing {self.model.__name__}: {self._get_item_display_name(item)}",
             submit_url="",
@@ -130,13 +116,9 @@ class GenericWebRoutes(CRUDRoutesBase):
             item=item,
             read_only=True,
         )
-
         context.update(self._get_template_context(context=context))
-        return render_safely(
-            self.view_template,
-            context,
-            f"Error viewing {self.model.__name__} with id {item_id}",
-        )
+        logger.debug(f"Rendering view template: {self.view_template}")
+        return render_safely(self.view_template, context, f"Error viewing {self.model.__name__} with id {item_id}")
 
     def _handle_view_post(self, item):
         note_content = request.form.get("note")
@@ -144,12 +126,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             flash("Note content is required.", "error")
             return redirect(url_for(f"{self.blueprint.name}.view", item_id=item.id))
 
-        note = Note(
-            content=note_content,
-            user_id=current_user.id,
-            parent_type=self.model.__name__,
-            parent_id=item.id,
-        )
+        note = Note(content=note_content, user_id=current_user.id, parent_type=self.model.__name__, parent_id=item.id)
         try:
             note.save()
             flash("Note added successfully", "success")
@@ -180,6 +157,20 @@ class GenericWebRoutes(CRUDRoutesBase):
         flash(f"{self.model.__name__} created successfully", "success")
         return result
 
+    def _render_create_form(self):
+        fields_by_section = self.json_validator.ensure_json_serializable(self.form_handler.build_fields())
+        context = self.form_handler.prepare_form_context(
+            title=f"Create a {self.model.__name__}",
+            submit_url=url_for(f"{self.blueprint.name}.create"),
+            cancel_url=url_for(f"{self.blueprint.name}.index"),
+            fields=fields_by_section,
+            button_text=f"Create {self.model.__name__}",
+            read_only=False,
+        )
+        context.update(self._get_template_context(context=context))
+        logger.debug(f"Rendering create template: {self.create_template}")
+        return render_safely(self.create_template, context, f"Error rendering create form for {self.model.__name__}")
+
     def _edit_route(self, item_id):
         self.request_logger.log_request_info(self.model.__name__, "edit", item_id)
         item, error = self.item_manager.get_item_by_id(item_id)
@@ -192,28 +183,8 @@ class GenericWebRoutes(CRUDRoutesBase):
 
         return self._render_edit_form(item)
 
-    def _render_create_form(self):
-        fields_by_section = self.json_validator.ensure_json_serializable(self.form_handler.build_fields())
-
-        context = self.form_handler.prepare_form_context(
-            title=f"Create a {self.model.__name__}",
-            submit_url=url_for(f"{self.blueprint.name}.create"),
-            cancel_url=url_for(f"{self.blueprint.name}.index"),
-            fields=fields_by_section,
-            button_text=f"Create {self.model.__name__}",
-            read_only=False,
-        )
-
-        context.update(self._get_template_context(context=context))
-        return render_safely(
-            self.create_template,
-            context,
-            f"Error rendering create form for {self.model.__name__}",
-        )
-
     def _render_edit_form(self, item):
         fields_by_section = self.json_validator.ensure_json_serializable(self.form_handler.build_fields(item))
-
         context = self.form_handler.prepare_form_context(
             title=f"Edit {self.model.__name__}",
             submit_url=url_for(f"{self.blueprint.name}.edit", item_id=item.id),
@@ -222,13 +193,9 @@ class GenericWebRoutes(CRUDRoutesBase):
             button_text=f"Update {self.model.__name__}",
             read_only=False,
         )
-
         context.update(self._get_template_context(context=context))
-        return render_safely(
-            self.edit_template,
-            context,
-            f"Error rendering edit form for {self.model.__name__}",
-        )
+        logger.debug(f"Rendering edit template: {self.edit_template}")
+        return render_safely(self.edit_template, context, f"Error rendering edit form for {self.model.__name__}")
 
     def _handle_edit_form_submission(self, item):
         errors = self.form_handler.validate_edit(item, request)
