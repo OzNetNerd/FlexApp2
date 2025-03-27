@@ -89,8 +89,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         return context
 
     def _determine_data_url(self):
-        return f"{self.api_url_prefix}/{self.model.__tablename__}" if self.api_url_prefix else url_for(
-            f"{self.blueprint.name}.data")
+        return f"{self.api_url_prefix}/{self.model.__tablename__}" if self.api_url_prefix else url_for(f"{self.blueprint.name}.data")
 
     def _prepare_index_context(self, table_config):
         data_url = self._determine_data_url()

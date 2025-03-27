@@ -65,7 +65,7 @@ class Contact(BaseModel):
         ],
         "Insights": [
             {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
-        ]
+        ],
     }
 
     def __repr__(self) -> str:

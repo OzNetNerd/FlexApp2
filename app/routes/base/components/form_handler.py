@@ -7,6 +7,7 @@ from app.models import User
 
 logger = logging.getLogger(__name__)
 
+
 class FormHandler:
     """Handles preparation and validation of dynamic form inputs for web routes."""
 
@@ -51,17 +52,52 @@ class FormHandler:
             "edit_url": edit_url,
         }
 
-    def build_fields(self, item=None) -> Dict[str, List[Dict]]:
+    def _validate_and_log_field_order(self) -> Dict[str, List[Dict]]:
         """
-        Generate ordered, grouped field definitions based on model metadata.
+        Validate and log the structure of the model's __field_order__ metadata.
 
-        Args:
-            item: SQLAlchemy instance to populate values (optional).
+        Logs the number of sections and fields defined in the model's `__field_order__`.
+        If `__field_order__` is missing, a ValueError is raised.
 
         Returns:
-            Dict[str, List[Dict]]: Dictionary grouping fields by section.
+            Dict[str, List[Dict]]: The validated __field_order__ dictionary.
+
+        Raises:
+            ValueError: If __field_order__ is not defined on the model.
         """
         field_definitions = getattr(self.model, "__field_order__", {})
+        if not field_definitions:
+            logger.error(f"__field_order__ not found for model {self.model.__name__}")
+            raise ValueError(f"__field_order__ is required for model {self.model.__name__}")
+
+        logger.info(
+            f"Found {len(field_definitions)} sections in __field_order__ for model {self.model.__name__}: {', '.join(field_definitions.keys())}"
+        )
+
+        for section, fields in field_definitions.items():
+            names = [f["name"] for f in fields if isinstance(f, dict) and "name" in f]
+            logger.info(f"  Section '{section}' has {len(names)} field(s): {', '.join(names)}")
+        return field_definitions
+
+    def build_fields(self, item=None) -> Dict[str, List[Dict]]:
+        """
+        Generate ordered, grouped field definitions based on model metadata,
+        injecting values from a given SQLAlchemy instance.
+
+        This method processes the model's `__field_order__` metadata to produce
+        a dictionary of fields grouped by section. If an item is provided,
+        each field will include a resolved `value` based on that instance.
+
+        If the current user is an admin, additional admin-only fields may be injected.
+
+        Args:
+            item (Optional[Base]): SQLAlchemy model instance to extract field values from.
+
+        Returns:
+            Dict[str, List[Dict]]: A dictionary where each key is a section name and
+            the value is a list of field definitions (with metadata and resolved values).
+        """
+
         grouped_fields = defaultdict(list)
 
         for section, section_fields in field_definitions.items():
@@ -79,15 +115,17 @@ class FormHandler:
             all_users = User.query.order_by(User.name).all()
             selected_user_ids = [str(r.user_id) for r in getattr(item, "relationships", [])]
 
-            grouped_fields["User Access"].append({
-                "name": "linked_users",
-                "label": "Linked Users",
-                "type": "multiselect",
-                "options": [{"label": u.name, "value": str(u.id)} for u in all_users],
-                "value": selected_user_ids,
-                "tab": "Permissions",
-                "section": "User Access"
-            })
+            grouped_fields["User Access"].append(
+                {
+                    "name": "linked_users",
+                    "label": "Linked Users",
+                    "type": "multiselect",
+                    "options": [{"label": u.name, "value": str(u.id)} for u in all_users],
+                    "value": selected_user_ids,
+                    "tab": "Permissions",
+                    "section": "User Access",
+                }
+            )
 
         return dict(grouped_fields)
 

@@ -18,18 +18,18 @@ from app.models.base import db
 from app.models.user import User
 from flask import current_app
 
+
 def configure_logging():
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
     logger.handlers.clear()
 
     handler = logging.StreamHandler()
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(filename)s - %(funcName)s - %(lineno)d - %(levelname)s - %(message)s"
-    )
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(filename)s - %(funcName)s - %(lineno)d - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)
 
     logger.addHandler(handler)
+
 
 # Top-level logger
 logger = logging.getLogger(__name__)
@@ -38,9 +38,11 @@ logger = logging.getLogger(__name__)
 login_manager = LoginManager()
 migrate = Migrate()
 
+
 @login_manager.unauthorized_handler
 def unauthorized():
     return make_response("🔒 Unauthorized - Please log in first", 401)
+
 
 def create_app(config_class=Config):
     configure_logging()
@@ -85,10 +87,10 @@ def create_app(config_class=Config):
         if endpoint is None:
             return
 
-        logger.debug(f"Before request: {endpoint}, Authenticated: {current_user.is_authenticated}")
-        logger.debug(f"Session contents: {dict(flask_session) if flask_session else 'None'}")
-        logger.debug(f"User ID: {current_user.get_id() if current_user.is_authenticated else None}")
-        logger.debug(f"Cookies: {request.cookies}")
+        # logger.debug(f"Before request: {endpoint}, Authenticated: {current_user.is_authenticated}")
+        # logger.debug(f"Session contents: {dict(flask_session) if flask_session else 'None'}")
+        # logger.debug(f"User ID: {current_user.get_id() if current_user.is_authenticated else None}")
+        # logger.debug(f"Cookies: {request.cookies}")
 
         if not current_user.is_authenticated:
             if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
@@ -130,6 +132,7 @@ def create_app(config_class=Config):
         return render_safely("errors/500.html", context, "Internal server error."), 500
 
     return app
+
 
 # Run app
 app = create_app()
