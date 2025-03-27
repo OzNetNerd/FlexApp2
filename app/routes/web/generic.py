@@ -141,7 +141,7 @@ class GenericWebRoutes(CRUDRoutesBase):
 
         # Build fields grouped by section
         fields_by_section = self.form_handler.build_fields(item)
-        logger.debug(f"Fields grouped by section for item with ID {item_id}: {fields_by_section}")
+        # logger.debug(f"Fields grouped by section for item with ID {item_id}: {fields_by_section}")
 
         # Prepare the form context
         context = self.form_handler.prepare_form_context(
@@ -152,11 +152,11 @@ class GenericWebRoutes(CRUDRoutesBase):
             item=item,
             read_only=True,
         )
-        logger.debug(f"Prepared form context for item with ID {item_id}: {context}")
+        # logger.debug(f"Prepared form context for item with ID {item_id}: {context}")
 
         # Update the context with additional data
         context.update(self._get_template_context(context=context))
-        logger.debug(f"Context updated with template data for item with ID {item_id}: {context}")
+        # logger.debug(f"Context updated with template data for item with ID {item_id}: {context}")
 
         # Render the template
         logger.debug(f"Rendering view template: {self.view_template}")
