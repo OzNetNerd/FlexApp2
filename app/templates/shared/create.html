@@ -1,0 +1,34 @@
+{% extends "pages/base/page.html" %}
+{% import "macros/form_fields.html" as macros %}
+
+{% block content %}
+  {% set title = title or ('Create ' ~ entity_name) %}
+  {% set button_text = button_text or 'Create' %}
+  {% set read_only = false %}
+  {% set fields = fields or [] %} {# ✅ Ensure fields is defined #}
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+      <h3 class="h4 mb-0 text-primary">
+        <i class="fas fa-plus-circle me-2"></i>{{ title }}
+      </h3>
+    </div>
+
+    <div class="card-body">
+      <form method="POST">
+        {% include 'pages/base/common/_section_layout.html' %}
+        {% include 'pages/form/_autocomplete.html' %}
+        {% include 'pages/form/_footer.html' %}
+      </form>
+    </div>
+  </div>
+
+  {% if error_message %}
+    <script type="module">
+      import { showToast } from "/static/js/toasts.js";
+      document.addEventListener('DOMContentLoaded', () => {
+        showToast({{ ("Error creating " ~ entity_name ~ ": " ~ error_message) | tojson }}, "error");
+      });
+    </script>
+  {% endif %}
+{% endblock %}
