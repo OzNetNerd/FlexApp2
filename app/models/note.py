@@ -31,14 +31,38 @@ class Note(BaseModel):
 
     __field_order__ = [
         {"name": "content", "label": "Content", "type": "textarea", "tab": "Post", "section": "Body"},
-        {"name": "processed_content", "label": "Processed", "type": "textarea", "readonly": True,
-         "tab": "Post", "section": "Body"},
-        {"name": "author.username", "label": "Author", "type": "text", "readonly": True,
-         "tab": "Post", "section": "Metadata"},
-        {"name": "created_at", "label": "Created At", "type": "datetime", "readonly": True,
-         "tab": "Post", "section": "Metadata"},
-        {"name": "updated_at", "label": "Updated At", "type": "datetime", "readonly": True,
-         "tab": "Post", "section": "Metadata"},
+        {
+            "name": "processed_content",
+            "label": "Processed",
+            "type": "textarea",
+            "readonly": True,
+            "tab": "Post",
+            "section": "Body",
+        },
+        {
+            "name": "author.username",
+            "label": "Author",
+            "type": "text",
+            "readonly": True,
+            "tab": "Post",
+            "section": "Metadata",
+        },
+        {
+            "name": "created_at",
+            "label": "Created At",
+            "type": "datetime",
+            "readonly": True,
+            "tab": "Post",
+            "section": "Metadata",
+        },
+        {
+            "name": "updated_at",
+            "label": "Updated At",
+            "type": "datetime",
+            "readonly": True,
+            "tab": "Post",
+            "section": "Metadata",
+        },
     ]
 
     def __repr__(self) -> str:

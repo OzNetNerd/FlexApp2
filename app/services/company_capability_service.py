@@ -19,14 +19,10 @@ def link_capability_to_company(company_id: int, capability_id: int) -> str:
         logger.warning(f"Capability {capability_id} not found.")
         return "Capability not found."
 
-    existing = CompanyCapability.query.filter_by(
-        company_id=company_id, capability_id=capability_id
-    ).first()
+    existing = CompanyCapability.query.filter_by(company_id=company_id, capability_id=capability_id).first()
 
     if existing:
-        logger.info(
-            f"Capability {capability_id} already linked to company {company_id}."
-        )
+        logger.info(f"Capability {capability_id} already linked to company {company_id}.")
         return "Already linked."
 
     link = CompanyCapability(company_id=company_id, capability_id=capability_id)
@@ -40,14 +36,10 @@ def unlink_capability_from_company(company_id: int, capability_id: int) -> str:
     """Unlink a capability from a company."""
     logger.debug(f"Unlinking capability {capability_id} from company {company_id}")
 
-    link = CompanyCapability.query.filter_by(
-        company_id=company_id, capability_id=capability_id
-    ).first()
+    link = CompanyCapability.query.filter_by(company_id=company_id, capability_id=capability_id).first()
 
     if not link:
-        logger.warning(
-            f"No link found between company {company_id} and capability {capability_id}."
-        )
+        logger.warning(f"No link found between company {company_id} and capability {capability_id}.")
         return "Link does not exist."
 
     db.session.delete(link)

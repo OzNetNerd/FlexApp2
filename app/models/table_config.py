@@ -68,7 +68,8 @@ class TableConfig(BaseModel):
                 logger.debug(f"Converting legacy format for table '{table_name}'")
                 column_overrides = {
                     col["field"]: {k: v for k, v in col.items() if k != "field"}
-                    for col in config_dict if "field" in col
+                    for col in config_dict
+                    if "field" in col
                 }
                 return {
                     "autoGenerateColumns": True,

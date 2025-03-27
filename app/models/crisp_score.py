@@ -22,9 +22,7 @@ class CRISPScore(BaseModel):
 
     __tablename__ = "crisp_scores"
 
-    relationship_id = db.Column(
-        db.Integer, db.ForeignKey("relationships.id"), nullable=False
-    )
+    relationship_id = db.Column(db.Integer, db.ForeignKey("relationships.id"), nullable=False)
     relationship = db.relationship("Relationship", back_populates="crisp_scores")
 
     credibility = db.Column(db.Integer, nullable=False)

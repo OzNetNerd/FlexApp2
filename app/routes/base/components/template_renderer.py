@@ -50,14 +50,10 @@ def render_safely(
             logger.debug(f"Traceback: {traceback.format_exc()}")
 
         # ✅ Provide error_message consistently to the template
-        context["error_message"] = (
-            f"{error_type}: {details}" if current_app.debug else fallback_error_message
-        )
+        context["error_message"] = f"{error_type}: {details}" if current_app.debug else fallback_error_message
 
         try:
             return render_template(template_name, **context), status_code
         except Exception as e2:
-            logger.critical(
-                f"{__name__} - CRITICAL - Failed to re-render '{template_name}' with error context: {e2}"
-            )
+            logger.critical(f"{__name__} - CRITICAL - Failed to re-render '{template_name}' with error context: {e2}")
             return f"<h1>{fallback_error_message}</h1><p>{error_type}</p>", status_code

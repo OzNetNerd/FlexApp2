@@ -18,46 +18,46 @@ def search():
     results = []
 
     logger.debug(f"Searching for users with query: {query}")
-    users = (
-        User.query.filter(
-            User.username.ilike(f"%{query}%") | User.name.ilike(f"%{query}%")
-        )
-        .limit(5)
-        .all()
+    users = User.query.filter(User.username.ilike(f"%{query}%") | User.name.ilike(f"%{query}%")).limit(5).all()
+    results.extend(
+        [
+            {
+                "id": user.id,
+                "text": user.name,
+                "type": "user",
+                "url": f"/users/{user.id}",
+            }
+            for user in users
+        ]
     )
-    results.extend([
-        {
-            "id": user.id,
-            "text": user.name,
-            "type": "user",
-            "url": f"/users/{user.id}",
-        }
-        for user in users
-    ])
 
     logger.debug(f"Searching for companies with query: {query}")
     companies = Company.query.filter(Company.name.ilike(f"%{query}%")).limit(5).all()
-    results.extend([
-        {
-            "id": company.id,
-            "text": company.name,
-            "type": "company",
-            "url": f"/companies/{company.id}",
-        }
-        for company in companies
-    ])
+    results.extend(
+        [
+            {
+                "id": company.id,
+                "text": company.name,
+                "type": "company",
+                "url": f"/companies/{company.id}",
+            }
+            for company in companies
+        ]
+    )
 
     logger.debug(f"Searching for opportunities with query: {query}")
     opportunities = Opportunity.query.filter(Opportunity.name.ilike(f"%{query}%")).limit(5).all()
-    results.extend([
-        {
-            "id": opportunity.id,
-            "text": opportunity.name,
-            "type": "opportunity",
-            "url": f"/opportunities/{opportunity.id}",
-        }
-        for opportunity in opportunities
-    ])
+    results.extend(
+        [
+            {
+                "id": opportunity.id,
+                "text": opportunity.name,
+                "type": "opportunity",
+                "url": f"/opportunities/{opportunity.id}",
+            }
+            for opportunity in opportunities
+        ]
+    )
 
     logger.info(f"Returning {len(results)} search results.")
     return jsonify(results)
@@ -74,18 +74,22 @@ def mentions_search():
 
     for item in items:
         if mention_type == "user":
-            results.append({
-                "id": item.id,
-                "username": item.username,
-                "name": item.name,
-                "text": f"@{item.username}",
-            })
+            results.append(
+                {
+                    "id": item.id,
+                    "username": item.username,
+                    "name": item.name,
+                    "text": f"@{item.username}",
+                }
+            )
         elif mention_type == "company":
-            results.append({
-                "id": item.id,
-                "name": item.name,
-                "text": f"#{item.name}",
-            })
+            results.append(
+                {
+                    "id": item.id,
+                    "name": item.name,
+                    "text": f"#{item.name}",
+                }
+            )
 
     logger.info(f"Returning {len(results)} mention results.")
     return jsonify(results)

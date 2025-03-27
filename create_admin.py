@@ -19,9 +19,7 @@ def create_admin_user():
         }
 
         # Check for existing admin by username OR email
-        existing = User.query.filter(
-            (User.username == admin_username) | (User.email == admin_email)
-        ).first()
+        existing = User.query.filter((User.username == admin_username) | (User.email == admin_email)).first()
 
         if existing:
             # Update existing admin user

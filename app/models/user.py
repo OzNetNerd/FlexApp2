@@ -31,36 +31,37 @@ class User(BaseModel, UserMixin):
     password_hash = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
 
-    relationships = db.relationship(
-        "Relationship", back_populates="user", cascade="all, delete-orphan"
-    )
+    relationships = db.relationship("Relationship", back_populates="user", cascade="all, delete-orphan")
     notes = db.relationship("Note", backref="author", lazy="dynamic")
 
     __field_order__ = [
         {
-            "name": "username", "label": "Username", "type": "text",
-            "tab": "About", "section": "Basic Info", "required": True
+            "name": "username",
+            "label": "Username",
+            "type": "text",
+            "tab": "About",
+            "section": "Basic Info",
+            "required": True,
+        },
+        {"name": "name", "label": "Name", "type": "text", "tab": "About", "section": "Basic Info", "required": True},
+        {"name": "email", "label": "Email", "type": "email", "tab": "About", "section": "Contact", "required": True},
+        {
+            "name": "created_at",
+            "label": "Created At",
+            "type": "datetime",
+            "readonly": True,
+            "tab": "About",
+            "section": "Record Info",
         },
         {
-            "name": "name", "label": "Name", "type": "text",
-            "tab": "About", "section": "Basic Info", "required": True
+            "name": "updated_at",
+            "label": "Updated At",
+            "type": "datetime",
+            "readonly": True,
+            "tab": "About",
+            "section": "Record Info",
         },
-        {
-            "name": "email", "label": "Email", "type": "email",
-            "tab": "About", "section": "Contact", "required": True
-        },
-        {
-            "name": "created_at", "label": "Created At", "type": "datetime",
-            "readonly": True, "tab": "About", "section": "Record Info"
-        },
-        {
-            "name": "updated_at", "label": "Updated At", "type": "datetime",
-            "readonly": True, "tab": "About", "section": "Record Info"
-        },
-        {
-            "name": "crisp", "label": "CRISP", "type": "custom",
-            "tab": "Insights", "section": "CRISP Score"
-        },
+        {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
     ]
 
     def __init__(self, *args, **kwargs):

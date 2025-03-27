@@ -66,9 +66,7 @@ def search_mentions(query, mention_type):
         logger.warning("Empty query provided to search_mentions.")
         return []
 
-    logger.debug(
-        f"Searching for mentions of type '{mention_type}' with query '{query}'."
-    )
+    logger.debug(f"Searching for mentions of type '{mention_type}' with query '{query}'.")
 
     if mention_type == "user":
         return User.search_by_username(query)

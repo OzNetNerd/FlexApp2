@@ -22,9 +22,7 @@ class ContactCRUDRoutes(GenericWebRoutes):
         context["relationship"] = relationship
 
         if relationship:
-            context["crisp_scores"] = relationship.crisp_scores.order_by(
-                CRISPScore.created_at.desc()
-            ).all()
+            context["crisp_scores"] = relationship.crisp_scores.order_by(CRISPScore.created_at.desc()).all()
 
     def _preprocess_form_data(self, request_obj):
         """

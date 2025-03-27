@@ -19,6 +19,7 @@ from app.routes.api.companies import api_companies_bp
 from app.routes.api.users import api_users_bp
 from app.routes.api.tasks import api_tasks_bp  # ✅ Added
 
+
 def register_api_blueprints(app):
     """Attach all API blueprints to the Flask app instance.
 

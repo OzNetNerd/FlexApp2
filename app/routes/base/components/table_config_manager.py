@@ -44,14 +44,10 @@ class TableConfigManager:
 
             try:
                 json.dumps(table_config["columns"])
-                logger.debug(
-                    f"Columns are JSON serializable with {len(table_config.get('columns', []))} columns"
-                )
+                logger.debug(f"Columns are JSON serializable with {len(table_config.get('columns', []))} columns")
             except TypeError as e:
                 logger.error(f"Columns are not JSON serializable: {str(e)}")
-                table_config["columns"] = self.json_validator.ensure_json_serializable(
-                    table_config.get("columns", [])
-                )
+                table_config["columns"] = self.json_validator.ensure_json_serializable(table_config.get("columns", []))
 
             issues = self.json_validator.validate_json_serializable(table_config)
             if issues:

@@ -38,9 +38,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         self.json_validator = JSONValidator()
         self.request_logger = RequestLogger()
         self.table_config_manager = TableConfigManager(self.json_validator)
-        self.data_handler = DataRouteHandler(
-            self.service, self.model, self.json_validator
-        )
+        self.data_handler = DataRouteHandler(self.service, self.model, self.json_validator)
         self.item_manager = ItemManager(self.model, self.service, self.blueprint.name)
         self.form_handler = self._create_form_handler()
 
@@ -56,12 +54,8 @@ class GenericWebRoutes(CRUDRoutesBase):
         return form_handler
 
     def _register_routes(self):
-        self.blueprint.add_url_rule(
-            "/", "index", login_required(self._index_route), methods=["GET"]
-        )
-        self.blueprint.add_url_rule(
-            "/<int:item_id>", "view", login_required(self._view_route), methods=["GET", "POST"]
-        )
+        self.blueprint.add_url_rule("/", "index", login_required(self._index_route), methods=["GET"])
+        self.blueprint.add_url_rule("/<int:item_id>", "view", login_required(self._view_route), methods=["GET", "POST"])
         self.blueprint.add_url_rule(
             "/create",
             "create",
@@ -80,9 +74,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             login_required(self._delete_route),
             methods=["POST"],
         )
-        self.blueprint.add_url_rule(
-            "/data", "data", login_required(self._data_route), methods=["GET"]
-        )
+        self.blueprint.add_url_rule("/data", "data", login_required(self._data_route), methods=["GET"])
 
     def _get_template_context(self, **kwargs):
         context = kwargs.get("context", {})
@@ -112,13 +104,9 @@ class GenericWebRoutes(CRUDRoutesBase):
 
     def _index_route(self):
         self.request_logger.log_request_info(self.model.__name__, "index")
-        table_config = self.table_config_manager.get_table_config(
-            self.model.__tablename__
-        )
+        table_config = self.table_config_manager.get_table_config(self.model.__tablename__)
         context = self._prepare_index_context(table_config)
-        return render_safely(
-            self.index_template, context, f"Error rendering {self.model.__name__} index"
-        )
+        return render_safely(self.index_template, context, f"Error rendering {self.model.__name__} index")
 
     def _get_item_display_name(self, item):
         for attr in ["name", "title", "email", "username"]:
@@ -224,9 +212,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         return result
 
     def _render_create_form(self):
-        fields = self.json_validator.ensure_json_serializable(
-            self.form_handler.build_fields()
-        )
+        fields = self.json_validator.ensure_json_serializable(self.form_handler.build_fields())
         context = self.form_handler.prepare_form_context(
             title=f"Create a {self.model.__name__}",
             submit_url=url_for(f"{self.blueprint.name}.create"),
@@ -243,9 +229,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         )
 
     def _render_edit_form(self, item):
-        fields = self.json_validator.ensure_json_serializable(
-            self.form_handler.build_fields(item)
-        )
+        fields = self.json_validator.ensure_json_serializable(self.form_handler.build_fields(item))
         context = self.form_handler.prepare_form_context(
             title=f"Edit {self.model.__name__}",
             submit_url=url_for(f"{self.blueprint.name}.edit", item_id=item.id),

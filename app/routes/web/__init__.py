@@ -30,8 +30,9 @@ from app.routes.web import (
     opportunities,
     relationship,
     crisp_score,
-    tasks  # ✅ Import this too so the routes get registered
+    tasks,  # ✅ Import this too so the routes get registered
 )
+
 
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""

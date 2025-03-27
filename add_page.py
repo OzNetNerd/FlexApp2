@@ -19,18 +19,22 @@ ROUTER_PATH = PROJECT_ROOT / "routes" / "router.py"
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("add_page")
 
+
 # --- Utilities ---
 def snake_to_pascal(name):
-    return ''.join(word.capitalize() for word in name.split('_'))
+    return "".join(word.capitalize() for word in name.split("_"))
+
 
 def pluralize(name):
-    return name + 's' if not name.endswith('s') else name
+    return name + "s" if not name.endswith("s") else name
+
 
 def file_contains(path, pattern):
     if not path.exists():
         return False
     with open(path, "r") as f:
         return re.search(pattern, f.read()) is not None
+
 
 def safe_write(path, content):
     if path.exists():
@@ -40,15 +44,16 @@ def safe_write(path, content):
             f.write(content)
         click.echo(click.style(f"Created {path}", fg="green"))
 
+
 # --- CLI ---
 @click.command()
-@click.option('--name', required=True, help='Entity name in snake_case (e.g., contact)')
-@click.option('--label', required=True, help='Human-readable label (e.g., Contact)')
-@click.option('--fields', default='name', help='Comma-separated list of required fields (e.g., name,email)')
+@click.option("--name", required=True, help="Entity name in snake_case (e.g., contact)")
+@click.option("--label", required=True, help="Human-readable label (e.g., Contact)")
+@click.option("--fields", default="name", help="Comma-separated list of required fields (e.g., name,email)")
 def main(name, label, fields):
     model_class = snake_to_pascal(name)
     table_name = pluralize(name)
-    required_fields = [f.strip() for f in fields.split(',') if f.strip()]
+    required_fields = [f.strip() for f in fields.split(",") if f.strip()]
 
     # 1. Create Model
     model_path = MODELS_DIR / f"{name}.py"
@@ -127,10 +132,14 @@ from app.services.crud_service import CRUDService
     if click.confirm(f"Add a default TableConfig entry for '{table_name}'?"):
         click.echo(click.style("Attempting to set table config via Flask shell...", fg="yellow"))
         try:
-            subprocess.run([
-                "flask", "shell", "-c",
-                f"from app.models.table_config import TableConfig; TableConfig.set_config('{table_name}', {{'columns': []}})"
-            ])
+            subprocess.run(
+                [
+                    "flask",
+                    "shell",
+                    "-c",
+                    f"from app.models.table_config import TableConfig; TableConfig.set_config('{table_name}', {{'columns': []}})",
+                ]
+            )
         except Exception as e:
             click.echo(click.style(f"Failed to set TableConfig: {e}", fg="red"))
 
@@ -141,5 +150,6 @@ from app.services.crud_service import CRUDService
 
     click.echo(click.style("✅ Done!", fg="green"))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

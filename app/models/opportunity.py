@@ -37,12 +37,29 @@ class Opportunity(BaseModel):
     )
 
     __field_order__ = [
-        {"name": "name", "label": "Name", "type": "text", "tab": "About",
-         "section": "Opportunity Info", "required": True},
-        {"name": "description", "label": "Description", "type": "textarea", "tab": "About",
-         "section": "Opportunity Info"},
-        {"name": "company.name", "label": "Company Name", "type": "text", "readonly": True, "tab": "About",
-         "section": "Opportunity Info"},
+        {
+            "name": "name",
+            "label": "Name",
+            "type": "text",
+            "tab": "About",
+            "section": "Opportunity Info",
+            "required": True,
+        },
+        {
+            "name": "description",
+            "label": "Description",
+            "type": "textarea",
+            "tab": "About",
+            "section": "Opportunity Info",
+        },
+        {
+            "name": "company.name",
+            "label": "Company Name",
+            "type": "text",
+            "readonly": True,
+            "tab": "About",
+            "section": "Opportunity Info",
+        },
         {"name": "stage", "label": "Stage", "type": "text", "tab": "Details", "section": "Pipeline"},
         {"name": "status", "label": "Status", "type": "text", "tab": "Details", "section": "Pipeline"},
         {"name": "value", "label": "Value", "type": "number", "tab": "Details", "section": "Financials"},
@@ -81,9 +98,7 @@ class Opportunity(BaseModel):
         Returns:
             float | None: Average CRISP score across all involved contacts.
         """
-        contacts = {
-            rel.contact for note in self.notes for rel in note.author.relationships
-        }
+        contacts = {rel.contact for note in self.notes for rel in note.author.relationships}
         scores = [c.crisp_summary for c in contacts if c.crisp_summary is not None]
 
         if not scores:

@@ -45,12 +45,12 @@ def create_app(config_class=Config):
 
     # ✅ Secure session configuration using Flask's built-in session management
     app.config.update(
-        PERMANENT_SESSION_LIFETIME=60 * 60 * 24,     # 1 day
+        PERMANENT_SESSION_LIFETIME=60 * 60 * 24,  # 1 day
         SESSION_PERMANENT=True,
         SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SECURE=True,                  # Set to False for local dev if needed
+        SESSION_COOKIE_SECURE=True,  # Set to False for local dev if needed
         SESSION_COOKIE_SAMESITE="Lax",
-        REMEMBER_COOKIE_DURATION=60 * 60 * 24 * 30,   # 30 days
+        REMEMBER_COOKIE_DURATION=60 * 60 * 24 * 30,  # 30 days
         REMEMBER_COOKIE_HTTPONLY=True,
     )
 
@@ -81,15 +81,9 @@ def create_app(config_class=Config):
         if endpoint is None:
             return
 
-        logger.debug(
-            f"Before request: {endpoint}, Authenticated: {current_user.is_authenticated}"
-        )
-        logger.debug(
-            f"Session contents: {dict(flask_session) if flask_session else 'None'}"
-        )
-        logger.debug(
-            f"User ID: {current_user.get_id() if current_user.is_authenticated else None}"
-        )
+        logger.debug(f"Before request: {endpoint}, Authenticated: {current_user.is_authenticated}")
+        logger.debug(f"Session contents: {dict(flask_session) if flask_session else 'None'}")
+        logger.debug(f"User ID: {current_user.get_id() if current_user.is_authenticated else None}")
         logger.debug(f"Cookies: {request.cookies}")
 
         if not current_user.is_authenticated:
@@ -120,9 +114,7 @@ def create_app(config_class=Config):
     with app.app_context():
         logger.debug("--- Registered URL Rules ---")
         for rule in sorted(app.url_map.iter_rules(), key=lambda r: r.endpoint):
-            logger.debug(
-                f"Endpoint: {rule.endpoint}, Methods: {rule.methods}, Rule: {rule}"
-            )
+            logger.debug(f"Endpoint: {rule.endpoint}, Methods: {rule.methods}, Rule: {rule}")
 
     @app.context_processor
     def inject_now():

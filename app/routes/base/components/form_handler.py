@@ -73,13 +73,15 @@ class FormHandler:
             all_users = User.query.order_by(User.name).all()
             selected_user_ids = [str(r.user_id) for r in getattr(item, "relationships", [])]
 
-            fields.append({
-                "name": "linked_users",
-                "label": "Linked Users",
-                "type": "multiselect",
-                "options": [{"label": u.name, "value": str(u.id)} for u in all_users],
-                "value": selected_user_ids,
-            })
+            fields.append(
+                {
+                    "name": "linked_users",
+                    "label": "Linked Users",
+                    "type": "multiselect",
+                    "options": [{"label": u.name, "value": str(u.id)} for u in all_users],
+                    "value": selected_user_ids,
+                }
+            )
 
         return fields
 

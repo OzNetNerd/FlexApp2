@@ -60,7 +60,8 @@ class GenericAPIRoutes(CRUDRoutesBase):
             sort_direction = request.args.get("order", "asc")
             filters = {
                 k.split(".")[1]: {"type": "contains", "filter": v}
-                for k, v in request.args.items() if k.startswith("filter.")
+                for k, v in request.args.items()
+                if k.startswith("filter.")
             }
 
             items = self.service.get_all(
@@ -72,15 +73,20 @@ class GenericAPIRoutes(CRUDRoutesBase):
             )
 
             data = [self._ensure_json_serializable(item.to_dict()) for item in items.items]
-            return jsonify({
-                "data": data,
-                "meta": {
-                    "page": page,
-                    "per_page": per_page,
-                    "total": items.total,
-                    "pages": items.pages,
-                },
-            }), 200
+            return (
+                jsonify(
+                    {
+                        "data": data,
+                        "meta": {
+                            "page": page,
+                            "per_page": per_page,
+                            "total": items.total,
+                            "pages": items.pages,
+                        },
+                    }
+                ),
+                200,
+            )
         except Exception as e:
             logger.error(f"Error in list route: {str(e)}")
             logger.error(traceback.format_exc())
@@ -103,10 +109,12 @@ class GenericAPIRoutes(CRUDRoutesBase):
         except Exception as e:
             logger.error(f"Error in get route: {str(e)}")
             logger.error(traceback.format_exc())
-            return jsonify({
-                "error": "Not Found" if "404" in str(e) else "Internal Server Error",
-                "message": str(e),
-            }), (404 if "404" in str(e) else 500)
+            return jsonify(
+                {
+                    "error": "Not Found" if "404" in str(e) else "Internal Server Error",
+                    "message": str(e),
+                }
+            ), (404 if "404" in str(e) else 500)
 
     def _create_route(self):
         """
@@ -123,10 +131,15 @@ class GenericAPIRoutes(CRUDRoutesBase):
                 return jsonify({"error": "Validation Error", "messages": errors}), 400
 
             item = self.service.create(self.model, data)
-            return jsonify({
-                "data": self._ensure_json_serializable(item.to_dict()),
-                "message": f"{self.model.__name__} created successfully"
-            }), 201
+            return (
+                jsonify(
+                    {
+                        "data": self._ensure_json_serializable(item.to_dict()),
+                        "message": f"{self.model.__name__} created successfully",
+                    }
+                ),
+                201,
+            )
         except Exception as e:
             logger.error(f"Error in create route: {str(e)}")
             logger.error(traceback.format_exc())
@@ -151,10 +164,15 @@ class GenericAPIRoutes(CRUDRoutesBase):
                 return jsonify({"error": "Validation Error", "messages": errors}), 400
 
             item = self.service.update(item, data)
-            return jsonify({
-                "data": self._ensure_json_serializable(item.to_dict()),
-                "message": f"{self.model.__name__} updated successfully"
-            }), 200
+            return (
+                jsonify(
+                    {
+                        "data": self._ensure_json_serializable(item.to_dict()),
+                        "message": f"{self.model.__name__} updated successfully",
+                    }
+                ),
+                200,
+            )
         except Exception as e:
             logger.error(f"Error in update route: {str(e)}")
             logger.error(traceback.format_exc())

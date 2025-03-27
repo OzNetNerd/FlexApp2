@@ -6,6 +6,7 @@ from app.models.base import db
 from app.models.user import User
 from werkzeug.security import generate_password_hash
 
+
 @pytest.fixture
 def app() -> Flask:
     """
@@ -42,6 +43,7 @@ def client(app: Flask):
     """
     return app.test_client()
 
+
 @pytest.fixture
 def test_user(app: Flask):
     """
@@ -56,7 +58,7 @@ def test_user(app: Flask):
     user = User(
         name="Test User",
         email="test@example.com",
-        password=generate_password_hash("testpass")  # Adjust depending on your User model
+        password=generate_password_hash("testpass"),  # Adjust depending on your User model
     )
     db.session.add(user)
     db.session.commit()

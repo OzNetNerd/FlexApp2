@@ -26,15 +26,9 @@ class Relationship(BaseModel):
     user = db.relationship("User", back_populates="relationships")
     contact = db.relationship("Contact", back_populates="relationships")
 
-    crisp_scores = db.relationship(
-        "CRISPScore",
-        back_populates="relationship",
-        cascade="all, delete-orphan"
-    )
+    crisp_scores = db.relationship("CRISPScore", back_populates="relationship", cascade="all, delete-orphan")
 
-    __table_args__ = (
-        db.UniqueConstraint("user_id", "contact_id", name="_user_contact_uc"),
-    )
+    __table_args__ = (db.UniqueConstraint("user_id", "contact_id", name="_user_contact_uc"),)
 
     def __repr__(self) -> str:
         """Readable string representation.

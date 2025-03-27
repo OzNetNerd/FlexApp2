@@ -74,9 +74,11 @@ class DataRouteHandler:
         """
         data = []
         for item in items:
-            item_dict = item.to_dict() if hasattr(item, "to_dict") else {
-                k: v for k, v in item.__dict__.items() if not k.startswith("_")
-            }
+            item_dict = (
+                item.to_dict()
+                if hasattr(item, "to_dict")
+                else {k: v for k, v in item.__dict__.items() if not k.startswith("_")}
+            )
             data.append(self.json_validator.ensure_json_serializable(item_dict))
         return data
 
@@ -91,9 +93,7 @@ class DataRouteHandler:
             500 response with error traceback on failure.
         """
         try:
-            page, page_size, start_row, sort_column, sort_direction, filter_model = (
-                self.parse_request_params()
-            )
+            page, page_size, start_row, sort_column, sort_direction, filter_model = self.parse_request_params()
 
             items = self.service.get_all(
                 page=page,
@@ -107,12 +107,14 @@ class DataRouteHandler:
 
             data = self.format_data_items(items.items)
 
-            return jsonify({
-                "data": data,
-                "total": items.total if hasattr(items, "total") else len(data),
-                "page": page,
-                "per_page": page_size,
-            })
+            return jsonify(
+                {
+                    "data": data,
+                    "total": items.total if hasattr(items, "total") else len(data),
+                    "page": page,
+                    "per_page": page_size,
+                }
+            )
 
         except Exception as e:
             logger.error(f"Error in data route: {str(e)}")

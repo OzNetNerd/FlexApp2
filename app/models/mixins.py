@@ -1,5 +1,6 @@
 # app/models/mixins.py
 
+
 class ValidatorMixin:
     """Mixin providing validation methods for create and update."""
 

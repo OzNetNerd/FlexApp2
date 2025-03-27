@@ -35,4 +35,3 @@ def test_login_page_loads(client: FlaskClient):
     assert response.status_code == 200
     assert b"<form" in response.data  # more reliable than "Log In"
     assert b'action="/auth/login"' in response.data
-

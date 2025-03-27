@@ -34,9 +34,7 @@ class Contact(BaseModel):
     company_id = db.Column(db.Integer, db.ForeignKey("companies.id"))
     company = db.relationship("Company", back_populates="contacts")
 
-    relationships = db.relationship(
-        "Relationship", back_populates="contact", cascade="all, delete-orphan"
-    )
+    relationships = db.relationship("Relationship", back_populates="contact", cascade="all, delete-orphan")
     notes = db.relationship(
         "Note",
         primaryjoin="and_(Note.notable_id == foreign(Contact.id), Note.notable_type == 'Contact')",
@@ -50,17 +48,41 @@ class Contact(BaseModel):
     )
 
     __field_order__ = [
-        {"name": "first_name", "label": "First Name", "type": "text", "required": True,
-         "tab": "About", "section": "Identity"},
-        {"name": "last_name", "label": "Last Name", "type": "text", "required": True,
-         "tab": "About", "section": "Identity"},
+        {
+            "name": "first_name",
+            "label": "First Name",
+            "type": "text",
+            "required": True,
+            "tab": "About",
+            "section": "Identity",
+        },
+        {
+            "name": "last_name",
+            "label": "Last Name",
+            "type": "text",
+            "required": True,
+            "tab": "About",
+            "section": "Identity",
+        },
         {"name": "email", "label": "Email", "type": "email", "tab": "About", "section": "Contact Info"},
         {"name": "phone", "label": "Phone", "type": "text", "tab": "About", "section": "Contact Info"},
         {"name": "company_name", "label": "Company", "type": "text", "tab": "About", "section": "Company Info"},
-        {"name": "created_at", "label": "Created At", "type": "text", "tab": "About",
-         "section": "Record Info", "readonly": True},
-        {"name": "updated_at", "label": "Updated At", "type": "text", "tab": "About",
-         "section": "Record Info", "readonly": True},
+        {
+            "name": "created_at",
+            "label": "Created At",
+            "type": "text",
+            "tab": "About",
+            "section": "Record Info",
+            "readonly": True,
+        },
+        {
+            "name": "updated_at",
+            "label": "Updated At",
+            "type": "text",
+            "tab": "About",
+            "section": "Record Info",
+            "readonly": True,
+        },
         {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
     ]
 

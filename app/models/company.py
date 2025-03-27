@@ -65,17 +65,15 @@ class Company(BaseModel):
 
     __field_order__ = [
         {
-            "name": "name", "label": "Name", "type": "text",
-            "tab": "About", "section": "Company Details", "required": True
+            "name": "name",
+            "label": "Name",
+            "type": "text",
+            "tab": "About",
+            "section": "Company Details",
+            "required": True,
         },
-        {
-            "name": "description", "label": "Description", "type": "text",
-            "tab": "About", "section": "Company Details"
-        },
-        {
-            "name": "crisp", "label": "CRISP", "type": "custom",
-            "tab": "Insights", "section": "CRISP Score"
-        },
+        {"name": "description", "label": "Description", "type": "text", "tab": "About", "section": "Company Details"},
+        {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
     ]
 
     def __repr__(self) -> str:

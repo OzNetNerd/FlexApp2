@@ -15,9 +15,7 @@ class CapabilityCategory(BaseModel):
 
     name = db.Column(db.String(100), nullable=False, unique=True)
 
-    capabilities = db.relationship(
-        "Capability", backref="category", lazy="dynamic"
-    )
+    capabilities = db.relationship("Capability", backref="category", lazy="dynamic")
 
     def __repr__(self) -> str:
         """String representation for debugging purposes.

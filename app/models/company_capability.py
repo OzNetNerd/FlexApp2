@@ -20,15 +20,9 @@ class CompanyCapability(BaseModel):
     __tablename__ = "company_capabilities"
 
     company_id = db.Column(db.Integer, db.ForeignKey("companies.id"), nullable=False)
-    capability_id = db.Column(
-        db.Integer, db.ForeignKey("capabilities.id"), nullable=False
-    )
+    capability_id = db.Column(db.Integer, db.ForeignKey("capabilities.id"), nullable=False)
 
-    __table_args__ = (
-        db.UniqueConstraint(
-            "company_id", "capability_id", name="uq_company_capability"
-        ),
-    )
+    __table_args__ = (db.UniqueConstraint("company_id", "capability_id", name="uq_company_capability"),)
 
     company = db.relationship("Company", back_populates="company_capabilities")
     capability = db.relationship("Capability", back_populates="company_capabilities")

@@ -17,9 +17,7 @@ class Capability(BaseModel):
     __tablename__ = "capabilities"
 
     name = db.Column(db.String(100), nullable=False)
-    category_id = db.Column(
-        db.Integer, db.ForeignKey("capability_categories.id"), nullable=False
-    )
+    category_id = db.Column(db.Integer, db.ForeignKey("capability_categories.id"), nullable=False)
 
     company_capabilities = db.relationship(
         "CompanyCapability",
