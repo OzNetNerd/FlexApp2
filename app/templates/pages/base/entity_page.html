@@ -17,110 +17,15 @@
   </div>
 
   <div class="card-body">
-    <form method="POST" enctype="multipart/form-data">
-      {% if csrf_token %}
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <form method="POST">
+      {% if fields %}
+        {% include 'pages/form/_tabs_and_sections.html' %}
+      {% else %}
+        {% include 'pages/base/common/_section_layout.html' %}
       {% endif %}
 
-      {# CHOOSE ONLY ONE APPROACH - Either fields_by_section OR fields with tabs #}
-      {% if fields_by_section and fields_by_section|length > 0 %}
-        {# Use fields_by_section approach - section-based tabs #}
-        <div class="mb-4">
-          <ul class="nav nav-pills" id="entity-tabs" role="tablist">
-            {% for section, section_fields in fields_by_section.items() %}
-              {% if section_fields and section_fields|length > 0 %}
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link {% if loop.first %}active{% endif %}"
-                          id="tab-{{ section | lower | replace(' ', '-') }}-tab"
-                          data-bs-toggle="pill"
-                          data-bs-target="#tab-{{ section | lower | replace(' ', '-') }}"
-                          type="button"
-                          role="tab"
-                          aria-controls="tab-{{ section | lower | replace(' ', '-') }}"
-                          aria-selected="{{ 'true' if loop.first else 'false' }}">
-                    {{ section }}
-                  </button>
-                </li>
-              {% endif %}
-            {% endfor %}
-          </ul>
-        </div>
-
-        <div class="tab-content" id="entity-tabs-content">
-          {% for section, section_fields in fields_by_section.items() %}
-            {% if section_fields and section_fields|length > 0 %}
-              <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
-                   id="tab-{{ section | lower | replace(' ', '-') }}"
-                   role="tabpanel"
-                   aria-labelledby="tab-{{ section | lower | replace(' ', '-') }}-tab">
-                <div class="row">
-                  {% for field in section_fields %}
-                    {{ macros.render_field(field, read_only|default(false)) }}
-                  {% endfor %}
-                </div>
-              </div>
-            {% endif %}
-          {% endfor %}
-        </div>
-      {% elif fields %}
-        {# Use the section_layout approach - DO NOT include, just implement it directly here #}
-        {% set tabs = {} %}
-        {% for field in fields %}
-          {% set tab = field.tab or 'Other' %}
-          {% if tab not in tabs %}
-            {% set _ = tabs.update({tab: []}) %}
-          {% endif %}
-          {% set _ = tabs[tab].append(field) %}
-        {% endfor %}
-
-        <ul class="nav nav-pills mb-3" id="formTabs" role="tablist">
-          {% for tab in tabs.keys() %}
-            <li class="nav-item" role="presentation">
-              <button class="nav-link {% if loop.first %}active{% endif %}"
-                      id="tab-{{ tab | lower | replace(' ', '-') }}-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#tab-{{ tab | lower | replace(' ', '-') }}"
-                      type="button"
-                      role="tab">
-                {{ tab }}
-              </button>
-            </li>
-          {% endfor %}
-        </ul>
-
-        <div class="tab-content" id="formTabsContent">
-          {% for tab, tab_fields in tabs.items() %}
-            <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
-                 id="tab-{{ tab | lower | replace(' ', '-') }}"
-                 role="tabpanel">
-              {% set grouped_by_section = tab_fields | groupby('section') %}
-              {% for section, section_fields in grouped_by_section %}
-                <div class="card shadow-sm border-0 mb-4">
-                  <div class="card-header bg-white">
-                    <h5 class="h6 text-primary fw-semibold mb-0">
-                      {{ section or 'General' }}
-                    </h5>
-                  </div>
-                  <div class="card-body">
-                    <div class="row g-3">
-                      {% for field in section_fields %}
-                        {% if field.name == 'crisp' and read_only %}
-                          {% include 'pages/components/_crisp.html' with context %}
-                        {% else %}
-                          {{ macros.render_field(field, read_only|default(false)) }}
-                        {% endif %}
-                      {% endfor %}
-                    </div>
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="alert alert-warning">
-          No fields provided to render.
-        </div>
+      {% if not read_only %}
+        {% include 'pages/base/common/_form_autocomplete.html' %}
       {% endif %}
 
       {% if not read_only %}
@@ -132,9 +37,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('Form initialized with tabs');
-  });
-</script>
+  <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
 {% endblock %}
