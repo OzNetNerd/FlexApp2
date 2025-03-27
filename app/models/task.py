@@ -32,71 +32,75 @@ class Task(BaseModel):
     notable_type = db.Column(db.String(50), nullable=False, default="User")
     notable_id = db.Column(db.Integer, nullable=False, default=1)
 
-    __field_order__ = [
-        {
-            "name": "title",
-            "label": "Title",
-            "type": "text",
-            "tab": "About",
-            "section": "Task Info",
-            "required": True,
-        },
-        {
-            "name": "description",
-            "label": "Description",
-            "type": "textarea",
-            "tab": "About",
-            "section": "Task Info",
-        },
-        {
-            "name": "due_date",
-            "label": "Due Date",
-            "type": "date",
-            "tab": "About",
-            "section": "Task Info",
-        },
-        {
-            "name": "status",
-            "label": "Status",
-            "type": "select",
-            "options": [
-                {"value": "Pending", "label": "Pending"},
-                {"value": "In Progress", "label": "In Progress"},
-                {"value": "Completed", "label": "Completed"},
-            ],
-            "tab": "About",
-            "section": "Task Info",
-            "required": True,
-        },
-        {
-            "name": "priority",
-            "label": "Priority",
-            "type": "select",
-            "options": [
-                {"value": "Low", "label": "Low"},
-                {"value": "Medium", "label": "Medium"},
-                {"value": "High", "label": "High"},
-            ],
-            "tab": "About",
-            "section": "Task Info",
-        },
-        {
-            "name": "notable_type",
-            "label": "Linked To (Type)",
-            "type": "hidden",
-            "default": "User",
-            "tab": "Details",
-            "section": "Linked Entity",
-        },
-        {
-            "name": "notable_id",
-            "label": "Linked To (ID)",
-            "type": "hidden",
-            "default": "1",
-            "tab": "Details",
-            "section": "Linked Entity",
-        },
-    ]
+    __field_order__ = {
+        "Task Info": [
+            {
+                "name": "title",
+                "label": "Title",
+                "type": "text",
+                "tab": "About",
+                "section": "Task Info",
+                "required": True,
+            },
+            {
+                "name": "description",
+                "label": "Description",
+                "type": "textarea",
+                "tab": "About",
+                "section": "Task Info",
+            },
+            {
+                "name": "due_date",
+                "label": "Due Date",
+                "type": "date",
+                "tab": "About",
+                "section": "Task Info",
+            },
+            {
+                "name": "status",
+                "label": "Status",
+                "type": "select",
+                "options": [
+                    {"value": "Pending", "label": "Pending"},
+                    {"value": "In Progress", "label": "In Progress"},
+                    {"value": "Completed", "label": "Completed"},
+                ],
+                "tab": "About",
+                "section": "Task Info",
+                "required": True,
+            },
+            {
+                "name": "priority",
+                "label": "Priority",
+                "type": "select",
+                "options": [
+                    {"value": "Low", "label": "Low"},
+                    {"value": "Medium", "label": "Medium"},
+                    {"value": "High", "label": "High"},
+                ],
+                "tab": "About",
+                "section": "Task Info",
+            },
+        ],
+        "Linked Entity": [
+            {
+                "name": "notable_type",
+                "label": "Linked To (Type)",
+                "type": "hidden",
+                "default": "User",
+                "tab": "Details",
+                "section": "Linked Entity",
+            },
+            {
+                "name": "notable_id",
+                "label": "Linked To (ID)",
+                "type": "hidden",
+                "default": "1",
+                "tab": "Details",
+                "section": "Linked Entity",
+            },
+        ],
+    }
 
     def __repr__(self) -> str:
         """Readable string representation.

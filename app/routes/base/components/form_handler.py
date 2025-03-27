@@ -1,7 +1,9 @@
 import logging
+from collections import defaultdict
 from typing import Dict, List
 from flask_login import current_user
 from app.models import User
+
 
 logger = logging.getLogger(__name__)
 
@@ -42,64 +44,60 @@ class FormHandler:
             "title": title,
             "submit_url": submit_url,
             "cancel_url": cancel_url,
-            "fields": fields,
+            "fields_by_section": fields,
             "button_text": button_text,
             "item": item,
             "read_only": read_only,
             "edit_url": edit_url,
         }
 
-    def build_fields(self, item=None) -> List[Dict]:
+    def build_fields(self, item=None) -> Dict[str, List[Dict]]:
         """
-        Generate dynamic field definitions based on model metadata.
+        Generate ordered, grouped field definitions based on model metadata.
 
         Args:
             item: SQLAlchemy instance to populate values (optional).
 
         Returns:
-            List[Dict]: List of field definitions.
+            Dict[str, List[Dict]]: Dictionary grouping fields by section.
         """
-        field_definitions = getattr(self.model, "__field_order__", [])
-        fields = []
+        field_definitions = getattr(self.model, "__field_order__", {})
+        grouped_fields = defaultdict(list)
 
-        for field in field_definitions:
-            # Ensure field is a dictionary before copying
-            if isinstance(field, dict):
-                field_copy = field.copy()
-                name = field_copy.get("name")
-                field_copy["value"] = self.resolve_value(item, name) if item else ""
-                fields.append(field_copy)
-            else:
-                logger.warning(f"Skipping field because it's not a dictionary: {field}")
+        for section, section_fields in field_definitions.items():
+            for field in section_fields:
+                if isinstance(field, dict):
+                    field_copy = field.copy()
+                    field_copy["section"] = field_copy.get("section", section)
+                    name = field_copy.get("name")
+                    field_copy["value"] = self.resolve_value(item, name) if item else ""
+                    grouped_fields[field_copy["section"]].append(field_copy)
+                else:
+                    logger.warning(f"Skipping invalid field (not a dict): {field} in section {section}")
 
         if current_user.is_authenticated and current_user.is_admin:
             all_users = User.query.order_by(User.name).all()
             selected_user_ids = [str(r.user_id) for r in getattr(item, "relationships", [])]
 
-            fields.append(
-                {
-                    "name": "linked_users",
-                    "label": "Linked Users",
-                    "type": "multiselect",
-                    "options": [{"label": u.name, "value": str(u.id)} for u in all_users],
-                    "value": selected_user_ids,
-                }
-            )
+            grouped_fields["User Access"].append({
+                "name": "linked_users",
+                "label": "Linked Users",
+                "type": "multiselect",
+                "options": [{"label": u.name, "value": str(u.id)} for u in all_users],
+                "value": selected_user_ids,
+                "tab": "Permissions",
+                "section": "User Access"
+            })
 
-        return fields
+        return dict(grouped_fields)
 
     def resolve_value(self, item, name: str) -> str:
-        """
-        Resolve nested attribute values from an object using dot notation.
-
-        Args:
-            item: Object to resolve from.
-            name (str): Dot notation string (e.g. "company.name").
-
-        Returns:
-            str: Resolved value or empty string.
-        """
         try:
+            if name == "company_name":
+                return item.company.name if item.company else ""
+            if name == "crisp":
+                return item.crisp_summary if hasattr(item, "crisp_summary") else ""
+
             for part in name.split("."):
                 item = getattr(item, part)
             return item

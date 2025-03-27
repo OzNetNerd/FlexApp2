@@ -1,24 +1,16 @@
-{# IMPORTANT: DO NOT IMPORT THIS FILE INTO ITSELF #}
-{# This file contains macros for rendering form fields in different layouts #}
-
-{% macro render_sections(fields, read_only=False) %}
-  {% set grouped_by_section = {} %}
-
-  {# Group fields by their sections #}
-  {% for field in fields %}
-    {% set section = field.section or "Other" %}
-    {% if section not in grouped_by_section %}
-      {% set _ = grouped_by_section.update({section: []}) %}
-    {% endif %}
-    {% set _ = grouped_by_section[section].append(field) %}
-  {% endfor %}
+{% macro render_sections(fields_by_section, read_only=False) %}
+  {# Expecting fields_by_section to be a dictionary: {section: [field, ...]} #}
 
   <ul class="nav nav-tabs" id="form-tabs" role="tablist">
-    {% for section in grouped_by_section.keys() %}
+    {% for section, fields in fields_by_section.items() %}
       <li class="nav-item" role="presentation">
-        <button class="nav-link {% if loop.first %}active{% endif %}" id="tab-{{ section | lower | replace(' ', '-') }}-tab"
-                data-bs-toggle="tab" data-bs-target="#tab-{{ section | lower | replace(' ', '-') }}" type="button"
-                role="tab" aria-controls="tab-{{ section | lower | replace(' ', '-') }}"
+        <button class="nav-link {% if loop.first %}active{% endif %}"
+                id="tab-{{ section | lower | replace(' ', '-') }}-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#tab-{{ section | lower | replace(' ', '-') }}"
+                type="button"
+                role="tab"
+                aria-controls="tab-{{ section | lower | replace(' ', '-') }}"
                 aria-selected="{{ 'true' if loop.first else 'false' }}">
           {{ section }}
         </button>
@@ -27,13 +19,13 @@
   </ul>
 
   <div class="tab-content mt-3">
-    {% for section, section_fields in grouped_by_section.items() %}
-      <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="tab-{{ section | lower | replace(' ', '-') }}"
-           role="tabpanel" aria-labelledby="tab-{{ section | lower | replace(' ', '-') }}-tab">
-
-        {# Render each field in the section #}
+    {% for section, fields in fields_by_section.items() %}
+      <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+           id="tab-{{ section | lower | replace(' ', '-') }}"
+           role="tabpanel"
+           aria-labelledby="tab-{{ section | lower | replace(' ', '-') }}-tab">
         <div class="row">
-          {% for field in section_fields %}
+          {% for field in fields %}
             {{ render_field(field, read_only) }}
           {% endfor %}
         </div>
@@ -81,7 +73,8 @@
     </select>
   {% elif field.type == 'checkbox' %}
     <div class="form-check">
-      <input type="checkbox" name="{{ field.name }}" id="{{ field.name }}"{% if field.value %} checked{% endif %} class="form-check-input" value="true">
+      <input type="checkbox" name="{{ field.name }}" id="{{ field.name }}"
+             {% if field.value %} checked{% endif %} class="form-check-input" value="true">
       <label class="form-check-label" for="{{ field.name }}">{{ field.checkbox_label }}</label>
     </div>
   {% else %}
@@ -110,10 +103,13 @@
   {% endif %}
 {% endmacro %}
 
-{% macro render_form(fields, submit_url, cancel_url, button_text="Submit", read_only=False) %}
+{% macro render_form(fields_by_section, submit_url, cancel_url, button_text="Submit", read_only=False, edit_url=None) %}
   <form action="{{ submit_url }}" method="post" enctype="multipart/form-data">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    {{ render_sections(fields, read_only) }}
+    {% if not read_only %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% endif %}
+
+    {{ render_sections(fields_by_section, read_only) }}
 
     {% if not read_only %}
       <div class="d-flex justify-content-between mt-4">
@@ -129,10 +125,10 @@
         <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
           <i class="fas fa-arrow-left me-1"></i> Back
         </a>
-        {% if not read_only %}
-        <a href="{{ edit_url }}" class="btn btn-primary">
-          <i class="fas fa-edit me-1"></i> Edit
-        </a>
+        {% if edit_url %}
+          <a href="{{ edit_url }}" class="btn btn-primary">
+            <i class="fas fa-edit me-1"></i> Edit
+          </a>
         {% endif %}
       </div>
     {% endif %}

@@ -53,8 +53,8 @@ class Contact(BaseModel):
             {"name": "last_name", "label": "Last Name", "type": "text", "required": True, "tab": "About"},
         ],
         "Contact Info": [
-            {"name": "email", "label": "Email", "type": "email", "tab": "About"},
             {"name": "phone", "label": "Phone", "type": "text", "tab": "About"},
+            {"name": "email", "label": "Email", "type": "email", "tab": "About"},
         ],
         "Company Info": [
             {"name": "company_name", "label": "Company", "type": "text", "tab": "About"},

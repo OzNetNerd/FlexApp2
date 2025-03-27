@@ -63,18 +63,34 @@ class Company(BaseModel):
             return None
         return round(sum(scores) / len(scores), 2)
 
-    __field_order__ = [
-        {
-            "name": "name",
-            "label": "Name",
-            "type": "text",
-            "tab": "About",
-            "section": "Company Details",
-            "required": True,
-        },
-        {"name": "description", "label": "Description", "type": "text", "tab": "About", "section": "Company Details"},
-        {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
-    ]
+    __field_order__ = {
+        "Company Details": [
+            {
+                "name": "name",
+                "label": "Name",
+                "type": "text",
+                "tab": "About",
+                "section": "Company Details",
+                "required": True,
+            },
+            {
+                "name": "description",
+                "label": "Description",
+                "type": "text",
+                "tab": "About",
+                "section": "Company Details",
+            },
+        ],
+        "CRISP Score": [
+            {
+                "name": "crisp",
+                "label": "CRISP",
+                "type": "custom",
+                "tab": "Insights",
+                "section": "CRISP Score",
+            },
+        ],
+    }
 
     def __repr__(self) -> str:
         """String representation for debugging.

@@ -36,35 +36,67 @@ class Opportunity(BaseModel):
         primaryjoin="and_(Note.notable_id == foreign(Opportunity.id), Note.notable_type == 'Opportunity')",
     )
 
-    __field_order__ = [
-        {
-            "name": "name",
-            "label": "Name",
-            "type": "text",
-            "tab": "About",
-            "section": "Opportunity Info",
-            "required": True,
-        },
-        {
-            "name": "description",
-            "label": "Description",
-            "type": "textarea",
-            "tab": "About",
-            "section": "Opportunity Info",
-        },
-        {
-            "name": "company.name",
-            "label": "Company Name",
-            "type": "text",
-            "readonly": True,
-            "tab": "About",
-            "section": "Opportunity Info",
-        },
-        {"name": "stage", "label": "Stage", "type": "text", "tab": "Details", "section": "Pipeline"},
-        {"name": "status", "label": "Status", "type": "text", "tab": "Details", "section": "Pipeline"},
-        {"name": "value", "label": "Value", "type": "number", "tab": "Details", "section": "Financials"},
-        {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
-    ]
+    __field_order__ = {
+        "Opportunity Info": [
+            {
+                "name": "name",
+                "label": "Name",
+                "type": "text",
+                "tab": "About",
+                "section": "Opportunity Info",
+                "required": True,
+            },
+            {
+                "name": "description",
+                "label": "Description",
+                "type": "textarea",
+                "tab": "About",
+                "section": "Opportunity Info",
+            },
+            {
+                "name": "company.name",
+                "label": "Company Name",
+                "type": "text",
+                "readonly": True,
+                "tab": "About",
+                "section": "Opportunity Info",
+            },
+        ],
+        "Pipeline": [
+            {
+                "name": "stage",
+                "label": "Stage",
+                "type": "text",
+                "tab": "Details",
+                "section": "Pipeline",
+            },
+            {
+                "name": "status",
+                "label": "Status",
+                "type": "text",
+                "tab": "Details",
+                "section": "Pipeline",
+            },
+        ],
+        "Financials": [
+            {
+                "name": "value",
+                "label": "Value",
+                "type": "number",
+                "tab": "Details",
+                "section": "Financials",
+            },
+        ],
+        "CRISP Score": [
+            {
+                "name": "crisp",
+                "label": "CRISP",
+                "type": "custom",
+                "tab": "Insights",
+                "section": "CRISP Score",
+            },
+        ],
+    }
 
     def __repr__(self) -> str:
         """Readable string representation.

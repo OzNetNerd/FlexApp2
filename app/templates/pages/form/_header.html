@@ -1,14 +1,111 @@
-<h3 class="h4 mb-0 text-primary">
-    {% if read_only %}
-      <i class="fas fa-eye me-2"></i>
-    {% elif item %}
-      <i class="fas fa-edit me-2"></i>
-    {% else %}
-      <i class="fas fa-plus-circle me-2"></i>
-    {% endif %}
-    {{ title }}
-  </h3>
+{% import "macros/form_fields.html" as macros %}
 
-  {% if fields %}
-    {% include 'pages/components/_pills_nav.html' %}
-  {% endif %}
+{% block content %}
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white py-3">
+    <div class="row">
+      <div class="col">
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <form method="POST" enctype="multipart/form-data">
+      {% if csrf_token %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% endif %}
+
+      {# CHOOSE ONLY ONE APPROACH - Either fields_by_section OR fields with tabs #}
+      {% if fields_by_section and fields_by_section|length > 0 %}
+        {# Use fields_by_section approach - section-based tabs #}
+        <div class="tab-content" id="entity-tabs-content">
+          {% for section, section_fields in fields_by_section.items() %}
+            {% if section_fields and section_fields|length > 0 %}
+              <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+                   id="tab-{{ section | lower | replace(' ', '-') }}"
+                   role="tabpanel"
+                   aria-labelledby="tab-{{ section | lower | replace(' ', '-') }}-tab">
+                <div class="row">
+                  {% for field in section_fields %}
+                    {{ macros.render_field(field, read_only|default(false)) }}
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% elif fields %}
+        {# Use the section_layout approach #}
+        <div class="tab-content" id="formTabsContent">
+          {% for tab, tab_fields in tabs.items() %}
+            <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+                 id="tab-{{ tab | lower | replace(' ', '-') }}"
+                 role="tabpanel">
+              {% set grouped_by_section = tab_fields | groupby('section') %}
+              {% for section, section_fields in grouped_by_section %}
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-white">
+                    <h5 class="h6 text-primary fw-semibold mb-0">
+                      {{ section or 'General' }}
+                    </h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="row g-3">
+                      {% for field in section_fields %}
+                        {% if field.name == 'crisp' and read_only %}
+                          {% include 'pages/components/_crisp.html' with context %}
+                        {% else %}
+                          {{ macros.render_field(field, read_only|default(false)) }}
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-warning">
+          No fields provided to render.
+        </div>
+      {% endif %}
+
+      {% if not read_only %}
+        {% include 'pages/base/common/_form_footer.html' %}
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+{# Modal for Delete Confirmation #}
+{% if item %}
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this item?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.delete', item_id=item.id) }}" class="btn btn-danger">
+            Delete
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Form initialized with tabs');
+  });
+</script>
+{% endblock %}

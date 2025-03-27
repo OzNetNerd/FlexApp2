@@ -29,41 +29,51 @@ class Note(BaseModel):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
-    __field_order__ = [
-        {"name": "content", "label": "Content", "type": "textarea", "tab": "Post", "section": "Body"},
-        {
-            "name": "processed_content",
-            "label": "Processed",
-            "type": "textarea",
-            "readonly": True,
-            "tab": "Post",
-            "section": "Body",
-        },
-        {
-            "name": "author.username",
-            "label": "Author",
-            "type": "text",
-            "readonly": True,
-            "tab": "Post",
-            "section": "Metadata",
-        },
-        {
-            "name": "created_at",
-            "label": "Created At",
-            "type": "datetime",
-            "readonly": True,
-            "tab": "Post",
-            "section": "Metadata",
-        },
-        {
-            "name": "updated_at",
-            "label": "Updated At",
-            "type": "datetime",
-            "readonly": True,
-            "tab": "Post",
-            "section": "Metadata",
-        },
-    ]
+    __field_order__ = {
+        "Body": [
+            {
+                "name": "content",
+                "label": "Content",
+                "type": "textarea",
+                "tab": "Post",
+                "section": "Body",
+            },
+            {
+                "name": "processed_content",
+                "label": "Processed",
+                "type": "textarea",
+                "readonly": True,
+                "tab": "Post",
+                "section": "Body",
+            },
+        ],
+        "Metadata": [
+            {
+                "name": "author.username",
+                "label": "Author",
+                "type": "text",
+                "readonly": True,
+                "tab": "Post",
+                "section": "Metadata",
+            },
+            {
+                "name": "created_at",
+                "label": "Created At",
+                "type": "datetime",
+                "readonly": True,
+                "tab": "Post",
+                "section": "Metadata",
+            },
+            {
+                "name": "updated_at",
+                "label": "Updated At",
+                "type": "datetime",
+                "readonly": True,
+                "tab": "Post",
+                "section": "Metadata",
+            },
+        ],
+    }
 
     def __repr__(self) -> str:
         """Readable string representation.

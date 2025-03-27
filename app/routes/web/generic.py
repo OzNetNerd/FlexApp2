@@ -113,30 +113,6 @@ class GenericWebRoutes(CRUDRoutesBase):
             return f"{item.first_name} {item.last_name}".strip()
         return str(item.id)
 
-    # New method to add order information to fields
-    def _add_order_to_fields(self, fields, field_order):
-        """
-        Add order to fields based on the field definitions provided.
-        """
-        # Debugging to check the structure of field_order
-        logger.debug(f"field_order: {field_order}")
-
-        # Check if each field in field_order is a dictionary with the expected structure
-        if not all(isinstance(field_def, dict) and 'name' in field_def for field_def in field_order):
-            logger.error(
-                "Field definitions are not in the expected format. Each field should be a dictionary with a 'name' key.")
-            return fields  # Return the original fields if the format is incorrect
-
-        # Create a mapping from field name to its order
-        field_name_to_order = {field_def['name']: idx for idx, field_def in enumerate(field_order)}
-
-        # Add order to the fields list
-        for field in fields:
-            if field.get('name') in field_name_to_order:
-                field['order'] = field_name_to_order[field['name']]
-
-        return fields
-
     def _view_route(self, item_id):
         self.request_logger.log_request_info(self.model.__name__, "view", item_id)
         item, error = self.item_manager.get_item_by_id(item_id)
@@ -144,24 +120,16 @@ class GenericWebRoutes(CRUDRoutesBase):
             flash(error, "error")
             return redirect(url_for(f"{self.blueprint.name}.index"))
 
-        fields = self.form_handler.build_fields(item)
-
-        # Add order to fields based on the model's field_order
-        if hasattr(item, '__field_order__'):
-            fields = self._add_order_to_fields(fields, item.__field_order__)
+        fields_by_section = self.form_handler.build_fields(item)
 
         context = self.form_handler.prepare_form_context(
             title=f"Viewing {self.model.__name__}: {self._get_item_display_name(item)}",
             submit_url="",
             cancel_url=url_for(f"{self.blueprint.name}.index"),
-            fields=fields,
+            fields=fields_by_section,
             item=item,
             read_only=True,
         )
-
-        # We still pass the field_order to the template for reference
-        if hasattr(item, '__field_order__'):
-            context["field_order"] = item.__field_order__
 
         context.update(self._get_template_context(context=context))
         return render_safely(
@@ -183,7 +151,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             parent_id=item.id,
         )
         try:
-            note.save()  # assuming your Note model has a `save()` method
+            note.save()
             flash("Note added successfully", "success")
         except Exception as e:
             logger.exception(f"Error saving note: {e}")
@@ -214,8 +182,6 @@ class GenericWebRoutes(CRUDRoutesBase):
 
     def _edit_route(self, item_id):
         self.request_logger.log_request_info(self.model.__name__, "edit", item_id)
-
-        # Fetch item and handle potential errors
         item, error = self.item_manager.get_item_by_id(item_id)
         if error or item is None:
             flash("Item not found.", "error")
@@ -224,28 +190,19 @@ class GenericWebRoutes(CRUDRoutesBase):
         if request.method == "POST":
             return self._handle_edit_form_submission(item)
 
-        # Render the edit form for the existing item
         return self._render_edit_form(item)
 
     def _render_create_form(self):
-        fields = self.json_validator.ensure_json_serializable(self.form_handler.build_fields())
-
-        # For create form, we need to get field_order from the model class directly
-        if hasattr(self.model, '__field_order__'):
-            fields = self._add_order_to_fields(fields, self.model.__field_order__)
+        fields_by_section = self.json_validator.ensure_json_serializable(self.form_handler.build_fields())
 
         context = self.form_handler.prepare_form_context(
             title=f"Create a {self.model.__name__}",
             submit_url=url_for(f"{self.blueprint.name}.create"),
             cancel_url=url_for(f"{self.blueprint.name}.index"),
-            fields=fields,
+            fields=fields_by_section,
             button_text=f"Create {self.model.__name__}",
             read_only=False,
         )
-
-        # We still pass the field_order to the template for reference
-        if hasattr(self.model, '__field_order__'):
-            context["field_order"] = self.model.__field_order__
 
         context.update(self._get_template_context(context=context))
         return render_safely(
@@ -255,24 +212,16 @@ class GenericWebRoutes(CRUDRoutesBase):
         )
 
     def _render_edit_form(self, item):
-        fields = self.json_validator.ensure_json_serializable(self.form_handler.build_fields(item))
-
-        # Add order to fields based on the model's field_order
-        if hasattr(item, '__field_order__'):
-            fields = self._add_order_to_fields(fields, item.__field_order__)
+        fields_by_section = self.json_validator.ensure_json_serializable(self.form_handler.build_fields(item))
 
         context = self.form_handler.prepare_form_context(
             title=f"Edit {self.model.__name__}",
             submit_url=url_for(f"{self.blueprint.name}.edit", item_id=item.id),
             cancel_url=url_for(f"{self.blueprint.name}.index"),
-            fields=fields,
+            fields=fields_by_section,
             button_text=f"Update {self.model.__name__}",
             read_only=False,
         )
-
-        # We still pass the field_order to the template for reference
-        if hasattr(item, '__field_order__'):
-            context["field_order"] = item.__field_order__
 
         context.update(self._get_template_context(context=context))
         return render_safely(
