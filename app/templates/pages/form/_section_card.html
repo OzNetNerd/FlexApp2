@@ -1,18 +1,51 @@
+{#
+  ------------------------------------------------------------------------------
+  File: _section_card.html
+  Purpose:
+    Renders a Bootstrap-styled card component for a group of fields belonging
+    to the same section within a form. Each card includes a section heading and
+    a responsive grid layout for its fields.
+
+  Inputs (expected in context):
+    - section        : String. The name of the section (e.g., "Details", "Settings").
+    - section_fields : List. The fields to display in this section.
+    - read_only      : Boolean. Indicates if the form is in read-only mode.
+    - macros         : Macro namespace containing the field renderer
+                       (typically `macros.field.render_field`).
+
+  Output:
+    - A `<div class="card">` containing:
+        • A section header (`<h5>`)
+        • A Bootstrap `.row` containing rendered fields
+        • Special-case handling for fields named `crisp` in read-only mode,
+          which includes a custom component
+
+  Example:
+    {% include 'pages/form/_section_card.html' with context %}
+
+  Notes:
+    - Falls back to 'General' if `section` is not provided.
+    - Assumes `macros.field.render_field` is imported in the parent template.
+    - Best used within a tab or grouped section layout.
+
+  ------------------------------------------------------------------------------
+#}
+
 <div class="card shadow-sm border-0 mb-4">
-    <div class="card-header bg-white">
-      <h5 class="h6 text-primary fw-semibold mb-0">
-        {{ section or 'General' }}
-      </h5>
-    </div>
-    <div class="card-body">
-      <div class="row g-3">
-        {% for field in section_fields %}
-          {% if field.name == 'crisp' and read_only %}
-            {% include 'pages/components/_crisp.html' with context %}
-          {% else %}
-            {{ macros.render_field(field, read_only) }}
-          {% endif %}
-        {% endfor %}
-      </div>
+  <div class="card-header bg-white">
+    <h5 class="h6 text-primary fw-semibold mb-0">
+      {{ section or 'General' }}
+    </h5>
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      {% for field in section_fields %}
+        {% if field.name == 'crisp' and read_only %}
+          {% include 'pages/components/_crisp.html' with context %}
+        {% else %}
+          {{ macros.field.render_field(field, read_only) }}
+        {% endif %}
+      {% endfor %}
     </div>
   </div>
+</div>

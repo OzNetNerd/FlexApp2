@@ -1,22 +1,59 @@
+{#
+  ------------------------------------------------------------------------------
+  File: pages/form/_autocomplete.html
+
+  Purpose:
+    Renders autocomplete-enabled input fields for selecting users and companies.
+    These inputs are intended to be enhanced by JavaScript (e.g. Tagify or AJAX)
+    to provide dynamic search and selection functionality.
+
+  Inputs (expected in context):
+    - item.users      : List of user objects (optional, for editing forms)
+    - item.company    : Company object (optional, for editing forms)
+
+  Output:
+    - "Users" input field:
+        • Text input with ID `users-input`
+        • Placeholder text for user search
+        • `data-initial` JSON-encoded list of selected user IDs (for edit mode)
+
+    - "Company" input field:
+        • Text input with ID `companies-input`
+        • Placeholder text for company search
+        • `data-initial` array containing one selected company ID (or empty)
+
+  Example:
+    {% include 'pages/form/_autocomplete.html' %}
+
+  JavaScript Integration:
+    These fields are expected to be enhanced by JavaScript to provide
+    autocomplete behavior, e.g.:
+      - Listening to input events
+      - Fetching suggestions via API
+      - Managing selection and updates to a hidden form field
+
+  ------------------------------------------------------------------------------
+#}
+
 <!-- Autocomplete Fields -->
 <div class="mb-3">
-    <label for="users-input" class="form-label">Users</label>
-    <input
-      type="text"
-      id="users-input"
-      class="form-control"
-      placeholder="Type to search users..."
-      data-initial='{{ item.users | map(attribute="id") | list | tojson }}'
-    >
-  </div>
+  <label for="users-input" class="form-label">Users</label>
+  <input
+    type="text"
+    id="users-input"
+    class="form-control"
+    placeholder="Type to search users..."
+    data-initial='{{ item.users | map(attribute="id") | list | tojson }}'
+  >
+</div>
 
-  <div class="mb-3">
-    <label for="companies-input" class="form-label">Company</label>
-    <input
-      type="text"
-      id="companies-input"
-      class="form-control"
-      placeholder="Type to search companies..."
-      data-initial='[{{ item.company.id if item and item.company else "" }}]'
-    >
-  </div>
+<div class="mb-3">
+  <label for="companies-input" class="form-label">Company</label>
+  <input
+    type="text"
+    id="companies-input"
+    class="form-control"
+    placeholder="Type to search companies..."
+    data-initial='[{{ item.company.id if item and item.company else "" }}]'
+  >
+</div>

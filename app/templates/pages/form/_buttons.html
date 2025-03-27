@@ -1,24 +1,58 @@
+{#
+  ------------------------------------------------------------------------------
+  File: _buttons.html
+  Purpose:
+    Renders context-aware action buttons (Cancel, Add, Edit, Delete, Back)
+    for a form header area. The visibility and behavior of these buttons
+    depend on whether the form is in read-only or edit mode, and whether
+    an existing item is being viewed.
+
+  Inputs (expected in context):
+    - item       : Object (optional). If present, indicates view/edit mode.
+    - read_only  : Boolean. True if the form is in read-only display mode.
+    - request    : Flask request context object (for determining current route).
+
+  Output:
+    - If `item` exists and `read_only` is False:
+        • Cancel button → goes to item view page (`*.view`)
+
+    - If `item` exists and `read_only` is True:
+        • Add button    → goes to item creation page (`*.create`)
+        • Edit button   → goes to item edit page (`*.edit`)
+        • Delete button → opens a Bootstrap modal (`#deleteModal`)
+        • Back button   → goes to item index page (`*.index`)
+
+  Example:
+    {% include 'pages/form/_buttons.html' %}
+
+  Notes:
+    - This block is typically included in the form header.
+    - The modal trigger assumes a modal with `id="deleteModal"` exists elsewhere on the page.
+
+  ------------------------------------------------------------------------------
+#}
+
 <div class="d-flex justify-content-end align-items-center gap-2">
-    {% if item and not read_only %}
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}"
-         class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
-        <i class="fas fa-times me-1"></i> Cancel
-      </a>
-    {% elif item and read_only %}
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}"
-         class="btn btn-primary fw-bold">
-        <i class="fas fa-plus me-1"></i> Add
-      </a>
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', item_id=item.id) }}"
-         class="btn btn-warning text-dark fw-bold">
-        <i class="fas fa-edit me-1"></i> Edit
-      </a>
-      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-        <i class="fas fa-trash me-1"></i> Delete
-      </button>
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
-         class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
-        <i class="fas fa-arrow-left me-1"></i> Back
-      </a>
-    {% endif %}
-  </div>
+  {% if item and not read_only %}
+    <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}"
+       class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+      <i class="fas fa-times me-1"></i> Cancel
+    </a>
+  {% elif item and read_only %}
+    <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}"
+       class="btn btn-primary fw-bold">
+      <i class="fas fa-plus me-1"></i> Add
+    </a>
+    <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', item_id=item.id) }}"
+       class="btn btn-warning text-dark fw-bold">
+      <i class="fas fa-edit me-1"></i> Edit
+    </a>
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+      <i class="fas fa-trash me-1"></i> Delete
+    </button>
+    <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
+       class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+      <i class="fas fa-arrow-left me-1"></i> Back
+    </a>
+  {% endif %}
+</div>

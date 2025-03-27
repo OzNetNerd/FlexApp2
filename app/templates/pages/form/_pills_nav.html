@@ -1,3 +1,34 @@
+{#
+  ------------------------------------------------------------------------------
+  File: _pills_nav.html
+  Purpose:
+    Renders Bootstrap pill-style navigation and tab content areas based on
+    the `tab` attribute of fields defined in `__field_order__`.
+
+  Inputs (expected in context):
+    - __field_order__ : OrderedDict mapping section names to lists of fields.
+                        Each field can optionally define a `tab` attribute.
+                        Used to group fields by tab labels.
+
+  Output:
+    - If more than one unique tab is found:
+        • Renders a pill-style tab navigation group
+        • Renders corresponding tab panes for each tab group
+        • Displays each field name inside its respective tab pane (placeholder)
+
+  Example:
+    {% include 'pages/components/_pills_nav.html' %}
+
+  Notes:
+    - This is meant as a navigation UI component.
+    - The inner content of each tab currently outputs `{{ field.name }}` as a placeholder;
+      this should be replaced with an appropriate field renderer (e.g., macro or include).
+    - IDs are normalized using lowercase and dashes for Bootstrap compatibility.
+    - Assumes Bootstrap 5 tab behavior and requires Bootstrap JS.
+
+  ------------------------------------------------------------------------------
+#}
+
 {% set tabs = {} %}
 {% for group_fields in __field_order__.values() %}
   {% for field in group_fields %}
@@ -32,9 +63,8 @@
            id="tab-{{ tab | lower | replace(' ', '-') }}"
            role="tabpanel"
            aria-labelledby="tab-{{ tab | lower | replace(' ', '-') }}-tab">
-        {# Render the content for each tab here #}
         {% for field in tabs[tab] %}
-          <div>{{ field.name }}</div>  <!-- Replace with the actual field rendering logic -->
+          <div>{{ field.name }}</div>  {# Replace this line with a call to your field renderer #}
         {% endfor %}
       </div>
     {% endfor %}

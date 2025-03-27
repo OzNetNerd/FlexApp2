@@ -1,3 +1,41 @@
+{#
+  ------------------------------------------------------------------------------
+  File: _tabs_and_sections.html
+  Purpose:
+    Dynamically groups form fields by their `tab` and `section` metadata,
+    and renders them accordingly using tabbed navigation (if more than one tab)
+    or as stacked sections (if only one tab or none).
+
+  Inputs (expected in context):
+    - fields : List of field objects, each supporting:
+        • field.tab     : Optional. Logical group used to separate content into tabs.
+        • field.section : Optional. Label for the section group within a tab.
+
+  Dependencies:
+    - Includes:
+        • pages/form/_section_card.html
+          (which expects `_section`, `_section_fields`, and `macros` in context)
+
+  Output:
+    - If multiple tabs:
+        • Bootstrap-styled tab panes (`tab-pane fade`)
+        • Each tab contains cards for grouped sections
+
+    - If one or no tabs:
+        • Sections are stacked vertically with no tab navigation
+
+  Example:
+    {% include 'pages/form/_tabs_and_sections.html' %}
+
+  Notes:
+    - This template only renders the tab content, not the tab navigation (buttons).
+      Pair it with `_pills_nav.html` if visual tab controls are needed.
+    - Tab and section IDs are normalized using lowercase and dashes.
+    - Uses temporary variables `_section` and `_section_fields` for context passing.
+
+  ------------------------------------------------------------------------------
+#}
+
 {% set tabs = {} %}
 {% for field in fields %}
   {% set tab = field.tab or 'Other' %}

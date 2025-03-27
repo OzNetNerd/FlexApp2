@@ -31,14 +31,12 @@
       <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
         <i class="fas fa-arrow-left me-1"></i> Back
       </a>
-    {% endif %}
-
+      {% endif %}
     </div>
   </div>
 
   <div class="card-body">
     <form method="POST">
-      {% import "macros/form_fields.html" as macros %}
       {% set tabs = {} %}
       {% for field in fields %}
         {% set tab = field.tab or 'Other' %}
@@ -67,7 +65,7 @@
                       {% if field.name == 'crisp' and read_only %}
                         {% include 'pages/components/_crisp.html' with context %}
                       {% else %}
-                        {{ macros.render_field(field, read_only) }}
+                        {{ macros.field.render_field(field, read_only) }}
                       {% endif %}
                     {% endfor %}
                   </div>
@@ -81,7 +79,6 @@
       {% if not read_only %}
         {% include 'pages/base/common/_form_autocomplete.html' %}
       {% else %}
-        <!-- Read-only display -->
         <div class="mb-3">
           <label class="form-label">Users</label>
           <p class="form-control-plaintext">

@@ -1,14 +1,48 @@
-<h3 class="h4 mb-0 text-primary">
-    {% if read_only %}
-      <i class="fas fa-eye me-2"></i>
-    {% elif item %}
-      <i class="fas fa-edit me-2"></i>
-    {% else %}
-      <i class="fas fa-plus-circle me-2"></i>
-    {% endif %}
-    {{ title }}
-  </h3>
+{#
+  ------------------------------------------------------------------------------
+  File: _header.html
+  Purpose:
+    Renders a dynamic form header with a context-aware icon and title,
+    followed optionally by tab-style navigation pills if form fields are present.
 
-  {% if fields %}
-    {% include 'pages/components/_pills_nav.html' %}
+  Inputs (expected in context):
+    - title     : String. The title of the form (e.g., "Edit User").
+    - item      : Object (optional). If present, indicates edit/view mode.
+    - read_only : Boolean. If true, indicates read-only display mode.
+    - fields    : List of field objects. Used to determine whether to show tab navigation.
+
+  Output:
+    - An <h3> element with:
+        • A leading icon representing the mode:
+          - 👁️ `fa-eye` for read-only
+          - ✏️ `fa-edit` for editing
+          - ➕ `fa-plus-circle` for creation
+        • The form title
+
+    - If `fields` is non-empty:
+        • Includes `_pills_nav.html` to render section/tab navigation pills
+
+  Example:
+    {% include 'pages/form/_header.html' %}
+
+  Notes:
+    - `_pills_nav.html` should handle rendering pills/tabs for navigation based on `fields`.
+    - Best used within a form page layout header row.
+  
+  ------------------------------------------------------------------------------
+#}
+
+<h3 class="h4 mb-0 text-primary">
+  {% if read_only %}
+    <i class="fas fa-eye me-2"></i>
+  {% elif item %}
+    <i class="fas fa-edit me-2"></i>
+  {% else %}
+    <i class="fas fa-plus-circle me-2"></i>
   {% endif %}
+  {{ title }}
+</h3>
+
+{% if fields %}
+  {% include 'pages/components/_pills_nav.html' %}
+{% endif %}
