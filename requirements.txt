@@ -14,5 +14,4 @@ flask-login
 Flask-Migrate
 coverage
 mypy
-mypy-coverage
 typecov

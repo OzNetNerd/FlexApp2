@@ -54,7 +54,7 @@ class BaseModel(db.Model):
         logger.debug(f"Converting {self.__class__.__name__} instance to dictionary.")
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-    def save(self):
+    def save(self) -> "BaseModel":
         """
         Persist the model instance to the database.
 
