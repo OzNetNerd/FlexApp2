@@ -155,7 +155,8 @@ class GenericWebRoutes(CRUDRoutesBase):
         logger.debug(f"Rendering index template: {self.index_template}")
         return render_safely(self.index_template, context, f"Error rendering {self.model.__name__} index")
 
-    def _get_item_display_name(self, item) -> str:
+    @staticmethod
+    def _get_item_display_name(item) -> str:
         """Retrieves a user-friendly display name for an item.
 
         Attempts to use one of the common attributes such as 'name', 'title', 'email', or 'username'.
@@ -207,8 +208,8 @@ class GenericWebRoutes(CRUDRoutesBase):
             "submit_url": "",
             "cancel_url": url_for(f"{self.blueprint.name}.index"),
             "fields": "",
-            "tabs": self.model.__tabs__,
-            "item": item,
+            "id": "id",
+            "item": "item",
             "read_only": True,
         }
 
@@ -288,13 +289,14 @@ class GenericWebRoutes(CRUDRoutesBase):
         Returns:
             Response: The rendered create form page.
         """
-        fields_by_section = self.json_validator.ensure_json_serializable(self.form_handler.build_fields())
         context = {
             "title": f"Create a {self.model.__name__}",
             "submit_url": url_for(f"{self.blueprint.name}.create"),
             "cancel_url": url_for(f"{self.blueprint.name}.index"),
-            "fields": fields_by_section,
+            "fields": "",
             "section": "",
+            "item": "item",
+            "id": "id",
             "button_text": f"Create {self.model.__name__}",
             "read_only": False,
         }
@@ -338,13 +340,13 @@ class GenericWebRoutes(CRUDRoutesBase):
             Response: The rendered edit form page.
         """
         logger.info(f'this is item - \n{item}')
-        fields_by_section = self.json_validator.ensure_json_serializable(self.form_handler.build_fields(item))
         context = {
             "title": f"Edit {self.model.__name__}",
             "submit_url": url_for(f"{self.blueprint.name}.edit", item_id=item.id),
             "cancel_url": url_for(f"{self.blueprint.name}.index"),
-            "fields": fields_by_section,
+            "fields": "",
             "section": "",
+            "id": "id",
             "button_text": f"Update {self.model.__name__}",
             "read_only": False,
         }
