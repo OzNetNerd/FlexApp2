@@ -1,12 +1,32 @@
 import logging
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Optional, Any
 from flask_login import current_user
 from app.models import User
+from dataclasses import dataclass, asdict
 
 
 logger = logging.getLogger(__name__)
 
+
+@dataclass
+class FormContext:
+    """Dataclass for rendering context of form templates."""
+
+    title: str
+    submit_url: str
+    cancel_url: str
+    model_name: str
+    item_name: str
+    fields: Dict[str, List[Dict[str, Any]]]
+    button_text: Optional[str] = None
+    item: Optional[Any] = None
+    read_only: bool = False
+    edit_url: Optional[str] = None
+
+    def as_dict(self) -> Dict[str, Any]:
+        """Convert the form context into a dictionary."""
+        return asdict(self)
 
 class FormHandler:
     """Handles preparation and validation of dynamic form inputs for web routes."""
@@ -23,33 +43,6 @@ class FormHandler:
         self.model = model
         self.service = service
         self.json_validator = json_validator
-
-    @staticmethod
-    def prepare_form_context(
-            title: str,
-            submit_url: str,
-            cancel_url: str,
-            fields: Dict[str, List[Dict]],  # Dictionary with section names as keys
-            button_text: str = None,
-            item=None,
-            read_only: bool = False,
-            edit_url: str = None,
-    ) -> Dict:
-        """
-        Generate a context dictionary for form templates.
-        Returns:
-            Dict: Render context.
-        """
-        return {
-            "title": title,
-            "submit_url": submit_url,
-            "cancel_url": cancel_url,
-            "fields": fields,  # Keep your original structure
-            "button_text": button_text,
-            "item": item,
-            "read_only": read_only,
-            "edit_url": edit_url,
-        }
 
     def _validate_and_log_field_order(self) -> Dict[str, List[Dict]]:
         """

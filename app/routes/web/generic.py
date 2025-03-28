@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional, List, Type, Any
+from typing import Optional, List, Type
 from flask import request, redirect, url_for, flash, Blueprint
 from flask_login import current_user, login_required
 import logging
@@ -11,7 +11,7 @@ from app.routes.base.components.json_validator import JSONValidator
 from app.routes.base.components.request_logger import RequestLogger
 from app.routes.base.components.table_config_manager import TableConfigManager
 from app.routes.base.components.data_route_handler import DataRouteHandler
-from app.routes.base.components.form_handler import FormHandler
+from app.routes.base.components.form_handler import FormHandler, FormContext
 from app.routes.base.components.item_manager import ItemManager
 from app.models import Company, CRISPScore, Note
 
@@ -142,8 +142,10 @@ class GenericWebRoutes(CRUDRoutesBase):
         # logger.debug(f"Fields grouped by section for item with ID {item_id}: {fields_by_section}")
 
         # Prepare the form context
-        context = self.form_handler.prepare_form_context(
-            title=f"Viewing {self.model.__name__}: {self._get_item_display_name(item)}",
+        context = FormContext(
+            title="Viewing",
+            model_name=self.model.__name__,
+            item_name=self._get_item_display_name(item),
             submit_url="",
             cancel_url=url_for(f"{self.blueprint.name}.index"),
             fields=fields_by_section,
