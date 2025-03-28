@@ -29,19 +29,20 @@
 {% import "macros/form_fields/render_field.html" as macros %}
 
 {% set tabs = {} %}
-{% for group_fields in fields.values() %}
+{% for section, group_fields in fields.items() %}
   {% for field in group_fields %}
     {% set tab = field.tab or 'Other' %}
     {% if tab not in tabs %}
       {% set _ = tabs.update({tab: []}) %}
     {% endif %}
+    {% set field = field.copy() %}
+    {% set _ = field.update({'_section': section}) %}
     {% set _ = tabs[tab].append(field) %}
   {% endfor %}
 {% endfor %}
 
+
 {% if tabs|length > 1 %}
-  <div class="d-flex align-items-center mt-3 ms-1">
-    <div class="me-3 fw-semibold text-muted">Sections:</div>
     <div class="btn-group" role="tablist">
       {% for tab in tabs.keys() %}
         <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
@@ -56,5 +57,4 @@
         </button>
       {% endfor %}
     </div>
-  </div>
 {% endif %}

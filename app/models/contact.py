@@ -60,8 +60,8 @@ class Contact(BaseModel):
             {"name": "company_name", "label": "Company", "type": "text", "tab": "About"},
         ],
         "Record Info": [
-            {"name": "created_at", "label": "Created At", "type": "text", "tab": "About", "readonly": True},
-            {"name": "updated_at", "label": "Updated At", "type": "text", "tab": "About", "readonly": True},
+            {"name": "created_at", "label": "Created At", "type": "text", "tab": "Metadata", "readonly": True},
+            {"name": "updated_at", "label": "Updated At", "type": "text", "tab": "Metadata", "readonly": True},
         ],
         "Insights": [
             {"name": "crisp", "label": "CRISP", "type": "custom", "tab": "Insights", "section": "CRISP Score"},
