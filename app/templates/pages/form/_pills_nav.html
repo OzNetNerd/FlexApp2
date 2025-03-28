@@ -1,7 +1,6 @@
 {% import "macros/form_fields/render_field.html" as macros %}
-
 {% if tabs|length > 1 %}
-  <div class="btn-group mb-3" role="tablist">
+  <div class="btn-group" role="tablist">
     {% for tab in tabs %}
       <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
               id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
