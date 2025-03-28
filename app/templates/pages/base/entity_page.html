@@ -97,28 +97,33 @@
     <!-- Tab Switching Logic -->
     <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
 
-    <!-- Logger to Output Context Information -->
-    <script type="module">
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
+<!-- Logger to Output Context Information -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  const context = {
+    message: "📝 Entity page context loaded",
+    title: {{ title | tojson }},
+    readOnly: {{ read_only | tojson }},
+    hasItem: {{ (item is defined and item is not none) | tojson }},
+    layout: {{ ("Tabbed" if tabs else "Sectioned") | tojson }}
+  };
+  log("info", "entity_page.html", "DOMContentLoaded", context);
+  const includes = [
+    "form/_header.html",
+    "form/_buttons.html",
+    "base/common/_toasts.html",
+    {% if tabs %}"form/_pills_nav_content.html",{% else %}"base/common/_section_layout.html",{% endif %}
+    {% if not read_only %}"form/_autocomplete.html",{% endif %}
+    {% if not read_only %}"form/_form_footer.html",{% endif %}
+    {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
+  ].filter(Boolean);
+  log("info", "entity_page.html", "includes", {
+    message: "🧩 Includes",
+    files: includes
+  });
+</script>
 
-      const context = {
-        title: {{ title | tojson | safe }},
-        readOnly: {{ read_only | tojson | safe }},
-        hasItem: {{ 'true' if item else 'false' }},
-        layout: {{ '\"Tabbed\"' if tabs else '\"Sectioned\"' }}
-      };
 
-      log("info", "entity_page.html", "DOMContentLoaded", "📝 Entity page context loaded", context);
-      log("info", "entity_page.html", "includes", "🧩 Includes", [
-        "form/_header.html",
-        "form/_buttons.html",
-        tabs ? "form/_pills_nav_content.html" : "base/common/_section_layout.html",
-        !read_only ? "form/_autocomplete.html" : null,
-        !read_only ? "form/_form_footer.html" : null,
-        "base/common/_toasts.html",
-        show_navbar !== false ? "base/common/_navbar.html" : null
-      ].filter(Boolean));
-    </script>
 
     {# Modal for Deletion Confirmation (only shown if `item` exists) #}
     {% if item %}

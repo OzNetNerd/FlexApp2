@@ -49,7 +49,8 @@
   const tabs = {{ tabs | map(attribute='tab_name') | list | tojson | safe }};
   const sectionCounts = {{ tabs | map(attribute='sections') | map('length') | list | tojson | safe }};
 
-  log("info", "_pills_nav.html", "render", "📑 Tab navigation rendered", {
+  log("info", "_pills_nav.html", "render", {
+    message: "📑 Tab navigation rendered",
     totalTabs: tabs.length,
     tabs,
     sectionCounts
