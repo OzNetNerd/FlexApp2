@@ -11,7 +11,7 @@ from app.routes.base.components.json_validator import JSONValidator
 from app.routes.base.components.request_logger import RequestLogger
 from app.routes.base.components.table_config_manager import TableConfigManager
 from app.routes.base.components.data_route_handler import DataRouteHandler
-from app.routes.base.components.form_handler import FormHandler
+from app.routes.base.components.form_handler import FormHandler, Context
 from app.routes.base.components.item_manager import ItemManager
 from app.models import Company, CRISPScore, Note
 
@@ -92,24 +92,24 @@ class GenericWebRoutes(CRUDRoutesBase):
         self.blueprint.add_url_rule("/<int:item_id>/delete", "delete", login_required(self._delete_route), methods=["POST"])
         self.blueprint.add_url_rule("/data", "data", login_required(self._data_route), methods=["GET"])
 
-    def _get_template_context(self, **kwargs) -> dict:
-        """Retrieves the context for rendering a template.
-
-        Prepares the context dictionary used for template rendering, including
-        a list of companies, autocomplete usage flag, and model field order.
-
-        Args:
-            **kwargs: Arbitrary keyword arguments that may include an existing context.
-
-        Returns:
-            dict: A context dictionary with keys 'companies', 'use_autocomplete', and 'fields'.
-        """
-        context = kwargs.get("context", {})
-        context["companies"] = Company.query.order_by(Company.name).all()
-        context["use_autocomplete"] = True
-        context["section"] = ""
-        context["fields"] = self.model.__field_order__
-        return context
+    # def _get_template_context(self, **kwargs) -> dict:
+    #     """Retrieves the context for rendering a template.
+    #
+    #     Prepares the context dictionary used for template rendering, including
+    #     a list of companies, autocomplete usage flag, and model field order.
+    #
+    #     Args:
+    #         **kwargs: Arbitrary keyword arguments that may include an existing context.
+    #
+    #     Returns:
+    #         dict: A context dictionary with keys 'companies', 'use_autocomplete', and 'fields'.
+    #     """
+    #     context = kwargs.get("context", {})
+    #     context["companies"] = Company.query.order_by(Company.name).all()
+    #     context["use_autocomplete"] = True
+    #     context["section"] = ""
+    #     context["fields"] = self.model.__tabs__
+    #     return context
 
     def _determine_data_url(self) -> str:
         """Determines the URL for data API requests.
@@ -200,18 +200,17 @@ class GenericWebRoutes(CRUDRoutesBase):
             logger.debug(f"POST request received for item with ID {item_id}. Handling view post.")
             return self._handle_view_post(item)
 
-        # temp context
-        context = {
-            "title": "Viewing",
-            "model_name": self.model.__name__,
-            "item_name": self._get_item_display_name(item),
-            "submit_url": "",
-            "cancel_url": url_for(f"{self.blueprint.name}.index"),
-            "fields": "",
-            "id": "id",
-            "item": "item",
-            "read_only": True,
-        }
+        context = Context(
+            title="Viewing",
+            model_name=self.model.__name__,
+            item_name=self._get_item_display_name(item),
+            submit_url="",
+            cancel_url=url_for(f"{self.blueprint.name}.index"),
+            fields="",  # Replace with actual fields if needed
+            id=getattr(item, "id", None),
+            item=item,
+            read_only=True
+        )
 
         logger.debug(f"Rendering view template: {self.view_template}")
         return render_safely(self.view_template, context, f"Error viewing {self.model.__name__} with id {item_id}")

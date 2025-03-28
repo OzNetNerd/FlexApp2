@@ -1,10 +1,19 @@
 import logging
-from collections import defaultdict
-from typing import Dict, List, Optional
-from flask_login import current_user
-from app.models import User
+from typing import Dict, List
 
 from dataclasses import dataclass, field
+
+@dataclass
+class Context:
+    title: str
+    model_name: str
+    item_name: str
+    submit_url: str
+    cancel_url: str
+    fields: str
+    id: str
+    item: str
+    read_only: bool
 
 
 @dataclass
