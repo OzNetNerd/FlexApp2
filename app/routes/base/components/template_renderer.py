@@ -48,11 +48,11 @@ def render_safely(
         if current_app.debug:
             logger.debug(f"Traceback:\n{traceback.format_exc()}")
 
-        context["error_message"] = f"{error_type}: {details}" if current_app.debug else fallback_error_message
+        context.error_message = f"{error_type}: {details}" if current_app.debug else fallback_error_message
 
         try:
             logger.debug(f"🔁 Fallback render attempt for: {template_name}")
-            return render_template(template_name, **context), status_code
+            return render_template(template_name, **context.__dict__), status_code
         except Exception as e2:
             logger.critical(
                 f"{__name__} - CRITICAL - Failed to re-render '{template_name}' with error context: {e2} "

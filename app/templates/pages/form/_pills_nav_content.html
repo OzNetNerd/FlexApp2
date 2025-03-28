@@ -28,7 +28,7 @@
       {
         tab: {{ tab.tab_name | tojson | safe }},
         sectionCount: {{ tab.sections | length }},
-        totalEntries: {{ tab.sections | sum(attribute='entries' | length) }}
+        totalEntries: {{ tab.sections | map(attribute='entries') | map('length') | sum }}
       }{% if not loop.last %},{% endif %}
     {% endfor %}
   ];

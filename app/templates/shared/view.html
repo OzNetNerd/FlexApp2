@@ -1,40 +1,3 @@
-{#
-  ------------------------------------------------------------------------------
-  File: view.html
-  Purpose:
-    Extends the base entity page layout and includes a modal for delete
-    confirmation. This page is typically used to display a read-only view
-    of an entity's details with a delete option.
-
-  Template Structure:
-    - Extends:
-        • pages/base/entity_page.html
-    - Imports:
-        • macros/form_fields.html (for possible field rendering needs)
-    - Blocks:
-        • content: Injects custom content into the base page
-        • Modal: Bootstrap modal for confirming item deletion
-
-  Inputs (expected in context):
-    - item      : The object being viewed (must have an `id` for delete URL)
-    - request   : Flask request context (used to resolve route for deletion)
-
-  Output:
-    - A Bootstrap modal (`#deleteModal`) for confirming item deletion.
-      When confirmed, redirects to the `*.delete` endpoint with the item ID.
-
-  Example Use:
-    Typically rendered for read-only detail views, where users can
-    optionally delete the entity via a confirmation dialog.
-
-  Notes:
-    - Modal visibility is triggered externally (e.g., via a button with
-      `data-bs-toggle="modal"` and `data-bs-target="#deleteModal"`).
-    - Make sure `item` is defined in the context or the delete URL will break.
-    - Use in conjunction with `_buttons.html` for edit/delete controls.
-  ------------------------------------------------------------------------------
-#}
-
 {% extends "pages/base/entity_page.html" %}
 {% import "macros/form_fields.html" as macros %}
 
@@ -72,7 +35,7 @@
         {
           tab: {{ tab.tab_name | tojson }},
           sections: {{ tab.sections | length }},
-          totalEntries: {{ tab.sections | sum(attribute='entries' | length) }}
+          totalEntries: {{ tab.sections | map(attribute='entries') | map('length') | sum }}
         }{% if not loop.last %},{% endif %}
       {% endfor %}
     ]

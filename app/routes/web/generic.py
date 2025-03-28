@@ -206,7 +206,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             item_name=self._get_item_display_name(item),
             submit_url="",
             cancel_url=url_for(f"{self.blueprint.name}.index"),
-            fields="",  # Replace with actual fields if needed
+            tabs=self.model.__tabs__,
             id=getattr(item, "id", None),
             item=item,
             read_only=True

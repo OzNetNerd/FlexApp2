@@ -22,10 +22,11 @@ class ResourceContext:
     item_name: str
     submit_url: str
     cancel_url: str
-    fields: str
+    tabs: dict
     id: str
     item: str
     read_only: bool
+    error_message: str = None
 
 
 @dataclass
