@@ -7,27 +7,26 @@
 
   Inputs (expected in context):
     - fields : OrderedDict mapping section names to lists of fields.
-                        Each field can optionally define a `tab` attribute.
-                        Used to group fields by tab labels.
+               Each field can optionally define a `tab` attribute.
+               Used to group fields by tab labels.
 
   Output:
     - If more than one unique tab is found:
         • Renders a pill-style tab navigation group
         • Renders corresponding tab panes for each tab group
-        • Displays each field name inside its respective tab pane (placeholder)
+        • Displays each rendered field inside its respective tab pane
 
   Example:
     {% include 'pages/form/_pills_nav.html' %}
 
   Notes:
-    - This is meant as a navigation UI component.
-    - The inner content of each tab currently outputs `{{ field.name }}` as a placeholder;
-      this should be replaced with an appropriate field renderer (e.g., macro or include).
+    - Requires `macros.render_field` to be available (typically from form_fields.html).
     - IDs are normalized using lowercase and dashes for Bootstrap compatibility.
     - Assumes Bootstrap 5 tab behavior and requires Bootstrap JS.
-
   ------------------------------------------------------------------------------
 #}
+
+{% import "macros/form_fields/render_field.html" as macros %}
 
 {% set tabs = {} %}
 {% for group_fields in fields.values() %}
@@ -41,32 +40,21 @@
 {% endfor %}
 
 {% if tabs|length > 1 %}
-  <div class="btn-group ms-3" role="tablist">
-    {% for tab in tabs.keys() %}
-      <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
-              id="tab-{{ tab | lower | replace(' ', '-') }}-tab"
-              data-bs-toggle="pill"
-              data-bs-target="#tab-{{ tab | lower | replace(' ', '-') }}"
-              type="button"
-              role="tab"
-              aria-controls="tab-{{ tab | lower | replace(' ', '-') }}"
-              aria-selected="{{ 'true' if loop.first else 'false' }}">
-        {{ tab }}
-      </button>
-    {% endfor %}
-  </div>
-
-  <!-- Tab Content -->
-  <div class="tab-content mt-2">
-    {% for tab in tabs.keys() %}
-      <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
-           id="tab-{{ tab | lower | replace(' ', '-') }}"
-           role="tabpanel"
-           aria-labelledby="tab-{{ tab | lower | replace(' ', '-') }}-tab">
-        {% for field in tabs[tab] %}
-          <div>{{ field.name }}</div>  {# Replace this line with a call to your field renderer #}
-        {% endfor %}
-      </div>
-    {% endfor %}
+  <div class="d-flex align-items-center mt-3 ms-1">
+    <div class="me-3 fw-semibold text-muted">Sections:</div>
+    <div class="btn-group" role="tablist">
+      {% for tab in tabs.keys() %}
+        <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
+                id="tab-{{ tab | lower | replace(' ', '-') }}-tab"
+                data-bs-toggle="pill"
+                data-bs-target="#tab-{{ tab | lower | replace(' ', '-') }}"
+                type="button"
+                role="tab"
+                aria-controls="tab-{{ tab | lower | replace(' ', '-') }}"
+                aria-selected="{{ 'true' if loop.first else 'false' }}">
+          {{ tab }}
+        </button>
+      {% endfor %}
+    </div>
   </div>
 {% endif %}
