@@ -1,3 +1,33 @@
+{#
+  ------------------------------------------------------------------------------
+  File: _buttons.html
+  Purpose:
+    Renders contextual action buttons for entity pages based on view mode
+    and item presence (e.g. view, edit, delete, back, cancel, add).
+
+  Inputs (expected in context):
+    - item: Optional[Model]
+        The object being displayed, edited, or deleted.
+    - read_only: bool
+        If True, user is in view-only mode. Buttons adjust accordingly.
+
+  Features:
+    - Bootstrap 5 buttons with contextual styling and icons
+    - Delete button uses Bootstrap modal trigger for confirmation
+    - Logs rendered buttons using logger.js for traceability
+
+  Button Logic:
+    - If `item` and not `read_only`:
+        Show "Cancel" button to return to view page
+    - If `item` and `read_only`:
+        Show buttons: Add, Edit, Delete (modal), Back
+
+  Notes:
+    - Assumes `#deleteModal` is rendered elsewhere if Delete is shown
+    - Uses `request.endpoint` to infer the correct route base
+  ------------------------------------------------------------------------------
+#}
+
 <div class="d-flex justify-content-end align-items-center gap-2">
   {% if item and not read_only %}
     <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}"
@@ -23,6 +53,7 @@
   {% endif %}
 </div>
 
+<!-- 🧾 Button Context Logging -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 

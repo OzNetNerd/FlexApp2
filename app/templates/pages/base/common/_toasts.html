@@ -1,4 +1,32 @@
-<!-- templates/_toast.html -->
+{#
+  ------------------------------------------------------------------------------
+  File: _toasts.html
+  Purpose:
+    Renders Bootstrap toasts for flash messages and critical render errors.
+    Uses custom JS modules for styling and animation.
+
+  Inputs (expected in context):
+    - get_flashed_messages(): Flask utility to retrieve session flash messages.
+    - template_render_error: str (optional)
+        A string passed from the server to indicate a rendering problem.
+
+  Features:
+    - Bootstrap 5 toast container styled and positioned bottom-right
+    - Dynamically injects toasts via JS for each flashed message
+    - Critical render errors shown in a persistent red toast
+    - Client-side logger integration for visibility and debugging
+
+  JavaScript:
+    - Uses toasts.js for UI rendering
+    - Uses logger.js for diagnostics
+
+  Notes:
+    - Included in most base templates to surface user/system messages
+    - Only renders if at least one message or error is present
+  ------------------------------------------------------------------------------
+#}
+
+{# ✅ Toast container rendered if flash messages or template errors exist #}
 {% if template_render_error or get_flashed_messages(with_categories=true) %}
   <div class="toast-container position-fixed bottom-0 end-0 p-3 z-9999">
     <div id="liveToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -10,6 +38,7 @@
   </div>
 {% endif %}
 
+{# 📢 Loop through flash messages and inject them via JavaScript #}
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% for category, message in messages %}
     <script type="module">
@@ -26,6 +55,7 @@
   {% endfor %}
 {% endwith %}
 
+{# ❌ Handle template rendering errors with a red/danger toast #}
 {% if template_render_error %}
   <script type="module">
     import { showToast } from "{{ url_for('static', filename='js/toasts.js') }}";

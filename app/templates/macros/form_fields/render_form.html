@@ -1,33 +1,92 @@
+{#
+  ------------------------------------------------------------------------------
+  File: form_macros.html
+  Purpose:
+    Defines a reusable macro for rendering complete forms with sections.
+    Handles both editable and read-only states, and renders appropriate
+    action buttons based on the mode and context.
+
+  Imports:
+    - render_sections.html → sections_macros: Renders grouped form field sections
+
+  Macros:
+    - render_form(fields_by_section, submit_url, cancel_url, button_text="Submit",
+                  read_only=False, edit_url=None)
+        Renders a form with dynamic sections and contextual buttons for
+        submission, cancelation, or read-only navigation.
+
+  Structure:
+    - <form> element with POST and multipart/form-data
+    - CSRF token input (only in editable mode)
+    - Sections rendered via sections_macros.render_sections
+    - Action buttons:
+        • Editable: Cancel + Submit
+        • Read-only: Back + (optional) Edit
+
+  Notes:
+    - Designed for use in dynamic form templates
+    - Integrated with section-based rendering
+    - Logging aids debugging form behavior and mode toggling
+  ------------------------------------------------------------------------------
+#}
+
 {% import "macros/form_fields/render_sections.html" as sections_macros %}
 
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  const filename = "form_macros.html";
+
+  log("info", filename, "init", "📦 Loaded form rendering macro");
+  log("debug", filename, "import", "🔗 Imported sections_macros from render_sections.html");
+</script>
+
 {% macro render_form(fields_by_section, submit_url, cancel_url, button_text="Submit", read_only=False, edit_url=None) %}
-<form action="{{ submit_url }}" method="post" enctype="multipart/form-data">
-  {% if not read_only %}
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  {% endif %}
+  <script type="module">
+    import log from "{{ url_for('static', filename='js/logger.js') }}";
 
-  {{ sections_macros.render_sections(fields_by_section, read_only) }}
+    const filename = "form_macros.html";
+    const mode = {{ "true" if read_only else "false" }};
+    const sectionNames = {{ fields_by_section.keys() | list | tojson | safe }};
+    const submitUrl = {{ submit_url | tojson | safe }};
+    const cancelUrl = {{ cancel_url | tojson | safe }};
+    const editUrl = {{ edit_url | tojson | safe }};
+    const btnText = {{ button_text | tojson | safe }};
 
-  {% if not read_only %}
-    <div class="d-flex justify-content-between mt-4">
-      <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
-        <i class="fas fa-times me-1"></i> Cancel
-      </a>
-      <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save me-1"></i> {{ button_text }}
-      </button>
-    </div>
-  {% else %}
-    <div class="d-flex justify-content-between mt-4">
-      <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-1"></i> Back
-      </a>
-      {% if edit_url %}
-        <a href="{{ edit_url }}" class="btn btn-primary">
-          <i class="fas fa-edit me-1"></i> Edit
+    log("info", filename, "render_form", `🧾 Rendering form in ${mode === "true" ? "read-only" : "editable"} mode`);
+    log("debug", filename, "render_form", "📌 Sections", sectionNames);
+    log("debug", filename, "render_form", "➡️ Submit URL", submitUrl);
+    log("debug", filename, "render_form", "↩️ Cancel URL", cancelUrl);
+    log("debug", filename, "render_form", "✏️ Edit URL", editUrl);
+    log("debug", filename, "render_form", "🔘 Button text", btnText);
+  </script>
+
+  <form action="{{ submit_url }}" method="post" enctype="multipart/form-data">
+    {% if not read_only %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% endif %}
+
+    {{ sections_macros.render_sections(fields_by_section, read_only) }}
+
+    {% if not read_only %}
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
+          <i class="fas fa-times me-1"></i> Cancel
         </a>
-      {% endif %}
-    </div>
-  {% endif %}
-</form>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save me-1"></i> {{ button_text }}
+        </button>
+      </div>
+    {% else %}
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-1"></i> Back
+        </a>
+        {% if edit_url %}
+          <a href="{{ edit_url }}" class="btn btn-primary">
+            <i class="fas fa-edit me-1"></i> Edit
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </form>
 {% endmacro %}

@@ -1,19 +1,56 @@
+{#
+  ------------------------------------------------------------------------------
+  File: _table.html
+  Purpose:
+    Renders a table view page with action buttons, a column selector,
+    and a global search bar. Designed for use with AG Grid and integrates
+    with a data URL for dynamic loading.
+
+  Inputs (expected in context):
+    - title: str
+        Title displayed in the page header.
+    - entity_name: str
+        Label used in the "Add" button (e.g., "User", "Task").
+    - data_url: str
+        URL used by JS to fetch table data (via data-api-url attribute).
+
+  Template Blocks:
+    - table_actions: block
+        Optional override for custom action buttons in the header.
+
+  Features:
+    - Bootstrap 5-based responsive layout
+    - Column selector with "All" and "Clear" buttons
+    - Search input for filtering table contents
+    - Dynamic JS logging for diagnostics and data binding
+
+  JavaScript:
+    - Prevents dropdown from closing when interacting with column options
+    - Logs template context and DOM status using logger.js
+
+  Notes:
+    - Intended to be extended for tables across the CRM application.
+    - JS handles dynamic population of column selector and grid.
+  ------------------------------------------------------------------------------
+#}
+
 {% block content %}
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
     <h3 class="h4 mb-0 text-primary">{{ title }}</h3>
     <div>
       {% block table_actions %}
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}" class="btn btn-primary btn-lg fw-bold shadow-sm">
-        <i class="fas fa-plus me-2"></i> Add {{ entity_name|default('item') }}
-      </a>
+        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}" class="btn btn-primary btn-lg fw-bold shadow-sm">
+          <i class="fas fa-plus me-2"></i> Add {{ entity_name|default('item') }}
+        </a>
       {% endblock %}
     </div>
   </div>
+
   <div class="card-body">
     <div class="d-flex justify-content-between align-items-center mb-4">
 
-      <!-- 📋 Column Selector Dropdown -->
+      {# 📋 Column Selector Dropdown #}
       <div class="dropdown">
         <button class="btn dropdown-toggle" type="button" id="columnSelectorDropdownToggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
           <i class="fas fa-table me-2"></i> Columns
@@ -34,7 +71,7 @@
         </ul>
       </div>
 
-      <!-- 🔍 Search Input -->
+      {# 🔍 Search Input #}
       <div class="input-group w-25">
         <span class="input-group-text">
           <i class="fas fa-search"></i>
@@ -43,13 +80,14 @@
       </div>
     </div>
 
+    {# AG Grid Container #}
     <div id="table-container" class="ag-theme-alpine w-100" data-api-url="{{ data_url }}" style="min-height: 420px;"></div>
   </div>
 </div>
 
+{# 🛠️ JS to prevent dropdown from closing when clicking inside column selector #}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Prevent the dropdown from closing when clicking checkboxes
   document.querySelectorAll('#columnSelectorItems, #selectAllColumns, #clearAllColumns').forEach(element => {
     element.addEventListener('click', function(e) {
       e.stopPropagation();
@@ -58,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- 🔍 Logging with logger.js -->
+{# 🔍 Logging with logger.js to debug context and page state #}
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 

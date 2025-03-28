@@ -1,30 +1,43 @@
+{#
+  ------------------------------------------------------------------------------
+  File: 404.html
+  Purpose:
+    Renders a user-friendly 404 "Page Not Found" error page. Provides a clear
+    explanation that the page doesn’t exist and a link to return to the homepage.
+
+  Features:
+    - Uses global 'main.css' styling for consistent look and feel
+    - Friendly and minimal error messaging
+    - Centered layout using Bootstrap utility classes
+    - Logs page load for debugging purposes
+
+  Notes:
+    - This page is standalone and doesn't extend a base layout
+    - Useful for Flask’s errorhandler(404) registration
+    - Requires .error-page styles to be present in main.css
+  ------------------------------------------------------------------------------
+#}
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>404 - Page Not Found</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-        }
-        h1 {
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 18px;
-            margin-bottom: 30px;
-        }
-        a {
-            color: #0066cc;
-            text-decoration: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>404 - Page Not Found</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+  <!-- 404 Debug Logger -->
+  <script type="module">
+    import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+    log("error", "404.html", "routing", "❌ 404 page triggered - page not found");
+    log("info", "404.html", "context", "🔙 Suggesting home page redirect");
+  </script>
 </head>
-<body>
+<body class="d-flex flex-column justify-content-center align-items-center" style="min-height: 100vh;">
+  <div class="error-page text-center">
     <h1>404 - Page Not Found</h1>
     <p>The page you are looking for doesn't exist or has been moved.</p>
-    <p><a href="/">Return to home page</a></p>
+    <a href="/" class="btn btn-outline-primary btn-sm">Return to home page</a>
+  </div>
 </body>
 </html>

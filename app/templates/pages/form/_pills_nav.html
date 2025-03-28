@@ -1,5 +1,31 @@
+{#
+  ------------------------------------------------------------------------------
+  File: _pills_nav.html
+  Purpose:
+    Renders tabbed (pills-style) navigation for forms with multiple tabs.
+    Buttons control visibility of tab panes via Bootstrap 5's pill system.
+
+  Inputs (expected in context):
+    - tabs: List[Tab]
+        Each tab should include:
+        - tab_name: str (used for label and tab ID)
+        - sections: List (used for logging, each section contains grouped fields)
+
+  Features:
+    - Bootstrap 5 pill-style navigation using button groups
+    - Automatically marks the first tab as active
+    - Accessible with proper ARIA roles and attributes
+    - JavaScript logger outputs tab names and section counts
+
+  Notes:
+    - Should be placed directly above tab content container
+    - Requires corresponding `.tab-pane` elements with matching IDs
+  ------------------------------------------------------------------------------
+#}
+
 {% import "macros/form_fields/render_field.html" as macros %}
-{% if tabs|length > 1 %}
+
+{% if tabs | length > 1 %}
   <div class="btn-group" role="tablist">
     {% for tab in tabs %}
       <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
@@ -16,7 +42,7 @@
   </div>
 {% endif %}
 
-<!-- Logging for Pills Nav -->
+<!-- 🧾 Logging for Pills Navigation Context -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 

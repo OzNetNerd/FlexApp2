@@ -1,23 +1,71 @@
+{#
+  ------------------------------------------------------------------------------
+  File: render_input.html
+  Purpose:
+    Defines a reusable macro for rendering form input elements based on field type.
+    Supports textarea, select, checkbox, and standard input fields with appropriate
+    Bootstrap 5 classes and structure.
+
+  Macro:
+    - render_input(field)
+        Renders a form field based on its type. Applies contextual Bootstrap 5 styling.
+
+  Parameters:
+    - field: Object with properties:
+        - type: 'textarea', 'select', 'checkbox', or any valid <input> type (default: 'text')
+        - name: str — field's input name
+        - value: any — current value to display
+        - label: str — field label, used for select placeholders
+        - options: list — used only for select (each item has 'value' and 'label')
+        - checkbox_label: str — label text for checkbox fields
+
+  Supported Field Types:
+    - textarea: multi-line input (4 rows)
+    - select: dropdown with provided options
+    - checkbox: single boolean toggle
+    - default: standard text/email/number/etc. <input> field
+
+  Notes:
+    - Designed to be consumed via macro imports (e.g., input_macros.render_input)
+    - Logging is included to trace field rendering logic and identify field types
+  ------------------------------------------------------------------------------
+#}
+
 {% macro render_input(field) %}
-{% if field.type == 'textarea' %}
-  <textarea name="{{ field.name }}" class="form-control" rows="4">{{ field.value or '' }}</textarea>
-{% elif field.type == 'select' %}
-  <select name="{{ field.name }}" class="form-select">
-    <option value="">-- Select {{ field.label }} --</option>
-    {% for opt in field.options %}
-      <option value="{{ opt.value }}" {% if opt.value == field.value %}selected{% endif %}>
-        {{ opt.label }}
-      </option>
-    {% endfor %}
-  </select>
-{% elif field.type == 'checkbox' %}
-  <div class="form-check">
-    <input type="checkbox" name="{{ field.name }}" id="{{ field.name }}"
-           {% if field.value %} checked{% endif %} class="form-check-input" value="true">
-    <label class="form-check-label" for="{{ field.name }}">{{ field.checkbox_label }}</label>
-  </div>
-{% else %}
-  <input type="{{ field.type or 'text' }}" name="{{ field.name }}"
-         class="form-control" value="{{ field.value or '' }}">
-{% endif %}
+  <script type="module">
+    import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+    const filename = "render_input.html";
+    const fieldName = {{ (field.name or 'unnamed') | tojson | safe }};
+    const fieldType = {{ (field.type or 'text') | tojson | safe }};
+    const fieldLabel = {{ (field.label or '') | tojson | safe }};
+    const value = {{ (field.value if field.value is not none else '') | tojson | safe }};
+
+    log("debug", filename, "render_input", `🧩 Rendering input field '${fieldName}'`);
+    log("debug", filename, "render_input", "📦 Type", fieldType);
+    log("debug", filename, "render_input", "🔤 Label", fieldLabel);
+    log("debug", filename, "render_input", "📝 Value", value);
+  </script>
+
+  {% if field.type == 'textarea' %}
+    <textarea name="{{ field.name }}" class="form-control" rows="4">{{ field.value or '' }}</textarea>
+  {% elif field.type == 'select' %}
+    <select name="{{ field.name }}" class="form-select">
+      <option value="">-- Select {{ field.label }} --</option>
+      {% for opt in field.options %}
+        <option value="{{ opt.value }}" {% if opt.value == field.value %}selected{% endif %}>
+          {{ opt.label }}
+        </option>
+      {% endfor %}
+    </select>
+  {% elif field.type == 'checkbox' %}
+    <div class="form-check">
+      <input type="checkbox" name="{{ field.name }}" id="{{ field.name }}"
+             {% if field.value %} checked{% endif %} class="form-check-input" value="true">
+      <label class="form-check-label" for="{{ field.name }}">{{ field.checkbox_label }}</label>
+    </div>
+  {% else %}
+    <input type="{{ field.type or 'text' }}" name="{{ field.name }}"
+           class="form-control" value="{{ field.value or '' }}">
+  {% endif %}
 {% endmacro %}

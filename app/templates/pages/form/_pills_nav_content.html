@@ -1,3 +1,40 @@
+{#
+  ------------------------------------------------------------------------------
+  File: _pills_nav_content.html
+  Purpose:
+    Renders tabbed content panes based on the provided `tabs` structure.
+    Each tab contains multiple sections, and each section contains form fields
+    ("entries"). Includes error guards and structured logging.
+
+  Inputs (expected in context):
+    - tabs: List[Tab]
+        Each Tab must include:
+        - tab_name: str
+        - sections: List[Section]
+          - section_name: str
+          - entries: List[Field]
+            - name: str (required)
+            - label: str (required)
+
+  Imports:
+    - render_field macro from macros/form_fields/render_field.html
+
+  Features:
+    - Bootstrap 5-based `.tab-pane` structure
+    - Shows first tab as active by default
+    - Gracefully skips invalid or undefined form fields
+    - Logs tab, section, and entry structure for debugging
+
+  Safety:
+    - Guards ensure only entries with `name` and `label` are rendered
+    - Invalid entries generate an inline warning
+
+  Notes:
+    - Intended to be used alongside `_pills_nav.html`
+    - Automatically IDs each pane with sanitized tab name
+  ------------------------------------------------------------------------------
+#}
+
 {% import "macros/form_fields/render_field.html" as macros %}
 
 <div class="tab-content">
@@ -9,16 +46,27 @@
 
       {% for section in tab.sections %}
         <h5 class="mt-3">{{ section.section_name }}</h5>
-        {% for entry in section.entries %}
-          {{ macros.render_field(entry) }}
-        {% endfor %}
+        <div class="row">
+          {% for entry in section.entries %}
+            {# ✅ Only render valid entries with name and label #}
+            {% if entry and entry.name is defined and entry.label is defined %}
+              {{ macros.render_field(entry) }}
+            {% else %}
+              <div class="col-md-6 mb-3">
+                <div class="alert alert-warning">
+                  ⚠️ Skipped invalid entry in section "{{ section.section_name }}"
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
       {% endfor %}
 
     </div>
   {% endfor %}
 </div>
 
-<!-- Logging for Tab Content Rendering -->
+<!-- 🧾 Logging: Tab + Section Structure Summary -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 

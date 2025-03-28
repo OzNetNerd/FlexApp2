@@ -2,21 +2,34 @@
   ------------------------------------------------------------------------------
   File: _tabs_and_sections.html
   Purpose:
-    Dynamically groups form fields by their `tab` and `section` metadata,
-    and renders them accordingly using tabbed navigation (if more than one tab)
-    or as stacked sections (if only one tab or none).
+    Dynamically groups form fields by `tab` and `section` metadata,
+    and renders them using Bootstrap-styled tabs (if more than one tab),
+    or as stacked section cards (if only one tab or no tabs at all).
+
   Inputs (expected in context):
-    - fields : Dictionary with sections as keys, and a list of field objects
-                    as values. Each field object should support:
-        • name       : Field name.
-        • label      : Field label.
-        • type       : Field type.
-        • tab        : Tab the field belongs to.
-        • section    : Optional. Label for the section group within a tab.
+    - fields: Dict[str, List[Field]]
+        A dictionary where each key is a section name and the value is a list
+        of field objects. Each field object should include:
+        • name    : str – The field's internal name.
+        • label   : str – The human-readable label.
+        • type    : str – Field input type.
+        • tab     : Optional[str] – The tab it belongs to.
+        • section : Optional[str] – Grouping label inside a tab.
+
+  Features:
+    - Auto-groups fields by tab → section → fields
+    - Renders tabbed layout if more than one tab is present
+    - Falls back to stacked section cards if only one or no tabs
+    - Each section is rendered using `_section_card.html`
+    - Logs full tab/section structure to JS console
+
+  Notes:
+    - Requires `read_only` and `field` (macro namespace) to be available
+    - Tabs are activated via Bootstrap’s `data-bs-toggle="pill"`
   ------------------------------------------------------------------------------
 #}
 
-{# Create dictionary to organize fields by tab then by section #}
+{# 🧱 Organize fields into nested tab > section > fields structure #}
 {% set tabs = {} %}
 {% for section_name, section_fields in fields.items() %}
   {% for field in section_fields %}
@@ -31,8 +44,8 @@
   {% endfor %}
 {% endfor %}
 
-{# Render the tabs #}
-{% if tabs|length > 1 %}
+{# 🧭 Render tabbed or stacked layout based on tab count #}
+{% if tabs | length > 1 %}
   <div class="tab-content" id="formTabsContent">
     {% for tab, tab_sections in tabs.items() %}
       <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
@@ -57,7 +70,7 @@
   {% endfor %}
 {% endif %}
 
-<!-- Logging for Tab and Section Structure -->
+<!-- 🧾 Logging for Tabs and Sections Structure -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 

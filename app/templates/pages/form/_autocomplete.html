@@ -1,4 +1,32 @@
-<!-- Autocomplete Fields -->
+{#
+  ------------------------------------------------------------------------------
+  File: _autocomplete.html
+  Purpose:
+    Renders autocomplete-enabled input fields for selecting users and a company.
+    Pre-populates inputs with initial values from the provided `item` context
+    and logs initial state for diagnostics.
+
+  Inputs (expected in context):
+    - item: Optional[Model]
+        Object containing `.users` (List[User]) and `.company` (Company)
+
+  Features:
+    - Bootstrap-styled form inputs with unique IDs and labels
+    - JS-compatible `data-initial` attribute stores selected IDs in JSON format
+    - JS logger tracks initialization and parses stored values
+
+  JavaScript:
+    - Parses `data-initial` attributes to ensure JSON is valid
+    - Logs parsed values for developers to verify autocomplete behavior
+    - Logs JSON parsing errors if malformed data is encountered
+
+  Notes:
+    - Inputs are hydrated and enhanced by `autoComplete.js`
+    - Compatible with async/autosuggest-style user/company pickers
+  ------------------------------------------------------------------------------
+#}
+
+<!-- 👥 Autocomplete Field: Users -->
 <div class="mb-3">
   <label for="users-input" class="form-label">Users</label>
   <input
@@ -10,6 +38,7 @@
   >
 </div>
 
+<!-- 🏢 Autocomplete Field: Company -->
 <div class="mb-3">
   <label for="companies-input" class="form-label">Company</label>
   <input
@@ -21,7 +50,7 @@
   >
 </div>
 
-<!-- Autocomplete Field Logging -->
+<!-- 🧾 Autocomplete Initialization Logging -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 
@@ -29,7 +58,7 @@
     const usersInitial = document.getElementById("users-input")?.dataset.initial || "[]";
     const companiesInitial = document.getElementById("companies-input")?.dataset.initial || "[]";
 
-    let parsedUsers, parsedCompany;
+    let parsedUsers = [], parsedCompany = [];
     try {
       parsedUsers = JSON.parse(usersInitial);
       parsedCompany = JSON.parse(companiesInitial);

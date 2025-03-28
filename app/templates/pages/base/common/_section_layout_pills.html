@@ -1,3 +1,38 @@
+{#
+  ------------------------------------------------------------------------------
+  File: _section_layout_pills.html
+  Purpose:
+    Dynamically renders a tabbed (pills) form layout based on fields grouped
+    by their assigned `tab` and `section`. Supports read-only and editable
+    modes and includes CRISP section rendering where applicable.
+
+  Inputs (expected in context):
+    - fields: List[Field]
+        Each field has `tab`, `section`, `name`, etc. to group them.
+    - item: Optional[Model]
+        The model instance being viewed/edited (if applicable).
+    - read_only: bool
+        If True, disables editing and shows read-only field renderers.
+    - title: str
+        Title for the page, dynamically used in logs and headers.
+
+  Template Features:
+    - Bootstrap 5-based card and pill-style tab layout
+    - Groups fields first by `tab`, then by `section` inside each tab
+    - Includes a CRISP viewer component when needed
+    - Imports reusable form field rendering macros
+    - Logs key context and structure using logger.js
+
+  JavaScript:
+    - Dynamically logs field tabs and sections using a JS logger module
+    - Helps with client-side debugging and template context verification
+
+  Notes:
+    - Used in create, view, and edit pages with shared structure
+    - Requires macros defined in `macros/form_fields.html`
+  ------------------------------------------------------------------------------
+#}
+
 {% import "macros/form_fields.html" as macros %}
 
 {% block content %}
@@ -13,24 +48,25 @@
       {% endif %}
       {{ title }}
     </h3>
+
     <div class="d-flex gap-2">
       {% if item and not read_only %}
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
-        <i class="fas fa-times me-1"></i> Cancel
-      </a>
+        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+          <i class="fas fa-times me-1"></i> Cancel
+        </a>
       {% elif item and read_only %}
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}" class="btn btn-primary fw-bold">
-        <i class="fas fa-plus me-1"></i> Add
-      </a>
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', item_id=item.id) }}" class="btn btn-warning text-dark fw-bold">
-        <i class="fas fa-edit me-1"></i> Edit
-      </a>
-      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-        <i class="fas fa-trash me-1"></i> Delete
-      </button>
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
-        <i class="fas fa-arrow-left me-1"></i> Back
-      </a>
+        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}" class="btn btn-primary fw-bold">
+          <i class="fas fa-plus me-1"></i> Add
+        </a>
+        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', item_id=item.id) }}" class="btn btn-warning text-dark fw-bold">
+          <i class="fas fa-edit me-1"></i> Edit
+        </a>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+          <i class="fas fa-trash me-1"></i> Delete
+        </button>
+        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+          <i class="fas fa-arrow-left me-1"></i> Back
+        </a>
       {% endif %}
     </div>
   </div>
@@ -101,20 +137,21 @@
   </div>
 </div>
 
-<!-- Logging Script -->
+{# JavaScript logger to trace tab and section structure #}
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 
-  log("info", "form_page.html", "render", "🧾 Title", {{ title | tojson | safe }});
-  log("info", "form_page.html", "render", "👁️ Read-only mode", {{ read_only | tojson | safe }});
-  log("info", "form_page.html", "render", "🧩 Item present", {{ 'true' if item else 'false' }});
+  log("info", "_section_layout_pills.html", "render", "📋 Page Title", {{ title | tojson | safe }});
+  log("info", "_section_layout_pills.html", "render", "👁️ Read-only mode", {{ read_only | tojson | safe }});
+  log("info", "_section_layout_pills.html", "render", "🧩 Item exists", {{ 'true' if item else 'false' }});
+  log("info", "_section_layout_pills.html", "import", "📦 Macros imported from", "macros/form_fields.html");
 
   const tabs = {{ tabs.keys() | list | tojson | safe }};
-  log("info", "form_page.html", "tabs", "🗂️ Tabs detected", tabs);
+  log("info", "_section_layout_pills.html", "tabs", "🗂️ Tabs detected", tabs);
 
   {% for tab, tab_fields in tabs.items() %}
     const sections_{{ loop.index }} = {{ tab_fields | map(attribute='section') | list | unique | tojson | safe }};
-    log("debug", "form_page.html", "tabs", "📁 Sections under tab: {{ tab }}", sections_{{ loop.index }});
+    log("debug", "_section_layout_pills.html", "tabs", "📁 Sections under tab: {{ tab }}", sections_{{ loop.index }});
   {% endfor %}
 </script>
 {% endblock %}

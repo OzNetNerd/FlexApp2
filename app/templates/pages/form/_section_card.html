@@ -2,16 +2,36 @@
   ------------------------------------------------------------------------------
   File: _section_card.html
   Purpose:
-    Renders a Bootstrap-styled card component for a group of fields belonging
-    to the same section within a form. Each card includes a section heading and
-    a responsive grid layout for its fields.
+    Renders a Bootstrap 5 card for a logical section of a form, such as
+    "Details", "Preferences", or "Settings". Displays a heading and
+    a grid of fields using responsive layout.
+
   Inputs (expected in context):
-    - _section       : String. The name of the section (e.g., "Details", "Settings").
-    - _section_fields : List. The fields to display in this section.
-    - read_only      : Boolean. Indicates if the form is in read-only mode.
-    - macros         : Macro namespace containing the field renderer.
+    - _section         : str
+        The name of the section (e.g., "General", "Preferences")
+    - _section_fields  : List[Field]
+        List of fields to display in this section
+    - read_only        : bool
+        If true, disables inputs and shows display values
+    - field            : Jinja macro namespace
+        Provides `field.render_field()` for rendering each field
+
+  Features:
+    - Bootstrap-styled card with header and padded body
+    - Responsive `.row.g-3` layout for grouped fields
+    - Conditional rendering of CRISP section via component
+    - JS logging of render context (section name, field count, mode)
+
+  Safety:
+    - Assumes `_section_fields` is a list of valid field objects
+    - Falls back to "General" if `_section` is not provided
+
+  Notes:
+    - Requires `macros.field.render_field` or compatible interface in `field`
+    - Should be used within a tabbed or section-based form layout
   ------------------------------------------------------------------------------
 #}
+
 <div class="card shadow-sm border-0 mb-4">
   <div class="card-header bg-white">
     <h5 class="h6 text-primary fw-semibold mb-0">
@@ -31,7 +51,7 @@
   </div>
 </div>
 
-<!-- Logging for Section Card -->
+<!-- 🧾 Logging Section Render Context -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 

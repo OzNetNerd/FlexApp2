@@ -1,3 +1,48 @@
+{#
+  ------------------------------------------------------------------------------
+  File: _navbar.html
+  Purpose:
+    Defines the top navigation bar of the CRM application. Provides dynamic,
+    context-aware navigation links, a mobile-responsive menu, a search bar,
+    user account options, and notification icons. Highlights the current page
+    based on the active Flask endpoint and adapts content based on user auth.
+
+  Inputs (expected in context):
+    - request.endpoint: str
+        The active Flask route, used to determine the highlighted nav item.
+    - current_user: Flask-Login user object
+        Provides access to user's name, email, and auth status.
+
+  Template Variables:
+    - nav_items: List[Dict[str, str]]
+        Predefined nav entries, each containing:
+        - name: str (used for url_for routing)
+        - display_name: str (label shown in the nav)
+        - icon: str (Font Awesome icon class)
+
+  Template Blocks:
+    - additional_nav_items: block
+        Can be overridden to inject additional nav links.
+
+  Features:
+    - Responsive design with Bootstrap 5
+    - Active nav highlighting based on request.endpoint
+    - Dynamic avatar (via ui-avatars.com) or default icon for guests
+    - Accessible dropdown for authenticated/unauthenticated user states
+    - Embedded logger for troubleshooting nav issues
+
+  JavaScript:
+    - Imports a custom logger module from /static/js/logger.js
+    - Logs active endpoint, navigation structure, auth state, and user details
+    - Logs template block extension for nav customization
+
+  Notes:
+    - Part of the global layout, included across all major templates.
+    - Uses only Flask-native `url_for` and context variables.
+    - Integrates cleanly with custom logger and supports visual debugging.
+  ------------------------------------------------------------------------------
+#}
+
 {% set nav_items = [
   {'name': 'companies', 'display_name': 'Companies', 'icon': 'fa-building'},
   {'name': 'contacts', 'display_name': 'Contacts', 'icon': 'fa-address-card'},
@@ -5,6 +50,17 @@
   {'name': 'users', 'display_name': 'Users', 'icon': 'fa-users'},
   {'name': 'tasks', 'display_name': 'Tasks', 'icon': 'fa-tasks'}
 ] %}
+
+<!-- Logger for Template Initialization -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  log("info", "_navbar.html", "init", "🚀 Template _navbar.html loaded");
+  log("debug", "_navbar.html", "context", "📦 nav_items loaded", {{ nav_items | tojson | safe }});
+  log("debug", "_navbar.html", "context", "🔎 request.endpoint", {{ request.endpoint | tojson | safe }});
+  log("debug", "_navbar.html", "context", "🧑 current_user.is_authenticated", {{ current_user.is_authenticated | tojson | safe }});
+  log("debug", "_navbar.html", "context", "🧑 current_user.name", {{ (current_user.name if current_user.is_authenticated else "Guest") | tojson | safe }});
+</script>
 
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top bg-white">
   <div class="container">
@@ -28,6 +84,7 @@
         {% for item in nav_items %}
           {% set endpoint = item.name + '.index' %}
           {% set is_active = request.endpoint and request.endpoint.startswith(item.name + '.') %}
+
           <li class="nav-item">
             <a class="nav-link {% if is_active %}active{% endif %}"
                href="{{ url_for(endpoint) }}"
@@ -38,7 +95,14 @@
             </a>
           </li>
         {% endfor %}
-        {% block additional_nav_items %}{% endblock %}
+
+        {# Log block extension if it's being used #}
+        {% block additional_nav_items %}
+          <script type="module">
+            import log from "{{ url_for('static', filename='js/logger.js') }}";
+            log("info", "_navbar.html", "block", "🧩 Block 'additional_nav_items' overridden or included");
+          </script>
+        {% endblock %}
       </ul>
 
       <!-- Search Bar -->
@@ -113,13 +177,9 @@
   </div>
 </nav>
 
-<!-- Logger for Navigation Context -->
+<!-- Final Debug Logger -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 
-  const navItems = {{ nav_items | tojson | safe }};
-  const currentEndpoint = {{ request.endpoint | tojson | safe }};
-
-  log("info", "_navbar.html", "navigation", "📍 Current endpoint", currentEndpoint);
-  log("debug", "_navbar.html", "navigation", "🧭 Navigation items loaded", navItems);
+  log("info", "_navbar.html", "final", "✅ Navbar rendered successfully");
 </script>
