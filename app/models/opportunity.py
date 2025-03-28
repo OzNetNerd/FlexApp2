@@ -37,7 +37,7 @@ class Opportunity(BaseModel):
     )
 
     __field_order__ = {
-        "Opportunity Info": [
+        "Opportunity": [
             {
                 "name": "name",
                 "label": "Name",
