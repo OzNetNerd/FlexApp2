@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 from dataclasses import dataclass, field
 
@@ -36,6 +36,8 @@ class TabEntry:
     type: str
     required: bool = False
     readonly: bool = False
+    options: Optional[List[dict[str, Any]]] = None
+    default: Optional[Any] = None
 
 @dataclass
 class TabSection:

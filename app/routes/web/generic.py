@@ -11,7 +11,7 @@ from app.routes.base.components.json_validator import JSONValidator
 from app.routes.base.components.request_logger import RequestLogger
 from app.routes.base.components.table_config_manager import TableConfigManager
 from app.routes.base.components.data_route_handler import DataRouteHandler
-from app.routes.base.components.form_handler import FormHandler, ResourceContext
+from app.routes.base.components.form_handler import FormHandler, ResourceContext, IndexContext
 from app.routes.base.components.item_manager import ItemManager
 from app.models import Company, CRISPScore, Note
 
@@ -129,16 +129,16 @@ class GenericWebRoutes(CRUDRoutesBase):
             dict: A dictionary with context data for the index page.
         """
         data_url = self._determine_data_url()
-        return {
-            "page_type": "index",
-            "title": f"{self.model.__name__}s",
-            "table_config": table_config,
-            "table_id": f"{self.model.__tablename__}_table",
-            "data_url": data_url,
-            "entity_name": self.model.__name__,
-            "add_url": url_for(f"{self.blueprint.name}.create"),
-            "columns": table_config.get("columns", []),
-        }
+        return IndexContext(
+            page_type="index",
+            title=f"{self.model.__name__}s",
+            table_config=table_config,
+            table_id=f"{self.model.__tablename__}_table",
+            data_url=data_url,
+            entity_name=self.model.__name__,
+            add_url=url_for(f"{self.blueprint.name}.create"),
+            columns=table_config.get("columns", []),
+        )
 
     def _index_route(self):
         """Handles requests to the index route.

@@ -48,7 +48,9 @@ def render_safely(
         if current_app.debug:
             logger.debug(f"Traceback:\n{traceback.format_exc()}")
 
+        print(f'error message: {context}')
         context.error_message = f"{error_type}: {details}" if current_app.debug else fallback_error_message
+        print(f'error message: {context}')
 
         try:
             logger.debug(f"🔁 Fallback render attempt for: {template_name}")
