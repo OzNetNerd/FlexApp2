@@ -111,7 +111,7 @@
       {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
     ].filter(Boolean)
   };
-  log("info", "entity_page.html", "pageRender", context); // Log the object directly!
+  log("info", "entity_page.html", "pageRender", JSON.stringify(context)); // Removed the space argument from stringify
 </script>
 
     {# Modal for Deletion Confirmation (only shown if `item` exists) #}

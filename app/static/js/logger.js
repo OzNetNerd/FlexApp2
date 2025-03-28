@@ -51,8 +51,7 @@ export default function log(level, scriptName, functionName, message, data) {
                 const strValue = Object.values(processedData).join('');
                 console[level](`${baseMessage} ${strValue}`, levelStyle, resetStyle);
             } else {
-                // Use console.dir for object logging to enable collapsible view
-                console.dir(`${timestamp} ${coloredLevel} ${contextLabel}:`, processedData);
+                console[level](baseMessage, levelStyle, resetStyle, processedData);
             }
         } catch (error) {
             console[level](`${baseMessage} (Unprintable object)`, levelStyle, resetStyle);
