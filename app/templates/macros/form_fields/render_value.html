@@ -34,12 +34,17 @@
     const filename = "render_value.html";
     const fieldName = {{ (field.name or 'unnamed') | tojson | safe }};
     const valueType = {{ (field.value.__class__.__name__ if field.value is not none else 'None') | tojson | safe }};
-    const valueStr = {{ (field.value if field.value is not none else 'null') | tojson | safe }};
+    const valueStr = {{ field.value | default('null') | tojson | safe }};
 
     log("debug", filename, "render_value", `🪪 Rendering value for field '${fieldName}'`);
     log("debug", filename, "render_value", "📦 Type", valueType);
     log("debug", filename, "render_value", "🔢 Value", valueStr);
   </script>
+
+log("debug", filename, "render_value", "Field Object: ", {{ field  }})
+log("debug", filename, "render_value", "Field Value: ", {{ field.value }})
+
+
 
   {% if field.value is none %}
     <span class="text-muted fst-italic">None</span>
@@ -63,4 +68,3 @@
     {{ field.value }}
   {% endif %}
 {% endmacro %}
-
