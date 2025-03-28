@@ -8,10 +8,9 @@
   {% else %}
     <i class="fas fa-plus-circle me-2"></i>
   {% endif %}
-  {{ title }}
+  {{ title }} {{ model_name }}: <span class="text-info">{{ item_name }}</span>
 </h3>
 
-
-{% if fields %}
+{% if tabs %}
   {% include 'pages/form/_pills_nav.html' %}
 {% endif %}

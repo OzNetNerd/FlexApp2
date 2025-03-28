@@ -3,58 +3,37 @@
   File: _pills_nav.html
   Purpose:
     Renders Bootstrap pill-style navigation and tab content areas based on
-    the `tab` attribute of fields defined in `__field_order__`.
+    a `tabs` variable containing Tab objects with sections and entries.
 
-  Inputs (expected in context):
-    - fields : OrderedDict mapping section names to lists of fields.
-               Each field can optionally define a `tab` attribute.
-               Used to group fields by tab labels.
+  Inputs:
+    - tabs: list of Tab objects with:
+        - tab_name: str
+        - sections: list of TabSection, each with:
+            - section_name: str
+            - entries: list of TabEntry, each with:
+                - entry_name, label, type, required, readonly
 
-  Output:
-    - If more than one unique tab is found:
-        • Renders a pill-style tab navigation group
-        • Renders corresponding tab panes for each tab group
-        • Displays each rendered field inside its respective tab pane
-
-  Example:
-    {% include 'pages/form/_pills_nav.html' %}
-
-  Notes:
-    - Requires `macros.render_field` to be available (typically from form_fields.html).
-    - IDs are normalized using lowercase and dashes for Bootstrap compatibility.
-    - Assumes Bootstrap 5 tab behavior and requires Bootstrap JS.
+  Requirements:
+    - macros.render_field must be available
+    - Bootstrap 5 required for tabs
   ------------------------------------------------------------------------------
 #}
 
 {% import "macros/form_fields/render_field.html" as macros %}
 
-{% set tabs = {} %}
-{% for section, group_fields in fields.items() %}
-  {% for field in group_fields %}
-    {% set tab = field.tab or 'Other' %}
-    {% if tab not in tabs %}
-      {% set _ = tabs.update({tab: []}) %}
-    {% endif %}
-    {% set field = field.copy() %}
-    {% set _ = field.update({'_section': section}) %}
-    {% set _ = tabs[tab].append(field) %}
-  {% endfor %}
-{% endfor %}
-
-
 {% if tabs|length > 1 %}
-    <div class="btn-group" role="tablist">
-      {% for tab in tabs.keys() %}
-        <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
-                id="tab-{{ tab | lower | replace(' ', '-') }}-tab"
-                data-bs-toggle="pill"
-                data-bs-target="#tab-{{ tab | lower | replace(' ', '-') }}"
-                type="button"
-                role="tab"
-                aria-controls="tab-{{ tab | lower | replace(' ', '-') }}"
-                aria-selected="{{ 'true' if loop.first else 'false' }}">
-          {{ tab }}
-        </button>
-      {% endfor %}
-    </div>
+  <div class="btn-group mb-3" role="tablist">
+    {% for tab in tabs %}
+      <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
+              id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+              type="button"
+              role="tab"
+              aria-controls="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+              aria-selected="{{ 'true' if loop.first else 'false' }}">
+        {{ tab.tab_name }}
+      </button>
+    {% endfor %}
+  </div>
 {% endif %}

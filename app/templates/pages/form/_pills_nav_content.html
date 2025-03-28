@@ -1,0 +1,19 @@
+{% import "macros/form_fields/render_field.html" as macros %}
+
+<div class="tab-content">
+  {% for tab in tabs %}
+    <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+         id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+         role="tabpanel"
+         aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
+
+      {% for section in tab.sections %}
+        <h5 class="mt-3">{{ section.section_name }}</h5>
+        {% for entry in section.entries %}
+          {{ macros.render_field(entry) }}
+        {% endfor %}
+      {% endfor %}
+
+    </div>
+  {% endfor %}
+</div>
