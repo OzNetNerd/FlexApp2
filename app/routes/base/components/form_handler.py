@@ -4,6 +4,26 @@ from typing import Dict, List, Optional
 from flask_login import current_user
 from app.models import User
 
+from dataclasses import dataclass, field
+
+
+@dataclass
+class TabEntry:
+    entry_name: str
+    label: str
+    type: str
+    required: bool = False
+    readonly: bool = False
+
+@dataclass
+class TabSection:
+    section_name: str
+    entries: List[TabEntry] = field(default_factory=list)
+
+@dataclass
+class Tab:
+    tab_name: str
+    sections: List[TabSection] = field(default_factory=list)
 
 
 logger = logging.getLogger(__name__)
@@ -71,7 +91,6 @@ class FormHandler:
             the value is a list of field definitions (with metadata and resolved values).
         """
         grouped_fields = defaultdict(list)
-        field_definitions = self._validate_and_log_field_order()
         required_keys = {"name", "type", "label"}
 
         for section, section_fields in field_definitions.items():

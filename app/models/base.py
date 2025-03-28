@@ -2,11 +2,11 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 import logging
 
+
 logger = logging.getLogger(__name__)
 
 # Initialize SQLAlchemy instance to be shared across models
 db = SQLAlchemy()
-
 
 class BaseModel(db.Model):
     """Base model class for all CRM entities.

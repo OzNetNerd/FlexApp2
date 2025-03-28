@@ -1,27 +1,8 @@
 import logging
-from typing import List
-from dataclasses import dataclass, field
 from app.models.base import db, BaseModel
+from app.routes.base.components.form_handler import Tab, TabSection, TabEntry
 
 logger = logging.getLogger(__name__)
-
-@dataclass
-class TabEntry:
-    entry_name: str
-    label: str
-    type: str
-    required: bool = False
-    readonly: bool = False
-
-@dataclass
-class TabSection:
-    section_name: str
-    entries: List[TabEntry] = field(default_factory=list)
-
-@dataclass
-class Tab:
-    tab_name: str
-    sections: List[TabSection] = field(default_factory=list)
 
 
 class Opportunity(BaseModel):

@@ -1,7 +1,7 @@
 import logging
-from sqlalchemy.orm import foreign
 from app.models.base import db, BaseModel
 from app.models.note import Note
+from app.routes.base.components.form_handler import Tab, TabSection, TabEntry
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,6 @@ class Company(BaseModel):
         opportunities (list[Opportunity]): Related opportunities.
         notes (list[Note]): Notes linked via polymorphic relationship.
         company_capabilities (list[CompanyCapability]): Capabilities offered.
-        __field_order__ (list[dict]): UI metadata for rendering forms.
     """
 
     __tablename__ = "companies"
@@ -42,6 +41,25 @@ class Company(BaseModel):
         lazy="dynamic",
     )
 
+    # Company Details section
+    company_details_section = TabSection(section_name="Company Details", entries=[
+        TabEntry(entry_name="name", label="Name", type="text", required=True),
+        TabEntry(entry_name="description", label="Description", type="text"),
+    ])
+
+    # CRISP Score section
+    crisp_score_section = TabSection(section_name="CRISP Score", entries=[
+        TabEntry(entry_name="crisp", label="CRISP", type="custom"),
+    ])
+
+    # About tab
+    about_tab = Tab(tab_name="About", sections=[company_details_section])
+
+    # Insights tab
+    insights_tab = Tab(tab_name="Insights", sections=[crisp_score_section])
+
+    __tabs__ = [about_tab, insights_tab]
+
     @property
     def capabilities(self) -> list:
         """Get all capabilities associated with this company.
@@ -62,35 +80,6 @@ class Company(BaseModel):
         if not scores:
             return None
         return round(sum(scores) / len(scores), 2)
-
-    __field_order__ = {
-        "Company Details": [
-            {
-                "name": "name",
-                "label": "Name",
-                "type": "text",
-                "tab": "About",
-                "section": "Company Details",
-                "required": True,
-            },
-            {
-                "name": "description",
-                "label": "Description",
-                "type": "text",
-                "tab": "About",
-                "section": "Company Details",
-            },
-        ],
-        "CRISP Score": [
-            {
-                "name": "crisp",
-                "label": "CRISP",
-                "type": "custom",
-                "tab": "Insights",
-                "section": "CRISP Score",
-            },
-        ],
-    }
 
     def __repr__(self) -> str:
         """String representation for debugging.
