@@ -88,42 +88,31 @@
       </div>
     </main>
 
-    <!-- Bootstrap JS (required for modals, dropdowns, etc.) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Auto Complete Lookup Input Script -->
     <script type="module" src="{{ url_for('static', filename='js/autoComplete.js') }}"></script>
 
-    <!-- Tab Switching Logic -->
     <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
 
-<!-- Logger to Output Context Information -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
   const context = {
-    message: "📝 Entity page context loaded",
     title: {{ title | tojson }},
     readOnly: {{ read_only | tojson }},
     hasItem: {{ (item is defined and item is not none) | tojson }},
-    layout: {{ ("Tabbed" if tabs else "Sectioned") | tojson }}
+    layout: {{ ("Tabbed" if tabs else "Sectioned") | tojson }},
+    includes: [
+      "form/_header.html",
+      "form/_buttons.html",
+      "base/common/_toasts.html",
+      {% if tabs %}"form/_pills_nav_content.html",{% else %}"base/common/_section_layout.html",{% endif %}
+      {% if not read_only %}"form/_autocomplete.html",{% endif %}
+      {% if not read_only %}"form/_form_footer.html",{% endif %}
+      {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
+    ].filter(Boolean)
   };
-  log("info", "entity_page.html", "DOMContentLoaded", context);
-  const includes = [
-    "form/_header.html",
-    "form/_buttons.html",
-    "base/common/_toasts.html",
-    {% if tabs %}"form/_pills_nav_content.html",{% else %}"base/common/_section_layout.html",{% endif %}
-    {% if not read_only %}"form/_autocomplete.html",{% endif %}
-    {% if not read_only %}"form/_form_footer.html",{% endif %}
-    {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
-  ].filter(Boolean);
-  log("info", "entity_page.html", "includes", {
-    message: "🧩 Includes",
-    files: includes
-  });
+  log("info", "entity_page.html", "pageRender", context); // Log the object directly!
 </script>
-
-
 
     {# Modal for Deletion Confirmation (only shown if `item` exists) #}
     {% if item %}
