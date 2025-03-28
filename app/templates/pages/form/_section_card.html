@@ -30,3 +30,18 @@
     </div>
   </div>
 </div>
+
+<!-- Logging for Section Card -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const sectionName = {{ (_section or 'General') | tojson | safe }};
+  const fieldCount = {{ _section_fields | length }};
+  const isReadOnly = {{ read_only | tojson | safe }};
+
+  log("info", "_section_card.html", "render", "📦 Section rendered", {
+    section: sectionName,
+    fieldCount: fieldCount,
+    readOnly: isReadOnly
+  });
+</script>

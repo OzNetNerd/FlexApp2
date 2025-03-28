@@ -77,4 +77,28 @@
     </form>
   </div>
 </div>
+
+<!-- Logging for Edit Page Context -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const editContext = {
+    mode: {{ "'edit'" if item else "'create'" }},
+    entityId: {{ item.id if item else 'null' }},
+    title: {{ title | tojson | safe }},
+    cancelDestination: {{ "'view'" if item else "'index'" }},
+    fieldCount: {{ fields | length }},
+    fields: [
+      {% for field in fields %}
+        {
+          name: {{ field.name | tojson }},
+          type: {{ field.type | tojson }},
+          readonly: {{ field.readonly | default(false) | tojson }}
+        }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  };
+
+  log("info", "edit.html", "render", "📝 Edit form initialized", editContext);
+</script>
 {% endblock %}

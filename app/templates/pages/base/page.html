@@ -72,9 +72,16 @@
     <script type="module" src="{{ url_for('static', filename='js/table.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/autoComplete.js') }}"></script>
 
-    <!-- Future Enhancements (currently disabled) -->
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
-    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script> -->
+    <!-- Logging Context Info -->
+    <script type="module">
+      import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+      const tableId = {{ table_id | tojson | safe }};
+      const dataUrl = {{ data_url | tojson | safe }};
+
+      log("info", "page.html", "DOMContentLoaded", "🔍 Table ID loaded", tableId);
+      log("info", "page.html", "DOMContentLoaded", "📡 Data URL loaded", dataUrl);
+    </script>
 
     {% block extra_scripts %}{% endblock %}
   </body>

@@ -11,14 +11,14 @@ import logging
 import traceback
 from flask import render_template, current_app, request
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
-from app.routes.base.components.form_handler import Context
+from app.routes.base.components.form_handler import ResourceContext, IndexContext
 
 logger = logging.getLogger(__name__)
 
 
 def render_safely(
     template_name: str,
-    context: Context,
+    context: ResourceContext,
     fallback_error_message: str = "An error occurred while rendering the page",
     endpoint_name: str = None,
 ):

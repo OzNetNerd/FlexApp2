@@ -1,40 +1,3 @@
-{#
-  ------------------------------------------------------------------------------
-  File: pages/form/_autocomplete.html
-
-  Purpose:
-    Renders autocomplete-enabled input fields for selecting users and companies.
-    These inputs are intended to be enhanced by JavaScript (e.g. Tagify or AJAX)
-    to provide dynamic search and selection functionality.
-
-  Inputs (expected in context):
-    - item.users      : List of user objects (optional, for editing forms)
-    - item.company    : Company object (optional, for editing forms)
-
-  Output:
-    - "Users" input field:
-        • Text input with ID `users-input`
-        • Placeholder text for user search
-        • `data-initial` JSON-encoded list of selected user IDs (for edit mode)
-
-    - "Company" input field:
-        • Text input with ID `companies-input`
-        • Placeholder text for company search
-        • `data-initial` array containing one selected company ID (or empty)
-
-  Example:
-    {% include 'pages/form/_autocomplete.html' %}
-
-  JavaScript Integration:
-    These fields are expected to be enhanced by JavaScript to provide
-    autocomplete behavior, e.g.:
-      - Listening to input events
-      - Fetching suggestions via API
-      - Managing selection and updates to a hidden form field
-
-  ------------------------------------------------------------------------------
-#}
-
 <!-- Autocomplete Fields -->
 <div class="mb-3">
   <label for="users-input" class="form-label">Users</label>
@@ -57,3 +20,24 @@
     data-initial='[{{ item.company.id if item and item.company else "" }}]'
   >
 </div>
+
+<!-- Autocomplete Field Logging -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const usersInitial = document.getElementById("users-input")?.dataset.initial || "[]";
+    const companiesInitial = document.getElementById("companies-input")?.dataset.initial || "[]";
+
+    let parsedUsers, parsedCompany;
+    try {
+      parsedUsers = JSON.parse(usersInitial);
+      parsedCompany = JSON.parse(companiesInitial);
+    } catch (e) {
+      log("error", "_autocomplete.html", "parse", "❌ Failed to parse initial values", e);
+    }
+
+    log("info", "_autocomplete.html", "init", "👥 Initial user IDs", parsedUsers);
+    log("info", "_autocomplete.html", "init", "🏢 Initial company ID", parsedCompany);
+  });
+</script>

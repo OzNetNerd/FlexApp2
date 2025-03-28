@@ -1,24 +1,3 @@
-{#
-  ------------------------------------------------------------------------------
-  File: _pills_nav.html
-  Purpose:
-    Renders Bootstrap pill-style navigation and tab content areas based on
-    a `tabs` variable containing Tab objects with sections and entries.
-
-  Inputs:
-    - tabs: list of Tab objects with:
-        - tab_name: str
-        - sections: list of TabSection, each with:
-            - section_name: str
-            - entries: list of TabEntry, each with:
-                - entry_name, label, type, required, readonly
-
-  Requirements:
-    - macros.render_field must be available
-    - Bootstrap 5 required for tabs
-  ------------------------------------------------------------------------------
-#}
-
 {% import "macros/form_fields/render_field.html" as macros %}
 
 {% if tabs|length > 1 %}
@@ -37,3 +16,17 @@
     {% endfor %}
   </div>
 {% endif %}
+
+<!-- Logging for Pills Nav -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const tabs = {{ tabs | map(attribute='tab_name') | list | tojson | safe }};
+  const sectionCounts = {{ tabs | map(attribute='sections') | map('length') | list | tojson | safe }};
+
+  log("info", "_pills_nav.html", "render", "📑 Tab navigation rendered", {
+    totalTabs: tabs.length,
+    tabs,
+    sectionCounts
+  });
+</script>

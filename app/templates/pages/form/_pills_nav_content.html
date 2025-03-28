@@ -17,3 +17,25 @@
     </div>
   {% endfor %}
 </div>
+
+<!-- Logging for Tab Content Rendering -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const tabSummary = {{ tabs | map(attribute='tab_name') | list | tojson | safe }};
+  const sectionDetails = [
+    {% for tab in tabs %}
+      {
+        tab: {{ tab.tab_name | tojson | safe }},
+        sectionCount: {{ tab.sections | length }},
+        totalEntries: {{ tab.sections | sum(attribute='entries' | length) }}
+      }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  log("info", "_pills_nav_content.html", "render", "🗂️ Tab panes rendered", {
+    totalTabs: tabSummary.length,
+    tabNames: tabSummary,
+    sectionDetails
+  });
+</script>

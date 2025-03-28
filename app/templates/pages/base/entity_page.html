@@ -5,33 +5,6 @@
     A standalone template for entity forms that doesn't require inheritance.
     Handles rendering of headers, buttons, tabbed field sections, autocomplete
     inputs, and the form footer.
-
-  Template Structure:
-    - Complete HTML document with all necessary structure
-    - Imports:
-        • macros/form_fields.html (for field rendering)
-    - Includes all necessary CSS and JS resources
-
-  Inputs (expected in context):
-    - title        : String. The title to display in the header.
-    - item         : Object (optional). Used to determine form mode (edit/view).
-    - read_only    : Boolean. True if rendering a view-only version of the form.
-    - fields       : List of field definitions with `tab` and `section` metadata.
-    - macros       : Macro namespace (typically `macros.field.render_field`).
-    - csrf_token() : Function to render CSRF token (in POST mode).
-    - show_navbar  : Optional Boolean. If False, skips navbar rendering.
-
-  Included Partials:
-    - pages/base/common/_head.html                → Head section with meta and CSS links
-    - pages/base/common/_navbar.html              → Navigation bar (conditionally shown)
-    - pages/base/common/_toasts.html              → Toast messages
-    - pages/form/_header.html                     → Displays the title and context-aware icon
-    - pages/form/_buttons.html                    → Renders edit/delete/create/cancel buttons
-    - pages/form/_tabs_and_sections.html          → Groups fields into tab/section layouts
-    - pages/base/common/_section_layout.html      → Fallback for unstructured fields
-    - pages/form/_form_autocomplete.html   → JavaScript-enhanced inputs
-    - pages/base/common/_form_footer.html         → Submit/cancel buttons for non-read-only
-
   ------------------------------------------------------------------------------
 #}
 {% import "macros/form_fields.html" as macros %}
@@ -68,13 +41,11 @@
 
           <div class="card-body">
             <form method="POST">
-              {# Render tab content only if 'tabs' is present; fallback to generic fields otherwise #}
               {% if tabs %}
                 {% include 'pages/form/_pills_nav_content.html' %}
               {% else %}
                 {% include 'pages/base/common/_section_layout.html' %}
               {% endif %}
-
 
               {% if not read_only %}
                 {% include 'pages/form/_autocomplete.html' %}
@@ -89,40 +60,45 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- AG Grid JS -->
-    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
-
-    <!-- AG Grid Init -->
-    <script type="module" src="{{ url_for('static', filename='js/table.js') }}"></script>
-
     <!-- Auto Complete Init -->
     <script type="module" src="{{ url_for('static', filename='js/autoComplete.js') }}"></script>
 
     <!-- Tabs JS -->
     <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
 
-  {% if item %}
-  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          Are you sure you want to delete this item?
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.delete', item_id=item.id) }}" class="btn btn-danger">
-            Delete
-          </a>
+    <!-- Custom Logger: Entity Page Context Debug -->
+    <script type="module">
+      import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+      const context = {
+        title: {{ title | tojson | safe }},
+        readOnly: {{ read_only | tojson | safe }},
+        hasItem: {{ 'true' if item else 'false' }}
+      };
+
+      log("info", "entity_page.html", "DOMContentLoaded", "📝 Page context loaded", context);
+    </script>
+
+    {% if item %}
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete this item?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.delete', item_id=item.id) }}" class="btn btn-danger">
+              Delete
+            </a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  {% endif %}
-
-
+    {% endif %}
   </body>
 </html>

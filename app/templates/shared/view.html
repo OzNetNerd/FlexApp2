@@ -32,7 +32,6 @@
       `data-bs-toggle="modal"` and `data-bs-target="#deleteModal"`).
     - Make sure `item` is defined in the context or the delete URL will break.
     - Use in conjunction with `_buttons.html` for edit/delete controls.
-
   ------------------------------------------------------------------------------
 #}
 
@@ -41,7 +40,6 @@
 
 {% block content %}
 {{ super() }}
-
 
 <div class="tab-content">
   {% for tab in tabs %}
@@ -60,4 +58,26 @@
     </div>
   {% endfor %}
 </div>
+
+<!-- Logging for View Page Context -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const viewContext = {
+    entityId: {{ item.id if item else 'null' }},
+    title: {{ title | default("null") | tojson | safe }},
+    totalTabs: {{ tabs | length }},
+    tabSummary: [
+      {% for tab in tabs %}
+        {
+          tab: {{ tab.tab_name | tojson }},
+          sections: {{ tab.sections | length }},
+          totalEntries: {{ tab.sections | sum(attribute='entries' | length) }}
+        }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  };
+
+  log("info", "view.html", "render", "🔍 View page initialized", viewContext);
+</script>
 {% endblock %}

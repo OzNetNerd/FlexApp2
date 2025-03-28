@@ -1,3 +1,20 @@
+{#
+  ------------------------------------------------------------------------------
+  File: create.html
+  Purpose:
+    Renders a form for creating a new entity with:
+      • A customizable title and submit button label
+      • Support for field rendering, autocomplete, and form footer
+
+  Inputs (expected in context):
+    - entity_name   : str (e.g. "Company", "Contact")
+    - title         : str (optional, defaults to "Create {entity_name}")
+    - button_text   : str (optional, defaults to "Create")
+    - fields        : list of field objects (may include section/tab metadata)
+    - error_message : str (optional, shows toast on error)
+  ------------------------------------------------------------------------------
+#}
+
 {% extends "pages/base/page.html" %}
 {% import "macros/form_fields.html" as macros %}
 
@@ -26,9 +43,27 @@
   {% if error_message %}
     <script type="module">
       import { showToast } from "/static/js/toasts.js";
+      import log from "/static/js/logger.js";
+
       document.addEventListener('DOMContentLoaded', () => {
-        showToast({{ ("Error creating " ~ entity_name ~ ": " ~ error_message) | tojson }}, "error");
+        const message = {{ ("Error creating " ~ entity_name ~ ": " ~ error_message) | tojson }};
+        showToast(message, "error");
+        log("error", "create.html", "form_init", "❌ Error on create page", message);
       });
     </script>
   {% endif %}
+
+  <!-- Render Context Logging -->
+  <script type="module">
+    import log from "/static/js/logger.js";
+
+    const context = {
+      title: {{ title | tojson | safe }},
+      entity: {{ entity_name | tojson | safe }},
+      buttonText: {{ button_text | tojson | safe }},
+      fieldCount: {{ fields | length }}
+    };
+
+    log("info", "create.html", "render", "📋 Create page initialized", context);
+  </script>
 {% endblock %}

@@ -14,3 +14,19 @@
 {% if tabs %}
   {% include 'pages/form/_pills_nav.html' %}
 {% endif %}
+
+<!-- Logging for Form Header -->
+<script type="module">
+  import log from "/static/js/logger.js";
+
+  const context = {
+    title: {{ title | tojson }},
+    modelName: {{ model_name | tojson }},
+    itemName: {{ item_name | tojson }},
+    mode: {{ ("read-only" if read_only else ("edit" if item else "create")) | tojson }},
+    tabsPresent: {{ (tabs is defined and tabs) | tojson }}
+  };
+
+  log("info", "_header.html", "render", "🧩 Header context", context);
+</script>
+

@@ -57,4 +57,18 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
+
+<!-- 🔍 Logging with logger.js -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const title = {{ title | tojson | safe }};
+  const entityName = {{ entity_name | tojson | safe }};
+  const dataUrl = document.getElementById('table-container')?.dataset.apiUrl;
+
+  log("info", "table.html", "render", "📄 Page title", title);
+  log("info", "table.html", "render", "📦 Entity name", entityName);
+  log("info", "table.html", "render", "📡 Data API URL", dataUrl);
+  log("debug", "table.html", "render", "✅ DOM content fully loaded");
+</script>
 {% endblock %}

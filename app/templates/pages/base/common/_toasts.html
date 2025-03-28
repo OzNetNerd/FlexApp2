@@ -14,8 +14,13 @@
   {% for category, message in messages %}
     <script type="module">
       import { showToast } from "{{ url_for('static', filename='js/toasts.js') }}";
+      import log from "{{ url_for('static', filename='js/logger.js') }}";
+
       document.addEventListener('DOMContentLoaded', () => {
-        showToast("{{ message | escape }}", "{{ category or 'success' }}");
+        const category = {{ category | tojson | safe }};
+        const message = {{ message | tojson | safe }};
+        showToast(message, category);
+        log("info", "_toast.html", "toast", "📢 Flash message shown", { category, message });
       });
     </script>
   {% endfor %}
@@ -24,8 +29,12 @@
 {% if template_render_error %}
   <script type="module">
     import { showToast } from "{{ url_for('static', filename='js/toasts.js') }}";
+    import log from "{{ url_for('static', filename='js/logger.js') }}";
+
     document.addEventListener('DOMContentLoaded', () => {
-      showToast("{{ template_render_error | escape }}", "danger");
+      const errorMessage = {{ template_render_error | tojson | safe }};
+      showToast(errorMessage, "danger");
+      log("error", "_toast.html", "template_renderer", "❌ Template render error", errorMessage);
     });
   </script>
 {% endif %}

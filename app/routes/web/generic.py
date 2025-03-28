@@ -11,7 +11,7 @@ from app.routes.base.components.json_validator import JSONValidator
 from app.routes.base.components.request_logger import RequestLogger
 from app.routes.base.components.table_config_manager import TableConfigManager
 from app.routes.base.components.data_route_handler import DataRouteHandler
-from app.routes.base.components.form_handler import FormHandler, Context
+from app.routes.base.components.form_handler import FormHandler, ResourceContext
 from app.routes.base.components.item_manager import ItemManager
 from app.models import Company, CRISPScore, Note
 
@@ -119,7 +119,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         """
         return f"{self.api_url_prefix}/{self.model.__tablename__}" if self.api_url_prefix else url_for(f"{self.blueprint.name}.data")
 
-    def _prepare_index_context(self, table_config: dict) -> dict:
+    def _prepare_page_index_context(self, table_config: dict) -> dict:
         """Prepares the context for the index page.
 
         Args:
@@ -151,7 +151,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         """
         self.request_logger.log_request_info(self.model.__name__, "index")
         table_config = self.table_config_manager.get_table_config(self.model.__tablename__)
-        context = self._prepare_index_context(table_config)
+        context = self._prepare_page_index_context(table_config)
         logger.debug(f"Rendering index template: {self.index_template}")
         return render_safely(self.index_template, context, f"Error rendering {self.model.__name__} index")
 
@@ -200,7 +200,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             logger.debug(f"POST request received for item with ID {item_id}. Handling view post.")
             return self._handle_view_post(item)
 
-        context = Context(
+        resource_contex = ResourceContext(
             title="Viewing",
             model_name=self.model.__name__,
             item_name=self._get_item_display_name(item),
@@ -213,7 +213,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         )
 
         logger.debug(f"Rendering view template: {self.view_template}")
-        return render_safely(self.view_template, context, f"Error viewing {self.model.__name__} with id {item_id}")
+        return render_safely(self.view_template, resource_contex, f"Error viewing {self.model.__name__} with id {item_id}")
 
     def _handle_view_post(self, item):
         """Processes POST requests on the view route to add a note.

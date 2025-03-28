@@ -1,37 +1,3 @@
-{#
-  ------------------------------------------------------------------------------
-  File: _buttons.html
-  Purpose:
-    Renders context-aware action buttons (Cancel, Add, Edit, Delete, Back)
-    for a form header area. The visibility and behavior of these buttons
-    depend on whether the form is in read-only or edit mode, and whether
-    an existing item is being viewed.
-
-  Inputs (expected in context):
-    - item       : Object (optional). If present, indicates view/edit mode.
-    - read_only  : Boolean. True if the form is in read-only display mode.
-    - request    : Flask request context object (for determining current route).
-
-  Output:
-    - If `item` exists and `read_only` is False:
-        • Cancel button → goes to item view page (`*.view`)
-
-    - If `item` exists and `read_only` is True:
-        • Add button    → goes to item creation page (`*.create`)
-        • Edit button   → goes to item edit page (`*.edit`)
-        • Delete button → opens a Bootstrap modal (`#deleteModal`)
-        • Back button   → goes to item index page (`*.index`)
-
-  Example:
-    {% include 'pages/form/_buttons.html' %}
-
-  Notes:
-    - This block is typically included in the form header.
-    - The modal trigger assumes a modal with `id="deleteModal"` exists elsewhere on the page.
-
-  ------------------------------------------------------------------------------
-#}
-
 <div class="d-flex justify-content-end align-items-center gap-2">
   {% if item and not read_only %}
     <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}"
@@ -56,3 +22,21 @@
     </a>
   {% endif %}
 </div>
+
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const context = {
+    hasItem: {{ 'true' if item else 'false' }},
+    readOnly: {{ read_only | tojson | safe }},
+    buttons: []
+  };
+
+  if (context.hasItem && !context.readOnly) {
+    context.buttons.push("Cancel");
+  } else if (context.hasItem && context.readOnly) {
+    context.buttons.push("Add", "Edit", "Delete", "Back");
+  }
+
+  log("info", "_buttons.html", "render", "🔘 Button render context", context);
+</script>

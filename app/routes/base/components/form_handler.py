@@ -1,10 +1,22 @@
 import logging
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from dataclasses import dataclass, field
 
 @dataclass
-class Context:
+class IndexContext:
+    page_type: str
+    title: str
+    table_config: dict
+    table_id: str
+    data_url: str
+    entity_name: str
+    add_url: str
+    columns: list[Any]
+
+
+@dataclass
+class ResourceContext:
     title: str
     model_name: str
     item_name: str

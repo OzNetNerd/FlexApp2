@@ -1,31 +1,3 @@
-{#
-  ------------------------------------------------------------------------------
-  File: pages/form/_footer.html
-  Purpose:
-    Renders the form footer with a dynamic Cancel and Submit button layout.
-    This template adapts to whether the form is creating a new item or editing
-    an existing one based on the presence of `item`.
-
-  Inputs (expected in context):
-    - item         : Object (optional). If present, assumed to be editing.
-    - button_text  : String (optional). Overrides default submit button text.
-    - request      : Flask request context object (for determining current route).
-
-  Output:
-    - Cancel button:
-        • Redirects to the 'view' page if editing (`*.view` with item_id)
-        • Redirects to the 'index' page if creating
-    - Submit button:
-        • Style: 'success' (green) for editing, 'primary' (blue) for creating
-        • Icon : 'save' icon for editing, 'plus-circle' icon for creating
-        • Label: 'Save Changes' or 'Create', unless overridden by `button_text`
-
-  Example:
-    {% include 'pages/base/common/_footer.html' %}
-
-  ------------------------------------------------------------------------------
-#}
-
 <div class="d-flex justify-content-end mt-4">
   <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + ('.view' if item else '.index'), item_id=item.id if item else None) }}"
      class="btn btn-secondary bg-opacity-75 fw-semibold text-white me-2">
@@ -36,3 +8,19 @@
     {{ button_text or ('Save Changes' if item else 'Create') }}
   </button>
 </div>
+
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const context = {
+    mode: {{ "'edit'" if item else "'create'" }},
+    cancelTarget: {{ ("'view'" if item else "'index'") }},
+    submit: {
+      style: {{ "'success'" if item else "'primary'" }},
+      icon: {{ "'save'" if item else "'plus-circle'" }},
+      label: {{ (button_text or ('Save Changes' if item else 'Create')) | tojson | safe }}
+    }
+  };
+
+  log("info", "_footer.html", "render", "🦶 Footer render context", context);
+</script>

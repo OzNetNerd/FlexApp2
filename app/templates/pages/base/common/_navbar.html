@@ -6,7 +6,6 @@
   {'name': 'tasks', 'display_name': 'Tasks', 'icon': 'fa-tasks'}
 ] %}
 
-
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top bg-white">
   <div class="container">
     <!-- Logo and Brand -->
@@ -113,3 +112,14 @@
     </div>
   </div>
 </nav>
+
+<!-- Logger for Navigation Context -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const navItems = {{ nav_items | tojson | safe }};
+  const currentEndpoint = {{ request.endpoint | tojson | safe }};
+
+  log("info", "_navbar.html", "navigation", "📍 Current endpoint", currentEndpoint);
+  log("debug", "_navbar.html", "navigation", "🧭 Navigation items loaded", navItems);
+</script>

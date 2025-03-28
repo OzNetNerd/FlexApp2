@@ -1,36 +1,3 @@
-{#
-  ------------------------------------------------------------------------------
-  File: old_readonly_summary.html
-  Purpose:
-    Displays a read-only summary of selected fields when viewing an existing item.
-    Specifically shows associated users and company in a stylized plaintext format.
-
-  Inputs (expected in context):
-    - item            : Object. Should have:
-        • item.users    : List of user objects (each with an `email` attribute)
-        • item.company  : Object with a `name` attribute
-
-  Output:
-    - Bootstrap-formatted, read-only `<div>` blocks showing:
-        • A comma-separated list of user emails
-        • The associated company name
-    - Falls back to an em dash (`—`) if values are missing
-
-  Styling:
-    - Values are wrapped in a `<span>` with:
-        • `text-success` for green text
-        • `fw-semibold` for medium-bold weight
-
-  Example:
-    {% include 'pages/form/old_readonly_summary.html' %}
-
-  Notes:
-    - Use in read-only views to display relational summary data clearly.
-    - Consider replacing this with a dynamic component if more flexibility is needed.
-
-  ------------------------------------------------------------------------------
-#}
-
 <div class="mb-3">
   <label class="form-label">Users</label>
   <p class="form-control-plaintext">
@@ -48,3 +15,13 @@
     </span>
   </p>
 </div>
+
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const userEmails = {{ item.users | map(attribute='email') | list | tojson | safe }};
+  const companyName = {{ item.company.name | tojson | safe if item.company else '"—"' }};
+
+  log("info", "old_readonly_summary.html", "render", "👥 User summary", userEmails.length ? userEmails : "—");
+  log("info", "old_readonly_summary.html", "render", "🏢 Company summary", companyName);
+</script>

@@ -100,4 +100,21 @@
     </form>
   </div>
 </div>
+
+<!-- Logging Script -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  log("info", "form_page.html", "render", "🧾 Title", {{ title | tojson | safe }});
+  log("info", "form_page.html", "render", "👁️ Read-only mode", {{ read_only | tojson | safe }});
+  log("info", "form_page.html", "render", "🧩 Item present", {{ 'true' if item else 'false' }});
+
+  const tabs = {{ tabs.keys() | list | tojson | safe }};
+  log("info", "form_page.html", "tabs", "🗂️ Tabs detected", tabs);
+
+  {% for tab, tab_fields in tabs.items() %}
+    const sections_{{ loop.index }} = {{ tab_fields | map(attribute='section') | list | unique | tojson | safe }};
+    log("debug", "form_page.html", "tabs", "📁 Sections under tab: {{ tab }}", sections_{{ loop.index }});
+  {% endfor %}
+</script>
 {% endblock %}

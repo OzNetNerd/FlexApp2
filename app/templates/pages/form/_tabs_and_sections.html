@@ -56,3 +56,28 @@
     {% endfor %}
   {% endfor %}
 {% endif %}
+
+<!-- Logging for Tab and Section Structure -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const tabSummary = {
+    totalTabs: {{ tabs | length }},
+    tabNames: {{ tabs.keys() | list | tojson | safe }},
+    structure: [
+      {% for tab, tab_sections in tabs.items() %}
+        {
+          tab: {{ tab | tojson | safe }},
+          sectionCount: {{ tab_sections | length }},
+          fieldCounts: {
+            {% for section, section_fields in tab_sections.items() %}
+              {{ section | tojson }}: {{ section_fields | length }}{% if not loop.last %},{% endif %}
+            {% endfor %}
+          }
+        }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  };
+
+  log("info", "_tabs_and_sections.html", "render", "🧭 Tab/Section structure", tabSummary);
+</script>

@@ -53,3 +53,16 @@
     </div>
   {% endfor %}
 </div>
+
+<!-- Logger for Tabs and Sections -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const tabs = {{ tabs.keys() | list | tojson | safe }};
+  log("info", "_pills_nav_content.html", "tabs", "🧩 Tabs generated from field definitions", tabs);
+
+  {% for tab, tab_fields in tabs.items() %}
+    const sections_{{ loop.index }} = {{ tab_fields | map(attribute='section') | list | unique | tojson | safe }};
+    log("debug", "_pills_nav_content.html", "tabs", "📁 Sections under tab: {{ tab }}", sections_{{ loop.index }});
+  {% endfor %}
+</script>
