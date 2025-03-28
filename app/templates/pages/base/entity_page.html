@@ -2,18 +2,15 @@
   ------------------------------------------------------------------------------
   File: entity_page.html
   Purpose:
-    Serves as a generic, reusable base layout for create/edit/view entity forms.
+    A standalone template for entity forms that doesn't require inheritance.
     Handles rendering of headers, buttons, tabbed field sections, autocomplete
     inputs, and the form footer.
 
   Template Structure:
-    - Extends:
-        • pages/base/page.html
+    - Complete HTML document with all necessary structure
     - Imports:
-        • macros/form_fields.html (for use within included components)
-    - Blocks:
-        • content: Main form UI with header, fields, and buttons
-        • extra_scripts: Loads JS for tab behavior
+        • macros/form_fields.html (for field rendering)
+    - Includes all necessary CSS and JS resources
 
   Inputs (expected in context):
     - title        : String. The title to display in the header.
@@ -22,71 +19,88 @@
     - fields       : List of field definitions with `tab` and `section` metadata.
     - macros       : Macro namespace (typically `macros.field.render_field`).
     - csrf_token() : Function to render CSRF token (in POST mode).
+    - show_navbar  : Optional Boolean. If False, skips navbar rendering.
 
   Included Partials:
-    - pages/form/_header.html          → Displays the title and context-aware icon
-    - pages/form/_buttons.html         → Renders edit/delete/create/cancel buttons
-    - pages/form/_tabs_and_sections.html → Groups fields into tab/section layouts
-    - pages/base/common/_section_layout.html → Fallback for unstructured fields
-    - pages/base/common/_form_autocomplete.html → JavaScript-enhanced inputs
-    - pages/base/common/_form_footer.html → Submit/cancel buttons for non-read-only
-
-  Output:
-    - A responsive card-based form layout that dynamically adapts to:
-        • Read-only mode
-        • Create/edit mode
-        • Number of tabs/sections
-        • Presence of autocomplete fields
-
-  Example:
-    {% extends "pages/base/entity_page.html" %}
-
-  Notes:
-    - Requires Bootstrap 5 and supporting JS for tab behavior.
-    - Use `read_only` in the context to control the behavior of all child components.
-    - Fields must be structured with tab/section metadata for full functionality.
+    - pages/base/common/_head.html                → Head section with meta and CSS links
+    - pages/base/common/_navbar.html              → Navigation bar (conditionally shown)
+    - pages/base/common/_toasts.html              → Toast messages
+    - pages/form/_header.html                     → Displays the title and context-aware icon
+    - pages/form/_buttons.html                    → Renders edit/delete/create/cancel buttons
+    - pages/form/_tabs_and_sections.html          → Groups fields into tab/section layouts
+    - pages/base/common/_section_layout.html      → Fallback for unstructured fields
+    - pages/base/common/_form_autocomplete.html   → JavaScript-enhanced inputs
+    - pages/base/common/_form_footer.html         → Submit/cancel buttons for non-read-only
 
   ------------------------------------------------------------------------------
 #}
-
-{% extends "pages/base/page.html" %}
 {% import "macros/form_fields.html" as macros %}
+{% import "macros/form_fields/render_form.html" as form %}
+{% import "macros/form_fields/render_sections.html" as sections %}
+{% import "macros/form_fields/render_field.html" as field %}
+{% import "macros/form_fields/render_input.html" as input %}
+{% import "macros/form_fields/render_value.html" as value %}
 
-<p style="color:red">[DEBUG: entity_page.html loaded]</p>
+<!DOCTYPE html>
+<html lang="en">
+  {% include 'pages/base/common/_head.html' %}
+  <body>
+    {% include "pages/base/common/_toasts.html" %}
+    {% if show_navbar is not defined or show_navbar %}
+      {% include 'pages/base/common/_navbar.html' %}
+    {% endif %}
 
+    <main class="py-4">
+      <div class="container">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+              <div class="col">
+                <div class="d-flex align-items-center">
+                  {% include 'pages/form/_header.html' %}
+                </div>
+              </div>
+              <div class="col-auto">
+                {% include 'pages/form/_buttons.html' %}
+              </div>
+            </div>
+          </div>
 
-{% block content %}
-<div class="card border-0 shadow-sm">
-  <div class="card-header bg-white py-3">
-    <div class="row align-items-center">
-      <div class="col">
-        <div class="d-flex align-items-center">
-          {% include 'pages/form/_header.html' %}
+          <div class="card-body">
+            <form method="POST">
+              {% if fields %}
+                {% include 'pages/form/_tabs_and_sections.html' %}
+              {% else %}
+                {% include 'pages/base/common/_section_layout.html' %}
+              {% endif %}
+
+              {% if not read_only %}
+                {% include 'pages/base/common/_form_autocomplete.html' %}
+                {% include 'pages/base/common/_form_footer.html' %}
+              {% endif %}
+            </form>
+          </div>
         </div>
       </div>
-      <div class="col-auto">
-        {% include 'pages/form/_buttons.html' %}
-      </div>
-    </div>
-  </div>
+    </main>
 
-  <div class="card-body">
-    <form method="POST">
-      {% if fields %}
-        {% include 'pages/form/_tabs_and_sections.html' %}
-      {% else %}
-        {% include 'pages/base/common/_section_layout.html' %}
-      {% endif %}
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-      {% if not read_only %}
-        {% include 'pages/base/common/_form_autocomplete.html' %}
-        {% include 'pages/base/common/_form_footer.html' %}
-      {% endif %}
-    </form>
-  </div>
-</div>
-{% endblock %}
+    <!-- AG Grid JS -->
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
 
-{% block extra_scripts %}
-  <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
-{% endblock %}
+    <!-- AG Grid Init -->
+    <script type="module" src="{{ url_for('static', filename='js/table.js') }}"></script>
+
+    <!-- Auto Complete Init -->
+    <script type="module" src="{{ url_for('static', filename='js/autoComplete.js') }}"></script>
+
+    <!-- Tabs JS -->
+    <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
+
+    <!-- Tagify (commented out for future use) -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script> -->
+  </body>
+</html>

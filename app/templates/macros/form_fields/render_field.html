@@ -25,3 +25,6 @@
   </div>
 </div>
 {% endmacro %}
+
+{# Create the field namespace to match what _section_card.html expects #}
+{% set field = namespace(render_field=render_field) %}

@@ -82,9 +82,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         context = kwargs.get("context", {})
         context["companies"] = Company.query.order_by(Company.name).all()
         context["use_autocomplete"] = True
-        context["field_entries"] = self.model.__field_order__
-
-        return context
+        context["fields"] = self.model.__field_order__
 
         return context
 

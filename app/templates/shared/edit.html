@@ -24,8 +24,8 @@
 
   <div class="card-body">
     <form method="POST">
-      {# Render fields dynamically based on field_entries #}
-      {% for field in field_entries %}
+      {# Render fields dynamically based on fields #}
+      {% for field in fields %}
         <div class="form-group">
           <label for="{{ field.name }}">{{ field.label }}</label>
           {% if field.type == 'text' %}

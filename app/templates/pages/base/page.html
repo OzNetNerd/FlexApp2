@@ -2,56 +2,54 @@
   ------------------------------------------------------------------------------
   File: page.html
   Purpose:
-    This is the base HTML layout for all standard pages in the app. It includes
-    a standard HTML5 document structure, global JavaScript/CSS includes,
-    navigation, and common page layout blocks.
+    Base HTML layout for all standard pages in the application. Provides the
+    common HTML structure, global assets, and consistent layout components.
 
   Template Structure:
-    - Uses standard DOCTYPE and <html>/<body> structure
-    - Includes global head and navbar partials
-    - Defines page regions using `{% block %}` for content and footer
-    - Includes shared toast messages component
+    - Standard HTML5 document structure with proper DOCTYPE declaration
+    - Modular component inclusion through partials
+    - Flexible block regions for content customization
+    - Centralized JavaScript resource management
 
   Inputs (expected in context):
-    - show_navbar : Optional Boolean. If False, skips navbar rendering.
-    - Static assets:
-        • Bootstrap (via CDN)
-        • AG Grid
-        • Custom JS modules (table.js, autoComplete.js)
+    - show_navbar : Boolean (optional). Controls navbar visibility.
+                   If not provided or True, navbar will be shown.
+                   If False, navbar will be hidden.
+    - Any variables needed by included partials (_head.html, _navbar.html, etc.)
 
   Blocks:
-    - content : Main page content (inside a padded container)
-    - footer  : Optional footer block (empty by default)
+    - content : Primary content area within a responsive container
+                Child templates should override this block
+    - footer  : Optional footer region at the bottom of the page
+                Empty by default, can be overridden by child templates
+    - extra_scripts : Optional block for page-specific script inclusion
+                      (not currently defined, consider adding if needed)
 
   Included Partials:
-    - pages/base/common/_head.html       → Head section with meta and CSS links
-    - pages/base/common/_navbar.html     → Navigation bar (conditionally shown)
-    - pages/base/common/_toasts.html     → Toast messages
-    - JS modules:
-        • Bootstrap JS
-        • AG Grid (grid functionality)
-        • Table.js (custom table behavior)
-        • autoComplete.js (search/autocomplete logic)
+    - pages/base/common/_head.html    : Meta tags, title, CSS resources
+    - pages/base/common/_toasts.html  : Notification/alert system
+    - pages/base/common/_navbar.html  : Navigation header (conditional)
+
+  JavaScript Resources:
+    - Bootstrap 5.3.2 (from CDN)      : Core UI framework
+    - AG Grid (from CDN)              : Data grid component
+    - table.js (local)                : Custom table initialization
+    - autoComplete.js (local)         : Search/autocomplete functionality
 
   Example usage:
     {% extends "pages/base/page.html" %}
     {% block content %}
-      <h1>Hello, World!</h1>
+      <h1>Page Title</h1>
+      <p>Content goes here...</p>
     {% endblock %}
-
-  Notes:
-    - Serves as the primary layout extended by `entity_page.html` and others.
-    - Commented-out Tagify block included for future use.
 
   ------------------------------------------------------------------------------
 #}
-
 <!DOCTYPE html>
 <html lang="en">
   {% include 'pages/base/common/_head.html' %}
   <body>
     {% include "pages/base/common/_toasts.html" %}
-
     {% if show_navbar is not defined or show_navbar %}
       {% include 'pages/base/common/_navbar.html' %}
     {% endif %}
@@ -64,20 +62,20 @@
 
     {% block footer %}{% endblock %}
 
-    <!-- Bootstrap JS -->
+    <!-- Core JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- AG Grid JS -->
+    <!-- Data Grid -->
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
 
-    <!-- AG Grid Init -->
+    <!-- Custom Application Scripts -->
     <script type="module" src="{{ url_for('static', filename='js/table.js') }}"></script>
-
-        <!-- Auto Complete Init -->
     <script type="module" src="{{ url_for('static', filename='js/autoComplete.js') }}"></script>
 
-    <!-- Tagify -->
+    <!-- Future Enhancements (currently disabled) -->
     <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script> -->
+
+    {% block extra_scripts %}{% endblock %}
   </body>
 </html>

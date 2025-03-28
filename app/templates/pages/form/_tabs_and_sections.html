@@ -5,74 +5,51 @@
     Dynamically groups form fields by their `tab` and `section` metadata,
     and renders them accordingly using tabbed navigation (if more than one tab)
     or as stacked sections (if only one tab or none).
-
   Inputs (expected in context):
-    - field_entries : Dictionary with sections as keys, and a list of field objects
+    - fields : Dictionary with sections as keys, and a list of field objects
                     as values. Each field object should support:
         • name       : Field name.
         • label      : Field label.
         • type       : Field type.
         • tab        : Tab the field belongs to.
         • section    : Optional. Label for the section group within a tab.
-
-  Dependencies:
-    - Includes:
-        • pages/form/_section_card.html
-          (which expects `_section`, `_section_fields`, and `macros` in context)
-
-  Output:
-    - If multiple tabs:
-        • Bootstrap-styled tab panes (`tab-pane fade`)
-        • Each tab contains cards for grouped sections
-
-    - If one or no tabs:
-        • Sections are stacked vertically with no tab navigation
-
-  Example:
-    {% include 'pages/form/_tabs_and_sections.html' %}
-
-  Notes:
-    - This template only renders the tab content, not the tab navigation (buttons).
-      Pair it with `_pills_nav.html` if visual tab controls are needed.
-    - Tab and section IDs are normalized using lowercase and dashes.
-    - Uses temporary variables `_section` and `_section_fields` for context passing.
-
   ------------------------------------------------------------------------------
 #}
 
+{# Create dictionary to organize fields by tab then by section #}
 {% set tabs = {} %}
-{% for section, fields in field_entries.items() %}
-  {% for field in fields %}
+{% for section_name, section_fields in fields.items() %}
+  {% for field in section_fields %}
     {% set tab = field.tab or 'Other' %}
     {% if tab not in tabs %}
-      {% set _ = tabs.update({tab: []}) %}
+      {% set _ = tabs.update({tab: {}}) %}
     {% endif %}
-    {% set _ = tabs[tab].append(field) %}
+    {% if section_name not in tabs[tab] %}
+      {% set _ = tabs[tab].update({section_name: []}) %}
+    {% endif %}
+    {% set _ = tabs[tab][section_name].append(field) %}
   {% endfor %}
 {% endfor %}
 
+{# Render the tabs #}
 {% if tabs|length > 1 %}
   <div class="tab-content" id="formTabsContent">
-    {% for tab, tab_fields in tabs.items() %}
+    {% for tab, tab_sections in tabs.items() %}
       <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
            id="tab-{{ tab | lower | replace(' ', '-') }}"
            role="tabpanel"
            aria-labelledby="tab-{{ tab | lower | replace(' ', '-') }}-tab">
-
-        {% set grouped_by_section = tab_fields | groupby('section') %}
-        {% for section, section_fields in grouped_by_section %}
+        {% for section, section_fields in tab_sections.items() %}
           {% set _section = section %}
           {% set _section_fields = section_fields %}
           {% include 'pages/form/_section_card.html' %}
         {% endfor %}
-
       </div>
     {% endfor %}
   </div>
 {% else %}
-  {% for tab, tab_fields in tabs.items() %}
-    {% set grouped_by_section = tab_fields | groupby('section') %}
-    {% for section, section_fields in grouped_by_section %}
+  {% for tab, tab_sections in tabs.items() %}
+    {% for section, section_fields in tab_sections.items() %}
       {% set _section = section %}
       {% set _section_fields = section_fields %}
       {% include 'pages/form/_section_card.html' %}
