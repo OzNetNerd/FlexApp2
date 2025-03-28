@@ -1,8 +1,27 @@
 import logging
-from sqlalchemy.orm import foreign
+from typing import List
+from dataclasses import dataclass, field
 from app.models.base import db, BaseModel
 
 logger = logging.getLogger(__name__)
+
+@dataclass
+class TabEntry:
+    entry_name: str
+    label: str
+    type: str
+    required: bool = False
+    readonly: bool = False
+
+@dataclass
+class TabSection:
+    section_name: str
+    entries: List[TabEntry] = field(default_factory=list)
+
+@dataclass
+class Tab:
+    tab_name: str
+    sections: List[TabSection] = field(default_factory=list)
 
 
 class Opportunity(BaseModel):
@@ -36,67 +55,34 @@ class Opportunity(BaseModel):
         primaryjoin="and_(Note.notable_id == foreign(Opportunity.id), Note.notable_type == 'Opportunity')",
     )
 
-    __field_order__ = {
-        "Opportunity": [
-            {
-                "name": "name",
-                "label": "Name",
-                "type": "text",
-                "tab": "About",
-                "section": "Opportunity Info",
-                "required": True,
-            },
-            {
-                "name": "description",
-                "label": "Description",
-                "type": "textarea",
-                "tab": "About",
-                "section": "Opportunity Info",
-            },
-            {
-                "name": "company.name",
-                "label": "Company Name",
-                "type": "text",
-                "readonly": True,
-                "tab": "About",
-                "section": "Opportunity Info",
-            },
-        ],
-        "Pipeline": [
-            {
-                "name": "stage",
-                "label": "Stage",
-                "type": "text",
-                "tab": "Details",
-                "section": "Pipeline",
-            },
-            {
-                "name": "status",
-                "label": "Status",
-                "type": "text",
-                "tab": "Details",
-                "section": "Pipeline",
-            },
-        ],
-        "Financials": [
-            {
-                "name": "value",
-                "label": "Value",
-                "type": "number",
-                "tab": "Details",
-                "section": "Financials",
-            },
-        ],
-        "CRISP Score": [
-            {
-                "name": "crisp",
-                "label": "CRISP",
-                "type": "custom",
-                "tab": "Insights",
-                "section": "CRISP Score",
-            },
-        ],
-    }
+    # Details section
+    details_section = TabSection(section_name="Details", entries=[
+        TabEntry(entry_name="name", label="Name", type="text", required=True),
+        TabEntry(entry_name="description", label="Description", type="textarea"),
+        TabEntry(entry_name="company.name", label="Company Name", type="text", readonly=True),
+    ])
+
+    # Pipeline section
+    pipeline_section = TabSection(section_name="Pipeline", entries=[
+        TabEntry(entry_name="stage", label="Stage", type="text", required=True),
+        TabEntry(entry_name="status", label="Status", type="text"),
+    ])
+
+    # Financial section
+    financial_section = TabSection(section_name="Financial", entries=[
+        TabEntry(entry_name="value", label="Value", type="number", required=True),
+    ])
+
+    # Crisp section
+    crisp_section = TabSection(section_name="CRISP", entries=[
+        TabEntry(entry_name="crisp", label="CRISP", type="string", required=True),
+    ])
+
+
+    overview_tab = Tab(tab_name='Overview', sections=[details_section, pipeline_section])
+    deal_tab = Tab(tab_name='Deal', sections=[financial_section, crisp_section])
+
+    __tabs__ = [overview_tab, deal_tab]
 
     def __repr__(self) -> str:
         """Readable string representation.

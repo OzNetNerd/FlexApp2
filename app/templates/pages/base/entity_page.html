@@ -29,7 +29,7 @@
     - pages/form/_buttons.html                    → Renders edit/delete/create/cancel buttons
     - pages/form/_tabs_and_sections.html          → Groups fields into tab/section layouts
     - pages/base/common/_section_layout.html      → Fallback for unstructured fields
-    - pages/base/common/_form_autocomplete.html   → JavaScript-enhanced inputs
+    - pages/form/_form_autocomplete.html   → JavaScript-enhanced inputs
     - pages/base/common/_form_footer.html         → Submit/cancel buttons for non-read-only
 
   ------------------------------------------------------------------------------
@@ -75,8 +75,8 @@
               {% endif %}
 
               {% if not read_only %}
-                {% include 'pages/base/common/_form_autocomplete.html' %}
-                {% include 'pages/base/common/_form_footer.html' %}
+                {% include 'pages/form/_autocomplete.html' %}
+                {% include 'pages/form/_form_footer.html' %}
               {% endif %}
             </form>
           </div>

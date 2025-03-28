@@ -199,18 +199,19 @@ class GenericWebRoutes(CRUDRoutesBase):
             logger.debug(f"POST request received for item with ID {item_id}. Handling view post.")
             return self._handle_view_post(item)
 
-        fields_by_section = self.form_handler.build_fields(item)
-        context = self.form_handler.form_context(
-            title="Viewing",
-            model_name=self.model.__name__,
-            item_name=self._get_item_display_name(item),
-            submit_url="",
-            cancel_url=url_for(f"{self.blueprint.name}.index"),
-            fields=fields_by_section,
-            item=item,
-            read_only=True,
-        )
-        # context.update(self._get_template_context(context=context))
+        # temp context
+        context = {
+            "title": "Viewing",
+            "model_name": self.model.__name__,
+            "item_name": self._get_item_display_name(item),
+            "submit_url": "",
+            "cancel_url": url_for(f"{self.blueprint.name}.index"),
+            "fields": "",
+            "tabs": self.model.__tabs__,
+            "item": item,
+            "read_only": True,
+        }
+
         logger.debug(f"Rendering view template: {self.view_template}")
         return render_safely(self.view_template, context, f"Error viewing {self.model.__name__} with id {item_id}")
 

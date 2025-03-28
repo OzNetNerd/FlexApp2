@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 from flask_login import current_user
 from app.models import User
 
@@ -165,29 +165,3 @@ class FormHandler:
         logger.info(f"✏️ [Edit] Selected company IDs: {companies}")
 
         return []
-
-    def form_context(
-            self,
-        title: str,
-        submit_url: str,
-        cancel_url: str,
-        model_name: str,
-        item_name: str,
-        fields: Dict[str, List[Dict[str, Any]]],
-        button_text: Optional[str] = None,
-        item: Optional[Any] = None,
-        read_only: bool = False,
-        edit_url: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        return {
-            "title": title,
-            "submit_url": submit_url,
-            "cancel_url": cancel_url,
-            "model_name": model_name,
-            "item_name": item_name,
-            "fields": fields,
-            "button_text": button_text,
-            "item": item,
-            "read_only": read_only,
-            "edit_url": edit_url,
-        }

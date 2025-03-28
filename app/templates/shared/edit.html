@@ -1,4 +1,38 @@
-{% extends "pages/base/page.html" %}
+{#
+  ------------------------------------------------------------------------------
+  File: edit.html
+  Purpose:
+    Extends the base entity page layout and provides an edit form for modifying
+    existing or creating new entities. Dynamically renders fields and includes
+    shared section components.
+
+  Template Structure:
+    - Extends:
+        • pages/base/entity_page.html
+    - Imports:
+        • macros/form_fields.html (for rendering form inputs)
+    - Blocks:
+        • content: Main body of the edit form
+
+  Inputs (expected in context):
+    - title     : Page title to display in the header
+    - item      : The object being edited (optional for creation)
+    - fields    : A list of field metadata to render dynamically
+    - request   : Flask request context (used to determine cancel URL)
+
+  Output:
+    - A Bootstrap card with editable form fields
+    - Cancel button that routes to either the view or index page
+    - Shared section layout and footer includes
+
+  Notes:
+    - Field rendering supports 'text', 'email', and 'custom' types
+    - Readonly fields are respected
+    - Assumes presence of macros and included partials for consistency
+  ------------------------------------------------------------------------------
+#}
+
+{% extends "pages/base/entity_page.html" %}
 {% import "macros/form_fields.html" as macros %}
 
 {% block content %}
@@ -24,9 +58,8 @@
 
   <div class="card-body">
     <form method="POST">
-      {# Render fields dynamically based on fields #}
       {% for field in fields %}
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label for="{{ field.name }}">{{ field.label }}</label>
           {% if field.type == 'text' %}
             <input type="text" id="{{ field.name }}" name="{{ field.name }}" value="{{ item | attribute(field.name) }}" class="form-control" {% if field.readonly %}readonly{% endif %}>
@@ -38,7 +71,6 @@
         </div>
       {% endfor %}
 
-      {# Include other sections as needed #}
       {% include 'pages/base/common/_section_layout.html' %}
       {% include 'pages/form/_autocomplete.html' %}
       {% include 'pages/form/_footer.html' %}
