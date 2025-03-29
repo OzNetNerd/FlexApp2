@@ -1,27 +1,15 @@
-{#
-  ------------------------------------------------------------------------------
-  File: _pills_nav.html
-  Purpose:
-    Renders tabbed (pills-style) navigation for forms with multiple tabs.
-    Buttons control visibility of tab panes via Bootstrap 5's pill system.
-
-  Inputs (expected in context):
+<!-- START TEMPLATE: _pills_nav.html -->
+{# ------------------------------------------------------------------------------
+  File: _pills_nav.html | Purpose: Pill-style tab navigation for forms
+  Inputs:
     - tabs: List[Tab]
-        Each tab should include:
-        - tab_name: str (used for label and tab ID)
-        - sections: List (used for logging, each section contains grouped fields)
-
-  Features:
-    - Bootstrap 5 pill-style navigation using button groups
-    - Automatically marks the first tab as active
-    - Accessible with proper ARIA roles and attributes
-    - JavaScript logger outputs tab names and section counts
-
+      Each tab:
+        • tab_name: str (label/ID)
+        • sections: List (used for logging)
   Notes:
-    - Should be placed directly above tab content container
-    - Requires corresponding `.tab-pane` elements with matching IDs
-  ------------------------------------------------------------------------------
-#}
+    - Bootstrap 5 tab/pill toggle via buttons
+    - Must match tab-pane IDs rendered below
+------------------------------------------------------------------------------ #}
 
 {% import "macros/form_fields/render_field.html" as macros %}
 
@@ -56,3 +44,4 @@
     sectionCounts
   });
 </script>
+<!-- END TEMPLATE: _pills_nav.html -->

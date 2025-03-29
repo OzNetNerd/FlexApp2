@@ -1,37 +1,17 @@
-{#
-  ------------------------------------------------------------------------------
-  File: _header.html
-  Purpose:
-    Renders the dynamic heading section for entity pages, showing the mode
-    (view/edit/create), entity name, and instance name. Also includes tab
-    navigation when `tabs` are available.
-
-  Inputs (expected in context):
-    - title      : str
-        Describes the action (e.g., "Viewing", "Editing", "Creating")
-    - model_name : str
-        Entity type (e.g., "User", "Company", "Task")
-    - item_name  : str
-        Display name of the current instance (e.g., "Jessie Smith")
-    - read_only  : bool
-        If True, sets icon to "eye"; if False, uses edit/create icon logic
+<!-- START TEMPLATE: _header.html -->
+{# ------------------------------------------------------------------------------
+  File: _header.html | Purpose: Heading + tab nav for entity pages
+  Inputs:
+    - title      : str  → "Viewing", "Editing", etc.
+    - model_name : str  → e.g. "User"
+    - item_name  : str  → e.g. "Jessie Smith"
+    - read_only  : bool → Controls icon
     - item       : Optional[Model]
-        Indicates if an entity instance is being acted on
-    - tabs       : Optional[List]
-        If present, includes `_pills_nav.html` for tab navigation
-
-  Features:
-    - Contextual icon based on view mode
-    - Dynamic heading with title and entity name
-    - Clean layout with margin adjustments
-    - Conditionally renders tab navigation pills
-    - Logs header rendering context using logger.js
-
+    - tabs       : Optional[List] → Includes _pills_nav.html if present
   Notes:
-    - Should be used within a Bootstrap-styled header layout
-    - Assumes tab definitions are formatted for `_pills_nav.html`
-  ------------------------------------------------------------------------------
-#}
+    - Should be inside a Bootstrap card header
+    - Uses icon to indicate mode and logs render context
+------------------------------------------------------------------------------ #}
 
 {% import "macros/form_fields/render_field.html" as macros %}
 
@@ -65,3 +45,4 @@
 
   log("info", "_header.html", "render", "🧠 Header context", headerContext);
 </script>
+<!-- END TEMPLATE: _header.html -->

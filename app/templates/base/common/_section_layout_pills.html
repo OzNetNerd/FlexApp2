@@ -1,41 +1,22 @@
-{#
-  ------------------------------------------------------------------------------
-  File: _section_layout_pills.html
-  Purpose:
-    Dynamically renders a tabbed (pills) form layout based on fields grouped
-    by their assigned `tab` and `section`. Supports read-only and editable
-    modes and includes CRISP section rendering where applicable.
-
-  Inputs (expected in context):
-    - fields: List[Field]
-        Each field has `tab`, `section`, `name`, etc. to group them.
-    - item: Optional[Model]
-        The model instance being viewed/edited (if applicable).
-    - read_only: bool
-        If True, disables editing and shows read-only field renderers.
-    - title: str
-        Title for the page, dynamically used in logs and headers.
-
-  Template Features:
-    - Bootstrap 5-based card and pill-style tab layout
-    - Groups fields first by `tab`, then by `section` inside each tab
-    - Includes a CRISP viewer component when needed
-    - Imports reusable form field rendering macros
-    - Logs key context and structure using logger.js
-
-  JavaScript:
-    - Dynamically logs field tabs and sections using a JS logger module
-    - Helps with client-side debugging and template context verification
-
-  Notes:
-    - Used in create, view, and edit pages with shared structure
-    - Requires macros defined in `macros/form_fields.html`
-  ------------------------------------------------------------------------------
-#}
+<!-- START TEMPLATE: _section_layout_pills.html -->
+{# ------------------------------------------------------------------------------
+  File: _section_layout_pills.html | Purpose: Tabbed form layout by tab/section
+  Inputs:
+    - fields: List[Field] with tab/section info
+    - item: Optional model instance
+    - read_only: bool for mode control
+    - title: Page title
+  Features:
+    - Bootstrap 5 tabbed card layout
+    - Grouped by tab > section
+    - CRISP viewer in read-only mode
+    - Macros for field rendering
+    - JS logger for context and structure
+------------------------------------------------------------------------------ #}
 
 {% import "macros/form_fields.html" as macros %}
 
-{% block content %}
+{% block content -%}
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
     <h3 class="h4 mb-0 text-primary">
@@ -48,7 +29,6 @@
       {% endif %}
       {{ title }}
     </h3>
-
     <div class="d-flex gap-2">
       {% if item and not read_only %}
         <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
@@ -73,22 +53,22 @@
 
   <div class="card-body">
     <form method="POST">
-      {% set tabs = {} %}
-      {% for field in fields %}
-        {% set tab = field.tab or 'Other' %}
-        {% if tab not in tabs %}
-          {% set _ = tabs.update({tab: []}) %}
-        {% endif %}
-        {% set _ = tabs[tab].append(field) %}
-      {% endfor %}
+      {%- set tabs = {} -%}
+      {%- for field in fields -%}
+        {%- set tab = field.tab or 'Other' -%}
+        {%- if tab not in tabs -%}
+          {%- set _ = tabs.update({tab: []}) -%}
+        {%- endif -%}
+        {%- set _ = tabs[tab].append(field) -%}
+      {%- endfor %}
 
       <div class="tab-content" id="formTabsContent">
-        {% for tab, tab_fields in tabs.items() %}
+        {%- for tab, tab_fields in tabs.items() %}
           <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
                id="tab-{{ tab | lower | replace(' ', '-') }}"
                role="tabpanel">
-            {% set grouped_by_section = tab_fields | groupby('section') %}
-            {% for section, section_fields in grouped_by_section %}
+            {%- set grouped_by_section = tab_fields | groupby('section') -%}
+            {%- for section, section_fields in grouped_by_section %}
               <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white">
                   <h5 class="h6 text-primary fw-semibold mb-0">
@@ -97,50 +77,47 @@
                 </div>
                 <div class="card-body">
                   <div class="row g-3">
-                    {% for field in section_fields %}
-                      {% if field.name == 'crisp' and read_only %}
+                    {%- for field in section_fields %}
+                      {%- if field.name == 'crisp' and read_only %}
                         {% include 'pages/components/_crisp.html' with context %}
-                      {% else %}
+                      {%- else %}
                         {{ macros.field.render_field(field, read_only) }}
-                      {% endif %}
-                    {% endfor %}
+                      {%- endif %}
+                    {%- endfor %}
                   </div>
                 </div>
               </div>
-            {% endfor %}
+            {%- endfor %}
           </div>
-        {% endfor %}
+        {%- endfor %}
       </div>
 
-      {% if not read_only %}
+      {%- if not read_only %}
         {% include 'pages/form/_autocomplete.html' %}
-      {% else %}
+      {%- else %}
         <div class="mb-3">
           <label class="form-label">Users</label>
           <p class="form-control-plaintext">
             {{ item.users | map(attribute='email') | join(', ') if item.users else '—' }}
           </p>
         </div>
-
         <div class="mb-3">
           <label class="form-label">Company</label>
           <p class="form-control-plaintext">
             {{ item.company.name if item.company else '—' }}
           </p>
         </div>
-      {% endif %}
+      {%- endif %}
 
-      {% if not read_only %}
+      {%- if not read_only %}
         {% include 'base/common/_form_footer.html' %}
-      {% endif %}
+      {%- endif %}
     </form>
   </div>
 </div>
 
-{# JavaScript logger to trace tab and section structure #}
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
-
   log("info", "_section_layout_pills.html", "render", "📋 Page Title", {{ title | tojson | safe }});
   log("info", "_section_layout_pills.html", "render", "👁️ Read-only mode", {{ read_only | tojson | safe }});
   log("info", "_section_layout_pills.html", "render", "🧩 Item exists", {{ 'true' if item else 'false' }});
@@ -149,9 +126,10 @@
   const tabs = {{ tabs.keys() | list | tojson | safe }};
   log("info", "_section_layout_pills.html", "tabs", "🗂️ Tabs detected", tabs);
 
-  {% for tab, tab_fields in tabs.items() %}
+  {%- for tab, tab_fields in tabs.items() %}
     const sections_{{ loop.index }} = {{ tab_fields | map(attribute='section') | list | unique | tojson | safe }};
     log("debug", "_section_layout_pills.html", "tabs", "📁 Sections under tab: {{ tab }}", sections_{{ loop.index }});
-  {% endfor %}
+  {%- endfor %}
 </script>
-{% endblock %}
+{%- endblock %}
+<!-- END TEMPLATE: _section_layout_pills.html -->

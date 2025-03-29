@@ -1,70 +1,39 @@
-{#
-  ------------------------------------------------------------------------------
+{# ------------------------------------------------------------------------------
   File: render_value.html
-  Purpose:
-    Defines a reusable macro for rendering field values in read-only mode.
-    Applies appropriate formatting depending on the data type of the value.
-
+  Purpose: Macro to render field values in read-only mode
   Macro:
     - render_value(field)
-        Renders a value from a form field, formatted based on its type.
-
-  Parameters:
-    - field: Object containing:
-        - name: str — field identifier (optional, used for logging)
-        - value: any — the value to render
-
-  Supported value types:
-    - None: italic “None” text
-    - Boolean: Bootstrap badge (green check / red times)
-    - Dictionary/Object: Pretty-printed JSON block
-    - List/Array: Rendered as a list group
-    - String or other: Plain text output
-
   Notes:
-    - Assumes Font Awesome and Bootstrap 5 are available
-    - Includes logging to debug rendering decisions
-  ------------------------------------------------------------------------------
-#}
-
+    - No JavaScript to avoid serialization issues
+    - Special handling for CRISP field to prevent undefined errors
+    - Safe access patterns for all fields
+------------------------------------------------------------------------------ #}
 {% macro render_value(field) %}
-  <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
+  {# Special handling for CRISP field by entry_name - avoids accessing field.value entirely #}
+  {% if field.name == 'crisp' %}
+    <span class="text-muted fst-italic">No CRISP score available</span>
 
-    const filename = "render_value.html";
-    const fieldName = {{ (field.name or 'unnamed') | tojson | safe }};
-    const valueType = {{ (field.value.__class__.__name__ if field.value is not none else 'None') | tojson | safe }};
-    const valueStr = {{ field.value | default('null') | tojson | safe }};
-
-    log("debug", filename, "render_value", `🪪 Rendering value for field '${fieldName}'`);
-    log("debug", filename, "render_value", "📦 Type", valueType);
-    log("debug", filename, "render_value", "🔢 Value", valueStr);
-  </script>
-
-log("debug", filename, "render_value", "Field Object: ", {{ field  }})
-log("debug", filename, "render_value", "Field Value: ", {{ field.value }})
-
-
-
-  {% if field.value is none %}
-    <span class="text-muted fst-italic">None</span>
-
-  {% elif field.value is boolean %}
-    <span class="badge bg-{{ 'success' if field.value else 'danger' }}">
-      <i class="fas fa-{{ 'check' if field.value else 'times' }}"></i> {{ 'Yes' if field.value else 'No' }}
-    </span>
-
-  {% elif field.value is mapping %}
-    <pre class="bg-light p-2 rounded">{{ field.value | tojson(indent=2) }}</pre>
-
-  {% elif field.value is iterable and field.value is not string %}
-    <ul class="list-group">
-      {% for v in field.value %}
-        <li class="list-group-item">{{ v }}</li>
-      {% endfor %}
-    </ul>
-
+  {# Standard field rendering logic #}
   {% else %}
-    {{ field.value }}
+    {# Check if value exists before trying to access it #}
+    {% set has_value = field is defined and 'value' in field|default({}) and field.value is not none %}
+
+    {% if not has_value %}
+      <span class="text-muted fst-italic">None</span>
+    {% elif field.value is boolean %}
+      <span class="badge bg-{{ 'success' if field.value else 'danger' }}">
+        <i class="fas fa-{{ 'check' if field.value else 'times' }}"></i> {{ 'Yes' if field.value else 'No' }}
+      </span>
+    {% elif field.value is mapping %}
+      <pre class="bg-light p-2 rounded">{{ field.value | tojson(indent=2) }}</pre>
+    {% elif field.value is iterable and field.value is not string %}
+      <ul class="list-group">
+        {% for v in field.value %}
+          <li class="list-group-item">{{ v }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      {{ field.value }}
+    {% endif %}
   {% endif %}
 {% endmacro %}

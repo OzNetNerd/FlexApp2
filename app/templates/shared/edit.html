@@ -1,41 +1,29 @@
-{#
-  ------------------------------------------------------------------------------
-  File: edit.html
-  Purpose:
-    Extends the base entity page layout and provides an edit form for modifying
-    existing or creating new entities. Dynamically renders fields and includes
-    shared section components.
-
-  Template Structure:
-    - Extends:
-        • base/entity_page.html
-    - Imports:
-        • macros/form_fields.html (for rendering form inputs)
-    - Blocks:
-        • content: Main body of the edit form
-
-  Inputs (expected in context):
-    - title     : Page title to display in the header
-    - item      : The object being edited (optional for creation)
-    - fields    : A list of field metadata to render dynamically
-    - request   : Flask request context (used to determine cancel URL)
-
+<!-- START TEMPLATE: edit.html -->
+{# ------------------------------------------------------------------------------
+  File: edit.html | Purpose: Renders an edit form for entities
+  Structure:
+    - Extends: base/entity_page.html
+    - Imports: macros/form_fields.html
+    - Blocks: content
+  Inputs:
+    - title      : Page title
+    - item       : Object being edited
+    - fields     : List of field metadata
+    - request    : Flask request context
   Output:
-    - A Bootstrap card with editable form fields
-    - Cancel button that routes to either the view or index page
-    - Shared section layout and footer includes
-
+    - A Bootstrap card with form fields
+    - Cancel button (routes to view/index)
+    - Includes shared section/footer
   Notes:
-    - Field rendering supports 'text', 'email', and 'custom' types
-    - Readonly fields are respected
-    - Assumes presence of macros and included partials for consistency
-  ------------------------------------------------------------------------------
-#}
+    - Supports 'text', 'email', 'custom' field types
+    - Respects readonly fields
+    - Uses partials and macros for consistency
+------------------------------------------------------------------------------ #}
 
 {% extends "base/entity_page.html" %}
 {% import "macros/form_fields.html" as macros %}
 
-{% block content %}
+{% block content -%}
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
     <h3 class="h4 mb-0 text-primary">
@@ -43,37 +31,37 @@
       {{ title }}
     </h3>
     <div class="d-flex gap-2">
-      {% if item %}
-        {% set view_endpoint = request.endpoint.rsplit('.', 1)[0] + '.view' %}
+      {%- if item %}
+        {%- set view_endpoint = request.endpoint.rsplit('.', 1)[0] + '.view' -%}
         <a href="{{ url_for(view_endpoint, item_id=item.id) }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
           <i class="fas fa-times me-1"></i> Cancel
         </a>
-      {% else %}
+      {%- else %}
         <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
           <i class="fas fa-times me-1"></i> Cancel
         </a>
-      {% endif %}
+      {%- endif %}
     </div>
   </div>
 
   <div class="card-body">
     <form method="POST">
-      {% for field in fields %}
+      {%- for field in fields %}
         <div class="form-group mb-3">
           <label for="{{ field.name }}">{{ field.label }}</label>
-          {% if field.type == 'text' %}
+          {%- if field.type == 'text' %}
             <input type="text" id="{{ field.name }}" name="{{ field.name }}" value="{{ item | attribute(field.name) }}" class="form-control" {% if field.readonly %}readonly{% endif %}>
-          {% elif field.type == 'email' %}
+          {%- elif field.type == 'email' %}
             <input type="email" id="{{ field.name }}" name="{{ field.name }}" value="{{ item | attribute(field.name) }}" class="form-control" {% if field.readonly %}readonly{% endif %}>
-          {% elif field.type == 'custom' %}
+          {%- elif field.type == 'custom' %}
             <input type="text" id="{{ field.name }}" name="{{ field.name }}" value="{{ item | attribute(field.name) }}" class="form-control" {% if field.readonly %}readonly{% endif %}>
-          {% endif %}
+          {%- endif %}
         </div>
-      {% endfor %}
+      {%- endfor %}
 
-      {% include 'base/common/_section_layout.html' %}
-      {% include 'pages/form/_autocomplete.html' %}
-      {% include 'pages/form/_footer.html' %}
+      {%- include 'base/common/_section_layout.html' -%}
+      {%- include 'pages/form/_autocomplete.html' -%}
+      {%- include 'pages/form/_footer.html' -%}
     </form>
   </div>
 </div>
@@ -89,16 +77,17 @@
     cancelDestination: {{ "'view'" if item else "'index'" }},
     fieldCount: {{ fields | length }},
     fields: [
-      {% for field in fields %}
+      {%- for field in fields %}
         {
           name: {{ field.name | tojson }},
           type: {{ field.type | tojson }},
           readonly: {{ field.readonly | default(false) | tojson }}
         }{% if not loop.last %},{% endif %}
-      {% endfor %}
+      {%- endfor %}
     ]
   };
 
   log("info", "edit.html", "render", "📝 Edit form initialized", editContext);
 </script>
-{% endblock %}
+{%- endblock %}
+<!-- END TEMPLATE: edit.html -->

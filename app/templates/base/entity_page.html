@@ -1,41 +1,18 @@
-{#
-  ------------------------------------------------------------------------------
-  File: entity_page.html
-  Purpose:
-    A standalone template for rendering entity forms such as create, edit, and
-    read-only views. This page does not rely on a base template and includes
-    all required components such as header, buttons, tabbed or sectioned forms,
-    autocomplete inputs, footer, and optional delete modal.
-
-  Inputs (expected in context):
-    - title: str
-        Title displayed at the top of the page
-    - read_only: bool
-        If true, disables inputs and switches components to read-only mode
-    - item: Optional[Model]
-        The entity instance being viewed or edited (used to show the delete modal)
-    - tabs: Optional[List]
-        If present, the form is rendered in tabbed layout
-    - show_navbar: Optional[bool]
-        Controls whether the navbar should be shown
-
+<!-- START TEMPLATE: entity_page.html -->
+{# ------------------------------------------------------------------------------
+  File: entity_page.html | Purpose: Standalone page for entity CRUD operations
+  Inputs:
+    - title: Page title
+    - read_only: Bool for display mode
+    - item: Optional model
+    - tabs: Optional tabbed layout
+    - show_navbar: Optional bool to include navbar
   Features:
-    - Self-contained template using Bootstrap 5 layout
-    - Conditionally renders tabbed vs section layout
-    - Includes reusable partials: header, buttons, footer, autocomplete, navbar
-    - Includes toast rendering and JS logging
-    - Uses client-side logger to trace context and structure
-
-  JavaScript:
-    - tabs.js: Handles pill/tab switching
-    - autoComplete.js: Initializes dynamic lookup inputs
-    - logger.js: Logs page-level context for debugging
-
-  Notes:
-    - Does not extend a parent layout, usable as a complete page
-    - Modal for delete confirmation shown only if `item` exists
-  ------------------------------------------------------------------------------
-#}
+    - Bootstrap 5 responsive layout
+    - Includes partials: header, buttons, tabs/sections, footer, toasts, navbar
+    - JavaScript for tabs, autocomplete, logging
+    - Optional delete confirmation modal
+------------------------------------------------------------------------------ #}
 
 {% import "macros/form_fields.html" as macros %}
 {% import "macros/form_fields/render_form.html" as form %}
@@ -50,9 +27,9 @@
   <body>
     {% include "base/common/_toasts.html" %}
 
-    {% if show_navbar is not defined or show_navbar %}
+    {%- if show_navbar is not defined or show_navbar %}
       {% include 'base/common/_navbar.html' %}
-    {% endif %}
+    {%- endif %}
 
     <main class="py-4">
       <div class="container">
@@ -89,33 +66,30 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <script type="module" src="{{ url_for('static', filename='js/autoComplete.js') }}"></script>
-
     <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
 
-<script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
-  const context = {
-    title: {{ title | tojson }},
-    readOnly: {{ read_only | tojson }},
-    hasItem: {{ (item is defined and item is not none) | tojson }},
-    layout: {{ ("Tabbed" if tabs else "Sectioned") | tojson }},
-    includes: [
-      "form/_header.html",
-      "form/_buttons.html",
-      "base/common/_toasts.html",
-      {% if tabs %}"form/_pills_nav_content.html",{% else %}"base/common/_section_layout.html",{% endif %}
-      {% if not read_only %}"form/_autocomplete.html",{% endif %}
-      {% if not read_only %}"form/_form_footer.html",{% endif %}
-      {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
-    ].filter(Boolean)
-  };
-  log("info", "entity_page.html", "pageRender", JSON.stringify(context)); // Removed the space argument from stringify
-</script>
+    <script type="module">
+      import log from "{{ url_for('static', filename='js/logger.js') }}";
+      const context = {
+        title: {{ title | tojson }},
+        readOnly: {{ read_only | tojson }},
+        hasItem: {{ (item is defined and item is not none) | tojson }},
+        layout: {{ ("Tabbed" if tabs else "Sectioned") | tojson }},
+        includes: [
+          "form/_header.html",
+          "form/_buttons.html",
+          "base/common/_toasts.html",
+          {% if tabs %}"form/_pills_nav_content.html",{% else %}"base/common/_section_layout.html",{% endif %}
+          {% if not read_only %}"form/_autocomplete.html",{% endif %}
+          {% if not read_only %}"form/_form_footer.html",{% endif %}
+          {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
+        ].filter(Boolean)
+      };
+      log("info", "entity_page.html", "pageRender", JSON.stringify(context));
+    </script>
 
-    {# Modal for Deletion Confirmation (only shown if `item` exists) #}
-    {% if item %}
+    {%- if item %}
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -135,6 +109,7 @@
         </div>
       </div>
     </div>
-    {% endif %}
+    {%- endif %}
   </body>
 </html>
+<!-- END TEMPLATE: entity_page.html -->

@@ -1,70 +1,54 @@
-{#
-  ------------------------------------------------------------------------------
-  File: render_input.html
-  Purpose:
-    Defines a reusable macro for rendering form input elements based on field type.
-    Supports textarea, select, checkbox, and standard input fields with appropriate
-    Bootstrap 5 classes and structure.
+<!-- START TEMPLATE: render_input.html -->
+{# ------------------------------------------------------------------------------
+  File: render_input.html | Purpose: Render input based on type (text, select, checkbox, etc.)
   Macro:
-    - render_input(field)
-        Renders a form field based on its type. Applies contextual Bootstrap 5 styling.
+    - render_input(field): Renders form input with Bootstrap 5 styling
   Parameters:
-    - field: Object with properties:
-        - type: 'textarea', 'select', 'checkbox', or any valid <input> type (default: 'text')
-        - name: str — field's input name
-        - value: any — current value to display
-        - label: str — field label, used for select placeholders
-        - options: list — used only for select (each item has 'value' and 'label')
-        - checkbox_label: str — label text for checkbox fields
-  Supported Field Types:
-    - textarea: multi-line input (4 rows)
-    - select: dropdown with provided options
-    - checkbox: single boolean toggle
-    - default: standard text/email/number/etc. <input> field
+    - field.name, type, value, label, options, checkbox_label
+  Supported:
+    - textarea, select, checkbox, and any input type
   Notes:
-    - Designed to be consumed via macro imports (e.g., input_macros.render_input)
-    - Logging is included to trace field rendering logic and identify field types
-  ------------------------------------------------------------------------------
-#}
-{% macro render_input(field) %}
+    - Intended for import as input_macros.render_input
+    - Logs name, type, label, and value
+------------------------------------------------------------------------------ #}
+
+{% macro render_input(field) -%}
   <script type="module">
     import log from "{{ url_for('static', filename='js/logger.js') }}";
     const filename = "render_input.html";
+
     const fieldName = {{ (field.name or 'unnamed') | tojson | safe }};
     const fieldType = {{ (field.type or 'text') | tojson | safe }};
     const fieldLabel = {{ (field.label or '') | tojson | safe }};
-    {% if field.value is defined %}
-      const value = {{ (field.value if field.value is not none else '') | tojson | safe }};
-    {% else %}
-      const value = "";
-    {% endif %}
+    const value = {{ (field.value if field.value is defined and field.value is not none else '') | tojson | safe }};
 
-    log("debug", filename, "render_input", `🧩 Rendering input field '${fieldName | default("undefined")}'`);
-    log("debug", filename, "render_input", "📦 Type", fieldType | default("undefined"));
-    log("debug", filename, "render_input", "🔤 Label", fieldLabel | default("undefined"));
-    log("debug", filename, "render_input", "📝 Value", value | default("undefined"));
-
-
+    log("debug", filename, "render_input", `🧩 Rendering input field '${fieldName}'`);
+    log("debug", filename, "render_input", "📦 Type", fieldType);
+    log("debug", filename, "render_input", "🔤 Label", fieldLabel);
+    log("debug", filename, "render_input", "📝 Value", value);
   </script>
-  {% if field.type == 'textarea' %}
+
+  {%- if field.type == 'textarea' %}
     <textarea name="{{ field.name }}" class="form-control" rows="4">{{ field.value if field.value is defined and field.value is not none else '' }}</textarea>
-  {% elif field.type == 'select' %}
+  {%- elif field.type == 'select' %}
     <select name="{{ field.name }}" class="form-select">
       <option value="">-- Select {{ field.label }} --</option>
-      {% for opt in field.options %}
+      {%- for opt in field.options %}
         <option value="{{ opt.value }}" {% if field.value is defined and field.value is not none and opt.value == field.value %}selected{% endif %}>
           {{ opt.label }}
         </option>
-      {% endfor %}
+      {%- endfor %}
     </select>
-  {% elif field.type == 'checkbox' %}
+  {%- elif field.type == 'checkbox' %}
     <div class="form-check">
       <input type="checkbox" name="{{ field.name }}" id="{{ field.name }}"
-             {% if field.value is defined and field.value %} checked{% endif %} class="form-check-input" value="true">
+             {% if field.value is defined and field.value %}checked{% endif %}
+             class="form-check-input" value="true">
       <label class="form-check-label" for="{{ field.name }}">{{ field.checkbox_label }}</label>
     </div>
-  {% else %}
-    <input type="{{ field.type or 'text' }}" name="{{ field.name }}"
-           class="form-control" value="{{ field.value if field.value is defined and field.value is not none else '' }}">
-  {% endif %}
-{% endmacro %}
+  {%- else %}
+    <input type="{{ field.type or 'text' }}" name="{{ field.name }}" class="form-control"
+           value="{{ field.value if field.value is defined and field.value is not none else '' }}">
+  {%- endif %}
+{%- endmacro %}
+<!-- END TEMPLATE: render_input.html -->

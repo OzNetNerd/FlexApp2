@@ -1,47 +1,30 @@
-{#
-  ------------------------------------------------------------------------------
-  File: form_field_macros.html
-  Purpose:
-    Defines a reusable macro system for rendering form fields in a consistent
-    card-based layout. Supports both editable and read-only states, using
-    imported macros to separate logic and layout cleanly.
-
+<!-- START TEMPLATE: form_field_macros.html -->
+{# ------------------------------------------------------------------------------
+  File: form_field_macros.html | Purpose: Reusable macro to render form fields
   Imports:
-    - render_input.html  → input_macros: Renders editable form inputs
-    - render_value.html  → value_macros: Renders read-only field values
-
-  Macros:
-    - render_field(field, read_only=False)
-        Renders a Bootstrap-styled card for each field with header, content,
-        required indicator, and help text (if present).
-
-  Structure:
-    - Bootstrap card with light border and subtle shadow
-    - Card header: field label and optional "Required" badge
-    - Card body: input or value depending on mode
-    - Help text: shown only in editable mode
-
+    - render_input.html  → input_macros
+    - render_value.html  → value_macros
+  Macro:
+    - render_field(field, read_only=False): Renders Bootstrap-styled card
   Notes:
-    - Uses `namespace(render_field=...)` to expose macro in Jinja contexts
-    - Logging embedded to assist with debugging field rendering
-  ------------------------------------------------------------------------------
-#}
+    - Exposed via namespace as field.render_field
+    - Logs usage, imports, and render state
+------------------------------------------------------------------------------ #}
 
 {% import "macros/form_fields/render_input.html" as input_macros %}
 {% import "macros/form_fields/render_value.html" as value_macros %}
 
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
-
   const filename = "form_field_macros.html";
+
   log("info", filename, "init", "📦 Loaded form field rendering macros");
   log("debug", filename, "import", "🔗 Imported macros: input_macros (render_input.html), value_macros (render_value.html)");
 </script>
 
-{% macro render_field(field, read_only=False) %}
+{% macro render_field(field, read_only=False) -%}
   <script type="module">
     import log from "{{ url_for('static', filename='js/logger.js') }}";
-
     const filename = "form_field_macros.html";
     const fieldName = {{ field.name | tojson | safe }};
     const fieldLabel = {{ field.label | tojson | safe }};
@@ -75,9 +58,8 @@
       </div>
     </div>
   </div>
-{% endmacro %}
+{%- endmacro %}
 
-{# Expose macro using a namespace so templates can do: field.render_field(...) #}
 {% set field = namespace(render_field=render_field) %}
 
 <script type="module">
@@ -85,3 +67,4 @@
   const filename = "form_field_macros.html";
   log("info", filename, "namespace", "🧬 Exposed macro as 'field.render_field'");
 </script>
+<!-- END TEMPLATE: form_field_macros.html -->

@@ -1,25 +1,24 @@
+<!-- START TEMPLATE: view.html -->
 {% extends "base/entity_page.html" %}
 {% import "macros/form_fields.html" as macros %}
 
-{% block content %}
+{% block content -%}
 {{ super() }}
 
 <div class="tab-content">
-  {% for tab in tabs %}
+  {%- for tab in tabs %}
     <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
          id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
          role="tabpanel"
          aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
-
-      {% for section in tab.sections %}
+      {%- for section in tab.sections %}
         <h5 class="mt-3">{{ section.section_name }}</h5>
-        {% for entry in section.entries %}
+        {%- for entry in section.entries %}
           {{ macros.render_field(entry) }}
-        {% endfor %}
-      {% endfor %}
-
+        {%- endfor %}
+      {%- endfor %}
     </div>
-  {% endfor %}
+  {%- endfor %}
 </div>
 
 <!-- Logging for View Page Context -->
@@ -31,16 +30,17 @@
     title: {{ title | default("null") | tojson | safe }},
     totalTabs: {{ tabs | length }},
     tabSummary: [
-      {% for tab in tabs %}
+      {%- for tab in tabs %}
         {
           tab: {{ tab.tab_name | tojson }},
           sections: {{ tab.sections | length }},
           totalEntries: {{ tab.sections | map(attribute='entries') | map('length') | sum }}
         }{% if not loop.last %},{% endif %}
-      {% endfor %}
+      {%- endfor %}
     ]
   };
 
   log("info", "view.html", "render", "🔍 View page initialized", viewContext);
 </script>
-{% endblock %}
+{%- endblock %}
+<!-- END TEMPLATE: view.html -->

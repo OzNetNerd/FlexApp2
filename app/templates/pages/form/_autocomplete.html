@@ -1,30 +1,15 @@
-{#
-  ------------------------------------------------------------------------------
-  File: _autocomplete.html
-  Purpose:
-    Renders autocomplete-enabled input fields for selecting users and a company.
-    Pre-populates inputs with initial values from the provided `item` context
-    and logs initial state for diagnostics.
-
-  Inputs (expected in context):
-    - item: Optional[Model]
-        Object containing `.users` (List[User]) and `.company` (Company)
-
+<!-- START TEMPLATE: _autocomplete.html -->
+{# ------------------------------------------------------------------------------
+  File: _autocomplete.html | Purpose: Render user/company autocomplete fields
+  Inputs:
+    - item: Object containing item.users (List[User]) and item.company (Company)
   Features:
-    - Bootstrap-styled form inputs with unique IDs and labels
-    - JS-compatible `data-initial` attribute stores selected IDs in JSON format
-    - JS logger tracks initialization and parses stored values
-
-  JavaScript:
-    - Parses `data-initial` attributes to ensure JSON is valid
-    - Logs parsed values for developers to verify autocomplete behavior
-    - Logs JSON parsing errors if malformed data is encountered
-
+    - Bootstrap inputs for user/company with data-initial JSON
+    - JS logs and parses initial values
   Notes:
-    - Inputs are hydrated and enhanced by `autoComplete.js`
-    - Compatible with async/autosuggest-style user/company pickers
-  ------------------------------------------------------------------------------
-#}
+    - Hydrated by autoComplete.js
+    - Logs success and parse errors for diagnostics
+------------------------------------------------------------------------------ #}
 
 <!-- 👥 Autocomplete Field: Users -->
 <div class="mb-3">
@@ -70,3 +55,4 @@
     log("info", "_autocomplete.html", "init", "🏢 Initial company ID", parsedCompany);
   });
 </script>
+<!-- END TEMPLATE: _autocomplete.html -->

@@ -1,36 +1,15 @@
-{#
-  ------------------------------------------------------------------------------
-  File: _footer.html
-  Purpose:
-    Renders form footer with Cancel and Submit buttons for entity create/edit
-    views. Adjusts behavior, style, and labels based on context.
-
-  Inputs (expected in context):
-    - item: Optional[Model]
-        If present, form is in edit mode. If not, it's in create mode.
-    - button_text: Optional[str]
-        Optional override for the submit button label (e.g., "Update", "Save").
-
-  Features:
-    - Bootstrap 5 layout with right-aligned buttons
-    - Cancel button dynamically routes to view or index based on mode
-    - Submit button icon, style, and label adapt based on form mode
-    - Logs footer context for diagnostics
-
-  Button Logic:
-    - Cancel:
-        - If editing: go to `.view`
-        - If creating: go to `.index`
-    - Submit:
-        - Button style: success (edit) or primary (create)
-        - Icon: save (edit) or plus-circle (create)
-        - Label: "Save Changes" or "Create" (or overridden by `button_text`)
-
+<!-- START TEMPLATE: _footer.html -->
+{# ------------------------------------------------------------------------------
+  File: _footer.html | Purpose: Cancel + Submit button group for form footers
+  Inputs:
+    - item: Optional[Model] → edit vs create mode
+    - button_text: Optional[str] → override default submit label
+  Behavior:
+    - Cancel routes to `.view` or `.index`
+    - Submit icon, style, and label change based on item presence
   Notes:
-    - Assumes parent form uses `method="POST"`
-    - Should be placed inside the `<form>` element
-  ------------------------------------------------------------------------------
-#}
+    - Assumes placement inside a <form> using method="POST"
+------------------------------------------------------------------------------ #}
 
 <div class="d-flex justify-content-end mt-4">
   <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + ('.view' if item else '.index'), item_id=item.id if item else None) }}"
@@ -49,7 +28,7 @@
 
   const context = {
     mode: {{ "'edit'" if item else "'create'" }},
-    cancelTarget: {{ ("'view'" if item else "'index'") }},
+    cancelTarget: {{ "'view'" if item else "'index'" }},
     submit: {
       style: {{ "'success'" if item else "'primary'" }},
       icon: {{ "'save'" if item else "'plus-circle'" }},
@@ -59,3 +38,4 @@
 
   log("info", "_footer.html", "render", "🦶 Footer render context", context);
 </script>
+<!-- END TEMPLATE: _footer.html -->

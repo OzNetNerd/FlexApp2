@@ -1,36 +1,29 @@
-{#
-  ------------------------------------------------------------------------------
-  File: form_macros_import.html
-  Purpose:
-    Central import hub for all form-related macros. Allows templates to
-    access the entire form rendering system by importing just this file.
-
-  Imported Macros:
-    - render_form.html    → form     → render_form(...)
-    - render_sections.html→ sections → render_sections(...)
-    - render_field.html   → field    → render_field(...)
-    - render_input.html   → input    → render_input(...)
-    - render_value.html   → value    → render_value(...)
-
-  Usage Example:
+<!-- START TEMPLATE: form_macros_import.html -->
+{# ------------------------------------------------------------------------------
+  File: form_macros_import.html | Purpose: Central import hub for all form macros
+  Imports:
+    - render_form.html     → form
+    - render_sections.html → sections
+    - render_field.html    → field
+    - render_input.html    → input
+    - render_value.html    → value
+  Usage:
     {% import "macros/form_fields/form_macros_import.html" as forms %}
     {{ forms.form.render_form(...) }}
     {{ forms.sections.render_sections(...) }}
     {{ forms.field.render_field(...) }}
     {{ forms.input.render_input(...) }}
     {{ forms.value.render_value(...) }}
-
   Notes:
-    - Useful for layout templates and pages with complex forms
-    - Logging added to confirm macro loading and namespace bindings
-  ------------------------------------------------------------------------------
-#}
+    - Enables simple access to entire form rendering system
+    - Logs confirmation of all imports
+------------------------------------------------------------------------------ #}
 
-{% import "macros/form_fields/render_form.html" as form %}
-{% import "macros/form_fields/render_sections.html" as sections %}
-{% import "macros/form_fields/render_field.html" as field %}
-{% import "macros/form_fields/render_input.html" as input %}
-{% import "macros/form_fields/render_value.html" as value %}
+{% import "macros/form_fields/render_form.html" as form -%}
+{% import "macros/form_fields/render_sections.html" as sections -%}
+{% import "macros/form_fields/render_field.html" as field -%}
+{% import "macros/form_fields/render_input.html" as input -%}
+{% import "macros/form_fields/render_value.html" as value -%}
 
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
@@ -44,3 +37,4 @@
 
   log("success", filename, "init", "✅ All form macros successfully loaded and namespaced");
 </script>
+<!-- END TEMPLATE: form_macros_import.html -->

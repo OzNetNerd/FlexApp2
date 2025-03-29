@@ -1,40 +1,19 @@
-{#
-  ------------------------------------------------------------------------------
-  File: _table.html
-  Purpose:
-    Renders a table view page with action buttons, a column selector,
-    and a global search bar. Designed for use with AG Grid and integrates
-    with a data URL for dynamic loading.
-
-  Inputs (expected in context):
-    - title: str
-        Title displayed in the page header.
-    - entity_name: str
-        Label used in the "Add" button (e.g., "User", "Task").
-    - data_url: str
-        URL used by JS to fetch table data (via data-api-url attribute).
-
-  Template Blocks:
-    - table_actions: block
-        Optional override for custom action buttons in the header.
-
+<!-- START TEMPLATE: _table.html -->
+{# ------------------------------------------------------------------------------
+  File: _table.html | Purpose: Renders AG Grid table view with search + actions
+  Inputs:
+    - title: Page title
+    - entity_name: Used in the Add button label
+    - data_url: API endpoint for loading table data
+  Blocks:
+    - table_actions: Optional custom buttons
   Features:
-    - Bootstrap 5-based responsive layout
-    - Column selector with "All" and "Clear" buttons
-    - Search input for filtering table contents
-    - Dynamic JS logging for diagnostics and data binding
+    - Bootstrap layout with column selector and search input
+    - AG Grid integration with dynamic API loading
+    - JS logging and dropdown click behavior fixes
+------------------------------------------------------------------------------ #}
 
-  JavaScript:
-    - Prevents dropdown from closing when interacting with column options
-    - Logs template context and DOM status using logger.js
-
-  Notes:
-    - Intended to be extended for tables across the CRM application.
-    - JS handles dynamic population of column selector and grid.
-  ------------------------------------------------------------------------------
-#}
-
-{% block content %}
+{% block content -%}
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
     <h3 class="h4 mb-0 text-primary">{{ title }}</h3>
@@ -49,8 +28,6 @@
 
   <div class="card-body">
     <div class="d-flex justify-content-between align-items-center mb-4">
-
-      {# 📋 Column Selector Dropdown #}
       <div class="dropdown">
         <button class="btn dropdown-toggle" type="button" id="columnSelectorDropdownToggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
           <i class="fas fa-table me-2"></i> Columns
@@ -71,7 +48,6 @@
         </ul>
       </div>
 
-      {# 🔍 Search Input #}
       <div class="input-group w-25">
         <span class="input-group-text">
           <i class="fas fa-search"></i>
@@ -80,12 +56,10 @@
       </div>
     </div>
 
-    {# AG Grid Container #}
     <div id="table-container" class="ag-theme-alpine w-100" data-api-url="{{ data_url }}" style="min-height: 420px;"></div>
   </div>
 </div>
 
-{# 🛠️ JS to prevent dropdown from closing when clicking inside column selector #}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('#columnSelectorItems, #selectAllColumns, #clearAllColumns').forEach(element => {
@@ -96,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-{# 🔍 Logging with logger.js to debug context and page state #}
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 
@@ -109,4 +82,5 @@ document.addEventListener('DOMContentLoaded', function() {
   log("info", "table.html", "render", "📡 Data API URL", dataUrl);
   log("debug", "table.html", "render", "✅ DOM content fully loaded");
 </script>
-{% endblock %}
+{%- endblock %}
+<!-- END TEMPLATE: _table.html -->

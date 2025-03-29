@@ -1,60 +1,30 @@
-{#
-  ------------------------------------------------------------------------------
-  File: _navbar.html
-  Purpose:
-    Defines the top navigation bar of the CRM application. Provides dynamic,
-    context-aware navigation links, a mobile-responsive menu, a search bar,
-    user account options, and notification icons. Highlights the current page
-    based on the active Flask endpoint and adapts content based on user auth.
-
-  Inputs (expected in context):
-    - request.endpoint: str
-        The active Flask route, used to determine the highlighted nav item.
+<!-- START TEMPLATE: _navbar.html -->
+{# ------------------------------------------------------------------------------
+  File: _navbar.html | Purpose: Top nav bar with search, nav items, user menu
+  Inputs:
+    - request.endpoint: Active Flask route
     - current_user: Flask-Login user object
-        Provides access to user's name, email, and auth status.
-
-  Template Variables:
-    - nav_items: List[Dict[str, str]]
-        Predefined nav entries, each containing:
-        - name: str (used for url_for routing)
-        - display_name: str (label shown in the nav)
-        - icon: str (Font Awesome icon class)
-
-  Template Blocks:
-    - additional_nav_items: block
-        Can be overridden to inject additional nav links.
-
+  Variables:
+    - nav_items: List of nav entries (name, display_name, icon)
+  Blocks:
+    - additional_nav_items: Inject custom nav links
   Features:
-    - Responsive design with Bootstrap 5
-    - Active nav highlighting based on request.endpoint
-    - Dynamic avatar (via ui-avatars.com) or default icon for guests
-    - Accessible dropdown for authenticated/unauthenticated user states
-    - Embedded logger for troubleshooting nav issues
+    - Bootstrap 5 responsive nav
+    - Dynamic user avatar and links
+    - Logger for template state and debugging
+------------------------------------------------------------------------------ #}
 
-  JavaScript:
-    - Imports a custom logger module from /static/js/logger.js
-    - Logs active endpoint, navigation structure, auth state, and user details
-    - Logs template block extension for nav customization
-
-  Notes:
-    - Part of the global layout, included across all major templates.
-    - Uses only Flask-native `url_for` and context variables.
-    - Integrates cleanly with custom logger and supports visual debugging.
-  ------------------------------------------------------------------------------
-#}
-
-{% set nav_items = [
+{%- set nav_items = [
   {'name': 'companies', 'display_name': 'Companies', 'icon': 'fa-building'},
   {'name': 'contacts', 'display_name': 'Contacts', 'icon': 'fa-address-card'},
   {'name': 'opportunities', 'display_name': 'Opportunities', 'icon': 'fa-chart-line'},
   {'name': 'users', 'display_name': 'Users', 'icon': 'fa-users'},
   {'name': 'tasks', 'display_name': 'Tasks', 'icon': 'fa-tasks'}
-] %}
+] -%}
 
 <!-- Logger for Template Initialization -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
-
   log("info", "_navbar.html", "init", "🚀 Template _navbar.html loaded");
   log("debug", "_navbar.html", "context", "📦 nav_items loaded", {{ nav_items | tojson | safe }});
   log("debug", "_navbar.html", "context", "🔎 request.endpoint", {{ request.endpoint | tojson | safe }});
@@ -64,27 +34,21 @@
 
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top bg-white">
   <div class="container">
-    <!-- Logo and Brand -->
     <a class="navbar-brand d-flex align-items-center" href="/static">
-      <div class="brand-icon-container me-2">
-        <i class="fas fa-building"></i>
-      </div>
+      <div class="brand-icon-container me-2"><i class="fas fa-building"></i></div>
       <span class="fw-bold">CRM Dashboard</span>
     </a>
 
-    <!-- Mobile Toggle Button -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
       aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
       <i class="fas fa-bars"></i>
     </button>
 
-    <!-- Main Navigation Content -->
     <div class="collapse navbar-collapse" id="navbarContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        {% for item in nav_items %}
-          {% set endpoint = item.name + '.index' %}
-          {% set is_active = request.endpoint and request.endpoint.startswith(item.name + '.') %}
-
+        {%- for item in nav_items %}
+          {%- set endpoint = item.name + '.index' -%}
+          {%- set is_active = request.endpoint and request.endpoint.startswith(item.name + '.') -%}
           <li class="nav-item">
             <a class="nav-link {% if is_active %}active{% endif %}"
                href="{{ url_for(endpoint) }}"
@@ -94,9 +58,8 @@
               {% if is_active %}<span class="visually-hidden">(current)</span>{% endif %}
             </a>
           </li>
-        {% endfor %}
+        {%- endfor %}
 
-        {# Log block extension if it's being used #}
         {% block additional_nav_items %}
           <script type="module">
             import log from "{{ url_for('static', filename='js/logger.js') }}";
@@ -105,17 +68,13 @@
         {% endblock %}
       </ul>
 
-      <!-- Search Bar -->
       <div class="d-none d-md-flex search-container me-3">
         <div class="input-group">
-          <span class="input-group-text border-0 bg-transparent">
-            <i class="fas fa-search"></i>
-          </span>
+          <span class="input-group-text border-0 bg-transparent"><i class="fas fa-search"></i></span>
           <input type="search" class="form-control border-0 shadow-none" placeholder="Search..." aria-label="Search">
         </div>
       </div>
 
-      <!-- Notification Icon -->
       <div class="notification-icon me-3 d-none d-md-block">
         <a href="#" class="position-relative">
           <i class="fas fa-bell"></i>
@@ -125,7 +84,6 @@
         </a>
       </div>
 
-      <!-- User Menu -->
       <div class="user-menu">
         <div class="dropdown">
           <a class="user-dropdown-toggle d-flex align-items-center text-decoration-none" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -138,11 +96,7 @@
             </div>
             <div class="user-info d-none d-md-block">
               <span class="user-name">
-                {% if current_user.is_authenticated %}
-                  {{ current_user.name }}
-                {% else %}
-                  Account
-                {% endif %}
+                {{ current_user.name if current_user.is_authenticated else 'Account' }}
               </span>
               <i class="fas fa-chevron-down ms-1 small"></i>
             </div>
@@ -180,6 +134,6 @@
 <!-- Final Debug Logger -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
-
   log("info", "_navbar.html", "final", "✅ Navbar rendered successfully");
 </script>
+<!-- END TEMPLATE: _navbar.html -->

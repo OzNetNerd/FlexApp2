@@ -1,34 +1,14 @@
-{#
-  ------------------------------------------------------------------------------
-  File: form_macros.html
-  Purpose:
-    Defines a reusable macro for rendering complete forms with sections.
-    Handles both editable and read-only states, and renders appropriate
-    action buttons based on the mode and context.
-
+<!-- START TEMPLATE: form_macros.html -->
+{# ------------------------------------------------------------------------------
+  File: form_macros.html | Purpose: Macro to render full form with sections
   Imports:
-    - render_sections.html → sections_macros: Renders grouped form field sections
-
-  Macros:
-    - render_form(fields_by_section, submit_url, cancel_url, button_text="Submit",
-                  read_only=False, edit_url=None)
-        Renders a form with dynamic sections and contextual buttons for
-        submission, cancelation, or read-only navigation.
-
-  Structure:
-    - <form> element with POST and multipart/form-data
-    - CSRF token input (only in editable mode)
-    - Sections rendered via sections_macros.render_sections
-    - Action buttons:
-        • Editable: Cancel + Submit
-        • Read-only: Back + (optional) Edit
-
+    - render_sections.html → sections_macros
+  Macro:
+    - render_form(fields_by_section, submit_url, cancel_url, button_text, read_only, edit_url)
+      Renders form layout with CSRF, sections, and contextual buttons
   Notes:
-    - Designed for use in dynamic form templates
-    - Integrated with section-based rendering
-    - Logging aids debugging form behavior and mode toggling
-  ------------------------------------------------------------------------------
-#}
+    - Logs context, mode, button behavior, and routing
+------------------------------------------------------------------------------ #}
 
 {% import "macros/form_fields/render_sections.html" as sections_macros %}
 
@@ -40,7 +20,7 @@
   log("debug", filename, "import", "🔗 Imported sections_macros from render_sections.html");
 </script>
 
-{% macro render_form(fields_by_section, submit_url, cancel_url, button_text="Submit", read_only=False, edit_url=None) %}
+{% macro render_form(fields_by_section, submit_url, cancel_url, button_text="Submit", read_only=False, edit_url=None) -%}
   <script type="module">
     import log from "{{ url_for('static', filename='js/logger.js') }}";
 
@@ -61,32 +41,26 @@
   </script>
 
   <form action="{{ submit_url }}" method="post" enctype="multipart/form-data">
-    {% if not read_only %}
+    {%- if not read_only %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    {% endif %}
+    {%- endif %}
 
     {{ sections_macros.render_sections(fields_by_section, read_only) }}
 
-    {% if not read_only %}
-      <div class="d-flex justify-content-between mt-4">
-        <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
-          <i class="fas fa-times me-1"></i> Cancel
+    <div class="d-flex justify-content-between mt-4">
+      <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
+        <i class="fas fa-{{ 'arrow-left' if read_only else 'times' }} me-1"></i> {{ 'Back' if read_only else 'Cancel' }}
+      </a>
+      {%- if read_only and edit_url %}
+        <a href="{{ edit_url }}" class="btn btn-primary">
+          <i class="fas fa-edit me-1"></i> Edit
         </a>
+      {%- elif not read_only %}
         <button type="submit" class="btn btn-primary">
           <i class="fas fa-save me-1"></i> {{ button_text }}
         </button>
-      </div>
-    {% else %}
-      <div class="d-flex justify-content-between mt-4">
-        <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
-          <i class="fas fa-arrow-left me-1"></i> Back
-        </a>
-        {% if edit_url %}
-          <a href="{{ edit_url }}" class="btn btn-primary">
-            <i class="fas fa-edit me-1"></i> Edit
-          </a>
-        {% endif %}
-      </div>
-    {% endif %}
+      {%- endif %}
+    </div>
   </form>
-{% endmacro %}
+{%- endmacro %}
+<!-- END TEMPLATE: form_macros.html -->
