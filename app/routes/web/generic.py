@@ -288,17 +288,17 @@ class GenericWebRoutes(CRUDRoutesBase):
         Returns:
             Response: The rendered create form page.
         """
-        context = {
-            "title": f"Create a {self.model.__name__}",
-            "submit_url": url_for(f"{self.blueprint.name}.create"),
-            "cancel_url": url_for(f"{self.blueprint.name}.index"),
-            "fields": "",
-            "section": "",
-            "item": "item",
-            "id": "id",
-            "button_text": f"Create {self.model.__name__}",
-            "read_only": False,
-        }
+        context = ResourceContext(
+            title=f"Create a {self.model.__name__}",
+            model_name=self.model.__name__,
+            item_name="",
+            submit_url=url_for(f"{self.blueprint.name}.create"),
+            cancel_url=url_for(f"{self.blueprint.name}.index"),
+            tabs=self.model.__tabs__,
+            id="",
+            item=None,
+            read_only=False
+        )
 
         # context.update(self._get_template_context(context=context))
         logger.debug(f"Rendering create template: {self.create_template}")
