@@ -339,16 +339,17 @@ class GenericWebRoutes(CRUDRoutesBase):
             Response: The rendered edit form page.
         """
         logger.info(f'this is item - \n{item}')
-        context = {
-            "title": f"Edit {self.model.__name__}",
-            "submit_url": url_for(f"{self.blueprint.name}.edit", item_id=item.id),
-            "cancel_url": url_for(f"{self.blueprint.name}.index"),
-            "fields": "",
-            "section": "",
-            "id": "id",
-            "button_text": f"Update {self.model.__name__}",
-            "read_only": False,
-        }
+        context = ResourceContext(
+            title=f"Edit {self.model.__name__}",
+            model_name=self.model.__name__,
+            item_name=self._get_item_display_name(item),
+            submit_url=url_for(f"{self.blueprint.name}.edit", item_id=item.id),
+            cancel_url=url_for(f"{self.blueprint.name}.index"),
+            tabs=self.model.__tabs__,
+            id=str(item.id),
+            item=item,
+            read_only=False
+        )
 
         # context.update(self._get_template_context(context=context))
         logger.debug(f"Rendering edit template: {self.edit_template}")
