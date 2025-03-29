@@ -25,7 +25,7 @@ class ResourceContext:
     tabs: dict = field(default_factory=dict)
     id: str = ""
     item: Any = ""
-    read_only: bool = False
+    read_only: bool = True
     error_message: str = None
 
 
@@ -35,7 +35,7 @@ class TabEntry:
     label: str
     type: str
     required: bool = False
-    readonly: bool = False
+    readonly: bool = True
     options: Optional[List[dict[str, Any]]] = None
     default: Optional[Any] = None
 

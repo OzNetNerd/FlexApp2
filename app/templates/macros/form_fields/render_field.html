@@ -31,9 +31,8 @@
     const isReadOnly = {{ (read_only or field.readonly) | tojson }};
     const isRequired = {{ field.required | tojson }};
 
-    log("debug", filename, "render_field", `🛠 Rendering field '${fieldName}' (label: '${fieldLabel}')`);
-    log("debug", filename, "render_field", "📌 Mode", isReadOnly ? "read-only" : "editable");
-    log("debug", filename, "render_field", "⭐ Required", isRequired);
+    log("debug", filename, "render_field", `🛠 Rendering field '${fieldName}' (label: '${fieldLabel}') | 📌 Mode: ${isReadOnly ? "read-only" : "editable"} | ⭐ Required: ${isRequired}`);
+
   </script>
 
   <div class="col-md-6 mb-3">

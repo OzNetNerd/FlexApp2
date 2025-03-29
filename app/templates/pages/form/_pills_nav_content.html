@@ -17,14 +17,30 @@
 
 {% import "macros/form_fields/render_field.html" as macros %}
 
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  const tabs = {{ tabs | tojson | safe }};
+  log("info", "_pills_nav_content.html", "init", "📋 Tabs input data", tabs);
+</script>
+
 <div class="tab-content">
   {% for tab in tabs %}
+    <script type="module">
+      import log from "{{ url_for('static', filename='js/logger.js') }}";
+      log("info", "_pills_nav_content.html", "tab", `📄 Rendering tab '{{ tab.tab_name }}'`, {{ tab | tojson | safe }});
+    </script>
+
     <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
          id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
          role="tabpanel"
          aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
 
       {% for section in tab.sections %}
+        <script type="module">
+          import log from "{{ url_for('static', filename='js/logger.js') }}";
+          log("info", "_pills_nav_content.html", "section", `📦 Rendering section '{{ section.section_name }}' in tab '{{ tab.tab_name }}'`, {{ section | tojson | safe }});
+        </script>
+
         {% if section.section_name %}
           <h5 class="mt-3">{{ section.section_name }}</h5>
         {% endif %}
@@ -80,7 +96,6 @@
   {% endfor %}
 </div>
 
-<!-- 🧾 Logging: Tab + Section Structure Summary -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 
@@ -101,4 +116,5 @@
     sectionDetails
   });
 </script>
+
 <!-- END TEMPLATE: _pills_nav_content.html -->
