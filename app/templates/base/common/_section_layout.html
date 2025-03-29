@@ -80,7 +80,7 @@
               {% for field in section_fields %}
                 {% if field.name == 'crisp' and read_only %}
                   {# Special case for crisp field in read-only mode #}
-                  {% include 'pages/shared/components/_crisp.html' with context %}
+                  {% include 'pages/components/_crisp.html' with context %}
                 {% else %}
                   {# Render standard field #}
                   {{ macros.field.render_field(field, read_only) }}

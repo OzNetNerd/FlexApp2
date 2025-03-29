@@ -26,9 +26,9 @@
                       (not currently defined, consider adding if needed)
 
   Included Partials:
-    - pages/base/common/_head.html    : Meta tags, title, CSS resources
-    - pages/base/common/_toasts.html  : Notification/alert system
-    - pages/base/common/_navbar.html  : Navigation header (conditional)
+    - base/common/_head.html    : Meta tags, title, CSS resources
+    - base/common/_toasts.html  : Notification/alert system
+    - base/common/_navbar.html  : Navigation header (conditional)
 
   JavaScript Resources:
     - Bootstrap 5.3.2 (from CDN)      : Core UI framework
@@ -37,7 +37,7 @@
     - autoComplete.js (local)         : Search/autocomplete functionality
 
   Example usage:
-    {% extends "pages/base/page.html" %}
+    {% extends "base/page.html" %}
     {% block content %}
       <h1>Page Title</h1>
       <p>Content goes here...</p>
@@ -47,11 +47,11 @@
 #}
 <!DOCTYPE html>
 <html lang="en">
-  {% include 'pages/base/common/_head.html' %}
+  {% include 'base/common/_head.html' %}
   <body>
-    {% include "pages/base/common/_toasts.html" %}
+    {% include "base/common/_toasts.html" %}
     {% if show_navbar is not defined or show_navbar %}
-      {% include 'pages/base/common/_navbar.html' %}
+      {% include 'base/common/_navbar.html' %}
     {% endif %}
 
     <main class="py-4">

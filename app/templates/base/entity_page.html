@@ -46,12 +46,12 @@
 
 <!DOCTYPE html>
 <html lang="en">
-  {% include 'pages/base/common/_head.html' %}
+  {% include 'base/common/_head.html' %}
   <body>
-    {% include "pages/base/common/_toasts.html" %}
+    {% include "base/common/_toasts.html" %}
 
     {% if show_navbar is not defined or show_navbar %}
-      {% include 'pages/base/common/_navbar.html' %}
+      {% include 'base/common/_navbar.html' %}
     {% endif %}
 
     <main class="py-4">
@@ -75,12 +75,12 @@
               {% if tabs %}
                 {% include 'pages/form/_pills_nav_content.html' %}
               {% else %}
-                {% include 'pages/base/common/_section_layout.html' %}
+                {% include 'base/common/_section_layout.html' %}
               {% endif %}
 
               {% if not read_only %}
-                {% include 'pages/form/_autocomplete.html' %}
-                {% include 'pages/form/_form_footer.html' %}
+                {% include 'form/_autocomplete.html' %}
+                {% include 'form/_form_footer.html' %}
               {% endif %}
             </form>
           </div>

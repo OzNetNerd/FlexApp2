@@ -15,7 +15,7 @@
   ------------------------------------------------------------------------------
 #}
 
-{% extends "pages/base/page.html" %}
+{% extends "base/page.html" %}
 {% import "macros/form_fields.html" as macros %}
 
 {% block content %}
@@ -33,7 +33,7 @@
 
     <div class="card-body">
       <form method="POST">
-        {% include 'pages/base/common/_section_layout.html' %}
+        {% include 'base/common/_section_layout.html' %}
         {% include 'pages/form/_autocomplete.html' %}
         {% include 'pages/form/_footer.html' %}
       </form>

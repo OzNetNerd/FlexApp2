@@ -16,6 +16,7 @@ from app.routes.web import register_web_blueprints
 from app.routes.base.components.template_renderer import render_safely
 from app.models.base import db
 from app.models.user import User
+from app.routes.base.components.form_handler import ResourceContext
 from flask import current_app
 
 
@@ -123,18 +124,24 @@ def create_app(config_class=Config):
 
     @app.errorhandler(404)
     def page_not_found(e):
-        context = {"error": e}
+        context = ResourceContext(
+            title="404 Not Found",
+            item=str(e),
+            read_only=True
+        )
         return render_safely("errors/404.html", context, "Page not found."), 404
 
     @app.errorhandler(500)
     def internal_server_error(e):
-        context = {"error": e}
+        context = ResourceContext(
+            title="500 Internal Server Error",
+            item=str(e),
+            read_only=True
+        )
         return render_safely("errors/500.html", context, "Internal server error."), 500
 
     return app
 
-
-# Run app
 app = create_app()
 
 if __name__ == "__main__":

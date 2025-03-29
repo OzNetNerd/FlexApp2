@@ -8,7 +8,7 @@
 
   Template Structure:
     - Extends:
-        • pages/base/entity_page.html
+        • base/entity_page.html
     - Imports:
         • macros/form_fields.html (for rendering form inputs)
     - Blocks:
@@ -32,7 +32,7 @@
   ------------------------------------------------------------------------------
 #}
 
-{% extends "pages/base/entity_page.html" %}
+{% extends "base/entity_page.html" %}
 {% import "macros/form_fields.html" as macros %}
 
 {% block content %}
@@ -71,7 +71,7 @@
         </div>
       {% endfor %}
 
-      {% include 'pages/base/common/_section_layout.html' %}
+      {% include 'base/common/_section_layout.html' %}
       {% include 'pages/form/_autocomplete.html' %}
       {% include 'pages/form/_footer.html' %}
     </form>

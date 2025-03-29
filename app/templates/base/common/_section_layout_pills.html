@@ -99,7 +99,7 @@
                   <div class="row g-3">
                     {% for field in section_fields %}
                       {% if field.name == 'crisp' and read_only %}
-                        {% include 'pages/shared/components/_crisp.html' with context %}
+                        {% include 'pages/components/_crisp.html' with context %}
                       {% else %}
                         {{ macros.field.render_field(field, read_only) }}
                       {% endif %}
@@ -131,7 +131,7 @@
       {% endif %}
 
       {% if not read_only %}
-        {% include 'pages/base/common/_form_footer.html' %}
+        {% include 'base/common/_form_footer.html' %}
       {% endif %}
     </form>
   </div>

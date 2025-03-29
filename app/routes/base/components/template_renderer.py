@@ -19,7 +19,7 @@ def render_safely(
     try:
         logger.debug(f"🔍 Rendering template: {template_name} for {current_endpoint} ({current_path})")
         # Log the context being passed into the template to check for unexpected fields
-        logger.debug(f"🔧 Context Data: {context.__dict__}")
+        logger.debug(f"🔧 Context Data: {context}")
 
         # Log the successful pageview here
         logger.info(
@@ -43,7 +43,7 @@ def render_safely(
             f"{__name__} - ERROR - {error_type} in '{template_name}' " f"for {current_endpoint} ({current_path}): {details}")
 
         # Log additional context data for error identification
-        logger.debug(f"🔧 Error Context Data: {context.__dict__}")
+        logger.debug(f"🔧 Error Context Data: {context}")
 
         if current_app.debug:
             logger.debug(f"Traceback:\n{traceback.format_exc()}")

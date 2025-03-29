@@ -17,15 +17,15 @@ class IndexContext:
 
 @dataclass
 class ResourceContext:
-    title: str
-    model_name: str
-    item_name: str
-    submit_url: str
-    cancel_url: str
-    tabs: dict
-    id: str
-    item: str
-    read_only: bool
+    title: str = ""
+    model_name: str = ""
+    item_name: str = ""
+    submit_url: str = ""
+    cancel_url: str = ""
+    tabs: dict = field(default_factory=dict)
+    id: str = ""
+    item: Any = ""
+    read_only: bool = False
     error_message: str = None
 
 
