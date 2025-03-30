@@ -56,8 +56,8 @@
               {% endif %}
 
               {% if not read_only %}
-                {% include 'form/_autocomplete.html' %}
-                {% include 'form/_form_footer.html' %}
+                {% include 'pages/form/_autocomplete.html' %}
+                {% include 'pages/form/_footer.html' %}
               {% endif %}
             </form>
           </div>
@@ -81,8 +81,8 @@
           "form/_buttons.html",
           "base/common/_toasts.html",
           {% if tabs %}"form/_pills_nav_content.html",{% else %}"base/common/_section_layout.html",{% endif %}
-          {% if not read_only %}"form/_autocomplete.html",{% endif %}
-          {% if not read_only %}"form/_form_footer.html",{% endif %}
+          {% if not read_only %}"pages/form/_autocomplete.html",{% endif %}
+          {% if not read_only %}"pages/form/_footer.html",{% endif %}
           {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
         ].filter(Boolean)
       };

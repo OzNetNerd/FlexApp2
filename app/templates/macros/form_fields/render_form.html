@@ -1,30 +1,46 @@
-<!-- START TEMPLATE: form_macros.html -->
+<!-- START TEMPLATE: render_form.html -->
 {# ------------------------------------------------------------------------------
-  File: form_macros.html | Purpose: Macro to render full form with sections
+  File: render_form.html
+  Purpose: Macro to render a full form with grouped sections and buttons
   Imports:
-    - render_sections.html → sections_macros
+    - render_sections.html → sections_macros (used to group and render sectioned fields)
   Macro:
     - render_form(fields_by_section, submit_url, cancel_url, button_text, read_only, edit_url)
-      Renders form layout with CSRF, sections, and contextual buttons
+      Renders a complete HTML form with fields grouped by section
+  Inputs:
+    - fields_by_section : dict[str, list[TabEntry]] — section name to fields
+    - submit_url        : str — target URL for form submission
+    - cancel_url        : str — target URL for cancellation/back
+    - button_text       : str — text on the submit button
+    - read_only         : bool — toggle for read-only mode
+    - edit_url          : str | None — optional edit button destination
+  Output:
+    - HTML form with CSRF, dynamic section rendering, buttons
   Notes:
-    - Logs context, mode, button behavior, and routing
+    - Logs render context to JS console for debugging
+    - Handles edit/view-only dual-purpose rendering
+    - CSRF token is only included if the form is editable
+    - Shows "Edit" button in read-only mode if edit_url is set
+    - Calls `render_sections` macro to lay out form fields from each section
 ------------------------------------------------------------------------------ #}
 
+{# Import section-rendering macro as alias for grouping inputs visually and semantically #}
 {% import "macros/form_fields/render_sections.html" as sections_macros %}
 
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
-  const filename = "form_macros.html";
+  const filename = "render_form.html";
 
   log("info", filename, "init", "📦 Loaded form rendering macro");
   log("debug", filename, "import", "🔗 Imported sections_macros from render_sections.html");
 </script>
 
+{# Main macro to render a form — used across create, edit, and view pages #}
 {% macro render_form(fields_by_section, submit_url, cancel_url, button_text="Submit", read_only=False, edit_url=None) -%}
   <script type="module">
     import log from "{{ url_for('static', filename='js/logger.js') }}";
 
-    const filename = "form_macros.html";
+    const filename = "render_form.html";
     const mode = {{ "true" if read_only else "false" }};
     const sectionNames = {{ fields_by_section.keys() | list | tojson | safe }};
     const submitUrl = {{ submit_url | tojson | safe }};
@@ -41,12 +57,24 @@
   </script>
 
   <form action="{{ submit_url }}" method="post" enctype="multipart/form-data">
+    {# Include CSRF token only if the form is editable #}
     {%- if not read_only %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {%- endif %}
 
+    {# Render grouped form fields using imported sections macro #}
     {{ sections_macros.render_sections(fields_by_section, read_only) }}
 
+    {#
+      Action buttons section — show different buttons depending on read-only mode.
+      - If read_only is True and edit_url is provided:
+          → Show an "Edit" button linking to the edit form.
+          → Show a "Back" button that navigates to the cancel_url.
+      - If read_only is False:
+          → Show a "Cancel" button linking to the cancel_url.
+          → Show a "Submit" button to save the form.
+      - Icons and text adjust dynamically to reflect the current mode.
+    #}
     <div class="d-flex justify-content-between mt-4">
       <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
         <i class="fas fa-{{ 'arrow-left' if read_only else 'times' }} me-1"></i> {{ 'Back' if read_only else 'Cancel' }}
@@ -63,4 +91,4 @@
     </div>
   </form>
 {%- endmacro %}
-<!-- END TEMPLATE: form_macros.html -->
+<!-- END TEMPLATE: render_form.html -->

@@ -246,7 +246,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             Response: Redirect to the index page.
         """
         self.request_logger.log_request_info(self.model.__name__, "delete", item_id)
-        item, error = self._get_item(item_id)
+        item, error = self.item_manager.get_item_by_id(item_id)
         if error:
             flash(error, "error")
         else:
@@ -255,6 +255,7 @@ class GenericWebRoutes(CRUDRoutesBase):
                 flash(error, "error")
             else:
                 flash(f"{self.model.__name__} deleted successfully", "success")
+
         return redirect(url_for(f"{self.blueprint.name}.index"))
 
     def _data_route(self):

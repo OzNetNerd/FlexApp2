@@ -1,18 +1,46 @@
 <!-- START TEMPLATE: view.html -->
+{# ------------------------------------------------------------------------------
+  File: view.html | Purpose: Renders a view-only detail page for entities
+  Structure:
+    - Extends: base/entity_page.html
+    - Imports: macros/form_fields.html
+    - Blocks: content
+  Inputs (from ResourceContext):
+    - title      : Page title
+    - item       : The object being viewed
+    - tabs       : List of Tab objects (each with sections and TabEntry fields)
+    - request    : Flask request context
+  Output:
+    - Tabbed Bootstrap interface with read-only field rendering
+    - Section headers grouping fields
+    - Each field rendered via a macro for consistency
+  Notes:
+    - First tab is shown as active by default
+    - Field rendering logic is abstracted into a reusable macro
+------------------------------------------------------------------------------ #}
+
 {% extends "base/entity_page.html" %}
+
+{# Import shared field rendering macro (handles types, labels, etc.) #}
 {% import "macros/form_fields.html" as macros %}
 
 {% block content -%}
+{# Call the base block content first (e.g. sets up headers) #}
 {{ super() }}
 
 <div class="tab-content">
+  {# Loop through all tabs (e.g., About, Insights) passed from ResourceContext #}
   {%- for tab in tabs %}
     <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
          id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
          role="tabpanel"
          aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
+
+      {# Loop through each section within the current tab (e.g., "Company Details") #}
       {%- for section in tab.sections %}
         <h5 class="mt-3">{{ section.section_name }}</h5>
+
+        {# Render each field (TabEntry) in the section using the shared macro #}
         {%- for entry in section.entries %}
           {{ macros.render_field(entry) }}
         {%- endfor %}
@@ -20,27 +48,5 @@
     </div>
   {%- endfor %}
 </div>
-
-<!-- Logging for View Page Context -->
-<script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
-
-  const viewContext = {
-    entityId: {{ item.id if item else 'null' }},
-    title: {{ title | default("null") | tojson | safe }},
-    totalTabs: {{ tabs | length }},
-    tabSummary: [
-      {%- for tab in tabs %}
-        {
-          tab: {{ tab.tab_name | tojson }},
-          sections: {{ tab.sections | length }},
-          totalEntries: {{ tab.sections | map(attribute='entries') | map('length') | sum }}
-        }{% if not loop.last %},{% endif %}
-      {%- endfor %}
-    ]
-  };
-
-  log("info", "view.html", "render", "🔍 View page initialized", viewContext);
-</script>
 {%- endblock %}
 <!-- END TEMPLATE: view.html -->
