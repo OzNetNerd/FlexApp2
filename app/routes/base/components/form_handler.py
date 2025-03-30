@@ -23,7 +23,7 @@ class ResourceContext:
     submit_url: str = ""
     cancel_url: str = ""
     tabs: dict = field(default_factory=dict)
-    id: str = ""
+    id: Optional[str] = ""
     item: Any = ""
     read_only: bool = True
     error_message: str = None

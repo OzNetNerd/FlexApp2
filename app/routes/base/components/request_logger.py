@@ -7,7 +7,8 @@ logger = logging.getLogger(__name__)
 class RequestLogger:
     """Handles logging of HTTP request information."""
 
-    def log_request_info(self, model_name: str, route_name: str, item_id: int = None) -> None:
+    @staticmethod
+    def log_request_info(model_name: str, route_name: str, item_id: int = None) -> None:
         """
         Log detailed HTTP request information for debugging purposes.
 

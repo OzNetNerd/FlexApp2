@@ -7,10 +7,6 @@ functionality of the company view page in the FlexApp application.
 import pytest
 from flask_login import current_user
 
-# Suppress SADeprecationWarning without trying to patch internals
-import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
 
 @pytest.fixture
 def client(app):
