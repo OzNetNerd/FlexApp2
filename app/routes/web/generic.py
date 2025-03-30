@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional, List, Type, Tuple
+from typing import Optional, List, Type
 from flask import request, redirect, url_for, flash, Blueprint
 from flask_login import current_user, login_required
 import logging
@@ -107,6 +107,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         """
         self.request_logger.log_request_info(self.model.__name__, "view", item_id)
         item, error = self.item_manager.get_item_by_id(item_id)
+        logger.info(f"This is item: {item.to_dict()}")
 
         if error:
             flash(error, "error")
