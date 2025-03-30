@@ -1,4 +1,5 @@
 import os
+import sqlite3
 import pytest
 from flask import Flask
 from app.app import create_app
@@ -7,16 +8,35 @@ from app.models.user import User
 from werkzeug.security import generate_password_hash
 
 
+def copy_db_to_memory(source_path: str = "crm.db") -> sqlite3.Connection:
+    """
+    Copies the on-disk SQLite database into memory.
+
+    Args:
+        source_path (str): Path to the existing SQLite DB file.
+
+    Returns:
+        sqlite3.Connection: In-memory SQLite connection with copied contents.
+    """
+    disk_conn = sqlite3.connect(source_path)
+    memory_conn = sqlite3.connect(":memory:")
+    disk_conn.backup(memory_conn)
+    disk_conn.close()
+    return memory_conn
+
+
 @pytest.fixture
 def app() -> Flask:
     """
-    Create a Flask test app with an in-memory SQLite database.
+    Create a Flask test app using a fully in-memory copy of `crm.db`.
 
     Returns:
         Flask: The configured Flask application.
     """
     os.environ["FLASK_ENV"] = "testing"
     app = create_app()
+    mem_conn = copy_db_to_memory()
+
     app.config.update(
         TESTING=True,
         SQLALCHEMY_DATABASE_URI="sqlite:///:memory:",
@@ -24,43 +44,40 @@ def app() -> Flask:
     )
 
     with app.app_context():
-        db.create_all()
+        # Reflect the schema into SQLAlchemy’s engine and copy data
+        raw_conn = db.engine.raw_connection()
+        mem_conn.backup(raw_conn.connection)
         yield app
         db.session.remove()
-        db.drop_all()
 
 
 @pytest.fixture
 def client(app: Flask):
-    """
-    Provides a Flask test client to simulate HTTP requests.
-
-    Args:
-        app (Flask): The test app fixture.
-
-    Returns:
-        FlaskClient: The test client for sending requests to the app.
-    """
     return app.test_client()
 
 
 @pytest.fixture
 def test_user(app: Flask):
     """
-    Creates a test user in the temporary test database.
-
-    Args:
-        app (Flask): The Flask application.
+    Creates a test admin user (newadmin@example.com) to avoid conflicts.
 
     Returns:
-        User: The created test user object.
+        User: The created or updated user.
     """
-    user = User(
-        name="Test User",
-        email="admin@example.com",
-        password=generate_password_hash("password"),
-    )
-    db.session.add(user)
+    user = User.query.filter_by(email="newadmin@example.com").first()
+    if not user:
+        user = User(
+            username="newadmin",
+            name="Test Admin",
+            email="newadmin@example.com",
+            password=generate_password_hash("password"),
+            is_admin=True,
+        )
+        db.session.add(user)
+    else:
+        user.name = "Test Admin"
+        user.password_hash = generate_password_hash("password")
+        user.is_admin = True
     db.session.commit()
     return user
 
@@ -68,18 +85,14 @@ def test_user(app: Flask):
 @pytest.fixture
 def logged_in_client(client, test_user):
     """
-    Logs in the test user using the login route and returns an authenticated client.
-
-    Args:
-        client (FlaskClient): The test client.
-        test_user (User): The user to log in.
+    Logs in the test admin user (newadmin@example.com).
 
     Returns:
-        FlaskClient: The authenticated client.
+        FlaskClient: The authenticated test client.
     """
     response = client.post(
         "/auth/login",
-        data={"email": "admin@example.com", "password": "password"},
+        data={"email": "newadmin@example.com", "password": "password"},
         follow_redirects=True,
     )
     assert response.status_code == 200

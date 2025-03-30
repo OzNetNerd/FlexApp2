@@ -1,6 +1,5 @@
-# tests/test_view_page.py
-
 import pytest
+from flask_login import current_user
 
 @pytest.fixture
 def client(app):
@@ -8,7 +7,9 @@ def client(app):
 
 @pytest.fixture
 def response(client):
-    return client.get('/companies/1')
+    with client:
+        client.post("/auth/login", data={"email": "newadmin@example.com", "password": "password"}, follow_redirects=True)
+        return client.get('/companies/1', follow_redirects=True)
 
 def test_status_code_ok(response):
     assert response.status_code == 200
@@ -35,8 +36,12 @@ def test_buttons_present(response):
     for button in ['Add', 'Edit', 'Delete', 'Back']:
         assert button in html
 
-def test_user_avatar_present(response):
-    assert "Administrator" in response.data.decode()
+def test_user_avatar_present(client):
+    with client:
+        client.post("/auth/login", data={"email": "newadmin@example.com", "password": "password"}, follow_redirects=True)
+        client.get("/companies/1")
+        assert current_user.is_authenticated
+        assert current_user.name == "Test Admin"
 
 def test_field_name_label_present(response):
     assert '<span class="fw-bold">Name</span>' in response.data.decode()
