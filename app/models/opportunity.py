@@ -40,7 +40,7 @@ class Opportunity(BaseModel):
     details_section = TabSection(section_name="Details", entries=[
         TabEntry(entry_name="name", label="Name", type="text", required=True),
         TabEntry(entry_name="description", label="Description", type="textarea"),
-        TabEntry(entry_name="company.name", label="Company Name", type="text", readonly=True),
+        TabEntry(entry_name="company.name", label="Company Name", type="text",),
     ])
 
     # Pipeline section

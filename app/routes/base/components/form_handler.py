@@ -9,7 +9,6 @@ class TabEntry:
     label: str
     type: str
     required: bool = False
-    readonly: bool = True
     options: Optional[List[dict[str, Any]]] = None
     default: Optional[Any] = None
     value: Optional[Any] = None

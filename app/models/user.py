@@ -47,8 +47,8 @@ class User(BaseModel, UserMixin):
 
     # Record Info section
     record_info_section = TabSection(section_name="Record Info", entries=[
-        TabEntry(entry_name="created_at", label="Created At", type="datetime", readonly=True),
-        TabEntry(entry_name="updated_at", label="Updated At", type="datetime", readonly=True),
+        TabEntry(entry_name="created_at", label="Created At", type="datetime"),
+        TabEntry(entry_name="updated_at", label="Updated At", type="datetime"),
     ])
 
     # CRISP Score section

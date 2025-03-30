@@ -65,8 +65,8 @@ class Contact(BaseModel):
 
     # Record Info section
     record_info_section = TabSection(section_name="Record Info", entries=[
-        TabEntry(entry_name="created_at", label="Created At", type="text", readonly=True),
-        TabEntry(entry_name="updated_at", label="Updated At", type="text", readonly=True),
+        TabEntry(entry_name="created_at", label="Created At", type="text"),
+        TabEntry(entry_name="updated_at", label="Updated At", type="text"),
     ])
 
     # CRISP Score section

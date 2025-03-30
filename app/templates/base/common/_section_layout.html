@@ -1,74 +1,84 @@
+
 <!-- START TEMPLATE: _pills_nav_content.html -->
 {# ------------------------------------------------------------------------------
-  File: _pills_nav_content.html
-  Purpose: Tabbed content layout using pre-defined ui tabs
+  File: _pills_nav_content.html | Purpose: Tab + section-based form layout
   Inputs:
-    - ui: List[Tab]
-    - read_only: Boolean
+    - fields: List of field objects (with optional tab/section/name)
+    - read_only: Boolean for rendering readonly mode
+  Structure:
+    - Bootstrap tabs (top level)
+    - Sections per tab
+    - Field rows per section (responsive grid)
+  Dependencies:
+    - macros/form_fields.html
+    - _crisp.html for crisp field in readonly mode
+    - logger.js for structured logging
 ------------------------------------------------------------------------------ #}
 
-{% import "macros/form_fields/render_field.html" as macros %}
+{% import "macros/form_fields.html" as macros %}
 
-<div class="tab-content">
-  {% for tab in ui %}
+{# Group fields by tab #}
+{%- set tabs = {} -%}
+{%- for field in fields -%}
+  {%- set tab = field.tab or 'Other' -%}
+  {%- if tab not in tabs -%}
+    {%- set _ = tabs.update({tab: []}) -%}
+  {%- endif -%}
+  {%- set _ = tabs[tab].append(field) -%}
+{%- endfor %}
+
+<ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
+  {%- for tab in tabs.keys() %}
+    <li class="nav-item" role="presentation">
+      <button class="nav-link {% if loop.first %}active{% endif %}"
+              id="tab-{{ tab | lower | replace(' ', '-') }}-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#tab-{{ tab | lower | replace(' ', '-') }}"
+              type="button"
+              role="tab">
+        {{ tab }}
+      </button>
+    </li>
+  {%- endfor %}
+</ul>
+
+<div class="tab-content" id="formTabsContent">
+  {%- for tab, tab_fields in tabs.items() %}
     <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
-         id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
-         role="tabpanel"
-         aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
-
-      {% for section in tab.sections %}
-        {% if section.section_name %}
-          <h5 class="mt-3">{{ section.section_name }}</h5>
-        {% endif %}
-
-        <div class="row">
-          {% for entry in section.entries %}
-            {% if entry.entry_name and entry.label %}
-              {{ macros.render_field({
-                'name': entry.entry_name,
-                'label': entry.label,
-                'type': entry.type,
-                'required': entry.required,
-                'readonly': entry.readonly,
-                'options': entry.options,
-                'value': entry.value if entry.value is defined else entry.default
-              }) }}
-            {% else %}
-              <div class="col-md-6 mb-3">
-                <div class="alert alert-warning">
-                  ⚠️ Invalid field entry in section "{{ section.section_name }}"
-                </div>
-              </div>
-            {% endif %}
-          {% endfor %}
+         id="tab-{{ tab | lower | replace(' ', '-') }}"
+         role="tabpanel">
+      {%- set grouped_by_section = tab_fields | groupby('section') -%}
+      {%- for section, section_fields in grouped_by_section %}
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-header bg-white">
+            <h5 class="h6 text-primary fw-semibold mb-0">
+              {{ section or 'General' }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              {%- for field in section_fields %}
+                {%- if field.name == 'crisp' and read_only %}
+                  {% include 'pages/components/_crisp.html' with context %}
+                {%- else %}
+                  {{ macros.field.render_field(field, read_only) }}
+                {%- endif %}
+              {%- endfor %}
+            </div>
+          </div>
         </div>
-      {% endfor %}
+      {%- endfor %}
     </div>
-  {% endfor %}
+  {%- endfor %}
 </div>
 
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
-
-  const tabNames = {{ ui | map(attribute='tab_name') | list | tojson | safe }};
-  const structure = [
-    {% for tab in ui %}
-      {
-        tab: {{ tab.tab_name | tojson }},
-        sectionCount: {{ tab.sections | length }},
-        entryCounts: {
-          {% for section in tab.sections %}
-            {{ section.section_name | tojson }}: {{ section.entries | length }}{% if not loop.last %},{% endif %}
-          {% endfor %}
-        }
-      }{% if not loop.last %},{% endif %}
-    {% endfor %}
-  ];
-
-  log("info", "_pills_nav_content.html", "render", "📋 Tab structure", {
-    totalTabs: tabNames.length,
-    tabNames,
-    structure
-  });
+  const tabs = {{ tabs.keys() | list | tojson | safe }};
+  log("info", "_pills_nav_content.html", "tabs", "🧩 Tabs generated from field definitions", tabs);
+  {%- for tab, tab_fields in tabs.items() %}
+    const sections_{{ loop.index }} = {{ tab_fields | map(attribute='section') | list | unique | tojson | safe }};
+    log("debug", "_pills_nav_content.html", "tabs", "📁 Sections under tab: {{ tab }}", sections_{{ loop.index }});
+  {%- endfor %}
 </script>
 <!-- END TEMPLATE: _pills_nav_content.html -->

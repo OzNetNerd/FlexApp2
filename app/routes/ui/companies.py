@@ -14,13 +14,13 @@ def get_company_tabs(item: dict, include_metadata: bool = False) -> List[Tab]:
     """
     # Company Details section
     company_details_section = TabSection(section_name="Company Details", entries=[
-        TabEntry(entry_name="name", label="Name", type="text", required=True, readonly=False, value=item.get("name")),
-        TabEntry(entry_name="description", label="Description", type="text", readonly=False, value=item.get("description")),
+        TabEntry(entry_name="name", label="Name", type="text", required=True, value=item.get("name")),
+        TabEntry(entry_name="description", label="Description", type="text", value=item.get("description")),
     ])
 
     # CRISP Score section
     crisp_score_section = TabSection(section_name="CRISP Score", entries=[
-        TabEntry(entry_name="crisp", label="CRISP", type="custom", readonly=False, value=item.get("crisp")),
+        TabEntry(entry_name="crisp", label="CRISP", type="custom", value=item.get("crisp")),
     ])
 
     # About tab
@@ -34,8 +34,8 @@ def get_company_tabs(item: dict, include_metadata: bool = False) -> List[Tab]:
     # Optionally add metadata
     if include_metadata:
         metadata_section = TabSection(section_name="Metadata", entries=[
-            TabEntry(entry_name="created_at", label="Created At", type="readonly", readonly=True, value=item.get("created_at")),
-            TabEntry(entry_name="updated_at", label="Updated At", type="readonly", readonly=True, value=item.get("updated_at")),
+            TabEntry(entry_name="created_at", label="Created At", type="readonly", value=item.get("created_at")),
+            TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
         ])
         metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
         tabs.append(metadata_tab)
