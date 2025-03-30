@@ -125,22 +125,9 @@ def create_app(config_class=Config):
         from app import models
         db.create_all()
 
-        # ✅ Seed demo data (admin user) if not already present
-        if not User.query.filter_by(email="admin@example.com").first():
-            admin = User(
-                username="admin",
-                name="Administrator",
-                email="admin@example.com",
-                password="password",  # This is hashed in your model __init__
-                is_admin=True,
-            )
-            db.session.add(admin)
-            db.session.commit()
-            logger.info("🚀 Created default admin user (email=admin@example.com, password=password)")
-
-        logger.debug("--- Registered URL Rules ---")
-        for rule in sorted(app.url_map.iter_rules(), key=lambda r: r.endpoint):
-            logger.debug(f"Endpoint: {rule.endpoint}, Methods: {rule.methods}, Rule: {rule}")
+        # logger.debug("--- Registered URL Rules ---")
+        # for rule in sorted(app.url_map.iter_rules(), key=lambda r: r.endpoint):
+            # logger.debug(f"Endpoint: {rule.endpoint}, Methods: {rule.methods}, Rule: {rule}")
 
     return app
 
