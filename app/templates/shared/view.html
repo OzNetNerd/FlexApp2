@@ -7,46 +7,39 @@
     - Blocks: content
   Inputs (from ResourceContext):
     - title      : Page title
-    - item       : The object being viewed
-    - tabs       : List of Tab objects (each with sections and TabEntry fields)
+    - read_only  : Boolean flag
+    - ui         : List of Tab objects (with sections and TabEntry fields)
     - request    : Flask request context
   Output:
     - Tabbed Bootstrap interface with read-only field rendering
     - Section headers grouping fields
     - Each field rendered via a macro for consistency
-  Notes:
-    - First tab is shown as active by default
-    - Field rendering logic is abstracted into a reusable macro
 ------------------------------------------------------------------------------ #}
 
 {% extends "base/entity_page.html" %}
 
-{# Import shared field rendering macro (handles types, labels, etc.) #}
 {% import "macros/form_fields.html" as macros %}
 
 {% block content -%}
-{# Call the base block content first (e.g. sets up headers) #}
 {{ super() }}
 
 <div class="tab-content">
-  {# Loop through all tabs (e.g., About, Insights) passed from ResourceContext #}
-  {%- for tab in tabs %}
+  {% for tab in ui %}
     <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
          id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
          role="tabpanel"
          aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
 
-      {# Loop through each section within the current tab (e.g., "Company Details") #}
-      {%- for section in tab.sections %}
+      {% for section in tab.sections %}
         <h5 class="mt-3">{{ section.section_name }}</h5>
 
-        {# Render each field (TabEntry) in the section using the shared macro #}
-        {%- for entry in section.entries %}
-          {{ macros.render_field(entry) }}
-        {%- endfor %}
-      {%- endfor %}
+        {% for entry in section.entries %}
+          {{ macros.render_field(entry, read_only=True) }}
+        {% endfor %}
+      {% endfor %}
+
     </div>
-  {%- endfor %}
+  {% endfor %}
 </div>
 {%- endblock %}
 <!-- END TEMPLATE: view.html -->

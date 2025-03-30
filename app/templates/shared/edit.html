@@ -3,21 +3,15 @@
   File: edit.html | Purpose: Renders an edit form for entities
   Structure:
     - Extends: base/entity_page.html
-    - Imports: macros/form_fields.html
-    - Blocks: content
-  Inputs:
-    - title      : Page title
-    - item       : Object being edited
-    - fields     : List of field metadata
-    - request    : Flask request context
+    - Inputs:
+        - title     : Page title
+        - read_only : false
+        - id        : Optional entity ID
+        - ui        : List[Tab] structure with sections and TabEntry fields
   Output:
-    - A Bootstrap card with form fields
-    - Cancel button (routes to view/index)
-    - Includes shared section/footer
-  Notes:
-    - Supports 'text', 'email', 'custom' field types
-    - Respects readonly fields
-    - Uses partials and macros for consistency
+    - A Bootstrap card with tabbed section layout
+    - Cancel button (routes to view or index)
+    - Form posts back to current route
 ------------------------------------------------------------------------------ #}
 
 {% extends "base/entity_page.html" %}
@@ -31,37 +25,23 @@
       {{ title }}
     </h3>
     <div class="d-flex gap-2">
-      {%- if item %}
-        {%- set view_endpoint = request.endpoint.rsplit('.', 1)[0] + '.view' -%}
-        <a href="{{ url_for(view_endpoint, item_id=item.id) }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+      {% if id %}
+        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
           <i class="fas fa-times me-1"></i> Cancel
         </a>
-      {%- else %}
+      {% else %}
         <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
           <i class="fas fa-times me-1"></i> Cancel
         </a>
-      {%- endif %}
+      {% endif %}
     </div>
   </div>
 
   <div class="card-body">
     <form method="POST">
-      {%- for field in fields %}
-        <div class="form-group mb-3">
-          <label for="{{ field.name }}">{{ field.label }}</label>
-          {%- if field.type == 'text' %}
-            <input type="text" id="{{ field.name }}" name="{{ field.name }}" value="{{ item | attribute(field.name) }}" class="form-control" {% if field.readonly %}readonly{% endif %}>
-          {%- elif field.type == 'email' %}
-            <input type="email" id="{{ field.name }}" name="{{ field.name }}" value="{{ item | attribute(field.name) }}" class="form-control" {% if field.readonly %}readonly{% endif %}>
-          {%- elif field.type == 'custom' %}
-            <input type="text" id="{{ field.name }}" name="{{ field.name }}" value="{{ item | attribute(field.name) }}" class="form-control" {% if field.readonly %}readonly{% endif %}>
-          {%- endif %}
-        </div>
-      {%- endfor %}
-
-      {%- include 'base/common/_section_layout.html' -%}
-      {%- include 'pages/form/_autocomplete.html' -%}
-      {%- include 'pages/form/_footer.html' -%}
+      {% include 'pages/form/_pills_nav_content.html' %}
+      {% include 'pages/form/_autocomplete.html' %}
+      {% include 'pages/form/_footer.html' %}
     </form>
   </div>
 </div>
@@ -71,19 +51,19 @@
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 
   const editContext = {
-    mode: {{ "'edit'" if item else "'create'" }},
-    entityId: {{ item.id if item else 'null' }},
-    title: {{ title | tojson | safe }},
-    cancelDestination: {{ "'view'" if item else "'index'" }},
-    fieldCount: {{ fields | length }},
-    fields: [
-      {%- for field in fields %}
+    mode: {{ "'edit'" if id else "'create'" }},
+    entityId: {{ id | tojson }},
+    title: {{ title | tojson }},
+    cancelDestination: {{ "'view'" if id else "'index'" }},
+    tabCount: {{ ui | length }},
+    structure: [
+      {% for tab in ui %}
         {
-          name: {{ field.name | tojson }},
-          type: {{ field.type | tojson }},
-          readonly: {{ field.readonly | default(false) | tojson }}
+          tab: {{ tab.tab_name | tojson }},
+          sections: {{ tab.sections | map(attribute='section_name') | list | tojson | safe }},
+          fieldCount: {{ tab.sections | map(attribute='entries') | map('length') | sum }}
         }{% if not loop.last %},{% endif %}
-      {%- endfor %}
+      {% endfor %}
     ]
   };
 

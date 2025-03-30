@@ -2,7 +2,7 @@
 {# ------------------------------------------------------------------------------
   File: _pills_nav.html | Purpose: Pill-style tab navigation for forms
   Inputs:
-    - tabs: List[Tab]
+    - ui: List[Tab]
       Each tab:
         • tab_name: str (label/ID)
         • sections: List (used for logging)
@@ -13,9 +13,9 @@
 
 {% import "macros/form_fields/render_field.html" as macros %}
 
-{% if tabs | length > 1 %}
+{% if ui | length > 1 %}
   <div class="btn-group" role="tablist">
-    {% for tab in tabs %}
+    {% for tab in ui %}
       <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
               id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
               data-bs-toggle="pill"
@@ -34,14 +34,18 @@
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 
-  const tabs = {{ tabs | map(attribute='tab_name') | list | tojson | safe }};
-  const sectionCounts = {{ tabs | map(attribute='sections') | map('length') | list | tojson | safe }};
+  try {
+    const tabNames = {{ ui | map(attribute='tab_name') | list | tojson | safe }};
+    const sectionCounts = {{ ui | map(attribute='sections') | map('length') | list | tojson | safe }};
 
-  log("info", "_pills_nav.html", "render", {
-    message: "📑 Tab navigation rendered",
-    totalTabs: tabs.length,
-    tabs,
-    sectionCounts
-  });
+    log("info", "_pills_nav.html", "render", {
+      message: "📑 Tab navigation rendered",
+      totalTabs: tabNames.length,
+      tabs: tabNames,
+      sectionCounts
+    });
+  } catch (e) {
+    console.warn("⚠️ Could not serialize tab info for logging:", e);
+  }
 </script>
 <!-- END TEMPLATE: _pills_nav.html -->

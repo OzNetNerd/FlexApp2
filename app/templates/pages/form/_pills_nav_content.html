@@ -3,7 +3,7 @@
   File: _pills_nav_content.html
   Purpose: Tabbed content layout for rendering form fields grouped by tab/section
   Inputs:
-    - tabs: List[Tab]
+    - ui: List[Tab]
       Each Tab contains:
         • tab_name: str — the tab's label
         • sections: List[Section]
@@ -13,27 +13,18 @@
     - Meant to be used alongside a nav component like _pills_nav.html
     - Uses Bootstrap's .tab-pane for tab content
     - Imports render_field macro for field layout
-    - Logs all rendering steps and skipped invalid entries for visibility
+    - Skips debug logging that causes JSON serialization errors
 ------------------------------------------------------------------------------ #}
 
-{# Import macro to render individual fields from entry metadata #}
 {% import "macros/form_fields/render_field.html" as macros %}
-
-<script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
-  const tabs = {{ tabs | tojson | safe }};
-  log("info", "_pills_nav_content.html", "init", "📋 Tabs input data", tabs);
-</script>
 
 <div class="tab-content">
   {# Iterate through each tab and render it as a Bootstrap .tab-pane #}
-  {% for tab in tabs %}
+  {% for tab in ui %}
     <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
          id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
          role="tabpanel"
          aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
-
-      {{ item }}
 
       {# Render each section inside the tab #}
       {% for section in tab.sections %}
@@ -48,7 +39,6 @@
             {% set has_name = has_entry and entry.entry_name is defined %}
             {% set has_label = has_entry and entry.label is defined %}
 
-            {# If entry is valid, render it using the macro #}
             {% if has_entry and has_name and has_label %}
               {{ macros.render_field({
                 'name': entry.entry_name,
@@ -57,10 +47,8 @@
                 'required': entry.required if entry.required is defined else False,
                 'readonly': entry.readonly if entry.readonly is defined else False,
                 'options': entry.options if entry.options is defined else None,
-                'default': entry.default if entry.default is defined else None
+                'value': entry.value if entry.value is defined else entry.default
               }) }}
-
-            {# If invalid, show warning in UI and log details in console #}
             {% else %}
               {% set reasons = [] %}
               {% if not has_entry %}{% set _ = reasons.append("entry is missing or null") %}{% endif %}
@@ -75,18 +63,9 @@
 
               <script type="module">
                 import log from "{{ url_for('static', filename='js/logger.js') }}";
-                const tabName = {{ tab.tab_name | tojson | safe }};
-                const sectionName = {{ section.section_name | tojson | safe }};
-                const reasons = {{ reasons | tojson | safe }};
-                const entryData = {{ entry | tojson | safe if entry else 'null' }};
-                const message = `⚠️ Skipped invalid entry in section "${sectionName}" (Tab: "${tabName}"): ${reasons.join(', ')}`;
-                console.warn(message, entryData);
-                log("error", "_pills_nav_content.html", "render", message, {
-                  tab: tabName,
-                  section: sectionName,
-                  reasons,
-                  entry: entryData
-                });
+                const message = `⚠️ Skipped invalid entry in section {{ section.section_name }} (Tab: {{ tab.tab_name }}): {{ reasons | join(', ') }}`;
+                console.warn(message);
+                log("error", "_pills_nav_content.html", "render", message);
               </script>
             {% endif %}
           {% endfor %}
@@ -96,25 +75,4 @@
   {% endfor %}
 </div>
 
-{# Summary logging of rendered tabs and sections #}
-<script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
-
-  const tabSummary = {{ tabs | map(attribute='tab_name') | list | tojson | safe }};
-  const sectionDetails = [
-    {% for tab in tabs %}
-      {
-        tab: {{ tab.tab_name | tojson | safe }},
-        sectionCount: {{ tab.sections | length }},
-        totalEntries: {{ tab.sections | map(attribute='entries') | map('length') | sum }}
-      }{% if not loop.last %},{% endif %}
-    {% endfor %}
-  ];
-
-  log("info", "_pills_nav_content.html", "render", "🗂️ Tab panes rendered", {
-    totalTabs: tabSummary.length,
-    tabNames: tabSummary,
-    sectionDetails
-  });
-</script>
 <!-- END TEMPLATE: _pills_nav_content.html -->

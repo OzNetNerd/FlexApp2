@@ -2,7 +2,8 @@
 {# ------------------------------------------------------------------------------
   File: _autocomplete.html | Purpose: Render user/company autocomplete fields
   Inputs:
-    - item: Object containing item.users (List[User]) and item.company (Company)
+    - initial_user_ids: List[int] for users
+    - initial_company_id: Optional[int] for the company
   Features:
     - Bootstrap inputs for user/company with data-initial JSON
     - JS logs and parses initial values
@@ -19,7 +20,7 @@
     id="users-input"
     class="form-control"
     placeholder="Type to search users..."
-    data-initial='{{ item.users | map(attribute="id") | list | tojson }}'
+    data-initial='{{ initial_user_ids | default([]) | tojson }}'
   >
 </div>
 
@@ -31,7 +32,7 @@
     id="companies-input"
     class="form-control"
     placeholder="Type to search companies..."
-    data-initial='[{{ item.company.id if item and item.company else "" }}]'
+    data-initial='{{ [initial_company_id] if initial_company_id else [] | tojson }}'
   >
 </div>
 

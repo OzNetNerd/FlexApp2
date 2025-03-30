@@ -3,55 +3,41 @@
   ------------------------------------------------------------------------------
   File: _tabs_and_sections.html
   Purpose:
-    Dynamically groups fields by `tab` and `section` and renders them in either
-    a tabbed or stacked layout, using Bootstrap 5 cards.
+    Renders a UI layout using your pre-defined list of Tab objects (`ui`), each
+    with named sections and field entries. Uses Bootstrap 5 card layout.
   Inputs:
-    - fields: Dict[str, List[Field]]
+    - ui: List[Tab]
   Context:
     - read_only: bool
     - field: macro namespace (with render_field)
   Notes:
-    - Includes JS logging of tab/section/field structure.
-    - Uses `_section_card.html` for layout rendering.
+    - Replaces legacy `fields` grouping logic
+    - Uses `_section_card.html` to render each section
+    - Logs tab/section structure for debugging
   ------------------------------------------------------------------------------
 #}
 
-{# 🧱 Group fields by tab > section #}
-{% set tabs = {} %}
-{% for section_name, section_fields in fields.items() %}
-  {% for field in section_fields %}
-    {% set tab = field.tab or 'Other' %}
-    {% if tab not in tabs %}
-      {% set _ = tabs.update({tab: {}}) %}
-    {% endif %}
-    {% if section_name not in tabs[tab] %}
-      {% set _ = tabs[tab].update({section_name: []}) %}
-    {% endif %}
-    {% set _ = tabs[tab][section_name].append(field) %}
-  {% endfor %}
-{% endfor %}
-
-{# 🧭 Render layout conditionally: Tabbed if multiple tabs, stacked otherwise #}
-{% if tabs | length > 1 %}
+{# 🧭 Render layout: Tabbed if multiple tabs, stacked otherwise #}
+{% if ui | length > 1 %}
   <div class="tab-content" id="formTabsContent">
-    {% for tab, tab_sections in tabs.items() %}
+    {% for tab in ui %}
       <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
-           id="tab-{{ tab | lower | replace(' ', '-') }}"
+           id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
            role="tabpanel"
-           aria-labelledby="tab-{{ tab | lower | replace(' ', '-') }}-tab">
-        {% for section, section_fields in tab_sections.items() %}
-          {% set _section = section %}
-          {% set _section_fields = section_fields %}
+           aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
+        {% for section in tab.sections %}
+          {% set _section = section.section_name %}
+          {% set _section_fields = section.entries %}
           {% include 'pages/form/_section_card.html' %}
         {% endfor %}
       </div>
     {% endfor %}
   </div>
 {% else %}
-  {% for tab, tab_sections in tabs.items() %}
-    {% for section, section_fields in tab_sections.items() %}
-      {% set _section = section %}
-      {% set _section_fields = section_fields %}
+  {% for tab in ui %}
+    {% for section in tab.sections %}
+      {% set _section = section.section_name %}
+      {% set _section_fields = section.entries %}
       {% include 'pages/form/_section_card.html' %}
     {% endfor %}
   {% endfor %}
@@ -61,24 +47,23 @@
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 
-  const tabSummary = {
-    totalTabs: {{ tabs | length }},
-    tabNames: {{ tabs.keys() | list | tojson | safe }},
-    structure: [
-      {% for tab, tab_sections in tabs.items() %}
-        {
-          tab: {{ tab | tojson | safe }},
-          sectionCount: {{ tab_sections | length }},
-          fieldCounts: {
-            {% for section, section_fields in tab_sections.items() %}
-              {{ section | tojson }}: {{ section_fields | length }}{% if not loop.last %},{% endif %}
-            {% endfor %}
-          }
-        }{% if not loop.last %},{% endif %}
-      {% endfor %}
-    ]
-  };
+  const structure = [
+    {% for tab in ui %}
+      {
+        tab: {{ tab.tab_name | tojson }},
+        sectionCount: {{ tab.sections | length }},
+        fieldCounts: {
+          {% for section in tab.sections %}
+            {{ section.section_name | tojson }}: {{ section.entries | length }}{% if not loop.last %},{% endif %}
+          {% endfor %}
+        }
+      }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
 
-  log("info", "_tabs_and_sections.html", "render", "🧭 Tab/Section structure", tabSummary);
+  log("info", "_tabs_and_sections.html", "render", "🧭 Tab/Section structure", {
+    totalTabs: structure.length,
+    structure
+  });
 </script>
 <!-- END TEMPLATE: _tabs_and_sections.html -->

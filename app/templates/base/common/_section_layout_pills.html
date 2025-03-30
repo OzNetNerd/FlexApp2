@@ -1,17 +1,12 @@
 <!-- START TEMPLATE: _section_layout_pills.html -->
 {# ------------------------------------------------------------------------------
-  File: _section_layout_pills.html | Purpose: Tabbed form layout by tab/section
+  File: _section_layout_pills.html
+  Purpose: Renders tabbed form layout from ui: List[Tab]
   Inputs:
-    - fields: List[Field] with tab/section info
+    - ui: List[Tab]
     - item: Optional model instance
     - read_only: bool for mode control
     - title: Page title
-  Features:
-    - Bootstrap 5 tabbed card layout
-    - Grouped by tab > section
-    - CRISP viewer in read-only mode
-    - Macros for field rendering
-    - JS logger for context and structure
 ------------------------------------------------------------------------------ #}
 
 {% import "macros/form_fields.html" as macros %}
@@ -53,48 +48,64 @@
 
   <div class="card-body">
     <form method="POST">
-      {%- set tabs = {} -%}
-      {%- for field in fields -%}
-        {%- set tab = field.tab or 'Other' -%}
-        {%- if tab not in tabs -%}
-          {%- set _ = tabs.update({tab: []}) -%}
-        {%- endif -%}
-        {%- set _ = tabs[tab].append(field) -%}
-      {%- endfor %}
+      {% if ui | length > 1 %}
+        <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
+          {% for tab in ui %}
+            <li class="nav-item" role="presentation">
+              <button class="nav-link {% if loop.first %}active{% endif %}"
+                      id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+                      type="button"
+                      role="tab">
+                {{ tab.tab_name }}
+              </button>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
 
       <div class="tab-content" id="formTabsContent">
-        {%- for tab, tab_fields in tabs.items() %}
+        {% for tab in ui %}
           <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
-               id="tab-{{ tab | lower | replace(' ', '-') }}"
+               id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
                role="tabpanel">
-            {%- set grouped_by_section = tab_fields | groupby('section') -%}
-            {%- for section, section_fields in grouped_by_section %}
+            {% for section in tab.sections %}
               <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white">
                   <h5 class="h6 text-primary fw-semibold mb-0">
-                    {{ section or 'General' }}
+                    {{ section.section_name or 'General' }}
                   </h5>
                 </div>
                 <div class="card-body">
                   <div class="row g-3">
-                    {%- for field in section_fields %}
-                      {%- if field.name == 'crisp' and read_only %}
+                    {% for field in section.entries %}
+                      {% if field.entry_name == 'crisp' and read_only %}
                         {% include 'pages/components/_crisp.html' with context %}
-                      {%- else %}
-                        {{ macros.field.render_field(field, read_only) }}
-                      {%- endif %}
-                    {%- endfor %}
+                      {% else %}
+                        {{ macros.render_field({
+                          'name': field.entry_name,
+                          'label': field.label,
+                          'type': field.type,
+                          'required': field.required,
+                          'readonly': field.readonly,
+                          'options': field.options,
+                          'value': field.value if field.value is defined else field.default
+                        }) }}
+                      {% endif %}
+                    {% endfor %}
                   </div>
                 </div>
               </div>
-            {%- endfor %}
+            {% endfor %}
           </div>
-        {%- endfor %}
+        {% endfor %}
       </div>
 
-      {%- if not read_only %}
+      {% if not read_only %}
         {% include 'pages/form/_autocomplete.html' %}
-      {%- else %}
+        {% include 'pages/form/_footer.html' %}
+      {% else %}
         <div class="mb-3">
           <label class="form-label">Users</label>
           <p class="form-control-plaintext">
@@ -107,29 +118,26 @@
             {{ item.company.name if item.company else '—' }}
           </p>
         </div>
-      {%- endif %}
-
-      {%- if not read_only %}
-        {% include 'pages/form/_footer.html' %}
-      {%- endif %}
+      {% endif %}
     </form>
   </div>
 </div>
 
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
-  log("info", "_section_layout_pills.html", "render", "📋 Page Title", {{ title | tojson | safe }});
-  log("info", "_section_layout_pills.html", "render", "👁️ Read-only mode", {{ read_only | tojson | safe }});
-  log("info", "_section_layout_pills.html", "render", "🧩 Item exists", {{ 'true' if item else 'false' }});
-  log("info", "_section_layout_pills.html", "import", "📦 Macros imported from", "macros/form_fields.html");
-
-  const tabs = {{ tabs.keys() | list | tojson | safe }};
-  log("info", "_section_layout_pills.html", "tabs", "🗂️ Tabs detected", tabs);
-
-  {%- for tab, tab_fields in tabs.items() %}
-    const sections_{{ loop.index }} = {{ tab_fields | map(attribute='section') | list | unique | tojson | safe }};
-    log("debug", "_section_layout_pills.html", "tabs", "📁 Sections under tab: {{ tab }}", sections_{{ loop.index }});
-  {%- endfor %}
+  const structure = {
+    totalTabs: {{ ui | length }},
+    tabNames: {{ ui | map(attribute='tab_name') | list | tojson | safe }},
+    detail: [
+      {% for tab in ui %}
+        {
+          tab: {{ tab.tab_name | tojson }},
+          sections: {{ tab.sections | map(attribute='section_name') | list | tojson | safe }}
+        }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  };
+  log("info", "_section_layout_pills.html", "render", "📋 Tab structure", structure);
 </script>
 {%- endblock %}
 <!-- END TEMPLATE: _section_layout_pills.html -->

@@ -15,6 +15,8 @@ from app.routes.base.components.form_handler import FormHandler, ResourceContext
 from app.routes.base.components.item_manager import ItemManager
 from app.models import Company, CRISPScore, Note
 
+from app.routes.ui.companies import get_company_tabs
+
 logger = logging.getLogger(__name__)
 GENERIC_TEMPLATE = "page.html"
 
@@ -116,19 +118,20 @@ class GenericWebRoutes(CRUDRoutesBase):
         if request.method == "POST":
             return self._handle_view_post(item)
 
-        resource_context = ResourceContext(
+        item_dict = item.to_dict()
+        tabs = get_company_tabs(item_dict, include_metadata=True)
+
+        resource_context = ResourceContext.create_context(
+            model=self.model,
+            blueprint_name=self.blueprint.name,
+            item_dict=item_dict,
+            tabs=tabs,
             title="Viewing",
-            model_name=self.model.__name__,
-            item_name=self._get_item_display_name(item),
-            submit_url="",
-            cancel_url=url_for(f"{self.blueprint.name}.index"),
-            tabs=self.model.__tabs__,
-            id=getattr(item, "id", None),
-            item=item,
             read_only=True
         )
 
-        return render_safely(self.view_template, resource_context, f"Error viewing {self.model.__name__} with id {item_id}")
+        return render_safely(self.view_template, resource_context,
+                             f"Error viewing {self.model.__name__} with id {item_id}")
 
     def _handle_view_post(self, item):
         """Handles POST action for the view page, usually note submission."""
@@ -172,17 +175,18 @@ class GenericWebRoutes(CRUDRoutesBase):
 
     def _render_create_form(self):
         """Renders the creation form template."""
-        context = ResourceContext(
+        item_dict = {}
+        tabs = get_company_tabs(item_dict, include_metadata=False)
+
+        context = ResourceContext.create_context(
+            model=self.model,
+            blueprint_name=self.blueprint.name,
+            item_dict=item_dict,
+            tabs=tabs,
             title=f"Create a {self.model.__name__}",
-            model_name=self.model.__name__,
-            item_name="",
-            submit_url=url_for(f"{self.blueprint.name}.create"),
-            cancel_url=url_for(f"{self.blueprint.name}.index"),
-            tabs=self.model.__tabs__,
-            id=None,
-            item=None,
             read_only=False
         )
+
         return render_safely(self.create_template, context, f"Error rendering create form for {self.model.__name__}")
 
     def _edit_route(self, item_id: int):
@@ -208,17 +212,18 @@ class GenericWebRoutes(CRUDRoutesBase):
 
     def _render_edit_form(self, item):
         """Renders the form for editing an existing item."""
-        context = ResourceContext(
+        item_dict = item.to_dict()
+        tabs = get_company_tabs(item_dict, include_metadata=False)
+
+        context = ResourceContext.create_context(
+            model=self.model,
+            blueprint_name=self.blueprint.name,
+            item_dict=item_dict,
+            tabs=tabs,
             title=f"Edit {self.model.__name__}",
-            model_name=self.model.__name__,
-            item_name=self._get_item_display_name(item),
-            submit_url=url_for(f"{self.blueprint.name}.edit", item_id=item.id),
-            cancel_url=url_for(f"{self.blueprint.name}.index"),
-            tabs=self.model.__tabs__,
-            id=str(item.id),
-            item=item,
             read_only=False
         )
+
         return render_safely(self.edit_template, context, f"Error rendering edit form for {self.model.__name__}")
 
     def _handle_edit_form_submission(self, item):

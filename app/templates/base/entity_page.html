@@ -1,19 +1,5 @@
 <!-- START TEMPLATE: entity_page.html -->
-{# ------------------------------------------------------------------------------
-  File: entity_page.html | Purpose: Standalone page for entity CRUD operations
-  Inputs:
-    - title: Page title
-    - read_only: Bool for display mode
-    - item: Optional model
-    - tabs: Optional tabbed layout
-    - show_navbar: Optional bool to include navbar
-  Features:
-    - Bootstrap 5 responsive layout
-    - Includes partials: header, buttons, tabs/sections, footer, toasts, navbar
-    - JavaScript for tabs, autocomplete, logging
-    - Optional delete confirmation modal
------------------------------------------------------------------------------- #}
-
+{# ------------------------------------------------------------------------------ #}
 {% import "macros/form_fields.html" as macros %}
 {% import "macros/form_fields/render_form.html" as form %}
 {% import "macros/form_fields/render_sections.html" as sections %}
@@ -49,7 +35,7 @@
 
           <div class="card-body">
             <form method="POST">
-              {% if tabs %}
+              {% if ui %}
                 {% include 'pages/form/_pills_nav_content.html' %}
               {% else %}
                 {% include 'base/common/_section_layout.html' %}
@@ -74,22 +60,22 @@
       const context = {
         title: {{ title | tojson }},
         readOnly: {{ read_only | tojson }},
-        hasItem: {{ (item is defined and item is not none) | tojson }},
-        layout: {{ ("Tabbed" if tabs else "Sectioned") | tojson }},
+        hasUi: {{ ui is defined and ui is not none | tojson }},
+        layout: {{ ("Tabbed" if ui else "Sectioned") | tojson }},
         includes: [
           "form/_header.html",
           "form/_buttons.html",
           "base/common/_toasts.html",
-          {% if tabs %}"form/_pills_nav_content.html",{% else %}"base/common/_section_layout.html",{% endif %}
+          {% if ui %}"form/_pills_nav_content.html",{% else %}"base/common/_section_layout.html",{% endif %}
           {% if not read_only %}"pages/form/_autocomplete.html",{% endif %}
           {% if not read_only %}"pages/form/_footer.html",{% endif %}
           {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
         ].filter(Boolean)
       };
-      log("info", "entity_page.html", "pageRender", JSON.stringify(context));
+      log("info", "entity_page.html", "pageRender", context);
     </script>
 
-    {%- if item %}
+    {%- if id %}
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -102,7 +88,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.delete', item_id=item.id) }}" class="btn btn-danger">
+            <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.delete', item_id=id) }}" class="btn btn-danger">
               Delete
             </a>
           </div>

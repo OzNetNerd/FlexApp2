@@ -1,7 +1,6 @@
 import logging
 from app.models.base import db, BaseModel
 from app.models.note import Note
-from app.routes.base.components.form_handler import Tab, TabSection, TabEntry
 
 logger = logging.getLogger(__name__)
 
@@ -40,25 +39,6 @@ class Company(BaseModel):
         cascade="all, delete-orphan",
         lazy="dynamic",
     )
-
-    # Company Details section
-    company_details_section = TabSection(section_name="Company Details", entries=[
-        TabEntry(entry_name="name", label="Name", type="text", required=True),
-        TabEntry(entry_name="description", label="Description", type="text"),
-    ])
-
-    # CRISP Score section
-    crisp_score_section = TabSection(section_name="CRISP Score", entries=[
-        TabEntry(entry_name="crisp", label="CRISP", type="custom"),
-    ])
-
-    # About tab
-    about_tab = Tab(tab_name="About", sections=[company_details_section])
-
-    # Insights tab
-    insights_tab = Tab(tab_name="Insights", sections=[crisp_score_section])
-
-    __tabs__ = [about_tab, insights_tab]
 
     @property
     def capabilities(self) -> list:

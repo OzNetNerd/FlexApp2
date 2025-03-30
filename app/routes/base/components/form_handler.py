@@ -1,33 +1,7 @@
 import logging
-from typing import Dict, List, Any, Optional
-
+from typing import Optional, Any, Dict, List
 from dataclasses import dataclass, field
-
-@dataclass
-class IndexContext:
-    page_type: str
-    title: str
-    table_config: dict
-    table_id: str
-    data_url: str
-    entity_name: str
-    add_url: str
-    columns: list[Any]
-
-
-@dataclass
-class ResourceContext:
-    title: str = ""
-    model_name: str = ""
-    item_name: str = ""
-    submit_url: str = ""
-    cancel_url: str = ""
-    tabs: dict = field(default_factory=dict)
-    id: Optional[str] = ""
-    item: Any = ""
-    read_only: bool = True
-    error_message: str = None
-
+from flask import url_for
 
 @dataclass
 class TabEntry:
@@ -38,6 +12,8 @@ class TabEntry:
     readonly: bool = True
     options: Optional[List[dict[str, Any]]] = None
     default: Optional[Any] = None
+    value: Optional[Any] = None
+
 
 @dataclass
 class TabSection:
@@ -49,6 +25,51 @@ class Tab:
     tab_name: str
     sections: List[TabSection] = field(default_factory=list)
 
+
+@dataclass
+class ResourceContext:
+    title: str
+    read_only: bool = True
+    submit_url: str = field(init=False)
+    cancel_url: str = field(init=False)
+    item_name: str = field(init=False)
+    id: Optional[str] = field(init=False)
+    error_message: Optional[str] = None
+    ui: List[Tab] = field(init=False)  # list[Tab]
+    model_name: str = field(init=False)
+
+    def __post_init__(self):
+        raise NotImplementedError("Use the factory method `create_context()` to construct ResourceContext.")
+
+    @classmethod
+    def create_context(cls, model, blueprint_name: str, item_dict: dict, tabs, title: str, read_only: bool, error_message: Optional[str] = None):
+        """Factory method to construct a ResourceContext with derived fields."""
+        self = cls.__new__(cls)  # Bypass __init__
+        self.title = title
+        self.submit_url = url_for(f"{blueprint_name}.create") if read_only is False else ""
+        self.cancel_url = url_for(f"{blueprint_name}.index")
+        self.read_only = read_only
+        self.error_message = error_message
+        self.model_name = model.__name__
+        self.id = str(item_dict.get("id", ""))
+        self.item_name = next(
+            (item_dict[k] for k in ["name", "title", "email", "username"] if k in item_dict and item_dict[k]),
+            str(item_dict.get("id", ""))
+        )
+        self.ui = tabs
+        return self
+
+
+@dataclass
+class IndexContext:
+    page_type: str
+    title: str
+    table_config: dict
+    table_id: str
+    data_url: str
+    entity_name: str
+    add_url: str
+    columns: list[Any]
 
 logger = logging.getLogger(__name__)
 

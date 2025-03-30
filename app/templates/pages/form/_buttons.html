@@ -2,28 +2,28 @@
 {# ------------------------------------------------------------------------------
   File: _buttons.html | Purpose: Render contextual buttons for entity pages
   Inputs:
-    - item: Optional[Model]
+    - id: Optional[str] → Determines if the item exists
     - read_only: Boolean
   Behavior:
     - Show "Cancel" if editing
-    - Show Add, Edit, Delete (modal), Back if in read-only mode with item
+    - Show Add, Edit, Delete (modal), Back if in read-only mode with id
   Notes:
     - Uses request.endpoint to infer base route
     - Delete assumes presence of #deleteModal
 ------------------------------------------------------------------------------ #}
 
 <div class="d-flex justify-content-end align-items-center gap-2">
-  {% if item and not read_only %}
-    <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=item.id) }}"
+  {% if id and not read_only %}
+    <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}"
        class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
       <i class="fas fa-times me-1"></i> Cancel
     </a>
-  {% elif item and read_only %}
+  {% elif id and read_only %}
     <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}"
        class="btn btn-primary fw-bold">
       <i class="fas fa-plus me-1"></i> Add
     </a>
-    <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', item_id=item.id) }}"
+    <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', item_id=id) }}"
        class="btn btn-warning text-dark fw-bold">
       <i class="fas fa-edit me-1"></i> Edit
     </a>
@@ -42,14 +42,14 @@
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 
   const context = {
-    hasItem: {{ 'true' if item else 'false' }},
-    readOnly: {{ read_only | tojson | safe }},
+    hasId: {{ id is defined and id is not none | tojson }},
+    readOnly: {{ read_only | tojson }},
     buttons: []
   };
 
-  if (context.hasItem && !context.readOnly) {
+  if (context.hasId && !context.readOnly) {
     context.buttons.push("Cancel");
-  } else if (context.hasItem && context.readOnly) {
+  } else if (context.hasId && context.readOnly) {
     context.buttons.push("Add", "Edit", "Delete", "Back");
   }
 
