@@ -1,3 +1,9 @@
+"""Test configuration fixtures and utilities.
+
+This module provides pytest fixtures and utility functions for testing the FlexApp application,
+including database setup, application creation, and authentication helpers.
+"""
+
 import os
 import sqlite3
 import pytest
@@ -44,22 +50,35 @@ def app() -> Flask:
     )
 
     with app.app_context():
-        # Reflect the schema into SQLAlchemy’s engine and copy data
+        # Reflect the schema into SQLAlchemy's engine and copy data
         raw_conn = db.engine.raw_connection()
-        mem_conn.backup(raw_conn.connection)
+        # Use driver_connection instead of connection to avoid deprecation warning
+        mem_conn.backup(raw_conn.driver_connection)
         yield app
         db.session.remove()
 
 
 @pytest.fixture
 def client(app: Flask):
+    """
+    Creates a test client for the Flask application.
+
+    Args:
+        app: The Flask application fixture.
+
+    Returns:
+        A Flask test client.
+    """
     return app.test_client()
 
 
 @pytest.fixture
-def test_user(app: Flask):
+def test_user(app: Flask) -> User:
     """
     Creates a test admin user (newadmin@example.com) to avoid conflicts.
+
+    Args:
+        app: The Flask application fixture.
 
     Returns:
         User: The created or updated user.
@@ -86,6 +105,10 @@ def test_user(app: Flask):
 def logged_in_client(client, test_user):
     """
     Logs in the test admin user (newadmin@example.com).
+
+    Args:
+        client: The Flask test client.
+        test_user: The test user fixture.
 
     Returns:
         FlaskClient: The authenticated test client.
