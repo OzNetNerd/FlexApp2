@@ -19,31 +19,25 @@ from app.models.user import User
 from app.routes.base.components.form_handler import ResourceContext
 from flask import current_app
 
-
 def configure_logging():
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
     logger.handlers.clear()
 
     handler = logging.StreamHandler()
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(filename)s - %(funcName)s - %(lineno)d - %(levelname)s - %(message)s")
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(filename)s - %(funcName)s - %(lineno)d - %(levelname)s - %(message)s"
+    )
     handler.setFormatter(formatter)
-
     logger.addHandler(handler)
 
-
-# Top-level logger
 logger = logging.getLogger(__name__)
-
-# Global extensions
 login_manager = LoginManager()
 migrate = Migrate()
-
 
 @login_manager.unauthorized_handler
 def unauthorized():
     return make_response("🔒 Unauthorized - Please log in first", 401)
-
 
 def create_app(config_class=Config):
     configure_logging()
@@ -51,12 +45,11 @@ def create_app(config_class=Config):
     app = Flask(__name__, static_folder="static", static_url_path="/static")
     app.config.from_object(config_class)
 
-    # ✅ Secure session configuration using Flask's built-in session management
     app.config.update(
         PERMANENT_SESSION_LIFETIME=60 * 60 * 24,  # 1 day
         SESSION_PERMANENT=True,
         SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SECURE=True,  # Set to False for local dev if needed
+        SESSION_COOKIE_SECURE=True,
         SESSION_COOKIE_SAMESITE="Lax",
         REMEMBER_COOKIE_DURATION=60 * 60 * 24 * 30,  # 30 days
         REMEMBER_COOKIE_HTTPONLY=True,
@@ -83,22 +76,14 @@ def create_app(config_class=Config):
             "static",
             "debug_session",
         ]
-
         endpoint = request.endpoint
         if endpoint is None:
             return
-
-        # logger.debug(f"Before request: {endpoint}, Authenticated: {current_user.is_authenticated}")
-        # logger.debug(f"Session contents: {dict(flask_session) if flask_session else 'None'}")
-        # logger.debug(f"User ID: {current_user.get_id() if current_user.is_authenticated else None}")
-        # logger.debug(f"Cookies: {request.cookies}")
-
         if not current_user.is_authenticated:
             if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
                 return
             return redirect(url_for("auth_bp.login", next=request.path))
 
-    # ✅ Register all web routes
     register_web_blueprints(app)
 
     @app.route("/debug-session")
@@ -112,11 +97,6 @@ def create_app(config_class=Config):
             "cookies": {k: v for k, v in request.cookies.items()},
         }
         return jsonify(result)
-
-    with app.app_context():
-        logger.debug("--- Registered URL Rules ---")
-        for rule in sorted(app.url_map.iter_rules(), key=lambda r: r.endpoint):
-            logger.debug(f"Endpoint: {rule.endpoint}, Methods: {rule.methods}, Rule: {rule}")
 
     @app.context_processor
     def inject_now():
@@ -139,6 +119,28 @@ def create_app(config_class=Config):
             read_only=True
         )
         return render_safely("errors/500.html", context, "Internal server error."), 500
+
+    # ✅ Create all tables and seed demo data if necessary
+    with app.app_context():
+        from app import models
+        db.create_all()
+
+        # ✅ Seed demo data (admin user) if not already present
+        if not User.query.filter_by(email="admin@example.com").first():
+            admin = User(
+                username="admin",
+                name="Administrator",
+                email="admin@example.com",
+                password="password",  # This is hashed in your model __init__
+                is_admin=True,
+            )
+            db.session.add(admin)
+            db.session.commit()
+            logger.info("🚀 Created default admin user (email=admin@example.com, password=password)")
+
+        logger.debug("--- Registered URL Rules ---")
+        for rule in sorted(app.url_map.iter_rules(), key=lambda r: r.endpoint):
+            logger.debug(f"Endpoint: {rule.endpoint}, Methods: {rule.methods}, Rule: {rule}")
 
     return app
 

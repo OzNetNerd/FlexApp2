@@ -1,3 +1,9 @@
+Run tests:
+```
+
+```
+
+
 navbar:
 EoQ m, w, d - Target %
 EoY m, w, d - Target %

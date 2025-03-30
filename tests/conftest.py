@@ -57,9 +57,30 @@ def test_user(app: Flask):
     """
     user = User(
         name="Test User",
-        email="test@example.com",
-        password=generate_password_hash("testpass"),  # Adjust depending on your User model
+        email="admin@example.com",
+        password=generate_password_hash("password"),
     )
     db.session.add(user)
     db.session.commit()
     return user
+
+
+@pytest.fixture
+def logged_in_client(client, test_user):
+    """
+    Logs in the test user using the login route and returns an authenticated client.
+
+    Args:
+        client (FlaskClient): The test client.
+        test_user (User): The user to log in.
+
+    Returns:
+        FlaskClient: The authenticated client.
+    """
+    response = client.post(
+        "/auth/login",
+        data={"email": "admin@example.com", "password": "password"},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    return client
