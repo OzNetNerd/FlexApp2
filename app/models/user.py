@@ -76,3 +76,66 @@ class User(BaseModel, UserMixin):
             bool: True if password is valid, False otherwise.
         """
         return check_password_hash(self.password_hash, password)
+
+
+def to_dict(self):
+    """Convert User instance to a dictionary for serialization.
+
+    Returns:
+        dict: Dictionary representation of the user.
+    """
+    base_dict = super().to_dict()
+
+    # Include relationships from both directions
+    from app.models.relationship import Relationship
+    from app.services.relationship_service import RelationshipService
+
+    # Get relationships where user is either entity1 or entity2
+    entity1_relationships = Relationship.query.filter_by(
+        entity1_type='user',
+        entity1_id=self.id
+    ).all()
+
+    entity2_relationships = Relationship.query.filter_by(
+        entity2_type='user',
+        entity2_id=self.id
+    ).all()
+
+    # Process relationships to get related users and companies
+    related_users = []
+    related_companies = []
+
+    for rel in entity1_relationships + entity2_relationships:
+        # Determine the related entity (the one that's not this user)
+        if rel.entity1_type == 'user' and rel.entity1_id == self.id:
+            related_type = rel.entity2_type
+            related_id = rel.entity2_id
+        else:
+            related_type = rel.entity1_type
+            related_id = rel.entity1_id
+
+        # Get the related entity
+        related_entity = RelationshipService.get_entity(related_type, related_id)
+        if not related_entity:
+            continue
+
+        # Add to appropriate list
+        if related_type == 'user':
+            related_users.append({
+                'id': related_entity.id,
+                'name': related_entity.name,
+                'username': related_entity.username,
+                'relationship_type': rel.relationship_type
+            })
+        elif related_type == 'company':
+            related_companies.append({
+                'id': related_entity.id,
+                'name': related_entity.name,
+                'relationship_type': rel.relationship_type
+            })
+
+    # Add the processed relationships to the dictionary
+    base_dict['related_users'] = related_users
+    base_dict['related_companies'] = related_companies
+
+    return base_dict

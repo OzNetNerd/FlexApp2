@@ -105,14 +105,45 @@ class GenericWebRoutes(CRUDRoutesBase):
         """
         self.request_logger.log_request_info(self.model.__name__, "view", item_id)
         item, error = self.item_manager.get_item_by_id(item_id)
-        logger.info(f"This is item: {item.to_dict()}")
+
         if error:
             flash(error, "error")
             return redirect(url_for(f"{self.blueprint.name}.index"))
+
         if request.method == "POST":
             return self._handle_view_post(item)
+
+        # Get the basic item data
         item_dict = item.to_dict()
+
+        # For User models, fetch relationships directly
+        if self.model.__name__ == "User":
+            from app.services.relationship_service import RelationshipService
+
+            # Get all relationships from the service
+            relationships = RelationshipService.get_relationships_for_entity('user', item_id)
+
+            # Add relationship data to the item dictionary
+            item_dict['related_users'] = [rel for rel in relationships if rel['entity_type'] == 'user']
+            item_dict['related_companies'] = [rel for rel in relationships if rel['entity_type'] == 'company']
+
+        logger.info(f"This is item: {item_dict}")
+
+        # Get tabs configuration
         tabs = self.get_tabs_function(item_dict)
+
+        # Update the 'users' and 'companies' tab entries with actual relationship data
+        if self.model.__name__ == "User":
+            for tab in tabs:
+                if tab.tab_name == "Mappings":
+                    for section in tab.sections:
+                        for entry in section.entries:
+                            if entry.entry_name == "users" and 'related_users' in item_dict:
+                                entry.value = item_dict['related_users']
+                            elif entry.entry_name == "companies" and 'related_companies' in item_dict:
+                                entry.value = item_dict['related_companies']
+
+        # Create the context for the template
         resource_context = ResourceContext.create_context(
             model=self.model,
             blueprint_name=self.blueprint.name,
@@ -121,6 +152,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             title="Viewing",
             read_only=True
         )
+
         return render_safely(self.view_template, resource_context,
                              f"Error viewing {self.model.__name__} with id {item_id}")
 

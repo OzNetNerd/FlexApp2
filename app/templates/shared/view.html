@@ -1,21 +1,3 @@
-<!-- START TEMPLATE: view.html -->
-{# ------------------------------------------------------------------------------
-  File: view.html | Purpose: Renders a view-only detail page for entities
-  Structure:
-    - Extends: base/entity_page.html
-    - Imports: macros/form_fields.html
-    - Blocks: content
-  Inputs (from ResourceContext):
-    - title      : Page title
-    - read_only  : Boolean flag
-    - ui         : List of Tab objects (with sections and TabEntry fields)
-    - request    : Flask request context
-  Output:
-    - Tabbed Bootstrap interface with read-only field rendering
-    - Section headers grouping fields
-    - Each field rendered via a macro for consistency
------------------------------------------------------------------------------- #}
-
 {% extends "base/entity_page.html" %}
 
 {% import "macros/form_fields.html" as macros %}
@@ -34,7 +16,53 @@
         <h5 class="mt-3">{{ section.section_name }}</h5>
 
         {% for entry in section.entries %}
-          {{ macros.render_field(entry, read_only=True) }}
+          {% if tab.tab_name == 'Mappings' and entry.entry_name == 'users' and item and item.related_users %}
+            <div class="mb-3">
+              <label class="form-label">{{ entry.label }}</label>
+              <div class="card">
+                <div class="card-body p-3">
+                  {% if item.related_users|length > 0 %}
+                    <ul class="list-group list-group-flush">
+                      {% for user in item.related_users %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                          <div>
+                            <strong>{{ user.name }}</strong> ({{ user.username }})
+                            <span class="badge bg-secondary ms-2">{{ user.relationship_type }}</span>
+                          </div>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p class="text-muted mb-0">No related users</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% elif tab.tab_name == 'Mappings' and entry.entry_name == 'companies' and item and item.related_companies %}
+            <div class="mb-3">
+              <label class="form-label">{{ entry.label }}</label>
+              <div class="card">
+                <div class="card-body p-3">
+                  {% if item.related_companies|length > 0 %}
+                    <ul class="list-group list-group-flush">
+                      {% for company in item.related_companies %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                          <div>
+                            <strong>{{ company.name }}</strong>
+                            <span class="badge bg-secondary ms-2">{{ company.relationship_type }}</span>
+                          </div>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p class="text-muted mb-0">No related companies</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% else %}
+            {{ macros.render_field(entry, read_only=True) }}
+          {% endif %}
         {% endfor %}
       {% endfor %}
 
@@ -42,4 +70,3 @@
   {% endfor %}
 </div>
 {%- endblock %}
-<!-- END TEMPLATE: view.html -->

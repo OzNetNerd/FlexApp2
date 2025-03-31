@@ -7,10 +7,61 @@
     - No JavaScript to avoid serialization issues
     - Special handling for CRISP field to prevent undefined errors
     - Safe access patterns for all fields
+    - Added special handling for relationship data (users/companies)
 ------------------------------------------------------------------------------ #}
 {% macro render_value(field) %}
+  {# Special handling for users/companies relationship fields #}
+  {% if field.entry_name == 'users' and field.value %}
+    {% if field.value|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Relationship</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in field.value %}
+              <tr>
+                <td>{{ user.entity_name }}</td>
+                <td><span class="badge bg-secondary">{{ user.relationship_type }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <span class="text-muted fst-italic">No related users</span>
+    {% endif %}
+
+  {# Special handling for companies relationship field #}
+  {% elif field.entry_name == 'companies' and field.value %}
+    {% if field.value|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Relationship</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for company in field.value %}
+              <tr>
+                <td>{{ company.entity_name }}</td>
+                <td><span class="badge bg-secondary">{{ company.relationship_type }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <span class="text-muted fst-italic">No related companies</span>
+    {% endif %}
+
   {# Special handling for CRISP field by entry_name - avoids accessing field.value entirely #}
-  {% if field.name == 'crisp' %}
+  {% elif field.entry_name == 'crisp' %}
     <span class="text-muted fst-italic">No CRISP score available</span>
 
   {# Standard field rendering logic #}
