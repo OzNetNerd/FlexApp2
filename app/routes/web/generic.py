@@ -15,8 +15,6 @@ from app.routes.base.components.form_handler import FormHandler, ResourceContext
 from app.routes.base.components.item_manager import ItemManager
 from app.models import Company, CRISPScore, Note
 
-from app.routes.ui.companies import get_company_tabs
-
 logger = logging.getLogger(__name__)
 GENERIC_TEMPLATE = "page.html"
 
@@ -34,6 +32,7 @@ class GenericWebRoutes(CRUDRoutesBase):
     create_template: Optional[str] = "shared/create.html"
     edit_template: Optional[str] = "shared/edit.html"
     api_url_prefix: Optional[str] = None
+    get_tabs_function: Optional[callable] = None
 
     def __post_init__(self):
         """Initializes route dependencies and registers endpoints."""
@@ -119,7 +118,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             return self._handle_view_post(item)
 
         item_dict = item.to_dict()
-        tabs = get_company_tabs(item_dict, include_metadata=True)
+        tabs = self.get_tabs_function(item_dict, include_metadata=True)
 
         resource_context = ResourceContext.create_context(
             model=self.model,
@@ -176,7 +175,7 @@ class GenericWebRoutes(CRUDRoutesBase):
     def _render_create_form(self):
         """Renders the creation form template."""
         item_dict = {}
-        tabs = get_company_tabs(item_dict, include_metadata=False)
+        tabs = self.get_tabs_function(item_dict, include_metadata=True)
 
         context = ResourceContext.create_context(
             model=self.model,
@@ -213,7 +212,7 @@ class GenericWebRoutes(CRUDRoutesBase):
     def _render_edit_form(self, item):
         """Renders the form for editing an existing item."""
         item_dict = item.to_dict()
-        tabs = get_company_tabs(item_dict, include_metadata=False)
+        tabs = self.get_tabs_function(item_dict, include_metadata=True)
 
         context = ResourceContext.create_context(
             model=self.model,
