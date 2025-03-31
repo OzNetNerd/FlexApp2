@@ -11,7 +11,7 @@ from app.routes.base.components.json_validator import JSONValidator
 from app.routes.base.components.request_logger import RequestLogger
 from app.routes.base.components.table_config_manager import TableConfigManager
 from app.routes.base.components.data_route_handler import DataRouteHandler
-from app.routes.base.components.form_handler import FormHandler, ResourceContext, IndexContext
+from app.routes.base.components.form_handler import FormHandler, ResourceContext, TableContext
 from app.routes.base.components.item_manager import ItemManager
 from app.models import Company, CRISPScore, Note
 
@@ -74,7 +74,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         table_config = self.table_config_manager.get_table_config(self.model.__tablename__)
         # context = self._prepare_page_index_context(table_config)
         data_url = self._determine_data_url()
-        context = IndexContext(
+        context = TableContext(
             page_type="index",
             title=f"{self.model.__name__}s",
             table_config=table_config,

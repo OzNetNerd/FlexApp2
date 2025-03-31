@@ -60,7 +60,11 @@ class ResourceContext:
 
 
 @dataclass
-class IndexContext:
+class BasicContext:
+    title: str
+
+@dataclass
+class TableContext:
     page_type: str
     title: str
     table_config: dict

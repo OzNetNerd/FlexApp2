@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash
 from app.models import User
 import logging
 from app.routes.base.components.template_renderer import render_safely
-from app.routes.base.components.form_handler import ResourceContext
+from app.routes.base.components.form_handler import BasicContext
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ def login():
         flash("Invalid email or password.", "danger")
         logger.warning(f"Failed login attempt for email: {email}")
 
-    context = ResourceContext()
+    context = BasicContext(title="TBA")
     return render_safely("login.html", context)  # Use render_safely for safe rendering
 
 
