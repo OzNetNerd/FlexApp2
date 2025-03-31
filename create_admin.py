@@ -27,9 +27,11 @@ def seed_users():
         ("carol", "Carol White", "carol@example.com"),
         ("dave", "Dave Black", "dave@example.com"),
         ("eve", "Eve Grey", "eve@example.com"),
+        ("admin", "Admin User", "admin@example.com"),  # Adding admin user
     ]
 
     for username, name, email in users:
+        is_admin = email == "admin@example.com"  # Set admin flag for this user
         create_or_update(
             User,
             {"username": username},
@@ -37,7 +39,7 @@ def seed_users():
                 "name": name,
                 "email": email,
                 "password_hash": generate_password_hash("password"),
-                "is_admin": False,
+                "is_admin": is_admin,  # Mark as admin if email matches
             },
         )
     db.session.commit()

@@ -33,7 +33,13 @@ def login():
 
         user = User.query.filter_by(email=email).first()
 
+        if user:
+            logger.debug(f"User found: {user.email}")
+        else:
+            logger.debug(f"User not found for email: {email}")
+
         if user and check_password_hash(user.password_hash, password):
+            logger.debug(f"Password valid for user: {user.email}")
             session.permanent = True
             login_user(user, remember=True)
 
@@ -50,6 +56,7 @@ def login():
 
     context = BasicContext(title="TBA")
     return render_safely("login.html", context)  # Use render_safely for safe rendering
+
 
 
 @auth_bp.route("/logout")
