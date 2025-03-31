@@ -12,7 +12,15 @@ from .fixtures.mock_data import TEST_USERS
 
 @pytest.fixture(scope='session')
 def app():
-    """Create and configure the production Flask app for testing."""
+    """Create and configure the production Flask app for testing.
+
+    This fixture sets up the Flask app for testing by configuring it with test-specific settings,
+    such as an in-memory SQLite database, disabling CSRF, and other necessary configurations. It
+    also creates all the necessary database tables for the tests and cleans them up after the tests.
+
+    Asserts:
+        - The app is correctly configured for testing.
+    """
     # Import create_app from app.py (not from the app package)
     from app.app import create_app
     app = create_app()
@@ -37,7 +45,18 @@ def app():
 
 @pytest.fixture(scope='function')
 def db(app):
-    """Create a new database for each test function."""
+    """Create a new database for each test function.
+
+    This fixture sets up a fresh database for each test by creating the necessary tables and
+    adding mock user data. After the test, the database is cleaned up by removing all entries.
+
+    Args:
+        app (Flask): The Flask application fixture for running the app.
+
+    Asserts:
+        - The database contains mock users before the test function runs.
+        - The database is cleaned up after the test function completes.
+    """
     with app.app_context():
         _db.create_all()
         # Add test users from our mock data
@@ -58,13 +77,33 @@ def db(app):
 
 @pytest.fixture
 def client(app):
-    """Return a test client for the app."""
+    """Return a test client for the app.
+
+    This fixture provides a test client that can be used to simulate requests to the Flask app
+    during testing.
+
+    Args:
+        app (Flask): The Flask application fixture for running the app.
+
+    Asserts:
+        - The test client is correctly set up and can make requests to the app.
+    """
     return app.test_client()
 
 
 @pytest.fixture
 def auth_client(client):
-    """Return an authenticated test client."""
+    """Return an authenticated test client.
+
+    This fixture simulates an authenticated user by modifying the session of the test client
+    to include a user ID, allowing tests to simulate actions as an authenticated user.
+
+    Args:
+        client (FlaskClient): The test client fixture.
+
+    Asserts:
+        - The test client is authenticated for the duration of the test.
+    """
     with client.session_transaction() as session:
         # Assuming TEST_USERS[0] has id '1'
         session['_user_id'] = '1'
@@ -74,5 +113,11 @@ def auth_client(client):
 
 @pytest.fixture
 def mock_user():
-    """Return a mock user from the test data."""
+    """Return a mock user from the test data.
+
+    This fixture provides mock user data that can be used in tests that require a user.
+
+    Asserts:
+        - The returned user data matches one of the entries in the mock data.
+    """
     return TEST_USERS[0]
