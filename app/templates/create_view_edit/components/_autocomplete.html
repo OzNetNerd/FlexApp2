@@ -5,7 +5,7 @@
     - initial_user_ids: List[int] for users
     - initial_company_id: Optional[int] for the company
   Features:
-    - Bootstrap inputs for user/company with data-initial JSON
+    - Bootstrap card-based inputs for user/company with data-initial JSON
     - JS logs and parses initial values
   Notes:
     - Hydrated by autoComplete.js
@@ -13,28 +13,86 @@
 ------------------------------------------------------------------------------ #}
 
 <!-- 👥 Autocomplete Field: Users -->
-<div class="mb-3">
-  <label for="users-input" class="form-label">Users</label>
-  <input
-    type="text"
-    id="users-input"
-    class="form-control"
-    placeholder="Type to search users..."
-    data-initial='{{ initial_user_ids | default([]) | tojson }}'
-  >
+<div class="col-md-6 mb-3">
+  <div class="card border-light h-100 shadow-sm">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+      <span class="fw-bold">Users</span>
+    </div>
+    <div class="card-body">
+      <input
+        type="text"
+        id="users-input"
+        class="form-control"
+        placeholder="Type to search users..."
+        data-initial='{{ initial_user_ids | default([]) | tojson }}'
+      >
+    </div>
+  </div>
 </div>
 
 <!-- 🏢 Autocomplete Field: Company -->
-<div class="mb-3">
-  <label for="companies-input" class="form-label">Company</label>
-  <input
-    type="text"
-    id="companies-input"
-    class="form-control"
-    placeholder="Type to search companies..."
-    data-initial='{{ [initial_company_id] if initial_company_id else [] | tojson }}'
-  >
+<div class="col-md-6 mb-3">
+  <div class="card border-light h-100 shadow-sm">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+      <span class="fw-bold">Companies</span>
+    </div>
+    <div class="card-body">
+      <input
+        type="text"
+        id="companies-input"
+        class="form-control"
+        placeholder="Type to search companies..."
+        data-initial='{{ [initial_company_id] if initial_company_id else [] | tojson }}'
+      >
+    </div>
+  </div>
 </div>
+
+<!-- Fixed CSS to ensure proper dropdown visibility -->
+<style>
+  /* Fix dropdown visibility issues */
+  .dropdown-menu, .autocomplete-results {
+    min-width: 320px !important;
+    width: auto !important;
+    max-height: 300px !important;
+    overflow-y: auto !important; /* Scrollbar for dropdown content only */
+    overflow-x: hidden !important;
+    position: fixed !important; /* Change to fixed positioning */
+    z-index: 9999 !important;
+    transform: none !important; /* Prevent transforms that might clip content */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important; /* Add shadow for better visibility */
+  }
+
+  /* Ensure all parent containers allow overflow */
+  .tab-content, .tab-pane, .card-body, .row, .col-md-6, .card {
+    overflow: visible !important;
+    position: relative !important; /* Better positioning context */
+  }
+
+  /* Ensure body doesn't get scrollbar when dropdown opens */
+  body.dropdown-open {
+    overflow: auto !important; /* Keep auto so the page can still scroll if needed */
+    padding-right: 0 !important;
+  }
+
+  /* Position the dropdown relative to the input field */
+  .autocomplete-wrapper {
+    position: relative !important;
+  }
+
+  /* Add styling to make dropdown more visible */
+  .dropdown-menu, .autocomplete-results {
+    border: 1px solid rgba(0,0,0,0.15) !important;
+    border-radius: 0.25rem !important;
+    background-color: white !important;
+  }
+
+  /* Make dropdown items easier to read */
+  .dropdown-item, .dropdown-menu li, .autocomplete-results li {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+  }
+</style>
 
 <!-- 🧾 Autocomplete Initialization Logging -->
 <script type="module">
@@ -57,8 +115,55 @@
     log("info", "_autocomplete.html", "init", "🏢 Initial company ID", parsedCompany);
 
     // Initialize autocomplete fields
-    console.log("🚀 Initializing autocomplete fields from template");
     initAutoCompleteFields();
+
+    // Fix dropdown body scroll issue
+    document.addEventListener('shown.bs.dropdown', function() {
+      document.body.classList.add('dropdown-open');
+    });
+
+    document.addEventListener('hidden.bs.dropdown', function() {
+      document.body.classList.remove('dropdown-open');
+    });
+
+    // Add positioning fix for autocomplete dropdown
+    const positionDropdown = (input, dropdown) => {
+      if (!input || !dropdown) return;
+
+      const rect = input.getBoundingClientRect();
+      dropdown.style.top = `${rect.bottom + window.scrollY}px`;
+      dropdown.style.left = `${rect.left + window.scrollX}px`;
+      dropdown.style.width = `${rect.width}px`;
+    };
+
+    // Apply positioning to autocomplete dropdowns
+    const observeDropdowns = () => {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.addedNodes.length) {
+            mutation.addedNodes.forEach((node) => {
+              if (node.classList && (node.classList.contains('dropdown-menu') ||
+                  node.classList.contains('autocomplete-results'))) {
+                const inputId = node.getAttribute('aria-labelledby') ||
+                             node.getAttribute('data-for');
+                const input = document.getElementById(inputId);
+                if (input) {
+                  positionDropdown(input, node);
+                }
+              }
+            });
+          }
+        });
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+    };
+
+    // Start observing for dropdowns
+    observeDropdowns();
   });
 </script>
 <!-- END TEMPLATE: _autocomplete.html -->

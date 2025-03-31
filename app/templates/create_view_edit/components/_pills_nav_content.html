@@ -25,42 +25,43 @@
         {% endif %}
 
         <div class="row">
-          {% for entry in section.entries %}
-            {% set has_entry = entry is defined and entry %}
-            {% set has_name = has_entry and entry.entry_name is defined %}
-            {% set has_label = has_entry and entry.label is defined %}
+          {% if tab.tab_name == 'Mappings' and section.section_name == 'Mappings' and not read_only %}
+            {# For edit mode, include the autocomplete template #}
+            {% include 'create_view_edit/components/_autocomplete.html' %}
+          {% else %}
+            {% for entry in section.entries %}
+              {% set has_entry = entry is defined and entry %}
+              {% set has_name = has_entry and entry.entry_name is defined %}
+              {% set has_label = has_entry and entry.label is defined %}
+              {% set skip_field = tab.tab_name == 'Mappings' and not read_only and has_name and (entry.entry_name == 'users' or entry.entry_name == 'companies') %}
 
-            {% if has_entry and has_name and has_label %}
-              {{ macros.render_field({
-                'name': entry.entry_name,
-                'label': entry.label,
-                'type': entry.type if entry.type is defined else 'text',
-                'required': entry.required if entry.required is defined else False,
-                'readonly': read_only or (entry.readonly if entry.readonly is defined else False) or (entry.type == 'readonly'),
-                'options': entry.options if entry.options is defined else None,
-                'value': entry.value if entry.value is defined else entry.default
-              }) }}
-            {% else %}
-              <div class="col-md-6 mb-3">
-                <div class="alert alert-warning">
-                  ⚠️ Skipped invalid entry in section "{{ section.section_name }}"
+              {% if has_entry and has_name and has_label and not skip_field %}
+                {{ macros.render_field({
+                  'name': entry.entry_name,
+                  'label': entry.label,
+                  'type': entry.type if entry.type is defined else 'text',
+                  'required': entry.required if entry.required is defined else False,
+                  'readonly': read_only or (entry.readonly if entry.readonly is defined else False) or (entry.type == 'readonly'),
+                  'options': entry.options if entry.options is defined else None,
+                  'value': entry.value if entry.value is defined else entry.default
+                }) }}
+              {% elif not skip_field %}
+                <div class="col-md-6 mb-3">
+                  <div class="alert alert-warning">
+                    ⚠️ Skipped invalid entry in section "{{ section.section_name }}"
+                  </div>
                 </div>
-              </div>
-              <script type="module">
-                import log from "{{ url_for('static', filename='js/logger.js') }}";
-                const message = `⚠️ Skipped invalid entry in section {{ section.section_name }} (Tab: {{ tab.tab_name }})`;
-                console.warn(message);
-                log("error", "_pills_nav_content.html", "render", message);
-              </script>
-            {% endif %}
-          {% endfor %}
+                <script type="module">
+                  import log from "{{ url_for('static', filename='js/logger.js') }}";
+                  const message = `⚠️ Skipped invalid entry in section {{ section.section_name }} (Tab: {{ tab.tab_name }})`;
+                  console.warn(message);
+                  log("error", "_pills_nav_content.html", "render", message);
+                </script>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
         </div>
       {% endfor %}
-
-      {# Include autocomplete fields only in Mappings tab and when not read_only #}
-      {% if tab.tab_name == 'Mappings' and not read_only %}
-        {% include 'create_view_edit/components/_autocomplete.html' %}
-      {% endif %}
     </div>
   {% endfor %}
 </div>
