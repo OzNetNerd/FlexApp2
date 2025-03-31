@@ -1,167 +1,102 @@
-"""Test configuration fixtures and utilities.
-
-This module provides pytest fixtures and utility functions for testing the FlexApp application,
-including database setup, application creation, and authentication helpers.
+"""
+Pytest fixtures for app testing.
 """
 
-import os
 import pytest
-from flask import Flask
-from app.app import create_app
-from app.models.base import db
+import sys
+import os
+
+# Add the parent directory to sys.path to find the app package
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from app.models.user import User
-from werkzeug.security import generate_password_hash
-
-# Global test credentials
-TEST_USER_EMAIL = "newadmin@example.com"
-TEST_USER_PASSWORD = "password"
-TEST_USER_NAME = "Administrator"  # Expected display name in the navbar
-TEST_USERNAME = "newadmin"
+from app.models.base import db as _db
+from app.routes.web.auth import auth_bp
+from app.routes.web.main import main_bp
+from .fixtures.mock_data import TEST_USERS
 
 
-@pytest.fixture
-def app() -> Flask:
-    """
-    Create a Flask test app with an in-memory database populated with static test data.
+@pytest.fixture(scope='session')
+def app():
+    """Create and configure a Flask app for testing."""
+    from flask import Flask
+    from flask_login import LoginManager
 
-    Returns:
-        Flask: The configured Flask application.
-    """
-    os.environ["FLASK_ENV"] = "testing"
-    app = create_app()
+    app = Flask(__name__)
     app.config.update(
         TESTING=True,
-        SQLALCHEMY_DATABASE_URI="sqlite:///:memory:",
+        SECRET_KEY='test_secret_key',
+        SQLALCHEMY_DATABASE_URI='sqlite:///:memory:',
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        WTF_CSRF_ENABLED=False,  # Disable CSRF for testing
+        SERVER_NAME='127.0.0.1:5000'
     )
+
+    # Initialize extensions
+    _db.init_app(app)
+
+    # Setup login manager
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth_bp.login'
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+
+    # Register blueprints
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(main_bp)
+
+    # Create context
     with app.app_context():
-        # Create all tables
-        db.create_all()
-
-        # -----------------------
-        # Populate Static Test Data
-        # -----------------------
-
-        # Create test admin user
-        test_user = User.query.filter_by(email=TEST_USER_EMAIL).first()
-        if not test_user:
-            test_user = User(
-                username=TEST_USERNAME,
-                name=TEST_USER_NAME,
-                email=TEST_USER_EMAIL,
-                password=generate_password_hash(TEST_USER_PASSWORD),
-                is_admin=True,
-            )
-            db.session.add(test_user)
-        else:
-            test_user.name = TEST_USER_NAME
-            test_user.password_hash = generate_password_hash(TEST_USER_PASSWORD)
-            test_user.is_admin = True
-
-        # Create a test company
-        from app.models.company import Company
-        test_company = Company.query.first()
-        if not test_company:
-            test_company = Company(
-                name="Company 1",
-                description="Description of Company 1"
-            )
-            db.session.add(test_company)
-        else:
-            test_company.name = "Company 1"
-            test_company.description = "Description of Company 1"
-
-        # Create a test contact for the company
-        from app.models.contact import Contact
-        test_contact = Contact.query.first()
-        if not test_contact:
-            test_contact = Contact(
-                first_name="John",
-                last_name="Doe",
-                email="johndoe@example.com",
-                phone="555-1234",
-                company=test_company
-            )
-            db.session.add(test_contact)
-
-        # Create a test opportunity for the company
-        from app.models.opportunity import Opportunity
-        test_opportunity = Opportunity.query.first()
-        if not test_opportunity:
-            test_opportunity = Opportunity(
-                name="Opportunity 1",
-                description="Opportunity description",
-                status="New",
-                stage="Prospecting",
-                value=10000.0,
-                company_id=test_company.id
-            )
-            db.session.add(test_opportunity)
-
-        # Create a test task associated with the company
-        from app.models.task import Task
-        test_task = Task.query.first()
-        if not test_task:
-            test_task = Task(
-                title="Follow up",
-                description="Follow up with client",
-                status="Pending",
-                priority="High",
-                notable_type="Company",
-                notable_id=test_company.id
-            )
-            db.session.add(test_task)
-
-        db.session.commit()
+        _db.create_all()
         yield app
-        db.session.remove()
+        _db.session.remove()
+        _db.drop_all()
+
+
+@pytest.fixture(scope='function')
+def db(app):
+    """Create a database for the tests."""
+    with app.app_context():
+        _db.create_all()
+
+        # Add test users
+        for user_data in TEST_USERS:
+            user = User(
+                email=user_data['email'],
+                password_hash=user_data['password_hash'],
+                name=user_data['name'],
+                is_active=user_data['is_active']
+            )
+            _db.session.add(user)
+
+        _db.session.commit()
+
+        yield _db
+
+        _db.session.remove()
+        _db.drop_all()
 
 
 @pytest.fixture
-def client(app: Flask):
-    """
-    Creates a test client for the Flask application.
-
-    Args:
-        app: The Flask application fixture.
-
-    Returns:
-        A Flask test client.
-    """
+def client(app):
+    """Create a test client for the app."""
     return app.test_client()
 
 
 @pytest.fixture
-def test_user(app: Flask) -> User:
-    """
-    Retrieves the test admin user from the populated database.
+def auth_client(client):
+    """Create an authenticated test client."""
+    with client.session_transaction() as session:
+        session['_user_id'] = '1'  # User ID of test@example.com
+        session['_fresh'] = True
 
-    Args:
-        app: The Flask application fixture.
-
-    Returns:
-        User: The test admin user.
-    """
-    with app.app_context():
-        return User.query.filter_by(email=TEST_USER_EMAIL).first()
+    yield client
 
 
 @pytest.fixture
-def logged_in_client(client, test_user):
-    """
-    Logs in the test admin user.
-
-    Args:
-        client: The Flask test client.
-        test_user: The test user fixture.
-
-    Returns:
-        FlaskClient: The authenticated test client.
-    """
-    response = client.post(
-        "/auth/login",
-        data={"email": TEST_USER_EMAIL, "password": TEST_USER_PASSWORD},
-        follow_redirects=True,
-    )
-    assert response.status_code == 200
-    return client
+def mock_user():
+    """Return a mock user for testing."""
+    return TEST_USERS[0]

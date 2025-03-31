@@ -5,14 +5,27 @@ import logging
 # Get the absolute path to the root directory
 BASE_DIR = pathlib.Path(__file__).parent.absolute()
 
+# Configure logger to ensure it outputs to console
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+# Create a console handler and set level to debug
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+
+# Create a formatter and add it to the handler
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+console_handler.setFormatter(formatter)
+
+# Add the handler to the logger
+logger.addHandler(console_handler)
 
 # Log the base directory
 logger.debug(f"Base directory set to: {BASE_DIR}")
 
-
 class Config:
+    """Configuration class to manage app settings."""
+
     # Basic configuration
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev_key_for_development")
     logger.debug(f"SECRET_KEY set to: {SECRET_KEY}")
@@ -22,7 +35,7 @@ class Config:
     SESSION_PERMANENT = True
     SESSION_USE_SIGNER = True
 
-    # Add to your Config class
+    # Session cookie settings
     SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
@@ -30,10 +43,13 @@ class Config:
     REMEMBER_COOKIE_SECURE = False  # Set to True in production with HTTPS
     REMEMBER_COOKIE_HTTPONLY = True
 
-    # Database configuration
-    # Use absolute path to ensure database is created in the correct location
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", f"sqlite:///{BASE_DIR}/crm.db")
-    logger.debug(f"SQLALCHEMY_DATABASE_URI set to: {SQLALCHEMY_DATABASE_URI}")
+    # Database configuration: Log the DB URI being used
+    if os.environ.get("FLASK_ENV") == "testing":
+        SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"  # Use in-memory SQLite for testing
+        logger.debug(f"Using in-memory SQLite DB for testing")
+    else:
+        SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", f"sqlite:///{BASE_DIR}/crm.db")
+        logger.debug(f"Using database: {SQLALCHEMY_DATABASE_URI}")
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
