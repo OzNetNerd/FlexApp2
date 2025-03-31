@@ -3,6 +3,7 @@ from typing import Optional, List, Type
 from flask import request, redirect, url_for, flash, Blueprint
 from flask_login import current_user, login_required
 import logging
+from datetime import datetime
 
 from app.services.crud_service import CRUDService
 from app.routes.base.crud_base import CRUDRoutesBase
@@ -67,12 +68,10 @@ class GenericWebRoutes(CRUDRoutesBase):
         """Constructs the data URL used for table API requests."""
         return f"{self.api_url_prefix}/{self.model.__tablename__}" if self.api_url_prefix else url_for(f"{self.blueprint.name}.data")
 
-
     def _index_route(self):
         """Serves the index (table list) page."""
         self.request_logger.log_request_info(self.model.__name__, "index")
         table_config = self.table_config_manager.get_table_config(self.model.__tablename__)
-        # context = self._prepare_page_index_context(table_config)
         data_url = self._determine_data_url()
         context = TableContext(
             page_type="index",
@@ -84,7 +83,6 @@ class GenericWebRoutes(CRUDRoutesBase):
             add_url=url_for(f"{self.blueprint.name}.create"),
             columns=table_config.get("columns", []),
         )
-
         return render_safely(self.index_template, context, f"Error rendering {self.model.__name__} index")
 
     @staticmethod
@@ -102,24 +100,19 @@ class GenericWebRoutes(CRUDRoutesBase):
 
         Args:
             item_id (int): The ID of the item.
-
         Returns:
             Response: Rendered view template.
         """
         self.request_logger.log_request_info(self.model.__name__, "view", item_id)
         item, error = self.item_manager.get_item_by_id(item_id)
         logger.info(f"This is item: {item.to_dict()}")
-
         if error:
             flash(error, "error")
             return redirect(url_for(f"{self.blueprint.name}.index"))
-
         if request.method == "POST":
             return self._handle_view_post(item)
-
         item_dict = item.to_dict()
         tabs = self.get_tabs_function(item_dict)
-
         resource_context = ResourceContext.create_context(
             model=self.model,
             blueprint_name=self.blueprint.name,
@@ -128,7 +121,6 @@ class GenericWebRoutes(CRUDRoutesBase):
             title="Viewing",
             read_only=True
         )
-
         return render_safely(self.view_template, resource_context,
                              f"Error viewing {self.model.__name__} with id {item_id}")
 
@@ -138,7 +130,6 @@ class GenericWebRoutes(CRUDRoutesBase):
         if not note_content:
             flash("Note content is required.", "error")
             return redirect(url_for(f"{self.blueprint.name}.view", item_id=item.id))
-
         note = Note(content=note_content, user_id=current_user.id, parent_type=self.model.__name__, parent_id=item.id)
         try:
             note.save()
@@ -146,7 +137,6 @@ class GenericWebRoutes(CRUDRoutesBase):
         except Exception as e:
             logger.exception(f"Error saving note: {e}")
             flash("Failed to save note", "error")
-
         return redirect(url_for(f"{self.blueprint.name}.view", item_id=item.id))
 
     def _create_route(self):
@@ -163,7 +153,6 @@ class GenericWebRoutes(CRUDRoutesBase):
             for e in errors:
                 flash(e, "error")
             return self._render_create_form()
-
         form_data = self._preprocess_form_data(request)
         result, error = self.item_manager.create_item(form_data)
         if error:
@@ -176,7 +165,6 @@ class GenericWebRoutes(CRUDRoutesBase):
         """Renders the creation form template."""
         item_dict = {}
         tabs = self.get_tabs_function(item_dict)
-
         context = ResourceContext.create_context(
             model=self.model,
             blueprint_name=self.blueprint.name,
@@ -185,7 +173,6 @@ class GenericWebRoutes(CRUDRoutesBase):
             title=f"Create a {self.model.__name__}",
             read_only=False
         )
-
         return render_safely(self.create_template, context, f"Error rendering create form for {self.model.__name__}")
 
     def _edit_route(self, item_id: int):
@@ -193,27 +180,22 @@ class GenericWebRoutes(CRUDRoutesBase):
 
         Args:
             item_id (int): The ID of the item.
-
         Returns:
             Response: Rendered edit template.
         """
         self.request_logger.log_request_info(self.model.__name__, "edit", item_id)
         item, error = self.item_manager.get_item_by_id(item_id)
-
         if error or item is None:
             flash("Item not found.", "error")
             return redirect(url_for(f"{self.blueprint.name}.index"))
-
         if request.method == "POST":
             return self._handle_edit_form_submission(item)
-
         return self._render_edit_form(item)
 
     def _render_edit_form(self, item):
         """Renders the form for editing an existing item."""
         item_dict = item.to_dict()
         tabs = self.get_tabs_function(item_dict)
-
         context = ResourceContext.create_context(
             model=self.model,
             blueprint_name=self.blueprint.name,
@@ -222,7 +204,6 @@ class GenericWebRoutes(CRUDRoutesBase):
             title=f"Edit {self.model.__name__}",
             read_only=False
         )
-
         return render_safely(self.edit_template, context, f"Error rendering edit form for {self.model.__name__}")
 
     def _handle_edit_form_submission(self, item):
@@ -232,7 +213,6 @@ class GenericWebRoutes(CRUDRoutesBase):
             for e in errors:
                 flash(e, "error")
             return self._render_edit_form(item)
-
         form_data = self._preprocess_form_data(request)
         result, error = self.item_manager.update_item(item, form_data)
         if error:
@@ -246,7 +226,6 @@ class GenericWebRoutes(CRUDRoutesBase):
 
         Args:
             item_id (int): The ID of the item.
-
         Returns:
             Response: Redirect to the index page.
         """
@@ -260,7 +239,6 @@ class GenericWebRoutes(CRUDRoutesBase):
                 flash(error, "error")
             else:
                 flash(f"{self.model.__name__} deleted successfully", "success")
-
         return redirect(url_for(f"{self.blueprint.name}.index"))
 
     def _data_route(self):
@@ -274,4 +252,24 @@ class GenericWebRoutes(CRUDRoutesBase):
 
     def _validate_edit_from_request(self, item, request_obj):
         """Validates form data from the request object for edit."""
-        return self._validate_edit(item, request_obj)
+        return self._validate_edit(item, request_obj.form.to_dict())
+
+    def _preprocess_form_data(self, request):
+        """
+        Converts form data into a dictionary and casts date strings to Python datetime objects.
+        This fixes the SQLite error where DateTime fields must be datetime objects.
+        """
+        form_data = request.form.to_dict()
+        # Convert 'created_at' to a datetime object if present.
+        if "created_at" in form_data:
+            try:
+                form_data["created_at"] = datetime.fromisoformat(form_data["created_at"])
+            except ValueError:
+                logger.error("Invalid format for created_at. Expected ISO format.")
+        # Convert 'updated_at' to a datetime object if present.
+        if "updated_at" in form_data:
+            try:
+                form_data["updated_at"] = datetime.fromisoformat(form_data["updated_at"])
+            except ValueError:
+                logger.error("Invalid format for updated_at. Expected ISO format.")
+        return form_data

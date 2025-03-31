@@ -1,41 +1,28 @@
 <!-- START TEMPLATE: _footer.html -->
 {# ------------------------------------------------------------------------------
-  File: _footer.html | Purpose: Cancel + Submit button group for form footers
-  Inputs:
-    - item: Optional[Model] → edit vs create mode
-    - button_text: Optional[str] → override default submit label
-  Behavior:
-    - Cancel routes to `.view` or `.index`
-    - Submit icon, style, and label change based on item presence
-  Notes:
-    - Assumes placement inside a <form> using method="POST"
+  File: _footer.html | Purpose: Render form footer with submit/cancel buttons
+  Features:
+    - Adaptive button text (Create/Update based on id presence)
+    - Cancel routes to view or index
 ------------------------------------------------------------------------------ #}
 
 <div class="d-flex justify-content-end mt-4">
-  <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + ('.view' if item else '.index'), item_id=item.id if item else None) }}"
-     class="btn btn-secondary bg-opacity-75 fw-semibold text-white me-2">
-    <i class="fas fa-times me-1"></i> Cancel
-  </a>
-  <button type="submit" class="btn btn-{{ 'success' if item else 'primary' }}">
-    <i class="fas fa-{{ 'save' if item else 'plus-circle' }} me-1"></i>
-    {{ button_text or ('Save Changes' if item else 'Create') }}
-  </button>
+  <div class="d-flex gap-2">
+    {% if id %}
+      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}" class="btn btn-secondary">
+        <i class="fas fa-times me-1"></i> Cancel
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> Update
+      </button>
+    {% else %}
+      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
+        <i class="fas fa-times me-1"></i> Cancel
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> Update
+      </button>
+    {% endif %}
+  </div>
 </div>
-
-<!-- 🧾 Footer Context Logging -->
-<script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
-
-  const context = {
-    mode: {{ ("'edit'" if item else "'create'") | safe }},
-    cancelTarget: {{ ("'view'" if item else "'index'") | safe }},
-    submit: {
-      style: {{ ("'success'" if item else "'primary'") | safe }},
-      icon: {{ ("'save'" if item else "'plus-circle'") | safe }},
-      label: {{ (button_text or ('Save Changes' if item else 'Create')) | tojson | safe }}
-    }
-  };
-
-  log("info", "_footer.html", "render", "🦶 Footer render context", context);
-</script>
 <!-- END TEMPLATE: _footer.html -->
