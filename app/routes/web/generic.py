@@ -17,7 +17,7 @@ from app.routes.base.components.item_manager import ItemManager
 from app.models import Company, CRISPScore, Note
 
 logger = logging.getLogger(__name__)
-GENERIC_TEMPLATE = "page.html"
+GENERIC_TEMPLATE = "entity_table.html"
 
 
 @dataclass

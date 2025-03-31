@@ -28,7 +28,7 @@
         {% for section in tab.sections %}
           {% set _section = section.section_name %}
           {% set _section_fields = section.entries %}
-          {% include 'create_view_edit/_section_card.html' %}
+          {% include 'base/create_view_edit/_section_card.html' %}
         {% endfor %}
       </div>
     {% endfor %}
@@ -38,7 +38,7 @@
     {% for section in tab.sections %}
       {% set _section = section.section_name %}
       {% set _section_fields = section.entries %}
-      {% include 'create_view_edit/_section_card.html' %}
+      {% include 'base/create_view_edit/_section_card.html' %}
     {% endfor %}
   {% endfor %}
 {% endif %}

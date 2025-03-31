@@ -1,6 +1,6 @@
-<!-- START TEMPLATE: page.html -->
+<!-- START TEMPLATE: entity_table.html -->
 {# ------------------------------------------------------------------------------
-  File: page.html | Purpose: Base layout for standard pages
+  File: entity_table.html | Purpose: Base layout for standard pages
   Inputs:
     - show_navbar: Optional bool to toggle navbar
     - table_id, data_url: Optional logging context vars
@@ -45,11 +45,11 @@
       const tableId = {{ table_id | tojson | safe }};
       const dataUrl = {{ data_url | tojson | safe }};
 
-      log("info", "page.html", "DOMContentLoaded", "🔍 Table ID loaded", tableId);
-      log("info", "page.html", "DOMContentLoaded", "📡 Data URL loaded", dataUrl);
+      log("info", "entity_table.html", "DOMContentLoaded", "🔍 Table ID loaded", tableId);
+      log("info", "entity_table.html", "DOMContentLoaded", "📡 Data URL loaded", dataUrl);
     </script>
 
     {% block extra_scripts %}{% endblock %}
   </body>
 </html>
-<!-- END TEMPLATE: page.html -->
+<!-- END TEMPLATE: entity_table.html -->
