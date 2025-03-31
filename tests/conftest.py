@@ -13,6 +13,12 @@ from app.models.base import db
 from app.models.user import User
 from werkzeug.security import generate_password_hash
 
+# Global test credentials
+TEST_USER_EMAIL = "newadmin@example.com"
+TEST_USER_PASSWORD = "password"
+TEST_USER_NAME = "Administrator"  # Match what the app shows in navbar
+TEST_USERNAME = "newadmin"
+
 
 def copy_db_to_memory(source_path: str = "crm.db") -> sqlite3.Connection:
     """
@@ -50,9 +56,7 @@ def app() -> Flask:
     )
 
     with app.app_context():
-        # Reflect the schema into SQLAlchemy's engine and copy data
         raw_conn = db.engine.raw_connection()
-        # Use driver_connection instead of connection to avoid deprecation warning
         mem_conn.backup(raw_conn.driver_connection)
         yield app
         db.session.remove()
@@ -75,7 +79,7 @@ def client(app: Flask):
 @pytest.fixture
 def test_user(app: Flask) -> User:
     """
-    Creates a test admin user (newadmin@example.com) to avoid conflicts.
+    Creates a test admin user.
 
     Args:
         app: The Flask application fixture.
@@ -83,19 +87,19 @@ def test_user(app: Flask) -> User:
     Returns:
         User: The created or updated user.
     """
-    user = User.query.filter_by(email="newadmin@example.com").first()
+    user = User.query.filter_by(email=TEST_USER_EMAIL).first()
     if not user:
         user = User(
-            username="newadmin",
-            name="Test Admin",
-            email="newadmin@example.com",
-            password=generate_password_hash("password"),
+            username=TEST_USERNAME,
+            name=TEST_USER_NAME,
+            email=TEST_USER_EMAIL,
+            password=generate_password_hash(TEST_USER_PASSWORD),
             is_admin=True,
         )
         db.session.add(user)
     else:
-        user.name = "Test Admin"
-        user.password_hash = generate_password_hash("password")
+        user.name = TEST_USER_NAME
+        user.password_hash = generate_password_hash(TEST_USER_PASSWORD)
         user.is_admin = True
     db.session.commit()
     return user
@@ -104,7 +108,7 @@ def test_user(app: Flask) -> User:
 @pytest.fixture
 def logged_in_client(client, test_user):
     """
-    Logs in the test admin user (newadmin@example.com).
+    Logs in the test admin user.
 
     Args:
         client: The Flask test client.
@@ -115,7 +119,7 @@ def logged_in_client(client, test_user):
     """
     response = client.post(
         "/auth/login",
-        data={"email": "newadmin@example.com", "password": "password"},
+        data={"email": TEST_USER_EMAIL, "password": TEST_USER_PASSWORD},
         follow_redirects=True,
     )
     assert response.status_code == 200
