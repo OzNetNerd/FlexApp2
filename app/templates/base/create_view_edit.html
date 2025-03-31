@@ -24,11 +24,11 @@
             <div class="row align-items-center">
               <div class="col">
                 <div class="d-flex align-items-center">
-                  {% include 'base/create_view_edit/_header.html' %}
+                  {% include 'create_view_edit/components/_header.html' %}
                 </div>
               </div>
               <div class="col-auto">
-                {% include 'base/create_view_edit/_buttons.html' %}
+                {% include 'create_view_edit/components/_buttons.html' %}
               </div>
             </div>
           </div>
@@ -36,14 +36,14 @@
           <div class="card-body">
             <form method="POST">
               {% if ui %}
-                {% include 'base/create_view_edit/_pills_nav_content.html' %}
+                {% include 'create_view_edit/components/_pills_nav_content.html' %}
               {% else %}
                 {% include 'base/common/_section_layout.html' %}
               {% endif %}
 
               {% if not read_only %}
-                {% include 'base/create_view_edit/_autocomplete.html' %}
-                {% include 'base/create_view_edit/_footer.html' %}
+                {% include 'create_view_edit/components/_autocomplete.html' %}
+                {% include 'create_view_edit/components/_footer.html' %}
               {% endif %}
             </form>
           </div>
