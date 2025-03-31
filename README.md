@@ -3,6 +3,194 @@ Run tests:
 
 ```
 
+```
+I currently have user-to-user mappings working. I now want to add mappings for user-to-companies, user-to-opportunities, user-to-contacts, contacts-to-contacts, contacts-to-opportunities, and opportunities-to-companies.
+
+Here's my tree. I want this to be as DRY as possible and use existing code and patterns where possible. Give me a succinct overview of how we're going to achieve this. then tell me which file(s) you need to get started. Give me one step at a time, then stop and ask if I have questions.
+
+.
+├── README.md
+├── README_FOR_TESTING.md
+├── add_page.py
+├── app
+│   ├── __init__.py
+│   ├── app.py
+│   ├── crm.db
+│   ├── flask_session
+│   │   └── 2029240f6d1128be89ddc32729463129
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   ├── capability.py
+│   │   ├── capability_category.py
+│   │   ├── company.py
+│   │   ├── company_capability.py
+│   │   ├── contact.py
+│   │   ├── crisp_score.py
+│   │   ├── mixins.py
+│   │   ├── note.py
+│   │   ├── opportunity.py
+│   │   ├── relationship.py
+│   │   ├── table_config.py
+│   │   ├── task.py
+│   │   └── user.py
+│   ├── routes
+│   │   ├── __init__.py
+│   │   ├── api
+│   │   │   ├── __init__.py
+│   │   │   ├── companies.py
+│   │   │   ├── contacts.py
+│   │   │   ├── generic.py
+│   │   │   ├── opportunities.py
+│   │   │   ├── search.py
+│   │   │   ├── table_config.py
+│   │   │   ├── tasks.py
+│   │   │   └── users.py
+│   │   ├── base
+│   │   │   ├── __init__.py
+│   │   │   ├── components
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── data_route_handler.py
+│   │   │   │   ├── form_handler.py
+│   │   │   │   ├── item_manager.py
+│   │   │   │   ├── json_validator.py
+│   │   │   │   ├── request_logger.py
+│   │   │   │   ├── table_config_manager.py
+│   │   │   │   └── template_renderer.py
+│   │   │   └── crud_base.py
+│   │   ├── router.py
+│   │   ├── ui
+│   │   │   ├── companies.py
+│   │   │   ├── contacts.py
+│   │   │   ├── opportunities.py
+│   │   │   ├── tasks.py
+│   │   │   └── users.py
+│   │   ├── web
+│   │   │   ├── __init__.py
+│   │   │   ├── auth.py
+│   │   │   ├── companies.py
+│   │   │   ├── contacts.py
+│   │   │   ├── crisp_score.py
+│   │   │   ├── generic.py
+│   │   │   ├── main.py
+│   │   │   ├── opportunities.py
+│   │   │   ├── relationship.py
+│   │   │   ├── tasks.py
+│   │   │   └── users.py
+│   │   └── web.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── company_capability_service.py
+│   │   ├── crud_service.py
+│   │   ├── mention.py
+│   │   ├── relationship_service.py
+│   │   ├── user_service.py
+│   │   └── validator_mixin.py
+│   ├── static
+│   │   ├── css
+│   │   │   ├── autoComplete.css
+│   │   │   ├── avatar.css
+│   │   │   ├── dropdown.css
+│   │   │   ├── main.css
+│   │   │   ├── navbar.css
+│   │   │   ├── style.css
+│   │   │   └── table.css
+│   │   └── js
+│   │       ├── pages
+│   │       └── table
+│   └── templates
+│       ├── base
+│       │   ├── common
+│       │   └── errors
+│       ├── components
+│       ├── create_view_edit
+│       │   └── components
+│       ├── entity_tables
+│       ├── macros
+│       │   └── form_fields
+│       └── relationship
+├── config.py
+├── create_admin.py
+├── create_db.py
+├── crm.db
+├── detailed_test_report_20250331_130405.log
+├── flask_session
+│   └── 2029240f6d1128be89ddc32729463129
+├── htmlcov
+│   ├── favicon_32_cb_58284776.png
+│   ├── keybd_closed_cb_ce680311.png
+│   ├── status.json
+│   └── style_cb_8e611ae1.css
+├── migrations
+│   ├── README
+│   ├── alembic.ini
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions
+│       └── 40adf23510af_initial_migration.py
+├── mypy_report
+│   └── index.txt
+├── pyproject.toml
+├── requirements.txt
+├── run_checks.sh
+├── test_details.log
+└── tests
+    ├── __init__.py
+    ├── conftest.py
+    ├── conftest_skip.py
+    ├── fixtures
+    │   ├── __init__.py
+    │   └── mock_data.py
+    ├── functional
+    │   ├── __init__.py
+    │   ├── test_auth_flow.py
+    │   ├── test_auth_flow_simple.py
+    │   └── test_mock_auth.py
+    ├── mark_db_tests.py
+    ├── skip_db_tests.py
+    └── unit
+        ├── __init__.py
+        ├── models
+        │   ├── __init__.py
+        │   └── test_user_model.py
+        ├── test_auth_additional.py
+        ├── test_auth_basic.py
+        ├── test_auth_routes.py
+        ├── test_basic.py
+        ├── test_login_redirect.py
+        └── test_login_view.py
+
+36 directories, 114 files
+
+```
+
+# Instructions
+To achieve the mappings you've described (user-to-companies, user-to-opportunities, user-to-contacts, contacts-to-contacts, contacts-to-opportunities, opportunities-to-companies), we will:
+
+Reuse Existing Relationships: The relationship.py file already seems to be handling relationships between entities. We'll extend it by adding the new mappings between users, companies, opportunities, and contacts.
+
+Extend Model Classes: We'll modify the existing user.py, contact.py, company.py, and opportunity.py model classes to include the necessary relationships, ensuring they stay DRY by following existing patterns.
+
+Update Services: We'll modify or add services (e.g., user_service.py, relationship_service.py) to manage these relationships programmatically. We'll also ensure that the data flow through the system stays consistent and efficient.
+
+Handle Routes: We'll need to add appropriate API routes in users.py, companies.py, contacts.py, and opportunities.py to allow interactions with these new relationships via the frontend.
+
+Template Updates: We will extend existing templates in company.py, contact.py, and opportunity.py to display or interact with the new relationships.
+
+File(s) needed to get started:
+models/relationship.py — We’ll likely need to extend this for the new mappings.
+
+models/user.py, models/contact.py, models/company.py, models/opportunity.py — To modify models and add relationships.
+
+services/relationship_service.py — If we need to create or fetch any new relationships.
+
+routes/api/users.py, routes/api/companies.py, routes/api/contacts.py, routes/api/opportunities.py — For the API endpoints related to these relationships.
+
+Let's start with the first step: extending the relationship.py model to include these new mappings.
+
+Do you have any questions before we move forward?
+
+----
 
 navbar:
 EoQ m, w, d - Target %
