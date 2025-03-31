@@ -29,9 +29,9 @@ class GenericWebRoutes(CRUDRoutesBase):
     required_fields: List[str] = field(default_factory=list)
     unique_fields: List[str] = field(default_factory=list)
     index_template: str = GENERIC_TEMPLATE
-    view_template: Optional[str] = "shared/view.html"
-    create_template: Optional[str] = "shared/create.html"
-    edit_template: Optional[str] = "shared/edit.html"
+    view_template: Optional[str] = "view.html"
+    create_template: Optional[str] = "create.html"
+    edit_template: Optional[str] = "edit.html"
     api_url_prefix: Optional[str] = None
     get_tabs_function: Optional[callable] = None
 

@@ -1,4 +1,4 @@
-<!-- START TEMPLATE: entity_page.html -->
+<!-- START TEMPLATE: create_view_edit.html -->
 {# ------------------------------------------------------------------------------ #}
 {% import "macros/form_fields.html" as macros %}
 {% import "macros/form_fields/render_form.html" as form %}
@@ -24,11 +24,11 @@
             <div class="row align-items-center">
               <div class="col">
                 <div class="d-flex align-items-center">
-                  {% include 'pages/form/_header.html' %}
+                  {% include 'create_view_edit/_header.html' %}
                 </div>
               </div>
               <div class="col-auto">
-                {% include 'pages/form/_buttons.html' %}
+                {% include 'create_view_edit/_buttons.html' %}
               </div>
             </div>
           </div>
@@ -36,14 +36,14 @@
           <div class="card-body">
             <form method="POST">
               {% if ui %}
-                {% include 'pages/form/_pills_nav_content.html' %}
+                {% include 'create_view_edit/_pills_nav_content.html' %}
               {% else %}
                 {% include 'base/common/_section_layout.html' %}
               {% endif %}
 
               {% if not read_only %}
-                {% include 'pages/form/_autocomplete.html' %}
-                {% include 'pages/form/_footer.html' %}
+                {% include 'create_view_edit/_autocomplete.html' %}
+                {% include 'create_view_edit/_footer.html' %}
               {% endif %}
             </form>
           </div>
@@ -67,12 +67,12 @@
           "form/_buttons.html",
           "base/common/_toasts.html",
           {% if ui %}"form/_pills_nav_content.html",{% else %}"base/common/_section_layout.html",{% endif %}
-          {% if not read_only %}"pages/form/_autocomplete.html",{% endif %}
-          {% if not read_only %}"pages/form/_footer.html",{% endif %}
+          {% if not read_only %}"create_view_edit/_autocomplete.html",{% endif %}
+          {% if not read_only %}"create_view_edit/_footer.html",{% endif %}
           {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
         ].filter(Boolean)
       };
-      log("info", "entity_page.html", "pageRender", context);
+      log("info", "create_view_edit.html", "pageRender", context);
     </script>
 
     {%- if id %}
@@ -98,4 +98,4 @@
     {%- endif %}
   </body>
 </html>
-<!-- END TEMPLATE: entity_page.html -->
+<!-- END TEMPLATE: create_view_edit.html -->

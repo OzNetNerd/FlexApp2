@@ -16,7 +16,7 @@
     - initial_company_id : Optional[int] (for _autocomplete)
 ------------------------------------------------------------------------------ #}
 
-{% extends "base/entity_page.html" %}
+{% extends "base/create_view_edit.html" %}
 {% import "macros/form_fields.html" as macros %}
 
 {% block content -%}
@@ -39,8 +39,8 @@
     {%- endfor %}
   </div>
 
-  {% include 'pages/form/_autocomplete.html' %}
-  {% include 'pages/form/_footer.html' %}
+  {% include 'create_view_edit/_autocomplete.html' %}
+  {% include 'create_view_edit/_footer.html' %}
 
   {%- if error_message %}
     <script type="module">

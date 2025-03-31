@@ -15,7 +15,7 @@
     - Uses `_section_card.html` to render each section
     - Logs tab/section structure for debugging
   ------------------------------------------------------------------------------
-#}
+
 
 {# 🧭 Render layout: Tabbed if multiple tabs, stacked otherwise #}
 {% if ui | length > 1 %}
@@ -28,7 +28,7 @@
         {% for section in tab.sections %}
           {% set _section = section.section_name %}
           {% set _section_fields = section.entries %}
-          {% include 'pages/form/_section_card.html' %}
+          {% include 'create_view_edit/_section_card.html' %}
         {% endfor %}
       </div>
     {% endfor %}
@@ -38,7 +38,7 @@
     {% for section in tab.sections %}
       {% set _section = section.section_name %}
       {% set _section_fields = section.entries %}
-      {% include 'pages/form/_section_card.html' %}
+      {% include 'create_view_edit/_section_card.html' %}
     {% endfor %}
   {% endfor %}
 {% endif %}
@@ -67,3 +67,4 @@
   });
 </script>
 <!-- END TEMPLATE: _tabs_and_sections.html -->
+#}
