@@ -28,15 +28,16 @@ def get_contact_tabs(item: dict) -> List[Tab]:
         TabEntry(entry_name="company_name", label="Company", type="text", value=item.get("company_name")),
     ])
 
-    # Record Info section
-    record_info_section = TabSection(section_name="Record Info", entries=[
-        TabEntry(entry_name="created_at", label="Created At", type="text", value=item.get("created_at")),
-        TabEntry(entry_name="updated_at", label="Updated At", type="text", value=item.get("updated_at")),
-    ])
 
     # CRISP Score section
     crisp_score_section = TabSection(section_name="CRISP Score", entries=[
         TabEntry(entry_name="crisp", label="CRISP", type="custom", value=item.get("crisp")),
+    ])
+
+    # Metadata section
+    metadata_section = TabSection(section_name="Metadata", entries=[
+        TabEntry(entry_name="created_at", label="Created At", type="readonly", value=item.get("created_at")),
+        TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
     ])
 
     # Tabs
@@ -46,12 +47,14 @@ def get_contact_tabs(item: dict) -> List[Tab]:
         company_info_section,
     ])
 
-    metadata_tab = Tab(tab_name="Metadata", sections=[
-        record_info_section,
-    ])
-
     insights_tab = Tab(tab_name="Insights", sections=[
         crisp_score_section,
     ])
 
-    return [about_tab, metadata_tab, insights_tab]
+    metadata_tab = Tab(tab_name="Metadata", sections=[
+        metadata_section,
+    ])
+
+
+
+    return [about_tab, insights_tab, metadata_tab]

@@ -34,8 +34,15 @@ def get_opportunity_tabs(item: dict) -> List[Tab]:
         TabEntry(entry_name="crisp", label="CRISP", type="string", required=True, value=item.get("crisp")),
     ])
 
+    # Metadata section
+    metadata_section = TabSection(section_name="Metadata", entries=[
+        TabEntry(entry_name="created_at", label="Created At", type="readonly", value=item.get("created_at")),
+        TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
+    ])
+
     # Tabs
     overview_tab = Tab(tab_name="Overview", sections=[details_section, pipeline_section])
     deal_tab = Tab(tab_name="Deal", sections=[financial_section, crisp_section])
+    metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
 
-    return [overview_tab, deal_tab]
+    return [overview_tab, deal_tab, metadata_tab]

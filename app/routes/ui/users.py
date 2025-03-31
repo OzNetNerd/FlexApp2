@@ -33,6 +33,13 @@ def get_users_tabs(item: dict) -> List[Tab]:
         TabEntry(entry_name="crisp", label="CRISP", type="custom", value=item.get("crisp")),
     ])
 
+    # Metadata section
+    metadata_section = TabSection(section_name="Metadata", entries=[
+        TabEntry(entry_name="created_at", label="Created At", type="readonly", value=item.get("created_at")),
+        TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
+    ])
+
+
     # Tabs
     about_tab = Tab(tab_name="About", sections=[
         basic_info_section,
@@ -44,6 +51,6 @@ def get_users_tabs(item: dict) -> List[Tab]:
         crisp_score_section,
     ])
 
+    metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
 
-
-    return [about_tab, insights_tab]
+    return [about_tab, insights_tab, metadata_tab]

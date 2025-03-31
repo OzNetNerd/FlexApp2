@@ -34,8 +34,15 @@ def get_task_tabs(item: dict) -> List[Tab]:
         TabEntry(entry_name="notable_id", label="Linked To (ID)", type="hidden", value=item.get("notable_id", "1")),
     ])
 
+    # Metadata section
+    metadata_section = TabSection(section_name="Metadata", entries=[
+        TabEntry(entry_name="created_at", label="Created At", type="readonly", value=item.get("created_at")),
+        TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
+    ])
+
     # Tabs
     about_tab = Tab(tab_name="About", sections=[task_info_section])
     details_tab = Tab(tab_name="Details", sections=[linked_entity_section])
+    metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
 
-    return [about_tab, details_tab]
+    return [about_tab, details_tab, metadata_tab]
