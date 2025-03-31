@@ -7,6 +7,7 @@
     - read_only: Boolean from context to control form interactivity
   Behavior:
     - Fields are rendered as readonly if `read_only` is true OR if the field's `readonly` is true
+    - Autocomplete fields only shown in Mappings tab when not read_only
 ------------------------------------------------------------------------------ #}
 
 {% import "macros/form_fields/render_field.html" as macros %}
@@ -55,6 +56,11 @@
           {% endfor %}
         </div>
       {% endfor %}
+
+      {# Include autocomplete fields only in Mappings tab and when not read_only #}
+      {% if tab.tab_name == 'Mappings' and not read_only %}
+        {% include 'create_view_edit/components/_autocomplete.html' %}
+      {% endif %}
     </div>
   {% endfor %}
 </div>

@@ -28,7 +28,7 @@
                 </div>
               </div>
               <div class="col-auto">
-                {% include 'create_view_edit/components/_buttons.html' %}
+                {% include 'create_view_edit/components/_header_buttons.html' %}
               </div>
             </div>
           </div>
@@ -42,8 +42,7 @@
               {% endif %}
 
               {% if not read_only %}
-                {% include 'create_view_edit/components/_autocomplete.html' %}
-                {% include 'create_view_edit/components/_footer.html' %}
+                {% include 'create_view_edit/components/_footer_buttons.html' %}
               {% endif %}
             </form>
           </div>
@@ -63,11 +62,10 @@
         hasUi: {{ ui is defined and ui is not none | tojson }},
         layout: {{ ("Tabbed" if ui else "Sectioned") | tojson }},
         includes: [
-          "form/_header.html",
-          "form/_buttons.html",
+          "create_view_edit/components/_header.html",
+          "create_view_edit/components/_header.html",
           "base/common/_toasts.html",
           {% if ui %}"form/_pills_nav_content.html",{% else %}"base/common/_section_layout.html",{% endif %}
-          {% if not read_only %}"create_view_edit/_autocomplete.html",{% endif %}
           {% if not read_only %}"create_view_edit/_footer.html",{% endif %}
           {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
         ].filter(Boolean)

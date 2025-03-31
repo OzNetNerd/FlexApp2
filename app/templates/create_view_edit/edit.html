@@ -40,18 +40,10 @@
   <div class="card-body">
     <form method="POST">
       {% include 'create_view_edit/components/_pills_nav_content.html' %}
-      {% include 'create_view_edit/components/_autocomplete.html' %}
-      {% include 'create_view_edit/components/_footer.html' %}
+      {% include 'create_view_edit/components/_footer_buttons.html' %}
     </form>
   </div>
 </div>
-
-<!-- Initialize Autocomplete Fields -->
-<script type="module">
-  import { initAutoCompleteFields } from "/static/js/autoComplete.js";
-  // Since this script is at the end of the body, the DOM is ready.
-  initAutoCompleteFields();
-</script>
 
 <!-- Logging for Edit Page Context -->
 <script type="module">
