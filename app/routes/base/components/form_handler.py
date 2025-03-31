@@ -24,28 +24,36 @@ class Tab:
     tab_name: str
     sections: List[TabSection] = field(default_factory=list)
 
+@dataclass
+class BasicContext:
+    title: str
+    item: Optional[Any] = None
+    read_only: bool = False
 
 @dataclass
 class ResourceContext:
     title: str
     read_only: bool = True
-    submit_url: str = field(init=False)
-    cancel_url: str = field(init=False)
-    item_name: str = field(init=False)
-    id: Optional[str] = field(init=False)
+    submit_url: Optional[str] = None
+    cancel_url: Optional[str] = None
+    item_name: Optional[str] = None
+    id: Optional[str] = None
     error_message: Optional[str] = None
-    ui: List[Tab] = field(init=False)  # list[Tab]
-    model_name: str = field(init=False)
+    ui: Optional[List[str]] = None
+    model_name: Optional[str] = None
+    item: Optional[str] = None  # Allow the item to be passed as an argument
 
     def __post_init__(self):
-        raise NotImplementedError("Use the factory method `create_context()` to construct ResourceContext.")
+        # Ensure that `create_context()` is called to properly initialize the instance
+        if self.item is None:
+            raise NotImplementedError("Use the factory method `create_context()` to construct ResourceContext.")
 
     @classmethod
-    def create_context(cls, model, blueprint_name: str, item_dict: dict, tabs, title: str, read_only: bool, error_message: Optional[str] = None):
+    def create_context(cls, model, blueprint_name: str, item_dict: dict, tabs, title: str, read_only: bool, error_message: Optional[str] = None, item: Optional[str] = None):
         """Factory method to construct a ResourceContext with derived fields."""
         self = cls.__new__(cls)  # Bypass __init__
         self.title = title
-        self.submit_url = url_for(f"{blueprint_name}.create") if read_only is False else ""
+        self.submit_url = url_for(f"{blueprint_name}.create") if not read_only else ""
         self.cancel_url = url_for(f"{blueprint_name}.index")
         self.read_only = read_only
         self.error_message = error_message
@@ -56,12 +64,8 @@ class ResourceContext:
             str(item_dict.get("id", ""))
         )
         self.ui = tabs
+        self.item = item  # Accept item if passed during creation
         return self
-
-
-@dataclass
-class BasicContext:
-    title: str
 
 @dataclass
 class TableContext:
