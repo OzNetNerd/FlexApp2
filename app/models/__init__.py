@@ -36,11 +36,14 @@ __all__ = [
     "Contact",
     "Opportunity",
     "Note",
-    "Task",  # ✅ Add to __all__
+    "Task",
     "TableConfig",
     "Relationship",
     "CRISPScore",
     "contact_user_association",
+    "CapabilityCategory",
+    "Capability",
+    "CompanyCapability",
 ]
 
 # Log that the models module has been loaded
