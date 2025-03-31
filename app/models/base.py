@@ -51,7 +51,7 @@ class BaseModel(db.Model):
         Returns:
             dict: A dictionary of column names and their values.
         """
-        logger.debug(f"Converting {self.__class__.__name__} instance to dictionary.")
+        # logger.debug(f"Converting {self.__class__.__name__} instance to dictionary.")
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def save(self) -> "BaseModel":
