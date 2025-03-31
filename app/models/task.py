@@ -33,37 +33,6 @@ class Task(BaseModel):
     notable_type = db.Column(db.String(50), nullable=False, default="User")
     notable_id = db.Column(db.Integer, nullable=False, default=1)
 
-    # Task Info section
-    task_info_section = TabSection(section_name="Task Info", entries=[
-        TabEntry(entry_name="title", label="Title", type="text", required=True),
-        TabEntry(entry_name="description", label="Description", type="textarea"),
-        TabEntry(entry_name="due_date", label="Due Date", type="date"),
-        TabEntry(entry_name="status", label="Status", type="select", required=True, options=[
-            {"value": "Pending", "label": "Pending"},
-            {"value": "In Progress", "label": "In Progress"},
-            {"value": "Completed", "label": "Completed"},
-        ]),
-        TabEntry(entry_name="priority", label="Priority", type="select", options=[
-            {"value": "Low", "label": "Low"},
-            {"value": "Medium", "label": "Medium"},
-            {"value": "High", "label": "High"},
-        ]),
-    ])
-
-    # Linked Entity section
-    linked_entity_section = TabSection(section_name="Linked Entity", entries=[
-        TabEntry(entry_name="notable_type", label="Linked To (Type)", type="hidden", default="User"),
-        TabEntry(entry_name="notable_id", label="Linked To (ID)", type="hidden", default="1"),
-    ])
-
-    # About tab
-    about_tab = Tab(tab_name="About", sections=[task_info_section])
-
-    # Details tab
-    details_tab = Tab(tab_name="Details", sections=[linked_entity_section])
-
-    __tabs__ = [about_tab, details_tab]
-
     def __repr__(self) -> str:
         """Readable string representation.
 

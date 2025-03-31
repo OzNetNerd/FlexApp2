@@ -36,35 +36,6 @@ class Opportunity(BaseModel):
         primaryjoin="and_(Note.notable_id == foreign(Opportunity.id), Note.notable_type == 'Opportunity')",
     )
 
-    # Details section
-    details_section = TabSection(section_name="Details", entries=[
-        TabEntry(entry_name="name", label="Name", type="text", required=True),
-        TabEntry(entry_name="description", label="Description", type="textarea"),
-        TabEntry(entry_name="company.name", label="Company Name", type="text",),
-    ])
-
-    # Pipeline section
-    pipeline_section = TabSection(section_name="Pipeline", entries=[
-        TabEntry(entry_name="stage", label="Stage", type="text", required=True),
-        TabEntry(entry_name="status", label="Status", type="text"),
-    ])
-
-    # Financial section
-    financial_section = TabSection(section_name="Financial", entries=[
-        TabEntry(entry_name="value", label="Value", type="number", required=True),
-    ])
-
-    # Crisp section
-    crisp_section = TabSection(section_name="CRISP", entries=[
-        TabEntry(entry_name="crisp", label="CRISP", type="string", required=True),
-    ])
-
-
-    overview_tab = Tab(tab_name='Overview', sections=[details_section, pipeline_section])
-    deal_tab = Tab(tab_name='Deal', sections=[financial_section, crisp_section])
-
-    __tabs__ = [overview_tab, deal_tab]
-
     def __repr__(self) -> str:
         """Readable string representation.
 

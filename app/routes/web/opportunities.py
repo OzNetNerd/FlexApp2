@@ -2,7 +2,8 @@ from app.models import Opportunity, Company, db
 from app.routes.web import opportunities_bp
 from app.routes.web.generic import GenericWebRoutes
 import logging
-import re
+from app.routes.ui.opportunities import get_opportunity_tabs
+
 
 logger = logging.getLogger(__name__)
 
@@ -43,4 +44,5 @@ opportunity_routes = OpportunityCRUDRoutes(
     index_template="opportunities.html",
     required_fields=["name"],
     unique_fields=[],
+    get_tabs_function=get_opportunity_tabs,
 )
