@@ -1,5 +1,8 @@
 """
 Mock data for tests.
+
+This file contains mock user data that is used for testing various parts of the application.
+It provides test users with different attributes to simulate different user states (e.g., active, inactive).
 """
 
 # Mock user data

@@ -1,7 +1,19 @@
 from unittest.mock import MagicMock, patch
 
 def test_login_flow_without_db(app, monkeypatch):
-    """Test login flow without needing the database."""
+    """Test login flow without needing the database.
+
+    This test mocks the database interaction by replacing the actual query for a user with
+    a mocked user object. It ensures that the login flow works even without a real database.
+    The test verifies that the user can log in with a mock email and password.
+
+    Args:
+        app (Flask): The Flask application fixture for running the app.
+        monkeypatch (MonkeyPatch): A pytest fixture used to mock methods and functions.
+
+    Asserts:
+        - The response status code is 302 (redirect).
+    """
     # Create a mock user
     user_mock = MagicMock()
     user_mock.email = 'test@example.com'
