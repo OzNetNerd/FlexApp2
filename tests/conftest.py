@@ -5,7 +5,6 @@ including database setup, application creation, and authentication helpers.
 """
 
 import os
-import sqlite3
 import pytest
 from flask import Flask
 from app.app import create_app
@@ -16,48 +15,104 @@ from werkzeug.security import generate_password_hash
 # Global test credentials
 TEST_USER_EMAIL = "newadmin@example.com"
 TEST_USER_PASSWORD = "password"
-TEST_USER_NAME = "Administrator"  # Match what the app shows in navbar
+TEST_USER_NAME = "Administrator"  # Expected display name in the navbar
 TEST_USERNAME = "newadmin"
-
-
-def copy_db_to_memory(source_path: str = "crm.db") -> sqlite3.Connection:
-    """
-    Copies the on-disk SQLite database into memory.
-
-    Args:
-        source_path (str): Path to the existing SQLite DB file.
-
-    Returns:
-        sqlite3.Connection: In-memory SQLite connection with copied contents.
-    """
-    disk_conn = sqlite3.connect(source_path)
-    memory_conn = sqlite3.connect(":memory:")
-    disk_conn.backup(memory_conn)
-    disk_conn.close()
-    return memory_conn
 
 
 @pytest.fixture
 def app() -> Flask:
     """
-    Create a Flask test app using a fully in-memory copy of `crm.db`.
+    Create a Flask test app with an in-memory database populated with static test data.
 
     Returns:
         Flask: The configured Flask application.
     """
     os.environ["FLASK_ENV"] = "testing"
     app = create_app()
-    mem_conn = copy_db_to_memory()
-
     app.config.update(
         TESTING=True,
         SQLALCHEMY_DATABASE_URI="sqlite:///:memory:",
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
-
     with app.app_context():
-        raw_conn = db.engine.raw_connection()
-        mem_conn.backup(raw_conn.driver_connection)
+        # Create all tables
+        db.create_all()
+
+        # -----------------------
+        # Populate Static Test Data
+        # -----------------------
+
+        # Create test admin user
+        test_user = User.query.filter_by(email=TEST_USER_EMAIL).first()
+        if not test_user:
+            test_user = User(
+                username=TEST_USERNAME,
+                name=TEST_USER_NAME,
+                email=TEST_USER_EMAIL,
+                password=generate_password_hash(TEST_USER_PASSWORD),
+                is_admin=True,
+            )
+            db.session.add(test_user)
+        else:
+            test_user.name = TEST_USER_NAME
+            test_user.password_hash = generate_password_hash(TEST_USER_PASSWORD)
+            test_user.is_admin = True
+
+        # Create a test company
+        from app.models.company import Company
+        test_company = Company.query.first()
+        if not test_company:
+            test_company = Company(
+                name="Company 1",
+                description="Description of Company 1"
+            )
+            db.session.add(test_company)
+        else:
+            test_company.name = "Company 1"
+            test_company.description = "Description of Company 1"
+
+        # Create a test contact for the company
+        from app.models.contact import Contact
+        test_contact = Contact.query.first()
+        if not test_contact:
+            test_contact = Contact(
+                first_name="John",
+                last_name="Doe",
+                email="johndoe@example.com",
+                phone="555-1234",
+                company=test_company
+            )
+            db.session.add(test_contact)
+
+        # Create a test opportunity for the company
+        from app.models.opportunity import Opportunity
+        test_opportunity = Opportunity.query.first()
+        if not test_opportunity:
+            test_opportunity = Opportunity(
+                name="Opportunity 1",
+                description="Opportunity description",
+                status="New",
+                stage="Prospecting",
+                value=10000.0,
+                company_id=test_company.id
+            )
+            db.session.add(test_opportunity)
+
+        # Create a test task associated with the company
+        from app.models.task import Task
+        test_task = Task.query.first()
+        if not test_task:
+            test_task = Task(
+                title="Follow up",
+                description="Follow up with client",
+                status="Pending",
+                priority="High",
+                notable_type="Company",
+                notable_id=test_company.id
+            )
+            db.session.add(test_task)
+
+        db.session.commit()
         yield app
         db.session.remove()
 
@@ -79,30 +134,16 @@ def client(app: Flask):
 @pytest.fixture
 def test_user(app: Flask) -> User:
     """
-    Creates a test admin user.
+    Retrieves the test admin user from the populated database.
 
     Args:
         app: The Flask application fixture.
 
     Returns:
-        User: The created or updated user.
+        User: The test admin user.
     """
-    user = User.query.filter_by(email=TEST_USER_EMAIL).first()
-    if not user:
-        user = User(
-            username=TEST_USERNAME,
-            name=TEST_USER_NAME,
-            email=TEST_USER_EMAIL,
-            password=generate_password_hash(TEST_USER_PASSWORD),
-            is_admin=True,
-        )
-        db.session.add(user)
-    else:
-        user.name = TEST_USER_NAME
-        user.password_hash = generate_password_hash(TEST_USER_PASSWORD)
-        user.is_admin = True
-    db.session.commit()
-    return user
+    with app.app_context():
+        return User.query.filter_by(email=TEST_USER_EMAIL).first()
 
 
 @pytest.fixture
