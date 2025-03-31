@@ -31,7 +31,7 @@ logger.debug("Setting up CRUD routes for User model.")
 user_routes = UserCRUDRoutes(
     model=User,
     blueprint=users_bp,
-    index_template="users.html",
+    index_template="entity_tables/users.html",
     required_fields=["username", "name", "email"],
     unique_fields=["username"],
     get_tabs_function=get_users_tabs,

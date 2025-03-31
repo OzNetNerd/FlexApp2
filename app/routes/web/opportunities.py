@@ -58,7 +58,7 @@ class OpportunityCRUDRoutes(GenericWebRoutes):
 opportunity_routes = OpportunityCRUDRoutes(
     blueprint=opportunities_bp,
     model=Opportunity,
-    index_template="opportunities.html",
+    index_template="entity_tables/opportunities.html",
     required_fields=["name"],
     unique_fields=[],
     get_tabs_function=get_opportunity_tabs,

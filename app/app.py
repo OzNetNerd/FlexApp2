@@ -109,7 +109,7 @@ def create_app(config_class=Config):
             item=str(e),
             read_only=True
         )
-        return render_safely("errors/404.html", context, "Page not found."), 404
+        return render_safely("base/errors/404.html", context, "Page not found."), 404
 
     @app.errorhandler(500)
     def internal_server_error(e):
@@ -118,7 +118,7 @@ def create_app(config_class=Config):
             item=str(e),
             read_only=True
         )
-        return render_safely("errors/500.html", context, "Internal server error."), 500
+        return render_safely("base/errors/500.html", context, "Internal server error."), 500
 
     # ✅ Create all tables and seed demo data if necessary
     with app.app_context():

@@ -101,7 +101,7 @@ logger.debug("⚙️ Setting up CRUD routes for contacts.")
 contact_routes = ContactCRUDRoutes(
     blueprint=contacts_bp,
     model=Contact,
-    index_template="contacts.html",
+    index_template="entity_tables/contacts.html",
     required_fields=["first_name", "last_name"],
     unique_fields=["email"],
     get_tabs_function=get_contact_tabs,
