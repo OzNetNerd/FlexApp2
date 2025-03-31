@@ -1,10 +1,10 @@
 import re
 import logging
-from flask import request
 from flask_login import current_user
 from app.models import Contact, Company, db, User
 from app.routes.web import contacts_bp
 from app.routes.web.generic import GenericWebRoutes
+from app.routes.ui.contacts import get_contact_tabs
 
 logger = logging.getLogger(__name__)
 
@@ -104,4 +104,5 @@ contact_routes = ContactCRUDRoutes(
     index_template="contacts.html",
     required_fields=["first_name", "last_name"],
     unique_fields=["email"],
+    get_tabs_function=get_contact_tabs,
 )

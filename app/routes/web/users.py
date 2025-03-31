@@ -2,6 +2,7 @@ from app.models import User, Note
 from app.routes.web import users_bp
 from app.routes.web.generic import GenericWebRoutes
 import logging
+from app.routes.ui.users import get_users_tabs
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ user_routes = UserCRUDRoutes(
     index_template="users.html",
     required_fields=["username", "name", "email"],
     unique_fields=["username"],
+    get_tabs_function=get_users_tabs,
 )
 
 logger.info("User CRUD routes setup successfully.")

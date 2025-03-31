@@ -34,41 +34,6 @@ class User(BaseModel, UserMixin):
     relationships = db.relationship("Relationship", back_populates="user", cascade="all, delete-orphan")
     notes = db.relationship("Note", backref="author", lazy="dynamic")
 
-    # Basic Info section
-    basic_info_section = TabSection(section_name="Basic Info", entries=[
-        TabEntry(entry_name="username", label="Username", type="text", required=True),
-        TabEntry(entry_name="name", label="Name", type="text", required=True),
-    ])
-
-    # Contact section
-    contact_section = TabSection(section_name="Contact", entries=[
-        TabEntry(entry_name="email", label="Email", type="email", required=True),
-    ])
-
-    # Record Info section
-    record_info_section = TabSection(section_name="Record Info", entries=[
-        TabEntry(entry_name="created_at", label="Created At", type="datetime"),
-        TabEntry(entry_name="updated_at", label="Updated At", type="datetime"),
-    ])
-
-    # CRISP Score section
-    crisp_score_section = TabSection(section_name="CRISP Score", entries=[
-        TabEntry(entry_name="crisp", label="CRISP", type="custom"),
-    ])
-
-    # About tab
-    about_tab = Tab(tab_name="About", sections=[
-        basic_info_section,
-        contact_section,
-        record_info_section,
-    ])
-
-    # Insights tab
-    insights_tab = Tab(tab_name="Insights", sections=[
-        crisp_score_section,
-    ])
-
-    __tabs__ = [about_tab, insights_tab]
 
     def __init__(self, *args, **kwargs):
         """Initialize user, allowing plain-text 'password' for hashing."""

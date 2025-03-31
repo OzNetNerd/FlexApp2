@@ -2,12 +2,11 @@ from app.routes.base.components.form_handler import Tab, TabSection, TabEntry
 from typing import List
 
 
-def get_company_tabs(item: dict, include_metadata: bool = False) -> List[Tab]:
+def get_company_tabs(item: dict) -> List[Tab]:
     """Returns the list of tabs with data injected from the item dictionary.
 
     Args:
         item (dict): Dictionary of field values to populate into TabEntry.value.
-        include_metadata (bool): Whether to include the Metadata tab.
 
     Returns:
         List[Tab]: List of populated Tab objects.
@@ -29,15 +28,14 @@ def get_company_tabs(item: dict, include_metadata: bool = False) -> List[Tab]:
     # Insights tab
     insights_tab = Tab(tab_name="Insights", sections=[crisp_score_section])
 
-    tabs = [about_tab, insights_tab]
+    # Metadata tab
+    metadata_section = TabSection(section_name="Metadata", entries=[
+        TabEntry(entry_name="created_at", label="Created At", type="readonly", value=item.get("created_at")),
+        TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
+    ])
+    metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
 
-    # Optionally add metadata
-    if include_metadata:
-        metadata_section = TabSection(section_name="Metadata", entries=[
-            TabEntry(entry_name="created_at", label="Created At", type="readonly", value=item.get("created_at")),
-            TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
-        ])
-        metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
-        tabs.append(metadata_tab)
+    tabs = [about_tab, insights_tab, metadata_tab]
+
 
     return tabs

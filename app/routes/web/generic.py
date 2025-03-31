@@ -118,7 +118,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             return self._handle_view_post(item)
 
         item_dict = item.to_dict()
-        tabs = self.get_tabs_function(item_dict, include_metadata=True)
+        tabs = self.get_tabs_function(item_dict)
 
         resource_context = ResourceContext.create_context(
             model=self.model,
@@ -175,7 +175,7 @@ class GenericWebRoutes(CRUDRoutesBase):
     def _render_create_form(self):
         """Renders the creation form template."""
         item_dict = {}
-        tabs = self.get_tabs_function(item_dict, include_metadata=True)
+        tabs = self.get_tabs_function(item_dict)
 
         context = ResourceContext.create_context(
             model=self.model,
@@ -212,7 +212,7 @@ class GenericWebRoutes(CRUDRoutesBase):
     def _render_edit_form(self, item):
         """Renders the form for editing an existing item."""
         item_dict = item.to_dict()
-        tabs = self.get_tabs_function(item_dict, include_metadata=True)
+        tabs = self.get_tabs_function(item_dict)
 
         context = ResourceContext.create_context(
             model=self.model,

@@ -46,51 +46,6 @@ class Contact(BaseModel):
         lazy="dynamic",
     )
 
-    # Identity section
-    identity_section = TabSection(section_name="Identity", entries=[
-        TabEntry(entry_name="first_name", label="First Name", type="text", required=True),
-        TabEntry(entry_name="last_name", label="Last Name", type="text", required=True),
-    ])
-
-    # Contact Info section
-    contact_info_section = TabSection(section_name="Contact Info", entries=[
-        TabEntry(entry_name="phone", label="Phone", type="text"),
-        TabEntry(entry_name="email", label="Email", type="email"),
-    ])
-
-    # Company Info section
-    company_info_section = TabSection(section_name="Company Info", entries=[
-        TabEntry(entry_name="company_name", label="Company", type="text"),
-    ])
-
-    # Record Info section
-    record_info_section = TabSection(section_name="Record Info", entries=[
-        TabEntry(entry_name="created_at", label="Created At", type="text"),
-        TabEntry(entry_name="updated_at", label="Updated At", type="text"),
-    ])
-
-    # CRISP Score section
-    crisp_score_section = TabSection(section_name="CRISP Score", entries=[
-        TabEntry(entry_name="crisp", label="CRISP", type="custom"),
-    ])
-
-    # Tabs
-    about_tab = Tab(tab_name="About", sections=[
-        identity_section,
-        contact_info_section,
-        company_info_section,
-    ])
-
-    metadata_tab = Tab(tab_name="Metadata", sections=[
-        record_info_section,
-    ])
-
-    insights_tab = Tab(tab_name="Insights", sections=[
-        crisp_score_section,
-    ])
-
-    __tabs__ = [about_tab, metadata_tab, insights_tab]
-
     def __repr__(self) -> str:
         """String representation for debugging purposes.
 
