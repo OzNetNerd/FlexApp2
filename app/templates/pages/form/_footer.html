@@ -27,11 +27,11 @@
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 
   const context = {
-    mode: {{ "'edit'" if item else "'create'" }},
-    cancelTarget: {{ "'view'" if item else "'index'" }},
+    mode: {{ ("'edit'" if item else "'create'") | safe }},
+    cancelTarget: {{ ("'view'" if item else "'index'") | safe }},
     submit: {
-      style: {{ "'success'" if item else "'primary'" }},
-      icon: {{ "'save'" if item else "'plus-circle'" }},
+      style: {{ ("'success'" if item else "'primary'") | safe }},
+      icon: {{ ("'save'" if item else "'plus-circle'") | safe }},
       label: {{ (button_text or ('Save Changes' if item else 'Create')) | tojson | safe }}
     }
   };

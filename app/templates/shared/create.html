@@ -54,6 +54,14 @@
     </script>
   {%- endif %}
 
+  <!-- Initialize Autocomplete Fields -->
+  <script type="module">
+    import { initAutoCompleteFields } from "/static/js/autoComplete.js";
+    document.addEventListener('DOMContentLoaded', () => {
+      initAutoCompleteFields();
+    });
+  </script>
+
   <!-- Render Context Logging -->
   <script type="module">
     import log from "/static/js/logger.js";
