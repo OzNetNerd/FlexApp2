@@ -1,6 +1,6 @@
-<!-- START TEMPLATE: form_field_macros.html -->
+<!-- START TEMPLATE: render_field.html -->
 {# ------------------------------------------------------------------------------
-  File: form_field_macros.html | Purpose: Reusable macro to render form fields
+  File: render_field.html | Purpose: Reusable macro to render form fields
   Imports:
     - render_input.html  → input_macros
     - render_value.html  → value_macros
@@ -16,7 +16,7 @@
 
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
-  const filename = "form_field_macros.html";
+  const filename = "render_field.html";
 
   log("info", filename, "init", "📦 Loaded form field rendering macros");
   log("debug", filename, "import", "🔗 Imported macros: input_macros (render_input.html), value_macros (render_value.html)");
@@ -25,14 +25,14 @@
 {% macro render_field(field, read_only=False) -%}
   <script type="module">
     import log from "{{ url_for('static', filename='js/logger.js') }}";
-    const filename = "form_field_macros.html";
+    const filename = "render_field.html";
     const fieldName = {{ field.name | tojson | safe }};
     const fieldLabel = {{ field.label | tojson | safe }};
     const isReadOnly = {{ (read_only or field.readonly) | tojson }};
     const isRequired = {{ field.required | tojson }};
-
-    log("debug", filename, "render_field", `🛠 Rendering field '${fieldName}' (label: '${fieldLabel}') | 📌 Mode: ${isReadOnly ? "read-only" : "editable"} | ⭐ Required: ${isRequired}`);
-
+    const fieldValue = {{ field.value | tojson | safe }};
+    
+    log("debug", filename, "render_field", `🛠 Rendering field '${fieldName}' (label: '${fieldLabel}', value: '${fieldValue}') | 📌 Mode: ${isReadOnly ? "read-only" : "editable"} | ⭐ Required: ${isRequired}`);
   </script>
 
   <div class="col-md-6 mb-3">
@@ -63,7 +63,7 @@
 
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
-  const filename = "form_field_macros.html";
+  const filename = "render_field.html";
   log("info", filename, "namespace", "🧬 Exposed macro as 'field.render_field'");
 </script>
-<!-- END TEMPLATE: form_field_macros.html -->
+<!-- END TEMPLATE: render_field.html -->

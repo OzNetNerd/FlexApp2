@@ -3,7 +3,7 @@ import traceback
 from flask import flash, redirect, url_for
 from typing import Tuple, Any, Optional
 from sqlalchemy.orm import joinedload, class_mapper, RelationshipProperty
-
+from app.models.base import db  # Updated import
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +75,6 @@ class ItemManager:
             flash(f"{self.model.__name__} created successfully", "success")
             return redirect(url_for(f"{self.blueprint_name}.index")), None
         except ValueError as ve:
-            # Specific handling for validation failures
             logger.warning(f"Validation error during create: {ve}")
             return None, str(ve)
         except Exception as e:
@@ -96,7 +95,24 @@ class ItemManager:
         """
         try:
             logger.debug(f"Updating {self.model.__name__} with id {item.id}, fields: {list(form_data.keys())}")
-            self.service.update(item, form_data)
+
+            # Manually update relationship fields.
+            if "users" in form_data:
+                from app.models.user import User  # Adjust the import path if needed.
+                # Convert list of user ID strings to User model instances.
+                item.users = [User.query.get(int(uid)) for uid in form_data["users"] if uid]
+            if "companies" in form_data:
+                from app.models.company import Company  # Adjust the import path if needed.
+                # Convert list of company ID strings to Company model instances.
+                item.companies = [Company.query.get(int(cid)) for cid in form_data["companies"] if cid]
+
+            # Update all other fields.
+            for field, value in form_data.items():
+                if field not in ["users", "companies"]:
+                    setattr(item, field, value)
+
+            # Commit changes using the db session.
+            db.session.commit()
             logger.info(f"{self.model.__name__} with id {item.id} updated successfully")
             flash(f"{self.model.__name__} updated successfully", "success")
             return redirect(url_for(f"{self.blueprint_name}.view", item_id=item.id)), None
@@ -106,6 +122,7 @@ class ItemManager:
         except Exception as e:
             logger.error(f"Error updating {self.model.__name__} with id {item.id}: {e}")
             logger.error(traceback.format_exc())
+            db.session.rollback()
             return None, f"Error updating {self.model.__name__}: {str(e)}"
 
     def delete_item(self, item):

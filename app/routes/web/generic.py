@@ -153,11 +153,22 @@ class GenericWebRoutes(CRUDRoutesBase):
             for e in errors:
                 flash(e, "error")
             return self._render_create_form()
+
+        # Log the raw form data (all values, including multi-selects)
+        logger.info(f"Raw form data received for create: {request.form.to_dict(flat=False)}")
         form_data = self._preprocess_form_data(request)
+        logger.info(f"Processed submitted data for create: {form_data}")
+
         result, error = self.item_manager.create_item(form_data)
         if error:
             flash(error, "error")
             return self._render_create_form()
+
+        # Log the newly created database entry (if available)
+        if hasattr(result, "to_dict"):
+            logger.info(f"Database entry created: {result.to_dict()}")
+        else:
+            logger.info(f"Database entry created: {result}")
         flash(f"{self.model.__name__} created successfully", "success")
         return result
 
@@ -213,11 +224,20 @@ class GenericWebRoutes(CRUDRoutesBase):
             for e in errors:
                 flash(e, "error")
             return self._render_edit_form(item)
+
+        logger.info(f"Raw form data received for edit (item ID {item.id}): {request.form.to_dict(flat=False)}")
         form_data = self._preprocess_form_data(request)
+        logger.info(f"Processed submitted data for edit (item ID {item.id}): {form_data}")
+
         result, error = self.item_manager.update_item(item, form_data)
         if error:
             flash(error, "error")
             return self._render_edit_form(item)
+
+        if hasattr(result, "to_dict"):
+            logger.info(f"Database entry updated: {result.to_dict()}")
+        else:
+            logger.info(f"Database entry updated: {result}")
         flash(f"{self.model.__name__} updated successfully", "success")
         return result
 
@@ -257,17 +277,32 @@ class GenericWebRoutes(CRUDRoutesBase):
     def _preprocess_form_data(self, request):
         """
         Converts form data into a dictionary and casts date strings to Python datetime objects.
-        This fixes the SQLite error where DateTime fields must be datetime objects.
+        Also processes multi-select fields for 'users' and 'companies' to capture list values,
+        filtering out any empty strings.
         """
+        # Log the raw form data (with all values as lists)
+        raw_data = request.form.to_dict(flat=False)
+        logger.info(f"Raw form data (flat=False): {raw_data}")
+
+        # Start with the basic form data (first value only for each field)
         form_data = request.form.to_dict()
+
+        # For multi-select or mapping fields, capture all selected values and filter out empty strings.
+        if "users" in request.form:
+            users_list = request.form.getlist("users")
+            form_data["users"] = [u for u in users_list if u]
+        if "companies" in request.form:
+            companies_list = request.form.getlist("companies")
+            form_data["companies"] = [c for c in companies_list if c]
+
         # Convert 'created_at' to a datetime object if present.
-        if "created_at" in form_data:
+        if "created_at" in form_data and form_data["created_at"]:
             try:
                 form_data["created_at"] = datetime.fromisoformat(form_data["created_at"])
             except ValueError:
                 logger.error("Invalid format for created_at. Expected ISO format.")
         # Convert 'updated_at' to a datetime object if present.
-        if "updated_at" in form_data:
+        if "updated_at" in form_data and form_data["updated_at"]:
             try:
                 form_data["updated_at"] = datetime.fromisoformat(form_data["updated_at"])
             except ValueError:

@@ -1,0 +1,48 @@
+{% macro render_relationships(entity_type, entity_id, relationships) %}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Relationships</h5>
+        <a href="{{ url_for('relationships.add_relationship', entity_type=entity_type, entity_id=entity_id) }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Add Relationship
+        </a>
+    </div>
+    <div class="card-body">
+        {% if relationships %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Entity Type</th>
+                        <th>Entity</th>
+                        <th>Relationship</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rel in relationships %}
+                    <tr>
+                        <td>{{ rel.entity_type|capitalize }}</td>
+                        <td>
+                            <a href="{{ url_for(rel.entity_type + 's.view', id=rel.entity_id) }}">
+                                {{ rel.entity_name }}
+                            </a>
+                        </td>
+                        <td>{{ rel.relationship_type }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('relationships.delete_relationship', relationship_id=rel.id, source_type=entity_type, source_id=entity_id) }}" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this relationship?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No relationships found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
