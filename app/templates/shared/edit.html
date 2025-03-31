@@ -46,6 +46,13 @@
   </div>
 </div>
 
+<!-- Initialize Autocomplete Fields -->
+<script type="module">
+  import { initAutoCompleteFields } from "/static/js/autoComplete.js";
+  // Since this script is at the end of the body, the DOM is ready.
+  initAutoCompleteFields();
+</script>
+
 <!-- Logging for Edit Page Context -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";

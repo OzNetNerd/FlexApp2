@@ -39,6 +39,7 @@
 <!-- 🧾 Autocomplete Initialization Logging -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
+  import { initAutoCompleteFields } from "{{ url_for('static', filename='js/autoComplete.js') }}";
 
   document.addEventListener('DOMContentLoaded', () => {
     const usersInitial = document.getElementById("users-input")?.dataset.initial || "[]";
@@ -54,6 +55,10 @@
 
     log("info", "_autocomplete.html", "init", "👥 Initial user IDs", parsedUsers);
     log("info", "_autocomplete.html", "init", "🏢 Initial company ID", parsedCompany);
+
+    // Initialize autocomplete fields
+    console.log("🚀 Initializing autocomplete fields from template");
+    initAutoCompleteFields();
   });
 </script>
 <!-- END TEMPLATE: _autocomplete.html -->

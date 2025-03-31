@@ -57,9 +57,8 @@
   <!-- Initialize Autocomplete Fields -->
   <script type="module">
     import { initAutoCompleteFields } from "/static/js/autoComplete.js";
-    document.addEventListener('DOMContentLoaded', () => {
-      initAutoCompleteFields();
-    });
+    // Call the initialization immediately since the script is loaded after the DOM is ready.
+    initAutoCompleteFields();
   </script>
 
   <!-- Render Context Logging -->
