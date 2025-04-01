@@ -134,4 +134,4 @@ class Contact(BaseModel):
         return subs
 
     def __repr__(self) -> str:
-        return f"<Contact {self.id} {self.name}>"
+        return f"<Contact {self.id} {self.full_name}>"

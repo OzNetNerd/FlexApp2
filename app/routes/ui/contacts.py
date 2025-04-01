@@ -30,7 +30,7 @@ def get_contact_tabs(item: dict) -> List[Tab]:
                 options=["Junior", "Mid", "Senior", "Lead"],
                 value=item.get("role_level")
             ),
-            TabEntry(entry_name="team_bu_name", label="Team/BU Name", type="text", value=item.get("team_bu_name")),
+            TabEntry(entry_name="team_bu_name", label="Team Name", type="text", value=item.get("team_bu_name")),
         ]
     )
     basic_info_tab = Tab(tab_name="Basic Info", sections=[contact_info_section, role_info_section])
@@ -95,7 +95,6 @@ def get_contact_tabs(item: dict) -> List[Tab]:
                 label="Cloud Platforms",
                 type="dropdown",
                 options=["AWS", "Azure", "Google Cloud", "IBM Cloud"],
-                multiple=True,
                 value=item.get("cloud_platforms")
             ),
             TabEntry(
@@ -103,7 +102,6 @@ def get_contact_tabs(item: dict) -> List[Tab]:
                 label="DevOps Tools",
                 type="dropdown",
                 options=["Terraform", "Jenkins", "Ansible", "Docker", "Kubernetes"],
-                multiple=True,
                 value=item.get("devops_tools")
             ),
             TabEntry(
@@ -111,7 +109,6 @@ def get_contact_tabs(item: dict) -> List[Tab]:
                 label="Version Control Systems",
                 type="dropdown",
                 options=["Git", "SVN", "Mercurial"],
-                multiple=True,
                 value=item.get("version_control_systems")
             ),
             TabEntry(
@@ -119,7 +116,6 @@ def get_contact_tabs(item: dict) -> List[Tab]:
                 label="Programming Languages",
                 type="dropdown",
                 options=["Python", "JavaScript", "Java", "Go", "Ruby"],
-                multiple=True,
                 value=item.get("programming_languages")
             ),
             TabEntry(
@@ -127,7 +123,6 @@ def get_contact_tabs(item: dict) -> List[Tab]:
                 label="Monitoring & Logging",
                 type="dropdown",
                 options=["Prometheus", "Grafana", "Splunk", "ELK Stack"],
-                multiple=True,
                 value=item.get("monitoring_logging")
             ),
             TabEntry(
@@ -135,7 +130,6 @@ def get_contact_tabs(item: dict) -> List[Tab]:
                 label="CI/CD Tools",
                 type="dropdown",
                 options=["GitLab CI", "CircleCI", "Travis CI", "Azure DevOps"],
-                multiple=True,
                 value=item.get("ci_cd_tools")
             ),
             TabEntry(

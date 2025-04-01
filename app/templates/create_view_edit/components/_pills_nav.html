@@ -1,28 +1,17 @@
-<!-- START TEMPLATE: _pills_nav.html -->
-{# ------------------------------------------------------------------------------
-  File: _pills_nav.html | Purpose: Pill-style tab navigation for forms
-  Inputs:
-    - ui: List[Tab]
-      Each tab:
-        • tab_name: str (label/ID)
-        • sections: List (used for logging)
-  Notes:
-    - Bootstrap 5 tab/pill toggle via buttons
-    - Must match tab-pane IDs rendered below
------------------------------------------------------------------------------- #}
-
 {% import "macros/form_fields/render_field.html" as macros %}
 
 {% if ui | length > 1 %}
   <div class="btn-group" role="tablist">
     {% for tab in ui %}
+      {# Replace '&' in id and data-bs-target, but leave the tab name unchanged #}
+      {% set tab_id = 'tab-' + tab.tab_name | lower | replace(' ', '-') | replace('&', '') %}
       <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
-              id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
+              id="{{ tab_id }}-tab"
               data-bs-toggle="pill"
-              data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+              data-bs-target="#{{ tab_id }}"
               type="button"
               role="tab"
-              aria-controls="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+              aria-controls="{{ tab_id }}"
               aria-selected="{{ 'true' if loop.first else 'false' }}">
         {{ tab.tab_name }}
       </button>
@@ -48,4 +37,3 @@
     console.warn("⚠️ Could not serialize tab info for logging:", e);
   }
 </script>
-<!-- END TEMPLATE: _pills_nav.html -->
