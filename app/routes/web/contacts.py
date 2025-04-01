@@ -4,7 +4,7 @@ from flask_login import current_user
 from app.models import Contact, Company, db, User
 from app.routes.web import contacts_bp
 from app.routes.web.generic import GenericWebRoutes
-from app.routes.ui.contacts import get_contact_tabs
+from app.routes.ui.contacts import BasicInfo
 from typing import Any, Dict, List
 from app.models import CRISPScore
 
@@ -170,5 +170,5 @@ contact_routes = ContactCRUDRoutes(
     index_template="entity_tables/contacts.html",
     required_fields=["first_name", "last_name"],
     unique_fields=["email"],
-    get_tabs_function=get_contact_tabs,
+    get_tabs_function=BasicInfo,
 )

@@ -156,7 +156,7 @@ class EntityHandler:
 class TabBuilder:
     tab_name: str
     item: Any
-    tab_sections: List[TabSection]
+    tab_sections: List[TabSection] = field(default_factory=list, init=False)
 
     def create_tab(self):
         """
@@ -173,16 +173,3 @@ class TabBuilder:
         logger.info(f"Finished creating {self.tab_name} section")
         logger.debug(f"{self.tab_name}: {tab}")
         return tab
-
-    def get_all_sections(self, section_functions: List[Callable]) -> List[TabSection]:
-        """
-        Calls both _basic_info_section and _role_info_section and stores the results in a list.
-
-        Returns:
-            List[TabSection]: List containing both TabSection objects.
-        """
-        sections = [
-            self._basic_info_section(),
-            self._role_info_section()
-        ]
-        return sections
