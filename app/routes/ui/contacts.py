@@ -1,62 +1,54 @@
-from app.routes.base.components.entity_handler import Tab, TabSection, TabEntry
-from typing import List
+from app.routes.base.components.entity_handler import Tab, TabSection, TabEntry, TabBuilder
+from dataclasses import dataclass
+from typing import List, Any
 import logging
 
 # Get logger for this module
 logger = logging.getLogger(__name__)
 
+@dataclass
+class BasicInfo(TabBuilder):
+    tab_name: str
+    item: Any
+    tab_sections: List[TabSection]
 
-def get_contact_tabs(item: dict) -> List[Tab]:
-    """Returns the list of contact-related tabs with data populated from the item dictionary.
+    def _basic_info_section(self):
+        section_name = "Contact"
+        contact_info_section = TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(entry_name="first_name", label="First Name", type="text", required=True,
+                         value=self.item.get("first_name")),
+                TabEntry(entry_name="last_name", label="Last Name", type="text", required=True,
+                         value=self.item.get("last_name")),
+                TabEntry(entry_name="email", label="Email", type="email", required=True, value=self.item.get("email")),
+                TabEntry(entry_name="phone_number", label="Phone Number", type="text", value=self.item.get("phone_number")),
+            ]
+        )
+        logger.info(f"Finished creating {contact_info_section} section")
+        return contact_info_section
 
-    Args:
-        item (dict): Dictionary of field values to populate into TabEntry.value.
+    def _role_info_section(self):
+        section_name = "Role Information"
+        role_info_section = TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(entry_name="role", label="Role", type="text", value=self.item.get("role")),
+                TabEntry(
+                    entry_name="role_level",
+                    label="Role Level",
+                    type="dropdown",
+                    options=["Junior", "Mid", "Senior", "Lead"],
+                    value=item.get("role_level")
+                ),
+                TabEntry(entry_name="team_bu_name", label="Team Name", type="text", value=self.item.get("team_bu_name")),
+            ]
+        )
+        logger.debug(f"Created role info section")
+        return role_info_section
 
-    Returns:
-        List[Tab]: List of populated Tab objects.
-    """
-    logger.info(f"Building contact tabs with input item")
-    logger.debug(f"Input item: {item}")
 
-    # --- Basic Info Tab ---
-
-
-    basic_info_tab_name = "Basic Info"
-    logger.info(f"Creating {basic_info_tab_name} tab")
-    contact_session_name = "Contact"
-    contact_info_section = TabSection(
-        section_name=contact_session_name,
-        entries=[
-            TabEntry(entry_name="first_name", label="First Name", type="text", required=True,
-                     value=item.get("first_name")),
-            TabEntry(entry_name="last_name", label="Last Name", type="text", required=True,
-                     value=item.get("last_name")),
-            TabEntry(entry_name="email", label="Email", type="email", required=True, value=item.get("email")),
-            TabEntry(entry_name="phone_number", label="Phone Number", type="text", value=item.get("phone_number")),
-        ]
-    )
-    logger.info(f"Finished creating {contact_session_name} section")
-
-    role_info_section_name = "Role Information"
-    role_info_section = TabSection(
-        section_name=role_info_section_name,
-        entries=[
-            TabEntry(entry_name="role", label="Role", type="text", value=item.get("role")),
-            TabEntry(
-                entry_name="role_level",
-                label="Role Level",
-                type="dropdown",
-                options=["Junior", "Mid", "Senior", "Lead"],
-                value=item.get("role_level")
-            ),
-            TabEntry(entry_name="team_bu_name", label="Team Name", type="text", value=item.get("team_bu_name")),
-        ]
-    )
-    logger.info(f"Finished creating {role_info_section_name} section")
-
-    basic_info_tab = Tab(tab_name=basic_info_tab_name, sections=[contact_info_section, role_info_section])
-    logger.debug(f"Created {basic_info_tab_name}")
-
+def abc():
     # --- Role & Responsibilities Tab ---
     roles_responsibilities_tab_name = "Role and Responsibilities"
     roles_responsibilities_section_name = "Role and Responsibilities"
@@ -222,3 +214,19 @@ def get_contact_tabs(item: dict) -> List[Tab]:
     tabs = [basic_info_tab, role_tab, skills_tab, expertise_tab, metadata_tab]
     logger.info(f"Returning {len(tabs)} tabs for contact")
     return tabs
+
+
+def get_contact_tabs(item: dict) -> List[Tab]:
+    """Returns the list of contact-related tabs with data populated from the item dictionary.
+
+    Args:
+        item (dict): Dictionary of field values to populate into TabEntry.value.
+
+    Returns:
+        List[Tab]: List of populated Tab objects.
+    """
+    contact_info_section = self._basic_info_section(basic_info_tab_name, item)
+    role_info_section = self._role_info_section(basic_info_tab_name, item)
+    return create_tab(basic_info_tab_name, [contact_info_section, role_info_section])
+
+
