@@ -189,10 +189,86 @@ def seed_tasks():
     print("✅ Tasks seeded.")
 
 
+def seed_relationships():
+    """Seed relationships between entities in the database."""
+    from app.models.relationship import Relationship
+
+    users = User.query.all()
+    contacts = Contact.query.all()
+    companies = Company.query.all()
+
+    # Define some relationship types
+    relationship_types = ["Manages", "Works With", "Reports To", "Client", "Partner", "Vendor"]
+
+    # Create user-to-user relationships
+    for i in range(len(users) - 1):
+        user1 = users[i]
+        user2 = users[i + 1]
+        rel_type = relationship_types[i % len(relationship_types)]
+
+        existing = Relationship.query.filter_by(
+            entity1_type='user', entity1_id=user1.id,
+            entity2_type='user', entity2_id=user2.id
+        ).first()
+
+        if not existing:
+            relationship = Relationship.create_relationship(
+                entity1_type='user', entity1_id=user1.id,
+                entity2_type='user', entity2_id=user2.id,
+                relationship_type=rel_type
+            )
+            db.session.add(relationship)
+            logger.info(f"Created relationship: User {user1.username} {rel_type} User {user2.username}")
+
+    # Create user-to-contact relationships
+    for i in range(min(len(users), len(contacts))):
+        user = users[i]
+        contact = contacts[i]
+        rel_type = relationship_types[(i + 2) % len(relationship_types)]
+
+        existing = Relationship.query.filter_by(
+            entity1_type='user', entity1_id=user.id,
+            entity2_type='contact', entity2_id=contact.id
+        ).first()
+
+        if not existing:
+            relationship = Relationship.create_relationship(
+                entity1_type='user', entity1_id=user.id,
+                entity2_type='contact', entity2_id=contact.id,
+                relationship_type=rel_type
+            )
+            db.session.add(relationship)
+            logger.info(f"Created relationship: User {user.username} {rel_type} Contact {contact.full_name}")
+
+    # Create user-to-company relationships
+    for i in range(min(len(users), len(companies))):
+        user = users[i]
+        company = companies[i]
+        rel_type = relationship_types[(i + 4) % len(relationship_types)]
+
+        existing = Relationship.query.filter_by(
+            entity1_type='user', entity1_id=user.id,
+            entity2_type='company', entity2_id=company.id
+        ).first()
+
+        if not existing:
+            relationship = Relationship.create_relationship(
+                entity1_type='user', entity1_id=user.id,
+                entity2_type='company', entity2_id=company.id,
+                relationship_type=rel_type
+            )
+            db.session.add(relationship)
+            logger.info(f"Created relationship: User {user.username} {rel_type} Company {company.name}")
+
+    db.session.commit()
+    print("✅ Relationships seeded.")
+
+
+# Update the seed_demo_data function to include the new seed_relationships function
 def seed_demo_data():
     """Seed all demo data into the database."""
-    entries = [seed_users, seed_companies, seed_contacts, seed_capabilities_and_categories, seed_company_capabilities,
-               seed_tasks, seed_opportunities]
+    entries = [seed_users, seed_companies, seed_contacts, seed_capabilities_and_categories,
+               seed_company_capabilities, seed_tasks, seed_opportunities, seed_relationships]
 
     app = create_app()
     with app.app_context():
