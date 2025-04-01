@@ -55,7 +55,7 @@ class UserCRUDRoutes(GenericWebRoutes):
                 id="users-input",
                 placeholder="Search for users...",
                 name="users",
-                data_url="/api/users/autocomplete",
+                data_url="/users/data",
                 initial_ids=related_user_ids
             ),
             AutoCompleteField(
@@ -63,7 +63,7 @@ class UserCRUDRoutes(GenericWebRoutes):
                 id="companies-input",
                 placeholder="Search for companies...",
                 name="companies",
-                data_url="/api/companies/autocomplete",
+                data_url="/companies/data",
                 initial_ids=related_company_ids
             )
         ]
