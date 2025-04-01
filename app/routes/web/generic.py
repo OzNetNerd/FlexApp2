@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional, List, Type
 from flask import request, redirect, url_for, flash, Blueprint
-from flask_login import current_user, login_required
+from flask_login import login_required
 import logging
 from datetime import datetime
 
@@ -10,12 +10,11 @@ from app.routes.base.crud_base import CRUDRoutesBase
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.json_validator import JSONValidator
 from app.routes.base.components.request_logger import RequestLogger
-from app.routes.base.components.table_config_manager import TableConfigManager
+from app.services.table_config_manager import TableConfigManager
 from app.routes.base.components.data_route_handler import DataRouteHandler
 from app.routes.base.components.form_handler import FormHandler, ResourceContext, TableContext
 from app.routes.base.components.item_manager import ItemManager
 from app.services.relationship_service import RelationshipService
-from app.models import Company, CRISPScore, Note
 from app.routes.base.components.autocomplete_config import get_autocomplete_fields, AutoCompleteField
 
 logger = logging.getLogger(__name__)
@@ -399,15 +398,6 @@ class GenericWebRoutes(CRUDRoutesBase):
             logger.debug(f"Added {len(context['autocomplete_fields'])} autocomplete fields to the edit context.")
         else:
             logger.debug(f"Added {len(context['autocomplete_fields'])} autocomplete fields to the view context.")
-
-    # Replace add_view_context and add_edit_context with add_context
-    def add_view_context(self, item, context):
-        """Adds context for the view."""
-        self.add_context(item, context, edit=False)
-
-    def add_edit_context(self, item, context):
-        """Adds context for the edit."""
-        self.add_context(item, context, edit=True)
 
     # Replace add_view_context and add_edit_context with add_context
     def add_view_context(self, item, context):
