@@ -37,11 +37,11 @@ def get_contact_tabs(item: dict) -> List[Tab]:
 
     # --- Role & Responsibilities Tab ---
     role_responsibilities_section = TabSection(
-        section_name="Role & Responsibilities",
+        section_name="Role and Responsibilities",
         entries=[
             TabEntry(
                 entry_name="team_roles_responsibilities",
-                label="Team's Roles & Responsibilities",
+                label="Team's Roles and Responsibilities",
                 type="textarea",
                 value=item.get("team_roles_responsibilities")
             ),
@@ -59,7 +59,7 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             ),
         ]
     )
-    role_tab = Tab(tab_name="Role & Responsibilities", sections=[role_responsibilities_section])
+    role_tab = Tab(tab_name="Role and Responsibilities", sections=[role_responsibilities_section])
 
     # --- Skills & Technologies Tab ---
     skill_level_section = TabSection(
@@ -140,11 +140,11 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             ),
         ]
     )
-    skills_tab = Tab(tab_name="Skills & Technologies", sections=[skill_level_section, technologies_used_section])
+    skills_tab = Tab(tab_name="Skills and Technologies", sections=[skill_level_section, technologies_used_section])
 
     # --- Expertise & Projects Tab ---
     expertise_section = TabSection(
-        section_name="Expertise & Projects",
+        section_name="Expertise and Projects",
         entries=[
             TabEntry(
                 entry_name="expertise_areas",
@@ -160,7 +160,7 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             ),
         ]
     )
-    expertise_tab = Tab(tab_name="Expertise & Projects", sections=[expertise_section])
+    expertise_tab = Tab(tab_name="Expertise and Projects", sections=[expertise_section])
 
     # --- Metadata Tab ---
     metadata_section = TabSection(
