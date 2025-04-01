@@ -19,9 +19,13 @@ def get_contact_tabs(item: dict) -> List[Tab]:
     logger.debug(f"Input item: {item}")
 
     # --- Basic Info Tab ---
-    logger.info(f"Creating Basic Info tab")
+
+
+    basic_info_tab_name = "Basic Info"
+    logger.info(f"Creating {basic_info_tab_name} tab")
+    contact_session_name = "Contact"
     contact_info_section = TabSection(
-        section_name="Contact",
+        section_name=contact_session_name,
         entries=[
             TabEntry(entry_name="first_name", label="First Name", type="text", required=True,
                      value=item.get("first_name")),
@@ -31,10 +35,11 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             TabEntry(entry_name="phone_number", label="Phone Number", type="text", value=item.get("phone_number")),
         ]
     )
-    logger.debug(f"Created Contact info section: {contact_info_section}")
+    logger.info(f"Finished creating {contact_session_name} section")
 
+    role_info_section_name = "Role Information"
     role_info_section = TabSection(
-        section_name="Role Information",
+        section_name=role_info_section_name,
         entries=[
             TabEntry(entry_name="role", label="Role", type="text", value=item.get("role")),
             TabEntry(
@@ -47,15 +52,17 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             TabEntry(entry_name="team_bu_name", label="Team Name", type="text", value=item.get("team_bu_name")),
         ]
     )
-    logger.debug(f"Created Role Information section: {role_info_section}")
+    logger.info(f"Finished creating {role_info_section_name} section")
 
-    basic_info_tab = Tab(tab_name="Basic Info", sections=[contact_info_section, role_info_section])
-    logger.debug(f"Created Basic Info tab: {basic_info_tab}")
+    basic_info_tab = Tab(tab_name=basic_info_tab_name, sections=[contact_info_section, role_info_section])
+    logger.debug(f"Created {basic_info_tab_name}")
 
     # --- Role & Responsibilities Tab ---
-    logger.info(f"Creating Role & Responsibilities tab")
+    roles_responsibilities_tab_name = "Role and Responsibilities"
+    roles_responsibilities_section_name = "Role and Responsibilities"
+    logger.info(f"Creating {roles_responsibilities_tab_name} tab")
     role_responsibilities_section = TabSection(
-        section_name="Role and Responsibilities",
+        section_name=roles_responsibilities_tab_name,
         entries=[
             TabEntry(
                 entry_name="team_roles_responsibilities",
@@ -77,15 +84,17 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             ),
         ]
     )
-    logger.debug(f"Created Role and Responsibilities section: {role_responsibilities_section}")
+    logger.debug(f"Created {roles_responsibilities_section_name} section: {role_responsibilities_section}")
 
-    role_tab = Tab(tab_name="Role and Responsibilities", sections=[role_responsibilities_section])
+    role_tab = Tab(tab_name=roles_responsibilities_tab_name, sections=[role_responsibilities_section])
     logger.debug(f"Created Role and Responsibilities tab: {role_tab}")
 
     # --- Skills & Technologies Tab ---
-    logger.info(f"Creating Skills & Technologies tab")
+    skills_technologies_tab_name = "Skills & Technologies tab"
+    skills_level_section_name = "Skill Level"
+    logger.info(f"Creating {skills_technologies_tab_name} tab")
     skill_level_section = TabSection(
-        section_name="Skill Level",
+        section_name=skills_level_section_name,
         entries=[
             TabEntry(
                 entry_name="primary_skill_area",
@@ -109,10 +118,11 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             ),
         ]
     )
-    logger.debug(f"Created Skill Level section: {skill_level_section}")
+    logger.debug(f"Created {skills_level_section_name} section: {skill_level_section}")
 
+    technologies_used_section_name = "Technologies Used"
     technologies_used_section = TabSection(
-        section_name="Technologies Used",
+        section_name=technologies_used_section_name,
         entries=[
             TabEntry(
                 entry_name="cloud_platforms",
@@ -164,15 +174,17 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             ),
         ]
     )
-    logger.debug(f"Created Technologies Used section: {technologies_used_section}")
+    logger.debug(f"Created {technologies_used_section_name} section: {technologies_used_section}")
 
-    skills_tab = Tab(tab_name="Skills and Technologies", sections=[skill_level_section, technologies_used_section])
+    skills_tab = Tab(tab_name=skills_technologies_tab_name, sections=[skill_level_section, technologies_used_section])
     logger.debug(f"Created Skills and Technologies tab: {skills_tab}")
 
     # --- Expertise & Projects Tab ---
-    logger.info(f"Creating Expertise & Projects tab")
+    expertise_projects_tab_name = "Expertise & Projects"
+    expertise_projects_section_name = "Expertise and Projects"
+    logger.info(f"Creating  tab")
     expertise_section = TabSection(
-        section_name="Expertise and Projects",
+        section_name=expertise_projects_section_name,
         entries=[
             TabEntry(
                 entry_name="expertise_areas",
@@ -188,10 +200,10 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             ),
         ]
     )
-    logger.debug(f"Created Expertise and Projects section: {expertise_section}")
+    logger.debug(f"Created {expertise_projects_section_name} section: {expertise_section}")
 
-    expertise_tab = Tab(tab_name="Expertise and Projects", sections=[expertise_section])
-    logger.debug(f"Created Expertise and Projects tab: {expertise_tab}")
+    expertise_tab = Tab(tab_name=expertise_projects_tab_name, sections=[expertise_section])
+    logger.debug(f"Created {expertise_projects_tab_name} tab: {expertise_tab}")
 
     # --- Metadata Tab ---
     logger.info(f"Creating Metadata tab")
