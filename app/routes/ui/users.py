@@ -1,4 +1,4 @@
-from app.routes.base.components.entity_handler import Tab, TabSection, TabEntry
+from app.routes.base.components.tab_builder import Tab, TabSection, TabEntry
 from typing import List
 
 

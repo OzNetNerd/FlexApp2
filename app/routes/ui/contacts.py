@@ -1,15 +1,19 @@
-from app.routes.base.components.entity_handler import Tab, TabSection, TabEntry, TabBuilder
+from app.routes.base.components.tab_builder import TabSection, TabEntry, TabBuilder
 from dataclasses import dataclass
-from typing import List, Any
+from typing import Any
 import logging
+from app.routes.base.components.tab_builder import create_tabs
 
-# Get logger for this module
 logger = logging.getLogger(__name__)
+
+
+__all__ = ["BasicInfoTab", "RoleAndResponsibilitiesTab", "SkillsAndTechnologiesTab", "ExpertiseAndProjectsTab"]
+
 
 @dataclass
 class BasicInfoTab(TabBuilder):
-    tab_name: str
     item: Any
+    tab_name: str = "Basic Info"
 
     def _basic_info_section(self):
         section_name = "Contact"
@@ -47,9 +51,9 @@ class BasicInfoTab(TabBuilder):
 
 
 @dataclass
-class RoleAndResponsibilities(TabBuilder):
-    tab_name: str
+class RoleAndResponsibilitiesTab(TabBuilder):
     item: Any
+    tab_name: str = "Roles and Responsibilities"
 
     def _role_responsibilities_section(self):
         section_name = "Role and Responsibilities"
@@ -76,14 +80,13 @@ class RoleAndResponsibilities(TabBuilder):
                 ),
             ]
         )
-        logger.debug(f"Created {role_responsibilities_section} section")
         return role_responsibilities_section
 
 
 @dataclass
-class SkillsAndTechnologies(TabBuilder):
-    tab_name: str
+class SkillsAndTechnologiesTab(TabBuilder):
     item: Any
+    tab_name: str = "Skills and Technologies"
 
     def _skill_level_section(self):
         section_name = "Skill Level"
@@ -170,13 +173,12 @@ class SkillsAndTechnologies(TabBuilder):
                 ),
             ]
         )
-        logger.debug(f"Created {technologies_used_section} section")
         return technologies_used_section
 
 @dataclass
-class ExpertiseAndProjects(TabBuilder):
-    tab_name: str
+class ExpertiseAndProjectsTab(TabBuilder):
     item: Any
+    tab_name: str = "Expertise and Projects"
 
     def _expertise_section(self):
         section_name = "Expertise and Projects"
@@ -197,32 +199,9 @@ class ExpertiseAndProjects(TabBuilder):
                 ),
             ]
         )
-        logger.debug(f"Created {expertise_section} section")
         return expertise_section
 
-@dataclass
-class Metadata(TabBuilder):
-    tab_name: str
-    item: Any
+def create_contacts_tabs():
+    tabs = create_tabs(__all__)
 
-    def _metadata_section(self):
-        section_name = "Metadata"
-        metadata_section = TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(
-                    entry_name="created_at",
-                    label="Created At",
-                    type="readonly",
-                    value=self.item.get("created_at")
-                ),
-                TabEntry(
-                    entry_name="updated_at",
-                    label="Updated At",
-                    type="readonly",
-                    value=self.item.get("updated_at")
-                ),
-            ]
-        )
-        logger.debug(f"Created {metadata_section} section")
-        return metadata_section#
+    return tabs

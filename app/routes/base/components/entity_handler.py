@@ -1,28 +1,10 @@
 import logging
-from typing import Optional, Any, Dict, List, Callable
+from typing import Optional, Any, Dict, List
 from dataclasses import dataclass, field
 from flask import url_for
 
-@dataclass
-class TabEntry:
-    entry_name: str
-    label: str
-    type: str
-    required: bool = False
-    options: Optional[List[dict[str, Any]]] = None
-    default: Optional[Any] = None
-    value: Optional[Any] = None
+logger = logging.getLogger(__name__)
 
-
-@dataclass
-class TabSection:
-    section_name: str
-    entries: List[TabEntry] = field(default_factory=list)
-
-@dataclass
-class Tab:
-    tab_name: str
-    sections: List[TabSection] = field(default_factory=list)
 
 @dataclass
 class BasicContext:
@@ -78,8 +60,6 @@ class TableContext:
     entity_name: str
     add_url: str
     columns: list[Any]
-
-logger = logging.getLogger(__name__)
 
 class EntityHandler:
     """Handles preparation and validation of dynamic form inputs for web routes."""
@@ -150,26 +130,3 @@ class EntityHandler:
         logger.info(f"✏️ [Edit] Selected company IDs: {companies}")
 
         return []
-
-
-@dataclass
-class TabBuilder:
-    tab_name: str
-    item: Any
-    tab_sections: List[TabSection] = field(default_factory=list, init=False)
-
-    def create_tab(self):
-        """
-        Creates a Tab object with the given tab_name and list of TabSection objects.
-
-        Returns:
-            Tab: A Tab object with the given tab_name and sections
-        """
-        logger.info(f"Creating {self.tab_name} tab")
-        for tab_section in self.tab_sections:
-            logger.debug(f"Finished creating {tab_section.section_name} section: {tab_section}")
-
-        tab = Tab(tab_name=self.tab_name, sections=self.tab_sections)
-        logger.info(f"Finished creating {self.tab_name} section")
-        logger.debug(f"{self.tab_name}: {tab}")
-        return tab
