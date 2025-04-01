@@ -3,8 +3,6 @@ from typing import List
 from dataclasses import dataclass
 
 import logging
-from app.services.relationship_service import RelationshipService
-
 logger = logging.getLogger(__name__)
 
 
@@ -15,7 +13,7 @@ class AutoCompleteField:
     placeholder: str
     name: str
     data_url: str
-    initial_ids: List[str]
+    related_ids: List[str]
 
 # def get_autocomplete_fields(relationships):
 #     """
@@ -45,7 +43,7 @@ class AutoCompleteField:
 #             placeholder="Search for users...",
 #             name="users",
 #             data_url="/users/data",
-#             initial_ids=related_user_ids
+#             related_ids=related_user_ids
 #         ),
 #         AutoCompleteField(
 #             title="Companies",
@@ -53,30 +51,39 @@ class AutoCompleteField:
 #             placeholder="Search for companies...",
 #             name="companies",
 #             data_url="/companies/data",
-#             initial_ids=related_company_ids
+#             related_ids=related_company_ids
 #         )
 #     ]
 
 
-
-def create_autocomplete_field(title, initial_ids=None, field_id=None, placeholder=None, name=None, data_url=None):
+def create_autocomplete_field(title, relationships=None, field_id=None, placeholder=None, name=None, data_url=None):
     """
     Create an AutoCompleteField instance using defaults derived from the title if parameters
     are not specified.
+
+    This function automatically extracts related IDs from the provided relationships list
+    based on the title. For example, if the title is "Users", it will filter relationships
+    where 'entity_type' equals 'user' (i.e. title.lower().rstrip('s')).
     """
     title_lower = title.lower()
     field_id = field_id or f"{title_lower}-input"
     placeholder = placeholder or f"Search for {title_lower}..."
     name = name or title_lower
-    # Assumes a plural URL pattern; adjust if necessary.
     data_url = data_url or f"/{title_lower}s/data"
+
+    # Determine the singular entity type from the title (e.g., "Users" -> "user")
+    entity_type = title_lower.rstrip('s')
+    related_ids = []
+    if relationships is not None:
+        related_ids = [rel['entity_id'] for rel in relationships if rel.get('entity_type') == entity_type]
+
     return AutoCompleteField(
         title=title,
         id=field_id,
         placeholder=placeholder,
         name=name,
         data_url=data_url,
-        initial_ids=initial_ids or []
+        related_ids=related_ids
     )
 
 
@@ -92,11 +99,11 @@ def get_autocomplete_fields(relationships, model_name=""):
         return [
             create_autocomplete_field(
                 title="Users",
-                initial_ids=related_user_ids
+                related_ids=related_user_ids
             ),
             create_autocomplete_field(
                 title="Companies",
-                initial_ids=related_company_ids
+                related_ids=related_company_ids
             )
         ]
     # Add additional model-specific logic here if needed.

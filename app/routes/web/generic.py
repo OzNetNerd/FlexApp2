@@ -382,7 +382,7 @@ class GenericWebRoutes(CRUDRoutesBase):
                     placeholder="Search for users...",
                     name="users",
                     data_url="/users/data",
-                    initial_ids=related_user_ids
+                    related_ids=related_user_ids
                 ),
                 AutoCompleteField(
                     title="Companies",
@@ -390,7 +390,7 @@ class GenericWebRoutes(CRUDRoutesBase):
                     placeholder="Search for companies...",
                     name="companies",
                     data_url="/companies/data",
-                    initial_ids=related_company_ids
+                    related_ids=related_company_ids
                 )
             ]
 
