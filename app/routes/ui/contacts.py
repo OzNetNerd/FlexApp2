@@ -12,9 +12,10 @@ def get_contact_tabs(item: dict) -> List[Tab]:
     """
     # --- Basic Info Tab ---
     contact_info_section = TabSection(
-        section_name="Contact Information",
+        section_name="Contact",
         entries=[
-            TabEntry(entry_name="name", label="Name", type="text", required=True, value=item.get("name")),
+            TabEntry(entry_name="first_name", label="First Name", type="text", required=True, value=item.get("first_name")),
+            TabEntry(entry_name="last_name", label="Last Name", type="text", required=True, value=item.get("last_name")),
             TabEntry(entry_name="email", label="Email", type="email", required=True, value=item.get("email")),
             TabEntry(entry_name="phone_number", label="Phone Number", type="text", value=item.get("phone_number")),
         ]
