@@ -42,6 +42,7 @@ class ResourceContext:
     ui: Optional[List[str]] = None
     model_name: Optional[str] = None
     item: Optional[str] = None  # Allow the item to be passed as an argument
+    autocomplete_fields: Optional[List[dict]] = None
 
     def __post_init__(self):
         # Ensure that `create_context()` is called to properly initialize the instance
@@ -49,7 +50,7 @@ class ResourceContext:
             raise NotImplementedError("Use the factory method `create_context()` to construct ResourceContext.")
 
     @classmethod
-    def create_context(cls, model, blueprint_name: str, item_dict: dict, tabs, title: str, read_only: bool, error_message: Optional[str] = None, item: Optional[str] = None):
+    def create_context(cls, model, blueprint_name: str, item_dict: dict, tabs, title: str, read_only: bool, error_message: Optional[str] = None, item: Optional[str] = None, autocomplete_fields: Optional[List[dict]] = None):
         """Factory method to construct a ResourceContext with derived fields."""
         self = cls.__new__(cls)  # Bypass __init__
         self.title = title
@@ -59,6 +60,7 @@ class ResourceContext:
         self.error_message = error_message
         self.model_name = model.__name__
         self.id = str(item_dict.get("id", ""))
+        self.autocomplete_fields = autocomplete_fields
         self.item_name = next(
             (item_dict[k] for k in ["name", "title", "email", "username"] if k in item_dict and item_dict[k]),
             str(item_dict.get("id", ""))

@@ -235,18 +235,54 @@ class GenericWebRoutes(CRUDRoutesBase):
             return self._handle_edit_form_submission(item)
         return self._render_edit_form(item)
 
+    # Add this method to the GenericWebRoutes class in generic.py
+
+    def add_edit_context(self, item, context):
+        """
+        Adds additional data to the edit context before rendering.
+        This method can be overridden by child classes to add custom data.
+
+        Args:
+            item: The database item being edited
+            context: The template rendering context dictionary
+        """
+        # Base implementation does nothing
+        pass
+
+    def add_edit_context(self, item, context_obj):
+        """
+        Adds additional data to the edit context before rendering.
+        This method can be overridden by child classes to add custom data.
+
+        Args:
+            item: The database item being edited
+            context_obj: The ResourceContext object for rendering
+        """
+        # Base implementation does nothing
+        pass
+
     def _render_edit_form(self, item):
         """Renders the form for editing an existing item."""
         item_dict = item.to_dict()
         tabs = self.get_tabs_function(item_dict)
+
+        # Create additional context data (before creating ResourceContext)
+        extra_context = {}
+
+        # Call the add_edit_context method to allow child classes to add data
+        self.add_edit_context(item, extra_context)
+
+        # Create the ResourceContext with the extra data
         context = ResourceContext.create_context(
             model=self.model,
             blueprint_name=self.blueprint.name,
             item_dict=item_dict,
             tabs=tabs,
             title=f"Edit {self.model.__name__}",
-            read_only=False
+            read_only=False,
+            **extra_context  # Include any extra context data
         )
+
         return render_safely(self.edit_template, context, f"Error rendering edit form for {self.model.__name__}")
 
     def _handle_edit_form_submission(self, item):

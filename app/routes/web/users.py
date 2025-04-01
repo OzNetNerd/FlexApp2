@@ -25,20 +25,84 @@ class UserCRUDRoutes(GenericWebRoutes):
         relationships = RelationshipService.get_relationships_for_entity('user', item.id)
         context["relationships"] = relationships
 
-        # Add autocomplete configuration for mappings
-        logger.debug(f"Adding autocomplete configuration for mappings to the view context for User {item.id}.")
-        context["autocomplete_config"] = [
+        # Add autocomplete fields for mappings
+        self._add_autocomplete_fields(item, context, relationships)
+
+    def add_edit_context(self, item, context):
+        """Add autocomplete fields to the edit context."""
+        # Call the parent method first
+        super().add_edit_context(item, context)
+
+        # Get relationships for this user
+        logger.debug(f"Adding autocomplete fields to edit context for User {item.id}")
+        relationships = RelationshipService.get_relationships_for_entity('user', item.id)
+
+        # Extract related user and company IDs from relationships
+        related_user_ids = []
+        related_company_ids = []
+
+        for rel in relationships:
+            if rel['entity_type'] == 'user':
+                related_user_ids.append(rel['entity_id'])
+            elif rel['entity_type'] == 'company':
+                related_company_ids.append(rel['entity_id'])
+
+        # Add autocomplete fields configuration
+        context["autocomplete_fields"] = [
             {
-                "selector": "#users-input",
-                "dataUrl": "/api/users/autocomplete",
-                "inputName": "users"
+                "title": "Users",
+                "id": "users-input",
+                "placeholder": "Search for users...",
+                "name": "users",
+                "data_url": "/api/users/autocomplete",
+                "initial_ids": related_user_ids
             },
             {
-                "selector": "#companies-input",
-                "dataUrl": "/api/companies/autocomplete",
-                "inputName": "companies"
+                "title": "Companies",
+                "id": "companies-input",
+                "placeholder": "Search for companies...",
+                "name": "companies",
+                "data_url": "/api/companies/autocomplete",
+                "initial_ids": related_company_ids
             }
         ]
+
+        logger.debug(f"Added {len(context['autocomplete_fields'])} autocomplete fields to context")
+
+    @staticmethod
+    def _add_autocomplete_fields(item, context, relationships):
+        """Helper method to add autocomplete fields to context"""
+        # Extract related user and company IDs from relationships
+        related_user_ids = []
+        related_company_ids = []
+
+        for rel in relationships:
+            if rel['entity_type'] == 'user':
+                related_user_ids.append(rel['entity_id'])
+            elif rel['entity_type'] == 'company':
+                related_company_ids.append(rel['entity_id'])
+
+        # Add autocomplete fields configuration
+        context["autocomplete_fields"] = [
+            {
+                "title": "Users",
+                "id": "users-input",
+                "placeholder": "Search for users...",
+                "name": "users",
+                "data_url": "/api/users/autocomplete",
+                "initial_ids": related_user_ids
+            },
+            {
+                "title": "Companies",
+                "id": "companies-input",
+                "placeholder": "Search for companies...",
+                "name": "companies",
+                "data_url": "/api/companies/autocomplete",
+                "initial_ids": related_company_ids
+            }
+        ]
+
+        logger.debug(f"Added {len(context['autocomplete_fields'])} autocomplete fields to context")
 
 
 # Set up the CRUD routes for users
