@@ -109,12 +109,12 @@ class GenericWebRoutes(CRUDRoutesBase):
     def _render_create_form(self):
         """Renders the creation form template."""
         item_dict = {}
+
         tabs = self.get_tabs_function(item_dict)
         context = ResourceContext(
             model=self.model,
             blueprint_name=self.blueprint.name,
             item_dict=item_dict,
-            item=None,  # Add missing required parameter
             tabs=tabs,
             title=f"Create a {self.model.__name__}",
             read_only=False
@@ -127,10 +127,10 @@ class GenericWebRoutes(CRUDRoutesBase):
         tabs = self.get_tabs_function(item_dict)
 
         # Create additional context data (before creating ResourceContext)
-        extra_context = {}
+        # extra_context = {}
 
         # Call the add_edit_context method to allow child classes to add data
-        self.add_edit_context(item, extra_context)
+        # self.add_edit_context(item, extra_context)
 
         # Create the ResourceContext with the extra data
         context = ResourceContext(
@@ -141,7 +141,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             tabs=tabs,
             title=f"Edit",
             read_only=False,
-            **extra_context  # Include any extra context data
+            # **extra_context  # Include any extra context data
         )
 
         return render_safely(self.edit_template, context, f"Error rendering edit form for {self.model.__name__}")
@@ -228,8 +228,6 @@ class GenericWebRoutes(CRUDRoutesBase):
             columns=table_config.get("columns", []),
         )
         return render_safely(self.index_template, context, f"Error rendering {self.model.__name__} index")
-
-
 
     def _handle_create_form_submission(self):
         """Processes the submitted data for creating a new item."""
@@ -363,11 +361,11 @@ class GenericWebRoutes(CRUDRoutesBase):
 
         logger.debug(f"Added {len(context.autocomplete_fields)} autocomplete fields to the {edit_mode} context.")
 
-    # Replace add_view_context and add_edit_context with add_context
-    def add_view_context(self, item, context):
-        """Adds context for the view."""
-        self.add_context(item, context, edit_mode=False)
-
-    def add_edit_context(self, item, context):
-        """Adds context for the edit."""
-        self.add_context(item, context, edit_mode=True)
+    # # Replace add_view_context and add_edit_context with add_context
+    # def add_view_context(self, item, context):
+    #     """Adds context for the view."""
+    #     self.add_context(item, context, edit_mode=False)
+    #
+    # def add_edit_context(self, item, context):
+    #     """Adds context for the edit."""
+    #     self.add_context(item, context, edit_mode=True)

@@ -36,10 +36,11 @@ class ResourceContext:
     model: Any
     blueprint_name: str
     item_dict: dict
-    item: Optional[str]
     tabs: List[str]
     title: str
     read_only: bool
+
+    item: Optional[str] = None
     error_message: Optional[str] = None
     autocomplete_fields: List[dict] = field(default_factory=list)  # Use default_factory=list instead of None
 

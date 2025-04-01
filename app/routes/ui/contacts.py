@@ -1,5 +1,10 @@
 from app.routes.base.components.entity_handler import Tab, TabSection, TabEntry
 from typing import List
+import logging
+
+# Get logger for this module
+logger = logging.getLogger(__name__)
+
 
 def get_contact_tabs(item: dict) -> List[Tab]:
     """Returns the list of contact-related tabs with data populated from the item dictionary.
@@ -10,16 +15,24 @@ def get_contact_tabs(item: dict) -> List[Tab]:
     Returns:
         List[Tab]: List of populated Tab objects.
     """
+    logger.info(f"Building contact tabs with input item")
+    logger.debug(f"Input item: {item}")
+
     # --- Basic Info Tab ---
+    logger.info(f"Creating Basic Info tab")
     contact_info_section = TabSection(
         section_name="Contact",
         entries=[
-            TabEntry(entry_name="first_name", label="First Name", type="text", required=True, value=item.get("first_name")),
-            TabEntry(entry_name="last_name", label="Last Name", type="text", required=True, value=item.get("last_name")),
+            TabEntry(entry_name="first_name", label="First Name", type="text", required=True,
+                     value=item.get("first_name")),
+            TabEntry(entry_name="last_name", label="Last Name", type="text", required=True,
+                     value=item.get("last_name")),
             TabEntry(entry_name="email", label="Email", type="email", required=True, value=item.get("email")),
             TabEntry(entry_name="phone_number", label="Phone Number", type="text", value=item.get("phone_number")),
         ]
     )
+    logger.debug(f"Created Contact info section: {contact_info_section}")
+
     role_info_section = TabSection(
         section_name="Role Information",
         entries=[
@@ -34,9 +47,13 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             TabEntry(entry_name="team_bu_name", label="Team Name", type="text", value=item.get("team_bu_name")),
         ]
     )
+    logger.debug(f"Created Role Information section: {role_info_section}")
+
     basic_info_tab = Tab(tab_name="Basic Info", sections=[contact_info_section, role_info_section])
+    logger.debug(f"Created Basic Info tab: {basic_info_tab}")
 
     # --- Role & Responsibilities Tab ---
+    logger.info(f"Creating Role & Responsibilities tab")
     role_responsibilities_section = TabSection(
         section_name="Role and Responsibilities",
         entries=[
@@ -60,9 +77,13 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             ),
         ]
     )
+    logger.debug(f"Created Role and Responsibilities section: {role_responsibilities_section}")
+
     role_tab = Tab(tab_name="Role and Responsibilities", sections=[role_responsibilities_section])
+    logger.debug(f"Created Role and Responsibilities tab: {role_tab}")
 
     # --- Skills & Technologies Tab ---
+    logger.info(f"Creating Skills & Technologies tab")
     skill_level_section = TabSection(
         section_name="Skill Level",
         entries=[
@@ -88,6 +109,8 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             ),
         ]
     )
+    logger.debug(f"Created Skill Level section: {skill_level_section}")
+
     technologies_used_section = TabSection(
         section_name="Technologies Used",
         entries=[
@@ -141,9 +164,13 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             ),
         ]
     )
+    logger.debug(f"Created Technologies Used section: {technologies_used_section}")
+
     skills_tab = Tab(tab_name="Skills and Technologies", sections=[skill_level_section, technologies_used_section])
+    logger.debug(f"Created Skills and Technologies tab: {skills_tab}")
 
     # --- Expertise & Projects Tab ---
+    logger.info(f"Creating Expertise & Projects tab")
     expertise_section = TabSection(
         section_name="Expertise and Projects",
         entries=[
@@ -161,9 +188,13 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             ),
         ]
     )
+    logger.debug(f"Created Expertise and Projects section: {expertise_section}")
+
     expertise_tab = Tab(tab_name="Expertise and Projects", sections=[expertise_section])
+    logger.debug(f"Created Expertise and Projects tab: {expertise_tab}")
 
     # --- Metadata Tab ---
+    logger.info(f"Creating Metadata tab")
     metadata_section = TabSection(
         section_name="Metadata",
         entries=[
@@ -171,6 +202,11 @@ def get_contact_tabs(item: dict) -> List[Tab]:
             TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
         ]
     )
-    metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
+    logger.debug(f"Created Metadata section: {metadata_section}")
 
-    return [basic_info_tab, role_tab, skills_tab, expertise_tab, metadata_tab]
+    metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
+    logger.debug(f"Created Metadata tab: {metadata_tab}")
+
+    tabs = [basic_info_tab, role_tab, skills_tab, expertise_tab, metadata_tab]
+    logger.info(f"Returning {len(tabs)} tabs for contact")
+    return tabs

@@ -16,7 +16,8 @@ class ContactCRUDRoutes(GenericWebRoutes):
     Custom CRUD routes for Contacts model that extends the generic implementation.
     """
 
-    def add_view_context(self, item: Any, context: Dict[str, Any]) -> None:
+    @staticmethod
+    def add_view_context(item: Any, context: Dict[str, Any]) -> None:
         """Adds relationship and CRISP score information to the view context.
 
         This method retrieves the relationship between the current user and the provided item.

@@ -35,8 +35,8 @@ def get_company_tabs(item: dict) -> List[Tab]:
     ])
     metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
 
-    # Mappings section for users and companies
-    mappings_section = TabSection(
+    # Relationships section for users and companies
+    relationships_section = TabSection(
         section_name="Mappings",
         entries=[
             TabEntry(entry_name="users", label="Users", type="custom", value=item.get("users")),
@@ -44,12 +44,12 @@ def get_company_tabs(item: dict) -> List[Tab]:
         ]
     )
 
-    mappings_tab = Tab(
-        tab_name="Mappings",
-        sections=[mappings_section]
+    relationships_tab = Tab(
+        tab_name="Relationships",
+        sections=[relationships_section]
     )
 
-    tabs = [about_tab, insights_tab, metadata_tab, mappings_tab]
+    tabs = [about_tab, insights_tab, metadata_tab, relationships_tab]
 
 
     return tabs

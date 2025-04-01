@@ -85,9 +85,9 @@ def get_users_tabs(item: dict) -> List[Tab]:
         sections=[metadata_section]
     )
 
-    mappings_tab = Tab(
-        tab_name="Mappings",
-        sections=[mappings_section]
+    relationships_tab = Tab(
+        tab_name="Relationships",
+        sections=[relationships_section]
     )
 
-    return [about_tab, insights_tab, metadata_tab, mappings_tab]
+    return [about_tab, insights_tab, metadata_tab, relationships_tab]
