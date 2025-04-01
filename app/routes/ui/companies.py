@@ -35,7 +35,21 @@ def get_company_tabs(item: dict) -> List[Tab]:
     ])
     metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
 
-    tabs = [about_tab, insights_tab, metadata_tab]
+    # Mappings section for users and companies
+    mappings_section = TabSection(
+        section_name="Mappings",
+        entries=[
+            TabEntry(entry_name="users", label="Users", type="custom", value=item.get("users")),
+            TabEntry(entry_name="companies", label="Companies", type="custom", value=item.get("companies")),
+        ]
+    )
+
+    mappings_tab = Tab(
+        tab_name="Mappings",
+        sections=[mappings_section]
+    )
+
+    tabs = [about_tab, insights_tab, metadata_tab, mappings_tab]
 
 
     return tabs
