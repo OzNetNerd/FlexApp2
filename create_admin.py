@@ -107,7 +107,7 @@ def seed_contacts():
                 "email": f"{first_names[i].lower()}@{company.name.lower()}.com",
             },
             {
-                "phone": f"0400{i}12345",
+                "phone_number": f"0400{i}12345",
                 "company": company,
             },
         )

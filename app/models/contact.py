@@ -1,58 +1,137 @@
 import logging
 from app.models.base import db, BaseModel
-from app.models import contact_user_association
-from app.routes.base.components.form_handler import Tab, TabSection, TabEntry
+from app.models.relationship import Relationship  # reuse the generic Relationship model
+from sqlalchemy.orm import foreign
 
 logger = logging.getLogger(__name__)
 
 class Contact(BaseModel):
-    """Represents a contact within a company in the CRM."""
-
     __tablename__ = "contacts"
 
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(100))
-    phone = db.Column(db.String(20))
+    # --- Contact Information ---
+    first_name = db.Column(db.String(127), nullable=False)
+    last_name = db.Column(db.String(127), nullable=False)
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    phone_number = db.Column(db.String(50))
+    role = db.Column(db.String(255))
+    role_level = db.Column(db.String(50))  # e.g., dropdown: Seniority levels
 
+    # Link Contact to a Company via foreign key instead of a free-text company name.
     company_id = db.Column(db.Integer, db.ForeignKey("companies.id"))
     company = db.relationship("Company", back_populates="contacts")
 
-    # Explicit foreign key and primaryjoin for relationships
+    # --- Role and Responsibilities ---
+    team_roles_responsibilities = db.Column(db.Text)
+    role_description = db.Column(db.Text)
+    responsibilities = db.Column(db.Text)
+
+    # --- Skill Level ---
+    primary_skill_area = db.Column(db.String(50))  # dropdown: Cloud, DevOps, etc.
+    skill_level = db.Column(db.String(50))           # dropdown: Beginner, Intermediate, Advanced, Expert
+    certifications = db.Column(db.Text)
+
+    # --- Technologies Used ---
+    cloud_platforms = db.Column(db.Text)
+    devops_tools = db.Column(db.Text)
+    version_control_systems = db.Column(db.Text)
+    programming_languages = db.Column(db.Text)
+    monitoring_logging = db.Column(db.Text)
+    ci_cd_tools = db.Column(db.Text)
+    other_technologies = db.Column(db.Text)
+
+    # --- Expertise & Projects ---
+    expertise_areas = db.Column(db.String(255))
+    technologies_led = db.Column(db.Text)
+
+    # --- Relationships ---
+    # This property satisfies the back_populates in the Relationship model.
+    # In Contact model:
     relationships = db.relationship(
         "Relationship",
-        foreign_keys="[Relationship.entity1_id]",
-        primaryjoin="and_(Contact.id == Relationship.entity1_id, Relationship.entity1_type == 'contact')",
+        primaryjoin="and_(foreign(Relationship.entity1_id)==Contact.id, Relationship.entity1_type=='contact')",
         back_populates="contact",
-        cascade="all, delete-orphan",
-        overlaps="user,relationships"
+        overlaps="user,relationships"  # Add "relationships" to the overlaps
     )
 
+    # Tasks imported from the tasks table; assumes a Task model exists.
+    tasks = db.relationship(
+        "Task",
+        primaryjoin="and_(Task.notable_type=='contact', foreign(Task.notable_id)==Contact.id)",
+        backref="contact",
+        lazy="dynamic"
+    )
+
+    # Notes using the polymorphic Note model.
     notes = db.relationship(
         "Note",
-        primaryjoin="and_(Note.notable_id == foreign(Contact.id), Note.notable_type == 'Contact')",
+        primaryjoin="and_(Note.notable_type=='Contact', foreign(Note.notable_id)==Contact.id)",
+        backref="contact"
     )
-
-    users = db.relationship(
-        "User",
-        secondary=contact_user_association,
-        backref="assigned_contacts",
-        lazy="dynamic",
-    )
-
-    def __repr__(self) -> str:
-        return f"<Contact {self.first_name} {self.last_name}>"
 
     @property
-    def full_name(self) -> str:
+    def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
+    # Computed properties to resolve relationships via the generic Relationship model.
     @property
-    def crisp_summary(self) -> float | None:
-        all_scores = [
-            score.total_score for relationship in self.relationships for score in relationship.crisp_scores if score.total_score is not None
+    def opportunities(self):
+        """
+        Retrieve Opportunities linked to this Contact.
+        Uses the Relationship model where this contact is linked to an opportunity.
+        """
+        from app.models.opportunity import Opportunity
+        relationships = Relationship.get_relationships("contact", self.id, "opportunity")
+        opp_ids = [
+            rel.entity2_id if rel.entity1_type == "contact" else rel.entity1_id
+            for rel in relationships
         ]
-        return round(sum(all_scores) / len(all_scores), 2) if all_scores else None
+        return Opportunity.query.filter(Opportunity.id.in_(opp_ids)).all()
 
-    def get_relationship_with(self, user) -> "Relationship | None":
-        return next((rel for rel in self.relationships if rel.user_id == user.id), None)
+    @property
+    def managers(self):
+        """
+        Retrieve the managers for this Contact.
+        Looks for relationships where this contact is the target (entity2)
+        and the relationship_type is 'manager'.
+        """
+        rels = Relationship.query.filter_by(
+            entity2_type="contact",
+            entity2_id=self.id,
+            relationship_type="manager"
+        ).all()
+        managers = []
+        for rel in rels:
+            if rel.entity1_type == "user":
+                from app.models.user import User
+                manager = User.query.get(rel.entity1_id)
+            elif rel.entity1_type == "contact":
+                manager = Contact.query.get(rel.entity1_id)
+            if manager:
+                managers.append(manager)
+        return managers
+
+    @property
+    def subordinates(self):
+        """
+        Retrieve contacts (or users) managed by this Contact.
+        Looks for relationships where this contact is the source (entity1)
+        and the relationship_type is 'manager'.
+        """
+        rels = Relationship.query.filter_by(
+            entity1_type="contact",
+            entity1_id=self.id,
+            relationship_type="manager"
+        ).all()
+        subs = []
+        for rel in rels:
+            if rel.entity2_type == "contact":
+                subordinate = Contact.query.get(rel.entity2_id)
+            elif rel.entity2_type == "user":
+                from app.models.user import User
+                subordinate = User.query.get(rel.entity2_id)
+            if subordinate:
+                subs.append(subordinate)
+        return subs
+
+    def __repr__(self) -> str:
+        return f"<Contact {self.id} {self.name}>"
