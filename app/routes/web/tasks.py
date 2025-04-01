@@ -14,8 +14,9 @@ class TaskCRUDRoutes(GenericWebRoutes):
 
     def add_view_context(self, item, context):
         """Add notes_model to the view context."""
-        logger.debug(f"Adding 'notes_model' to the view context for Task {item.id}.")
-        context["notes_model"] = Note
+        # logger.debug(f"Adding 'notes_model' to the view context for Task {item.id}.")
+        # context["notes_model"] = Note
+        pass
 
 
 # Set up the CRUD routes for tasks
