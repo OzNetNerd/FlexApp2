@@ -38,7 +38,7 @@
               {% if ui %}
                 {% include 'create_view_edit/components/_pills_nav_content.html' %}
               {% else %}
-                {% include 'base/common/_section_layout.html' %}
+                {% include 'create_view_edit/components/_section_layout.html' %}
               {% endif %}
 
               {% if not read_only %}
@@ -64,7 +64,7 @@
           "create_view_edit/components/_header.html",
           "create_view_edit/components/_header.html",
           "base/common/_toasts.html",
-          {% if ui %}"form/_pills_nav_content.html",{% else %}"base/common/_section_layout.html",{% endif %}
+          {% if ui %}"form/_pills_nav_content.html",{% else %}"create_view_edit/components/_section_layout.html",{% endif %}
           {% if not read_only %}"create_view_edit/_footer.html",{% endif %}
           {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
         ].filter(Boolean)

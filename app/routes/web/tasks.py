@@ -27,7 +27,7 @@ task_routes = TaskCRUDRoutes(
     index_template="entity_tables/tasks.html",
     required_fields=["title", "status"],
     unique_fields=[],
-    get_tabs_function=get_task_tabs,
+    create_tabs_function=get_task_tabs,
 )
 
 logger.info("Task CRUD routes setup successfully.")

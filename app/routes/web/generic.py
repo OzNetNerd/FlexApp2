@@ -34,7 +34,7 @@ class GenericWebRoutes(CRUDRoutesBase):
     create_template: Optional[str] = "create_view_edit/create.html"
     edit_template: Optional[str] = "create_view_edit/edit.html"
     api_url_prefix: Optional[str] = None
-    get_tabs_function: Optional[callable] = None
+    create_tabs_function: Optional[callable] = None
 
     def __post_init__(self):
         """Initializes route dependencies and registers endpoints."""
@@ -110,7 +110,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         """Renders the creation form template."""
         item_dict = {}
 
-        tabs = self.get_tabs_function()
+        tabs = self.create_tabs_function()
         context = ResourceContext(
             model=self.model,
             blueprint_name=self.blueprint.name,
@@ -124,7 +124,7 @@ class GenericWebRoutes(CRUDRoutesBase):
     def _render_edit_form(self, item):
         """Renders the form for editing an existing item."""
         item_dict = item.to_dict()
-        tabs = self.get_tabs_function()
+        tabs = self.create_tabs_function()
 
         # Create additional context data (before creating ResourceContext)
         # extra_context = {}
@@ -310,7 +310,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         logger.info(f"This is item: {item_dict}")
 
         # Get tabs configuration
-        tabs = self.get_tabs_function()
+        tabs = self.create_tabs_function()
 
         # Update the 'users' and 'companies' tab entries with actual relationship data
         if self.model.__name__ == "User":

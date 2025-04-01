@@ -61,5 +61,5 @@ opportunity_routes = OpportunityCRUDRoutes(
     index_template="entity_tables/opportunities.html",
     required_fields=["name"],
     unique_fields=[],
-    get_tabs_function=get_opportunity_tabs,
+    create_tabs_function=get_opportunity_tabs,
 )

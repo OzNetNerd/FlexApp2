@@ -170,5 +170,5 @@ contact_routes = ContactCRUDRoutes(
     index_template="entity_tables/contacts.html",
     required_fields=["first_name", "last_name"],
     unique_fields=["email"],
-    get_tabs_function=create_contacts_tabs,
+    create_tabs_function=create_contacts_tabs,
 )
