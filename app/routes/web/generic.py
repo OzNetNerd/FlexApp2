@@ -137,7 +137,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             blueprint_name=self.blueprint.name,
             item_dict=item_dict,
             tabs=tabs,
-            title=f"Edit {self.model.__name__}",
+            title=f"Edit",
             read_only=False,
             **extra_context  # Include any extra context data
         )

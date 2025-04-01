@@ -8,7 +8,7 @@
         - placeholder: string (placeholder text)
         - name: string (form field name)
         - data_url: string (API endpoint for data)
-        - initial_ids: List[int] (initial selected IDs)
+        - related_ids: List[int] (related IDs)
   Features:
     - Bootstrap card-based inputs with data-initial JSON
     - JS logs and parses initial values from data-initial attribute
@@ -16,9 +16,9 @@
     - Logs success and parse errors for diagnostics
   Notes:
     - The `autocomplete_fields` variable is passed from the Python backend to this template, and it contains the configuration for each autocomplete field.
-    - The `initial_ids` are provided via the `data-initial` attribute, which is parsed by JavaScript to prepopulate the selected items in the autocomplete list.
-    - Hydrated by `autoComplete.js`, which initializes autocomplete functionality, fetches data from the specified `data_url`, and uses the `initial_ids` for pre-selected values.
-    - JavaScript logs are included for diagnostics, such as successful parsing of `initial_ids` and warnings if the values could not be parsed correctly.
+    - The `related_ids` are provided via the `data-initial` attribute, which is parsed by JavaScript to prepopulate the selected items in the autocomplete list.
+    - Hydrated by `autoComplete.js`, which initializes autocomplete functionality, fetches data from the specified `data_url`, and uses the `related_ids` for pre-selected values.
+    - JavaScript logs are included for diagnostics, such as successful parsing of `related_ids` and warnings if the values could not be parsed correctly.
 ------------------------------------------------------------------------------ #}
 
 {% if autocomplete_fields %}
@@ -35,7 +35,7 @@
           id="{{ field.id }}"
           class="form-control"
           placeholder="{{ field.placeholder }}"
-          data-initial='{{ field.initial_ids | default([]) | tojson }}'
+          data-initial='{{ field.related_ids | default([]) | tojson }}'
         >
       </div>
     </div>

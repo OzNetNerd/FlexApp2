@@ -1,4 +1,5 @@
-add 'reports' tab
+add 'reports' tab - report on what tools and technologies companies are using
+add 'explore' tab - used for applying different filters to draw diagrams based on technologies etc
 add 'admin' tab to view db/table entries
 
 
