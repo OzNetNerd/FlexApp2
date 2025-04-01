@@ -69,15 +69,25 @@ def get_autocomplete_field(title, relationships=None, field_id=None, placeholder
     field_id = field_id or f"{title_lower}-input"
     placeholder = placeholder or f"Search for {title_lower}..."
     name = name or title_lower
-    data_url = data_url or f"/{title_lower}s/data"
+    data_url = data_url or f"/{title_lower}/data"
+
+    logger.debug(
+        f"Creating autocomplete field '{title}' with defaults: field_id='{field_id}', "
+        f"placeholder='{placeholder}', name='{name}', data_url='{data_url}'."
+    )
 
     # Determine the singular entity type from the title (e.g., "Users" -> "user")
     entity_type = title_lower.rstrip('s')
+    logger.debug(f"Derived entity_type '{entity_type}' from title '{title}'.")
+
     related_ids = []
     if relationships is not None:
         related_ids = [rel['entity_id'] for rel in relationships if rel.get('entity_type') == entity_type]
+        logger.debug(f"Extracted related IDs for entity_type '{entity_type}': {related_ids}")
+    else:
+        logger.debug("No relationships provided; setting related_ids to empty list.")
 
-    return AutoCompleteField(
+    field = AutoCompleteField(
         title=title,
         id=field_id,
         placeholder=placeholder,
@@ -85,3 +95,5 @@ def get_autocomplete_field(title, relationships=None, field_id=None, placeholder
         data_url=data_url,
         related_ids=related_ids
     )
+    logger.debug(f"Created AutoCompleteField: {field}")
+    return field
