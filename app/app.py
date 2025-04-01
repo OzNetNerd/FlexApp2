@@ -16,7 +16,7 @@ from app.routes.web import register_web_blueprints
 from app.routes.base.components.template_renderer import render_safely
 from app.models.base import db
 from app.models.user import User
-from app.routes.base.components.form_handler import BasicContext, ResourceContext
+from app.routes.base.components.entity_handler import BasicContext, ResourceContext
 from flask import current_app
 
 def configure_logging():

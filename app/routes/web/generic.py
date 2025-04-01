@@ -11,9 +11,9 @@ from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.json_validator import JSONValidator
 from app.routes.base.components.request_logger import RequestLogger
 from app.services.table_config_manager import TableConfigManager
-from app.routes.base.components.data_route_handler import DataRouteHandler
-from app.routes.base.components.form_handler import FormHandler, ResourceContext, TableContext
-from app.routes.base.components.item_manager import ItemManager
+from app.services.data_route_handler import DataRouteHandler
+from app.routes.base.components.entity_handler import EntityHandler, ResourceContext, TableContext
+from app.services.item_manager import ItemManager
 from app.services.relationship_service import RelationshipService
 from app.routes.base.components.autocomplete_config import get_autocomplete_fields, AutoCompleteField
 
@@ -45,16 +45,16 @@ class GenericWebRoutes(CRUDRoutesBase):
         self.table_config_manager = TableConfigManager(self.json_validator)
         self.data_handler = DataRouteHandler(self.service, self.model, self.json_validator)
         self.item_manager = ItemManager(self.model, self.service, self.blueprint.name)
-        self.form_handler = self._create_form_handler()
+        self.entity_handler = self._create_entity_handler()
         self._register_routes()
         logger.debug(f"Web CRUD routes registered for {self.model.__name__} model.")
 
-    def _create_form_handler(self) -> FormHandler:
+    def _create_entity_handler(self) -> EntityHandler:
         """Creates and configures the form handler."""
-        form_handler = FormHandler(self.model, self.service, self.json_validator)
-        form_handler.validate_create = self._validate_create_from_request
-        form_handler.validate_edit = self._validate_edit_from_request
-        return form_handler
+        entity_handler = EntityHandler(self.model, self.service, self.json_validator)
+        entity_handler.validate_create = self._validate_create_from_request
+        entity_handler.validate_edit = self._validate_edit_from_request
+        return entity_handler
 
     def _validate_create_from_request(self, request_obj):
         """Validates form data from the request object for create."""
@@ -171,7 +171,7 @@ class GenericWebRoutes(CRUDRoutesBase):
 
     def _handle_edit_form_submission(self, item):
         """Handles submitted form data for editing an existing item."""
-        errors = self.form_handler.validate_edit(item, request)
+        errors = self.entity_handler.validate_edit(item, request)
         if errors:
             for e in errors:
                 flash(e, "error")
@@ -231,7 +231,7 @@ class GenericWebRoutes(CRUDRoutesBase):
 
     def _handle_create_form_submission(self):
         """Processes the submitted data for creating a new item."""
-        errors = self.form_handler.validate_create(request)
+        errors = self.entity_handler.validate_create(request)
         if errors:
             for e in errors:
                 flash(e, "error")

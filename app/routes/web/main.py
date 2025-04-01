@@ -1,7 +1,7 @@
 import logging
 from app.routes.web import main_bp
 from app.routes.base.components.template_renderer import render_safely
-from app.routes.base.components.form_handler import BasicContext
+from app.routes.base.components.entity_handler import BasicContext
 
 logger = logging.getLogger(__name__)
 

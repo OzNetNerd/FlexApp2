@@ -3,7 +3,7 @@ import traceback
 from typing import Union
 from flask import render_template, current_app, request
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
-from app.routes.base.components.form_handler import BasicContext, ResourceContext, TableContext
+from app.routes.base.components.entity_handler import BasicContext, ResourceContext, TableContext
 
 logger = logging.getLogger(__name__)
 

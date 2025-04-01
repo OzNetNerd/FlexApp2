@@ -82,7 +82,7 @@ class TableContext:
 
 logger = logging.getLogger(__name__)
 
-class FormHandler:
+class EntityHandler:
     """Handles preparation and validation of dynamic form inputs for web routes."""
 
     def __init__(self, model, service, json_validator):
