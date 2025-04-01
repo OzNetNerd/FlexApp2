@@ -4,6 +4,15 @@ from dataclasses import dataclass, field
 from flask import url_for
 
 @dataclass
+class AutoCompleteField:
+    title: str
+    id: str
+    placeholder: str
+    name: str
+    data_url: str
+    initial_ids: List[str]
+
+@dataclass
 class TabEntry:
     entry_name: str
     label: str

@@ -11,10 +11,14 @@
         - initial_ids: List[int] (initial selected IDs)
   Features:
     - Bootstrap card-based inputs with data-initial JSON
-    - JS logs and parses initial values
-  Notes:
-    - Hydrated by autoComplete.js
+    - JS logs and parses initial values from data-initial attribute
+    - Automatically initializes autocomplete functionality via autoComplete.js
     - Logs success and parse errors for diagnostics
+  Notes:
+    - The `autocomplete_fields` variable is passed from the Python backend to this template, and it contains the configuration for each autocomplete field.
+    - The `initial_ids` are provided via the `data-initial` attribute, which is parsed by JavaScript to prepopulate the selected items in the autocomplete list.
+    - Hydrated by `autoComplete.js`, which initializes autocomplete functionality, fetches data from the specified `data_url`, and uses the `initial_ids` for pre-selected values.
+    - JavaScript logs are included for diagnostics, such as successful parsing of `initial_ids` and warnings if the values could not be parsed correctly.
 ------------------------------------------------------------------------------ #}
 
 {% if autocomplete_fields %}

@@ -6,9 +6,10 @@ from app.routes.web.generic import GenericWebRoutes
 import logging
 from app.routes.ui.users import get_users_tabs
 from app.services.relationship_service import RelationshipService
+from typing import List
+from app.routes.base.components.form_handler import AutoCompleteField
 
 logger = logging.getLogger(__name__)
-
 
 # Create a custom CRUD routes class for Users
 class UserCRUDRoutes(GenericWebRoutes):
@@ -49,22 +50,22 @@ class UserCRUDRoutes(GenericWebRoutes):
 
         # Add autocomplete fields configuration
         context["autocomplete_fields"] = [
-            {
-                "title": "Users",
-                "id": "users-input",
-                "placeholder": "Search for users...",
-                "name": "users",
-                "data_url": "/api/users/autocomplete",
-                "initial_ids": related_user_ids
-            },
-            {
-                "title": "Companies",
-                "id": "companies-input",
-                "placeholder": "Search for companies...",
-                "name": "companies",
-                "data_url": "/api/companies/autocomplete",
-                "initial_ids": related_company_ids
-            }
+            AutoCompleteField(
+                title="Users",
+                id="users-input",
+                placeholder="Search for users...",
+                name="users",
+                data_url="/api/users/autocomplete",
+                initial_ids=related_user_ids
+            ),
+            AutoCompleteField(
+                title="Companies",
+                id="companies-input",
+                placeholder="Search for companies...",
+                name="companies",
+                data_url="/api/companies/autocomplete",
+                initial_ids=related_company_ids
+            )
         ]
 
         logger.debug(f"Added {len(context['autocomplete_fields'])} autocomplete fields to context")
