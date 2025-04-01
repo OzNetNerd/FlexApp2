@@ -41,7 +41,7 @@ class ResourceContext:
     title: str
     read_only: bool
     error_message: Optional[str] = None
-    autocomplete_fields: Optional[List[dict]] = None
+    autocomplete_fields: List[dict] = field(default_factory=list)  # Use default_factory=list instead of None
 
     # Derived fields with defaults
     item_name: Optional[str] = None

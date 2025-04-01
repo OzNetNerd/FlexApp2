@@ -110,10 +110,11 @@ class GenericWebRoutes(CRUDRoutesBase):
         """Renders the creation form template."""
         item_dict = {}
         tabs = self.get_tabs_function(item_dict)
-        context = ResourceContext.create_context(
+        context = ResourceContext(
             model=self.model,
             blueprint_name=self.blueprint.name,
             item_dict=item_dict,
+            item=None,  # Add missing required parameter
             tabs=tabs,
             title=f"Create a {self.model.__name__}",
             read_only=False
@@ -132,10 +133,11 @@ class GenericWebRoutes(CRUDRoutesBase):
         self.add_edit_context(item, extra_context)
 
         # Create the ResourceContext with the extra data
-        context = ResourceContext.create_context(
+        context = ResourceContext(
             model=self.model,
             blueprint_name=self.blueprint.name,
             item_dict=item_dict,
+            item=None,  # Add missing required parameter
             tabs=tabs,
             title=f"Edit",
             read_only=False,
@@ -324,10 +326,11 @@ class GenericWebRoutes(CRUDRoutesBase):
                                 entry.value = item_dict['related_companies']
 
         # Create the context for the template
-        context = ResourceContext.create_context(
+        context = ResourceContext(
             model=self.model,
             blueprint_name=self.blueprint.name,
             item_dict=item_dict,
+            item=None,  # Add missing required parameter
             tabs=tabs,
             title="Viewing",
             read_only=True
@@ -358,7 +361,7 @@ class GenericWebRoutes(CRUDRoutesBase):
                 get_autocomplete_field("Companies", relationships=relationships)
             ]
 
-        logger.debug(f"Added {len(context['autocomplete_fields'])} autocomplete fields to the {edit_mode} context.")
+        logger.debug(f"Added {len(context.autocomplete_fields)} autocomplete fields to the {edit_mode} context.")
 
     # Replace add_view_context and add_edit_context with add_context
     def add_view_context(self, item, context):
