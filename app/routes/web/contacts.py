@@ -30,12 +30,25 @@ class ContactCRUDRoutes(GenericWebRoutes):
         and extract user associations using request.form.getlist().
 
         Args:
-            request_obj (flask.Request): The full Flask request object.
+            request_obj (flask.Request or dict): The full Flask request object or a pre-parsed form dict.
 
         Returns:
             dict: Preprocessed form data with company_id and user objects.
         """
-        form_data = request_obj.form.to_dict(flat=True)
+        # Determine if request_obj is a Flask request or a dict
+        if isinstance(request_obj, dict):
+            form_data = request_obj
+
+            # Define a simple getlist function for dicts
+            def getlist(key):
+                # In case the dict already has a list or a single value
+                value = form_data.get(key)
+                if isinstance(value, list):
+                    return value
+                return [value] if value is not None else []
+        else:
+            form_data = request_obj.form.to_dict(flat=True)
+            getlist = request_obj.form.getlist
 
         # Handle company name → ID
         company_name = form_data.get("company_name", "").strip()
@@ -53,7 +66,7 @@ class ContactCRUDRoutes(GenericWebRoutes):
         form_data.pop("company_name", None)
 
         # Handle user IDs from multi-select
-        user_ids = request_obj.form.getlist("users")
+        user_ids = getlist("users")
         if user_ids:
             users = User.query.filter(User.id.in_(user_ids)).all()
             form_data["users"] = users

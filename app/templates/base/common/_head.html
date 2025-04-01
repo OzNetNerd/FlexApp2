@@ -36,5 +36,10 @@
     log("info", "_head.html", "head", "🎯 Page title set", {{ (title or "CRM") | tojson | safe }});
     log("debug", "_head.html", "head", "📦 Head assets loaded");
   </script>
+  <!-- Toast Module Loader: Always load toasts.js and expose showToast globally -->
+  <script type="module">
+    import { showToast } from "{{ url_for('static', filename='js/toasts.js') }}";
+    window.showToast = showToast;
+  </script>
 </head>
 <!-- END TEMPLATE: _head.html -->

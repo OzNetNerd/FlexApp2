@@ -1,3 +1,7 @@
+add 'reports' tab
+add 'admin' tab to view db/table entries
+
+
 Run tests:
 ```
 

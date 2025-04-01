@@ -18,55 +18,59 @@
 {% import "macros/form_fields.html" as macros %}
 
 {% block content -%}
-<div class="card border-0 shadow-sm">
-  <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-    <h3 class="h4 mb-0 text-primary">
-      <i class="fas fa-edit me-2"></i>
-      {{ title }}
-    </h3>
-    <div class="d-flex gap-2">
-      {% if id %}
-        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
-          <i class="fas fa-times me-1"></i> Cancel
-        </a>
-      {% else %}
-        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
-          <i class="fas fa-times me-1"></i> Cancel
-        </a>
-      {% endif %}
+  {# Include the toast container so it is always rendered #}
+  {% include 'base/common/_toasts.html' %}
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+      <h3 class="h4 mb-0 text-primary">
+        <i class="fas fa-edit me-2"></i>
+        {{ title }}
+      </h3>
+      <div class="d-flex gap-2">
+        {% if id %}
+          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+            <i class="fas fa-times me-1"></i> Cancel
+          </a>
+        {% else %}
+          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+            <i class="fas fa-times me-1"></i> Cancel
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card-body">
+      <form method="POST">
+        {% include 'create_view_edit/components/_pills_nav_content.html' %}
+        {% include 'create_view_edit/components/_footer_buttons.html' %}
+      </form>
     </div>
   </div>
 
-  <div class="card-body">
-    <form method="POST">
-      {% include 'create_view_edit/components/_pills_nav_content.html' %}
-      {% include 'create_view_edit/components/_footer_buttons.html' %}
-    </form>
-  </div>
-</div>
+  <!-- Logging for Edit Page Context -->
+  <script type="module">
+    import log from "{{ url_for('static', filename='js/logger.js') }}";
 
-<!-- Logging for Edit Page Context -->
-<script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
+    const editContext = {
+      mode: {{ "'edit'" if id else "'create'" }},
+      entityId: {{ id | tojson }},
+      title: {{ title | tojson }},
+      cancelDestination: {{ "'view'" if id else "'index'" }},
+      tabCount: {{ ui | length }},
+      structure: [
+        {% for tab in ui %}
+          {
+            tab: {{ tab.tab_name | tojson }},
+            sections: {{ tab.sections | map(attribute='section_name') | list | tojson | safe }},
+            fieldCount: {{ tab.sections | map(attribute='entries') | map('length') | sum }}
+          }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    };
 
-  const editContext = {
-    mode: {{ "'edit'" if id else "'create'" }},
-    entityId: {{ id | tojson }},
-    title: {{ title | tojson }},
-    cancelDestination: {{ "'view'" if id else "'index'" }},
-    tabCount: {{ ui | length }},
-    structure: [
-      {% for tab in ui %}
-        {
-          tab: {{ tab.tab_name | tojson }},
-          sections: {{ tab.sections | map(attribute='section_name') | list | tojson | safe }},
-          fieldCount: {{ tab.sections | map(attribute='entries') | map('length') | sum }}
-        }{% if not loop.last %},{% endif %}
-      {% endfor %}
-    ]
-  };
-
-  log("info", "edit.html", "render", "📝 Edit form initialized", editContext);
-</script>
+    log("info", "edit.html", "render", "📝 Edit form initialized", editContext);
+  </script>
 {%- endblock %}
+
 <!-- END TEMPLATE: edit.html -->

@@ -5,49 +5,77 @@
     - get_flashed_messages(): Flask utility for flash messages
     - template_render_error: Optional error string from the server
   Features:
-    - Bootstrap 5 toast container in bottom-right
-    - Flash messages shown via JS
-    - Template errors shown in red toast
-    - Uses toasts.js + logger.js for handling and logging
+    - Custom toast container independent of Bootstrap components
+    - Simple JavaScript implementation for maximum compatibility
+    - Shows flash messages and template errors
 ------------------------------------------------------------------------------ #}
 
-{%- if template_render_error or get_flashed_messages(with_categories=true) %}
-  <div class="toast-container position-fixed bottom-0 end-0 p-3 z-9999">
-    <div id="liveToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body" id="toastMessage">Loading...</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-    </div>
-  </div>
-{%- endif %}
+<!-- Toast container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+  <!-- Template toast (hidden) -->
+  <div id="liveToast" style="display: none;"></div>
+</div>
 
+<!-- Add flash messages -->
 {%- with messages = get_flashed_messages(with_categories=true) %}
-  {%- for category, message in messages %}
-    <script type="module">
-      import { showToast } from "{{ url_for('static', filename='js/toasts.js') }}";
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
-
-      document.addEventListener('DOMContentLoaded', () => {
-        const category = {{ category | tojson | safe }};
-        const message = {{ message | tojson | safe }};
-        showToast(message, category);
-        log("info", "_toast.html", "toast", "📢 Flash message shown", { category, message });
+  {%- if messages %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Give the toast system time to initialize
+        setTimeout(function() {
+          {% for category, message in messages %}
+            // Add delay between messages
+            setTimeout(function() {
+              if (typeof window.showToast === 'function') {
+                window.showToast({{ message | tojson | safe }}, {{ category | tojson | safe }});
+                console.log("📢 Flash message shown", {
+                  category: {{ category | tojson | safe }},
+                  message: {{ message | tojson | safe }}
+                });
+              } else {
+                console.error("Toast function not available");
+              }
+            }, {{ loop.index * 500 }});  // 500ms between toasts
+          {% endfor %}
+        }, 300);  // Wait for initialization
       });
     </script>
-  {%- endfor %}
+  {%- endif %}
 {%- endwith %}
 
+<!-- Add template error if present -->
 {%- if template_render_error %}
-  <script type="module">
-    import { showToast } from "{{ url_for('static', filename='js/toasts.js') }}";
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const errorMessage = {{ template_render_error | tojson | safe }};
-      showToast(errorMessage, "danger");
-      log("error", "_toast.html", "template_renderer", "❌ Template render error", errorMessage);
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Give the toast system time to initialize
+      setTimeout(function() {
+        if (typeof window.showToast === 'function') {
+          window.showToast({{ template_render_error | tojson | safe }}, "danger");
+          console.log("❌ Template render error", {{ template_render_error | tojson | safe }});
+        } else {
+          console.error("Toast function not available");
+        }
+      }, 800);  // Wait longer for template errors
     });
   </script>
 {%- endif %}
+
+<!-- Fallback direct flash rendering when JavaScript might be disabled -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9998; display: none;">
+  {%- with messages = get_flashed_messages(with_categories=true) %}
+    {%- for category, message in messages %}
+      <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {%- endfor %}
+  {%- endwith %}
+
+  {%- if template_render_error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ template_render_error }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {%- endif %}
+</div>
 <!-- END TEMPLATE: _toasts.html -->

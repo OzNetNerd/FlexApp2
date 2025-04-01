@@ -1,42 +1,122 @@
 import log from './logger.js';
 
-document.addEventListener('DOMContentLoaded', function () {
-    const scriptName = "toasts.js";
-    const functionName = "DOMContentLoaded";
+// Simple toast system that doesn't rely heavily on Bootstrap
+const ToastSystem = {
+  initialized: false,
+  container: null,
+  template: null,
+  queue: [],
 
-    log("debug", scriptName, functionName, "🔄 Initializing toast notifications");
+  init: function() {
+    if (this.initialized) return;
 
-    // Initialize all .toast elements with 10s auto-dismiss
-    const toasts = document.querySelectorAll('.toast');
-    toasts.forEach(toast => {
-        new bootstrap.Toast(toast, { delay: 10000 });
-    });
+    log("debug", "toasts.js", "init", "🔄 Initializing simplified toast system");
 
-    log("info", scriptName, functionName, `✅🔄 Initialized ${toasts.length} toast notifications`);
+    // Create container if it doesn't exist
+    this.container = document.querySelector('.toast-container');
+    if (!this.container) {
+      this.container = document.createElement('div');
+      this.container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+      this.container.style.zIndex = '9999';
+      document.body.appendChild(this.container);
+    }
+
+    // Save template
+    this.template = document.getElementById('liveToast');
+
+    this.initialized = true;
+    log("info", "toasts.js", "init", "✅ Simplified toast system initialized");
+
+    // Process any queued toasts
+    this.processQueue();
+  },
+
+  processQueue: function() {
+    if (this.queue.length > 0) {
+      this.queue.forEach(item => {
+        this.createToast(item.message, item.type);
+      });
+      this.queue = [];
+    }
+  },
+
+  createToast: function(message, type) {
+    try {
+      // Create new toast element
+      const toast = document.createElement('div');
+      toast.className = `toast show my-2`;
+      toast.style.backgroundColor = type === 'danger' || type === 'error' ? '#dc3545' :
+                                   type === 'warning' ? '#ffc107' :
+                                   type === 'success' ? '#198754' : '#0d6efd';
+      toast.style.color = (type === 'warning') ? '#000' : '#fff';
+      toast.style.minWidth = '250px';
+
+      // Create toast content
+      const content = document.createElement('div');
+      content.className = 'd-flex';
+
+      const body = document.createElement('div');
+      body.className = 'toast-body';
+      body.textContent = message;
+
+      const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'btn-close btn-close-white me-2 m-auto';
+      closeBtn.setAttribute('data-bs-dismiss', 'toast');
+      closeBtn.setAttribute('aria-label', 'Close');
+      closeBtn.onclick = function() {
+        toast.remove();
+      };
+
+      content.appendChild(body);
+      content.appendChild(closeBtn);
+      toast.appendChild(content);
+
+      // Add to container
+      this.container.appendChild(toast);
+
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        toast.remove();
+      }, 5000);
+
+      log("debug", "toasts.js", "createToast", `🍞 Showing toast: ${message} (${type})`);
+    } catch (err) {
+      console.error("Error creating toast:", err);
+    }
+  }
+};
+
+// Initialize on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+  log("debug", "toasts.js", "DOMContentLoaded", "🔄 Initializing toast notifications");
+
+  // Initialize in a small delay to ensure DOM is ready
+  setTimeout(() => {
+    ToastSystem.init();
+  }, 100);
 });
 
+// Public function for showing toasts
 export function showToast(message, type = 'success') {
-    const toastEl = document.getElementById('liveToast');
-    const toastMsg = document.getElementById('toastMessage');
+  // Convert "error" to "danger" to match Bootstrap's classes
+  if (type === "error") {
+    type = "danger";
+  }
 
-    if (!toastEl || !toastMsg) {
-        console.warn("Toast elements not found in DOM.");
-        return;
-    }
+  // Clean and limit message
+  const cleanMessage = typeof message === "string"
+    ? message.replace(/\n/g, ' ').slice(0, 500)
+    : JSON.stringify(message).slice(0, 500);
 
-    // Escape newlines and long text
-    const cleanMessage = typeof message === "string"
-        ? message.replace(/\n/g, ' ').slice(0, 500)
-        : JSON.stringify(message).slice(0, 500);
+  // If system not initialized, queue the toast
+  if (!ToastSystem.initialized) {
+    ToastSystem.queue.push({ message: cleanMessage, type });
+    return;
+  }
 
-    toastMsg.textContent = cleanMessage;
-    toastEl.className = `toast align-items-center text-bg-${type} border-0`;
-
-    const existingToast = bootstrap.Toast.getInstance(toastEl);
-    if (existingToast) {
-        existingToast.hide();
-    }
-
-    const toast = new bootstrap.Toast(toastEl, { delay: 10000 });
-    toast.show();
+  ToastSystem.createToast(cleanMessage, type);
 }
+
+// Expose to global scope for direct use
+window.showToast = showToast;
