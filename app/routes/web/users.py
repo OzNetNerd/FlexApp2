@@ -5,7 +5,6 @@ from app.routes.web import users_bp
 from app.routes.web.generic import GenericWebRoutes
 import logging
 from app.routes.ui.users import get_users_tabs
-from app.services.relationship_service import RelationshipService
 
 
 logger = logging.getLogger(__name__)

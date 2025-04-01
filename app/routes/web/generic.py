@@ -15,7 +15,7 @@ from app.services.data_route_handler import DataRouteHandler
 from app.routes.base.components.entity_handler import EntityHandler, ResourceContext, TableContext
 from app.services.item_manager import ItemManager
 from app.services.relationship_service import RelationshipService
-from app.routes.base.components.autocomplete_config import get_autocomplete_fields, AutoCompleteField
+from app.routes.base.components.autocomplete import get_autocomplete_fields, AutoCompleteField
 
 logger = logging.getLogger(__name__)
 GENERIC_TEMPLATE = "entity_table.html"

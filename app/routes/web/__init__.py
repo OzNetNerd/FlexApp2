@@ -28,7 +28,7 @@ from app.routes.web import (
     companies,
     contacts,
     opportunities,
-    relationships,
+    _relationships,
     crisp_score,
     tasks,
 )
