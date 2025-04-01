@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 @dataclass
-class BasicInfo(TabBuilder):
+class BasicInfoTab(TabBuilder):
     tab_name: str
     item: Any
 
@@ -43,191 +43,186 @@ class BasicInfo(TabBuilder):
                 TabEntry(entry_name="team_bu_name", label="Team Name", type="text", value=self.item.get("team_bu_name")),
             ]
         )
-        logger.debug(f"Created role info section")
         return role_info_section
 
-# Example data to pass as 'item'
-item_data = {
-    "first_name": "John",
-    "last_name": "Doe",
-    "email": "john.doe@example.com",
-    "phone_number": "123-456-7890",
-    "role": "Developer",
-    "role_level": "Mid",
-    "team_bu_name": "Engineering"
-}
 
-# Instantiate the BasicInfo class with the example data
-basic_info = BasicInfo(tab_name="User Info", item=item_data)
+@dataclass
+class RoleAndResponsibilities(TabBuilder):
+    tab_name: str
+    item: Any
+
+    def _role_responsibilities_section(self):
+        section_name = "Role and Responsibilities"
+        role_responsibilities_section = TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="team_roles_responsibilities",
+                    label="Team's Roles and Responsibilities",
+                    type="textarea",
+                    value=self.item.get("team_roles_responsibilities")
+                ),
+                TabEntry(
+                    entry_name="role_description",
+                    label="Role Description",
+                    type="textarea",
+                    value=self.item.get("role_description")
+                ),
+                TabEntry(
+                    entry_name="responsibilities",
+                    label="Responsibilities",
+                    type="textarea",
+                    value=self.item.get("responsibilities")
+                ),
+            ]
+        )
+        logger.debug(f"Created {role_responsibilities_section} section")
+        return role_responsibilities_section
 
 
+@dataclass
+class SkillsAndTechnologies(TabBuilder):
+    tab_name: str
+    item: Any
 
+    def _skill_level_section(self):
+        section_name = "Skill Level"
+        skill_level_section = TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="primary_skill_area",
+                    label="Primary Skill Area",
+                    type="dropdown",
+                    options=["Cloud", "DevOps", "Networking", "Programming", "Security"],
+                    value=self.item.get("primary_skill_area")
+                ),
+                TabEntry(
+                    entry_name="skill_level",
+                    label="Skill Level",
+                    type="dropdown",
+                    options=["Beginner", "Intermediate", "Advanced", "Expert"],
+                    value=self.item.get("skill_level")
+                ),
+                TabEntry(
+                    entry_name="certifications",
+                    label="Certifications",
+                    type="textarea",
+                    value=self.item.get("certifications")
+                ),
+            ]
+        )
+        logger.debug(f"Created {skill_level_section} section")
+        return skill_level_section
 
+    def _technologies_used_section(self):
+        section_name = "Technologies Used"
+        technologies_used_section = TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="cloud_platforms",
+                    label="Cloud Platforms",
+                    type="dropdown",
+                    options=["AWS", "Azure", "Google Cloud", "IBM Cloud"],
+                    value=self.item.get("cloud_platforms")
+                ),
+                TabEntry(
+                    entry_name="devops_tools",
+                    label="DevOps Tools",
+                    type="dropdown",
+                    options=["Terraform", "Jenkins", "Ansible", "Docker", "Kubernetes"],
+                    value=self.item.get("devops_tools")
+                ),
+                TabEntry(
+                    entry_name="version_control_systems",
+                    label="Version Control Systems",
+                    type="dropdown",
+                    options=["Git", "SVN", "Mercurial"],
+                    value=self.item.get("version_control_systems")
+                ),
+                TabEntry(
+                    entry_name="programming_languages",
+                    label="Programming Languages",
+                    type="dropdown",
+                    options=["Python", "JavaScript", "Java", "Go", "Ruby"],
+                    value=self.item.get("programming_languages")
+                ),
+                TabEntry(
+                    entry_name="monitoring_logging",
+                    label="Monitoring & Logging",
+                    type="dropdown",
+                    options=["Prometheus", "Grafana", "Splunk", "ELK Stack"],
+                    value=self.item.get("monitoring_logging")
+                ),
+                TabEntry(
+                    entry_name="ci_cd_tools",
+                    label="CI/CD Tools",
+                    type="dropdown",
+                    options=["GitLab CI", "CircleCI", "Travis CI", "Azure DevOps"],
+                    value=self.item.get("ci_cd_tools")
+                ),
+                TabEntry(
+                    entry_name="other_technologies",
+                    label="Other Technologies",
+                    type="textarea",
+                    value=self.item.get("other_technologies")
+                ),
+            ]
+        )
+        logger.debug(f"Created {technologies_used_section} section")
+        return technologies_used_section
 
-# def abc():
-#     # --- Role & Responsibilities Tab ---
-#     roles_responsibilities_tab_name = "Role and Responsibilities"
-#     roles_responsibilities_section_name = "Role and Responsibilities"
-#     logger.info(f"Creating {roles_responsibilities_tab_name} tab")
-#     role_responsibilities_section = TabSection(
-#         section_name=roles_responsibilities_tab_name,
-#         entries=[
-#             TabEntry(
-#                 entry_name="team_roles_responsibilities",
-#                 label="Team's Roles and Responsibilities",
-#                 type="textarea",
-#                 value=item.get("team_roles_responsibilities")
-#             ),
-#             TabEntry(
-#                 entry_name="role_description",
-#                 label="Role Description",
-#                 type="textarea",
-#                 value=item.get("role_description")
-#             ),
-#             TabEntry(
-#                 entry_name="responsibilities",
-#                 label="Responsibilities",
-#                 type="textarea",
-#                 value=item.get("responsibilities")
-#             ),
-#         ]
-#     )
-#     logger.debug(f"Created {roles_responsibilities_section_name} section: {role_responsibilities_section}")
-#
-#     role_tab = Tab(tab_name=roles_responsibilities_tab_name, sections=[role_responsibilities_section])
-#     logger.debug(f"Created Role and Responsibilities tab: {role_tab}")
-#
-#     # --- Skills & Technologies Tab ---
-#     skills_technologies_tab_name = "Skills & Technologies tab"
-#     skills_level_section_name = "Skill Level"
-#     logger.info(f"Creating {skills_technologies_tab_name} tab")
-#     skill_level_section = TabSection(
-#         section_name=skills_level_section_name,
-#         entries=[
-#             TabEntry(
-#                 entry_name="primary_skill_area",
-#                 label="Primary Skill Area",
-#                 type="dropdown",
-#                 options=["Cloud", "DevOps", "Networking", "Programming", "Security"],
-#                 value=item.get("primary_skill_area")
-#             ),
-#             TabEntry(
-#                 entry_name="skill_level",
-#                 label="Skill Level",
-#                 type="dropdown",
-#                 options=["Beginner", "Intermediate", "Advanced", "Expert"],
-#                 value=item.get("skill_level")
-#             ),
-#             TabEntry(
-#                 entry_name="certifications",
-#                 label="Certifications",
-#                 type="textarea",
-#                 value=item.get("certifications")
-#             ),
-#         ]
-#     )
-#     logger.debug(f"Created {skills_level_section_name} section: {skill_level_section}")
-#
-#     technologies_used_section_name = "Technologies Used"
-#     technologies_used_section = TabSection(
-#         section_name=technologies_used_section_name,
-#         entries=[
-#             TabEntry(
-#                 entry_name="cloud_platforms",
-#                 label="Cloud Platforms",
-#                 type="dropdown",
-#                 options=["AWS", "Azure", "Google Cloud", "IBM Cloud"],
-#                 value=item.get("cloud_platforms")
-#             ),
-#             TabEntry(
-#                 entry_name="devops_tools",
-#                 label="DevOps Tools",
-#                 type="dropdown",
-#                 options=["Terraform", "Jenkins", "Ansible", "Docker", "Kubernetes"],
-#                 value=item.get("devops_tools")
-#             ),
-#             TabEntry(
-#                 entry_name="version_control_systems",
-#                 label="Version Control Systems",
-#                 type="dropdown",
-#                 options=["Git", "SVN", "Mercurial"],
-#                 value=item.get("version_control_systems")
-#             ),
-#             TabEntry(
-#                 entry_name="programming_languages",
-#                 label="Programming Languages",
-#                 type="dropdown",
-#                 options=["Python", "JavaScript", "Java", "Go", "Ruby"],
-#                 value=item.get("programming_languages")
-#             ),
-#             TabEntry(
-#                 entry_name="monitoring_logging",
-#                 label="Monitoring & Logging",
-#                 type="dropdown",
-#                 options=["Prometheus", "Grafana", "Splunk", "ELK Stack"],
-#                 value=item.get("monitoring_logging")
-#             ),
-#             TabEntry(
-#                 entry_name="ci_cd_tools",
-#                 label="CI/CD Tools",
-#                 type="dropdown",
-#                 options=["GitLab CI", "CircleCI", "Travis CI", "Azure DevOps"],
-#                 value=item.get("ci_cd_tools")
-#             ),
-#             TabEntry(
-#                 entry_name="other_technologies",
-#                 label="Other Technologies",
-#                 type="textarea",
-#                 value=item.get("other_technologies")
-#             ),
-#         ]
-#     )
-#     logger.debug(f"Created {technologies_used_section_name} section: {technologies_used_section}")
-#
-#     skills_tab = Tab(tab_name=skills_technologies_tab_name, sections=[skill_level_section, technologies_used_section])
-#     logger.debug(f"Created Skills and Technologies tab: {skills_tab}")
-#
-#     # --- Expertise & Projects Tab ---
-#     expertise_projects_tab_name = "Expertise & Projects"
-#     expertise_projects_section_name = "Expertise and Projects"
-#     logger.info(f"Creating  tab")
-#     expertise_section = TabSection(
-#         section_name=expertise_projects_section_name,
-#         entries=[
-#             TabEntry(
-#                 entry_name="expertise_areas",
-#                 label="Expertise Areas",
-#                 type="text",
-#                 value=item.get("expertise_areas")
-#             ),
-#             TabEntry(
-#                 entry_name="technologies_led",
-#                 label="Technologies Led/Worked With",
-#                 type="textarea",
-#                 value=item.get("technologies_led")
-#             ),
-#         ]
-#     )
-#     logger.debug(f"Created {expertise_projects_section_name} section: {expertise_section}")
-#
-#     expertise_tab = Tab(tab_name=expertise_projects_tab_name, sections=[expertise_section])
-#     logger.debug(f"Created {expertise_projects_tab_name} tab: {expertise_tab}")
-#
-#     # --- Metadata Tab ---
-#     logger.info(f"Creating Metadata tab")
-#     metadata_section = TabSection(
-#         section_name="Metadata",
-#         entries=[
-#             TabEntry(entry_name="created_at", label="Created At", type="readonly", value=item.get("created_at")),
-#             TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
-#         ]
-#     )
-#     logger.debug(f"Created Metadata section: {metadata_section}")
-#
-#     metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
-#     logger.debug(f"Created Metadata tab: {metadata_tab}")
-#
-#     tabs = [basic_info_tab, role_tab, skills_tab, expertise_tab, metadata_tab]
-#     logger.info(f"Returning {len(tabs)} tabs for contact")
-#     return tabs
-#
+@dataclass
+class ExpertiseAndProjects(TabBuilder):
+    tab_name: str
+    item: Any
+
+    def _expertise_section(self):
+        section_name = "Expertise and Projects"
+        expertise_section = TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="expertise_areas",
+                    label="Expertise Areas",
+                    type="text",
+                    value=self.item.get("expertise_areas")
+                ),
+                TabEntry(
+                    entry_name="technologies_led",
+                    label="Technologies Led/Worked With",
+                    type="textarea",
+                    value=self.item.get("technologies_led")
+                ),
+            ]
+        )
+        logger.debug(f"Created {expertise_section} section")
+        return expertise_section
+
+@dataclass
+class Metadata(TabBuilder):
+    tab_name: str
+    item: Any
+
+    def _metadata_section(self):
+        section_name = "Metadata"
+        metadata_section = TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="created_at",
+                    label="Created At",
+                    type="readonly",
+                    value=self.item.get("created_at")
+                ),
+                TabEntry(
+                    entry_name="updated_at",
+                    label="Updated At",
+                    type="readonly",
+                    value=self.item.get("updated_at")
+                ),
+            ]
+        )
+        logger.debug(f"Created {metadata_section} section")
+        return metadata_section#
