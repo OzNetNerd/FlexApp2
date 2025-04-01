@@ -8,29 +8,33 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 def create_or_update(model, match_by: dict, data: dict):
+    """Create or update an instance of the model based on the match criteria."""
     instance = model.query.filter_by(**match_by).first()
     if instance:
+        # Update the instance with new data
         for key, value in data.items():
             setattr(instance, key, value)
         logger.info(f"Updated existing {model.__name__}: {match_by}")
     else:
+        # Create a new instance if none found
         instance = model(**{**match_by, **data})
         db.session.add(instance)
         logger.info(f"Created new {model.__name__}: {match_by}")
     return instance
 
 def seed_users():
+    """Seed users into the database."""
     users = [
         ("alice", "Alice Johnson", "alice@example.com"),
         ("bob", "Bob Smith", "bob@example.com"),
         ("carol", "Carol White", "carol@example.com"),
         ("dave", "Dave Black", "dave@example.com"),
         ("eve", "Eve Grey", "eve@example.com"),
-        ("admin", "Admin User", "admin@example.com"),  # Adding admin user
+        ("admin", "Admin User", "admin@example.com"),  # Admin user
     ]
 
     for username, name, email in users:
-        is_admin = email == "admin@example.com"  # Set admin flag for this user
+        is_admin = email == "admin@example.com"  # Mark as admin if email matches
         create_or_update(
             User,
             {"username": username},
@@ -38,13 +42,14 @@ def seed_users():
                 "name": name,
                 "email": email,
                 "password_hash": generate_password_hash("password"),
-                "is_admin": is_admin,  # Mark as admin if email matches
+                "is_admin": is_admin,  # Set is_admin flag
             },
         )
     db.session.commit()
     print("✅ Users seeded.")
 
 def seed_opportunities():
+    """Seed opportunities into the database."""
     companies = Company.query.all()
     opportunities = [
         ("Cloud Expansion", "Opportunity to expand our cloud services.", "New", "Prospecting", 50000.0),
@@ -55,7 +60,6 @@ def seed_opportunities():
     ]
 
     for name, description, status, stage, value in opportunities:
-        # Choose a company from the list
         company = companies[len(opportunities) % len(companies)]
         create_or_update(
             Opportunity,
@@ -72,6 +76,7 @@ def seed_opportunities():
     print("✅ Opportunities seeded.")
 
 def seed_companies():
+    """Seed companies into the database."""
     companies = [
         ("FlexTech", "A flexible software consultancy."),
         ("CloudCorp", "Leaders in scalable cloud infrastructure."),
@@ -86,6 +91,7 @@ def seed_companies():
     print("✅ Companies seeded.")
 
 def seed_contacts():
+    """Seed contacts into the database."""
     companies = Company.query.all()
     users = User.query.all()
     first_names = ["Liam", "Noah", "Olivia", "Emma", "Ava"]
@@ -109,6 +115,7 @@ def seed_contacts():
     print("✅ Contacts seeded.")
 
 def seed_capabilities_and_categories():
+    """Seed capabilities and categories into the database."""
     categories = ["Security", "Data", "Infrastructure", "DevOps", "AI"]
     for category in categories:
         create_or_update(CapabilityCategory, {"name": category}, {})
@@ -130,6 +137,7 @@ def seed_capabilities_and_categories():
     print("✅ Capabilities and categories seeded.")
 
 def seed_company_capabilities():
+    """Seed company capabilities into the database."""
     companies = Company.query.all()
     capabilities = Capability.query.all()
 
@@ -145,6 +153,10 @@ def seed_tasks():
     users = User.query.all()
     opportunities = Opportunity.query.all()
 
+    if len(users) == 0 or len(opportunities) == 0:
+        print("❌ Not enough users or opportunities to create tasks.")
+        return
+
     tasks = [
         ("Follow up on Cloud Expansion", "Follow up with the client about the cloud expansion opportunity.", "2025-06-30", "Pending", "High", "Opportunity", opportunities[0].id),
         ("Review security partnership terms", "Review the proposed terms for the security partnership.", "2025-05-15", "In Progress", "Medium", "Opportunity", opportunities[1].id),
@@ -155,8 +167,11 @@ def seed_tasks():
         ("Internal team meeting", "Schedule an internal team meeting for next week.", "2025-04-25", "Completed", "Low", "User", users[1].id),
     ]
 
-    for title, description, due_date, status, priority, notable_type, notable_id in tasks:
-        # Convert due_date to datetime object
+    # Handle cases where there are fewer users or opportunities than tasks
+    task_assignments = min(len(users), len(opportunities))
+
+    for i in range(task_assignments):
+        title, description, due_date, status, priority, notable_type, notable_id = tasks[i]
         due_date = datetime.strptime(due_date, "%Y-%m-%d")
         create_or_update(
             Task,
@@ -173,7 +188,9 @@ def seed_tasks():
     db.session.commit()
     print("✅ Tasks seeded.")
 
+
 def seed_demo_data():
+    """Seed all demo data into the database."""
     entries = [seed_users, seed_companies, seed_contacts, seed_capabilities_and_categories, seed_company_capabilities,
                seed_tasks, seed_opportunities]
 

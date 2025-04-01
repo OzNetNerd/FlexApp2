@@ -5,23 +5,8 @@ from app.routes.base.components.form_handler import Tab, TabSection, TabEntry
 
 logger = logging.getLogger(__name__)
 
-
 class Contact(BaseModel):
-    """Represents a contact within a company in the CRM.
-
-    Stores individual user details and links to relationships,
-    companies, notes, and associated CRM users.
-
-    Attributes:
-        first_name (str): Contact's first name.
-        last_name (str): Contact's last name.
-        email (str): Email address.
-        phone (str): Contact number.
-        company (Company): Associated company.
-        relationships (list[Relationship]): Associated relationships.
-        notes (list[Note]): Polymorphic note objects.
-        users (list[User]): CRM users linked to this contact.
-    """
+    """Represents a contact within a company in the CRM."""
 
     __tablename__ = "contacts"
 
@@ -33,7 +18,16 @@ class Contact(BaseModel):
     company_id = db.Column(db.Integer, db.ForeignKey("companies.id"))
     company = db.relationship("Company", back_populates="contacts")
 
-    relationships = db.relationship("Relationship", back_populates="contact", cascade="all, delete-orphan")
+    # Explicit foreign key and primaryjoin for relationships
+    relationships = db.relationship(
+        "Relationship",
+        foreign_keys="[Relationship.entity1_id]",
+        primaryjoin="and_(Contact.id == Relationship.entity1_id, Relationship.entity1_type == 'contact')",
+        back_populates="contact",
+        cascade="all, delete-orphan",
+        overlaps="user,relationships"
+    )
+
     notes = db.relationship(
         "Note",
         primaryjoin="and_(Note.notable_id == foreign(Contact.id), Note.notable_type == 'Contact')",
@@ -47,42 +41,18 @@ class Contact(BaseModel):
     )
 
     def __repr__(self) -> str:
-        """String representation for debugging purposes.
-
-        Returns:
-            str: Full name of the contact.
-        """
         return f"<Contact {self.first_name} {self.last_name}>"
 
     @property
     def full_name(self) -> str:
-        """Concatenate first and last name.
-
-        Returns:
-            str: Full name.
-        """
-        logger.debug(f"Accessing full name for {self.first_name} {self.last_name}")
         return f"{self.first_name} {self.last_name}"
 
     @property
     def crisp_summary(self) -> float | None:
-        """Calculate average CRISP score from all relationships.
-
-        Returns:
-            float | None: Average score or None if unavailable.
-        """
         all_scores = [
             score.total_score for relationship in self.relationships for score in relationship.crisp_scores if score.total_score is not None
         ]
         return round(sum(all_scores) / len(all_scores), 2) if all_scores else None
 
     def get_relationship_with(self, user) -> "Relationship | None":
-        """Return the relationship between this contact and a specific user.
-
-        Args:
-            user (User): The user to search for.
-
-        Returns:
-            Relationship | None: The relationship if found, otherwise None.
-        """
         return next((rel for rel in self.relationships if rel.user_id == user.id), None)
