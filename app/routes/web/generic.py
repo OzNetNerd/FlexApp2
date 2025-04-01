@@ -271,23 +271,6 @@ class GenericWebRoutes(CRUDRoutesBase):
         return f"{self.api_url_prefix}/{self.model.__tablename__}" if self.api_url_prefix else url_for(
             f"{self.blueprint.name}.data")
 
-    def _index_route(self):
-        """Serves the index (table list) page."""
-        self.request_logger.log_request_info(self.model.__name__, "index")
-        table_config = self.table_config_manager.get_table_config(self.model.__tablename__)
-        data_url = self._determine_data_url()
-        context = TableContext(
-            page_type="index",
-            title=f"{self.model.__name__}s",
-            table_config=table_config,
-            table_id=f"{self.model.__tablename__}_table",
-            data_url=data_url,
-            entity_name=self.model.__name__,
-            add_url=url_for(f"{self.blueprint.name}.create"),
-            columns=table_config.get("columns", []),
-        )
-        return render_safely(self.index_template, context, f"Error rendering {self.model.__name__} index")
-
     @staticmethod
     def _get_item_display_name(item) -> str:
         """Returns a user-friendly name for the given item."""

@@ -36,11 +36,11 @@ class ResourceContext:
     model: Any
     blueprint_name: str
     item_dict: dict
+    item: Optional[str]
     tabs: List[str]
     title: str
-    read_only: bool = True
+    read_only: bool
     error_message: Optional[str] = None
-    item: Optional[str] = None
     autocomplete_fields: Optional[List[dict]] = None
 
     # Derived fields with defaults
@@ -56,11 +56,16 @@ class ResourceContext:
         self.model_name = self.model.__name__
         self.id = str(self.item_dict.get("id", ""))
         self.ui = self.tabs
-        self.item_name = next(
-            (self.item_dict[k] for k in ["name", "title", "email", "username"]
-             if k in self.item_dict and self.item_dict[k]),
-            str(self.item_dict.get("id", ""))
-        )
+
+        # Find a display name by checking keys in priority order: name, title, email, username
+        # If none are found, fall back to the ID as a string
+        name_keys = ["name", "title", "email", "username"]
+        for key in name_keys:
+            if key in self.item_dict and self.item_dict[key]:
+                self.item_name = self.item_dict[key]
+                break
+        else:
+            self.item_name = str(self.item_dict.get("id", ""))
 
 @dataclass
 class TableContext:
