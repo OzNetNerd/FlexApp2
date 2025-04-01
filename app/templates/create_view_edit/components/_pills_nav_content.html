@@ -1,69 +1,58 @@
-<!-- START TEMPLATE: _pills_nav_content.html -->
-{# ------------------------------------------------------------------------------
-  File: _pills_nav_content.html
-  Purpose: Tabbed content layout for rendering form fields grouped by tab/section
-  Inputs:
-    - ui: List[Tab]
-    - read_only: Boolean from context to control form interactivity
-  Behavior:
-    - Fields are rendered as readonly if `read_only` is true OR if the field's `readonly` is true
-    - Autocomplete fields only shown in Mappings tab when not read_only
------------------------------------------------------------------------------- #}
-
-{% import "macros/form_fields/render_field.html" as macros %}
-
-<div class="tab-content">
-  {% for tab in ui %}
-    <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
-         id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
-         role="tabpanel"
-         aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
-
-      {% for section in tab.sections %}
-        {% if section.section_name %}
-          <h5 class="mt-3">{{ section.section_name }}</h5>
-        {% endif %}
-
-        <div class="row">
-          {% if tab.tab_name == 'Mappings' and section.section_name == 'Mappings' and not read_only %}
-            {# For edit mode, include the autocomplete template #}
-            {% include 'create_view_edit/components/_autocomplete.html' %}
-          {% else %}
-            {% for entry in section.entries %}
-              {% set has_entry = entry is defined and entry %}
-              {% set has_name = has_entry and entry.entry_name is defined %}
-              {% set has_label = has_entry and entry.label is defined %}
-              {% set skip_field = tab.tab_name == 'Mappings' and not read_only and has_name and (entry.entry_name == 'users' or entry.entry_name == 'companies') %}
-
-              {% if has_entry and has_name and has_label and not skip_field %}
-                {{ macros.render_field({
-                  'name': entry.entry_name,
-                  'label': entry.label,
-                  'type': entry.type if entry.type is defined else 'text',
-                  'required': entry.required if entry.required is defined else False,
-                  'readonly': read_only or (entry.readonly if entry.readonly is defined else False) or (entry.type == 'readonly'),
-                  'options': entry.options if entry.options is defined else None,
-                  'value': entry.value if entry.value is defined else entry.default
-                }) }}
-              {% elif not skip_field %}
-                <div class="col-md-6 mb-3">
-                  <div class="alert alert-warning">
-                    ⚠️ Skipped invalid entry in section "{{ section.section_name }}"
-                  </div>
-                </div>
-                <script type="module">
-                  import log from "{{ url_for('static', filename='js/logger.js') }}";
-                  const message = `⚠️ Skipped invalid entry in section {{ section.section_name }} (Tab: {{ tab.tab_name }})`;
-                  console.warn(message);
-                  log("error", "_pills_nav_content.html", "render", message);
-                </script>
-              {% endif %}
-            {% endfor %}
-          {% endif %}
+{% if tab.tab_name == 'Mappings' and section.section_name == 'Mappings' %}
+  <div class="col-12">
+    {% if not read_only %}
+      {# For edit mode, include the autocomplete template #}
+      {% include 'create_view_edit/components/_autocomplete.html' %}
+    {% else %}
+      {# For read-only mode, use our new formatted display #}
+      {% from "_entity_mapping_display.html" import render_entity_mapping %}
+      
+      <div class="row">
+        <div class="col-md-6">
+          {% set users = [
+            {'id': 1, 'entity_type': 'user', 'entity_id': 1, 'entity_name': 'Alice Johnson', 'relationship_type': 'Manages'},
+            {'id': 2, 'entity_type': 'user', 'entity_id': 3, 'entity_name': 'Carol White', 'relationship_type': 'Works With'}
+          ] %}
+          {{ render_entity_mapping('users', users) }}
         </div>
-      {% endfor %}
-    </div>
-  {% endfor %}
-</div>
+        <div class="col-md-6">
+          {% set companies = [
+            {'id': 12, 'entity_type': 'company', 'entity_id': 2, 'entity_name': 'CloudCorp', 'relationship_type': 'Vendor'}
+          ] %}
+          {{ render_entity_mapping('companies', companies) }}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% else %}
+  {% for entry in section.entries %}
+    {% set has_entry = entry is defined and entry %}
+    {% set has_name = has_entry and entry.entry_name is defined %}
+    {% set has_label = has_entry and entry.label is defined %}
+    {% set skip_field = tab.tab_name == 'Mappings' and not read_only and has_name and (entry.entry_name == 'users' or entry.entry_name == 'companies') %}
 
-<!-- END TEMPLATE: _pills_nav_content.html -->
+    {% if has_entry and has_name and has_label and not skip_field %}
+      {{ macros.render_field({
+        'name': entry.entry_name,
+        'label': entry.label,
+        'type': entry.type if entry.type is defined else 'text',
+        'required': entry.required if entry.required is defined else False,
+        'readonly': read_only or (entry.readonly if entry.readonly is defined else False) or (entry.type == 'readonly'),
+        'options': entry.options if entry.options is defined else None,
+        'value': entry.value if entry.value is defined else entry.default
+      }) }}
+    {% elif not skip_field %}
+      <div class="col-md-6 mb-3">
+        <div class="alert alert-warning">
+          ⚠️ Skipped invalid entry in section "{{ section.section_name }}"
+        </div>
+      </div>
+      <script type="module">
+        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        const message = `⚠️ Skipped invalid entry in section {{ section.section_name }} (Tab: {{ tab.tab_name }})`;
+        console.warn(message);
+        log("error", "_pills_nav_content.html", "render", message);
+      </script>
+    {% endif %}
+  {% endfor %}
+{% endif %}

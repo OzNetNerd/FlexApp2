@@ -1,0 +1,44 @@
+{# _entity_mapping_display.html #}
+{% macro render_entity_mapping(entity_type, items) %}
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">
+        <i class="fas fa-{% if entity_type == 'users' %}users{% else %}building{% endif %} me-2"></i>
+        {{ entity_type|capitalize }}
+      </h5>
+    </div>
+    <div class="card-body p-0">
+      {% if items %}
+        <div class="list-group list-group-flush">
+          {% for item in items %}
+            <div class="list-group-item p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="d-flex align-items-center">
+                    <span class="avatar-circle avatar-sm bg-{% if item.relationship_type == 'Manages' %}primary{% elif item.relationship_type == 'Works With' %}success{% elif item.relationship_type == 'Vendor' %}purple{% else %}secondary{% endif %} me-3">
+                      <i class="fas fa-{% if entity_type == 'users' %}user{% else %}building{% endif %}-alt text-white"></i>
+                    </span>
+                    <strong>{{ item.entity_name }}</strong>
+                  </div>
+                  <div class="text-muted small mt-1">
+                    ID: {{ item.id }} • Type: {{ item.entity_type }}
+                  </div>
+                </div>
+                <div>
+                  <span class="badge bg-{% if item.relationship_type == 'Manages' %}primary-soft{% elif item.relationship_type == 'Works With' %}success-soft{% elif item.relationship_type == 'Vendor' %}purple-soft{% else %}secondary-soft{% endif %} text-{% if item.relationship_type == 'Manages' %}primary{% elif item.relationship_type == 'Works With' %}success{% elif item.relationship_type == 'Vendor' %}purple{% else %}secondary{% endif %} px-3 py-2">
+                    <i class="fas fa-{% if item.relationship_type == 'Manages' %}user-tie{% elif item.relationship_type == 'Works With' %}user-friends{% elif item.relationship_type == 'Vendor' %}handshake{% else %}link{% endif %} me-1"></i>
+                    {{ item.relationship_type }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="p-4 text-center text-muted">
+          <i class="fas fa-info-circle me-2"></i> No {{ entity_type }} mappings found
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endmacro %}
