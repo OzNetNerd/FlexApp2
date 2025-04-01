@@ -1,0 +1,53 @@
+/* entity_mappings.css */
+.avatar-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  font-size: 0.8rem;
+}
+
+/* Soft background colors for badges */
+.bg-primary-soft {
+  background-color: rgba(13, 110, 253, 0.15);
+}
+
+.bg-success-soft {
+  background-color: rgba(25, 135, 84, 0.15);
+}
+
+.bg-purple-soft {
+  background-color: rgba(111, 66, 193, 0.15);
+}
+
+.bg-secondary-soft {
+  background-color: rgba(108, 117, 125, 0.15);
+}
+
+/* Custom card styling */
+.card {
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0.75rem 1rem;
+}
+
+/* Custom list group styling */
+.list-group-item {
+  transition: background-color 0.15s ease;
+}
+
+.list-group-item:hover {
+  background-color: rgba(0, 0, 0, 0.01);
+}
