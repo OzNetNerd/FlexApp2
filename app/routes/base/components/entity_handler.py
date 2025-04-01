@@ -30,44 +30,37 @@ class BasicContext:
     item: Optional[Any] = None
     read_only: bool = False
 
+
 @dataclass
 class ResourceContext:
+    model: Any
+    blueprint_name: str
+    item_dict: dict
+    tabs: List[str]
     title: str
     read_only: bool = True
-    submit_url: Optional[str] = None
-    cancel_url: Optional[str] = None
-    item_name: Optional[str] = None
-    id: Optional[str] = None
     error_message: Optional[str] = None
-    ui: Optional[List[str]] = None
-    model_name: Optional[str] = None
-    item: Optional[str] = None  # Allow the item to be passed as an argument
+    item: Optional[str] = None
     autocomplete_fields: Optional[List[dict]] = None
 
-    def __post_init__(self):
-        # Ensure that `create_context()` is called to properly initialize the instance
-        if self.item is None:
-            raise NotImplementedError("Use the factory method `create_context()` to construct ResourceContext.")
+    # Derived fields with defaults
+    item_name: Optional[str] = None
+    submit_url: Optional[str] = None
+    id: Optional[str] = None
+    ui: Optional[List[str]] = None
+    model_name: Optional[str] = None
 
-    @classmethod
-    def create_context(cls, model, blueprint_name: str, item_dict: dict, tabs, title: str, read_only: bool, error_message: Optional[str] = None, item: Optional[str] = None, autocomplete_fields: Optional[List[dict]] = None):
-        """Factory method to construct a ResourceContext with derived fields."""
-        self = cls.__new__(cls)  # Bypass __init__
-        self.title = title
-        self.submit_url = url_for(f"{blueprint_name}.create") if not read_only else ""
-        self.cancel_url = url_for(f"{blueprint_name}.index")
-        self.read_only = read_only
-        self.error_message = error_message
-        self.model_name = model.__name__
-        self.id = str(item_dict.get("id", ""))
-        self.autocomplete_fields = autocomplete_fields
+    def __post_init__(self):
+        # Set derived fields
+        self.submit_url = url_for(f"{self.blueprint_name}.create") if not self.read_only else ""
+        self.model_name = self.model.__name__
+        self.id = str(self.item_dict.get("id", ""))
+        self.ui = self.tabs
         self.item_name = next(
-            (item_dict[k] for k in ["name", "title", "email", "username"] if k in item_dict and item_dict[k]),
-            str(item_dict.get("id", ""))
+            (self.item_dict[k] for k in ["name", "title", "email", "username"]
+             if k in self.item_dict and self.item_dict[k]),
+            str(self.item_dict.get("id", ""))
         )
-        self.ui = tabs
-        self.item = item  # Accept item if passed during creation
-        return self
 
 @dataclass
 class TableContext:

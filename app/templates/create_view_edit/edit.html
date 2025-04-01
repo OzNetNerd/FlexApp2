@@ -28,23 +28,34 @@
         {{ title }}
       </h3>
       <div class="d-flex gap-2">
-        {% if id %}
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
-            <i class="fas fa-times me-1"></i> Cancel
-          </a>
-        {% else %}
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
-            <i class="fas fa-times me-1"></i> Cancel
-          </a>
-        {% endif %}
+        <!-- Cancel button removed from here as it's in the form itself -->
       </div>
     </div>
 
     <div class="card-body">
-      <form method="POST">
+      <form method="POST" id="edit-form">
         {% include 'create_view_edit/components/_pills_nav_content.html' %}
         {% include 'create_view_edit/components/_footer_buttons.html' %}
       </form>
+    </div>
+  </div>
+
+  <!-- Unsaved changes confirmation modal -->
+  <div class="modal fade" id="unsavedChangesModal" tabindex="-1" aria-labelledby="unsavedChangesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="unsavedChangesModalLabel">Unsaved Changes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          You have unsaved changes. Are you sure you want to leave?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay on Page</button>
+          <button type="button" class="btn btn-primary" id="confirmLeaveBtn">Leave Without Saving</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -70,6 +81,38 @@
     };
 
     log("info", "edit.html", "render", "📝 Edit form initialized", editContext);
+  </script>
+
+  <!-- Unsaved changes modal handler -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get the cancel button from render_form.html
+      const cancelButton = document.querySelector('#cancel-button');
+
+      if (cancelButton) {
+        // Override the default click behavior
+        cancelButton.addEventListener('click', function(event) {
+          // Prevent the default navigation
+          event.preventDefault();
+
+          // Show the bootstrap modal
+          const modal = new bootstrap.Modal(document.getElementById('unsavedChangesModal'));
+          modal.show();
+        });
+      }
+
+      // Handle confirm leave button click
+      const confirmLeaveBtn = document.getElementById('confirmLeaveBtn');
+      if (confirmLeaveBtn) {
+        confirmLeaveBtn.addEventListener('click', function() {
+          {% if id %}
+            window.location.href = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}";
+          {% else %}
+            window.location.href = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}";
+          {% endif %}
+        });
+      }
+    });
   </script>
 {%- endblock %}
 

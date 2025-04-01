@@ -341,7 +341,7 @@ class GenericWebRoutes(CRUDRoutesBase):
                                 entry.value = item_dict['related_companies']
 
         # Create the context for the template
-        resource_context = ResourceContext.create_context(
+        context = ResourceContext.create_context(
             model=self.model,
             blueprint_name=self.blueprint.name,
             item_dict=item_dict,
@@ -350,7 +350,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             read_only=True
         )
 
-        return render_safely(self.view_template, resource_context,
+        return render_safely(self.view_template, context,
                              f"Error viewing {self.model.__name__} with id {item_id}")
 
     def add_context(self, item, context, edit_mode):

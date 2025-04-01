@@ -5,12 +5,11 @@
   Imports:
     - render_sections.html → sections_macros (used to group and render sectioned fields)
   Macro:
-    - render_form(fields_by_section, submit_url, cancel_url, button_text, read_only, edit_url)
+    - render_form(fields_by_section, submit_url, button_text, read_only, edit_url)
       Renders a complete HTML form with fields grouped by section
   Inputs:
     - fields_by_section : dict[str, list[TabEntry]] — section name to fields
     - submit_url        : str — target URL for form submission
-    - cancel_url        : str — target URL for cancellation/back
     - button_text       : str — text on the submit button
     - read_only         : bool — toggle for read-only mode
     - edit_url          : str | None — optional edit button destination
@@ -36,7 +35,7 @@
 </script>
 
 {# Main macro to render a form — used across create, edit, and view pages #}
-{% macro render_form(fields_by_section, submit_url, cancel_url, button_text="Submit", read_only=False, edit_url=None) -%}
+{% macro render_form(fields_by_section, submit_url, button_text="Submit", read_only=False, edit_url=None) -%}
   <script type="module">
     import log from "{{ url_for('static', filename='js/logger.js') }}";
 
@@ -44,14 +43,12 @@
     const mode = {{ "true" if read_only else "false" }};
     const sectionNames = {{ fields_by_section.keys() | list | tojson | safe }};
     const submitUrl = {{ submit_url | tojson | safe }};
-    const cancelUrl = {{ cancel_url | tojson | safe }};
     const editUrl = {{ edit_url | tojson | safe }};
     const btnText = {{ button_text | tojson | safe }};
 
     log("info", filename, "render_form", `🧾 Rendering form in ${mode === "true" ? "read-only" : "editable"} mode`);
     log("debug", filename, "render_form", "📌 Sections", sectionNames);
     log("debug", filename, "render_form", "➡️ Submit URL", submitUrl);
-    log("debug", filename, "render_form", "↩️ Cancel URL", cancelUrl);
     log("debug", filename, "render_form", "✏️ Edit URL", editUrl);
     log("debug", filename, "render_form", "🔘 Button text", btnText);
   </script>
@@ -69,14 +66,14 @@
       Action buttons section — show different buttons depending on read-only mode.
       - If read_only is True and edit_url is provided:
           → Show an "Edit" button linking to the edit form.
-          → Show a "Back" button that navigates to the cancel_url.
+          → Show a "Back" button that navigates to the previous page.
       - If read_only is False:
-          → Show a "Cancel" button linking to the cancel_url.
+          → Show a "Cancel" button linking to the previous page.
           → Show a "Submit" button to save the form.
       - Icons and text adjust dynamically to reflect the current mode.
     #}
     <div class="d-flex justify-content-between mt-4">
-      <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
+      <a href="#" class="btn btn-outline-secondary" id="cancel-button">
         <i class="fas fa-{{ 'arrow-left' if read_only else 'times' }} me-1"></i> {{ 'Back' if read_only else 'Cancel' }}
       </a>
       {%- if read_only and edit_url %}

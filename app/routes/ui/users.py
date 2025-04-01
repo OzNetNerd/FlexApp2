@@ -54,9 +54,9 @@ def get_users_tabs(item: dict) -> List[Tab]:
         ]
     )
 
-    # Mappings section for users and companies
-    mappings_section = TabSection(
-        section_name="Mappings",
+    # Relationships section for users and companies
+    relationships_section = TabSection(
+        section_name="Relationships",
         entries=[
             TabEntry(entry_name="users", label="Users", type="custom", value=item.get("users")),
             TabEntry(entry_name="companies", label="Companies", type="custom", value=item.get("companies")),

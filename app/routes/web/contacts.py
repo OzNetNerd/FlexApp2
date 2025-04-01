@@ -5,6 +5,8 @@ from app.models import Contact, Company, db, User
 from app.routes.web import contacts_bp
 from app.routes.web.generic import GenericWebRoutes
 from app.routes.ui.contacts import get_contact_tabs
+from typing import Any, Dict, List
+from app.models import CRISPScore
 
 logger = logging.getLogger(__name__)
 
@@ -14,11 +16,25 @@ class ContactCRUDRoutes(GenericWebRoutes):
     Custom CRUD routes for Contacts model that extends the generic implementation.
     """
 
-    def add_view_context(self, item, context):
-        from app.models import Relationship, CRISPScore
+    def add_view_context(self, item: Any, context: Dict[str, Any]) -> None:
+        """Adds relationship and CRISP score information to the view context.
 
-        user = current_user
-        relationship = item.get_relationship_with(user)
+        This method retrieves the relationship between the current user and the provided item.
+        It then adds the relationship to the context dictionary. If a relationship exists,
+        the method further queries for the associated CRISP scores, ordered by their creation
+        date in descending order, and adds these scores to the context.
+
+        Args:
+            item (Any): An object representing an item that supports a relationship with the current user.
+                This object must implement a `get_relationship_with` method that accepts a user.
+            context (Dict[str, Any]): A dictionary that will be updated with view context data. The keys
+                'relationship' and 'crisp_scores' (if applicable) will be added to this dictionary.
+
+        Returns:
+            None: The function modifies the `context` dictionary in place.
+        """
+
+        relationship = item.get_relationship_with(current_user)
         context["relationship"] = relationship
 
         if relationship:
@@ -74,33 +90,69 @@ class ContactCRUDRoutes(GenericWebRoutes):
 
         return form_data
 
-    def _validate_create(self, form_data):
-        """
-        Core validation for creating a contact from dict form data.
+    def _validate_create(self, form_data: Dict[str, Any]) -> List[str]:
+        """Core validation for creating a contact from dictionary form data.
+
+        This method performs the primary validation for creating a contact. It delegates to
+        the parent class's validation method and then performs additional checks for the
+        contact data.
+
+        Args:
+            form_data (Dict[str, Any]): A dictionary containing form data for creating a contact.
+
+        Returns:
+            List[str]: A list of validation error messages (if any).
         """
         errors = super()._validate_create(form_data)
         self._validate_contact_data(form_data, errors)
         return errors
 
-    def _validate_edit(self, item, request_obj):
-        """
-        Entry point from GenericWebRoutes that expects a Flask request object.
-        Converts to dict before calling actual validation logic.
+    def _validate_edit(self, item: Any, request_obj: Any) -> List[str]:
+        """Entry point from GenericWebRoutes that expects a Flask request object.
+
+        This method converts the Flask request object to a dictionary and then calls
+        the actual validation logic for editing a contact.
+
+        Args:
+            item (Any): The item (contact) to be edited.
+            request_obj (Any): The Flask request object containing the form data.
+
+        Returns:
+            List[str]: A list of validation error messages (if any).
         """
         form_data = self._preprocess_form_data(request_obj)
         return self._validate_edit_data(item, form_data)
 
-    def _validate_edit_data(self, item, form_data):
-        """
-        Core validation for editing a contact from preprocessed form data.
+    def _validate_edit_data(self, item: Any, form_data: Dict[str, Any]) -> List[str]:
+        """Core validation for editing a contact from preprocessed form data.
+
+        This method performs the primary validation for editing a contact. It delegates
+        to the parent class's validation method and then performs additional checks for
+        the contact data.
+
+        Args:
+            item (Any): The item (contact) to be edited.
+            form_data (Dict[str, Any]): A dictionary containing preprocessed form data for editing a contact.
+
+        Returns:
+            List[str]: A list of validation error messages (if any).
         """
         errors = super()._validate_edit(item, form_data)
         self._validate_contact_data(form_data, errors)
         return errors
 
-    def _validate_contact_data(self, form_data, errors):
-        """
-        Common validation for contact data.
+    @staticmethod
+    def _validate_contact_data(form_data: Dict[str, Any], errors: List[str]) -> None:
+        """Common validation for contact data.
+
+        This method validates the contact data, specifically checking if the email format is valid.
+
+        Args:
+            form_data (Dict[str, Any]): A dictionary containing form data for a contact.
+            errors (List[str]): A list of error messages that will be populated with validation errors.
+
+        Returns:
+            None: The function modifies the `errors` list in place.
         """
         if form_data.get("email"):
             email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
