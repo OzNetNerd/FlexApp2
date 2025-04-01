@@ -1,52 +1,54 @@
 <!-- START TEMPLATE: _autocomplete.html -->
 {# ------------------------------------------------------------------------------
-  File: _autocomplete.html | Purpose: Render user/company autocomplete fields
+  File: _autocomplete.html | Purpose: Render dynamic autocomplete fields
   Inputs:
-    - initial_user_ids: List[int] for users
-    - initial_company_id: Optional[int] for the company
+    - autocomplete_fields: List of dictionaries with the following keys:
+        - title: string (display name of the field)
+        - id: string (HTML id for the input, without #)
+        - placeholder: string (placeholder text)
+        - name: string (form field name)
+        - data_url: string (API endpoint for data)
+        - initial_ids: List[int] (initial selected IDs)
   Features:
-    - Bootstrap card-based inputs for user/company with data-initial JSON
+    - Bootstrap card-based inputs with data-initial JSON
     - JS logs and parses initial values
   Notes:
     - Hydrated by autoComplete.js
     - Logs success and parse errors for diagnostics
 ------------------------------------------------------------------------------ #}
 
-<!-- 👥 Autocomplete Field: Users -->
-<div class="col-md-6 mb-3">
-  <div class="card border-light h-100 shadow-sm">
-    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-      <span class="fw-bold">Users</span>
-    </div>
-    <div class="card-body">
-      <input
-        type="text"
-        id="users-input"
-        class="form-control"
-        placeholder="Type to search users..."
-        data-initial='{{ initial_user_ids | default([]) | tojson }}'
-      >
-    </div>
-  </div>
-</div>
-
-<!-- 🏢 Autocomplete Field: Company -->
-<div class="col-md-6 mb-3">
-  <div class="card border-light h-100 shadow-sm">
-    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-      <span class="fw-bold">Companies</span>
-    </div>
-    <div class="card-body">
-      <input
-        type="text"
-        id="companies-input"
-        class="form-control"
-        placeholder="Type to search companies..."
-        data-initial='{{ [initial_company_id] if initial_company_id else [] | tojson }}'
-      >
+{% if autocomplete_fields %}
+  {% for field in autocomplete_fields %}
+  <!-- {{ field.title }} Autocomplete Field -->
+  <div class="col-md-6 mb-3">
+    <div class="card border-light h-100 shadow-sm">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+        <span class="fw-bold">{{ field.title }}</span>
+      </div>
+      <div class="card-body">
+        <input
+          type="text"
+          id="{{ field.id }}"
+          class="form-control"
+          placeholder="{{ field.placeholder }}"
+          data-initial='{{ field.initial_ids | default([]) | tojson }}'
+        >
+      </div>
     </div>
   </div>
-</div>
+  {% endfor %}
+{% else %}
+  <!-- No autocomplete fields configured -->
+  <div class="col-12">
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle me-2"></i> No mapping fields are configured for this entity.
+    </div>
+  </div>
+  <script type="module">
+    import log from "{{ url_for('static', filename='js/logger.js') }}";
+    log("warn", "_autocomplete.html", "init", "⚠️ No autocomplete_fields found in context");
+  </script>
+{% endif %}
 
 <!-- Fixed CSS to ensure proper dropdown visibility -->
 <style>
@@ -94,28 +96,39 @@
   }
 </style>
 
-<!-- 🧾 Autocomplete Initialization Logging -->
+<!-- Autocomplete Initialization Logging -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
   import { initAutoCompleteFields } from "{{ url_for('static', filename='js/autoComplete.js') }}";
 
   document.addEventListener('DOMContentLoaded', () => {
-    const usersInitial = document.getElementById("users-input")?.dataset.initial || "[]";
-    const companiesInitial = document.getElementById("companies-input")?.dataset.initial || "[]";
+    const autoCompleteConfig = [];
 
-    let parsedUsers = [], parsedCompany = [];
-    try {
-      parsedUsers = JSON.parse(usersInitial);
-      parsedCompany = JSON.parse(companiesInitial);
-    } catch (e) {
-      log("error", "_autocomplete.html", "parse", "❌ Failed to parse initial values", e);
-    }
+    {% if autocomplete_fields %}
+      log("info", "_autocomplete.html", "init", "📋 Found {{ autocomplete_fields|length }} autocomplete field(s)");
 
-    log("info", "_autocomplete.html", "init", "👥 Initial user IDs", parsedUsers);
-    log("info", "_autocomplete.html", "init", "🏢 Initial company ID", parsedCompany);
+      {% for field in autocomplete_fields %}
+      autoCompleteConfig.push({
+        selector: '#{{ field.id }}',
+        dataUrl: '{{ field.data_url }}',
+        inputName: '{{ field.name }}'
+      });
+
+      let parsed{{ field.id | replace('-', '_') }} = [];
+      try {
+        const initial{{ field.id | replace('-', '_') }} = document.getElementById("{{ field.id }}")?.dataset.initial || "[]";
+        parsed{{ field.id | replace('-', '_') }} = JSON.parse(initial{{ field.id | replace('-', '_') }});
+        log("info", "_autocomplete.html", "init", "📋 {{ field.title }} Initial IDs", parsed{{ field.id | replace('-', '_') }});
+      } catch (e) {
+        log("error", "_autocomplete.html", "parse", "❌ Failed to parse initial values for {{ field.id }}", e);
+      }
+      {% endfor %}
+    {% else %}
+      log("warn", "_autocomplete.html", "init", "⚠️ No autocomplete_fields found in context");
+    {% endif %}
 
     // Initialize autocomplete fields
-    initAutoCompleteFields();
+    initAutoCompleteFields(autoCompleteConfig);
 
     // Fix dropdown body scroll issue
     document.addEventListener('shown.bs.dropdown', function() {

@@ -8,10 +8,6 @@ console.log('🚀 Loading autoComplete.js');
  *
  * Data is fetched from the specified endpoint.
  *
- * Endpoints:
- * - For users: '/users/data'
- * - For companies: '/companies/data'
- *
  * @param {Object} params
  * @param {string} params.inputSelector - CSS selector for the input field.
  * @param {string} params.dataUrl - URL endpoint to fetch autocomplete data.
@@ -248,45 +244,37 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
 }
 
 /**
- * Automatically initialize autocomplete fields for both users and companies.
+ * Initialize autocomplete fields based on configuration.
  *
- * It pulls data from the following endpoints:
- * - Users: '/users/data'
- * - Companies: '/companies/data'
+ * @param {Array<Object>} config - Array of configuration objects for autocomplete fields
+ * @param {string} config[].selector - CSS selector for the input field
+ * @param {string} config[].dataUrl - URL endpoint to fetch autocomplete data
+ * @param {string} config[].inputName - Name of the input field
  */
-export function initAutoCompleteFields() {
-  console.log('🚀 initAutoCompleteFields called');
-  log("info", scriptName, "initAutoCompleteFields", "📋 Initializing autocomplete fields");
+export function initAutoCompleteFields(config = []) {
+  console.log('🚀 initAutoCompleteFields called with', config.length, 'fields');
+  log("info", scriptName, "initAutoCompleteFields", `📋 Initializing ${config.length} autocomplete fields`);
 
-  const usersInput = document.querySelector('#users-input');
-  if (usersInput) {
-    const usersInitial = JSON.parse(usersInput.dataset.initial || '[]');
-    log("info", scriptName, "initAutoCompleteFields", `🔍 Found users input with initial data:`, usersInitial);
+  config.forEach(fieldConfig => {
+    const input = document.querySelector(fieldConfig.selector);
+    if (input) {
+      try {
+        const initialIds = JSON.parse(input.dataset.initial || '[]');
+        log("info", scriptName, "initAutoCompleteFields", `🔍 Found input ${fieldConfig.selector} with initial data:`, initialIds);
 
-    setupAutoComplete({
-      inputSelector: '#users-input',
-      dataUrl: '/users/data',
-      inputName: 'users',
-      initialIds: usersInitial
-    });
-  } else {
-    log("warn", scriptName, "initAutoCompleteFields", "⚠️ No users input field found with selector '#users-input'");
-  }
-
-  const companiesInput = document.querySelector('#companies-input');
-  if (companiesInput) {
-    const companiesInitial = JSON.parse(companiesInput.dataset.initial || '[]');
-    log("info", scriptName, "initAutoCompleteFields", `🔍 Found companies input with initial data:`, companiesInitial);
-
-    setupAutoComplete({
-      inputSelector: '#companies-input',
-      dataUrl: '/companies/data',
-      inputName: 'company_id',
-      initialIds: companiesInitial
-    });
-  } else {
-    log("warn", scriptName, "initAutoCompleteFields", "⚠️ No companies input field found with selector '#companies-input'");
-  }
+        setupAutoComplete({
+          inputSelector: fieldConfig.selector,
+          dataUrl: fieldConfig.dataUrl,
+          inputName: fieldConfig.inputName,
+          initialIds: initialIds
+        });
+      } catch (e) {
+        log("error", scriptName, "initAutoCompleteFields", `❌ Error parsing initial data for ${fieldConfig.selector}:`, e);
+      }
+    } else {
+      log("warn", scriptName, "initAutoCompleteFields", `⚠️ No input field found with selector '${fieldConfig.selector}'`);
+    }
+  });
 
   log("info", scriptName, "initAutoCompleteFields", "✅ Autocomplete initialization complete");
 }

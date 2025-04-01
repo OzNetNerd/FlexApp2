@@ -25,6 +25,21 @@ class UserCRUDRoutes(GenericWebRoutes):
         relationships = RelationshipService.get_relationships_for_entity('user', item.id)
         context["relationships"] = relationships
 
+        # Add autocomplete configuration for mappings
+        logger.debug(f"Adding autocomplete configuration for mappings to the view context for User {item.id}.")
+        context["autocomplete_config"] = [
+            {
+                "selector": "#users-input",
+                "dataUrl": "/api/users/autocomplete",
+                "inputName": "users"
+            },
+            {
+                "selector": "#companies-input",
+                "dataUrl": "/api/companies/autocomplete",
+                "inputName": "companies"
+            }
+        ]
+
 
 # Set up the CRUD routes for users
 logger.debug("Setting up CRUD routes for User model.")
