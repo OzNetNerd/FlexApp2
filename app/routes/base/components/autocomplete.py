@@ -56,9 +56,9 @@ class AutoCompleteField:
 #     ]
 
 
-def create_autocomplete_field(title, relationships=None, field_id=None, placeholder=None, name=None, data_url=None):
+def get_autocomplete_field(title, relationships=None, field_id=None, placeholder=None, name=None, data_url=None):
     """
-    Create an AutoCompleteField instance using defaults derived from the title if parameters
+    Get an AutoCompleteField instance using defaults derived from the title if parameters
     are not specified.
 
     This function automatically extracts related IDs from the provided relationships list
@@ -85,26 +85,3 @@ def create_autocomplete_field(title, relationships=None, field_id=None, placehol
         data_url=data_url,
         related_ids=related_ids
     )
-
-
-def get_autocomplete_fields(relationships, model_name=""):
-    """
-    Build a list of autocomplete fields based on relationships.
-    For User models, extract related user and company IDs.
-    """
-    if model_name == "User":
-        related_user_ids = [rel['entity_id'] for rel in relationships if rel['entity_type'] == 'user']
-        related_company_ids = [rel['entity_id'] for rel in relationships if rel['entity_type'] == 'company']
-
-        return [
-            create_autocomplete_field(
-                title="Users",
-                related_ids=related_user_ids
-            ),
-            create_autocomplete_field(
-                title="Companies",
-                related_ids=related_company_ids
-            )
-        ]
-    # Add additional model-specific logic here if needed.
-    return []

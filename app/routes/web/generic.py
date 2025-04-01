@@ -15,7 +15,7 @@ from app.services.data_route_handler import DataRouteHandler
 from app.routes.base.components.entity_handler import EntityHandler, ResourceContext, TableContext
 from app.services.item_manager import ItemManager
 from app.services.relationship_service import RelationshipService
-from app.routes.base.components.autocomplete import get_autocomplete_fields, AutoCompleteField
+from app.routes.base.components.autocomplete import get_autocomplete_field
 
 logger = logging.getLogger(__name__)
 GENERIC_TEMPLATE = "entity_table.html"
@@ -353,9 +353,9 @@ class GenericWebRoutes(CRUDRoutesBase):
         return render_safely(self.view_template, resource_context,
                              f"Error viewing {self.model.__name__} with id {item_id}")
 
-    def add_context(self, item, context, edit=False):
+    def add_context(self, item, context, edit_mode):
         """Add notes_model, relationships, and autocomplete fields to the context."""
-        # Add notes_model to the context
+        # Optionally add notes_model:
         # logger.debug(f"Adding 'notes_model' to the view context for {self.model.__name__} {item.id}.")
         # context["notes_model"] = Note
 
@@ -367,43 +367,21 @@ class GenericWebRoutes(CRUDRoutesBase):
 
         # context["relationships"] = relationships
 
-        # Add autocomplete fields configuration
-        context["autocomplete_fields"] = get_autocomplete_fields(relationships)
-
-        # For User models, extract related user and company IDs
+        # For User models, create autocomplete fields using get_autocomplete_field which automatically
+        # extracts related IDs based on the title.
         if self.model.__name__ == "User":
-            related_user_ids = [rel['entity_id'] for rel in relationships if rel['entity_type'] == 'user']
-            related_company_ids = [rel['entity_id'] for rel in relationships if rel['entity_type'] == 'company']
-
             context["autocomplete_fields"] = [
-                AutoCompleteField(
-                    title="Users",
-                    id="users-input",
-                    placeholder="Search for users...",
-                    name="users",
-                    data_url="/users/data",
-                    related_ids=related_user_ids
-                ),
-                AutoCompleteField(
-                    title="Companies",
-                    id="companies-input",
-                    placeholder="Search for companies...",
-                    name="companies",
-                    data_url="/companies/data",
-                    related_ids=related_company_ids
-                )
+                get_autocomplete_field("Users", relationships=relationships),
+                get_autocomplete_field("Companies", relationships=relationships)
             ]
 
-        if edit:
-            logger.debug(f"Added {len(context['autocomplete_fields'])} autocomplete fields to the edit context.")
-        else:
-            logger.debug(f"Added {len(context['autocomplete_fields'])} autocomplete fields to the view context.")
+        logger.debug(f"Added {len(context['autocomplete_fields'])} autocomplete fields to the {edit_mode} context.")
 
     # Replace add_view_context and add_edit_context with add_context
     def add_view_context(self, item, context):
         """Adds context for the view."""
-        self.add_context(item, context, edit=False)
+        self.add_context(item, context, edit_mode=False)
 
     def add_edit_context(self, item, context):
         """Adds context for the edit."""
-        self.add_context(item, context, edit=True)
+        self.add_context(item, context, edit_mode=True)
