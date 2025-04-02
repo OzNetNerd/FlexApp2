@@ -1,62 +1,71 @@
 /**
-  js/logger.js
- * Logger Module
- * Centralized logging utility for consistent logging across the application
+ * js/logger.js
+ * Logger Module – Updated to support file and function grouping.
  */
 
-  const levelColors = {
-    debug: '#808080', // Gray
-    info: '#4682B4',  // Steel blue
-    warn: '#FFA500',  // Orange/Yellow
-    error: '#FF0000'  // Red
+const levelColors = {
+  debug: '#808080',
+  info: '#4682B4',
+  warn: '#FFA500',
+  error: '#FF0000'
 };
 
-/**
- * Logs a message at the specified level.
- * @param {string} level - The log level (`debug`, `info`, `warn`, `error`).
- * @param {string} scriptName - The script where the log originates.
- * @param {string} functionName - The function where the log originates.
- * @param {string} message - The log message.
- * @param {any} [data] - Optional additional data to log.
- */
-export default function log(level, scriptName, functionName, message, data) {
-    const timestamp = new Date().toISOString();
-    const contextLabel = `[${scriptName}:${functionName}]`;
+// Map to track open file groups. Each entry holds the function count and current function name.
+const fileGroups = new Map();
 
-    // Format the message with colored level
-    const coloredLevel = `%c${level.toUpperCase()}%c`;
-    const levelStyle = `color: ${levelColors[level]}; font-weight: bold;`;
-    const resetStyle = 'color: inherit; font-weight: normal;';
-
-    const baseMessage = `${timestamp} ${coloredLevel} ${contextLabel}: ${message}`;
-
-    if (data === undefined) {
-        console[level](baseMessage, levelStyle, resetStyle);
-    } else if (data === null) {
-        console[level](`${baseMessage} (null)`, levelStyle, resetStyle);
-    } else if (typeof data === 'object') {
-        try {
-            // Handle special DOM objects
-            const processedData = data instanceof DOMStringMap ? Object.fromEntries(Object.entries(data)) : data;
-
-            // Check if this is a string-like object (with numeric keys)
-            const hasNumericKeys = typeof processedData === 'object' &&
-                                  processedData !== null &&
-                                  !Array.isArray(processedData) &&
-                                  Object.keys(processedData).length > 0 &&
-                                  Object.keys(processedData).every(k => !isNaN(parseInt(k)));
-
-            if (hasNumericKeys) {
-                // Handle string-like objects by converting to actual string
-                const strValue = Object.values(processedData).join('');
-                console[level](`${baseMessage} ${strValue}`, levelStyle, resetStyle);
-            } else {
-                console[level](baseMessage, levelStyle, resetStyle, processedData);
-            }
-        } catch (error) {
-            console[level](`${baseMessage} (Unprintable object)`, levelStyle, resetStyle);
-        }
-    } else {
-        console[level](baseMessage, levelStyle, resetStyle, data);
+// Helper to close all open groups (both file and nested function groups)
+function closeAllFileGroups() {
+  fileGroups.forEach((group) => {
+    if (group.currentFunction) {
+      console.groupEnd(); // close the function group
     }
+    console.groupEnd(); // close the file group
+  });
+  fileGroups.clear();
+}
+
+export default function log(level, scriptName, functionName, message, data) {
+  const timestamp = new Date().toISOString();
+  const coloredLevel = `%c${level.toUpperCase()}%c`;
+  const levelStyle = `color: ${levelColors[level]}; font-weight: bold;`;
+  const resetStyle = 'color: inherit; font-weight: normal;';
+  const baseMessage = `${timestamp} ${coloredLevel} [${scriptName}:${functionName}]: ${message}`;
+
+  // If we haven't opened a file group for this script, close any existing groups and open a new file group.
+  if (!fileGroups.has(scriptName)) {
+    closeAllFileGroups();
+    // We open the file group with an initial count (here shown as 0).
+    // (Due to console API limits, updating this count later isn’t directly possible.)
+    console.groupCollapsed(`${scriptName} (0)`);
+    fileGroups.set(scriptName, {
+      functionCount: 0,
+      currentFunction: null
+    });
+  }
+
+  const fileGroup = fileGroups.get(scriptName);
+
+  // If the current function group isn’t the one for this log, close the old function group (if any)
+  // and start a new one.
+  if (fileGroup.currentFunction !== functionName) {
+    if (fileGroup.currentFunction !== null) {
+      console.groupEnd(); // close previous function group
+    }
+    fileGroup.functionCount++;
+    // Ideally we would update the file group header to reflect the new function count,
+    // but the console API does not allow updating an already-opened group header.
+    console.groupCollapsed(functionName);
+    fileGroup.currentFunction = functionName;
+  }
+
+  // Log the message inside the current function group.
+  if (data === undefined) {
+    console[level](baseMessage, levelStyle, resetStyle);
+  } else {
+    console[level](baseMessage, levelStyle, resetStyle, data);
+  }
+}
+
+export function resetGroups() {
+  closeAllFileGroups();
 }

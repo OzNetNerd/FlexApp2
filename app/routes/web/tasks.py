@@ -1,7 +1,7 @@
-from app.models import Task, Note
+from app.models import Task
 from app.routes.web import tasks_bp
 from app.routes.web.generic import GenericWebRoutes
-from app.routes.ui.tasks import get_task_tabs
+from routes.base.ui.tasks import get_task_tabs
 import logging
 
 logger = logging.getLogger(__name__)

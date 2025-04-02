@@ -13,6 +13,7 @@ console.log('🚀 Loading autoComplete.js');
  * @param {string} params.dataUrl - URL endpoint to fetch autocomplete data.
  * @param {string} params.inputName - Name of the input field (used for badges, etc.).
  * @param {Array<number>} [params.initialIds=[]] - Array of initial selected IDs.
+ * @returns {Promise<void>} - Resolves when autocomplete is set up.
  */
 export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialIds = [] }) {
   const functionName = 'setupAutoComplete';
@@ -22,7 +23,7 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
   const input = document.querySelector(inputSelector);
   if (!input) {
     log("error", scriptName, functionName, `❌ Input not found: ${inputSelector}`);
-    return;
+    return Promise.resolve();
   }
 
   log("info", scriptName, functionName, `🎯 Initializing autocomplete for '${inputName}' using endpoint ${dataUrl}`);
@@ -48,10 +49,9 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
   let highlightIndex = -1;
 
   log("info", scriptName, functionName, `🔄 Fetching data from: ${dataUrl}`);
-
   console.log(`🔄 Fetching data from: ${dataUrl}`);
 
-  fetch(dataUrl)
+  const fetchPromise = fetch(dataUrl)
     .then(res => {
       console.log(`📡 Response status from ${dataUrl}: ${res.status}`);
       log("debug", scriptName, functionName, `📡 Response status from ${dataUrl}: ${res.status}`);
@@ -68,11 +68,9 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
       suggestions = json.data;
       log('info', scriptName, functionName, `📦 Loaded ${suggestions.length} suggestions from ${dataUrl}`);
 
-      // Log warning if no suggestions were returned
       if (!suggestions || suggestions.length === 0) {
         log('warn', scriptName, functionName, `⚠️ No suggestions returned from ${dataUrl}`);
       } else {
-        // Log sample data to help with debugging
         const sampleData = suggestions.slice(0, 3);
         log('debug', scriptName, functionName, `🔍 Sample data (first 3 items):`, sampleData);
       }
@@ -81,7 +79,6 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
         log('debug', scriptName, functionName, `🔍 Looking for initial IDs in data:`, initialIds);
         const prefillItems = suggestions.filter(s => initialIds.includes(s.id));
 
-        // Log warning if some initial IDs weren't found
         const missingIds = initialIds.filter(id => !suggestions.some(s => s.id === id));
         if (missingIds.length > 0) {
           log('warn', scriptName, functionName, `⚠️ Some initial IDs were not found in the data:`, missingIds);
@@ -100,9 +97,9 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
   input.addEventListener('focus', handleInputEvent);
 
   function handleInputEvent() {
-    const functionName = 'input:filter';
+    const innerFunctionName = 'input:filter';
     const query = input.value.trim().toLowerCase();
-    log('debug', scriptName, functionName, `🔍 Filtering with query: "${query}"`);
+    log('debug', scriptName, innerFunctionName, `🔍 Filtering with query: "${query}"`);
 
     autocompleteList.innerHTML = '';
     highlightIndex = -1;
@@ -113,7 +110,7 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
       filtered = suggestions
         .filter(s => !selected.some(sel => sel.id === s.id))
         .slice(0, 10);
-      log('debug', scriptName, functionName, `ℹ️ Showing first 10 '${inputName}' results (${filtered.length} items)`);
+      log('debug', scriptName, innerFunctionName, `ℹ️ Showing first 10 '${inputName}' results (${filtered.length} items)`);
     } else {
       filtered = suggestions
         .filter(s => !selected.some(sel => sel.id === s.id))
@@ -122,10 +119,10 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
           (s.email && s.email.toLowerCase().includes(query))
         );
 
-      log('debug', scriptName, functionName, `🔍 Filter results for "${query}": ${filtered.length} matches`);
+      log('debug', scriptName, innerFunctionName, `🔍 Filter results for "${query}": ${filtered.length} matches`);
 
       if (!filtered.length) {
-        log('warn', scriptName, functionName, `⚠️ No matches found in '${inputName}' for query '${query}'`);
+        log('warn', scriptName, innerFunctionName, `⚠️ No matches found in '${inputName}' for query '${query}'`);
         autocompleteList.style.display = 'none';
         return;
       }
@@ -138,12 +135,12 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
       div.textContent = item.email ? `${fullName} (${item.email})` : fullName;
 
       div.addEventListener('click', () => {
-        const functionName = 'click:addItem';
+        const clickFunctionName = 'click:addItem';
         addItem(item);
         input.value = '';
         autocompleteList.innerHTML = '';
         autocompleteList.style.display = 'none';
-        log('info', scriptName, functionName, `➕ Selected '${fullName}' (ID: ${item.id})`);
+        log('info', scriptName, clickFunctionName, `➕ Selected '${fullName}' (ID: ${item.id})`);
       });
 
       autocompleteList.appendChild(div);
@@ -153,28 +150,28 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
   }
 
   input.addEventListener('keydown', (e) => {
-    const functionName = 'keydown:navigate';
+    const innerFunctionName = 'keydown:navigate';
     const items = autocompleteList.querySelectorAll('.autocomplete-item');
 
-    log('debug', scriptName, functionName, `⌨️ Key pressed: ${e.key}`);
+    log('debug', scriptName, innerFunctionName, `⌨️ Key pressed: ${e.key}`);
 
     if (e.key === 'ArrowDown') {
       highlightIndex = (highlightIndex + 1) % items.length;
-      log('debug', scriptName, functionName, `⬇️ Arrow down: highlight index ${highlightIndex}`);
+      log('debug', scriptName, innerFunctionName, `⬇️ Arrow down: highlight index ${highlightIndex}`);
     } else if (e.key === 'ArrowUp') {
       highlightIndex = (highlightIndex - 1 + items.length) % items.length;
-      log('debug', scriptName, functionName, `⬆️ Arrow up: highlight index ${highlightIndex}`);
+      log('debug', scriptName, innerFunctionName, `⬆️ Arrow up: highlight index ${highlightIndex}`);
     } else if (e.key === 'Enter' || e.key === 'Tab') {
       if (highlightIndex >= 0 && highlightIndex < items.length) {
         e.preventDefault();
-        log('debug', scriptName, functionName, `✅ Selection confirmed for item at index ${highlightIndex}`);
+        log('debug', scriptName, innerFunctionName, `✅ Selection confirmed for item at index ${highlightIndex}`);
         items[highlightIndex].click();
       }
     } else if (e.key === 'Backspace' && input.value === '' && selected.length > 0) {
       const removed = selected.pop();
       const removedName = removed.name || `${removed.first_name || ''} ${removed.last_name || ''}`.trim();
       renderBadges();
-      log('info', scriptName, functionName, `🗑️ Removed last item: ${removedName} (ID: ${removed.id})`);
+      log('info', scriptName, innerFunctionName, `🗑️ Removed last item: ${removedName} (ID: ${removed.id})`);
     }
 
     items.forEach((item, i) => {
@@ -183,36 +180,38 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
   });
 
   document.addEventListener('click', (e) => {
-    const functionName = 'document:click';
+    const innerFunctionName = 'document:click';
     if (!container.contains(e.target)) {
       autocompleteList.style.display = 'none';
-      log('debug', scriptName, functionName, `👆 Click outside container, hiding dropdown`);
+      log('debug', scriptName, innerFunctionName, `👆 Click outside container, hiding dropdown`);
     }
   });
 
   function addItem(item) {
-    const functionName = 'addItem';
+    const innerFunctionName = 'addItem';
     const fullName = item.name || `${item.first_name || ''} ${item.last_name || ''}`.trim();
     selected.push(item);
     renderBadges();
-    log('info', scriptName, functionName, `🏷️ Added: ${fullName} (ID: ${item.id})`);
+    log('info', scriptName, innerFunctionName, `🏷️ Added: ${fullName} (ID: ${item.id})`);
   }
 
   function removeItem(id) {
-    const functionName = 'removeItem';
+    const innerFunctionName = 'removeItem';
     const itemToRemove = selected.find(i => i.id === id);
-    const itemName = itemToRemove ? (itemToRemove.name || `${itemToRemove.first_name || ''} ${itemToRemove.last_name || ''}`.trim()) : 'unknown';
+    const itemName = itemToRemove
+      ? (itemToRemove.name || `${itemToRemove.first_name || ''} ${itemToRemove.last_name || ''}`.trim())
+      : 'unknown';
 
     selected = selected.filter(i => i.id !== id);
     renderBadges();
-    log('info', scriptName, functionName, `➖ Removed: ${itemName} (ID: ${id})`);
+    log('info', scriptName, innerFunctionName, `➖ Removed: ${itemName} (ID: ${id})`);
   }
 
   function renderBadges() {
-    const functionName = 'renderBadges';
+    const innerFunctionName = 'renderBadges';
     badgeContainer.innerHTML = '';
 
-    log('debug', scriptName, functionName, `🔄 Rendering ${selected.length} badges`);
+    log('debug', scriptName, innerFunctionName, `🔄 Rendering ${selected.length} badges`);
 
     selected.forEach(item => {
       const badge = document.createElement('div');
@@ -239,8 +238,10 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
     });
 
     const selectedIds = selected.map(item => item.id);
-    log('debug', scriptName, functionName, `🏷️ Updated badges. Current selection IDs:`, selectedIds);
+    log('debug', scriptName, 'renderBadges', `🏷️ Updated badges. Current selection IDs:`, selectedIds);
   }
+
+  return fetchPromise;
 }
 
 /**
@@ -250,19 +251,20 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
  * @param {string} config[].selector - CSS selector for the input field
  * @param {string} config[].dataUrl - URL endpoint to fetch autocomplete data
  * @param {string} config[].inputName - Name of the input field
+ * @returns {Promise<void>} - Resolves when all autocomplete fields have been set up.
  */
 export function initAutoCompleteFields(config = []) {
   console.log('🚀 initAutoCompleteFields called with', config.length, 'fields');
   log("info", scriptName, "initAutoCompleteFields", `📋 Initializing ${config.length} autocomplete fields`);
 
-  config.forEach(fieldConfig => {
+  const promises = config.map(fieldConfig => {
     const input = document.querySelector(fieldConfig.selector);
     if (input) {
       try {
         const initialIds = JSON.parse(input.dataset.initial || '[]');
         log("info", scriptName, "initAutoCompleteFields", `🔍 Found input ${fieldConfig.selector} with initial data:`, initialIds);
 
-        setupAutoComplete({
+        return setupAutoComplete({
           inputSelector: fieldConfig.selector,
           dataUrl: fieldConfig.dataUrl,
           inputName: fieldConfig.inputName,
@@ -270,11 +272,15 @@ export function initAutoCompleteFields(config = []) {
         });
       } catch (e) {
         log("error", scriptName, "initAutoCompleteFields", `❌ Error parsing initial data for ${fieldConfig.selector}:`, e);
+        return Promise.resolve();
       }
     } else {
       log("warn", scriptName, "initAutoCompleteFields", `⚠️ No input field found with selector '${fieldConfig.selector}'`);
+      return Promise.resolve();
     }
   });
 
-  log("info", scriptName, "initAutoCompleteFields", "✅ Autocomplete initialization complete");
+  return Promise.all(promises).then(() => {
+    log("info", scriptName, "final", "✅ Autocomplete initialization complete");
+  });
 }

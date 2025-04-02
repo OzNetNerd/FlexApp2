@@ -2,6 +2,9 @@ import logging
 from typing import Optional, Any, Dict, List
 from dataclasses import dataclass, field
 from flask import url_for
+from flask_login import current_user
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +25,7 @@ class ResourceContext:
     title: str
     read_only: bool
 
+    current_user: Any = field(init=False)
     item: Optional[str] = None
     error_message: Optional[str] = None
     autocomplete_fields: List[dict] = field(default_factory=list)  # Use default_factory=list instead of None
@@ -35,6 +39,7 @@ class ResourceContext:
 
     def __post_init__(self):
         # Set derived fields
+        self.current_user = current_user
         self.submit_url = url_for(f"{self.blueprint_name}.create") if not self.read_only else ""
         self.model_name = self.model.__name__
         self.id = str(self.item_dict.get("id", ""))

@@ -1,7 +1,7 @@
 
-<!-- START TEMPLATE: _pills_nav_content.html -->
+<!-- START TEMPLATE: _section_layout.html -->
 {# ------------------------------------------------------------------------------
-  File: _pills_nav_content.html | Purpose: Tab + section-based form layout
+  File: _section_layout.html | Purpose: Tab + section-based form layout
   Inputs:
     - fields: List of field objects (with optional tab/section/name)
     - read_only: Boolean for rendering readonly mode
@@ -10,12 +10,9 @@
     - Sections per tab
     - Field rows per section (responsive grid)
   Dependencies:
-    - macros/form_fields.html
     - _crisp.html for crisp field in readonly mode
     - logger.js for structured logging
 ------------------------------------------------------------------------------ #}
-
-{% import "macros/form_fields.html" as macros %}
 
 {# Group fields by tab #}
 {%- set tabs = {} -%}
@@ -75,10 +72,10 @@
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
   const tabs = {{ tabs.keys() | list | tojson | safe }};
-  log("info", "_pills_nav_content.html", "tabs", "🧩 Tabs generated from field definitions", tabs);
+  log("info", "_section_layout.html", "tabs", "🧩 Tabs generated from field definitions", tabs);
   {%- for tab, tab_fields in tabs.items() %}
     const sections_{{ loop.index }} = {{ tab_fields | map(attribute='section') | list | unique | tojson | safe }};
-    log("debug", "_pills_nav_content.html", "tabs", "📁 Sections under tab: {{ tab }}", sections_{{ loop.index }});
+    log("debug", "_section_layout.html", "tabs", "📁 Sections under tab: {{ tab }}", sections_{{ loop.index }});
   {%- endfor %}
 </script>
-<!-- END TEMPLATE: _pills_nav_content.html -->
+<!-- END TEMPLATE: _section_layout.html -->

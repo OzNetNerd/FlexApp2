@@ -3,35 +3,18 @@
   File: render_form.html
   Purpose: Macro to render a full form with grouped sections and buttons
   Imports:
-    - render_sections.html → sections_macros (used to group and render sectioned fields)
-  Macro:
-    - render_form(fields_by_section, submit_url, button_text, read_only, edit_url)
-      Renders a complete HTML form with fields grouped by section
-  Inputs:
-    - fields_by_section : dict[str, list[TabEntry]] — section name to fields
-    - submit_url        : str — target URL for form submission
-    - button_text       : str — text on the submit button
-    - read_only         : bool — toggle for read-only mode
-    - edit_url          : str | None — optional edit button destination
-  Output:
-    - HTML form with CSRF, dynamic section rendering, buttons
-  Notes:
-    - Logs render context to JS console for debugging
-    - Handles edit/view-only dual-purpose rendering
-    - CSRF token is only included if the form is editable
-    - Shows "Edit" button in read-only mode if edit_url is set
-    - Calls `render_sections` macro to lay out form fields from each section
+    - _render_sections.html → sections_macros (used to group and render sectioned fields)
 ------------------------------------------------------------------------------ #}
 
 {# Import section-rendering macro as alias for grouping inputs visually and semantically #}
-{% import "macros/form_fields/render_sections.html" as sections_macros %}
+{% import "macros/form_fields/_render_sections.html" as sections_macros %}
 
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
   const filename = "render_form.html";
 
   log("info", filename, "init", "📦 Loaded form rendering macro");
-  log("debug", filename, "import", "🔗 Imported sections_macros from render_sections.html");
+  log("debug", filename, "import", "🔗 Imported sections_macros from _render_sections.html");
 </script>
 
 {# Main macro to render a form — used across create, edit, and view pages #}
@@ -62,16 +45,6 @@
     {# Render grouped form fields using imported sections macro #}
     {{ sections_macros.render_sections(fields_by_section, read_only) }}
 
-    {#
-      Action buttons section — show different buttons depending on read-only mode.
-      - If read_only is True and edit_url is provided:
-          → Show an "Edit" button linking to the edit form.
-          → Show a "Back" button that navigates to the previous page.
-      - If read_only is False:
-          → Show a "Cancel" button linking to the previous page.
-          → Show a "Submit" button to save the form.
-      - Icons and text adjust dynamically to reflect the current mode.
-    #}
     <div class="d-flex justify-content-between mt-4">
       <a href="#" class="btn btn-outline-secondary" id="cancel-button">
         <i class="fas fa-{{ 'arrow-left' if read_only else 'times' }} me-1"></i> {{ 'Back' if read_only else 'Cancel' }}

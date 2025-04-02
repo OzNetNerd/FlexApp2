@@ -1,10 +1,10 @@
 # app/routes/web/users.py
 
-from app.models import User, Note
+from app.models import User
 from app.routes.web import users_bp
 from app.routes.web.generic import GenericWebRoutes
 import logging
-from app.routes.ui.users import get_users_tabs
+from routes.base.ui.users import get_users_tabs
 
 
 logger = logging.getLogger(__name__)
