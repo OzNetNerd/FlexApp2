@@ -183,6 +183,11 @@ class ExpertiseAndProjectsTab(TabBuilder):
     item: Any
     tab_name: str = "Expertise and Projects"
 
+    def __post_init__(self):
+        self.section_method_order = [
+            self._expertise_section,
+        ]
+
     def _expertise_section(self):
         section_name = "Expertise and Projects"
         expertise_section = TabSection(
@@ -205,4 +210,9 @@ class ExpertiseAndProjectsTab(TabBuilder):
         return expertise_section
 
 def contacts_tabs(item):
-    return SkillsAndTechnologiesTab(item).create_tab()
+    tabs = []
+
+    for tab in [BasicInfoTab, RoleAndResponsibilitiesTab, SkillsAndTechnologiesTab, ExpertiseAndProjectsTab]:
+        tabs.append(tab.create_tab(item))
+
+    return tabs
