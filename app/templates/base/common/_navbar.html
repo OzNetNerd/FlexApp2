@@ -12,7 +12,7 @@
     - Bootstrap 5 responsive nav
     - Dynamic user avatar and links
     - Logger for template state and debugging
-------------------------------------------------------------------------------
+------------------------------------------------------------------------------ #}
 
 {%- set nav_items = [
   {'name': 'companies', 'display_name': 'Companies', 'icon': 'fa-building'},
@@ -22,15 +22,14 @@
   {'name': 'tasks', 'display_name': 'Tasks', 'icon': 'fa-tasks'}
 ] -%}
 
-<!-- Logger for Template Initialization -->
+{# Log Initial Template Load #}
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
   log("info", "_navbar.html", "init", "🚀 Template _navbar.html loaded");
-  log("debug", "_navbar.html", "context", "📦 nav_items loaded", {{ nav_items | tojson | safe }});
-  log("debug", "_navbar.html", "context", "🔎 request.endpoint", {{ request.endpoint | tojson | safe }});
-  log("debug", "_navbar.html", "context", "🧑 current_user.is_authenticated", {{ current_user.is_authenticated | tojson | safe }});
-  log("debug", "_navbar.html", "context", "🧑 current_user.name", {{ (current_user.name if current_user.is_authenticated else "Guest") | tojson | safe }});
 </script>
+
+{# Set Context Variables (precompute values to avoid inline logic in HTML) #}
+{% set show_navbar = show_navbar %}
 
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top bg-white">
   <div class="container">
@@ -61,10 +60,7 @@
         {%- endfor %}
 
         {% block additional_nav_items %}
-          <script type="module">
-            import log from "{{ url_for('static', filename='js/logger.js') }}";
-            log("info", "_navbar.html", "block", "🧩 Block 'additional_nav_items' overridden or included");
-          </script>
+          <!-- Custom nav items injected here -->
         {% endblock %}
       </ul>
 
@@ -131,10 +127,10 @@
   </div>
 </nav>
 
-<!-- Final Debug Logger -->
+<!-- Log Final Template Render -->
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
   log("info", "_navbar.html", "final", "✅ Navbar rendered successfully");
 </script>
+
 <!-- END TEMPLATE: _navbar.html -->
-#}

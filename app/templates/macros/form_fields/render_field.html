@@ -8,9 +8,9 @@
   <body>
     {% include "base/common/_toasts.html" %}
 
-    {%- if show_navbar is not defined or show_navbar %}
-      {% include 'base/common/_navbar.html' %}
-    {%- endif %}
+    {%- set show_navbar = show_navbar %}  {# Precompute the variable before including #}
+
+    {% include 'base/common/_navbar.html' %}  {# No 'with' needed anymore #}
 
     <main class="py-4">
       <div class="container">
@@ -19,7 +19,7 @@
             <div class="row align-items-center">
               <div class="col">
                 <div class="d-flex align-items-center">
-                 {# {% include 'create_view_edit/components/_header.html' %}  #}
+                  {# {% include 'create_view_edit/components/_header.html' %}  #}
                 </div>
               </div>
               <div class="col-auto">
@@ -51,10 +51,10 @@
     <script type="module">
       import log from "{{ url_for('static', filename='js/logger.js') }}";
       const context = {
-        title: {{ title | tojson }},
+        title: "{{ title }}",  {# Precomputed values before passing into JS #}
         readOnly: {{ read_only | tojson }},
         hasUi: {{ ui is defined and ui is not none | tojson }},
-        layout: {{ ("Tabbed" if ui else "Sectioned") | tojson }},
+        layout: "{{ 'Tabbed' if ui else 'Sectioned' }}",
         includes: [
           "create_view_edit/components/_header.html",
           "base/common/_toasts.html",
@@ -89,4 +89,4 @@
     {%- endif %}
   </body>
 </html>
-<!-- END TEMPLATE: create_view_edit.html -->
+<!-- END TEMPLATE: render_field.html -->

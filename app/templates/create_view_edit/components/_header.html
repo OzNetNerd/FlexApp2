@@ -35,14 +35,15 @@
   import log from "{{ url_for('static', filename='js/logger.js') }}";
 
   const headerContext = {
-    title: {{ title | tojson | safe }},
-    model: {{ model_name | tojson | safe }},
-    itemName: {{ item_name | tojson | safe }},
-    readOnly: {{ read_only | tojson | safe }},
+    title: "{{ title }}",  // Precomputed values before passing them into JS
+    model: "{{ model_name }}",
+    itemName: "{{ item_name }}",
+    readOnly: {{ read_only | tojson }},
     hasId: {{ id is defined and id is not none | tojson }},
     hasUi: {{ ui is defined and ui is not none | tojson }}
   };
 
   log("info", "_header.html", "render", "🧠 Header context", headerContext);
 </script>
+
 <!-- END TEMPLATE: _header.html -->
