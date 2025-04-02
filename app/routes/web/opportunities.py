@@ -55,6 +55,14 @@ class OpportunityCRUDRoutes(GenericWebRoutes):
             return form_data
 
 
+# Set up CRUD routes for managing opportunities within the 'opportunities_bp' blueprint.
+# This configures routes for creating, reading, updating, and deleting opportunities.
+# The setup includes:
+# - The `Opportunity` model as the target for CRUD operations.
+# - A required field for opportunity creation: `name`.
+# - No uniqueness constraint is applied to any fields.
+# - The template used for rendering the opportunities table: `entity_tables/opportunities.html`.
+# - A custom function (`get_opportunity_tabs`) to define the tabs displayed on the opportunity creation page.
 opportunity_routes = OpportunityCRUDRoutes(
     blueprint=opportunities_bp,
     model=Opportunity,

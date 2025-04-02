@@ -19,7 +19,14 @@ class TaskCRUDRoutes(GenericWebRoutes):
         pass
 
 
-# Set up the CRUD routes for tasks
+# Set up CRUD routes for managing tasks within the 'tasks_bp' blueprint.
+# This configures routes for creating, reading, updating, and deleting tasks.
+# The setup includes:
+# - The `Task` model as the target for CRUD operations.
+# - Required fields for task creation: `title` and `status`.
+# - No uniqueness constraint is applied to any fields.
+# - The template used for rendering the tasks table: `entity_tables/tasks.html`.
+# - A custom function (`get_task_tabs`) to define the tabs displayed on the task creation page.
 logger.debug("Setting up CRUD routes for Task model.")
 task_routes = TaskCRUDRoutes(
     model=Task,

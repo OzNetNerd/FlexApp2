@@ -14,7 +14,14 @@ class UserCRUDRoutes(GenericWebRoutes):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-# Set up the CRUD routes for users
+# Set up CRUD routes for managing users within the 'users_bp' blueprint.
+# This configures routes for creating, reading, updating, and deleting users.
+# The setup includes:
+# - The `User` model as the target for CRUD operations.
+# - Required fields for user creation: `username`, `name`, and `email`.
+# - A uniqueness constraint on the `username` field to prevent duplicate entries.
+# - The template used for rendering the users table: `entity_tables/users.html`.
+# - A custom function (`get_users_tabs`) to define the tabs displayed on the user creation page.
 logger.debug("Setting up CRUD routes for User model.")
 user_routes = UserCRUDRoutes(
     model=User,

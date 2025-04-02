@@ -6,9 +6,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-__all__ = ["BasicInfoTab", "RoleAndResponsibilitiesTab", "SkillsAndTechnologiesTab", "ExpertiseAndProjectsTab"]
-
-
 @dataclass
 class BasicInfoTab(TabBuilder):
     item: Any
