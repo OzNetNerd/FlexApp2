@@ -1,28 +1,138 @@
-<!-- START TEMPLATE: _footer.html -->
+<!-- START TEMPLATE: _footer_buttons.html -->
 {# ------------------------------------------------------------------------------
-  File: _footer.html | Purpose: Render form footer with submit/cancel buttons
+  File: _footer_buttons.html | Purpose: Render form footer with submit/cancel buttons
   Features:
     - Adaptive button text (Create/Update based on id presence)
     - Cancel routes to view or index
 ------------------------------------------------------------------------------ #}
 
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  log("info", "_footer_buttons.html", "init", "🚀 Footer buttons template loaded");
+  log("debug", "_footer_buttons.html", "config", "Has ID: {{ id is defined and id is not none }}");
+  log("debug", "_footer_buttons.html", "route", "Current endpoint: {{ request.endpoint }}");
+
+  {% if id is defined and id is not none %}
+    log("debug", "_footer_buttons.html", "item_id", "Working with item ID: {{ id }}");
+  {% else %}
+    log("debug", "_footer_buttons.html", "item_id", "No item ID provided - new item mode");
+  {% endif %}
+</script>
+
 <div class="d-flex justify-content-end mt-4">
   <div class="d-flex gap-2">
     {% if id %}
+      <script type="module">
+        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        log("debug", "_footer_buttons.html", "mode", "Edit mode - rendering Cancel and Update buttons");
+        log("debug", "_footer_buttons.html", "url_gen", "Generating view URL with item_id={{ id }}");
+      </script>
+
       <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}" class="btn btn-secondary">
         <i class="fas fa-times me-1"></i> Cancel
       </a>
+
+      <script type="module">
+        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        log("debug", "_footer_buttons.html", "button_rendered", "Cancel button rendered (links to view)");
+      </script>
+
       <button type="submit" class="btn btn-primary">
         <i class="fas fa-save me-1"></i> Update
       </button>
+
+      <script type="module">
+        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        log("debug", "_footer_buttons.html", "button_rendered", "Update button rendered with save icon");
+      </script>
     {% else %}
+      <script type="module">
+        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        log("debug", "_footer_buttons.html", "mode", "Create mode - rendering Cancel and Create buttons");
+        log("debug", "_footer_buttons.html", "url_gen", "Generating index URL for Cancel button");
+      </script>
+
       <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
         <i class="fas fa-times me-1"></i> Cancel
       </a>
-      <button type="submit" class="btn btn-primary">
-        <i class="fas fa-plus me-1"></i> Update
-      </button>
+
+      <script type="module">
+        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        log("debug", "_footer_buttons.html", "button_rendered", "Cancel button rendered (links to index)");
+      </script>
+
+_text", "Note: Fixed button text from 'Update' to 'Create' in new item mode");
+      </script>
     {% endif %}
   </div>
 </div>
-<!-- END TEMPLATE: _footer.html -->
+
+<!-- 🦶 Footer Buttons Context Logging -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  const context = {
+    hasId: {{ (id is defined and id is not none) | tojson }},
+    endpoint: "{{ request.endpoint }}",
+    baseRoute: "{{ request.endpoint.rsplit('.', 1)[0] }}",
+    buttons: []
+  };
+
+  if (context.hasId) {
+    context.buttons.push("Cancel (to view)", "Update");
+    context.cancelTarget = "view";
+  } else {
+    context.buttons.push("Cancel (to index)", "Create");
+    context.cancelTarget = "index";
+  }
+
+  log("info", "_footer_buttons.html", "render", "🔘 Footer buttons render context", context);
+
+  // DOM verification on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const footerContainer = document.querySelector('.d-flex.justify-content-end.mt-4');
+    if (footerContainer) {
+      const buttonCount = footerContainer.querySelectorAll('a, button').length;
+      log("debug", "_footer_buttons.html", "dom_check", `Footer container found with ${buttonCount} controls`);
+
+      if (buttonCount !== context.buttons.length) {
+        log("warn", "_footer_buttons.html", "dom_check", `Expected ${context.buttons.length} buttons but found ${buttonCount}`);
+      } else {
+        log("info", "_footer_buttons.html", "dom_check", "All expected buttons are present in the DOM");
+      }
+
+      // Check for form enclosing the buttons (should be in a form for submit to work)
+      const isInForm = footerContainer.closest('form') !== null;
+      if (isInForm) {
+        log("debug", "_footer_buttons.html", "dom_check", "Footer buttons are properly enclosed in a form element");
+      } else {
+        log("warn", "_footer_buttons.html", "dom_check", "Footer buttons are not in a form - submit button may not work");
+      }
+    } else {
+      log("warn", "_footer_buttons.html", "dom_check", "Footer container not found in DOM");
+    }
+  });
+</script>
+
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  log("info", "_footer_buttons.html", "final", "✅ Footer buttons template finished rendering");
+
+  // Monitor button click events
+  document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('.d-flex.justify-content-end.mt-4 a, .d-flex.justify-content-end.mt-4 button');
+    buttons.forEach(button => {
+      button.addEventListener('click', (event) => {
+        const buttonText = button.textContent.trim();
+        const isSubmit = button.getAttribute('type') === 'submit';
+
+        if (isSubmit) {
+          log("info", "_footer_buttons.html", "interaction", `Form submit initiated via ${buttonText} button`);
+        } else {
+          log("info", "_footer_buttons.html", "interaction", `Navigation button clicked: ${buttonText}`);
+        }
+      });
+    });
+  });
+</script>
+<!-- END TEMPLATE: _footer_buttons.html -->
