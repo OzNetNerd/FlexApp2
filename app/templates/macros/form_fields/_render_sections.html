@@ -1,0 +1,24 @@
+<!-- START TEMPLATE: _render_sections.html -->
+{# ------------------------------------------------------------------------------
+  File: _render_sections.html
+  Purpose: Macro to render grouped form fields
+------------------------------------------------------------------------------ #}
+
+{# Removed the circular import to break the dependency:
+    {% import "macros/form_fields/render_form.html" as form %}
+#}
+
+{% macro render_sections(fields_by_section, read_only) %}
+  {# Loop through each section and render its fields #}
+  {% for section, fields in fields_by_section.items() %}
+    <div class="form-section">
+      <h4>{{ section }}</h4>
+      {% for field in fields %}
+        <div class="form-group">
+          {{ field.label }} {{ field.input }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+{% endmacro %}
+<!-- END TEMPLATE: _render_sections.html -->
