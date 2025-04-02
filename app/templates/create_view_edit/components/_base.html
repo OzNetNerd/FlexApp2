@@ -2,13 +2,84 @@
 <html lang="en">
   {% include 'base/common/_head.html' %}
   <body>
+    <script type="module">
+      import log from "{{ url_for('static', filename='js/logger.js') }}";
+      log("info", "base_template", "init", "🚀 Base template loaded");
+      log("debug", "base_template", "structure", "Starting template structure rendering");
+    </script>
+
     {% include 'base/common/_toasts.html' %}
+
+    <script type="module">
+      import log from "{{ url_for('static', filename='js/logger.js') }}";
+      log("debug", "base_template", "component", "Toasts component included");
+    </script>
+
     {% include 'base/common/_navbar.html' %}
+
+    <script type="module">
+      import log from "{{ url_for('static', filename='js/logger.js') }}";
+      log("debug", "base_template", "component", "Navbar component included");
+    </script>
+
+    {% include 'create_view_edit/components/_header_buttons.html' %}
+
+    <script type="module">
+      import log from "{{ url_for('static', filename='js/logger.js') }}";
+      log("debug", "base_template", "component", "Header buttons component included at top of page");
+    </script>
+
     <main class="py-4">
       <div class="container">
+        <script type="module">
+          import log from "{{ url_for('static', filename='js/logger.js') }}";
+          log("debug", "base_template", "content", "Rendering main content block");
+        </script>
+
         {% block content %}{% endblock %}
+
+        <script type="module">
+          import log from "{{ url_for('static', filename='js/logger.js') }}";
+          log("debug", "base_template", "content", "Content block rendering complete");
+        </script>
       </div>
     </main>
+
     {% include 'create_view_edit/components/_scripts.html' %}
+
+    <script type="module">
+      import log from "{{ url_for('static', filename='js/logger.js') }}";
+      log("debug", "base_template", "component", "Scripts component included");
+      log("info", "base_template", "final", "✅ Base template finished rendering");
+
+      // DOM verification on load
+      document.addEventListener('DOMContentLoaded', () => {
+        log("info", "base_template", "dom_ready", "DOM content loaded event fired");
+
+        // Check key components
+        const navbar = document.querySelector('nav');
+        const headerButtons = document.querySelector('.header-buttons-container'); // Assuming this class exists in the component
+        const mainContent = document.querySelector('main');
+
+        if (navbar) {
+          log("debug", "base_template", "dom_check", "Navbar found in DOM");
+        } else {
+          log("warn", "base_template", "dom_check", "Navbar not found in DOM");
+        }
+
+        if (headerButtons) {
+          log("debug", "base_template", "dom_check", "Header buttons found in DOM");
+          log("debug", "base_template", "layout", "Header buttons positioned correctly after navbar");
+        } else {
+          log("warn", "base_template", "dom_check", "Header buttons not found in DOM");
+        }
+
+        if (mainContent) {
+          log("debug", "base_template", "dom_check", "Main content container found in DOM");
+        } else {
+          log("warn", "base_template", "dom_check", "Main content container not found in DOM");
+        }
+      });
+    </script>
   </body>
 </html>
