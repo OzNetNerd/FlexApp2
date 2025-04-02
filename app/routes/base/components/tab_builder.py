@@ -30,7 +30,7 @@ class TabBuilder:
     item: Any
     tab_name: str
     # order the sections will be displayed
-    section_method_order: List[Callable]
+    section_method_order: List[TabSection]
 
     def _metadata_section(self):
         section_name = "Metadata"
@@ -47,14 +47,6 @@ class TabBuilder:
         """
         Creates a Tab object with the given tab_name and list of TabSection objects.
         """
-        # Call each method to generate the sections only when needed (in create_tab)
-        all_tab_sections = [method() for method in self.section_method_order]
-
-        logger.info(f"Creating {self.tab_name} tab")
-        for tab_section in all_tab_sections:
-            logger.debug(f"Finished creating {tab_section.section_name} section: {tab_section}")
-
-        tab = Tab(tab_name=self.tab_name, sections=all_tab_sections)
-        logger.info(f"Finished creating {self.tab_name} section")
-        logger.debug(f"{self.tab_name}: {tab}")
+        tab = Tab(tab_name=self.tab_name, sections=self.section_method_order)
+        logger.debug(f"{self.tab_name} tabbing: {tab}")
         return tab

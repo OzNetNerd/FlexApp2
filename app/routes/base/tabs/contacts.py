@@ -10,6 +10,13 @@ logger = logging.getLogger(__name__)
 class BasicInfoTab(TabBuilder):
     item: Any
     tab_name: str = "Basic Info"
+    section_method_order: List[Callable] = field(init=False)
+
+    def __post_init__(self):
+        self.section_method_order = [
+            self._basic_info_section,
+            self._role_info_section,
+        ]
 
     def _basic_info_section(self):
         section_name = "Contact"
@@ -50,6 +57,12 @@ class BasicInfoTab(TabBuilder):
 class RoleAndResponsibilitiesTab(TabBuilder):
     item: Any
     tab_name: str = "Roles and Responsibilities"
+    section_method_order: List[Callable] = field(init=False)
+
+    def __post_init__(self):
+        self.section_method_order = [
+            self._role_responsibilities_section,
+        ]
 
     def _role_responsibilities_section(self):
         section_name = "Role and Responsibilities"
@@ -182,6 +195,7 @@ class SkillsAndTechnologiesTab(TabBuilder):
 class ExpertiseAndProjectsTab(TabBuilder):
     item: Any
     tab_name: str = "Expertise and Projects"
+    section_method_order: List[Callable] = field(init=False)
 
     def __post_init__(self):
         self.section_method_order = [
@@ -213,6 +227,6 @@ def contacts_tabs(item):
     tabs = []
 
     for tab in [BasicInfoTab, RoleAndResponsibilitiesTab, SkillsAndTechnologiesTab, ExpertiseAndProjectsTab]:
-        tabs.append(tab.create_tab(item))
+        tabs.append(tab(item).create_tab())
 
     return tabs
