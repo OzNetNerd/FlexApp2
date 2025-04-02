@@ -11,7 +11,7 @@ class TabEntry:
     label: str
     type: str
     required: bool = False
-    options: Optional[List[dict[str, Any]]] = None
+    options: Optional[List[Any]] = None
     default: Optional[Any] = None
     value: Optional[Any] = None
 
@@ -30,7 +30,7 @@ class TabBuilder:
     item: Any
     tab_name: str
     # order the sections will be displayed
-    section_method_order: List[TabSection]
+    section_method_order: List[Callable]
 
     def _metadata_section(self):
         section_name = "Metadata"
@@ -47,6 +47,8 @@ class TabBuilder:
         """
         Creates a Tab object with the given tab_name and list of TabSection objects.
         """
-        tab = Tab(tab_name=self.tab_name, sections=self.section_method_order)
+        # Call each section method to get the actual TabSection objects
+        sections = [method() for method in self.section_method_order]
+        tab = Tab(tab_name=self.tab_name, sections=sections)
         logger.debug(f"{self.tab_name} tabbing: {tab}")
         return tab

@@ -1,65 +1,42 @@
 <!-- START TEMPLATE: _section_layout.html -->
-{# ------------------------------------------------------------------------------
-  File: _section_layout.html | Purpose: Tab + section-based form layout
-  Inputs:
-    - fields: List of field objects (each may have optional properties:
-      tab, section, name, etc.)
-    - read_only: Boolean flag to determine if fields are rendered in read-only mode
-  Structure:
-    - Uses Bootstrap tabs for top-level grouping
-    - Groups fields by tab and then by section within each tab
-    - Each section is rendered in a card layout with a responsive grid for fields
-  Dependencies:
-    - A logger.js module for structured logging
------------------------------------------------------------------------------- #}
+{# Import the field macros - adjust the path if your macros are located elsewhere #}
+{% import 'create_view_edit/macros/render_field.html' as field_macros with context %}
 
-{% if fields %}
-  {# Group fields by their tab property (default to "Other" if not provided) #}
-  {%- set tabs = {} -%}
-  {%- for field in fields -%}
-    {%- set tab = field.tab or 'Other' -%}
-    {%- if tab not in tabs -%}
-      {%- set _ = tabs.update({tab: []}) -%}
-    {%- endif -%}
-    {%- set _ = tabs[tab].append(field) -%}
-  {%- endfor %}
-
+{% if tabs %}
   <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
-    {%- for tab in tabs.keys() %}
+    {%- for tab in tabs %}
       <li class="nav-item" role="presentation">
         <button class="nav-link {% if loop.first %}active{% endif %}"
-                id="tab-{{ tab | lower | replace(' ', '-') }}-tab"
+                id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
                 data-bs-toggle="tab"
-                data-bs-target="#tab-{{ tab | lower | replace(' ', '-') }}"
+                data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
                 type="button"
                 role="tab">
-          {{ tab }}
+          {{ tab.tab_name }}
         </button>
       </li>
     {%- endfor %}
   </ul>
 
   <div class="tab-content" id="formTabsContent">
-    {%- for tab, tab_fields in tabs.items() %}
+    {%- for tab in tabs %}
       <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
-           id="tab-{{ tab | lower | replace(' ', '-') }}"
+           id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
            role="tabpanel">
-        {# Group fields within the current tab by their section property #}
-        {%- set grouped_by_section = tab_fields | groupby('section') -%}
-        {%- for section, section_fields in grouped_by_section %}
+        {%- for section in tab.sections %}
           <div class="card shadow-sm border-0 mb-4">
             <div class="card-header bg-white">
               <h5 class="h6 text-primary fw-semibold mb-0">
-                {{ section or 'General' }}
+                {{ section.section_name or 'General' }}
               </h5>
             </div>
             <div class="card-body">
               <div class="row g-3">
-                {%- for field in section_fields %}
-                  {%- if field.name == 'crisp' and read_only %}
+                {%- for field in section.entries %}
+                  {%- if field.entry_name == 'crisp' and read_only %}
                     {% include 'pages/components/_crisp.html' with context %}
                   {%- else %}
-                    {{ macros.field.render_field(field, read_only) }}
+                    {{ field_macros.render_field(field, read_only) }}
                   {%- endif %}
                 {%- endfor %}
               </div>
@@ -76,28 +53,25 @@
     const scriptName = '_section_layout.html';
     const functionName = 'template_render';
 
-    const tabNames = {{ tabs.keys() | list | tojson | safe }};
-    log("info", scriptName, functionName, "🧩 Tabs generated from field definitions", tabNames);
+    const tabSummaries = {{ tabs | map(attribute='tab_name') | list | tojson | safe }};
+    log("info", scriptName, functionName, "🧩 Tabs rendered:", tabSummaries);
 
-    {%- for tab, tab_fields in tabs.items() %}
-      const sections_{{ loop.index }} = {{ tab_fields | map(attribute='section') | list | unique | tojson | safe }};
-      log("debug", scriptName, functionName, "📁 Sections under tab: {{ tab }}", sections_{{ loop.index }});
-      log("debug", scriptName, functionName, "🧮 Field count in tab '{{ tab }}':", {{ tab_fields | length }});
+    {%- for tab in tabs %}
+      {% set section_names = [] %}
+      {%- for section in tab.sections %}
+        {% set _ = section_names.append(section.section_name) %}
+      {%- endfor %}
+      const sectionsInTab_{{ loop.index }} = {{ section_names | tojson | safe }};
+      log("debug", scriptName, functionName, "📁 Sections in tab '{{ tab.tab_name }}':", sectionsInTab_{{ loop.index }});
     {%- endfor %}
-
-    if (tabNames.length === 0) {
-      log("warn", scriptName, functionName, "⚠️ No tabs found. Fallback rendering may be needed.");
-    } else {
-      log("info", scriptName, functionName, "✅ Tabs and sections rendered successfully.");
-    }
   </script>
 {% else %}
   <div class="alert alert-warning">
-    No fields available for display.
+    No tabs available for display.
   </div>
   <script type="module">
     import log from "{{ url_for('static', filename='js/logger.js') }}";
-    log("warn", "_section_layout.html", "template_render", "⚠️ No fields passed into template.");
+    log("warn", "_section_layout.html", "template_render", "⚠️ No tabs passed into template.");
   </script>
 {% endif %}
 <!-- END TEMPLATE: _section_layout.html -->
