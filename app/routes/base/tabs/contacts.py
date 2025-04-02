@@ -206,5 +206,4 @@ class ExpertiseAndProjectsTab(TabBuilder):
 
 def contacts_tabs(item):
     SkillsAndTechnologiesTab(item)
-
     pass

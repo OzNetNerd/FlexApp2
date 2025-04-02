@@ -38,6 +38,7 @@ class GenericWebRoutes(CRUDRoutesBase):
     unique_fields: List[str] = field(default_factory=list)
     index_template: str = GENERIC_TEMPLATE
     view_template: Optional[str] = "create_view_edit/view.html"
+    # view_template: Optional[str] = "tshoot.html"
     create_template: Optional[str] = "create_view_edit/create.html"
     edit_template: Optional[str] = "create_view_edit/edit.html"
     api_url_prefix: Optional[str] = None
