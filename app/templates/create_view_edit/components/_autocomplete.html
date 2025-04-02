@@ -1,32 +1,38 @@
-{% if autocomplete_fields %}
-  <div class="row">
-    {% for field in autocomplete_fields %}
-      <div class="col-md-6 mb-3">
-        <div class="card border-light h-100 shadow-sm">
-          <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-            <span class="fw-bold">{{ field.title }}</span>
+{% extends "create_view_edit/_create_view_edit.html" %}
+
+{% block content %}
+  <div class="tab-content">
+    {% for tab in ui %}
+      <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+           id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+           role="tabpanel"
+           aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
+        {% for section in tab.sections %}
+          <h5 class="mt-3">{{ section.section_name }}</h5>
+          <div class="row">
+            {% for entry in section.entries %}
+              {{ macros.render_field(entry) }}
+            {% endfor %}
           </div>
-          <div class="card-body">
-            <input
-              type="text"
-              id="{{ field.id }}"
-              class="form-control"
-              placeholder="{{ field.placeholder }}"
-              data-initial='{{ field.related_ids | default([]) | tojson }}'
-            >
-          </div>
-        </div>
+        {% endfor %}
       </div>
     {% endfor %}
   </div>
-{% else %}
-  <div class="col-12">
-    <div class="alert alert-info">
-      <i class="fas fa-info-circle me-2"></i> No mapping fields are configured for this entity.
-    </div>
-  </div>
-  <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
-    log("warn", "_autocomplete.html", "init", "⚠️ No autocomplete_fields found in context");
-  </script>
-{% endif %}
+
+  {# Include footer component #}
+  {% include 'base/components/_footer.html' %}
+
+  {# Add the main.js script which will handle autocomplete functionality #}
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  {# If there's an error, show a toast message using toasts.js #}
+  {% if error_message %}
+    <script type="module">
+      import { showToast } from "/static/js/toasts.js";
+      document.addEventListener('DOMContentLoaded', () => {
+        const message = {{ ("Error creating " ~ model_name ~ ": " ~ error_message) | tojson }};
+        showToast(message, "error");
+      });
+    </script>
+  {% endif %}
+{% endblock %}

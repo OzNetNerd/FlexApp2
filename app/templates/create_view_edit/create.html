@@ -1,4 +1,4 @@
-{% extends "create_view_edit/components/_create_view_edit.html" %}
+{% extends "create_view_edit/_create_view_edit.html" %}
 
 {% block content %}
   <div class="tab-content">
@@ -19,34 +19,18 @@
     {% endfor %}
   </div>
 
+  {# Autocomplete and footer components are included once here #}
   {% include 'base/components/_autocomplete.html' %}
   {% include 'base/components/_footer.html' %}
 
+  {# If there's an error, show a toast message using toasts.js #}
   {% if error_message %}
     <script type="module">
       import { showToast } from "/static/js/toasts.js";
-      import log from "/static/js/logger.js";
       document.addEventListener('DOMContentLoaded', () => {
         const message = {{ ("Error creating " ~ model_name ~ ": " ~ error_message) | tojson }};
         showToast(message, "error");
-        log("error", "create.html", "form_init", "❌ Error on create page", message);
       });
     </script>
   {% endif %}
-
-  <script type="module">
-    import { initAutoCompleteFields } from "/static/js/autoComplete.js";
-    initAutoCompleteFields();
-  </script>
-
-  <script type="module">
-    import log from "/static/js/logger.js";
-    const context = {
-      mode: "create",
-      model: {{ model_name | tojson }},
-      fieldTabs: {{ ui | map(attribute='tab_name') | list | tojson }},
-      totalFields: {{ ui | sum(attribute='sections') | map(attribute='entries') | map('length') | sum }}
-    };
-    log("info", "create.html", "render", "📋 Create form loaded", context);
-  </script>
 {% endblock %}
