@@ -2,7 +2,7 @@ import logging
 from app.models import Company
 from app.routes.web import companies_bp
 from app.routes.web.generic import GenericWebRoutes
-from routes.base.ui.companies import get_company_tabs
+from app.routes.base.tabs.companies import get_company_tabs
 
 logger = logging.getLogger(__name__)
 

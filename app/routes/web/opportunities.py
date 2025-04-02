@@ -2,7 +2,7 @@ from app.models import Opportunity, Company, db
 from app.routes.web import opportunities_bp
 from app.routes.web.generic import GenericWebRoutes
 import logging
-from routes.base.ui.opportunities import get_opportunity_tabs
+from app.routes.base.tabs.opportunities import get_opportunity_tabs
 
 
 logger = logging.getLogger(__name__)

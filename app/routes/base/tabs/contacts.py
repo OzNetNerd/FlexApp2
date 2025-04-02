@@ -1,6 +1,6 @@
 from app.routes.base.components.tab_builder import TabSection, TabEntry, TabBuilder
-from dataclasses import dataclass
-from typing import Any
+from dataclasses import dataclass, field
+from typing import Any, List, Callable
 import logging
 
 logger = logging.getLogger(__name__)
@@ -86,6 +86,13 @@ class RoleAndResponsibilitiesTab(TabBuilder):
 class SkillsAndTechnologiesTab(TabBuilder):
     item: Any
     tab_name: str = "Skills and Technologies"
+    section_method_order: List[Callable] = field(init=False)
+
+    def __post_init__(self):
+        self.section_method_order = [
+            self._skill_level_section,
+            self._technologies_used_section,
+        ]
 
     def _skill_level_section(self):
         section_name = "Skill Level"
@@ -200,7 +207,7 @@ class ExpertiseAndProjectsTab(TabBuilder):
         )
         return expertise_section
 
-def contacts_tabs():
-    # use ALL HERE
+def create_contacts_tabs(item):
+    SkillsAndTechnologiesTab(item)
 
-    return tabs
+    pass
