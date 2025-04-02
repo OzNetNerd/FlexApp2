@@ -171,7 +171,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             model=self.model,
             blueprint_name=self.blueprint.name,
             item_dict=item_dict,
-            tabs=UI_TAB_MAPPING(item_dict),
+            tabs=UI_TAB_MAPPING[self.model](item_dict),
             title=f"Create a {self.model.__name__}",
             read_only=False
         )
@@ -196,7 +196,7 @@ class GenericWebRoutes(CRUDRoutesBase):
             blueprint_name=self.blueprint.name,
             item_dict=item_dict,
             item=None,  # Placeholder for additional item data if needed
-            tabs=UI_TAB_MAPPING(item_dict),
+            tabs=UI_TAB_MAPPING[self.model](item_dict),
             title=f"Edit",
             read_only=False
         )
@@ -447,12 +447,16 @@ class GenericWebRoutes(CRUDRoutesBase):
         #                     elif entry.entry_name == "companies" and 'related_companies' in item_dict:
         #                         entry.value = item_dict['related_companies']
 
+        logger.error(f'ITEM_DICT {item_dict}')
+        logger.error(f'MODEL NAME {self.model.__name__}')
+        logger.error(f'MAPPING {UI_TAB_MAPPING}')
+
         context = ResourceContext(
             model=self.model,
             blueprint_name=self.blueprint.name,
             item_dict=item_dict,
             item=None,  # Placeholder for additional item data if needed
-            tabs=UI_TAB_MAPPING(item_dict),
+            tabs=UI_TAB_MAPPING[self.model.__name__](item_dict),
             title="Viewing",
             read_only=True
         )
