@@ -1,0 +1,186 @@
+<!-- START TEMPLATE: _autocomplete.html -->
+{# ------------------------------------------------------------------------------
+  File: _autocomplete.html | Purpose: Render dynamic autocomplete fields
+  Inputs:
+    - autocomplete_fields: List of dictionaries with the following keys:
+        - title: string (display name of the field)
+        - id: string (HTML id for the input, without #)
+        - placeholder: string (placeholder text)
+        - name: string (form field name)
+        - data_url: string (API endpoint for data)
+        - related_ids: List[int] (related IDs)
+  Features:
+    - Bootstrap card-based inputs with data-initial JSON
+    - JS logs and parses initial values from data-initial attribute
+    - Automatically initializes autocomplete functionality via autoComplete.js
+    - Logs success and parse errors for diagnostics
+  Notes:
+    - The `autocomplete_fields` variable is passed from the Python backend to this template, and it contains the configuration for each autocomplete field.
+    - The `related_ids` are provided via the `data-initial` attribute, which is parsed by JavaScript to prepopulate the selected items in the autocomplete list.
+    - Hydrated by `autoComplete.js`, which initializes autocomplete functionality, fetches data from the specified `data_url`, and uses the `related_ids` for pre-selected values.
+    - JavaScript logs are included for diagnostics, such as successful parsing of `related_ids` and warnings if the values could not be parsed correctly.
+------------------------------------------------------------------------------ #}
+
+{% if autocomplete_fields %}
+  {% for field in autocomplete_fields %}
+  <!-- {{ field.title }} Autocomplete Field -->
+  <div class="col-md-6 mb-3">
+    <div class="card border-light h-100 shadow-sm">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+        <span class="fw-bold">{{ field.title }}</span>
+      </div>
+      <div class="card-body">
+        <input
+          type="text"
+          id="{{ field.id }}"
+          class="form-control"
+          placeholder="{{ field.placeholder }}"
+          data-initial='{{ field.related_ids | default([]) | tojson }}'
+        >
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <!-- No autocomplete fields configured -->
+  <div class="col-12">
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle me-2"></i> No mapping fields are configured for this entity.
+    </div>
+  </div>
+  <script type="module">
+    import log from "{{ url_for('static', filename='js/logger.js') }}";
+    log("warn", "_autocomplete.html", "init", "⚠️ No autocomplete_fields found in context");
+  </script>
+{% endif %}
+
+<!-- Fixed CSS to ensure proper dropdown visibility -->
+<style>
+  /* Fix dropdown visibility issues */
+  .dropdown-menu, .autocomplete-results {
+    min-width: 320px !important;
+    width: auto !important;
+    max-height: 300px !important;
+    overflow-y: auto !important; /* Scrollbar for dropdown content only */
+    overflow-x: hidden !important;
+    position: fixed !important; /* Change to fixed positioning */
+    z-index: 9999 !important;
+    transform: none !important; /* Prevent transforms that might clip content */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important; /* Add shadow for better visibility */
+  }
+
+  /* Ensure all parent containers allow overflow */
+  .tab-content, .tab-pane, .card-body, .row, .col-md-6, .card {
+    overflow: visible !important;
+    position: relative !important; /* Better positioning context */
+  }
+
+  /* Ensure body doesn't get scrollbar when dropdown opens */
+  body.dropdown-open {
+    overflow: auto !important; /* Keep auto so the page can still scroll if needed */
+    padding-right: 0 !important;
+  }
+
+  /* Position the dropdown relative to the input field */
+  .autocomplete-wrapper {
+    position: relative !important;
+  }
+
+  /* Add styling to make dropdown more visible */
+  .dropdown-menu, .autocomplete-results {
+    border: 1px solid rgba(0,0,0,0.15) !important;
+    border-radius: 0.25rem !important;
+    background-color: white !important;
+  }
+
+  /* Make dropdown items easier to read */
+  .dropdown-item, .dropdown-menu li, .autocomplete-results li {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+  }
+</style>
+
+<!-- Autocomplete Initialization Logging -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  import { initAutoCompleteFields } from "{{ url_for('static', filename='js/autoComplete.js') }}";
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const autoCompleteConfig = [];
+
+    {% if autocomplete_fields %}
+      log("info", "_autocomplete.html", "init", "📋 Found {{ autocomplete_fields|length }} autocomplete field(s)");
+
+      {% for field in autocomplete_fields %}
+      autoCompleteConfig.push({
+        selector: '#{{ field.id }}',
+        dataUrl: '{{ field.data_url }}',
+        inputName: '{{ field.name }}'
+      });
+
+      let parsed{{ field.id | replace('-', '_') }} = [];
+      try {
+        const initial{{ field.id | replace('-', '_') }} = document.getElementById("{{ field.id }}")?.dataset.initial || "[]";
+        parsed{{ field.id | replace('-', '_') }} = JSON.parse(initial{{ field.id | replace('-', '_') }});
+        log("info", "_autocomplete.html", "init", "📋 {{ field.title }} Initial IDs", parsed{{ field.id | replace('-', '_') }});
+      } catch (e) {
+        log("error", "_autocomplete.html", "parse", "❌ Failed to parse initial values for {{ field.id }}", e);
+      }
+      {% endfor %}
+    {% else %}
+      log("warn", "_autocomplete.html", "init", "⚠️ No autocomplete_fields found in context");
+    {% endif %}
+
+    // Initialize autocomplete fields
+    initAutoCompleteFields(autoCompleteConfig);
+
+    // Fix dropdown body scroll issue
+    document.addEventListener('shown.bs.dropdown', function() {
+      document.body.classList.add('dropdown-open');
+    });
+
+    document.addEventListener('hidden.bs.dropdown', function() {
+      document.body.classList.remove('dropdown-open');
+    });
+
+    // Add positioning fix for autocomplete dropdown
+    const positionDropdown = (input, dropdown) => {
+      if (!input || !dropdown) return;
+
+      const rect = input.getBoundingClientRect();
+      dropdown.style.top = `${rect.bottom + window.scrollY}px`;
+      dropdown.style.left = `${rect.left + window.scrollX}px`;
+      dropdown.style.width = `${rect.width}px`;
+    };
+
+    // Apply positioning to autocomplete dropdowns
+    const observeDropdowns = () => {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.addedNodes.length) {
+            mutation.addedNodes.forEach((node) => {
+              if (node.classList && (node.classList.contains('dropdown-menu') ||
+                  node.classList.contains('autocomplete-results'))) {
+                const inputId = node.getAttribute('aria-labelledby') ||
+                             node.getAttribute('data-for');
+                const input = document.getElementById(inputId);
+                if (input) {
+                  positionDropdown(input, node);
+                }
+              }
+            });
+          }
+        });
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+    };
+
+    // Start observing for dropdowns
+    observeDropdowns();
+  });
+</script>
+<!-- END TEMPLATE: _autocomplete.html -->

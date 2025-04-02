@@ -1,0 +1,39 @@
+{% import "macros/form_fields/render_field.html" as macros %}
+
+{% if ui | length > 1 %}
+  <div class="btn-group" role="tablist">
+    {% for tab in ui %}
+      {# Replace '&' in id and data-bs-target, but leave the tab name unchanged #}
+      {% set tab_id = 'tab-' + tab.tab_name | lower | replace(' ', '-') | replace('&', '') %}
+      <button class="btn btn-sm btn-outline-primary {% if loop.first %}active{% endif %}"
+              id="{{ tab_id }}-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#{{ tab_id }}"
+              type="button"
+              role="tab"
+              aria-controls="{{ tab_id }}"
+              aria-selected="{{ 'true' if loop.first else 'false' }}">
+        {{ tab.tab_name }}
+      </button>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<!-- 🧾 Logging for Pills Navigation Context -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  try {
+    const tabNames = {{ ui | map(attribute='tab_name') | list | tojson | safe }};
+    const sectionCounts = {{ ui | map(attribute='sections') | map('length') | list | tojson | safe }};
+
+    log("info", "_pills_nav.html", "render", {
+      message: "📑 Tab navigation rendered",
+      totalTabs: tabNames.length,
+      tabs: tabNames,
+      sectionCounts
+    });
+  } catch (e) {
+    console.warn("⚠️ Could not serialize tab info for logging:", e);
+  }
+</script>

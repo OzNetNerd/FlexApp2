@@ -1,70 +1,22 @@
-{% extends "create_view_edit/_create_view_edit.html" %}
+{% extends "create_view_edit/components/_create_view_edit.html" %}
 
-{% block content -%}
-{{ super() }}
+{% block content %}
+  {{ super() }}
 
-<div class="tab-content">
-  {% for tab in ui %}
-    <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
-         id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
-         role="tabpanel"
-         aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
-
-      {% for section in tab.sections %}
-        <h5 class="mt-3">{{ section.section_name }}</h5>
-
-        {% for entry in section.entries %}
-          {% if tab.tab_name == 'Mappings' and entry.entry_name == 'users' and item and item.related_users %}
-            <div class="mb-3">
-              <label class="form-label">{{ entry.label }}</label>
-              <div class="card">
-                <div class="card-body p-3">
-                  {% if item.related_users|length > 0 %}
-                    <ul class="list-group list-group-flush">
-                      {% for user in item.related_users %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                          <div>
-                            <strong>{{ user.name }}</strong> ({{ user.username }})
-                            <span class="badge bg-secondary ms-2">{{ user.relationship_type }}</span>
-                          </div>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  {% else %}
-                    <p class="text-muted mb-0">No related users</p>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          {% elif tab.tab_name == 'Mappings' and entry.entry_name == 'companies' and item and item.related_companies %}
-            <div class="mb-3">
-              <label class="form-label">{{ entry.label }}</label>
-              <div class="card">
-                <div class="card-body p-3">
-                  {% if item.related_companies|length > 0 %}
-                    <ul class="list-group list-group-flush">
-                      {% for company in item.related_companies %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                          <div>
-                            <strong>{{ company.name }}</strong>
-                            <span class="badge bg-secondary ms-2">{{ company.relationship_type }}</span>
-                          </div>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  {% else %}
-                    <p class="text-muted mb-0">No related companies</p>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          {% else %}
+  <div class="tab-content">
+    {% for tab in ui %}
+      <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+           id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+           role="tabpanel"
+           aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
+        {% for section in tab.sections %}
+          <h5 class="mt-3">{{ section.section_name }}</h5>
+          {% for entry in section.entries %}
+            {# For special mapping fields, you can add custom logic here if needed #}
             {{ macros.render_field(entry, read_only=True) }}
-          {% endif %}
+          {% endfor %}
         {% endfor %}
-      {% endfor %}
-
-    </div>
-  {% endfor %}
-</div>
-{%- endblock %}
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

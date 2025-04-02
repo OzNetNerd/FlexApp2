@@ -1,118 +1,61 @@
-<!-- START TEMPLATE: edit.html -->
-{# ------------------------------------------------------------------------------
-  File: edit.html | Purpose: Renders an edit form for entities
-  Structure:
-    - Extends: base/create_view_edit.html
-    - Inputs:
-        - title     : Page title
-        - read_only : false
-        - id        : Optional entity ID
-        - ui        : List[Tab] structure with sections and TabEntry fields
-  Output:
-    - A Bootstrap card with tabbed section layout
-    - Cancel button (routes to view or index)
-    - Form posts back to current route
------------------------------------------------------------------------------- #}
+{% extends "create_view_edit/components/_create_view_edit.html" %}
 
-{% extends "create_view_edit/_create_view_edit.html" %}
-
-{% block content -%}
-  {# Include the toast container so it is always rendered #}
-  {% include 'base/common/_toasts.html' %}
-
-  <div class="card border-0 shadow-sm">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-      <h3 class="h4 mb-0 text-primary">
-        <i class="fas fa-edit me-2"></i>
-        {{ title }}
-      </h3>
-      <div class="d-flex gap-2">
-        <!-- Cancel button removed from here as it's in the form itself -->
-      </div>
-    </div>
-
-    <div class="card-body">
-      <form method="POST" id="edit-form">
-        {% include 'create_view_edit/components/_pills_nav_content.html' %}
-        {% include 'create_view_edit/components/_footer_buttons.html' %}
-      </form>
-    </div>
+{% block content %}
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+    <h3 class="h4 mb-0 text-primary">
+      <i class="fas fa-edit me-2"></i>
+      {{ title }}
+    </h3>
   </div>
+  <div class="card-body">
+    <form method="POST" id="edit-form">
+      {% include 'base/components/_pills_nav_content.html' %}
+      {% include 'base/components/_footer.html' %}
+    </form>
+  </div>
+</div>
 
-  <!-- Unsaved changes confirmation modal -->
-  <div class="modal fade" id="unsavedChangesModal" tabindex="-1" aria-labelledby="unsavedChangesModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="unsavedChangesModalLabel">Unsaved Changes</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          You have unsaved changes. Are you sure you want to leave?
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay on Page</button>
-          <button type="button" class="btn btn-primary" id="confirmLeaveBtn">Leave Without Saving</button>
-        </div>
+<!-- Unsaved changes confirmation modal -->
+<div class="modal fade" id="unsavedChangesModal" tabindex="-1" aria-labelledby="unsavedChangesModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="unsavedChangesModalLabel">Unsaved Changes</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        You have unsaved changes. Are you sure you want to leave?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay on Page</button>
+        <button type="button" class="btn btn-primary" id="confirmLeaveBtn">Leave Without Saving</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Logging for Edit Page Context -->
-  <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
-
-    const editContext = {
-      mode: {{ "'edit'" if id else "'create'" }},
-      entityId: {{ id | tojson }},
-      title: {{ title | tojson }},
-      cancelDestination: {{ "'view'" if id else "'index'" }},
-      tabCount: {{ ui | length }},
-      structure: [
-        {% for tab in ui %}
-          {
-            tab: {{ tab.tab_name | tojson }},
-            sections: {{ tab.sections | map(attribute='section_name') | list | tojson | safe }},
-            fieldCount: {{ tab.sections | map(attribute='entries') | map('length') | sum }}
-          }{% if not loop.last %},{% endif %}
-        {% endfor %}
-      ]
-    };
-
-    log("info", "edit.html", "render", "📝 Edit form initialized", editContext);
-  </script>
-
-  <!-- Unsaved changes modal handler -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Get the cancel button from render_form.html
-      const cancelButton = document.querySelector('#cancel-button');
-
-      if (cancelButton) {
-        // Override the default click behavior
-        cancelButton.addEventListener('click', function(event) {
-          // Prevent the default navigation
-          event.preventDefault();
-
-          // Show the bootstrap modal
-          const modal = new bootstrap.Modal(document.getElementById('unsavedChangesModal'));
-          modal.show();
-        });
-      }
-
-      // Handle confirm leave button click
-      const confirmLeaveBtn = document.getElementById('confirmLeaveBtn');
-      if (confirmLeaveBtn) {
-        confirmLeaveBtn.addEventListener('click', function() {
-          {% if id %}
-            window.location.href = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}";
-          {% else %}
-            window.location.href = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}";
-          {% endif %}
-        });
-      }
-    });
-  </script>
-{%- endblock %}
-
-<!-- END TEMPLATE: edit.html -->
+<script type="module">
+  // Unsaved changes modal handling
+  document.addEventListener('DOMContentLoaded', function() {
+    const cancelButton = document.querySelector('#cancel-button');
+    if (cancelButton) {
+      cancelButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        const modal = new bootstrap.Modal(document.getElementById('unsavedChangesModal'));
+        modal.show();
+      });
+    }
+    const confirmLeaveBtn = document.getElementById('confirmLeaveBtn');
+    if (confirmLeaveBtn) {
+      confirmLeaveBtn.addEventListener('click', function() {
+        {% if id %}
+          window.location.href = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}";
+        {% else %}
+          window.location.href = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}";
+        {% endif %}
+      });
+    }
+  });
+</script>
+{% endblock %}

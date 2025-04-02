@@ -1,20 +1,19 @@
-
 <!-- START TEMPLATE: _section_layout.html -->
 {# ------------------------------------------------------------------------------
   File: _section_layout.html | Purpose: Tab + section-based form layout
   Inputs:
-    - fields: List of field objects (with optional tab/section/name)
-    - read_only: Boolean for rendering readonly mode
+    - fields: List of field objects (with optional tab/section properties)
+    - read_only: Boolean flag for rendering fields in read-only mode
   Structure:
     - Bootstrap tabs (top level)
-    - Sections per tab
-    - Field rows per section (responsive grid)
+    - Sections per tab, with each section rendered in a card layout
+    - Fields rendered in a responsive grid inside each section
   Dependencies:
-    - _crisp.html for crisp field in readonly mode
-    - logger.js for structured logging
+    - Optionally, _crisp.html for crisp field rendering in read-only mode
+    - A logger.js module for structured logging
 ------------------------------------------------------------------------------ #}
 
-{# Group fields by tab #}
+{# Group fields by tab; if no tab is provided, assign to "Other" #}
 {%- set tabs = {} -%}
 {%- for field in fields -%}
   {%- set tab = field.tab or 'Other' -%}
@@ -44,6 +43,7 @@
     <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
          id="tab-{{ tab | lower | replace(' ', '-') }}"
          role="tabpanel">
+      {# Group fields within the current tab by section #}
       {%- set grouped_by_section = tab_fields | groupby('section') -%}
       {%- for section, section_fields in grouped_by_section %}
         <div class="card shadow-sm border-0 mb-4">
@@ -71,8 +71,8 @@
 
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
-  const tabs = {{ tabs.keys() | list | tojson | safe }};
-  log("info", "_section_layout.html", "tabs", "🧩 Tabs generated from field definitions", tabs);
+  const tabNames = {{ tabs.keys() | list | tojson | safe }};
+  log("info", "_section_layout.html", "tabs", "🧩 Tabs generated from field definitions", tabNames);
   {%- for tab, tab_fields in tabs.items() %}
     const sections_{{ loop.index }} = {{ tab_fields | map(attribute='section') | list | unique | tojson | safe }};
     log("debug", "_section_layout.html", "tabs", "📁 Sections under tab: {{ tab }}", sections_{{ loop.index }});

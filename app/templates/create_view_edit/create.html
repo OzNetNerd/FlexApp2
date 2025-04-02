@@ -1,46 +1,28 @@
-<!-- START TEMPLATE: create.html -->
-{# ------------------------------------------------------------------------------
-  File: create.html
-  Purpose:
-    Renders a form for creating a new entity using the new `ui` layout system.
-  Inputs (expected in context):
-    - title         : str (optional, defaults to "Create {model_name}")
-    - model_name    : str (e.g. "Company", "Contact")
-    - item_name     : str (optional, empty for create)
-    - ui            : List[Tab] (prebuilt tab/section/field layout)
-    - read_only     : bool (should be False)
-    - submit_url    : str
-    - error_message : str (optional)
-    - initial_user_ids : List[int] (for _autocomplete)
-    - initial_company_id : Optional[int] (for _autocomplete)
------------------------------------------------------------------------------- #}
+{% extends "create_view_edit/components/_create_view_edit.html" %}
 
-{% extends "create_view_edit/_create_view_edit.html" %}
-
-{% block content -%}
+{% block content %}
   <div class="tab-content">
-    {%- for tab in ui %}
+    {% for tab in ui %}
       <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
            id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
            role="tabpanel"
            aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
-
-        {%- for section in tab.sections %}
+        {% for section in tab.sections %}
           <h5 class="mt-3">{{ section.section_name }}</h5>
           <div class="row">
-            {%- for entry in section.entries %}
+            {% for entry in section.entries %}
               {{ macros.render_field(entry) }}
-            {%- endfor %}
+            {% endfor %}
           </div>
-        {%- endfor %}
+        {% endfor %}
       </div>
-    {%- endfor %}
+    {% endfor %}
   </div>
 
-  {% include 'create_view_edit/components/_autocomplete.html' %}
-  {% include 'create_view_edit/components/_footer_buttons.html' %}
+  {% include 'base/components/_autocomplete.html' %}
+  {% include 'base/components/_footer.html' %}
 
-  {%- if error_message %}
+  {% if error_message %}
     <script type="module">
       import { showToast } from "/static/js/toasts.js";
       import log from "/static/js/logger.js";
@@ -50,25 +32,21 @@
         log("error", "create.html", "form_init", "❌ Error on create page", message);
       });
     </script>
-  {%- endif %}
+  {% endif %}
 
-  <!-- Initialize Autocomplete Fields -->
   <script type="module">
     import { initAutoCompleteFields } from "/static/js/autoComplete.js";
-    // Call the initialization immediately since the script is loaded after the DOM is ready.
     initAutoCompleteFields();
   </script>
 
-  <!-- Render Context Logging -->
   <script type="module">
     import log from "/static/js/logger.js";
     const context = {
       mode: "create",
-      model: {{ model_name | tojson | safe }},
-      fieldTabs: {{ ui | map(attribute='tab_name') | list | tojson | safe }},
+      model: {{ model_name | tojson }},
+      fieldTabs: {{ ui | map(attribute='tab_name') | list | tojson }},
       totalFields: {{ ui | sum(attribute='sections') | map(attribute='entries') | map('length') | sum }}
     };
     log("info", "create.html", "render", "📋 Create form loaded", context);
   </script>
-{%- endblock %}
-<!-- END TEMPLATE: create.html -->
+{% endblock %}
