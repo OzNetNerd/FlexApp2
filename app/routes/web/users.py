@@ -29,7 +29,7 @@ user_routes = UserCRUDRoutes(
     index_template="entity_tables/users.html",
     required_fields=["username", "name", "email"],
     unique_fields=["username"],
-    create_tabs_function=get_users_tabs,
+    # create_tabs_function=get_users_tabs,
 )
 
 logger.info("User CRUD routes setup successfully.")

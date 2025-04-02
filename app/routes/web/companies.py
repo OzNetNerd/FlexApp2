@@ -25,6 +25,6 @@ company_routes = CompanyCRUDRoutes(
     required_fields=["name"],
     unique_fields=["name"],
     index_template="entity_tables/companies.html",
-    create_tabs_function=get_company_tabs,
+    # create_tabs_function=get_company_tabs,
 )
 

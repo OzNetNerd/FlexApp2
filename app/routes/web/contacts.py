@@ -4,7 +4,6 @@ from flask_login import current_user
 from app.models import Contact, Company, db, User
 from app.routes.web import contacts_bp
 from app.routes.web.generic import GenericWebRoutes
-from app.routes.base.tabs.contacts import create_contacts_tabs
 from typing import Any, Dict, List
 from app.models import CRISPScore
 

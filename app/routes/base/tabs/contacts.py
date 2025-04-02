@@ -204,7 +204,7 @@ class ExpertiseAndProjectsTab(TabBuilder):
         )
         return expertise_section
 
-def create_contacts_tabs(item):
+def contacts_tabs(item):
     SkillsAndTechnologiesTab(item)
 
     pass
