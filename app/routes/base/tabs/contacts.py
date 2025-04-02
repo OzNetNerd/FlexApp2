@@ -205,5 +205,4 @@ class ExpertiseAndProjectsTab(TabBuilder):
         return expertise_section
 
 def contacts_tabs(item):
-    SkillsAndTechnologiesTab(item)
-    pass
+    return SkillsAndTechnologiesTab(item).create_tab()

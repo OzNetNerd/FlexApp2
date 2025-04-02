@@ -1,0 +1,79 @@
+{% macro render_field(field, read_only=False) %}
+  {% set name = field.name %}
+  {% set label = field.label or name|capitalize %}
+  {% set type = field.type or 'text' %}
+  {% set value = field.value or '' %}
+  {% set required = field.required or false %}
+  {% set options = field.options or [] %}
+  {% set readonly = read_only or field.readonly or type == 'readonly' %}
+
+  <div class="col-md-6 mb-3">
+    <label for="{{ name }}" class="form-label fw-semibold">{{ label }}</label>
+
+    {# -------- READONLY MODE -------- #}
+    {% if readonly %}
+      <div class="form-control-plaintext bg-light border rounded px-3 py-2">
+        {% if type == 'checkbox' %}
+          <i class="fas fa-{{ 'check' if value else 'times' }}"></i> {{ 'Yes' if value else 'No' }}
+        {% elif type == 'select' %}
+          {{ options[value] if value in options else value }}
+        {% elif type == 'date' %}
+          {{ value.strftime('%Y-%m-%d') if value else '' }}
+        {% else %}
+          {{ value }}
+        {% endif %}
+      </div>
+
+    {# -------- TEXTAREA -------- #}
+    {% elif type == 'textarea' %}
+      <textarea id="{{ name }}"
+                name="{{ name }}"
+                class="form-control"
+                rows="4"
+                {% if required %}required{% endif %}>{{ value }}</textarea>
+
+    {# -------- SELECT -------- #}
+    {% elif type == 'select' %}
+      <select id="{{ name }}"
+              name="{{ name }}"
+              class="form-select"
+              {% if required %}required{% endif %}>
+        <option value="">Select {{ label }}</option>
+        {% for key, label in options.items() %}
+          <option value="{{ key }}" {% if value == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+
+    {# -------- CHECKBOX -------- #}
+    {% elif type == 'checkbox' %}
+      <div class="form-check">
+        <input class="form-check-input"
+               type="checkbox"
+               id="{{ name }}"
+               name="{{ name }}"
+               {% if value %}checked{% endif %}>
+        <label class="form-check-label" for="{{ name }}">
+          {{ label }}
+        </label>
+      </div>
+
+    {# -------- DATE -------- #}
+    {% elif type == 'date' %}
+      <input type="date"
+             id="{{ name }}"
+             name="{{ name }}"
+             class="form-control"
+             value="{{ value }}"
+             {% if required %}required{% endif %}>
+
+    {# -------- DEFAULT INPUT -------- #}
+    {% else %}
+      <input type="{{ type }}"
+             id="{{ name }}"
+             name="{{ name }}"
+             class="form-control"
+             value="{{ value }}"
+             {% if required %}required{% endif %}>
+    {% endif %}
+  </div>
+{% endmacro %}

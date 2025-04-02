@@ -14,6 +14,21 @@
     - Logger for template state and debugging
 ------------------------------------------------------------------------------ #}
 
+{# ------------------------------------------------------------------------------
+  File: _navbar.html | Purpose: Top nav bar with search, nav items, user menu
+  Inputs:
+    - request.endpoint: Active Flask route
+    - current_user: Flask-Login user object
+  Variables:
+    - nav_items: List of nav entries (name, display_name, icon)
+  Blocks:
+    - additional_nav_items: Inject custom nav links
+  Features:
+    - Bootstrap 5 responsive nav
+    - Dynamic user avatar and links
+    - Logger for template state and debugging
+------------------------------------------------------------------------------ #}
+
 {%- set nav_items = [
   {'name': 'companies', 'display_name': 'Companies', 'icon': 'fa-building'},
   {'name': 'contacts', 'display_name': 'Contacts', 'icon': 'fa-address-card'},
@@ -26,17 +41,32 @@
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";
   log("info", "_navbar.html", "init", "🚀 Template _navbar.html loaded");
+  log("debug", "_navbar.html", "vars", "Nav items: " + JSON.stringify({{ nav_items|tojson }}));
+  log("debug", "_navbar.html", "context", "Current endpoint: {{ request.endpoint }}");
+  log("debug", "_navbar.html", "auth", "User authenticated: {{ current_user.is_authenticated }}");
 </script>
 
 {# Set Context Variables (precompute values to avoid inline logic in HTML) #}
 {% set show_navbar = show_navbar %}
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  log("debug", "_navbar.html", "context", "show_navbar value: {{ show_navbar }}");
+</script>
 
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top bg-white">
+  <script type="module">
+    import log from "{{ url_for('static', filename='js/logger.js') }}";
+    log("debug", "_navbar.html", "render", "Rendering navbar container");
+  </script>
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="/static">
       <div class="brand-icon-container me-2"><i class="fas fa-building"></i></div>
       <span class="fw-bold">CRM Dashboard</span>
     </a>
+    <script type="module">
+      import log from "{{ url_for('static', filename='js/logger.js') }}";
+      log("debug", "_navbar.html", "render", "Brand logo rendered");
+    </script>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
       aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +74,10 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarContent">
+      <script type="module">
+        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        log("debug", "_navbar.html", "render", "Starting nav items rendering");
+      </script>
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         {%- for item in nav_items %}
           {%- set endpoint = item.name + '.index' -%}
@@ -57,10 +91,18 @@
               {% if is_active %}<span class="visually-hidden">(current)</span>{% endif %}
             </a>
           </li>
+          <script type="module">
+            import log from "{{ url_for('static', filename='js/logger.js') }}";
+            log("debug", "_navbar.html", "nav_item", "Rendered nav item: {{ item.name }}");
+          </script>
         {%- endfor %}
 
         {% block additional_nav_items %}
           <!-- Custom nav items injected here -->
+          <script type="module">
+            import log from "{{ url_for('static', filename='js/logger.js') }}";
+            log("debug", "_navbar.html", "blocks", "additional_nav_items block position");
+          </script>
         {% endblock %}
       </ul>
 
@@ -69,6 +111,10 @@
           <span class="input-group-text border-0 bg-transparent"><i class="fas fa-search"></i></span>
           <input type="search" class="form-control border-0 shadow-none" placeholder="Search..." aria-label="Search">
         </div>
+        <script type="module">
+          import log from "{{ url_for('static', filename='js/logger.js') }}";
+          log("debug", "_navbar.html", "render", "Search box rendered");
+        </script>
       </div>
 
       <div class="notification-icon me-3 d-none d-md-block">
@@ -81,13 +127,25 @@
       </div>
 
       <div class="user-menu">
+        <script type="module">
+          import log from "{{ url_for('static', filename='js/logger.js') }}";
+          log("debug", "_navbar.html", "render", "Starting user menu rendering");
+        </script>
         <div class="dropdown">
           <a class="user-dropdown-toggle d-flex align-items-center text-decoration-none" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             <div class="avatar-container me-2">
               {% if current_user.is_authenticated %}
                 <img src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=random" alt="User avatar" class="user-avatar">
+                <script type="module">
+                  import log from "{{ url_for('static', filename='js/logger.js') }}";
+                  log("debug", "_navbar.html", "user", "Authenticated user avatar rendered for: {{ current_user.name }}");
+                </script>
               {% else %}
                 <i class="fas fa-user-circle fs-4"></i>
+                <script type="module">
+                  import log from "{{ url_for('static', filename='js/logger.js') }}";
+                  log("debug", "_navbar.html", "user", "Anonymous user icon rendered");
+                </script>
               {% endif %}
             </div>
             <div class="user-info d-none d-md-block">
@@ -98,6 +156,10 @@
             </div>
           </a>
           <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="userDropdown">
+            <script type="module">
+              import log from "{{ url_for('static', filename='js/logger.js') }}";
+              log("debug", "_navbar.html", "render", "Dropdown menu items start");
+            </script>
             {% if current_user.is_authenticated %}
               <li class="dropdown-user-details d-md-none">
                 <div class="d-flex align-items-center p-3">
@@ -116,9 +178,17 @@
               <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i> Help Center</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item logout-item" href="{{ url_for('auth_bp.logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+              <script type="module">
+                import log from "{{ url_for('static', filename='js/logger.js') }}";
+                log("debug", "_navbar.html", "auth", "Authenticated user menu items rendered");
+              </script>
             {% else %}
               <li><a class="dropdown-item" href="{{ url_for('auth_bp.login') }}"><i class="fas fa-sign-in-alt me-2"></i> Login</a></li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus me-2"></i> Register</a></li>
+              <script type="module">
+                import log from "{{ url_for('static', filename='js/logger.js') }}";
+                log("debug", "_navbar.html", "auth", "Anonymous user menu items rendered");
+              </script>
             {% endif %}
           </ul>
         </div>
@@ -126,6 +196,49 @@
     </div>
   </div>
 </nav>
+
+<!-- Check DOM loaded status -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  document.addEventListener('DOMContentLoaded', () => {
+    log("info", "_navbar.html", "dom", "✅ DOM fully loaded and navbar visible");
+    // Check if navbar is actually visible
+    const navbar = document.querySelector('nav.navbar');
+    if (navbar) {
+      log("info", "_navbar.html", "verify", "📏 Navbar dimensions: " + navbar.offsetWidth + "x" + navbar.offsetHeight);
+      // Log CSS computed styles to check visibility
+      const styles = window.getComputedStyle(navbar);
+      log("debug", "_navbar.html", "styles", "Navbar display: " + styles.display + ", visibility: " + styles.visibility);
+    } else {
+      log("error", "_navbar.html", "verify", "❌ Navbar element not found in DOM");
+    }
+  });
+</script>
+
+<!-- Bootstrap JS error checking -->
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+
+  // Check if Bootstrap JS is loaded
+  setTimeout(() => {
+    if (typeof bootstrap !== 'undefined') {
+      log("info", "_navbar.html", "deps", "✅ Bootstrap JS is loaded");
+    } else {
+      log("error", "_navbar.html", "deps", "❌ Bootstrap JS not found - navigation may not work");
+    }
+
+    // Check if FontAwesome is loaded by testing an icon
+    const iconElement = document.querySelector('.fas');
+    if (iconElement) {
+      const iconStyle = window.getComputedStyle(iconElement, ':before');
+      if (iconStyle.content && iconStyle.content !== 'none' && iconStyle.content !== 'normal') {
+        log("info", "_navbar.html", "deps", "✅ FontAwesome icons loaded correctly");
+      } else {
+        log("error", "_navbar.html", "deps", "❌ FontAwesome icons not rendering properly");
+      }
+    }
+  }, 500);  // Small delay to ensure resources are checked after loading
+</script>
 
 <!-- Log Final Template Render -->
 <script type="module">

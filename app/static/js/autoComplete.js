@@ -1,7 +1,6 @@
 import log from './logger.js';
 
 const scriptName = 'autoComplete.js';
-console.log('🚀 Loading autoComplete.js');
 
 /**
  * Sets up the autocomplete functionality for an input field.
@@ -254,7 +253,6 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
  * @returns {Promise<void>} - Resolves when all autocomplete fields have been set up.
  */
 export function initAutoCompleteFields(config = []) {
-  console.log('🚀 initAutoCompleteFields called with', config.length, 'fields');
   log("info", scriptName, "initAutoCompleteFields", `📋 Initializing ${config.length} autocomplete fields`);
 
   const promises = config.map(fieldConfig => {

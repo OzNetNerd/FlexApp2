@@ -42,7 +42,13 @@ class ResourceContext:
         self.submit_url = url_for(f"{self.blueprint_name}.create") if not self.read_only else ""
         self.model_name = self.model.__name__
         self.id = str(self.item_dict.get("id", ""))
-        self.tabs = UI_TAB_MAPPING[self.model.__name__](self.item_dict),
+        self.tabs = UI_TAB_MAPPING[self.model.__name__](self.item_dict)
+
+        # logger.error("UI TABS")
+        # logger.error(UI_TAB_MAPPING)
+        # logger.error(f'Name: {self.model.__name__}')
+        # logger.error(f'Item: {self.item_dict}')
+        # logger.error(f'Result: {result}')
 
         # Find a display name by checking keys in priority order: name, title, email, username
         # If none are found, fall back to the ID as a string
