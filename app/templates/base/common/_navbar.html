@@ -34,8 +34,10 @@
   {'name': 'contacts', 'display_name': 'Contacts', 'icon': 'fa-address-card'},
   {'name': 'opportunities', 'display_name': 'Opportunities', 'icon': 'fa-chart-line'},
   {'name': 'users', 'display_name': 'Users', 'icon': 'fa-users'},
-  {'name': 'tasks', 'display_name': 'Tasks', 'icon': 'fa-tasks'}
+  {'name': 'tasks', 'display_name': 'Tasks', 'icon': 'fa-tasks'},
+  {'name': 'settings', 'display_name': 'Settings', 'icon': 'fa-cog'}
 ] -%}
+
 
 {# Log Initial Template Load #}
 <script type="module">
@@ -174,7 +176,7 @@
                 <hr class="dropdown-divider m-0">
               </li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a></li>
-              <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Settings</a></li>
+              <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i> Settings</a></li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i> Help Center</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item logout-item" href="{{ url_for('auth_bp.logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
