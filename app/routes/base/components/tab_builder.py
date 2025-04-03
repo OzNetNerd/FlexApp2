@@ -32,6 +32,9 @@ class TabBuilder(ABC):
     tab_name: str
     section_method_order: List[Callable] = field(default_factory=list, init=False)
 
+    def __post_init__(self):
+        logger.info(f'Item: {self.item}')
+
     def create_tab(self) -> Tab:
         sections = [method() for method in self.section_method_order]
         tab = Tab(tab_name=self.tab_name, sections=sections)
@@ -70,10 +73,13 @@ class MetadataTab(TabBuilder):
         )
 
 def create_tabs(item: Any, tabs: List[Callable], add_metadata_tab=True) -> List[Tab]:
+    logger.info(f'About to start creating tabs for UI')
     if add_metadata_tab:
+        logger.info("Add 'metadata' option is enabled. Will add the tab to the UI")
         all_tabs = list(tabs) + ([MetadataTab])
 
     else:
+        logger.info("Add 'metadata' option is disabled. Will NOT add the tab to the UI")
         all_tabs = tabs
 
     grouped_tabs = []
@@ -82,4 +88,6 @@ def create_tabs(item: Any, tabs: List[Callable], add_metadata_tab=True) -> List[
         logger.info(f'Creating tab: {tab_obj.tab_name}')
         tab_entry = tab_obj.create_tab()
         grouped_tabs.append(tab_entry)
+
+    logger.info(f"Successfully added {len(grouped_tabs)} tabs")
     return grouped_tabs

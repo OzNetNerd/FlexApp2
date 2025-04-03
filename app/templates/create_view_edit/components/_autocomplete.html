@@ -1,4 +1,4 @@
-{% extends "create_view_edit/_create_view_edit.html" %}
+{% extends "create_view_edit/components/_create_view_edit.html" %}
 
 {% block content %}
   <div class="tab-content">
@@ -20,7 +20,7 @@
   </div>
 
   {# Include footer component #}
-  {% include 'base/components/_footer.html' %}
+  {% include 'create_view_edit/components/_footer_buttons.html' %}
 
   {# Add the main.js script which will handle autocomplete functionality #}
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>

@@ -1,4 +1,4 @@
-{% extends "create_view_edit/_create_view_edit.html" %}
+{% extends "create_view_edit/components/_create_view_edit.html" %}
 
 {% block content %}
   <div class="tab-content">
@@ -20,8 +20,8 @@
   </div>
 
   {# Autocomplete and footer components are included once here #}
-  {% include 'base/components/_autocomplete.html' %}
-  {% include 'base/components/_footer.html' %}
+  {% include 'create_view_edit/components/_autocomplete.html' %}
+  {% include 'create_view_edit/components/_footer_buttons.html' %}
 
   {# If there's an error, show a toast message using toasts.js #}
   {% if error_message %}

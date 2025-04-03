@@ -195,6 +195,8 @@ class ExpertiseAndProjectsTab(TabBuilder):
             self._expertise_section,
         ]
 
+        super().__post_init__()
+
     def _expertise_section(self):
         section_name = "Expertise and Projects"
         expertise_section = TabSection(
