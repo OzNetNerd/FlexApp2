@@ -41,7 +41,7 @@ def view_route(ctx: Any, item_id: int) -> Any:
         item_dict["related_users"] = [rel for rel in relationships if rel["entity_type"] == "user"]
         item_dict["related_companies"] = [rel for rel in relationships if rel["entity_type"] == "company"]
 
-    logger.info(f"This is item: {item_dict}")
+    # logger.info(f"This is item: {item_dict}")
 
     # Optional: inject relationships into tab sections here (commented for future use)
     # tabs = ctx.create_tabs_function()

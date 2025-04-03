@@ -15,6 +15,7 @@ class BasicInfoTab(TabBuilder):
             self._basic_info_section,
             self._role_info_section,
         ]
+        super().__post_init__()
 
     def _basic_info_section(self):
         section_name = "Contact"
@@ -56,6 +57,7 @@ class RoleAndResponsibilitiesTab(TabBuilder):
         self.section_method_order = [
             self._role_responsibilities_section,
         ]
+        super().__post_init__()
 
     def _role_responsibilities_section(self):
         section_name = "Role and Responsibilities"
@@ -96,6 +98,7 @@ class SkillsAndTechnologiesTab(TabBuilder):
             self._skill_level_section,
             self._technologies_used_section,
         ]
+        super().__post_init__()
 
     def _skill_level_section(self):
         section_name = "Skill Level"
@@ -194,6 +197,7 @@ class ExpertiseAndProjectsTab(TabBuilder):
         self.section_method_order = [
             self._expertise_section,
         ]
+        super().__post_init__()
 
     def _expertise_section(self):
         section_name = "Expertise and Projects"

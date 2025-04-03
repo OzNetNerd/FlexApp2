@@ -5,7 +5,6 @@ from app.routes.web import users_bp
 from app.routes.web.generic_crud_routes import GenericWebRoutes
 
 import logging
-from app.routes.base.tabs.users import get_users_tabs
 
 
 logger = logging.getLogger(__name__)

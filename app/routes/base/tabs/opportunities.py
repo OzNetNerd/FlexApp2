@@ -1,48 +1,139 @@
-from app.routes.base.components.tab_builder import Tab, TabSection, TabEntry
-from typing import List
+import logging
+from dataclasses import dataclass, field
+from typing import List, Callable, Any
+from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEntry
 
+logger = logging.getLogger(__name__)
 
-def get_opportunity_tabs(item: dict) -> List[Tab]:
-    """Returns the list of opportunity-related tabs with data populated from the item dictionary.
+@dataclass
+class OverviewTab(TabBuilder):
+    tab_name: str = "Overview"
 
-    Args:
-        item (dict): Dictionary of field values to populate into TabEntry.value.
+    def __post_init__(self):
+        self.section_method_order = [
+            self._details_section,
+            self._pipeline_section,
+        ]
+        super().__post_init__()
 
-    Returns:
-        List[Tab]: List of populated Tab objects.
-    """
-    # Details section
-    details_section = TabSection(section_name="Details", entries=[
-        TabEntry(entry_name="name", label="Name", type="text", required=True, value=item.get("name")),
-        TabEntry(entry_name="description", label="Description", type="textarea", value=item.get("description")),
-        TabEntry(entry_name="company.name", label="Company Name", type="text", value=item.get("company.name")),
-    ])
+    def _details_section(self):
+        section_name = "Details"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="name",
+                    label="Name",
+                    type="text",
+                    required=True,
+                    value=self.item.get("name")
+                ),
+                TabEntry(
+                    entry_name="description",
+                    label="Description",
+                    type="textarea",
+                    value=self.item.get("description")
+                ),
+                TabEntry(
+                    entry_name="company.name",
+                    label="Company Name",
+                    type="text",
+                    value=self.item.get("company.name")
+                ),
+            ]
+        )
 
-    # Pipeline section
-    pipeline_section = TabSection(section_name="Pipeline", entries=[
-        TabEntry(entry_name="stage", label="Stage", type="text", required=True, value=item.get("stage")),
-        TabEntry(entry_name="status", label="Status", type="text", value=item.get("status")),
-    ])
+    def _pipeline_section(self):
+        section_name = "Pipeline"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="stage",
+                    label="Stage",
+                    type="text",
+                    required=True,
+                    value=self.item.get("stage")
+                ),
+                TabEntry(
+                    entry_name="status",
+                    label="Status",
+                    type="text",
+                    value=self.item.get("status")
+                ),
+            ]
+        )
 
-    # Financial section
-    financial_section = TabSection(section_name="Financial", entries=[
-        TabEntry(entry_name="value", label="Value", type="number", required=True, value=item.get("value")),
-    ])
+@dataclass
+class DealTab(TabBuilder):
+    tab_name: str = "Deal"
 
-    # CRISP section
-    crisp_section = TabSection(section_name="CRISP", entries=[
-        TabEntry(entry_name="crisp", label="CRISP", type="string", required=True, value=item.get("crisp")),
-    ])
+    def __post_init__(self):
+        self.section_method_order = [
+            self._financial_section,
+            self._crisp_section,
+        ]
+        super().__post_init__()
 
-    # Metadata section
-    metadata_section = TabSection(section_name="Metadata", entries=[
-        TabEntry(entry_name="created_at", label="Created At", type="readonly", value=item.get("created_at")),
-        TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
-    ])
+    def _financial_section(self):
+        section_name = "Financial"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="value",
+                    label="Value",
+                    type="number",
+                    required=True,
+                    value=self.item.get("value")
+                ),
+            ]
+        )
 
-    # Tabs
-    overview_tab = Tab(tab_name="Overview", sections=[details_section, pipeline_section])
-    deal_tab = Tab(tab_name="Deal", sections=[financial_section, crisp_section])
-    metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
+    def _crisp_section(self):
+        section_name = "CRISP"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="crisp",
+                    label="CRISP",
+                    type="string",
+                    required=True,
+                    value=self.item.get("crisp")
+                ),
+            ]
+        )
 
-    return [overview_tab, deal_tab, metadata_tab]
+@dataclass
+class MetadataTab(TabBuilder):
+    tab_name: str = "Metadata"
+
+    def __post_init__(self):
+        self.section_method_order = [
+            self._metadata_section,
+        ]
+        super().__post_init__()
+
+    def _metadata_section(self):
+        section_name = "Metadata"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="created_at",
+                    label="Created At",
+                    type="readonly",
+                    value=self.item.get("created_at")
+                ),
+                TabEntry(
+                    entry_name="updated_at",
+                    label="Updated At",
+                    type="readonly",
+                    value=self.item.get("updated_at")
+                ),
+            ]
+        )
+
+# Constant list of opportunity tabs
+OPPORTUNITIES_TABS = [OverviewTab, DealTab, MetadataTab]

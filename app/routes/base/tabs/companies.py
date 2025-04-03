@@ -13,6 +13,7 @@ class AboutTab(TabBuilder):
         self.section_method_order = [
             self._company_details_section,
         ]
+        super().__post_init__()
 
     def _company_details_section(self):
         section_name = "Company Details"
@@ -43,6 +44,7 @@ class InsightsTab(TabBuilder):
         self.section_method_order = [
             self._crisp_score_section,
         ]
+        super().__post_init__()
 
     def _crisp_score_section(self):
         section_name = "CRISP Score"
@@ -66,6 +68,7 @@ class MetadataTab(TabBuilder):
         self.section_method_order = [
             self._metadata_section,
         ]
+        super().__post_init__()
 
     def _metadata_section(self):
         section_name = "Metadata"
@@ -95,6 +98,7 @@ class RelationshipsTab(TabBuilder):
         self.section_method_order = [
             self._relationships_section,
         ]
+        super().__post_init__()
 
     def _relationships_section(self):
         section_name = "Mappings"

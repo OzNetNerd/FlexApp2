@@ -21,7 +21,7 @@ from flask import current_app
 
 def configure_logging():
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
     handler = logging.StreamHandler()

@@ -1,48 +1,129 @@
-from app.routes.base.components.tab_builder import Tab, TabSection, TabEntry
-from typing import List
+import logging
+from dataclasses import dataclass, field
+from typing import List, Callable, Any
+from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEntry
 
+logger = logging.getLogger(__name__)
 
-def get_task_tabs(item: dict) -> List[Tab]:
-    """Returns the list of task-related tabs with data populated from the item dictionary.
+@dataclass
+class AboutTab(TabBuilder):
+    tab_name: str = "About"
 
-    Args:
-        item (dict): Dictionary of field values to populate into TabEntry.value.
+    def __post_init__(self):
+        self.section_method_order = [
+            self._task_info_section,
+        ]
+        super().__post_init__()
 
-    Returns:
-        List[Tab]: List of populated Tab objects.
-    """
-    # Task Info section
-    task_info_section = TabSection(section_name="Task Info", entries=[
-        TabEntry(entry_name="title", label="Title", type="text", required=True, value=item.get("title")),
-        TabEntry(entry_name="description", label="Description", type="textarea", value=item.get("description")),
-        TabEntry(entry_name="due_date", label="Due Date", type="date", value=item.get("due_date")),
-        TabEntry(entry_name="status", label="Status", type="select", required=True, value=item.get("status"), options=[
-            {"value": "Pending", "label": "Pending"},
-            {"value": "In Progress", "label": "In Progress"},
-            {"value": "Completed", "label": "Completed"},
-        ]),
-        TabEntry(entry_name="priority", label="Priority", type="select", value=item.get("priority"), options=[
-            {"value": "Low", "label": "Low"},
-            {"value": "Medium", "label": "Medium"},
-            {"value": "High", "label": "High"},
-        ]),
-    ])
+    def _task_info_section(self):
+        section_name = "Task Info"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="title",
+                    label="Title",
+                    type="text",
+                    required=True,
+                    value=self.item.get("title")
+                ),
+                TabEntry(
+                    entry_name="description",
+                    label="Description",
+                    type="textarea",
+                    value=self.item.get("description")
+                ),
+                TabEntry(
+                    entry_name="due_date",
+                    label="Due Date",
+                    type="date",
+                    value=self.item.get("due_date")
+                ),
+                TabEntry(
+                    entry_name="status",
+                    label="Status",
+                    type="select",
+                    required=True,
+                    value=self.item.get("status"),
+                    options=[
+                        {"value": "Pending", "label": "Pending"},
+                        {"value": "In Progress", "label": "In Progress"},
+                        {"value": "Completed", "label": "Completed"},
+                    ]
+                ),
+                TabEntry(
+                    entry_name="priority",
+                    label="Priority",
+                    type="select",
+                    value=self.item.get("priority"),
+                    options=[
+                        {"value": "Low", "label": "Low"},
+                        {"value": "Medium", "label": "Medium"},
+                        {"value": "High", "label": "High"},
+                    ]
+                ),
+            ]
+        )
 
-    # Linked Entity section
-    linked_entity_section = TabSection(section_name="Linked Entity", entries=[
-        TabEntry(entry_name="notable_type", label="Linked To (Type)", type="hidden", value=item.get("notable_type", "User")),
-        TabEntry(entry_name="notable_id", label="Linked To (ID)", type="hidden", value=item.get("notable_id", "1")),
-    ])
+@dataclass
+class DetailsTab(TabBuilder):
+    tab_name: str = "Details"
 
-    # Metadata section
-    metadata_section = TabSection(section_name="Metadata", entries=[
-        TabEntry(entry_name="created_at", label="Created At", type="readonly", value=item.get("created_at")),
-        TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
-    ])
+    def __post_init__(self):
+        self.section_method_order = [
+            self._linked_entity_section,
+        ]
+        super().__post_init__()
 
-    # Tabs
-    about_tab = Tab(tab_name="About", sections=[task_info_section])
-    details_tab = Tab(tab_name="Details", sections=[linked_entity_section])
-    metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
+    def _linked_entity_section(self):
+        section_name = "Linked Entity"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="notable_type",
+                    label="Linked To (Type)",
+                    type="hidden",
+                    value=self.item.get("notable_type", "User")
+                ),
+                TabEntry(
+                    entry_name="notable_id",
+                    label="Linked To (ID)",
+                    type="hidden",
+                    value=self.item.get("notable_id", "1")
+                ),
+            ]
+        )
 
-    return [about_tab, details_tab, metadata_tab]
+@dataclass
+class MetadataTab(TabBuilder):
+    tab_name: str = "Metadata"
+
+    def __post_init__(self):
+        self.section_method_order = [
+            self._metadata_section,
+        ]
+        super().__post_init__()
+
+    def _metadata_section(self):
+        section_name = "Metadata"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="created_at",
+                    label="Created At",
+                    type="readonly",
+                    value=self.item.get("created_at")
+                ),
+                TabEntry(
+                    entry_name="updated_at",
+                    label="Updated At",
+                    type="readonly",
+                    value=self.item.get("updated_at")
+                ),
+            ]
+        )
+
+# Constant list of task-related tabs
+TASKS_TABS = [AboutTab, DetailsTab, MetadataTab]

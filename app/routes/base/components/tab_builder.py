@@ -29,18 +29,22 @@ class Tab:
 class TabBuilder(ABC):
     item: Any
     tab_name: str
-    section_method_order: List[Callable] = field(init=False)
+    include_metadata: bool = True
+    section_method_order: List[Callable] = field(default_factory=list, init=False)
+
+    def __post_init__(self):
+        if self.include_metadata:
+            self.section_method_order.append(self._metadata_section)
 
     def _metadata_section(self) -> TabSection:
         section_name = "Metadata"
-        metadata_section = TabSection(
+        return TabSection(
             section_name=section_name,
             entries=[
                 TabEntry(entry_name="created_at", label="Created At", type="readonly", value=self.item.get("created_at")),
                 TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=self.item.get("updated_at")),
             ]
         )
-        return metadata_section
 
     def create_tab(self) -> Tab:
         sections = [method() for method in self.section_method_order]
@@ -48,12 +52,11 @@ class TabBuilder(ABC):
         logger.debug(f"{self.tab_name} tabbing: {tab}")
         return tab
 
-def create_tabs(item: Any, tabs: List[Tab]):
+def create_tabs(item: Any, tabs: List[Callable[[Any], TabBuilder]]) -> List[Tab]:
     grouped_tabs = []
-
-    for tab in tabs:
-        tab_obj = tab(item)
+    for tab_class in tabs:
+        tab_obj = tab_class(item)
+        logger.info(f'Creating tab: {tab_obj.tab_name}')
         tab_entry = tab_obj.create_tab()
         grouped_tabs.append(tab_entry)
-
     return grouped_tabs
