@@ -216,4 +216,4 @@ class ExpertiseAndProjectsTab(TabBuilder):
         )
         return expertise_section
 
-CONTACT_TABS = [BasicInfoTab, RoleAndResponsibilitiesTab, SkillsAndTechnologiesTab, ExpertiseAndProjectsTab]
+CONTACTS_TABS = [BasicInfoTab, RoleAndResponsibilitiesTab, SkillsAndTechnologiesTab, ExpertiseAndProjectsTab]

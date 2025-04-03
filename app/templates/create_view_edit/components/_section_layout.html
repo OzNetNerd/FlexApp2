@@ -34,7 +34,7 @@
               <div class="row g-3">
                 {%- for field in section.entries %}
                   {%- if field.entry_name == 'crisp' and read_only %}
-                    {% include 'pages/components/_crisp.html' with context %}
+                    {% include 'components/_crisp.html' with context %}
                   {%- else %}
                     {{ field_macros.render_field(field, read_only) }}
                   {%- endif %}

@@ -1,55 +1,120 @@
-from app.routes.base.components.tab_builder import Tab, TabSection, TabEntry
-from typing import List
+import logging
+from dataclasses import dataclass, field
+from typing import List, Callable, Any
+from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEntry
 
+logger = logging.getLogger(__name__)
 
-def get_company_tabs(item: dict) -> List[Tab]:
-    """Returns the list of tabs with data injected from the item dictionary.
+@dataclass
+class AboutTab(TabBuilder):
+    tab_name: str = "About"
 
-    Args:
-        item (dict): Dictionary of field values to populate into TabEntry.value.
-
-    Returns:
-        List[Tab]: List of populated Tab objects.
-    """
-    # Company Details section
-    company_details_section = TabSection(section_name="Company Details", entries=[
-        TabEntry(entry_name="name", label="Name", type="text", required=True, value=item.get("name")),
-        TabEntry(entry_name="description", label="Description", type="text", value=item.get("description")),
-    ])
-
-    # CRISP Score section
-    crisp_score_section = TabSection(section_name="CRISP Score", entries=[
-        TabEntry(entry_name="crisp", label="CRISP", type="custom", value=item.get("crisp")),
-    ])
-
-    # About tab
-    about_tab = Tab(tab_name="About", sections=[company_details_section])
-
-    # Insights tab
-    insights_tab = Tab(tab_name="Insights", sections=[crisp_score_section])
-
-    # Metadata tab
-    metadata_section = TabSection(section_name="Metadata", entries=[
-        TabEntry(entry_name="created_at", label="Created At", type="readonly", value=item.get("created_at")),
-        TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=item.get("updated_at")),
-    ])
-    metadata_tab = Tab(tab_name="Metadata", sections=[metadata_section])
-
-    # Relationships section for users and companies
-    relationships_section = TabSection(
-        section_name="Mappings",
-        entries=[
-            TabEntry(entry_name="users", label="Users", type="custom", value=item.get("users")),
-            TabEntry(entry_name="companies", label="Companies", type="custom", value=item.get("companies")),
+    def __post_init__(self):
+        self.section_method_order = [
+            self._company_details_section,
         ]
-    )
 
-    relationships_tab = Tab(
-        tab_name="Relationships",
-        sections=[relationships_section]
-    )
+    def _company_details_section(self):
+        section_name = "Company Details"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="name",
+                    label="Name",
+                    type="text",
+                    required=True,
+                    value=self.item.get("name")
+                ),
+                TabEntry(
+                    entry_name="description",
+                    label="Description",
+                    type="text",
+                    value=self.item.get("description")
+                ),
+            ]
+        )
 
-    tabs = [about_tab, insights_tab, metadata_tab, relationships_tab]
+@dataclass
+class InsightsTab(TabBuilder):
+    tab_name: str = "Insights"
 
+    def __post_init__(self):
+        self.section_method_order = [
+            self._crisp_score_section,
+        ]
 
-    return tabs
+    def _crisp_score_section(self):
+        section_name = "CRISP Score"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="crisp",
+                    label="CRISP",
+                    type="custom",
+                    value=self.item.get("crisp")
+                ),
+            ]
+        )
+
+@dataclass
+class MetadataTab(TabBuilder):
+    tab_name: str = "Metadata"
+
+    def __post_init__(self):
+        self.section_method_order = [
+            self._metadata_section,
+        ]
+
+    def _metadata_section(self):
+        section_name = "Metadata"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="created_at",
+                    label="Created At",
+                    type="readonly",
+                    value=self.item.get("created_at")
+                ),
+                TabEntry(
+                    entry_name="updated_at",
+                    label="Updated At",
+                    type="readonly",
+                    value=self.item.get("updated_at")
+                ),
+            ]
+        )
+
+@dataclass
+class RelationshipsTab(TabBuilder):
+    tab_name: str = "Relationships"
+
+    def __post_init__(self):
+        self.section_method_order = [
+            self._relationships_section,
+        ]
+
+    def _relationships_section(self):
+        section_name = "Mappings"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="users",
+                    label="Users",
+                    type="custom",
+                    value=self.item.get("users")
+                ),
+                TabEntry(
+                    entry_name="companies",
+                    label="Companies",
+                    type="custom",
+                    value=self.item.get("companies")
+                ),
+            ]
+        )
+
+# Constant list of tabs for a company
+COMPANIES_TABS = [AboutTab, InsightsTab, MetadataTab, RelationshipsTab]
