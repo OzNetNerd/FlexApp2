@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Any, Dict, List
+from typing import Any, Dict, List
 from dataclasses import dataclass, field
 from flask import url_for
 from flask_login import current_user
@@ -8,60 +8,56 @@ from app.routes.base.tabs import UI_TAB_MAPPING
 
 logger = logging.getLogger(__name__)
 
+
+
 @dataclass
 class Context:
     """Base context class that allows injecting arbitrary extra fields."""
-    read_only: bool
-    item: Any
-    extra: dict[str, Any]
+    title: str = ""
+    extra: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
         for key, value in self.extra.items():
             setattr(self, key, value)
 
 
-
-from dataclasses import dataclass, field
-from typing import Any, Optional
-
 @dataclass
 class TableContext:
-    title: str
     page_type: str
     table_config: dict
     table_id: str
     data_url: str
     entity_name: str
     add_url: str
-    columns: list[Any]
-
-    read_only: bool = False
-    item: Optional[Any] = None
-    extra: dict[str, Any] = field(default_factory=dict)
+    columns: List[Any]
+    title: str = ""
+    extra: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
-        super().__post_init__()  # This runs Context’s logic for `extra`
-
-
+        for key, value in self.extra.items():
+            setattr(self, key, value)
 
 @dataclass
-class ResourceContext(Context):
+class ResourceContext:
     model: Any
     blueprint_name: str
     item_dict: dict
-    title: str
-    autocomplete_fields: list[dict]
-    error_message: str
+    title: str = ""
+    autocomplete_fields: list[dict] = field(default_factory=list)
+    error_message: str = ""
+    read_only: bool = False
+    extra: Dict[str, Any] = field(default_factory=dict)
 
-    tabs: list = field(init=False)
-    current_user: Any = field(init=False)
-    item_name: str = field(init=False)
-    submit_url: str = field(init=False)
-    id: str = field(init=False)
-    model_name: str = field(init=False)
+    tabs: list = field(default_factory=list, init=False)
+    current_user: Any = field(default=None, init=False)
+    item_name: str = field(default="", init=False)
+    submit_url: str = field(default="", init=False)
+    id: str = field(default="", init=False)
+    model_name: str = field(default="", init=False)
 
     def __post_init__(self) -> None:
-        super().__post_init__()
+        for key, value in self.extra.items():
+            setattr(self, key, value)
 
         self.current_user = current_user
         self.submit_url = (
@@ -78,7 +74,6 @@ class ResourceContext(Context):
                 break
         else:
             self.item_name = self.id
-
 
 class EntityHandler:
     """Handles preparation and validation of dynamic form inputs for web routes."""

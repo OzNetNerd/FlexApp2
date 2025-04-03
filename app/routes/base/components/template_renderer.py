@@ -3,13 +3,13 @@ import traceback
 from flask import render_template, request, current_app
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
 import logging
-from app.routes.base.components.entity_handler import BasicContext, TableContext, ResourceContext
+from app.routes.base.components.entity_handler import Context, TableContext, ResourceContext
 
 logger = logging.getLogger(__name__)
 
 def render_safely(
         template_name: str,
-        context: Union[BasicContext, TableContext, ResourceContext],
+        context: Union[Context, TableContext, ResourceContext],
         fallback_error_message: str = "An error occurred while rendering the page",
         endpoint_name: Optional[str] = None,
 ) -> tuple[str, int] | str:

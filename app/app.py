@@ -16,7 +16,7 @@ from app.routes.web import register_web_blueprints
 from app.routes.base.components.template_renderer import render_safely
 from app.models.base import db
 from app.models.user import User
-from app.routes.base.components.entity_handler import BasicContext, ResourceContext
+from app.routes.base.components.entity_handler import Context, ResourceContext
 from flask import current_app
 
 def configure_logging():
@@ -104,7 +104,7 @@ def create_app(config_class=Config):
 
     @app.errorhandler(404)
     def page_not_found(e):
-        context = BasicContext(
+        context = Context(
             title="404 Not Found",
             item=str(e),
             read_only=True
@@ -113,7 +113,7 @@ def create_app(config_class=Config):
 
     @app.errorhandler(500)
     def internal_server_error(e):
-        context = BasicContext(
+        context = Context(
             title="500 Internal Server Error",
             item=str(e),
             read_only=True
