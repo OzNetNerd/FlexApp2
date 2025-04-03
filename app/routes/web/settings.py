@@ -1,7 +1,7 @@
 import logging
 from app.models.setting import Setting
 from app.routes.web import settings_bp
-from app.routes.web.generic_crud import GenericWebRoutes
+from app.routes.web.generic_crud_routes import GenericWebRoutes
 
 logger = logging.getLogger(__name__)
 

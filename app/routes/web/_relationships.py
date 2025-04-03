@@ -3,7 +3,7 @@
 # import logging
 # from app.models import Relationship
 # from app.routes.web import relationships_bp
-# from app.routes.web.generic import GenericWebRoutes
+# from app.routes.web.generic_crud_routes import GenericWebRoutes
 # from flask import request, render_template, flash, redirect, url_for
 # from app.models.base import db
 # from app.services.relationship_service import RelationshipService

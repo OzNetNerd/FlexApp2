@@ -1,7 +1,7 @@
 import logging
 from app.models import Company
 from app.routes.web import companies_bp
-from app.routes.web.generic_crud import GenericWebRoutes
+from app.routes.web.generic_crud_routes import GenericWebRoutes
 from app.routes.base.tabs.companies import get_company_tabs
 
 logger = logging.getLogger(__name__)
