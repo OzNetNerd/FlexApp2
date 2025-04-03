@@ -1,35 +1,16 @@
-<!-- START TEMPLATE: _pills_nav_content.html -->
 {# ------------------------------------------------------------------------------
   File: _pills_nav_content.html | Purpose: Render pill navigation for tabbed content
   Inputs:
-    - ui: List[Dict] → Contains tab configuration objects
+    - tabs: List[Tab] → Contains tab configuration objects
   Notes:
     - Works in conjunction with tab_content.html
     - Creates pill navigation using Bootstrap nav-pills
 ------------------------------------------------------------------------------ #}
 
-<script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
-  log("info", "_pills_nav_content.html", "init", "🚀 Pills navigation template loaded");
-  log("debug", "_pills_nav_content.html", "config", "UI config exists: {{ ui is defined and ui is not none }}");
-</script>
-
-{% if ui %}
-  <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
-    log("debug", "_pills_nav_content.html", "tabs", "Number of tabs: {{ ui|length }}");
-    {% for tab in ui %}
-      log("debug", "_pills_nav_content.html", "tab_info", "Tab {{ loop.index }}: {{ tab.tab_name }}");
-    {% endfor %}
-  </script>
-
+{% if tabs is defined and tabs is not none and tabs|length > 0 %}
+  <!-- Tab Pills Navigation -->
   <ul class="nav nav-pills mb-3" id="tab-pills" role="tablist">
-    {% for tab in ui %}
-      <script type="module">
-        import log from "{{ url_for('static', filename='js/logger.js') }}";
-        log("debug", "_pills_nav_content.html", "render_pill", "Rendering pill for tab: {{ tab.tab_name }} ({{ loop.index }}/{{ ui|length }})");
-      </script>
-
+    {% for tab in tabs %}
       <li class="nav-item" role="presentation">
         <button class="nav-link {% if loop.first %}active{% endif %}"
                 id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
@@ -44,99 +25,148 @@
           {% endif %}
           {{ tab.tab_name }}
         </button>
-        <script type="module">
-          import log from "{{ url_for('static', filename='js/logger.js') }}";
-          log("debug", "_pills_nav_content.html", "pill_state", "Pill {{ tab.tab_name }} initial state: {% if loop.first %}active{% else %}inactive{% endif %}");
-          {% if tab.icon %}
-            log("debug", "_pills_nav_content.html", "pill_icon", "Pill has icon: fa-{{ tab.icon }}");
-          {% endif %}
-        </script>
       </li>
     {% endfor %}
   </ul>
 
+  <!-- Tab Content -->
+  <div class="tab-content" id="pillsTabContent">
+    {% for tab in tabs %}
+      <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+           id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+           role="tabpanel"
+           aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
+
+        {% if tab.sections and tab.sections|length > 0 %}
+          {% for section in tab.sections %}
+            <div class="card mb-3">
+              {% if section.section_name %}
+                <div class="card-header">
+                  {% if section.icon %}
+                    <i class="fas fa-{{ section.icon }} me-1"></i>
+                  {% endif %}
+                  {{ section.section_name }}
+                </div>
+              {% endif %}
+              <div class="card-body">
+                {% if section.entries and section.entries|length > 0 %}
+                  <div class="row">
+                    {% for entry in section.entries %}
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label" for="{{ entry.entry_name }}">
+                          {{ entry.label }}
+                          {% if entry.required %}<span class="text-danger">*</span>{% endif %}
+                        </label>
+
+                        {% if entry.type == 'text' %}
+                          <input type="text" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}" value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
+                        {% elif entry.type == 'email' %}
+                          <input type="email" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}" value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
+                        {% elif entry.type == 'textarea' %}
+                          <textarea class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}" rows="3" {% if entry.required %}required{% endif %}>{{ entry.value or '' }}</textarea>
+                        {% elif entry.type == 'dropdown' %}
+                          <select class="form-select" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}" {% if entry.required %}required{% endif %}>
+                            <option value="" {% if not entry.value %}selected{% endif %}>-- Select --</option>
+                            {% for option in entry.options or [] %}
+                              <option value="{{ option }}" {% if entry.value == option %}selected{% endif %}>{{ option }}</option>
+                            {% endfor %}
+                          </select>
+                        {% else %}
+                          <input type="text" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}" value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
+                          <small class="text-muted">Unknown type: {{ entry.type }}</small>
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="alert alert-light">No form fields defined for this section.</div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="alert alert-light">
+            No sections defined for this tab.
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
   <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
-    log("info", "_pills_nav_content.html", "nav_rendered", "All pills navigation rendered successfully");
-
-    // Check pill activation on DOM ready
     document.addEventListener('DOMContentLoaded', () => {
-      const activePill = document.querySelector('#tab-pills .nav-link.active');
-      if (activePill) {
-        log("info", "_pills_nav_content.html", "active_pill", "Active pill: " + activePill.textContent.trim());
-        log("debug", "_pills_nav_content.html", "active_pill_target", "Target content: " + activePill.getAttribute('data-bs-target'));
-      } else {
-        log("error", "_pills_nav_content.html", "active_pill", "No active pill found");
-      }
+      // Log events through debug panel if available
+      if (window.debugLogger && window.debugLogger.pills) {
+        window.debugLogger.pills.info('Tab navigation initialized');
 
-      // Verify pills are visible and properly styled
-      const pills = document.querySelectorAll('#tab-pills .nav-link');
-      if (pills.length > 0) {
-        log("debug", "_pills_nav_content.html", "pills_count", `Found ${pills.length} pills in DOM`);
-        
-        // Check if Bootstrap styles are applied
-        const firstPill = pills[0];
-        const computedStyle = window.getComputedStyle(firstPill);
-        const hasBootstrapStyles = computedStyle.borderRadius !== '0px';
-        
-        if (hasBootstrapStyles) {
-          log("debug", "_pills_nav_content.html", "styles", "Bootstrap styles properly applied to pills");
-        } else {
-          log("warn", "_pills_nav_content.html", "styles", "Bootstrap styles may not be applied correctly to pills");
-        }
-      } else {
-        log("error", "_pills_nav_content.html", "pills_count", "No pills found in DOM");
+        // Add event listeners for tab switching
+        document.querySelectorAll('#tab-pills .nav-link').forEach(pill => {
+          pill.addEventListener('click', () => {
+            window.debugLogger.pills.info(`Tab switched to: ${pill.textContent.trim()}`);
+          });
+        });
       }
-    });
-
-    // Monitor pill switching
-    document.addEventListener('shown.bs.tab', event => {
-      const pillId = event.target.id;
-      const targetId = event.target.getAttribute('data-bs-target');
-      log("info", "_pills_nav_content.html", "pill_switched", `Tab switched to: ${event.target.textContent.trim()} (${pillId} → ${targetId})`);
     });
   </script>
+
+  <!-- Include debug panel at the bottom -->
+  {% with
+    template_name="_pills_nav_content.html",
+    debug_id="pills",
+    debug_title="Pills Navigation Debug",
+    debug_data={
+      "tabs_count": tabs|length,
+      "first_tab": tabs[0].tab_name if tabs|length > 0 else "None",
+      "tab_names": tabs|map(attribute='tab_name')|list if tabs|length > 0 else []
+    },
+    debug_context={
+      "item_type": item_type|default('N/A'),
+      "item_id": id|default('N/A')
+    }
+  %}
+    {% include 'base/common/_debug_panel.html' %}
+  {% endwith %}
 {% else %}
-  <div class="alert alert-info">
-    No UI configuration available for navigation.
+  <div class="alert alert-warning">
+    <strong>UI Configuration Missing:</strong> No UI configuration available for navigation.
   </div>
+
+  <!-- Include debug panel with error status -->
+  {% with
+    template_name="_pills_nav_content.html",
+    debug_id="pills",
+    debug_title="Pills Navigation Error",
+    debug_severity="error",
+    debug_expanded=true,
+    debug_data={
+      "tabs_defined": tabs is defined,
+      "tabs_is_none": tabs is defined and tabs is none,
+      "tabs_length": tabs|length if tabs is defined and tabs is not none else 0
+    },
+    debug_context={
+      "item_type": item_type|default('N/A'),
+      "item_id": id|default('N/A')
+    }
+  %}
+    {% include 'base/common/_debug_panel.html' %}
+  {% endwith %}
+
   <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
-    log("warn", "_pills_nav_content.html", "no_ui", "No UI configuration available for navigation");
+    document.addEventListener('DOMContentLoaded', () => {
+      // Log error through debug panel if available
+      if (window.debugLogger && window.debugLogger.pills) {
+        window.debugLogger.pills.error('UI configuration missing');
+
+        // Get basic route information
+        const url = new URL(window.location.href);
+        const pathParts = url.pathname.split('/').filter(part => part.length > 0);
+
+        window.debugLogger.pills.debug('URL analysis', {
+          url: url.toString(),
+          pathParts: pathParts,
+          potentialItemType: pathParts.length > 0 ? pathParts[0] : null
+        });
+      }
+    });
   </script>
 {% endif %}
-
-<script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
-  log("info", "_pills_nav_content.html", "final", "✅ Pills navigation template finished rendering");
-
-  // Additional DOM verification
-  document.addEventListener('DOMContentLoaded', () => {
-    // Check if pills are properly linked to tab content
-    const pills = document.querySelectorAll('#tab-pills .nav-link');
-    let missingTargets = 0;
-    
-    pills.forEach(pill => {
-      const targetId = pill.getAttribute('data-bs-target');
-      if (targetId) {
-        const targetElement = document.querySelector(targetId);
-        if (!targetElement) {
-          log("warn", "_pills_nav_content.html", "validation", `Pill targets missing tab content: ${targetId}`);
-          missingTargets++;
-        }
-      }
-    });
-    
-    if (missingTargets === 0 && pills.length > 0) {
-      log("info", "_pills_nav_content.html", "validation", "All pills correctly target existing tab content");
-    }
-
-    // Check for Bootstrap and event handlers
-    if (typeof bootstrap === 'undefined') {
-      log("error", "_pills_nav_content.html", "deps", "Bootstrap JS not loaded - pill switching may not work");
-    } else {
-      log("debug", "_pills_nav_content.html", "deps", "Bootstrap JS loaded successfully");
-    }
-  });
-</script>
-<!-- END TEMPLATE: _pills_nav_content.html -->

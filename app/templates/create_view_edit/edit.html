@@ -1,5 +1,10 @@
 {% extends "create_view_edit/components/_create_view_edit.html" %}
 
+{# Debug template context #}
+{% if request.endpoint is not defined %}
+<!-- ERROR: No request.endpoint available in template context -->
+{% endif %}
+
 {% block content %}
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
@@ -7,11 +12,26 @@
       <i class="fas fa-edit me-2"></i>
       {{ title }}
     </h3>
+
+    <!-- Debug info section -->
+    <div class="small text-muted">
+      Endpoint: {{ request.endpoint | default('Not Available', true) }} |
+      Type: {{ item_type | default('Not Available', true) }} |
+      ID: {{ id | default('Not Available', true) }}
+    </div>
   </div>
   <div class="card-body">
     <form method="POST" id="edit-form">
-      {% include 'create_view_edit/components/_pills_nav_content.html' %}
-      {% include 'create_view_edit/components/_footer_buttons.html' %}
+      <!-- Pills Navigation with Debug -->
+      <div data-template="_pills_nav_content.html">
+        {% include 'create_view_edit/components/_pills_nav_content.html' %}
+      </div>
+
+      <!-- Footer Buttons Include -->
+      <div data-template="_footer_buttons.html">
+        {% include 'create_view_edit/components/_footer_buttons.html' %}
+      </div>
+      <!-- End Footer Buttons Include -->
     </form>
   </div>
 </div>
@@ -36,26 +56,88 @@
 </div>
 
 <script type="module">
+  // Track form changes
+  let formChanged = false;
+  const formElements = document.querySelectorAll('#edit-form input, #edit-form select, #edit-form textarea');
+
+  formElements.forEach(element => {
+    element.addEventListener('change', () => {
+      formChanged = true;
+
+      // Use debug logger if available
+      if (window.debugLogger && window.debugLogger.edit) {
+        window.debugLogger.edit.info("Form state changed - unsaved changes detected", {
+          element: element.name || element.id,
+          type: element.type,
+          value: element.value
+        });
+      }
+    });
+  });
+
   // Unsaved changes modal handling
   document.addEventListener('DOMContentLoaded', function() {
-    const cancelButton = document.querySelector('#cancel-button');
+    // Find the cancel button
+    const cancelButton = document.querySelector('.d-flex.justify-content-end.mt-4 a.btn-secondary');
+
     if (cancelButton) {
       cancelButton.addEventListener('click', function(event) {
-        event.preventDefault();
-        const modal = new bootstrap.Modal(document.getElementById('unsavedChangesModal'));
-        modal.show();
+        if (formChanged) {
+          event.preventDefault();
+          const modal = new bootstrap.Modal(document.getElementById('unsavedChangesModal'));
+          modal.show();
+        }
       });
     }
+
     const confirmLeaveBtn = document.getElementById('confirmLeaveBtn');
     if (confirmLeaveBtn) {
       confirmLeaveBtn.addEventListener('click', function() {
-        {% if id %}
-          window.location.href = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}";
+        // Use the same URL logic as in the _footer_buttons template
+        {% if id is defined and id is not none %}
+          const viewUrl = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}";
+          window.location.href = viewUrl;
         {% else %}
-          window.location.href = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}";
+          const indexUrl = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}";
+          window.location.href = indexUrl;
         {% endif %}
       });
     }
+
+    // Add form submit handler
+    const form = document.getElementById('edit-form');
+    if (form) {
+      form.addEventListener('submit', function() {
+        formChanged = false; // Reset after submission
+      });
+    }
+  });
+
+  // Add window unload handler for unsaved changes
+  window.addEventListener('beforeunload', function(e) {
+    if (formChanged) {
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    }
   });
 </script>
+
+<!-- Include main debug panel -->
+{% with
+  template_name="edit.html",
+  debug_id="edit",
+  debug_title="Edit Form Debug",
+  debug_data={
+    "item_type": item_type|default('N/A'),
+    "id": id|default('N/A'),
+    "ui_defined": ui is defined,
+    "ui_not_none": ui is defined and ui is not none,
+    "ui_length": ui|length if ui is defined and ui is not none else 0,
+    "title": title|default('N/A'),
+    "endpoint": request.endpoint|default('N/A')
+  }
+%}
+  {% include 'base/common/_debug_panel.html' %}
+{% endwith %}
 {% endblock %}

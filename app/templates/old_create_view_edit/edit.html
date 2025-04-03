@@ -1,118 +1,183 @@
-<!-- START TEMPLATE: edit.html -->
-{# ------------------------------------------------------------------------------
-  File: edit.html | Purpose: Renders an edit form for entities
-  Structure:
-    - Extends: base/create_view_edit.html
-    - Inputs:
-        - title     : Page title
-        - read_only : false
-        - id        : Optional entity ID
-        - ui        : List[Tab] structure with sections and TabEntry fields
-  Output:
-    - A Bootstrap card with tabbed section layout
-    - Cancel button (routes to view or index)
-    - Form posts back to current route
------------------------------------------------------------------------------- #}
+{% extends "create_view_edit/components/_create_view_edit.html" %}
 
-{% extends "create_view_edit/_create_view_edit.html" %}
+{# Debug template context #}
+{% if request.endpoint is not defined %}
+<!-- ERROR: No request.endpoint available in template context -->
+{% endif %}
 
-{% block content -%}
-  {# Include the toast container so it is always rendered #}
-  {% include 'base/common/_toasts.html' %}
-
-  <div class="card border-0 shadow-sm">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-      <h3 class="h4 mb-0 text-primary">
-        <i class="fas fa-edit me-2"></i>
-        {{ title }}
-      </h3>
-      <div class="d-flex gap-2">
-        <!-- Cancel button removed from here as it's in the form itself -->
-      </div>
-    </div>
-
-    <div class="card-body">
-      <form method="POST" id="edit-form">
-        {% include 'create_view_edit/components/_pills_nav_content.html' %}
+{% block content %}
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+    <h3 class="h4 mb-0 text-primary">
+      <i class="fas fa-edit me-2"></i>
+      {{ title }}
+    </h3>
+  </div>
+  <div class="card-body">
+    <form method="POST" id="edit-form">
+      {% include 'create_view_edit/components/_pills_nav_content.html' %}
+      <!-- Footer Buttons Include -->
+      <div data-template="_footer_buttons.html">
         {% include 'create_view_edit/components/_footer_buttons.html' %}
-      </form>
-    </div>
+      </div>
+      <!-- End Footer Buttons Include -->
+    </form>
   </div>
+</div>
 
-  <!-- Unsaved changes confirmation modal -->
-  <div class="modal fade" id="unsavedChangesModal" tabindex="-1" aria-labelledby="unsavedChangesModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="unsavedChangesModalLabel">Unsaved Changes</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          You have unsaved changes. Are you sure you want to leave?
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay on Page</button>
-          <button type="button" class="btn btn-primary" id="confirmLeaveBtn">Leave Without Saving</button>
-        </div>
+<!-- Unsaved changes confirmation modal -->
+<div class="modal fade" id="unsavedChangesModal" tabindex="-1" aria-labelledby="unsavedChangesModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="unsavedChangesModalLabel">Unsaved Changes</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        You have unsaved changes. Are you sure you want to leave?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay on Page</button>
+        <button type="button" class="btn btn-primary" id="confirmLeaveBtn">Leave Without Saving</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Logging for Edit Page Context -->
-  <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
+<script type="module">
+  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  
+  // Track form changes
+  let formChanged = false;
+  const formElements = document.querySelectorAll('#edit-form input, #edit-form select, #edit-form textarea');
+  
+  formElements.forEach(element => {
+    element.addEventListener('change', () => {
+      formChanged = true;
+      log("info", "edit.html", "form_state", "Form state changed - unsaved changes detected");
+    });
+  });
 
-    const editContext = {
-      mode: {{ "'edit'" if id else "'create'" }},
-      entityId: {{ id | tojson }},
-      title: {{ title | tojson }},
-      cancelDestination: {{ "'view'" if id else "'index'" }},
-      tabCount: {{ ui | length }},
-      structure: [
-        {% for tab in ui %}
-          {
-            tab: {{ tab.tab_name | tojson }},
-            sections: {{ tab.sections | map(attribute='section_name') | list | tojson | safe }},
-            fieldCount: {{ tab.sections | map(attribute='entries') | map('length') | sum }}
-          }{% if not loop.last %},{% endif %}
-        {% endfor %}
-      ]
-    };
-
-    log("info", "edit.html", "render", "📝 Edit form initialized", editContext);
-  </script>
-
-  <!-- Unsaved changes modal handler -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Get the cancel button from render_form.html
-      const cancelButton = document.querySelector('#cancel-button');
-
-      if (cancelButton) {
-        // Override the default click behavior
-        cancelButton.addEventListener('click', function(event) {
-          // Prevent the default navigation
-          event.preventDefault();
-
-          // Show the bootstrap modal
-          const modal = new bootstrap.Modal(document.getElementById('unsavedChangesModal'));
-          modal.show();
-        });
-      }
-
-      // Handle confirm leave button click
-      const confirmLeaveBtn = document.getElementById('confirmLeaveBtn');
-      if (confirmLeaveBtn) {
-        confirmLeaveBtn.addEventListener('click', function() {
-          {% if id %}
-            window.location.href = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}";
-          {% else %}
-            window.location.href = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}";
-          {% endif %}
-        });
+  // Unsaved changes modal handling
+  document.addEventListener('DOMContentLoaded', function() {
+    log("info", "edit.html", "init", "🚀 Edit page script initialized");
+    
+    // Debug UI Configuration
+    log("debug", "edit.html", "ui_config", {
+      requestEndpoint: "{{ request.endpoint | default('undefined', true) }}",
+      id: "{{ id | default('undefined', true) }}",
+      template: "edit.html",
+      includesLoaded: {
+        pillsNavContent: document.querySelector('div[data-template="_pills_nav_content.html"]') !== null,
+        footerButtons: document.querySelector('div[data-template="_footer_buttons.html"]') !== null
       }
     });
-  </script>
-{%- endblock %}
 
-<!-- END TEMPLATE: edit.html -->
+    // Check critical template variables
+    if (!("{{ request.endpoint | default('', true) }}")) {
+      log("error", "edit.html", "ui_config", "No request.endpoint available for navigation");
+    }
+    
+    {% if id is defined and id is not none %}
+      log("info", "edit.html", "ui_config", "Working with item ID: {{ id }}");
+    {% else %}
+      log("warn", "edit.html", "ui_config", "No item ID defined in template context");
+    {% endif %}
+    
+    // Use MutationObserver to detect when the footer buttons are added to the DOM
+    const formElement = document.getElementById('edit-form');
+    
+    if (formElement) {
+      log("debug", "edit.html", "dom_check", "Found edit form element");
+      
+      const observer = new MutationObserver(function(mutations) {
+        // Find the cancel button after DOM changes
+        const cancelButton = document.querySelector('.d-flex.justify-content-end.mt-4 a.btn-secondary');
+        const footerContainer = document.querySelector('.d-flex.justify-content-end.mt-4');
+        
+        if (footerContainer) {
+          log("debug", "edit.html", "dom_check", "Footer container found");
+          
+          if (!cancelButton) {
+            log("error", "edit.html", "dom_check", "Footer container exists but cancel button not found - inspect HTML:", {
+              footerHTML: footerContainer.innerHTML.substring(0, 200) + "...",
+              childElements: footerContainer.querySelectorAll('*').length
+            });
+          }
+        }
+        
+        if (cancelButton && !cancelButton.dataset.listenerAttached) {
+          log("debug", "edit.html", "dom_check", "Cancel button found in DOM");
+          cancelButton.dataset.listenerAttached = "true";
+          
+          cancelButton.addEventListener('click', function(event) {
+            if (formChanged) {
+              event.preventDefault();
+              log("info", "edit.html", "interaction", "Cancel clicked with unsaved changes - showing confirmation modal");
+              const modal = new bootstrap.Modal(document.getElementById('unsavedChangesModal'));
+              modal.show();
+            } else {
+              log("info", "edit.html", "interaction", "Cancel clicked with no changes - proceeding to destination");
+              // Allow default navigation since no changes
+            }
+          });
+          
+          // Once we've found and attached to the button, disconnect the observer
+          observer.disconnect();
+        }
+      });
+      
+      // Start observing changes to the form element and its children
+      observer.observe(formElement, { childList: true, subtree: true });
+    } else {
+      log("error", "edit.html", "dom_check", "Form element not found in DOM");
+    }
+    
+    const confirmLeaveBtn = document.getElementById('confirmLeaveBtn');
+    if (confirmLeaveBtn) {
+      confirmLeaveBtn.addEventListener('click', function() {
+        log("info", "edit.html", "interaction", "User confirmed leaving without saving");
+        
+        // Get navigation URL with error handling
+        try {
+          // Use the same URL logic as in the _footer_buttons template
+          {% if id is defined and id is not none %}
+            const viewUrl = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}";
+            log("debug", "edit.html", "navigation", "Generated view URL: " + viewUrl);
+            window.location.href = viewUrl;
+          {% else %}
+            const indexUrl = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}";
+            log("debug", "edit.html", "navigation", "Generated index URL: " + indexUrl);
+            window.location.href = indexUrl;
+          {% endif %}
+        } catch (e) {
+          log("error", "edit.html", "navigation", "Failed to generate navigation URL: " + e.message);
+          alert("No UI configuration available for navigation. Please check the console for details.");
+        }
+      });
+    } else {
+      log("error", "edit.html", "dom_check", "Confirm leave button not found in DOM");
+    }
+    
+    // Add form submit handler to log submission
+    const form = document.getElementById('edit-form');
+    if (form) {
+      form.addEventListener('submit', function() {
+        log("info", "edit.html", "form_action", "Form submitted by user");
+        formChanged = false; // Reset after submission
+      });
+    }
+  });
+  
+  // Add window unload handler to catch browser/tab close with unsaved changes
+  window.addEventListener('beforeunload', function(e) {
+    if (formChanged) {
+      log("warn", "edit.html", "navigation", "Attempted to leave page with unsaved changes");
+      // Standard way to show browser's native confirmation dialog
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    }
+  });
+</script>
+{% endblock %}
