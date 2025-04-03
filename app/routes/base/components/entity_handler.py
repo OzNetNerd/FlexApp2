@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 class Context:
     """Base context class that allows injecting arbitrary extra fields."""
     title: str = ""
+    item: Any = None
+    read_only: bool = True
     extra: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
@@ -31,6 +33,8 @@ class TableContext:
     add_url: str
     columns: List[Any]
     title: str = ""
+    item: Any = None
+    read_only: bool = True
     extra: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
@@ -45,7 +49,8 @@ class ResourceContext:
     title: str = ""
     autocomplete_fields: list[dict] = field(default_factory=list)
     error_message: str = ""
-    read_only: bool = False
+    item: Any = None
+    read_only: bool = True
     extra: Dict[str, Any] = field(default_factory=dict)
 
     tabs: list = field(default_factory=list, init=False)
