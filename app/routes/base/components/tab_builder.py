@@ -5,6 +5,7 @@ from abc import ABC
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class TabEntry:
     entry_name: str
@@ -29,22 +30,7 @@ class Tab:
 class TabBuilder(ABC):
     item: Any
     tab_name: str
-    include_metadata: bool = True
     section_method_order: List[Callable] = field(default_factory=list, init=False)
-
-    def __post_init__(self):
-        if self.include_metadata:
-            self.section_method_order.append(self._metadata_section)
-
-    def _metadata_section(self) -> TabSection:
-        section_name = "Metadata"
-        return TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(entry_name="created_at", label="Created At", type="readonly", value=self.item.get("created_at")),
-                TabEntry(entry_name="updated_at", label="Updated At", type="readonly", value=self.item.get("updated_at")),
-            ]
-        )
 
     def create_tab(self) -> Tab:
         sections = [method() for method in self.section_method_order]
@@ -52,9 +38,46 @@ class TabBuilder(ABC):
         logger.debug(f"{self.tab_name} tabbing: {tab}")
         return tab
 
-def create_tabs(item: Any, tabs: List[Callable[[Any], TabBuilder]]) -> List[Tab]:
+
+
+@dataclass
+class MetadataTab(TabBuilder):
+    tab_name: str = "Metadata"
+
+    def __post_init__(self):
+        self.section_method_order = [
+            self._metadata_section,
+        ]
+
+    def _metadata_section(self):
+        section_name = "Metadata"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(
+                    entry_name="created_at",
+                    label="Created At",
+                    type="readonly",
+                    value=self.item.get("created_at")
+                ),
+                TabEntry(
+                    entry_name="updated_at",
+                    label="Updated At",
+                    type="readonly",
+                    value=self.item.get("updated_at")
+                ),
+            ]
+        )
+
+def create_tabs(item: Any, tabs: List[Callable], add_metadata_tab=True) -> List[Tab]:
+    if add_metadata_tab:
+        all_tabs = list(tabs) + ([MetadataTab])
+
+    else:
+        all_tabs = tabs
+
     grouped_tabs = []
-    for tab_class in tabs:
+    for tab_class in all_tabs:
         tab_obj = tab_class(item)
         logger.info(f'Creating tab: {tab_obj.tab_name}')
         tab_entry = tab_obj.create_tab()

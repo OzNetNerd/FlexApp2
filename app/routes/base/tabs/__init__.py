@@ -10,7 +10,6 @@ UI_TAB_MAPPING = {
     'Company': COMPANIES_TABS,
     'Opportunity': OPPORTUNITIES_TABS,
     'User': USERS_TABS,
-    'Tasks': TASKS_TABS,
+    'Task': TASKS_TABS,
 }
-
 

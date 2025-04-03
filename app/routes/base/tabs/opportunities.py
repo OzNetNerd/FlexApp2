@@ -14,7 +14,6 @@ class OverviewTab(TabBuilder):
             self._details_section,
             self._pipeline_section,
         ]
-        super().__post_init__()
 
     def _details_section(self):
         section_name = "Details"
@@ -73,7 +72,6 @@ class DealTab(TabBuilder):
             self._financial_section,
             self._crisp_section,
         ]
-        super().__post_init__()
 
     def _financial_section(self):
         section_name = "Financial"
@@ -104,36 +102,5 @@ class DealTab(TabBuilder):
                 ),
             ]
         )
-
-@dataclass
-class MetadataTab(TabBuilder):
-    tab_name: str = "Metadata"
-
-    def __post_init__(self):
-        self.section_method_order = [
-            self._metadata_section,
-        ]
-        super().__post_init__()
-
-    def _metadata_section(self):
-        section_name = "Metadata"
-        return TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(
-                    entry_name="created_at",
-                    label="Created At",
-                    type="readonly",
-                    value=self.item.get("created_at")
-                ),
-                TabEntry(
-                    entry_name="updated_at",
-                    label="Updated At",
-                    type="readonly",
-                    value=self.item.get("updated_at")
-                ),
-            ]
-        )
-
 # Constant list of opportunity tabs
-OPPORTUNITIES_TABS = [OverviewTab, DealTab, MetadataTab]
+OPPORTUNITIES_TABS = [OverviewTab, DealTab]

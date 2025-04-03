@@ -1,6 +1,5 @@
 import logging
-from dataclasses import dataclass, field
-from typing import List, Callable, Any
+from dataclasses import dataclass
 from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEntry
 
 logger = logging.getLogger(__name__)
@@ -15,7 +14,6 @@ class AboutTab(TabBuilder):
             self._contact_section,
             self._record_info_section,
         ]
-        super().__post_init__()
 
     def _basic_info_section(self):
         section_name = "Basic Info"
@@ -82,7 +80,6 @@ class InsightsTab(TabBuilder):
         self.section_method_order = [
             self._crisp_score_section,
         ]
-        super().__post_init__()
 
     def _crisp_score_section(self):
         section_name = "CRISP Score"
@@ -99,36 +96,6 @@ class InsightsTab(TabBuilder):
         )
 
 @dataclass
-class MetadataTab(TabBuilder):
-    tab_name: str = "Metadata"
-
-    def __post_init__(self):
-        self.section_method_order = [
-            self._metadata_section,
-        ]
-        super().__post_init__()
-
-    def _metadata_section(self):
-        section_name = "Metadata"
-        return TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(
-                    entry_name="created_at",
-                    label="Created At",
-                    type="readonly",
-                    value=self.item.get("created_at")
-                ),
-                TabEntry(
-                    entry_name="updated_at",
-                    label="Updated At",
-                    type="readonly",
-                    value=self.item.get("updated_at")
-                ),
-            ]
-        )
-
-@dataclass
 class RelationshipsTab(TabBuilder):
     tab_name: str = "Relationships"
 
@@ -136,7 +103,6 @@ class RelationshipsTab(TabBuilder):
         self.section_method_order = [
             self._relationships_section,
         ]
-        super().__post_init__()
 
     def _relationships_section(self):
         section_name = "Relationships"

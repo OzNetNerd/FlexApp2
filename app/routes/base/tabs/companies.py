@@ -13,7 +13,6 @@ class AboutTab(TabBuilder):
         self.section_method_order = [
             self._company_details_section,
         ]
-        super().__post_init__()
 
     def _company_details_section(self):
         section_name = "Company Details"
@@ -44,7 +43,6 @@ class InsightsTab(TabBuilder):
         self.section_method_order = [
             self._crisp_score_section,
         ]
-        super().__post_init__()
 
     def _crisp_score_section(self):
         section_name = "CRISP Score"
@@ -60,35 +58,6 @@ class InsightsTab(TabBuilder):
             ]
         )
 
-@dataclass
-class MetadataTab(TabBuilder):
-    tab_name: str = "Metadata"
-
-    def __post_init__(self):
-        self.section_method_order = [
-            self._metadata_section,
-        ]
-        super().__post_init__()
-
-    def _metadata_section(self):
-        section_name = "Metadata"
-        return TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(
-                    entry_name="created_at",
-                    label="Created At",
-                    type="readonly",
-                    value=self.item.get("created_at")
-                ),
-                TabEntry(
-                    entry_name="updated_at",
-                    label="Updated At",
-                    type="readonly",
-                    value=self.item.get("updated_at")
-                ),
-            ]
-        )
 
 @dataclass
 class RelationshipsTab(TabBuilder):
@@ -98,7 +67,6 @@ class RelationshipsTab(TabBuilder):
         self.section_method_order = [
             self._relationships_section,
         ]
-        super().__post_init__()
 
     def _relationships_section(self):
         section_name = "Mappings"
@@ -121,4 +89,4 @@ class RelationshipsTab(TabBuilder):
         )
 
 # Constant list of tabs for a company
-COMPANIES_TABS = [AboutTab, InsightsTab, MetadataTab, RelationshipsTab]
+COMPANIES_TABS = [AboutTab, InsightsTab, RelationshipsTab]
