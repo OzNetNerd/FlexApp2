@@ -8,17 +8,26 @@ from app.routes.base.tabs import UI_TAB_MAPPING
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
-class BasicContext:
-    title: str
-    item: Optional[Any] = None
-    read_only: bool = False
+class Context:
+    """Base context class that allows injecting arbitrary extra fields."""
+    read_only: bool
+    item: Any
+    extra: dict[str, Any]
+
+    def __post_init__(self):
+        for key, value in self.extra.items():
+            setattr(self, key, value)
+
+
+
+from dataclasses import dataclass, field
+from typing import Any, Optional
 
 @dataclass
 class TableContext:
-    page_type: str
     title: str
+    page_type: str
     table_config: dict
     table_id: str
     data_url: str
@@ -26,50 +35,50 @@ class TableContext:
     add_url: str
     columns: list[Any]
 
+    read_only: bool = False
+    item: Optional[Any] = None
+    extra: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        super().__post_init__()  # This runs Context’s logic for `extra`
+
+
 
 @dataclass
-class ResourceContext:
+class ResourceContext(Context):
     model: Any
     blueprint_name: str
     item_dict: dict
     title: str
-    read_only: bool
+    autocomplete_fields: list[dict]
+    error_message: str
 
-    tabs: List = field(init=False)
+    tabs: list = field(init=False)
     current_user: Any = field(init=False)
-    item: Optional[str] = None
-    error_message: Optional[str] = None
-    autocomplete_fields: List[dict] = field(default_factory=list)  # Use default_factory=list instead of None
+    item_name: str = field(init=False)
+    submit_url: str = field(init=False)
+    id: str = field(init=False)
+    model_name: str = field(init=False)
 
-    # Derived fields with defaults
-    item_name: Optional[str] = None
-    submit_url: Optional[str] = None
-    id: Optional[str] = None
-    model_name: Optional[str] = None
+    def __post_init__(self) -> None:
+        super().__post_init__()
 
-    def __post_init__(self):
-        # Set derived fields
         self.current_user = current_user
-        self.submit_url = url_for(f"{self.blueprint_name}.create") if not self.read_only else ""
+        self.submit_url = (
+            url_for(f"{self.blueprint_name}.create")
+            if not self.read_only else ""
+        )
         self.model_name = self.model.__name__
         self.id = str(self.item_dict.get("id", ""))
-        self.tabs = UI_TAB_MAPPING[self.model.__name__](self.item_dict)
+        self.tabs = UI_TAB_MAPPING[self.model_name](self.item_dict)
 
-        # logger.error("UI TABS")
-        # logger.error(UI_TAB_MAPPING)
-        # logger.error(f'Name: {self.model.__name__}')
-        # logger.error(f'Item: {self.item_dict}')
-        # logger.error(f'Result: {result}')
-
-        # Find a display name by checking keys in priority order: name, title, email, username
-        # If none are found, fall back to the ID as a string
-        name_keys = ["name", "title", "email", "username"]
-        for key in name_keys:
-            if key in self.item_dict and self.item_dict[key]:
+        for key in ("name", "title", "email", "username"):
+            if self.item_dict.get(key):
                 self.item_name = self.item_dict[key]
                 break
         else:
-            self.item_name = str(self.item_dict.get("id", ""))
+            self.item_name = self.id
+
 
 class EntityHandler:
     """Handles preparation and validation of dynamic form inputs for web routes."""
