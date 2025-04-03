@@ -1,8 +1,8 @@
-from app.routes.base.tabs.contacts import contacts_tabs
+from app.routes.base.tabs.contacts import CONTACT_TABS
 
 # In your tabs module or a dedicated registry file
 UI_TAB_MAPPING = {
-    'Contact': contacts_tabs,
+    'Contact': CONTACT_TABS,
     # 'Company': companies_tabs,
 }
 

@@ -1,16 +1,13 @@
-from app.routes.base.components.tab_builder import TabSection, TabEntry, TabBuilder
 from dataclasses import dataclass, field
-from typing import Any, List, Callable
-import logging
+from typing import List, Callable, Any
+from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEntry
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class BasicInfoTab(TabBuilder):
-    item: Any
+    # Only override the default for tab_name; do not re-declare 'item'
     tab_name: str = "Basic Info"
-    section_method_order: List[Callable] = field(init=False)
 
     def __post_init__(self):
         self.section_method_order = [
@@ -20,42 +17,37 @@ class BasicInfoTab(TabBuilder):
 
     def _basic_info_section(self):
         section_name = "Contact"
-        contact_info_section = TabSection(
+        return TabSection(
             section_name=section_name,
             entries=[
                 TabEntry(entry_name="first_name", label="First Name", type="text", required=True,
                          value=self.item.get("first_name")),
                 TabEntry(entry_name="last_name", label="Last Name", type="text", required=True,
                          value=self.item.get("last_name")),
-                TabEntry(entry_name="email", label="Email", type="email", required=True, value=self.item.get("email")),
-                TabEntry(entry_name="phone_number", label="Phone Number", type="text", value=self.item.get("phone_number")),
+                TabEntry(entry_name="email", label="Email", type="email", required=True,
+                         value=self.item.get("email")),
+                TabEntry(entry_name="phone_number", label="Phone Number", type="text",
+                         value=self.item.get("phone_number")),
             ]
         )
-        logger.info(f"Finished creating {contact_info_section} section")
-        return contact_info_section
 
     def _role_info_section(self):
         section_name = "Role Information"
-        role_info_section = TabSection(
+        return TabSection(
             section_name=section_name,
             entries=[
                 TabEntry(entry_name="role", label="Role", type="text", value=self.item.get("role")),
-                TabEntry(
-                    entry_name="role_level",
-                    label="Role Level",
-                    type="dropdown",
-                    options=["Junior", "Mid", "Senior", "Lead"],
-                    value=self.item.get("role_level")
-                ),
-                TabEntry(entry_name="team_bu_name", label="Team Name", type="text", value=self.item.get("team_bu_name")),
+                TabEntry(entry_name="role_level", label="Role Level", type="dropdown",
+                         options=["Junior", "Mid", "Senior", "Lead"], value=self.item.get("role_level")),
+                TabEntry(entry_name="team_bu_name", label="Team Name", type="text",
+                         value=self.item.get("team_bu_name")),
             ]
         )
-        return role_info_section
+
 
 
 @dataclass
 class RoleAndResponsibilitiesTab(TabBuilder):
-    item: Any
     tab_name: str = "Roles and Responsibilities"
     section_method_order: List[Callable] = field(init=False)
 
@@ -223,10 +215,4 @@ class ExpertiseAndProjectsTab(TabBuilder):
         )
         return expertise_section
 
-def contacts_tabs(item):
-    tabs = []
-
-    for tab in [BasicInfoTab, RoleAndResponsibilitiesTab, SkillsAndTechnologiesTab, ExpertiseAndProjectsTab]:
-        tabs.append(tab(item).create_tab())
-
-    return tabs
+CONTACT_TABS = [BasicInfoTab, RoleAndResponsibilitiesTab, SkillsAndTechnologiesTab, ExpertiseAndProjectsTab]

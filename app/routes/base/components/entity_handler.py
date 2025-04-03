@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from flask import url_for
 from flask_login import current_user
 from app.routes.base.tabs import UI_TAB_MAPPING
-
+from app.routes.base.components.tab_builder import create_tabs
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +71,8 @@ class ResourceContext:
         )
         self.model_name = self.model.__name__
         self.id = str(self.item_dict.get("id", ""))
-        self.tabs = UI_TAB_MAPPING[self.model_name](self.item_dict)
+        tab_entries = UI_TAB_MAPPING[self.model_name]
+        self.tabs = create_tabs(item=self.item_dict, tabs=tab_entries)
 
         for key in ("name", "title", "email", "username"):
             if self.item_dict.get(key):

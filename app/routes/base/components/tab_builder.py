@@ -1,9 +1,9 @@
 import logging
 from typing import Any, List, Optional, Callable
 from dataclasses import dataclass, field
+from abc import ABC
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class TabEntry:
@@ -15,7 +15,6 @@ class TabEntry:
     default: Optional[Any] = None
     value: Optional[Any] = None
 
-
 @dataclass
 class TabSection:
     section_name: str
@@ -26,13 +25,13 @@ class Tab:
     tab_name: str
     sections: List[TabSection] = field(default_factory=list)
 
-class TabBuilder:
+@dataclass
+class TabBuilder(ABC):
     item: Any
     tab_name: str
-    # order the sections will be displayed
-    section_method_order: List[Callable]
+    section_method_order: List[Callable] = field(init=False)
 
-    def _metadata_section(self):
+    def _metadata_section(self) -> TabSection:
         section_name = "Metadata"
         metadata_section = TabSection(
             section_name=section_name,
@@ -43,12 +42,18 @@ class TabBuilder:
         )
         return metadata_section
 
-    def create_tab(self):
-        """
-        Creates a Tab object with the given tab_name and list of TabSection objects.
-        """
-        # Call each section method to get the actual TabSection objects
+    def create_tab(self) -> Tab:
         sections = [method() for method in self.section_method_order]
         tab = Tab(tab_name=self.tab_name, sections=sections)
         logger.debug(f"{self.tab_name} tabbing: {tab}")
         return tab
+
+def create_tabs(item: Any, tabs: List[Tab]):
+    grouped_tabs = []
+
+    for tab in tabs:
+        tab_obj = tab(item)
+        tab_entry = tab_obj.create_tab()
+        grouped_tabs.append(tab_entry)
+
+    return grouped_tabs
