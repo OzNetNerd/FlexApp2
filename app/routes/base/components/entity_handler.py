@@ -15,6 +15,17 @@ class BasicContext:
     item: Optional[Any] = None
     read_only: bool = False
 
+@dataclass
+class TableContext:
+    page_type: str
+    title: str
+    table_config: dict
+    table_id: str
+    data_url: str
+    entity_name: str
+    add_url: str
+    columns: list[Any]
+
 
 @dataclass
 class ResourceContext:
@@ -59,17 +70,6 @@ class ResourceContext:
                 break
         else:
             self.item_name = str(self.item_dict.get("id", ""))
-
-@dataclass
-class TableContext:
-    page_type: str
-    title: str
-    table_config: dict
-    table_id: str
-    data_url: str
-    entity_name: str
-    add_url: str
-    columns: list[Any]
 
 class EntityHandler:
     """Handles preparation and validation of dynamic form inputs for web routes."""
