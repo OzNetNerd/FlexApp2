@@ -2,7 +2,7 @@
 
 from app.models import User
 from app.routes.web import users_bp
-from app.routes.web.generic import GenericWebRoutes
+from app.routes.web.generic_crud import GenericWebRoutes
 import logging
 from app.routes.base.tabs.users import get_users_tabs
 
