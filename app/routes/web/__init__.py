@@ -1,13 +1,13 @@
+# app/routes/web/__init__.py
+
 import logging
 from flask import Blueprint
-
-# Auth handlers must be imported early to register routes
 from app.routes.web.auth import login, logout
+from app.routes.web.index import index_bp  # 👈 your blueprint with routes
 
 logger = logging.getLogger(__name__)
 
-# Create blueprints for web UI
-main_bp = Blueprint("main", __name__)
+# Create blueprints for web UI (these should be imported from their own modules ideally)
 users_bp = Blueprint("users", __name__, url_prefix="/users")
 companies_bp = Blueprint("companies", __name__, url_prefix="/companies")
 contacts_bp = Blueprint("contacts", __name__, url_prefix="/contacts")
@@ -18,20 +18,15 @@ auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth")
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 settings_bp = Blueprint("settings", __name__, url_prefix="/settings")
 
-
 # Register login/logout routes with auth blueprint
 auth_bp.add_url_rule("/login", view_func=login, methods=["GET", "POST"])
 auth_bp.add_url_rule("/logout", view_func=logout, methods=["GET"])
-
-# Import modules to register routes after blueprints are created
-# from routes.web.crud import tasks
-# from app.routes.web.crud.tasks import task_routes
 
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""
     logger.debug("Registering web blueprints...")
 
-    app.register_blueprint(main_bp)
+    app.register_blueprint(index_bp)         # 👈 now includes route for "/"
     app.register_blueprint(users_bp)
     app.register_blueprint(companies_bp)
     app.register_blueprint(contacts_bp)
