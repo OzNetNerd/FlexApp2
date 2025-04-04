@@ -14,6 +14,8 @@ class AboutTab(TabBuilder):
             self._task_info_section,
         ]
 
+        super().__post_init__()
+
     def _task_info_section(self):
         section_name = "Task Info"
         return TabSection(
@@ -72,6 +74,8 @@ class DetailsTab(TabBuilder):
         self.section_method_order = [
             self._linked_entity_section,
         ]
+
+        super().__post_init__()
 
     def _linked_entity_section(self):
         section_name = "Linked Entity"

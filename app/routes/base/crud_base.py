@@ -135,7 +135,7 @@ class CRUDRoutesBase:
                 try:
                     json.dumps({key: value})
                 except TypeError as e:
-                    logger.error(f"JSON serialization error at {current_path}: {str(e)}")
+                    logger.error(f"❌  JSON serialization error at {current_path}: {str(e)}")
                     issues.append(f"{current_path}: {type(value).__name__}")
 
                 if isinstance(value, dict):

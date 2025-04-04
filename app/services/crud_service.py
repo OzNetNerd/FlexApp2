@@ -69,7 +69,7 @@ class CRUDService:
             return query.paginate(page=page, per_page=per_page, error_out=False)
 
         except Exception as e:
-            logger.error(f"Error in get_all for {self.model_class.__name__}: {e}")
+            logger.error(f"❌  Error in get_all for {self.model_class.__name__}: {e}")
             logger.error(traceback.format_exc())
             raise
 
@@ -86,7 +86,7 @@ class CRUDService:
         try:
             return self.model_class.query.get_or_404(item_id)
         except Exception as e:
-            logger.error(f"Error in get_by_id for {self.model_class.__name__} with id {item_id}: {e}")
+            logger.error(f"❌  Error in get_by_id for {self.model_class.__name__} with id {item_id}: {e}")
             logger.error(traceback.format_exc())
             raise
 
@@ -133,7 +133,7 @@ class CRUDService:
             return item
         except Exception as e:
             db.session.rollback()
-            logger.error(f"Error creating {self.model_class.__name__}: {e}")
+            logger.error(f"❌  Error creating {self.model_class.__name__}: {e}")
             logger.error(traceback.format_exc())
             raise
 
@@ -164,7 +164,7 @@ class CRUDService:
             return item
         except Exception as e:
             db.session.rollback()
-            logger.error(f"Error updating {item.__class__.__name__} with id {item.id}: {e}")
+            logger.error(f"❌  Error updating {item.__class__.__name__} with id {item.id}: {e}")
             logger.error(traceback.format_exc())
             raise
 
@@ -184,7 +184,7 @@ class CRUDService:
             return True
         except Exception as e:
             db.session.rollback()
-            logger.error(f"Error deleting {item.__class__.__name__} with id {item.id}: {e}")
+            logger.error(f"❌  Error deleting {item.__class__.__name__} with id {item.id}: {e}")
             logger.error(traceback.format_exc())
             raise
 

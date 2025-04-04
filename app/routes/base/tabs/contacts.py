@@ -16,6 +16,8 @@ class BasicInfoTab(TabBuilder):
             self._role_info_section,
         ]
 
+        super().__post_init__()
+
     def _basic_info_section(self):
         section_name = "Contact"
         return TabSection(
@@ -57,6 +59,8 @@ class RoleAndResponsibilitiesTab(TabBuilder):
             self._role_responsibilities_section,
         ]
 
+        super().__post_init__()
+
     def _role_responsibilities_section(self):
         section_name = "Role and Responsibilities"
         role_responsibilities_section = TabSection(
@@ -96,6 +100,8 @@ class SkillsAndTechnologiesTab(TabBuilder):
             self._skill_level_section,
             self._technologies_used_section,
         ]
+
+        super().__post_init__()
 
     def _skill_level_section(self):
         section_name = "Skill Level"

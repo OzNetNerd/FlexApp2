@@ -48,7 +48,7 @@ def render_safely(
             details = f"Syntax error in template '{template_name}': {str(e)}"
             status_code = 500
         else:
-            error_type = "Rendering Error"
+            error_type = "❌  Rendering Error"
             details = str(e)
             status_code = 500
 
@@ -75,5 +75,5 @@ def render_safely(
         except Exception as e2:
             # Even the fallback render failed — this is the last resort.
             # Return a minimal HTML error message directly.
-            logger.critical(f"Failed to re-render '{template_name}' with error context: {e2} for {current_endpoint} ({current_path})")
+            logger.critical(f"❌  Failed to re-render '{template_name}' with error context: {e2} for {current_endpoint} ({current_path})")
             return f"<h1>{fallback_error_message}</h1><p>{error_type}</p>", status_code

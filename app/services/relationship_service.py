@@ -33,7 +33,7 @@ class RelationshipService:
         """Get an entity by type and ID."""
         model = cls.ENTITY_MODELS.get(entity_type.lower())
         if not model:
-            logger.error(f"Unknown entity type: {entity_type}")
+            logger.error(f"❌  Unknown entity type: {entity_type}")
             return None
 
         return model.query.get(entity_id)
@@ -101,7 +101,7 @@ class RelationshipService:
 
         except Exception as e:
             db.session.rollback()
-            logger.error(f"Error creating relationship: {str(e)}")
+            logger.error(f"❌  Error creating relationship: {str(e)}")
             return False, None, f"Error creating relationship: {str(e)}"
 
     @classmethod
@@ -120,8 +120,8 @@ class RelationshipService:
 
         except Exception as e:
             db.session.rollback()
-            logger.error(f"Error deleting relationship: {str(e)}")
-            return False, f"Error deleting relationship: {str(e)}"
+            logger.error(f"❌  Error deleting relationship: {str(e)}")
+            return False, f"❌  Error deleting relationship: {str(e)}"
 
     @classmethod
     def get_relationships_for_entity(cls, entity_type: str, entity_id: int) -> List[Dict[str, Any]]:

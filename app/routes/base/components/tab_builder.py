@@ -3,6 +3,9 @@ from typing import Any, List, Optional, Callable
 from dataclasses import dataclass, field
 from abc import ABC
 
+from app.utils.app_logging import log_instance_vars
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -33,7 +36,7 @@ class TabBuilder(ABC):
     section_method_order: List[Callable] = field(default_factory=list, init=False)
 
     def __post_init__(self):
-        logger.info(f'Item: {self.item}')
+        log_instance_vars(self, exclude=['item'])
 
     def create_tab(self) -> Tab:
         sections = [method() for method in self.section_method_order]
@@ -73,21 +76,21 @@ class MetadataTab(TabBuilder):
         )
 
 def create_tabs(item: Any, tabs: List[Callable], add_metadata_tab=True) -> List[Tab]:
-    logger.info(f'About to start creating tabs for UI')
+    logger.info(f'ℹ️ About to start creating tabs for UI')
     if add_metadata_tab:
-        logger.info("Add 'metadata' option is enabled. Will add the tab to the UI")
         all_tabs = list(tabs) + ([MetadataTab])
+        logger.info("ℹ️ Add 'metadata' option is enabled. Will add the tab to the UI")
 
     else:
-        logger.info("Add 'metadata' option is disabled. Will NOT add the tab to the UI")
+        logger.info("ℹ️ Add 'metadata' option is disabled. Will NOT add the tab to the UI")
         all_tabs = tabs
 
     grouped_tabs = []
     for tab_class in all_tabs:
         tab_obj = tab_class(item)
-        logger.info(f'Creating tab: {tab_obj.tab_name}')
+        logger.info(f'📂 Creating tab: {tab_obj.tab_name}')
         tab_entry = tab_obj.create_tab()
         grouped_tabs.append(tab_entry)
 
-    logger.info(f"Successfully added {len(grouped_tabs)} tabs")
+    logger.info(f"✅  Successfully added {len(grouped_tabs)} tabs")
     return grouped_tabs

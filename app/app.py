@@ -19,25 +19,78 @@ from app.models.user import User
 from app.routes.base.components.entity_handler import Context, ResourceContext
 from flask import current_app
 
-def configure_logging():
+
+class IndentationPreservingFormatter(logging.Formatter):
+    """Formatter that preserves leading whitespace by re-injecting it after log formatting."""
+
+    def __init__(self, fmt=None, datefmt=None, style='%'):
+        super().__init__(fmt, datefmt, style)
+        self.indent_level = 0
+        self.indent_char = "  "
+
+    def format(self, record):
+        original_msg = record.getMessage()
+
+        # Add indentation to the message if needed
+        if hasattr(record, 'indent_level'):
+            indent_level = record.indent_level
+        else:
+            indent_level = self.indent_level
+
+        # Save leading whitespace (if any)
+        leading_ws = ''
+        if isinstance(record.msg, str):
+            stripped = record.msg.lstrip()
+            leading_ws = record.msg[:len(record.msg) - len(stripped)]
+            # Add indentation
+            if not leading_ws.startswith(self.indent_char * indent_level):
+                record.msg = self.indent_char * indent_level + record.msg
+
+        # Format the record using the base logic
+        formatted = super().format(record)
+
+        return formatted
+
+
+def configure_logging() -> None:
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
     handler = logging.StreamHandler()
-    formatter = logging.Formatter(
+    formatter = IndentationPreservingFormatter(
         "%(asctime)s - %(name)s - %(filename)s - %(funcName)s - %(lineno)d - %(levelname)s - %(message)s"
     )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
+    # Add indentation control methods to the logger
+    def increase_indent():
+        formatter.indent_level += 1
+
+    def decrease_indent():
+        if formatter.indent_level > 0:
+            formatter.indent_level -= 1
+
+    def set_indent(level):
+        formatter.indent_level = max(0, level)
+
+    # Attach methods to the logger
+    logger.increase_indent = increase_indent
+    logger.decrease_indent = decrease_indent
+    logger.set_indent = set_indent
+
+
+# Global logger and Flask extensions
 logger = logging.getLogger(__name__)
 login_manager = LoginManager()
 migrate = Migrate()
 
+
 @login_manager.unauthorized_handler
 def unauthorized():
     return make_response("🔒 Unauthorized - Please log in first", 401)
+
 
 def create_app(config_class=Config):
     configure_logging()
@@ -80,7 +133,12 @@ def create_app(config_class=Config):
         if endpoint is None:
             return
         if not current_user.is_authenticated:
-            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
+            if (
+                    endpoint in whitelisted
+                    or endpoint.startswith("static")
+                    or endpoint.startswith("api_")
+                    or endpoint.endswith(".data")
+            ):
                 return
             return redirect(url_for("auth_bp.login", next=request.path))
 
@@ -125,11 +183,8 @@ def create_app(config_class=Config):
         from app import models
         db.create_all()
 
-        # logger.debug("--- Registered URL Rules ---")
-        # for rule in sorted(app.url_map.iter_rules(), key=lambda r: r.endpoint):
-            # logger.debug(f"Endpoint: {rule.endpoint}, Methods: {rule.methods}, Rule: {rule}")
-
     return app
+
 
 app = create_app()
 

@@ -76,7 +76,7 @@ class ItemManager:
         except Exception as e:
             error_msg = f"Error accessing {self.model.__name__} with id {item_id}: {str(e)}"
             logger.error(error_msg)
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            logger.error(f"❌  Traceback: {traceback.format_exc()}")
             return None, error_msg
 
     def create_item(self, form_data):
@@ -99,7 +99,7 @@ class ItemManager:
             logger.warning(f"Validation error during create: {ve}")
             return None, str(ve)
         except Exception as e:
-            logger.error(f"Error creating {self.model.__name__}: {e}")
+            logger.error(f"❌  Error creating {self.model.__name__}: {e}")
             logger.error(traceback.format_exc())
             return None, f"Error creating {self.model.__name__}: {str(e)}"
 
@@ -155,7 +155,7 @@ class ItemManager:
             logger.warning(f"Validation error during update: {ve}")
             return None, str(ve)
         except Exception as e:
-            logger.error(f"Error updating {self.model.__name__} with id {item.id}: {e}")
+            logger.error(f"❌  Error updating {self.model.__name__} with id {item.id}: {e}")
             logger.error(traceback.format_exc())
             db.session.rollback()
             return None, f"Error updating {self.model.__name__}: {str(e)}"
@@ -234,6 +234,6 @@ class ItemManager:
             flash(f"{self.model.__name__} deleted successfully", "success")
             return True, None
         except Exception as e:
-            logger.error(f"Error deleting {self.model.__name__} with id {item.id}: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
-            return False, f"Error deleting {self.model.__name__}: {str(e)}"
+            logger.error(f"❌  Error deleting {self.model.__name__} with id {item.id}: {str(e)}")
+            logger.error(f"❌  Traceback: {traceback.format_exc()}")
+            return False, f"❌  Error deleting {self.model.__name__}: {str(e)}"

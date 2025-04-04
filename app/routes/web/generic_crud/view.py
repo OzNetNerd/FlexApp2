@@ -60,7 +60,7 @@ def view_route(ctx: Any, item_id: int) -> Any:
         blueprint_name=ctx.blueprint.name,
         item_dict=item_dict,
         item=None,
-        title="Viewing",
+        action="Viewing",
         read_only=True
     )
 

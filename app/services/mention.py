@@ -73,5 +73,5 @@
 #     elif mention_type == "company":
 #         return Company.search_by_name(query)
 #
-#     logger.error(f"Invalid mention_type: '{mention_type}'")
+#     logger.error(f"❌ Invalid mention_type: '{mention_type}'")
 #     return []

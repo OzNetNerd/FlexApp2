@@ -84,7 +84,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
                 200,
             )
         except Exception as e:
-            logger.error(f"Error in list route: {str(e)}")
+            logger.error(f"❌  Error in list route: {str(e)}")
             logger.error(traceback.format_exc())
             return jsonify({"error": "Internal Server Error", "message": str(e)}), 500
 
@@ -103,7 +103,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
             item = self.service.get_by_id(self.model, item_id)
             return jsonify({"data": self._ensure_json_serializable(item.to_dict())}), 200
         except Exception as e:
-            logger.error(f"Error in get route: {str(e)}")
+            logger.error(f"❌  Error in get route: {str(e)}")
             logger.error(traceback.format_exc())
             return jsonify(
                 {
@@ -137,7 +137,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
                 201,
             )
         except Exception as e:
-            logger.error(f"Error in create route: {str(e)}")
+            logger.error(f"❌  Error in create route: {str(e)}")
             logger.error(traceback.format_exc())
             return jsonify({"error": "Internal Server Error", "message": str(e)}), 500
 
@@ -170,7 +170,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
                 200,
             )
         except Exception as e:
-            logger.error(f"Error in update route: {str(e)}")
+            logger.error(f"❌  Error in update route: {str(e)}")
             logger.error(traceback.format_exc())
             return jsonify({"error": "Internal Server Error", "message": str(e)}), 500
 
@@ -190,6 +190,6 @@ class GenericAPIRoutes(CRUDRoutesBase):
             self.service.delete(item)
             return jsonify({"message": f"{self.model.__name__} deleted successfully"}), 200
         except Exception as e:
-            logger.error(f"Error in delete route: {str(e)}")
+            logger.error(f"❌  Error in delete route: {str(e)}")
             logger.error(traceback.format_exc())
             return jsonify({"error": "Internal Server Error", "message": str(e)}), 500

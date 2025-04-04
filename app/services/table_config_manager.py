@@ -35,26 +35,26 @@ class TableConfigManager:
             logger.debug(f"Retrieved table config for {table_name}")
 
             if not isinstance(table_config, dict):
-                logger.error(f"Table config is not a dictionary: {type(table_config).__name__}")
+                logger.error(f"❌  Table config is not a dictionary: {type(table_config).__name__}")
                 table_config = {}
 
             if "columns" not in table_config:
-                logger.error(f"No 'columns' found in table config for {table_name}")
+                logger.error(f"❌  No 'columns' found in table config for {table_name}")
                 table_config["columns"] = []
 
             try:
                 json.dumps(table_config["columns"])
                 logger.debug(f"Columns are JSON serializable with {len(table_config.get('columns', []))} columns")
             except TypeError as e:
-                logger.error(f"Columns are not JSON serializable: {str(e)}")
+                logger.error(f"❌  Columns are not JSON serializable: {str(e)}")
                 table_config["columns"] = self.json_validator.ensure_json_serializable(table_config.get("columns", []))
 
             issues = self.json_validator.validate_json_serializable(table_config)
             if issues:
-                logger.error(f"JSON serialization issues in table_config: {issues}")
+                logger.error(f"❌  JSON serialization issues in table_config: {issues}")
 
             return table_config
         except Exception as e:
-            logger.error(f"Error retrieving table config for {table_name}: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            logger.error(f"❌  Error retrieving table config for {table_name}: {str(e)}")
+            logger.error(f"❌  Traceback: {traceback.format_exc()}")
             return {"columns": []}

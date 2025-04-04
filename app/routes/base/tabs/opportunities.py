@@ -15,6 +15,8 @@ class OverviewTab(TabBuilder):
             self._pipeline_section,
         ]
 
+        super().__post_init__()
+
     def _details_section(self):
         section_name = "Details"
         return TabSection(
@@ -72,6 +74,8 @@ class DealTab(TabBuilder):
             self._financial_section,
             self._crisp_section,
         ]
+
+        super().__post_init__()
 
     def _financial_section(self):
         section_name = "Financial"

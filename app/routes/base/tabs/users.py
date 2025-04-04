@@ -15,6 +15,8 @@ class AboutTab(TabBuilder):
             self._record_info_section,
         ]
 
+        super().__post_init__()
+
     def _basic_info_section(self):
         section_name = "Basic Info"
         return TabSection(
@@ -81,6 +83,8 @@ class InsightsTab(TabBuilder):
             self._crisp_score_section,
         ]
 
+        super().__post_init__()
+
     def _crisp_score_section(self):
         section_name = "CRISP Score"
         return TabSection(
@@ -103,6 +107,8 @@ class RelationshipsTab(TabBuilder):
         self.section_method_order = [
             self._relationships_section,
         ]
+
+        super().__post_init__()
 
     def _relationships_section(self):
         section_name = "Relationships"

@@ -101,7 +101,7 @@ def reset_config(table_name):
     }
 
     if table_name not in default_configs:
-        logger.error(f"No default configuration found for table '{table_name}'.")
+        logger.error(f"❌  No default configuration found for table '{table_name}'.")
         return jsonify({"error": f"No default configuration found for {table_name}"}), 404
 
     TableConfig.set_config(table_name, default_configs[table_name])

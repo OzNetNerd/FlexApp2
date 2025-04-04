@@ -47,14 +47,14 @@ class DataRouteHandler:
         try:
             sort_model = json.loads(sort_model)
         except (TypeError, json.JSONDecodeError) as e:
-            logger.error(f"Error parsing sortModel JSON: {e}")
+            logger.error(f"❌  Error parsing sortModel JSON: {e}")
             sort_model = []
 
         filter_model = request.args.get("filterModel", "{}")
         try:
             filter_model = json.loads(filter_model)
         except (TypeError, json.JSONDecodeError) as e:
-            logger.error(f"Error parsing filterModel JSON: {e}")
+            logger.error(f"❌  Error parsing filterModel JSON: {e}")
             filter_model = {}
 
         sort_column = sort_model[0].get("colId", "id") if sort_model else "id"
@@ -113,8 +113,8 @@ class DataRouteHandler:
             )
 
         except Exception as e:
-            logger.error(f"Error in data route: {str(e)}")
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            logger.error(f"❌  Error in data route: {str(e)}")
+            logger.error(f"❌  Traceback: {traceback.format_exc()}")
             return (
                 jsonify({"error": str(e), "data": [], "total": 0, "page": 1, "per_page": 15}),
                 500,
