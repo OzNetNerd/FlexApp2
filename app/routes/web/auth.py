@@ -55,7 +55,7 @@ def login():
         logger.warning(f"Failed login attempt for email: {email}")
 
     context = Context(title="TBA")
-    return render_safely("login.html", context)  # Use render_safely for safe rendering
+    return render_safely("pages/misc/login.html", context)  # Use render_safely for safe rendering
 
 
 

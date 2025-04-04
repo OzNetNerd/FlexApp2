@@ -37,9 +37,9 @@ class GenericWebRoutes(CRUDRoutesBase):
     required_fields: List[str] = field(default_factory=list)
     unique_fields: List[str] = field(default_factory=list)
     index_template: str = GENERIC_TEMPLATE
-    view_template: Optional[str] = "view.html"
-    create_template: Optional[str] = "create.html"
-    edit_template: Optional[str] = "edit.html"
+    view_template: Optional[str] = "pages/crud/view.html"
+    create_template: Optional[str] = "pages/crud/create.html"
+    edit_template: Optional[str] = "pages/crud/edit.html"
     api_url_prefix: Optional[str] = None
 
     def __post_init__(self) -> None:

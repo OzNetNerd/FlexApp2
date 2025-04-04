@@ -15,14 +15,14 @@ class CompanyCRUDRoutes(GenericWebRoutes):
 # - The `Company` model as the target for CRUD operations.
 # - A required field for company creation: `name`.
 # - A uniqueness constraint on the `name` field to prevent duplicate entries.
-# - The template used for rendering the companies table: `entity_tables/companies.html`.
+# - The template used for rendering the companies table: `pages/tables/companies.html`.
 # - A custom function (`get_company_tabs`) to define the tabs displayed on the company creation page.
 company_routes = CompanyCRUDRoutes(
     blueprint=companies_bp,
     model=Company,
     required_fields=["name"],
     unique_fields=["name"],
-    index_template="entity_tables/companies.html",
+    index_template="pages/tables/companies.html",
     # create_tabs_function=get_company_tabs,
 )
 

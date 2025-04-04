@@ -38,7 +38,7 @@ class SettingsCRUDRoutes(GenericWebRoutes):
 settings_routes = SettingsCRUDRoutes(
     blueprint=settings_bp,
     model=Setting,
-    index_template="settings.html",
+    index_template="pages/misc/settings.html",
     required_fields=[],
     unique_fields=[],
 )

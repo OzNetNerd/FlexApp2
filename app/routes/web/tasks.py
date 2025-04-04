@@ -25,13 +25,13 @@ class TaskCRUDRoutes(GenericWebRoutes):
 # - The `Task` model as the target for CRUD operations.
 # - Required fields for task creation: `title` and `status`.
 # - No uniqueness constraint is applied to any fields.
-# - The template used for rendering the tasks table: `entity_tables/tasks.html`.
+# - The template used for rendering the tasks table: `pages/tables/tasks.html`.
 # - A custom function (`get_task_tabs`) to define the tabs displayed on the task creation page.
 logger.debug("Setting up CRUD routes for Task model.")
 task_routes = TaskCRUDRoutes(
     model=Task,
     blueprint=tasks_bp,
-    index_template="entity_tables/tasks.html",
+    index_template="pages/tables/tasks.html",
     required_fields=["title", "status"],
     unique_fields=[],
     # create_tabs_function=get_task_tabs,

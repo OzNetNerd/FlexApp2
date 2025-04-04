@@ -60,12 +60,12 @@ class OpportunityCRUDRoutes(GenericWebRoutes):
 # - The `Opportunity` model as the target for CRUD operations.
 # - A required field for opportunity creation: `name`.
 # - No uniqueness constraint is applied to any fields.
-# - The template used for rendering the opportunities table: `entity_tables/opportunities.html`.
+# - The template used for rendering the opportunities table: `pages/tables/opportunities.html`.
 # - A custom function (`get_opportunity_tabs`) to define the tabs displayed on the opportunity creation page.
 opportunity_routes = OpportunityCRUDRoutes(
     blueprint=opportunities_bp,
     model=Opportunity,
-    index_template="entity_tables/opportunities.html",
+    index_template="pages/tables/opportunities.html",
     required_fields=["name"],
     unique_fields=[],
     # create_tabs_function=get_opportunity_tabs,

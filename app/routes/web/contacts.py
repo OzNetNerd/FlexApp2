@@ -165,14 +165,14 @@ class ContactCRUDRoutes(GenericWebRoutes):
 # This configures routes for creating, reading, updating, and deleting contacts.
 # The setup includes:
 # - The `Contact` model as the target for CRUD operations.
-# - The template used for rendering the contacts table: `entity_tables/contacts.html`.
+# - The template used for rendering the contacts table: `pages/tables/contacts.html`.
 # - Required fields for contact creation: `first_name` and `last_name`.
 # - A uniqueness constraint on the `email` field to prevent duplicate entries.
 logger.debug("⚙️ Setting up CRUD routes for contacts.")
 contact_routes = ContactCRUDRoutes(
     blueprint=contacts_bp,
     model=Contact,
-    index_template="entity_tables/contacts.html",
+    index_template="pages/tables/contacts.html",
     required_fields=["first_name", "last_name"],
     unique_fields=["email"],
 )
