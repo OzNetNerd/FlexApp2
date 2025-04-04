@@ -27,7 +27,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Footer Buttons</title>
   <!-- Link to custom CSS file -->
-  <link rel="stylesheet" href="footer_buttons.css">
+  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/footer_buttons.css') }}" /> -->
   <!-- Optionally include Bootstrap if needed -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome for icons -->
@@ -76,7 +76,7 @@
     </div>
 
     <!-- External JavaScript file -->
-    <script type="module" src="pages/footer_buttons.js"></script>
+    <script type="module" src="{{ url_for('static', filename='js/pages/footer_buttons.js') }}"></script>
   {% endif %}
 </body>
 </html>
