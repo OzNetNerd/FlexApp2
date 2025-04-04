@@ -6,7 +6,7 @@
 <html lang="en">
   {% include 'base/core/_head.html' %}
   <body>
-    {% include "base/common/_toasts.html" %}
+    {% include "base/core/_toasts.html" %}
 
     {%- set show_navbar = show_navbar %}  {# Precompute the variable before including #}
 
@@ -37,7 +37,7 @@
               {% endif %}
 
               {% if not read_only %}
-                {% include 'create_view_edit/components/_footer_buttons.html' %}
+                {% include 'base/common/_footer_buttons.html' %}
               {% endif %}
             </form>
           </div>
@@ -57,7 +57,7 @@
         layout: "{{ 'Tabbed' if ui else 'Sectioned' }}",
         includes: [
           "create_view_edit/components/_header.html",
-          "base/common/_toasts.html",
+          "base/core/_toasts.html",
           {% if ui %}"form/_pills_nav_content.html",{% else %}"create_view_edit/components/_section_layout.html",{% endif %}
           {% if not read_only %}"create_view_edit/_footer.html",{% endif %}
           {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}

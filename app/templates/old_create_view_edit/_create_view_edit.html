@@ -5,7 +5,7 @@
 <html lang="en">
   {% include 'base/core/_head.html' %}
   <body>
-    {% include "base/common/_toasts.html" %}
+    {% include "base/core/_toasts.html" %}
 
     {%- set show_navbar = show_navbar %}  {# Precompute the variable before including #}
 
@@ -36,7 +36,7 @@
               {% endif %}
 
               {% if not read_only %}
-                {% include 'create_view_edit/components/_footer_buttons.html' %}
+                {% include 'base/common/_footer_buttons.html' %}
               {% endif %}
             </form>
           </div>
