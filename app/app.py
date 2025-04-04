@@ -17,6 +17,7 @@ from app.routes.base.components.template_renderer import render_safely
 from app.models.base import db
 from app.models.user import User
 from app.routes.base.components.entity_handler import Context, ResourceContext
+from app.models.setting import Setting
 from flask import current_app
 
 
