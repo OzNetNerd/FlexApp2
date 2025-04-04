@@ -2,7 +2,6 @@ import logging
 from typing import Any, Dict
 
 from flask import request, flash, redirect, url_for
-from flask.wrappers import Request
 
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import ResourceContext

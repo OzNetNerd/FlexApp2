@@ -1,4 +1,7 @@
 import logging
+from flask_login import current_user
+from flask import abort, render_template
+
 from app.models.setting import Setting
 from app.routes.web import settings_bp
 from app.routes.web.generic_crud_routes import GenericWebRoutes
@@ -12,18 +15,25 @@ class SettingsCRUDRoutes(GenericWebRoutes):
     """
 
     def _preprocess_form_data(self, form_data):
-        # You can customize this later if needed
         return form_data
 
+    def index(self):
+        """Overrides the default index to inject 'setting' into context."""
+        if not current_user.is_authenticated or not current_user.is_admin:
+            abort(403)
 
-# Define CRUD routes for the Setting model
-# settings_routes = SettingsCRUDRoutes(
-#     blueprint=settings_bp,
-#     model=Setting,
-#     index_template="settings.html",
-#     required_fields=["key"],
-#     unique_fields=["key"],
-# )
+        setting = Setting.query.filter_by(key="debug").first()
+        if not setting:
+            setting = Setting(key="debug", value="false").save()
+
+        logger.debug(f"Loaded setting: {setting}")
+
+        return render_template(
+            self.index_template,
+            setting=setting,
+            title="Settings",
+        )
+
 
 settings_routes = SettingsCRUDRoutes(
     blueprint=settings_bp,
@@ -31,22 +41,4 @@ settings_routes = SettingsCRUDRoutes(
     index_template="settings.html",
     required_fields=[],
     unique_fields=[],
-    # create_tabs_function=get_opportunity_tabs,
 )
-
-
-# need to inject 'context' in
-# def index():
-#     # Get the first/only setting row
-#     setting = Setting.query.first()
-#
-#     # Fallback if it doesn't exist (optional)
-#     if not setting:
-#         setting = Setting(debug_enabled=False)
-#         # optionally save it to DB
-#
-#     # Inject into context via 'extra'
-#     ctx = Context(
-#         title="Settings",
-#         extra={"setting": setting}
-#     )

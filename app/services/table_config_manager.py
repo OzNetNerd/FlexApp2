@@ -32,14 +32,18 @@ class TableConfigManager:
             from app.models.table_config import TableConfig
 
             table_config = TableConfig.get_config(table_name)
-            logger.debug(f"Retrieved table config for {table_name}")
+            logger.info(f"Retrieved table config for '{table_name}'")
+            logger.info(f"Table config: {table_config}")
 
             if not isinstance(table_config, dict):
                 logger.error(f"❌  Table config is not a dictionary: {type(table_config).__name__}")
                 table_config = {}
 
-            if "columns" not in table_config:
-                logger.error(f"❌  No 'columns' found in table config for {table_name}")
+            if "columns" in table_config:
+                logger.error(f"✅  'columns' found: {table_config['columns']}")
+
+            else:
+                logger.error(f"❌  No 'columns' found in table")
                 table_config["columns"] = []
 
             try:
