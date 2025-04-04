@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% include 'base/core/_head.html' %}
+  <body>
+    {% include 'base/core/_toasts.html' %}
+    {% include 'base/core/_navbar.html' %}
+
+    <main class="py-4">
+      <div class="container">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+
+    {% include 'base/core/_scripts.html' %}
+
+    <!-- Load external JavaScript for base template logging and DOM verification -->
+    <script type="module" src="{{ url_for('static', filename='js/pages/base_page.js') }}"></script>
+  </body>
+</html>

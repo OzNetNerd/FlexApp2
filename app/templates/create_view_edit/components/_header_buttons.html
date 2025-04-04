@@ -27,147 +27,49 @@
    - Tracks button interactions via event listeners
 #}
 
-<script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
-  log("info", "_header_buttons.html", "init", "🚀 Buttons template loaded");
-  log("debug", "_header_buttons.html", "config", "Has ID: {{ id is defined and id is not none }}");
-  log("debug", "_header_buttons.html", "config", "Read-only mode: {{ read_only }}");
-  log("debug", "_header_buttons.html", "route", "Current endpoint: {{ request.endpoint }}");
-  
-  {% if id is defined and id is not none %}
-    log("debug", "_header_buttons.html", "item_id", "Working with item ID: {{ id }}");
-  {% else %}
-    log("debug", "_header_buttons.html", "item_id", "No item ID provided");
-  {% endif %}
-</script>
-
 <div class="d-flex justify-content-end align-items-center gap-2">
   {% if id and not read_only %}
-    <script type="module">
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
-      log("debug", "_header_buttons.html", "mode", "Edit mode - rendering Cancel button");
-      log("debug", "_header_buttons.html", "url_gen", "Generating view URL with item_id={{ id }}");
-    </script>
-    
     <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}"
        class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
       <i class="fas fa-times me-1"></i> Cancel
     </a>
-    
-    <script type="module">
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
-      log("debug", "_header_buttons.html", "button_rendered", "Cancel button rendered");
-    </script>
   {% elif id and read_only %}
-    <script type="module">
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
-      log("debug", "_header_buttons.html", "mode", "Read-only mode with ID - rendering action buttons");
-      log("debug", "_header_buttons.html", "url_gen", "Generating create URL");
-    </script>
-    
     <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}"
        class="btn btn-primary fw-bold">
       <i class="fas fa-plus me-1"></i> Add
     </a>
-    
-    <script type="module">
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
-      log("debug", "_header_buttons.html", "button_rendered", "Add button rendered");
-      log("debug", "_header_buttons.html", "url_gen", "Generating edit URL with item_id={{ id }}");
-    </script>
-    
     <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', item_id=id) }}"
        class="btn btn-warning text-dark fw-bold">
       <i class="fas fa-edit me-1"></i> Edit
     </a>
-    
-    <script type="module">
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
-      log("debug", "_header_buttons.html", "button_rendered", "Edit button rendered");
-    </script>
-    
     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
       <i class="fas fa-trash me-1"></i> Delete
     </button>
-    
-    <script type="module">
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
-      log("debug", "_header_buttons.html", "button_rendered", "Delete button rendered (modal trigger)");
-      log("debug", "_header_buttons.html", "url_gen", "Generating index URL for Back button");
-    </script>
-    
     <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
        class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
       <i class="fas fa-arrow-left me-1"></i> Back
     </a>
-    
-    <script type="module">
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
-      log("debug", "_header_buttons.html", "button_rendered", "Back button rendered");
-    </script>
-  {% else %}
-    <script type="module">
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
-      log("debug", "_header_buttons.html", "mode", "No buttons to render in current mode");
-    </script>
   {% endif %}
 </div>
 
-<!-- 🧾 Button Context Logging -->
-<script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
-
-  const context = {
+<!-- Pass dynamic data from Jinja to JavaScript -->
+<script type="text/javascript">
+  window.headerButtonsData = {
     hasId: {{ (id is defined and id is not none) | tojson }},
     readOnly: {{ read_only | tojson }},
     endpoint: "{{ request.endpoint }}",
     baseRoute: "{{ request.endpoint.rsplit('.', 1)[0] }}",
-    buttons: []
+    // Calculate expected button labels based on logic:
+    buttons: {% if id and not read_only %}
+                ["Cancel"]
+             {% elif id and read_only %}
+                ["Add", "Edit", "Delete", "Back"]
+             {% else %}
+                []
+             {% endif %}
   };
-
-  if (context.hasId && !context.readOnly) {
-    context.buttons.push("Cancel");
-  } else if (context.hasId && context.readOnly) {
-    context.buttons.push("Add", "Edit", "Delete", "Back");
-  }
-
-  log("info", "_header_buttons.html", "render", "🔘 Button render context", context);
-  
-  // DOM verification on load
-  document.addEventListener('DOMContentLoaded', () => {
-    const buttonContainer = document.querySelector('.d-flex.justify-content-end.align-items-center.gap-2');
-    if (buttonContainer) {
-      const buttonCount = buttonContainer.querySelectorAll('a, button').length;
-      log("debug", "_header_buttons.html", "dom_check", `Button container found with ${buttonCount} controls`);
-      
-      if (buttonCount !== context.buttons.length) {
-        log("warn", "_header_buttons.html", "dom_check", `Expected ${context.buttons.length} buttons but found ${buttonCount}`);
-      } else {
-        log("info", "_header_buttons.html", "dom_check", "All expected buttons are present in the DOM");
-      }
-    } else {
-      log("warn", "_header_buttons.html", "dom_check", "Button container not found in DOM");
-    }
-  });
 </script>
 
-<script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
-  log("info", "_header_buttons.html", "final", "✅ Buttons template finished rendering");
-  
-  // Monitor button click events
-  document.addEventListener('DOMContentLoaded', () => {
-    const buttons = document.querySelectorAll('.d-flex.justify-content-end.align-items-center.gap-2 a, .d-flex.justify-content-end.align-items-center.gap-2 button');
-    buttons.forEach(button => {
-      button.addEventListener('click', (event) => {
-        const buttonText = button.textContent.trim();
-        log("info", "_header_buttons.html", "interaction", `Button clicked: ${buttonText}`);
-        
-        if (buttonText === "Delete") {
-          log("debug", "_header_buttons.html", "modal", "Delete button clicked - should trigger modal");
-        }
-      });
-    });
-  });
-</script>
+<!-- Load external JavaScript for header buttons interactions -->
+<script type="module" src="{{ url_for('static', filename='js/pages/header_buttons.js') }}"></script>
 <!-- END TEMPLATE: _header_buttons.html -->
