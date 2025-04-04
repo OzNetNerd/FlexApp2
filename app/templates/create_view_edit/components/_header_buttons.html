@@ -1,16 +1,31 @@
 <!-- START TEMPLATE: _header_buttons.html -->
-{# ------------------------------------------------------------------------------
-  File: _header_buttons.html | Purpose: Render contextual buttons for entity pages
-  Inputs:
-    - id: Optional[str] → Determines if the item exists
-    - read_only: Boolean
-  Behavior:
-    - Show "Cancel" if editing
-    - Show Add, Edit, Delete (modal), Back if in read-only mode with id
-  Notes:
-    - Uses request.endpoint to infer base route
-    - Delete assumes presence of #deleteModal
------------------------------------------------------------------------------- #}
+
+{#
+ create_view_edit/components/_header_buttons.html - Contextual buttons for entity pages
+
+ This template renders the appropriate action buttons in the header area based on
+ the current context (create, view, or edit mode).
+
+ Inputs:
+   - id: Optional[str] → Determines if the item exists
+   - read_only: Boolean → Controls which set of buttons to display
+
+ Behavior:
+   - Shows "Cancel" if editing (id exists and not read_only)
+   - Shows Add, Edit, Delete, Back buttons if in read-only mode with id
+   - Shows no buttons in other contexts
+
+ Features:
+   - Automatically generates appropriate URLs based on current endpoint
+   - Delete button triggers a modal dialog (#deleteModal)
+   - Comprehensive logging for debugging and monitoring
+   - DOM verification to ensure proper rendering
+
+ Notes:
+   - Uses request.endpoint to infer base route names
+   - Uses Font Awesome icons for button visuals
+   - Tracks button interactions via event listeners
+#}
 
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";

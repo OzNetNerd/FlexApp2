@@ -1,6 +1,34 @@
 <!-- START TEMPLATE: _section_layout.html -->
+
+{#
+ create_view_edit/components/_section_layout.html - Form content organized in tabs and sections
+
+ This template renders a tabbed interface with form fields organized into sections,
+ providing a structured layout for data entry and display.
+
+ Inputs:
+   - tabs: List of tab objects containing sections and fields
+   - read_only: Boolean indicating if the form should be in read-only mode
+
+ Features:
+   - Bootstrap tab navigation with automatic activation of the first tab
+   - Hierarchical organization with tabs containing sections containing fields
+   - Section cards with clean styling and consistent spacing
+   - Special handling for "crisp" component in read-only mode
+   - Comprehensive logging of tab and section structures
+
+ Dependencies:
+   - Imports field rendering macros from render_field.html
+   - Uses Bootstrap 5 tab components and card styling
+   - Requires logger.js for diagnostic logging
+
+ Notes:
+   - Can gracefully handle empty tab configurations with a warning
+   - Maintains consistent styling with shadow-sm and border-0 card design
+#}
+
 {# Import the field macros - adjust the path if your macros are located elsewhere #}
-{% import 'create_view_edit/macros/render_field.html' as field_macros with context %}
+{% import 'macros/render_form_fields.html' as field_macros with context %}
 
 {% if tabs %}
   <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">

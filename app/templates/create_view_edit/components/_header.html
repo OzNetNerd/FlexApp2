@@ -1,3 +1,29 @@
+{#
+ create_view_edit/components/_header.html - Heading + tab navigation for entity pages
+
+ This template renders the page header with contextual icons and optional tabbed navigation
+ for entity-related pages (view, create, edit).
+
+ Inputs:
+   - title      : str  → "Viewing", "Editing", etc.
+   - model_name : str  → e.g. "User"
+   - item_name  : str  → e.g. "Jessie Smith"
+   - read_only  : bool → Controls icon
+   - id         : Optional[str] → Presence determines view/edit icon
+   - ui         : Optional[List] → If present, includes _pills_nav.html
+
+ Features:
+   - Context-aware icon selection based on page mode
+   - Conditional tabbed navigation when UI configuration is present
+   - Detailed logging for debugging and monitoring
+   - DOM verification to ensure proper rendering
+
+ Notes:
+   - Should be included inside a Bootstrap card header
+   - Imports field rendering macros
+   - Uses different Font Awesome icons to indicate view/edit/create mode
+#}
+
 <!-- START TEMPLATE: _header.html -->
 {# ------------------------------------------------------------------------------
   File: _header.html | Purpose: Heading + tab nav for entity pages
@@ -14,7 +40,7 @@
 ------------------------------------------------------------------------------ #}
 
 <!-- START HEADER MARKER - If you see this in the DOM, template is being included -->
-{% import "create_view_edit/macros/render_field.html" as macros %}
+{% import "macros/render_form_fields.html" as macros %}
 
 <script type="module">
   import log from "{{ url_for('static', filename='js/logger.js') }}";

@@ -1,9 +1,24 @@
-{# ------------------------------------------------------------------------------
-  File: _footer_buttons.html | Purpose: Render form footer with submit/cancel buttons
+{#
+  create_view_edit/components/_footer_buttons.html - Form footer with submit/cancel buttons
+
+  This template renders the form footer action buttons that adapt based on context.
+  It provides different button text (Create/Update) based on whether an ID is present,
+  and routes the Cancel button to either view or index pages as appropriate.
+
   Features:
     - Adaptive button text (Create/Update based on id presence)
     - Cancel routes to view or index
------------------------------------------------------------------------------- #}
+    - Extensive logging for debugging
+    - DOM verification checks
+
+  Context variables:
+    - id: When present, indicates edit mode; when absent indicates create mode
+    - request.endpoint: Required for generating navigation URLs
+
+  Dependencies:
+    - Requires logger.js for diagnostic logging
+    - Uses Font Awesome icons for button visuals
+#}
 
 <!-- Check for required context -->
 {% if request.endpoint is not defined %}

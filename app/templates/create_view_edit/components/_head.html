@@ -1,3 +1,25 @@
+{#
+ create_view_edit/components/_head.html - HTML head element with document metadata
+
+ This template defines the HTML head section used across all pages in the application,
+ establishing the document metadata, viewport settings, title, and CSS resource links.
+
+ Features:
+   - Sets UTF-8 character encoding and responsive viewport
+   - Provides extensible title block with default value
+   - Loads external CSS dependencies (Bootstrap, FontAwesome)
+   - Includes application-specific stylesheets
+
+ Usage:
+   - Typically included in base templates
+   - Title can be overridden by child templates using the title block
+
+ Dependencies:
+   - Bootstrap 5.3.0 (loaded from CDN)
+   - FontAwesome 6.4.0 (loaded from CDN)
+   - Application CSS files (style.css, main.css)
+#}
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

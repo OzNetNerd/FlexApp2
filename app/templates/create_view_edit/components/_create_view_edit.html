@@ -1,5 +1,28 @@
+{#
+ create_view_edit/components/_create_view_edit.html - Standardized CRUD form container template
+
+ This template provides the primary layout for creating, viewing, and editing data records.
+ It implements a consistent card-based interface with conditional components based on
+ the context (create, view, or edit mode).
+
+ Context variables:
+   - ui: If present, indicates a tabbed interface should be used
+   - read_only: Boolean that controls whether edit controls are displayed
+   - id: If present, indicates edit mode and enables the delete modal
+
+ Component structure:
+   - Card header with title and action buttons
+   - Form body with either tabbed navigation or section layout
+   - Conditional footer buttons for form submission
+   - Conditional delete modal for existing records
+
+ Inheritance:
+   - Extends _base.html for application-wide layout consistency
+#}
+
 {% extends "create_view_edit/components/_base.html" %}
 
+{# content that goes into _base.html #}
 {% block content %}
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
@@ -24,7 +47,4 @@
     </form>
   </div>
 </div>
-{% if id %}
-  {% include 'create_view_edit/components/_delete_modal.html' %}
-{% endif %}
 {% endblock %}

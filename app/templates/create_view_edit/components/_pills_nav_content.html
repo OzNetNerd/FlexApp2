@@ -1,172 +1,66 @@
-{# ------------------------------------------------------------------------------
-  File: _pills_nav_content.html | Purpose: Render pill navigation for tabbed content
-  Inputs:
-    - tabs: List[Tab] → Contains tab configuration objects
-  Notes:
-    - Works in conjunction with tab_content.html
-    - Creates pill navigation using Bootstrap nav-pills
------------------------------------------------------------------------------- #}
+{#
+ create_view_edit/components/_pills_nav_content.html - Tabbed interface with pill navigation
 
-{% if tabs is defined and tabs is not none and tabs|length > 0 %}
-  <!-- Tab Pills Navigation -->
-  <ul class="nav nav-pills mb-3" id="tab-pills" role="tablist">
-    {% for tab in tabs %}
-      <li class="nav-item" role="presentation">
-        <button class="nav-link {% if loop.first %}active{% endif %}"
-                id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
-                data-bs-toggle="pill"
-                data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
-                type="button"
-                role="tab"
-                aria-controls="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
-                aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
-          {% if tab.icon %}
-            <i class="fas fa-{{ tab.icon }} me-1"></i>
-          {% endif %}
-          {{ tab.tab_name }}
-        </button>
-      </li>
-    {% endfor %}
-  </ul>
+ This template renders a complete tabbed interface with both navigation pills and
+ the corresponding tab content panels. It dynamically generates form fields based
+ on the provided configuration structure.
 
-  <!-- Tab Content -->
-  <div class="tab-content" id="pillsTabContent">
-    {% for tab in tabs %}
-      <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
-           id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
-           role="tabpanel"
-           aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
+ Inputs:
+   - tabs: List[Tab] → Contains tab configuration objects with nested sections and entries
 
-        {% if tab.sections and tab.sections|length > 0 %}
-          {% for section in tab.sections %}
-            <div class="card mb-3">
-              {% if section.section_name %}
-                <div class="card-header">
-                  {% if section.icon %}
-                    <i class="fas fa-{{ section.icon }} me-1"></i>
-                  {% endif %}
-                  {{ section.section_name }}
-                </div>
+ Features:
+   - Bootstrap-based pill navigation
+   - Automatic tab content generation with proper ARIA attributes
+   - Support for icons in tab and section headers
+   - Dynamic form field rendering based on field type
+   - Comprehensive error handling and debug information
+
+ Dependencies:
+   - Requires Bootstrap 5 for styling and tab functionality
+   - Uses Font Awesome for optional icons
+   - Integrates with debug panel system for diagnostics
+
+ Notes:
+   - First tab is automatically selected by default
+   - Empty tabs and sections display appropriate messages
+   - Logs tab navigation events through debug panel if available
+#}
+
+{% import 'macros/render_form_fields.html' as forms %}
+
+{% for tab in tabs %}
+  <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+       id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+       role="tabpanel"
+       aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
+
+    {% if tab.sections %}
+      {% for section in tab.sections %}
+        <div class="card mb-3">
+          {% if section.section_name %}
+            <div class="card-header">
+              {% if section.icon %}
+                <i class="fas fa-{{ section.icon }} me-1"></i>
               {% endif %}
-              <div class="card-body">
-                {% if section.entries and section.entries|length > 0 %}
-                  <div class="row">
-                    {% for entry in section.entries %}
-                      <div class="col-md-6 mb-3">
-                        <label class="form-label" for="{{ entry.entry_name }}">
-                          {{ entry.label }}
-                          {% if entry.required %}<span class="text-danger">*</span>{% endif %}
-                        </label>
-
-                        {% if entry.type == 'text' %}
-                          <input type="text" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}" value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
-                        {% elif entry.type == 'email' %}
-                          <input type="email" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}" value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
-                        {% elif entry.type == 'textarea' %}
-                          <textarea class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}" rows="3" {% if entry.required %}required{% endif %}>{{ entry.value or '' }}</textarea>
-                        {% elif entry.type == 'dropdown' %}
-                          <select class="form-select" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}" {% if entry.required %}required{% endif %}>
-                            <option value="" {% if not entry.value %}selected{% endif %}>-- Select --</option>
-                            {% for option in entry.options or [] %}
-                              <option value="{{ option }}" {% if entry.value == option %}selected{% endif %}>{{ option }}</option>
-                            {% endfor %}
-                          </select>
-                        {% else %}
-                          <input type="text" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}" value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
-                          <small class="text-muted">Unknown type: {{ entry.type }}</small>
-                        {% endif %}
-                      </div>
-                    {% endfor %}
-                  </div>
-                {% else %}
-                  <div class="alert alert-light">No form fields defined for this section.</div>
-                {% endif %}
-              </div>
+              {{ section.section_name }}
             </div>
-          {% endfor %}
-        {% else %}
-          <div class="alert alert-light">
-            No sections defined for this tab.
+          {% endif %}
+
+          <div class="card-body">
+            {% if section.entries %}
+              <div class="row">
+                {% for entry in section.entries %}
+                  {{ forms.render_field(entry, read_only=read_only) }}
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="alert alert-light">No form fields defined for this section.</div>
+            {% endif %}
           </div>
-        {% endif %}
-      </div>
-    {% endfor %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="alert alert-light">No sections defined for this tab.</div>
+    {% endif %}
   </div>
-
-  <script type="module">
-    document.addEventListener('DOMContentLoaded', () => {
-      // Log events through debug panel if available
-      if (window.debugLogger && window.debugLogger.pills) {
-        window.debugLogger.pills.info('Tab navigation initialized');
-
-        // Add event listeners for tab switching
-        document.querySelectorAll('#tab-pills .nav-link').forEach(pill => {
-          pill.addEventListener('click', () => {
-            window.debugLogger.pills.info(`Tab switched to: ${pill.textContent.trim()}`);
-          });
-        });
-      }
-    });
-  </script>
-
-  <!-- Include debug panel at the bottom -->
-  {% with
-    template_name="_pills_nav_content.html",
-    debug_id="pills",
-    debug_title="Pills Navigation Debug",
-    debug_data={
-      "tabs_count": tabs|length,
-      "first_tab": tabs[0].tab_name if tabs|length > 0 else "None",
-      "tab_names": tabs|map(attribute='tab_name')|list if tabs|length > 0 else []
-    },
-    debug_context={
-      "item_type": item_type|default('N/A'),
-      "item_id": id|default('N/A')
-    }
-  %}
-    {% include 'base/common/_debug_panel.html' %}
-  {% endwith %}
-{% else %}
-  <div class="alert alert-warning">
-    <strong>UI Configuration Missing:</strong> No UI configuration available for navigation.
-  </div>
-
-  <!-- Include debug panel with error status -->
-  {% with
-    template_name="_pills_nav_content.html",
-    debug_id="pills",
-    debug_title="Pills Navigation Error",
-    debug_severity="error",
-    debug_expanded=true,
-    debug_data={
-      "tabs_defined": tabs is defined,
-      "tabs_is_none": tabs is defined and tabs is none,
-      "tabs_length": tabs|length if tabs is defined and tabs is not none else 0
-    },
-    debug_context={
-      "item_type": item_type|default('N/A'),
-      "item_id": id|default('N/A')
-    }
-  %}
-    {% include 'base/common/_debug_panel.html' %}
-  {% endwith %}
-
-  <script type="module">
-    document.addEventListener('DOMContentLoaded', () => {
-      // Log error through debug panel if available
-      if (window.debugLogger && window.debugLogger.pills) {
-        window.debugLogger.pills.error('UI configuration missing');
-
-        // Get basic route information
-        const url = new URL(window.location.href);
-        const pathParts = url.pathname.split('/').filter(part => part.length > 0);
-
-        window.debugLogger.pills.debug('URL analysis', {
-          url: url.toString(),
-          pathParts: pathParts,
-          potentialItemType: pathParts.length > 0 ? pathParts[0] : null
-        });
-      }
-    });
-  </script>
-{% endif %}
+{% endfor %}

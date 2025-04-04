@@ -1,3 +1,25 @@
+{#
+  create_view_edit/components/_autocomplete.html - Dynamic form template with tabbed interface
+
+  This template renders a tabbed interface for creating, viewing, or editing data.
+  It dynamically generates form fields based on the 'ui' structure provided and
+  includes autocomplete functionality via main.js.
+
+  Context variables:
+    - ui: A nested structure containing tabs, sections, and form entries
+    - model_name: String representing the model being created/edited
+    - error_message: Optional error message to display
+    - macros: Object containing the render_field macro for form field generation
+
+  Template inheritance:
+    - Extends _create_view_edit.html base template
+    - Includes _footer_buttons.html for form submission controls
+
+  Dependencies:
+    - Requires main.js for autocomplete functionality
+    - Uses toasts.js for error notifications
+#}
+
 {% extends "create_view_edit/components/_create_view_edit.html" %}
 
 {% block content %}

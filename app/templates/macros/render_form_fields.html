@@ -1,3 +1,46 @@
+{#
+ Renders a form fields with various input types and states.
+
+ This macro generates HTML for different form field types with consistent styling
+ using Bootstrap 5 classes. It supports various field types including text inputs,
+ textareas, selects, checkboxes, and date pickers.
+
+ @param {Object} field - The field configuration object
+ @param {string} field.name - The field name (used for id and name attributes)
+ @param {string} [field.label] - The field label (defaults to capitalized name if not provided)
+ @param {string} [field.type='text'] - The input type (text, textarea, select, checkbox, date, readonly)
+ @param {*} [field.value] - The current field value
+ @param {boolean} [field.required=false] - Whether the field is required
+ @param {Object} [field.options] - Key-value pairs for select options where key is the value and value is the label
+ @param {boolean} [field.readonly=false] - Whether the field is read-only
+ @param {boolean} [read_only=false] - Global parameter to make all fields read-only
+
+ @returns {HTML} Bootstrap 5 styled form field HTML
+
+ @example
+ {{ render_field({
+    name: 'first_name',
+    label: 'First Name',
+    value: user.first_name,
+    required: true
+ }) }}
+
+ @example
+ {{ render_field({
+    name: 'user_type',
+    type: 'select',
+    options: {'admin': 'Administrator', 'user': 'Regular User'},
+    value: user.type
+ }) }}
+
+ @example
+ {{ render_field({
+    name: 'is_active',
+    type: 'checkbox',
+    value: user.is_active
+ }) }}
+#}
+
 {% macro render_field(field, read_only=False) %}
   {% set name = field.name %}
   {% set label = field.label or name|capitalize %}

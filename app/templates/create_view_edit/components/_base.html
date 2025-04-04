@@ -1,3 +1,28 @@
+ {#
+   create_view_edit/components/_base.html - Core application layout template
+
+   This template serves as the foundation for all pages in the application,
+   providing consistent structure and including common components.
+
+   Structure:
+     - Includes common head element with metadata and CSS
+     - Sets up logging for template rendering process
+     - Includes toast notification system
+     - Includes global navigation bar
+     - Defines main content area for child templates to populate
+     - Includes common scripts and performs DOM verification
+
+   Dependencies:
+     - Requires logger.js for debugging and monitoring
+     - Includes various component templates from base/common/
+     - Includes scripts component from create_view_edit/components/
+
+   Notes:
+     - Contains extensive debug logging throughout the rendering process
+     - Performs DOM verification checks after page load
+     - All child templates should extend this base and populate the content block
+ #}
+
 <!DOCTYPE html>
 <html lang="en">
   {% include 'base/common/_head.html' %}

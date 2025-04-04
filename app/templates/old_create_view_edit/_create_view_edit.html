@@ -1,4 +1,4 @@
-{% import "macros/form_fields/render_form.html" as form %}
+{% import "macros/render_form_fields.html" as form %}
 {% import "macros/form_fields/_render_sections.html" as sections %}
 
 <!DOCTYPE html>
@@ -45,9 +45,5 @@
     </main>
 
     {% include "base/common/_scripts.html" %}
-
-    {% if id %}
-      {% include 'create_view_edit/components/_delete_modal.html' %}
-    {% endif %}
   </body>
 </html>
