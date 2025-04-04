@@ -4,7 +4,7 @@ from flask import abort, render_template
 
 from app.models.setting import Setting
 from app.routes.web import settings_bp
-from app.routes.web.generic_crud_routes import GenericWebRoutes
+from app.routes.web.generic_crud.generic_crud_routes import GenericWebRoutes
 
 logger = logging.getLogger(__name__)
 

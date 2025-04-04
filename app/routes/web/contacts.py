@@ -3,7 +3,7 @@ import logging
 from flask_login import current_user
 from app.models import Contact, Company, db, User
 from app.routes.web import contacts_bp
-from app.routes.web.generic_crud_routes import GenericWebRoutes
+from app.routes.web.generic_crud.generic_crud_routes import GenericWebRoutes
 from typing import Any, Dict, List
 from app.models import CRISPScore
 

@@ -15,12 +15,12 @@ from app.services.data_route_handler import DataRouteHandler
 from app.services.item_manager import ItemManager
 from app.routes.base.components.entity_handler import EntityHandler
 
-from .generic_crud.create import create_route
-from .generic_crud.edit import edit_route
-from .generic_crud.view import view_route
-from .generic_crud.delete import delete_route
-from .generic_crud.data import data_route
-from .generic_crud.index import index_route
+from app.routes.web.generic_crud.create import create_route
+from app.routes.web.generic_crud.edit import edit_route
+from app.routes.web.generic_crud.view import view_route
+from app.routes.web.generic_crud.delete import delete_route
+from app.routes.web.generic_crud.data import data_route
+from app.routes.web.generic_crud.index import index_route
 
 logger = logging.getLogger(__name__)
 GENERIC_TEMPLATE = "entity_table.html"

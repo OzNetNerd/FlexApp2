@@ -30,6 +30,23 @@
 {# Import the field macros - adjust the path if your macros are located elsewhere #}
 {% import 'macros/render_form_fields.html' as field_macros with context %}
 
+<script type="module">
+  import log from '/static/js/logger.js';
+
+  const scriptName = '_section_layout.html';
+  const functionName = 'template_init';
+
+  const received = [];
+  const missing = [];
+
+  if ({{ tabs is defined | tojson }}) received.push('tabs'); else missing.push('tabs');
+  if ({{ read_only is defined | tojson }}) received.push('read_only'); else missing.push('read_only');
+
+  log("info", scriptName, functionName, `✅ Received variables: ${received.join(', ') || 'None'}`);
+  log("warn", scriptName, functionName, `❌ Missing variables: ${missing.join(', ') || 'None'}`);
+</script>
+
+
 {% if tabs %}
   <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
     {%- for tab in tabs %}
@@ -102,4 +119,5 @@
     log("warn", "_section_layout.html", "template_render", "⚠️ No tabs passed into template.");
   </script>
 {% endif %}
+
 <!-- END TEMPLATE: _section_layout.html -->

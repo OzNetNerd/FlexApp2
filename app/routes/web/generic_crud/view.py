@@ -41,20 +41,6 @@ def view_route(ctx: Any, item_id: int) -> Any:
         item_dict["related_users"] = [rel for rel in relationships if rel["entity_type"] == "user"]
         item_dict["related_companies"] = [rel for rel in relationships if rel["entity_type"] == "company"]
 
-    # logger.info(f"This is item: {item_dict}")
-
-    # Optional: inject relationships into tab sections here (commented for future use)
-    # tabs = ctx.create_tabs_function()
-    # if ctx.model.__name__ == "User":
-    #     for tab in tabs:
-    #         if tab.tab_name == "Mappings":
-    #             for section in tab.sections:
-    #                 for entry in section.entries:
-    #                     if entry.entry_name == "users" and 'related_users' in item_dict:
-    #                         entry.value = item_dict['related_users']
-    #                     elif entry.entry_name == "companies" and 'related_companies' in item_dict:
-    #                         entry.value = item_dict['related_companies']
-
     context = ResourceContext(
         model=ctx.model,
         blueprint_name=ctx.blueprint.name,

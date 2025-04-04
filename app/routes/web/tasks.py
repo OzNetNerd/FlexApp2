@@ -1,6 +1,6 @@
 from app.models import Task
 from app.routes.web import tasks_bp
-from app.routes.web.generic_crud_routes import GenericWebRoutes
+from app.routes.web.generic_crud.generic_crud_routes import GenericWebRoutes
 
 import logging
 

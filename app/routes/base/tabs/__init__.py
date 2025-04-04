@@ -3,6 +3,7 @@ from app.routes.base.tabs.companies import COMPANIES_TABS
 from app.routes.base.tabs.opportunities import OPPORTUNITIES_TABS
 from app.routes.base.tabs.users import USERS_TABS
 from app.routes.base.tabs.tasks import TASKS_TABS
+from app.routes.base.tabs.settings import SETTINGS_TABS
 
 # In your tabs module or a dedicated registry file
 UI_TAB_MAPPING = {
@@ -11,5 +12,6 @@ UI_TAB_MAPPING = {
     'Opportunity': OPPORTUNITIES_TABS,
     'User': USERS_TABS,
     'Task': TASKS_TABS,
+    'Setting': SETTINGS_TABS,
 }
 

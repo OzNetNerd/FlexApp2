@@ -37,6 +37,8 @@ from app.routes.web import (
 )
 
 
+
+
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""
     logger.debug("Registering web blueprints...")
