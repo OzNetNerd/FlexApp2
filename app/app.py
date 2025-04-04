@@ -8,7 +8,6 @@ from flask import (
     session as flask_session,
     jsonify,
     make_response,
-    current_app,
 )
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
@@ -17,7 +16,7 @@ from app.routes.web import register_web_blueprints
 from app.routes.base.components.template_renderer import render_safely
 from app.models.base import db
 from app.models import User, Setting
-from app.routes.base.components.entity_handler import Context, ResourceContext
+from app.routes.base.components.entity_handler import Context
 
 # ---------------------------------------------
 # Logging
@@ -58,7 +57,7 @@ class IndentationPreservingFormatter(logging.Formatter):
 
 def configure_logging() -> None:
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     logger.handlers.clear()
 
     handler = logging.StreamHandler()
