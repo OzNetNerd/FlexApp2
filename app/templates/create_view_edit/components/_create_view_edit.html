@@ -27,10 +27,10 @@
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center">
-      {% include 'create_view_edit/components/_header.html' %}
+      {% include 'base/content_pane/_header.html' %}
     </div>
     <div class="d-flex gap-2">
-      {% include 'create_view_edit/components/_header_buttons.html' %}
+      {% include 'base/content_pane/_header_buttons.html' %}
     </div>
   </div>
   <div class="card-body">
@@ -38,7 +38,7 @@
       {% if ui %}
         {% include 'base/common/_pills_nav_content.html' %}
       {% else %}
-        {% include 'create_view_edit/components/_section_layout.html' %}
+        {% include 'base/content_pane/_section_layout.html' %}
       {% endif %}
 
       {% if not read_only %}

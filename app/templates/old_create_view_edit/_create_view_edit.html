@@ -18,11 +18,11 @@
             <div class="row align-items-center">
               <div class="col">
                 <div class="d-flex align-items-center">
-                  {% include 'create_view_edit/components/_header.html' %}
+                  {% include 'base/content_pane/_header.html' %}
                 </div>
               </div>
               <div class="col-auto">
-                {% include 'create_view_edit/components/_header_buttons.html' %}
+                {% include 'base/content_pane/_header_buttons.html' %}
               </div>
             </div>
           </div>
@@ -32,7 +32,7 @@
               {% if ui %}
                 {% include 'base/common/_pills_nav_content.html' %}
               {% else %}
-                {% include 'create_view_edit/components/_section_layout.html' %}
+                {% include 'base/content_pane/_section_layout.html' %}
               {% endif %}
 
               {% if not read_only %}

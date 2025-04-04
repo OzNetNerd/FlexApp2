@@ -19,11 +19,11 @@
             <div class="row align-items-center">
               <div class="col">
                 <div class="d-flex align-items-center">
-                  {# {% include 'create_view_edit/components/_header.html' %}  #}
+                  {# {% include 'base/content_pane/_header.html' %}  #}
                 </div>
               </div>
               <div class="col-auto">
-                {% include 'create_view_edit/components/_header_buttons.html' %}
+                {% include 'base/content_pane/_header_buttons.html' %}
               </div>
             </div>
           </div>
@@ -33,7 +33,7 @@
               {% if ui %}
                 {% include 'base/common/_pills_nav_content.html' %}
               {% else %}
-                {% include 'create_view_edit/components/_section_layout.html' %}
+                {% include 'base/content_pane/_section_layout.html' %}
               {% endif %}
 
               {% if not read_only %}
@@ -56,9 +56,9 @@
         hasUi: {{ ui is defined and ui is not none | tojson }},
         layout: "{{ 'Tabbed' if ui else 'Sectioned' }}",
         includes: [
-          "create_view_edit/components/_header.html",
+          "base/content_pane/_header.html",
           "base/core/_toasts.html",
-          {% if ui %}"form/_pills_nav_content.html",{% else %}"create_view_edit/components/_section_layout.html",{% endif %}
+          {% if ui %}"form/_pills_nav_content.html",{% else %}"base/content_pane/_section_layout.html",{% endif %}
           {% if not read_only %}"create_view_edit/_footer.html",{% endif %}
           {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
         ].filter(Boolean)
