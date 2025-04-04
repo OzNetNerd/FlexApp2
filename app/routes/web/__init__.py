@@ -24,18 +24,8 @@ auth_bp.add_url_rule("/login", view_func=login, methods=["GET", "POST"])
 auth_bp.add_url_rule("/logout", view_func=logout, methods=["GET"])
 
 # Import modules to register routes after blueprints are created
-from app.routes.web import (
-    main,
-    users,
-    companies,
-    contacts,
-    opportunities,
-    _relationships,
-    crisp_score,
-    tasks,
-    settings,
-)
-
+# from routes.web.crud import tasks
+# from app.routes.web.crud.tasks import task_routes
 
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""
