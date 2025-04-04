@@ -39,7 +39,7 @@
 
 <!-- 🧾 Button Context Logging -->
 <script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  import log from '/static/js/logger.js';
 
   const context = {
     hasId: {{ id is defined and id is not none | tojson }},

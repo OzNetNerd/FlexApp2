@@ -7,7 +7,7 @@
 ------------------------------------------------------------------------------ #}
 
 <script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  import log from '/static/js/logger.js';
   log("info", "_footer_buttons.html", "init", "🚀 Footer buttons template loaded");
   log("debug", "_footer_buttons.html", "config", "Has ID: {{ id is defined and id is not none }}");
   log("debug", "_footer_buttons.html", "route", "Current endpoint: {{ request.endpoint }}");
@@ -23,7 +23,7 @@
   <div class="d-flex gap-2">
     {% if id %}
       <script type="module">
-        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        import log from '/static/js/logger.js';
         log("debug", "_footer_buttons.html", "mode", "Edit mode - rendering Cancel and Update buttons");
         log("debug", "_footer_buttons.html", "url_gen", "Generating view URL with item_id={{ id }}");
       </script>
@@ -33,7 +33,7 @@
       </a>
 
       <script type="module">
-        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        import log from '/static/js/logger.js';
         log("debug", "_footer_buttons.html", "button_rendered", "Cancel button rendered (links to view)");
       </script>
 
@@ -42,12 +42,12 @@
       </button>
 
       <script type="module">
-        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        import log from '/static/js/logger.js';
         log("debug", "_footer_buttons.html", "button_rendered", "Update button rendered with save icon");
       </script>
     {% else %}
       <script type="module">
-        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        import log from '/static/js/logger.js';
         log("debug", "_footer_buttons.html", "mode", "Create mode - rendering Cancel and Create buttons");
         log("debug", "_footer_buttons.html", "url_gen", "Generating index URL for Cancel button");
       </script>
@@ -57,7 +57,7 @@
       </a>
 
       <script type="module">
-        import log from "{{ url_for('static', filename='js/logger.js') }}";
+        import log from '/static/js/logger.js';
         log("debug", "_footer_buttons.html", "button_rendered", "Cancel button rendered (links to index)");
       </script>
 
@@ -69,7 +69,7 @@ _text", "Note: Fixed button text from 'Update' to 'Create' in new item mode");
 
 <!-- 🦶 Footer Buttons Context Logging -->
 <script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  import log from '/static/js/logger.js';
 
   const context = {
     hasId: {{ (id is defined and id is not none) | tojson }},
@@ -115,7 +115,7 @@ _text", "Note: Fixed button text from 'Update' to 'Create' in new item mode");
 </script>
 
 <script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  import log from '/static/js/logger.js';
   log("info", "_footer_buttons.html", "final", "✅ Footer buttons template finished rendering");
 
   // Monitor button click events

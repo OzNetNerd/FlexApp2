@@ -1,6 +1,6 @@
 const scriptName = "utils.js";
 
-import log from './logger.js';
+import log from '/static/js/logger.js';
 
 /**
  * Fetches JSON data from an API and logs the process.

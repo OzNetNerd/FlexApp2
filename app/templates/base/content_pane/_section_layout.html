@@ -76,7 +76,7 @@
   </div>
 
   <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
+    import log from '/static/js/logger.js';
 
     const scriptName = '_section_layout.html';
     const functionName = 'template_render';
@@ -98,7 +98,7 @@
     No tabs available for display.
   </div>
   <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
+    import log from '/static/js/logger.js';
     log("warn", "_section_layout.html", "template_render", "⚠️ No tabs passed into template.");
   </script>
 {% endif %}

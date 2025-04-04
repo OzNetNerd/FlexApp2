@@ -32,7 +32,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
   <!-- Head Debug Logger -->
   <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
+    import log from '/static/js/logger.js';
     log("info", "_head.html", "head", "🎯 Page title set", {{ (title or "CRM") | tojson | safe }});
     log("debug", "_head.html", "head", "📦 Head assets loaded");
   </script>

@@ -40,7 +40,7 @@
     <script type="module" src="{{ url_for('static', filename='js/autoComplete.js') }}"></script>
 
     <script type="module">
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
+      import log from '/static/js/logger.js';
 
       const tableId = {{ table_id | tojson | safe }};
       const dataUrl = {{ data_url | tojson | safe }};

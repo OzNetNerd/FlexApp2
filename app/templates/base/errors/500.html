@@ -26,7 +26,7 @@
 
   <!-- 500 Error Debug Logger -->
   <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
+    import log from '/static/js/logger.js';
 
     log("error", "500.html", "server", "🔥 Internal server error - 500 page triggered");
     log("info", "500.html", "context", "🛠 User offered fallback to home");

@@ -21,7 +21,7 @@
 
 <!-- 🧾 Logging for Pills Navigation Context -->
 <script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  import log from '/static/js/logger.js';
 
   try {
     const tabNames = {{ ui | map(attribute='tab_name') | list | tojson | safe }};

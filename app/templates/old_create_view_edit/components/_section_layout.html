@@ -70,7 +70,7 @@
 </div>
 
 <script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  import log from '/static/js/logger.js';
   const tabs = {{ tabs.keys() | list | tojson | safe }};
   log("info", "_section_layout.html", "tabs", "🧩 Tabs generated from field definitions", tabs);
   {%- for tab, tab_fields in tabs.items() %}

@@ -1,4 +1,4 @@
-import log from './logger.js';
+import log from '/static/js/logger.js';
 
 const scriptName = 'autoComplete.js';
 

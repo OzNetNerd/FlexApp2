@@ -1,6 +1,6 @@
 // table/tableUtils.js
 
-import log from '../logger.js';
+import log from '/static/js/logger.js';
 
 const scriptName = "tableUtils";
 

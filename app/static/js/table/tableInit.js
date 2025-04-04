@@ -2,7 +2,7 @@
 
 const scriptName = "tableInit.js";
 
-import log from '../logger.js';
+import log from '/static/js/logger.js';
 import { getDatasetVariables, getDatasetValue, fetchApiData } from '../utils.js';
 import getGridOptions, { setGridApi } from './tableConfig.js';
 

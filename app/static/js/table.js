@@ -1,4 +1,4 @@
-import log from './logger.js';
+import log from '/static/js/logger.js';
 import initializeTable from './table/tableInit.js';
 
 const scriptName = "table.js";

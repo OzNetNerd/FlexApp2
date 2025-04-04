@@ -1,4 +1,4 @@
-import log from "{{ url_for('static', filename='js/logger.js') }}";
+import log from '/static/js/logger.js';
 
 // Log base template initialization and structure
 log("info", "base_template", "init", "🚀 Base template loaded");

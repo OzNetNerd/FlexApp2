@@ -2,7 +2,7 @@
 
 // Import custom modules; these files must exist in your /static/js directory.
 import { initAutoCompleteFields } from './autoComplete.js';
-import log from './logger.js';
+import log from '/static/js/logger.js';
 
 // DOMContentLoaded event to ensure the DOM is ready before running scripts.
 document.addEventListener('DOMContentLoaded', () => {

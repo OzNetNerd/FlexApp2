@@ -32,7 +32,7 @@
 
 <!-- 🔍 Header Render Context Logging -->
 <script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  import log from '/static/js/logger.js';
 
   const headerContext = {
     title: "{{ title }}",  // Precomputed values before passing them into JS

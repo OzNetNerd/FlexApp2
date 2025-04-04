@@ -10,7 +10,7 @@
 {% import "macros/form_fields/_render_sections.html" as sections_macros %}
 
 <script type="module">
-  import log from "{{ url_for('static', filename='js/logger.js') }}";
+  import log from '/static/js/logger.js';
   const filename = "render_form.html";
 
   log("info", filename, "init", "📦 Loaded form rendering macro");
@@ -20,7 +20,7 @@
 {# Main macro to render a form — used across create, edit, and view pages #}
 {% macro render_form(fields_by_section, submit_url, button_text="Submit", read_only=False, edit_url=None) -%}
   <script type="module">
-    import log from "{{ url_for('static', filename='js/logger.js') }}";
+    import log from '/static/js/logger.js';
 
     const filename = "render_form.html";
     const mode = {{ "true" if read_only else "false" }};
