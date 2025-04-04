@@ -8,6 +8,7 @@ from flask import (
     session as flask_session,
     jsonify,
     make_response,
+    current_app,
 )
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
@@ -15,11 +16,12 @@ from config import Config
 from app.routes.web import register_web_blueprints
 from app.routes.base.components.template_renderer import render_safely
 from app.models.base import db
-from app.models.user import User
+from app.models import User, Setting
 from app.routes.base.components.entity_handler import Context, ResourceContext
-from app.models.setting import Setting
-from flask import current_app
 
+# ---------------------------------------------
+# Logging
+# ---------------------------------------------
 
 class IndentationPreservingFormatter(logging.Formatter):
     """Formatter that preserves leading whitespace by re-injecting it after log formatting."""
@@ -76,13 +78,15 @@ def configure_logging() -> None:
     def set_indent(level):
         formatter.indent_level = max(0, level)
 
-    # Attach methods to the logger
     logger.increase_indent = increase_indent
     logger.decrease_indent = decrease_indent
     logger.set_indent = set_indent
 
 
-# Global logger and Flask extensions
+# ---------------------------------------------
+# Flask Extensions
+# ---------------------------------------------
+
 logger = logging.getLogger(__name__)
 login_manager = LoginManager()
 migrate = Migrate()
@@ -92,6 +96,10 @@ migrate = Migrate()
 def unauthorized():
     return make_response("🔒 Unauthorized - Please log in first", 401)
 
+
+# ---------------------------------------------
+# App Factory
+# ---------------------------------------------
 
 def create_app(config_class=Config):
     configure_logging()
@@ -119,8 +127,7 @@ def create_app(config_class=Config):
 
     @login_manager.user_loader
     def load_user(user_id):
-        with current_app.app_context():
-            return db.session.get(User, int(user_id))
+        return db.session.get(User, int(user_id))
 
     @app.before_request
     def require_login():
@@ -135,10 +142,10 @@ def create_app(config_class=Config):
             return
         if not current_user.is_authenticated:
             if (
-                    endpoint in whitelisted
-                    or endpoint.startswith("static")
-                    or endpoint.startswith("api_")
-                    or endpoint.endswith(".data")
+                endpoint in whitelisted
+                or endpoint.startswith("static")
+                or endpoint.startswith("api_")
+                or endpoint.endswith(".data")
             ):
                 return
             return redirect(url_for("auth_bp.login", next=request.path))
@@ -179,13 +186,18 @@ def create_app(config_class=Config):
         )
         return render_safely("base/errors/500.html", context, "Internal server error."), 500
 
-    # ✅ Create all tables and seed demo data if necessary
+    # Create all tables and seed known app settings
     with app.app_context():
-        from app import models
+        from app import models  # Ensure all models are loaded
+        Setting.seed()
         db.create_all()
 
     return app
 
+
+# ---------------------------------------------
+# Entrypoint
+# ---------------------------------------------
 
 app = create_app()
 

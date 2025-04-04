@@ -24,10 +24,11 @@ from .company import Company
 from .contact import Contact
 from .opportunity import Opportunity
 from .note import Note
-from .task import Task  # ✅ Add Task model here
+from .task import Task
 from .table_config import TableConfig
 from .relationship import Relationship
 from .crisp_score import CRISPScore
+from .setting import Setting  # ✅ Added Setting model here
 
 __all__ = [
     "db",
@@ -40,6 +41,7 @@ __all__ = [
     "TableConfig",
     "Relationship",
     "CRISPScore",
+    "Setting",  # ✅ Added to export list
     "contact_user_association",
     "CapabilityCategory",
     "Capability",

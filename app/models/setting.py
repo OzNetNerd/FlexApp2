@@ -1,4 +1,5 @@
 import logging
+from sqlalchemy import inspect
 from app.models.base import db, BaseModel
 
 logger = logging.getLogger(__name__)
@@ -12,7 +13,6 @@ class Setting(BaseModel):
     key = db.Column(db.String(100), unique=True, nullable=False)
     value = db.Column(db.Text, nullable=True)
 
-    # The authoritative list of settings used by the app
     SETTINGS = {
         "debug_mode": "false",
         "maintenance_mode": "false",
@@ -20,7 +20,7 @@ class Setting(BaseModel):
     }
 
     def __repr__(self) -> str:
-        return f"<Settings {self.key}: {self.value}>"
+        return f"<Setting {self.key}: {self.value}>"
 
     def save(self) -> "Setting":
         logger.debug(f"Saving setting '{self.key}' with value '{self.value}'")
@@ -35,17 +35,36 @@ class Setting(BaseModel):
 
     @classmethod
     def seed(cls) -> None:
-        """Insert known settings if not present, using default values."""
+        """Ensure all app settings exist in the DB with defaults if needed."""
+        inspector = inspect(db.engine)
+        logger.info("🔧 Checking for existence of 'settings' table")
+
+        if cls.__tablename__ not in inspector.get_table_names():
+            logger.warning(f"⚠️ Table '{cls.__tablename__}' does not exist. Creating")
+            db.create_all()
+            logger.info(f"✅ Table '{cls.__tablename__}' created successfully.")
+
+        logger.info("🔍 Verifying required settings in the database")
+
         for key, default_value in cls.SETTINGS.items():
-            if not cls.query.filter_by(key=key).first():
-                logger.info(f"Seeding setting '{key}' with default value '{default_value}'")
+            existing = cls.query.filter_by(key=key).first()
+            if existing:
+                logger.info(f"   ✔️ '{key}' already exists with value: '{existing.value}'")
+            else:
+                logger.info(f"➕ Creating setting '{key}' with default value: '{default_value}'")
                 db.session.add(cls(key=key, value=default_value))
+
         db.session.commit()
+        logger.info("✅  Setting check complete. All required settings are now in the database")
 
     @classmethod
     def get_value(cls, key: str, fallback: str = None) -> str:
-        """Get the current value for a setting, falling back to default or provided fallback."""
+        """Retrieve the current value for a setting, with fallback."""
+        logger.debug(f"Getting value for setting '{key}'")
         setting = cls.query.filter_by(key=key).first()
         if setting:
+            logger.info(f"🔎 Found '{key}' = '{setting.value}'")
             return setting.value
-        return cls.SETTINGS.get(key, fallback)
+        default = cls.SETTINGS.get(key, fallback)
+        logger.info(f"❓ Setting '{key}' not in DB. Returning default/fallback: '{default}'")
+        return default
