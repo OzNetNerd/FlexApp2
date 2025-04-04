@@ -64,7 +64,7 @@ def render_safely(
             try:
                 # Attempt to render the _debug_panel.html as a final fallback
                 return render_template(
-                    "base/common/_debug_panel.html",
+                    "base/core/_debug_panel.html",
                     template_name=template_name,
                     debug_title="Fatal Rendering Error",
                     debug_severity="error",

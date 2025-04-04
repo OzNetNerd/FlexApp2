@@ -4,13 +4,13 @@
 
 <!DOCTYPE html>
 <html lang="en">
-  {% include 'base/common/_head.html' %}
+  {% include 'base/core/_head.html' %}
   <body>
     {% include "base/common/_toasts.html" %}
 
     {%- set show_navbar = show_navbar %}  {# Precompute the variable before including #}
 
-    {% include 'base/common/_navbar.html' with context %}  {# Explicitly pass context to include current_user and others #}
+    {% include 'base/core/_navbar.html' with context %}  {# Explicitly pass context to include current_user and others #}
 
     <main class="py-4">
       <div class="container">
@@ -31,7 +31,7 @@
           <div class="card-body">
             <form method="POST">
               {% if ui %}
-                {% include 'create_view_edit/components/_pills_nav_content.html' %}
+                {% include 'base/common/_pills_nav_content.html' %}
               {% else %}
                 {% include 'create_view_edit/components/_section_layout.html' %}
               {% endif %}

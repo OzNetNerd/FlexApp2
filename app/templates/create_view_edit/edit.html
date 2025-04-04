@@ -24,7 +24,7 @@
     <form method="POST" id="edit-form">
       <!-- Pills Navigation with Debug -->
       <div data-template="_pills_nav_content.html">
-        {% include 'create_view_edit/components/_pills_nav_content.html' %}
+        {% include 'base/common/_pills_nav_content.html' %}
       </div>
 
       <!-- Footer Buttons Include -->
@@ -138,6 +138,6 @@
     "endpoint": request.endpoint|default('N/A')
   }
 %}
-  {% include 'base/common/_debug_panel.html' %}
+  {% include 'base/core/_debug_panel.html' %}
 {% endwith %}
 {% endblock %}
