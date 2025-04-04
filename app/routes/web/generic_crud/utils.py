@@ -63,14 +63,14 @@ def add_context(ctx: Any, item: Any, context: Dict[str, Any], edit_mode: bool) -
         edit_mode (bool): Flag indicating whether the context is for edit mode.
     """
     logger.debug(f"Adding relationships to the context for {ctx.model.__name__} {item.id}.")
-    relationships = RelationshipService.get_relationships_for_entity('user', item.id)
+    relationships = RelationshipService.get_relationships_for_entity("user", item.id)
     logger.info(f"Retrieved {len(relationships)} relationships for user with ID {item.id}.")
     logger.debug(f"Payload: {relationships}")
 
     if ctx.model.__name__ == "User":
         context["autocomplete_fields"] = [
             get_autocomplete_field("Users", relationships=relationships),
-            get_autocomplete_field("Companies", relationships=relationships)
+            get_autocomplete_field("Companies", relationships=relationships),
         ]
 
     logger.debug(f"Added {len(context.get('autocomplete_fields', []))} autocomplete fields to the {edit_mode} context.")

@@ -10,7 +10,7 @@ import sys
 import os
 
 # Add the parent directory to sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 
 def test_logout_endpoint(client):
@@ -25,14 +25,17 @@ def test_logout_endpoint(client):
     Asserts:
         - The response status code is 302 (redirect).
     """
-    response = client.get('/auth/logout')
+    response = client.get("/auth/logout")
     assert response.status_code == 302  # Should redirect
 
 
-@pytest.mark.parametrize('endpoint', [
-    '/auth/login',
-    '/auth/logout',
-])
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/auth/login",
+        "/auth/logout",
+    ],
+)
 def test_auth_endpoints_exist(client, endpoint):
     """Test that basic authentication endpoints exist and return appropriate status codes.
 

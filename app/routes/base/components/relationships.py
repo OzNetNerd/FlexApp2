@@ -3,7 +3,8 @@ from app.services.relationship_service import RelationshipService
 
 logger = logging.getLogger(__name__)
 
-def get_relationships(item, entity_type='user'):
+
+def get_relationships(item, entity_type="user"):
     """
     Retrieve and log relationships for a given item.
     Returns the list of relationships.

@@ -5,6 +5,7 @@ from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEn
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class OverviewTab(TabBuilder):
     tab_name: str = "Overview"
@@ -22,26 +23,10 @@ class OverviewTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="name",
-                    label="Name",
-                    type="text",
-                    required=True,
-                    value=self.item.get("name")
-                ),
-                TabEntry(
-                    entry_name="description",
-                    label="Description",
-                    type="textarea",
-                    value=self.item.get("description")
-                ),
-                TabEntry(
-                    entry_name="company.name",
-                    label="Company Name",
-                    type="text",
-                    value=self.item.get("company.name")
-                ),
-            ]
+                TabEntry(entry_name="name", label="Name", type="text", required=True, value=self.item.get("name")),
+                TabEntry(entry_name="description", label="Description", type="textarea", value=self.item.get("description")),
+                TabEntry(entry_name="company.name", label="Company Name", type="text", value=self.item.get("company.name")),
+            ],
         )
 
     def _pipeline_section(self):
@@ -49,21 +34,11 @@ class OverviewTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="stage",
-                    label="Stage",
-                    type="text",
-                    required=True,
-                    value=self.item.get("stage")
-                ),
-                TabEntry(
-                    entry_name="status",
-                    label="Status",
-                    type="text",
-                    value=self.item.get("status")
-                ),
-            ]
+                TabEntry(entry_name="stage", label="Stage", type="text", required=True, value=self.item.get("stage")),
+                TabEntry(entry_name="status", label="Status", type="text", value=self.item.get("status")),
+            ],
         )
+
 
 @dataclass
 class DealTab(TabBuilder):
@@ -82,14 +57,8 @@ class DealTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="value",
-                    label="Value",
-                    type="number",
-                    required=True,
-                    value=self.item.get("value")
-                ),
-            ]
+                TabEntry(entry_name="value", label="Value", type="number", required=True, value=self.item.get("value")),
+            ],
         )
 
     def _crisp_section(self):
@@ -97,14 +66,10 @@ class DealTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="crisp",
-                    label="CRISP",
-                    type="string",
-                    required=True,
-                    value=self.item.get("crisp")
-                ),
-            ]
+                TabEntry(entry_name="crisp", label="CRISP", type="string", required=True, value=self.item.get("crisp")),
+            ],
         )
+
+
 # Constant list of opportunity tabs
 OPPORTUNITIES_TABS = [OverviewTab, DealTab]

@@ -22,7 +22,7 @@ class Relationship(BaseModel):
         foreign_keys=[entity1_id],
         primaryjoin="and_(Relationship.entity1_id==User.id, Relationship.entity1_type=='user')",
         back_populates="relationships",
-        overlaps="contact"
+        overlaps="contact",
     )
 
     contact = db.relationship(
@@ -30,15 +30,16 @@ class Relationship(BaseModel):
         foreign_keys=[entity1_id],
         primaryjoin="and_(Relationship.entity1_id==Contact.id, Relationship.entity1_type=='contact')",
         back_populates="relationships",
-        overlaps="user"
+        overlaps="user",
     )
 
     # CRISP scores relationship
     crisp_scores = db.relationship("CRISPScore", back_populates="relationship", cascade="all, delete-orphan")
 
     __table_args__ = (
-        db.UniqueConstraint("entity1_type", "entity1_id", "entity2_type", "entity2_id", "relationship_type",
-                            name="_entity_relationship_uc"),
+        db.UniqueConstraint(
+            "entity1_type", "entity1_id", "entity2_type", "entity2_id", "relationship_type", name="_entity_relationship_uc"
+        ),
     )
 
     def __repr__(self) -> str:
@@ -51,7 +52,7 @@ class Relationship(BaseModel):
             entity1_id=entity1_id,
             entity2_type=entity2_type,
             entity2_id=entity2_id,
-            relationship_type=relationship_type
+            relationship_type=relationship_type,
         )
         return relationship
 
@@ -60,16 +61,11 @@ class Relationship(BaseModel):
         query = cls.query.filter(
             db.or_(
                 db.and_(cls.entity1_type == entity_type, cls.entity1_id == entity_id),
-                db.and_(cls.entity2_type == entity_type, cls.entity2_id == entity_id)
+                db.and_(cls.entity2_type == entity_type, cls.entity2_id == entity_id),
             )
         )
         if related_entity_type:
-            query = query.filter(
-                db.or_(
-                    cls.entity1_type == related_entity_type,
-                    cls.entity2_type == related_entity_type
-                )
-            )
+            query = query.filter(db.or_(cls.entity1_type == related_entity_type, cls.entity2_type == related_entity_type))
         return query.all()
 
     def get_related_entity(self, from_entity_type, from_entity_id):

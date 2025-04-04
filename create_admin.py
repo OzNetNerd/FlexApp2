@@ -7,6 +7,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 def create_or_update(model, match_by: dict, data: dict):
     """Create or update an instance of the model based on the match criteria."""
     instance = model.query.filter_by(**match_by).first()
@@ -21,6 +22,7 @@ def create_or_update(model, match_by: dict, data: dict):
         db.session.add(instance)
         logger.info(f"Created new {model.__name__}: {match_by}")
     return instance
+
 
 def seed_users():
     """Seed users into the database."""
@@ -47,6 +49,7 @@ def seed_users():
         )
     db.session.commit()
     print("✅ Users seeded.")
+
 
 def seed_opportunities():
     """Seed opportunities into the database."""
@@ -75,6 +78,7 @@ def seed_opportunities():
     db.session.commit()
     print("✅ Opportunities seeded.")
 
+
 def seed_companies():
     """Seed companies into the database."""
     companies = [
@@ -89,6 +93,7 @@ def seed_companies():
         create_or_update(Company, {"name": name}, {"description": description})
     db.session.commit()
     print("✅ Companies seeded.")
+
 
 def seed_contacts():
     """Seed contacts into the database."""
@@ -114,6 +119,7 @@ def seed_contacts():
     db.session.commit()
     print("✅ Contacts seeded.")
 
+
 def seed_capabilities_and_categories():
     """Seed capabilities and categories into the database."""
     categories = ["Security", "Data", "Infrastructure", "DevOps", "AI"]
@@ -126,7 +132,7 @@ def seed_capabilities_and_categories():
         "Data": ["ETL", "Data Warehousing"],
         "Infrastructure": ["Load Balancing"],
         "DevOps": ["CI/CD Pipelines"],
-        "AI": ["ML Model Training"]
+        "AI": ["ML Model Training"],
     }
 
     for category_name, capability_names in capability_map.items():
@@ -135,6 +141,7 @@ def seed_capabilities_and_categories():
             create_or_update(Capability, {"name": cap_name}, {"category": category})
     db.session.commit()
     print("✅ Capabilities and categories seeded.")
+
 
 def seed_company_capabilities():
     """Seed company capabilities into the database."""
@@ -149,6 +156,7 @@ def seed_company_capabilities():
     db.session.commit()
     print("✅ CompanyCapabilities seeded.")
 
+
 def seed_tasks():
     users = User.query.all()
     opportunities = Opportunity.query.all()
@@ -158,13 +166,61 @@ def seed_tasks():
         return
 
     tasks = [
-        ("Follow up on Cloud Expansion", "Follow up with the client about the cloud expansion opportunity.", "2025-06-30", "Pending", "High", "Opportunity", opportunities[0].id),
-        ("Review security partnership terms", "Review the proposed terms for the security partnership.", "2025-05-15", "In Progress", "Medium", "Opportunity", opportunities[1].id),
-        ("Prepare proposal for data analytics", "Prepare a detailed proposal for the data analytics project.", "2025-04-20", "Pending", "High", "Opportunity", opportunities[2].id),
-        ("Renew software licenses", "Process the renewal for software licenses for the enterprise.", "2025-07-10", "Completed", "Low", "Opportunity", opportunities[3].id),
-        ("Cybersecurity audit for client", "Complete the cybersecurity audit for the client and report findings.", "2025-06-05", "Pending", "High", "Opportunity", opportunities[4].id),
+        (
+            "Follow up on Cloud Expansion",
+            "Follow up with the client about the cloud expansion opportunity.",
+            "2025-06-30",
+            "Pending",
+            "High",
+            "Opportunity",
+            opportunities[0].id,
+        ),
+        (
+            "Review security partnership terms",
+            "Review the proposed terms for the security partnership.",
+            "2025-05-15",
+            "In Progress",
+            "Medium",
+            "Opportunity",
+            opportunities[1].id,
+        ),
+        (
+            "Prepare proposal for data analytics",
+            "Prepare a detailed proposal for the data analytics project.",
+            "2025-04-20",
+            "Pending",
+            "High",
+            "Opportunity",
+            opportunities[2].id,
+        ),
+        (
+            "Renew software licenses",
+            "Process the renewal for software licenses for the enterprise.",
+            "2025-07-10",
+            "Completed",
+            "Low",
+            "Opportunity",
+            opportunities[3].id,
+        ),
+        (
+            "Cybersecurity audit for client",
+            "Complete the cybersecurity audit for the client and report findings.",
+            "2025-06-05",
+            "Pending",
+            "High",
+            "Opportunity",
+            opportunities[4].id,
+        ),
         ("User feedback analysis", "Analyze user feedback on the latest release.", "2025-05-01", "Pending", "Medium", "User", users[0].id),
-        ("Internal team meeting", "Schedule an internal team meeting for next week.", "2025-04-25", "Completed", "Low", "User", users[1].id),
+        (
+            "Internal team meeting",
+            "Schedule an internal team meeting for next week.",
+            "2025-04-25",
+            "Completed",
+            "Low",
+            "User",
+            users[1].id,
+        ),
     ]
 
     # Handle cases where there are fewer users or opportunities than tasks
@@ -206,16 +262,11 @@ def seed_relationships():
         user2 = users[i + 1]
         rel_type = relationship_types[i % len(relationship_types)]
 
-        existing = Relationship.query.filter_by(
-            entity1_type='user', entity1_id=user1.id,
-            entity2_type='user', entity2_id=user2.id
-        ).first()
+        existing = Relationship.query.filter_by(entity1_type="user", entity1_id=user1.id, entity2_type="user", entity2_id=user2.id).first()
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type='user', entity1_id=user1.id,
-                entity2_type='user', entity2_id=user2.id,
-                relationship_type=rel_type
+                entity1_type="user", entity1_id=user1.id, entity2_type="user", entity2_id=user2.id, relationship_type=rel_type
             )
             db.session.add(relationship)
             logger.info(f"Created relationship: User {user1.username} {rel_type} User {user2.username}")
@@ -227,15 +278,12 @@ def seed_relationships():
         rel_type = relationship_types[(i + 2) % len(relationship_types)]
 
         existing = Relationship.query.filter_by(
-            entity1_type='user', entity1_id=user.id,
-            entity2_type='contact', entity2_id=contact.id
+            entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id
         ).first()
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type='user', entity1_id=user.id,
-                entity2_type='contact', entity2_id=contact.id,
-                relationship_type=rel_type
+                entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id, relationship_type=rel_type
             )
             db.session.add(relationship)
             logger.info(f"Created relationship: User {user.username} {rel_type} Contact {contact.full_name}")
@@ -247,15 +295,12 @@ def seed_relationships():
         rel_type = relationship_types[(i + 4) % len(relationship_types)]
 
         existing = Relationship.query.filter_by(
-            entity1_type='user', entity1_id=user.id,
-            entity2_type='company', entity2_id=company.id
+            entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id
         ).first()
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type='user', entity1_id=user.id,
-                entity2_type='company', entity2_id=company.id,
-                relationship_type=rel_type
+                entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id, relationship_type=rel_type
             )
             db.session.add(relationship)
             logger.info(f"Created relationship: User {user.username} {rel_type} Company {company.name}")
@@ -267,14 +312,22 @@ def seed_relationships():
 # Update the seed_demo_data function to include the new seed_relationships function
 def seed_demo_data():
     """Seed all demo data into the database."""
-    entries = [seed_users, seed_companies, seed_contacts, seed_capabilities_and_categories,
-               seed_company_capabilities, seed_tasks, seed_opportunities, seed_relationships]
+    entries = [
+        seed_users,
+        seed_companies,
+        seed_contacts,
+        seed_capabilities_and_categories,
+        seed_company_capabilities,
+        seed_tasks,
+        seed_opportunities,
+        seed_relationships,
+    ]
 
     app = create_app()
     with app.app_context():
         for entry in entries:
             entry_name = entry.__name__  # Get the function name
-            print(f'Seeding entry {entry_name}')
+            print(f"Seeding entry {entry_name}")
             try:
                 entry()  # Call the function
                 print(f"🎉 {entry_name} Done")
@@ -284,6 +337,7 @@ def seed_demo_data():
             except Exception as e:
                 db.session.rollback()
                 print(f"❌ {entry_name} Error seeding data: {e}")
+
 
 if __name__ == "__main__":
     seed_demo_data()

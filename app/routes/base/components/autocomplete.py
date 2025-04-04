@@ -3,6 +3,7 @@ from typing import List
 from dataclasses import dataclass
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,6 +15,7 @@ class AutoCompleteField:
     name: str
     data_url: str
     related_ids: List[str]
+
 
 # def get_autocomplete_fields(relationships):
 #     """
@@ -68,22 +70,15 @@ def get_autocomplete_field(title, relationships=None, field_id=None, placeholder
     if title_lower == "companies":
         entity_type = "company"
     else:
-        entity_type = title_lower.rstrip('s')
+        entity_type = title_lower.rstrip("s")
 
     logger.debug(f"Derived entity_type '{entity_type}' from title '{title}'.")
 
     related_ids = []
     if relationships is not None:
-        related_ids = [rel['entity_id'] for rel in relationships if rel.get('entity_type') == entity_type]
+        related_ids = [rel["entity_id"] for rel in relationships if rel.get("entity_type") == entity_type]
         logger.debug(f"Extracted related IDs for entity_type '{entity_type}': {related_ids}")
 
     # Make sure to use related_ids to match template expectations
-    field = AutoCompleteField(
-        title=title,
-        id=field_id,
-        placeholder=placeholder,
-        name=name,
-        data_url=data_url,
-        related_ids=related_ids
-    )
+    field = AutoCompleteField(title=title, id=field_id, placeholder=placeholder, name=name, data_url=data_url, related_ids=related_ids)
     return field

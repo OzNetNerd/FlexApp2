@@ -9,10 +9,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 # Create a custom CRUD routes class for Users
 class UserCRUDRoutes(GenericWebRoutes):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
 
 # Set up CRUD routes for managing users within the 'users_bp' blueprint.
 # This configures routes for creating, reading, updating, and deleting users.

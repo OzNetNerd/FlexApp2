@@ -9,7 +9,7 @@ import sys
 import os
 
 # Add the parent directory to sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 
 def test_login_route_exists(client):
@@ -24,7 +24,7 @@ def test_login_route_exists(client):
     Asserts:
         - The response status code is either 200 (OK) or 302 (redirect).
     """
-    response = client.get('/auth/login')
+    response = client.get("/auth/login")
     assert response.status_code in [200, 302]
 
 
@@ -40,13 +40,7 @@ def test_login_post_endpoint(client):
     Asserts:
         - The response status code is one of 200, 302, 401, or 422, depending on the request handling.
     """
-    response = client.post(
-        '/auth/login',
-        data={
-            'email': 'test@example.com',
-            'password': 'password123'
-        }
-    )
+    response = client.post("/auth/login", data={"email": "test@example.com", "password": "password123"})
     # Just checking that it accepts the POST request
     assert response.status_code in [200, 302, 401, 422]
 
@@ -64,5 +58,5 @@ def test_logout_route_exists(client):
     Asserts:
         - The response status code is either 200 (OK) or 302 (redirect).
     """
-    response = client.get('/auth/logout')
+    response = client.get("/auth/logout")
     assert response.status_code in [200, 302]

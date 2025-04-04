@@ -23,10 +23,11 @@ from app.routes.base.components.entity_handler import Context, ResourceContext
 # Logging
 # ---------------------------------------------
 
+
 class IndentationPreservingFormatter(logging.Formatter):
     """Formatter that preserves leading whitespace by re-injecting it after log formatting."""
 
-    def __init__(self, fmt=None, datefmt=None, style='%'):
+    def __init__(self, fmt=None, datefmt=None, style="%"):
         super().__init__(fmt, datefmt, style)
         self.indent_level = 0
         self.indent_char = "  "
@@ -35,16 +36,16 @@ class IndentationPreservingFormatter(logging.Formatter):
         original_msg = record.getMessage()
 
         # Add indentation to the message if needed
-        if hasattr(record, 'indent_level'):
+        if hasattr(record, "indent_level"):
             indent_level = record.indent_level
         else:
             indent_level = self.indent_level
 
         # Save leading whitespace (if any)
-        leading_ws = ''
+        leading_ws = ""
         if isinstance(record.msg, str):
             stripped = record.msg.lstrip()
-            leading_ws = record.msg[:len(record.msg) - len(stripped)]
+            leading_ws = record.msg[: len(record.msg) - len(stripped)]
             # Add indentation
             if not leading_ws.startswith(self.indent_char * indent_level):
                 record.msg = self.indent_char * indent_level + record.msg
@@ -101,6 +102,7 @@ def unauthorized():
 # App Factory
 # ---------------------------------------------
 
+
 def create_app(config_class=Config):
     configure_logging()
 
@@ -141,12 +143,7 @@ def create_app(config_class=Config):
         if endpoint is None:
             return
         if not current_user.is_authenticated:
-            if (
-                endpoint in whitelisted
-                or endpoint.startswith("static")
-                or endpoint.startswith("api_")
-                or endpoint.endswith(".data")
-            ):
+            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
                 return
             return redirect(url_for("auth_bp.login", next=request.path))
 
@@ -170,25 +167,18 @@ def create_app(config_class=Config):
 
     @app.errorhandler(404)
     def page_not_found(e):
-        context = Context(
-            title="404 Not Found",
-            item=str(e),
-            read_only=True
-        )
+        context = Context(title="404 Not Found", item=str(e), read_only=True)
         return render_safely("base/errors/404.html", context, "Page not found."), 404
 
     @app.errorhandler(500)
     def internal_server_error(e):
-        context = Context(
-            title="500 Internal Server Error",
-            item=str(e),
-            read_only=True
-        )
+        context = Context(title="500 Internal Server Error", item=str(e), read_only=True)
         return render_safely("base/errors/500.html", context, "Internal server error."), 500
 
     # Create all tables and seed known app settings
     with app.app_context():
         from app import models  # Ensure all models are loaded
+
         Setting.seed()
         db.create_all()
 

@@ -7,11 +7,12 @@ from app.routes.base.components.entity_handler import Context, TableContext, Res
 
 logger = logging.getLogger(__name__)
 
+
 def render_safely(
-        template_name: str,
-        context: Union[Context, TableContext, ResourceContext],
-        fallback_error_message: str = "An error occurred while rendering the page",
-        endpoint_name: Optional[str] = None,
+    template_name: str,
+    context: Union[Context, TableContext, ResourceContext],
+    fallback_error_message: str = "An error occurred while rendering the page",
+    endpoint_name: Optional[str] = None,
 ) -> tuple[str, int] | str:
     """
     Safely renders a Jinja2 template with error handling, fallback rendering,
@@ -63,24 +64,27 @@ def render_safely(
 
             try:
                 # Attempt to render the _debug_panel.html as a final fallback
-                return render_template(
-                    "base/core/_debug_panel.html",
-                    template_name=template_name,
-                    debug_title="Fatal Rendering Error",
-                    debug_severity="error",
-                    debug_context={
-                        "original_error": str(e),
-                        "render_fallback_error": str(e2),
-                        "template_name": template_name,
-                        "endpoint": current_endpoint,
-                        "path": current_path
-                    },
-                    debug_data=None,
-                    debug_id="fatal",
-                    debug_expanded=True,
-                    debug_show_toggle=False,
-                    debug_capture_console=False
-                ), status_code
+                return (
+                    render_template(
+                        "base/core/_debug_panel.html",
+                        template_name=template_name,
+                        debug_title="Fatal Rendering Error",
+                        debug_severity="error",
+                        debug_context={
+                            "original_error": str(e),
+                            "render_fallback_error": str(e2),
+                            "template_name": template_name,
+                            "endpoint": current_endpoint,
+                            "path": current_path,
+                        },
+                        debug_data=None,
+                        debug_id="fatal",
+                        debug_expanded=True,
+                        debug_show_toggle=False,
+                        debug_capture_console=False,
+                    ),
+                    status_code,
+                )
             except Exception as e3:
                 logger.critical(f"❌ Even the debug panel failed: {e3}")
                 return f"<h1>{fallback_error_message}</h1><p>{error_type}</p>", status_code

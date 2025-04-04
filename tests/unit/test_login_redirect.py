@@ -11,7 +11,7 @@ import sys
 import os
 
 # Add the parent directory to sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 
 def test_index_redirect_to_login(app):
@@ -28,6 +28,6 @@ def test_index_redirect_to_login(app):
         - The Location header contains the login URL with a 'next' parameter set to '/'.
     """
     with app.test_client() as client:
-        response = client.get('/', follow_redirects=False)
+        response = client.get("/", follow_redirects=False)
         assert response.status_code == 302
-        assert '/auth/login?next=/' in response.location
+        assert "/auth/login?next=/" in response.location

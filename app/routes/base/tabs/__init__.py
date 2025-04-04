@@ -7,11 +7,10 @@ from app.routes.base.tabs.settings import SETTINGS_TABS
 
 # In your tabs module or a dedicated registry file
 UI_TAB_MAPPING = {
-    'Contact': CONTACTS_TABS,
-    'Company': COMPANIES_TABS,
-    'Opportunity': OPPORTUNITIES_TABS,
-    'User': USERS_TABS,
-    'Task': TASKS_TABS,
-    'Setting': SETTINGS_TABS,
+    "Contact": CONTACTS_TABS,
+    "Company": COMPANIES_TABS,
+    "Opportunity": OPPORTUNITIES_TABS,
+    "User": USERS_TABS,
+    "Task": TASKS_TABS,
+    "Setting": SETTINGS_TABS,
 }
-

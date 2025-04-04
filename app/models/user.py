@@ -6,6 +6,7 @@ from app.models.relationship import Relationship
 
 logger = logging.getLogger(__name__)
 
+
 class User(BaseModel, UserMixin):
     """Represents a CRM system user."""
 
@@ -24,7 +25,7 @@ class User(BaseModel, UserMixin):
         primaryjoin="and_(User.id == Relationship.entity1_id, Relationship.entity1_type == 'user')",
         back_populates="user",
         cascade="all, delete-orphan",
-        overlaps="contact"
+        overlaps="contact",
     )
 
     notes = db.relationship("Note", backref="author", lazy="dynamic")
@@ -51,21 +52,15 @@ class User(BaseModel, UserMixin):
         base_dict = super().to_dict()
         from app.services.relationship_service import RelationshipService
 
-        entity1_relationships = Relationship.query.filter_by(
-            entity1_type='user',
-            entity1_id=self.id
-        ).all()
+        entity1_relationships = Relationship.query.filter_by(entity1_type="user", entity1_id=self.id).all()
 
-        entity2_relationships = Relationship.query.filter_by(
-            entity2_type='user',
-            entity2_id=self.id
-        ).all()
+        entity2_relationships = Relationship.query.filter_by(entity2_type="user", entity2_id=self.id).all()
 
         related_users = []
         related_companies = []
 
         for rel in entity1_relationships + entity2_relationships:
-            if rel.entity1_type == 'user' and rel.entity1_id == self.id:
+            if rel.entity1_type == "user" and rel.entity1_id == self.id:
                 related_type = rel.entity2_type
                 related_id = rel.entity2_id
             else:
@@ -76,21 +71,19 @@ class User(BaseModel, UserMixin):
             if not related_entity:
                 continue
 
-            if related_type == 'user':
-                related_users.append({
-                    'id': related_entity.id,
-                    'name': related_entity.name,
-                    'username': related_entity.username,
-                    'relationship_type': rel.relationship_type
-                })
-            elif related_type == 'company':
-                related_companies.append({
-                    'id': related_entity.id,
-                    'name': related_entity.name,
-                    'relationship_type': rel.relationship_type
-                })
+            if related_type == "user":
+                related_users.append(
+                    {
+                        "id": related_entity.id,
+                        "name": related_entity.name,
+                        "username": related_entity.username,
+                        "relationship_type": rel.relationship_type,
+                    }
+                )
+            elif related_type == "company":
+                related_companies.append({"id": related_entity.id, "name": related_entity.name, "relationship_type": rel.relationship_type})
 
-        base_dict['related_users'] = related_users
-        base_dict['related_companies'] = related_companies
+        base_dict["related_users"] = related_users
+        base_dict["related_companies"] = related_companies
 
         return base_dict

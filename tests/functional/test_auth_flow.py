@@ -8,6 +8,7 @@ the user authentication flow works as expected in different scenarios.
 
 import pytest
 
+
 def test_root_url_redirect(client):
     """Test that the root URL redirects to the login page when unauthenticated.
 
@@ -21,9 +22,9 @@ def test_root_url_redirect(client):
         - The response status code is 302 (redirect).
         - The redirect location contains '/auth/login?next=/'.
     """
-    response = client.get('/', follow_redirects=False)
+    response = client.get("/", follow_redirects=False)
     assert response.status_code == 302
-    assert '/auth/login?next=/' in response.location
+    assert "/auth/login?next=/" in response.location
 
 
 def test_login_to_protected_page(client, mock_user):
@@ -39,16 +40,16 @@ def test_login_to_protected_page(client, mock_user):
     Asserts:
         - The protected page returns a 200 status code after login.
     """
-    response = client.get('/', follow_redirects=True)
+    response = client.get("/", follow_redirects=True)
     assert response.status_code == 200
 
     response = client.post(
-        '/auth/login?next=/',
+        "/auth/login?next=/",
         data={
-            'email': mock_user['email'],
-            'password': mock_user['password'],
+            "email": mock_user["email"],
+            "password": mock_user["password"],
         },
-        follow_redirects=True
+        follow_redirects=True,
     )
     assert response.status_code == 200
 
@@ -67,13 +68,7 @@ def test_remember_me_functionality(client, mock_user):
         - The response status code is 200 after login with the 'remember me' checkbox checked.
     """
     response = client.post(
-        '/auth/login',
-        data={
-            'email': mock_user['email'],
-            'password': mock_user['password'],
-            'remember': '1'
-        },
-        follow_redirects=True
+        "/auth/login", data={"email": mock_user["email"], "password": mock_user["password"], "remember": "1"}, follow_redirects=True
     )
     assert response.status_code == 200
 
@@ -92,14 +87,14 @@ def test_session_persistence(client, mock_user):
         - The response status code is 200 for the protected page after login.
     """
     client.post(
-        '/auth/login',
+        "/auth/login",
         data={
-            'email': mock_user['email'],
-            'password': mock_user['password'],
+            "email": mock_user["email"],
+            "password": mock_user["password"],
         },
-        follow_redirects=True
+        follow_redirects=True,
     )
-    response = client.get('/', follow_redirects=True)
+    response = client.get("/", follow_redirects=True)
     assert response.status_code == 200
 
 
@@ -117,11 +112,11 @@ def test_flash_messages(client, mock_user):
         - The response status code is 200 after posting the login data.
     """
     response = client.post(
-        '/auth/login',
+        "/auth/login",
         data={
-            'email': mock_user['email'],
-            'password': mock_user['password'],
+            "email": mock_user["email"],
+            "password": mock_user["password"],
         },
-        follow_redirects=True
+        follow_redirects=True,
     )
     assert response.status_code == 200

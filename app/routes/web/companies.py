@@ -6,6 +6,7 @@ from app.routes.web.generic_crud.generic_crud_routes import GenericWebRoutes
 
 logger = logging.getLogger(__name__)
 
+
 class CompanyCRUDRoutes(GenericWebRoutes):
     pass
 
@@ -26,4 +27,3 @@ company_routes = CompanyCRUDRoutes(
     index_template="pages/tables/companies.html",
     # create_tabs_function=get_company_tabs,
 )
-

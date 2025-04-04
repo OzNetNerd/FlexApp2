@@ -4,6 +4,7 @@ from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEn
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class AboutTab(TabBuilder):
     tab_name: str = "About"
@@ -22,21 +23,9 @@ class AboutTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="username",
-                    label="Username",
-                    type="text",
-                    required=True,
-                    value=self.item.get("username")
-                ),
-                TabEntry(
-                    entry_name="name",
-                    label="Name",
-                    type="text",
-                    required=True,
-                    value=self.item.get("name")
-                ),
-            ]
+                TabEntry(entry_name="username", label="Username", type="text", required=True, value=self.item.get("username")),
+                TabEntry(entry_name="name", label="Name", type="text", required=True, value=self.item.get("name")),
+            ],
         )
 
     def _contact_section(self):
@@ -44,14 +33,8 @@ class AboutTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="email",
-                    label="Email",
-                    type="email",
-                    required=True,
-                    value=self.item.get("email")
-                ),
-            ]
+                TabEntry(entry_name="email", label="Email", type="email", required=True, value=self.item.get("email")),
+            ],
         )
 
     def _record_info_section(self):
@@ -59,20 +42,11 @@ class AboutTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="created_at",
-                    label="Created At",
-                    type="datetime",
-                    value=self.item.get("created_at")
-                ),
-                TabEntry(
-                    entry_name="updated_at",
-                    label="Updated At",
-                    type="datetime",
-                    value=self.item.get("updated_at")
-                ),
-            ]
+                TabEntry(entry_name="created_at", label="Created At", type="datetime", value=self.item.get("created_at")),
+                TabEntry(entry_name="updated_at", label="Updated At", type="datetime", value=self.item.get("updated_at")),
+            ],
         )
+
 
 @dataclass
 class InsightsTab(TabBuilder):
@@ -90,14 +64,10 @@ class InsightsTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="crisp",
-                    label="CRISP",
-                    type="custom",
-                    value=self.item.get("crisp")
-                ),
-            ]
+                TabEntry(entry_name="crisp", label="CRISP", type="custom", value=self.item.get("crisp")),
+            ],
         )
+
 
 @dataclass
 class RelationshipsTab(TabBuilder):
@@ -115,20 +85,11 @@ class RelationshipsTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="users",
-                    label="Users",
-                    type="custom",
-                    value=self.item.get("users")
-                ),
-                TabEntry(
-                    entry_name="companies",
-                    label="Companies",
-                    type="custom",
-                    value=self.item.get("companies")
-                ),
-            ]
+                TabEntry(entry_name="users", label="Users", type="custom", value=self.item.get("users")),
+                TabEntry(entry_name="companies", label="Companies", type="custom", value=self.item.get("companies")),
+            ],
         )
+
 
 # Constant list of user-related tabs
 USERS_TABS = [AboutTab, InsightsTab, RelationshipsTab]

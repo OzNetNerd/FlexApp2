@@ -58,7 +58,6 @@ def login():
     return render_safely("pages/misc/login.html", context)  # Use render_safely for safe rendering
 
 
-
 @auth_bp.route("/logout")
 def logout():
     """Logs out the current user and redirects to login.

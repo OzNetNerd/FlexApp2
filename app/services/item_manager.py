@@ -56,16 +56,10 @@ class ItemManager:
                 from app.models.relationship import Relationship
 
                 # Load relationships where this user is entity1
-                entity1_relationships = Relationship.query.filter_by(
-                    entity1_type='user',
-                    entity1_id=item_id
-                ).all()
+                entity1_relationships = Relationship.query.filter_by(entity1_type="user", entity1_id=item_id).all()
 
                 # Load relationships where this user is entity2
-                entity2_relationships = Relationship.query.filter_by(
-                    entity2_type='user',
-                    entity2_id=item_id
-                ).all()
+                entity2_relationships = Relationship.query.filter_by(entity2_type="user", entity2_id=item_id).all()
 
                 # Combine all relationships
                 item.all_relationships = entity1_relationships + entity2_relationships
@@ -132,8 +126,9 @@ class ItemManager:
                     setattr(item, field, value)
 
             # Update the timestamp for this change
-            if hasattr(item, 'updated_at'):
+            if hasattr(item, "updated_at"):
                 from datetime import datetime
+
                 item.updated_at = datetime.now()
 
             # Save the basic changes
@@ -177,10 +172,8 @@ class ItemManager:
         if "users" in relationship_data and relationship_data["users"]:
             # Clear existing user-user relationships
             existing_relationships = Relationship.query.filter(
-                ((Relationship.entity1_type == 'user') & (Relationship.entity1_id == user.id) &
-                 (Relationship.entity2_type == 'user')) |
-                ((Relationship.entity2_type == 'user') & (Relationship.entity2_id == user.id) &
-                 (Relationship.entity1_type == 'user'))
+                ((Relationship.entity1_type == "user") & (Relationship.entity1_id == user.id) & (Relationship.entity2_type == "user"))
+                | ((Relationship.entity2_type == "user") & (Relationship.entity2_id == user.id) & (Relationship.entity1_type == "user"))
             ).all()
 
             for rel in existing_relationships:
@@ -191,19 +184,15 @@ class ItemManager:
             for related_user_id in relationship_data["users"]:
                 if str(related_user_id) != str(user.id):  # Prevent self-relationship
                     RelationshipService.create_relationship(
-                        'user', user.id,
-                        'user', int(related_user_id),
-                        'Colleague'  # Default relationship type - could be made configurable
+                        "user", user.id, "user", int(related_user_id), "Colleague"  # Default relationship type - could be made configurable
                     )
 
         # Process company relationships
         if "companies" in relationship_data and relationship_data["companies"]:
             # Clear existing user-company relationships
             existing_relationships = Relationship.query.filter(
-                ((Relationship.entity1_type == 'user') & (Relationship.entity1_id == user.id) &
-                 (Relationship.entity2_type == 'company')) |
-                ((Relationship.entity2_type == 'company') & (Relationship.entity2_id == user.id) &
-                 (Relationship.entity1_type == 'user'))
+                ((Relationship.entity1_type == "user") & (Relationship.entity1_id == user.id) & (Relationship.entity2_type == "company"))
+                | ((Relationship.entity2_type == "company") & (Relationship.entity2_id == user.id) & (Relationship.entity1_type == "user"))
             ).all()
 
             for rel in existing_relationships:
@@ -213,9 +202,7 @@ class ItemManager:
             # Create new relationships
             for company_id in relationship_data["companies"]:
                 RelationshipService.create_relationship(
-                    'user', user.id,
-                    'company', int(company_id),
-                    'Account Manager'  # Default relationship type - could be made configurable
+                    "user", user.id, "company", int(company_id), "Account Manager"  # Default relationship type - could be made configurable
                 )
 
     def delete_item(self, item):

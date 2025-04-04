@@ -42,12 +42,7 @@ def view_route(ctx: Any, item_id: int) -> Any:
         item_dict["related_companies"] = [rel for rel in relationships if rel["entity_type"] == "company"]
 
     context = ResourceContext(
-        model=ctx.model,
-        blueprint_name=ctx.blueprint.name,
-        item_dict=item_dict,
-        item=None,
-        action="Viewing",
-        read_only=True
+        model=ctx.model, blueprint_name=ctx.blueprint.name, item_dict=item_dict, item=None, action="Viewing", read_only=True
     )
 
     return render_safely(ctx.view_template, context, f"Error viewing {ctx.model.__name__} with id {item_id}")

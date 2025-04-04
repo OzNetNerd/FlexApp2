@@ -62,6 +62,7 @@ class ContactCRUDRoutes(GenericWebRoutes):
                 if isinstance(value, list):
                     return value
                 return [value] if value is not None else []
+
         else:
             form_data = request_obj.form.to_dict(flat=True)
             getlist = request_obj.form.getlist

@@ -4,6 +4,7 @@ from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEn
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class AboutTab(TabBuilder):
     tab_name: str = "About"
@@ -20,25 +21,9 @@ class AboutTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="title",
-                    label="Title",
-                    type="text",
-                    required=True,
-                    value=self.item.get("title")
-                ),
-                TabEntry(
-                    entry_name="description",
-                    label="Description",
-                    type="textarea",
-                    value=self.item.get("description")
-                ),
-                TabEntry(
-                    entry_name="due_date",
-                    label="Due Date",
-                    type="date",
-                    value=self.item.get("due_date")
-                ),
+                TabEntry(entry_name="title", label="Title", type="text", required=True, value=self.item.get("title")),
+                TabEntry(entry_name="description", label="Description", type="textarea", value=self.item.get("description")),
+                TabEntry(entry_name="due_date", label="Due Date", type="date", value=self.item.get("due_date")),
                 TabEntry(
                     entry_name="status",
                     label="Status",
@@ -49,7 +34,7 @@ class AboutTab(TabBuilder):
                         {"value": "Pending", "label": "Pending"},
                         {"value": "In Progress", "label": "In Progress"},
                         {"value": "Completed", "label": "Completed"},
-                    ]
+                    ],
                 ),
                 TabEntry(
                     entry_name="priority",
@@ -60,10 +45,11 @@ class AboutTab(TabBuilder):
                         {"value": "Low", "label": "Low"},
                         {"value": "Medium", "label": "Medium"},
                         {"value": "High", "label": "High"},
-                    ]
+                    ],
                 ),
-            ]
+            ],
         )
+
 
 @dataclass
 class DetailsTab(TabBuilder):
@@ -81,20 +67,11 @@ class DetailsTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="notable_type",
-                    label="Linked To (Type)",
-                    type="hidden",
-                    value=self.item.get("notable_type", "User")
-                ),
-                TabEntry(
-                    entry_name="notable_id",
-                    label="Linked To (ID)",
-                    type="hidden",
-                    value=self.item.get("notable_id", "1")
-                ),
-            ]
+                TabEntry(entry_name="notable_type", label="Linked To (Type)", type="hidden", value=self.item.get("notable_type", "User")),
+                TabEntry(entry_name="notable_id", label="Linked To (ID)", type="hidden", value=self.item.get("notable_id", "1")),
+            ],
         )
+
 
 # Constant list of task-related tabs
 TASKS_TABS = [AboutTab, DetailsTab]

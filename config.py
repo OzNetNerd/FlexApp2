@@ -14,7 +14,7 @@ console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
 
 # Create a formatter and add it to the handler
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 console_handler.setFormatter(formatter)
 
 # Add the handler to the logger
@@ -22,6 +22,7 @@ logger.addHandler(console_handler)
 
 # Log the base directory
 logger.debug(f"Base directory set to: {BASE_DIR}")
+
 
 class Config:
     """Configuration class to manage app settings."""

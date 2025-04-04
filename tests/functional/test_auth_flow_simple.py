@@ -8,6 +8,7 @@ fundamental authentication features work as expected.
 
 import pytest
 
+
 def test_root_url_redirect(client):
     """Test that the root URL redirects unauthenticated users to the login page.
 
@@ -21,9 +22,9 @@ def test_root_url_redirect(client):
         - Response status code is 302 (redirect).
         - The Location header contains '/auth/login?next=/'.
     """
-    response = client.get('/', follow_redirects=False)
+    response = client.get("/", follow_redirects=False)
     assert response.status_code == 302
-    assert '/auth/login?next=/' in response.location
+    assert "/auth/login?next=/" in response.location
 
 
 def test_login_page_loads(client):
@@ -38,7 +39,7 @@ def test_login_page_loads(client):
     Asserts:
         - Response status code is 200 (OK).
     """
-    response = client.get('/auth/login')
+    response = client.get("/auth/login")
     assert response.status_code == 200
 
 
@@ -54,5 +55,5 @@ def test_logout_redirects(client):
     Asserts:
         - Response status code is 302 (redirect).
     """
-    response = client.get('/auth/logout', follow_redirects=False)
+    response = client.get("/auth/logout", follow_redirects=False)
     assert response.status_code == 302

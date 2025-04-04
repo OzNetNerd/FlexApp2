@@ -49,12 +49,7 @@ def render_edit_form(ctx: Any, item: Any) -> Any:
     item_dict: Dict[str, Any] = item.to_dict()
 
     context = ResourceContext(
-        model=ctx.model,
-        blueprint_name=ctx.blueprint.name,
-        item_dict=item_dict,
-        item=None,
-        title="Edit",
-        read_only=False
+        model=ctx.model, blueprint_name=ctx.blueprint.name, item_dict=item_dict, item=None, title="Edit", read_only=False
     )
 
     return render_safely(ctx.edit_template, context, f"Error rendering edit form for {ctx.model.__name__}")

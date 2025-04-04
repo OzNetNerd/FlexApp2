@@ -14,18 +14,14 @@ logger = logging.getLogger(__name__)
 class RelationshipService:
     """Service class to manage entity relationships."""
 
-    ENTITY_MODELS = {
-        'user': User,
-        'contact': Contact,
-        'company': Company
-    }
+    ENTITY_MODELS = {"user": User, "contact": Contact, "company": Company}
 
     RELATIONSHIP_TYPES = {
-        'user-user': ['Manager', 'Colleague', 'Direct Report', 'Mentor'],
-        'user-contact': ['Primary', 'Secondary', 'Support'],
-        'user-company': ['Account Manager', 'Sales Lead', 'Support Lead'],
-        'contact-company': ['Employee', 'Executive', 'Owner', 'Board Member'],
-        'company-company': ['Partner', 'Supplier', 'Customer', 'Competitor']
+        "user-user": ["Manager", "Colleague", "Direct Report", "Mentor"],
+        "user-contact": ["Primary", "Secondary", "Support"],
+        "user-company": ["Account Manager", "Sales Lead", "Support Lead"],
+        "contact-company": ["Employee", "Executive", "Owner", "Board Member"],
+        "company-company": ["Partner", "Supplier", "Customer", "Competitor"],
     }
 
     @classmethod
@@ -52,9 +48,9 @@ class RelationshipService:
             return []
 
     @classmethod
-    def create_relationship(cls, entity1_type: str, entity1_id: int,
-                            entity2_type: str, entity2_id: int,
-                            relationship_type: str) -> Tuple[bool, Optional[Relationship], str]:
+    def create_relationship(
+        cls, entity1_type: str, entity1_id: int, entity2_type: str, entity2_id: int, relationship_type: str
+    ) -> Tuple[bool, Optional[Relationship], str]:
         """Create a relationship between two entities."""
         # Validate entities exist
         entity1 = cls.get_entity(entity1_type, entity1_id)
@@ -71,7 +67,7 @@ class RelationshipService:
             entity1_id=entity1_id,
             entity2_type=entity2_type.lower(),
             entity2_id=entity2_id,
-            relationship_type=relationship_type
+            relationship_type=relationship_type,
         ).first()
 
         if existing:
@@ -84,19 +80,18 @@ class RelationshipService:
                 entity1_id=entity1_id,
                 entity2_type=entity2_type.lower(),
                 entity2_id=entity2_id,
-                relationship_type=relationship_type
+                relationship_type=relationship_type,
             )
 
             # For backward compatibility
-            if entity1_type.lower() == 'user' and entity2_type.lower() == 'contact':
+            if entity1_type.lower() == "user" and entity2_type.lower() == "contact":
                 relationship.user_id = entity1_id
                 relationship.contact_id = entity2_id
 
             db.session.add(relationship)
             db.session.commit()
 
-            logger.info(
-                f"Created relationship: {entity1_type}={entity1_id} {relationship_type} {entity2_type}={entity2_id}")
+            logger.info(f"Created relationship: {entity1_type}={entity1_id} {relationship_type} {entity2_type}={entity2_id}")
             return True, relationship, "Relationship created successfully"
 
         except Exception as e:
@@ -129,7 +124,7 @@ class RelationshipService:
         relationships = Relationship.query.filter(
             db.or_(
                 db.and_(Relationship.entity1_type == entity_type.lower(), Relationship.entity1_id == entity_id),
-                db.and_(Relationship.entity2_type == entity_type.lower(), Relationship.entity2_id == entity_id)
+                db.and_(Relationship.entity2_type == entity_type.lower(), Relationship.entity2_id == entity_id),
             )
         ).all()
 
@@ -148,14 +143,16 @@ class RelationshipService:
             if not related_entity:
                 continue
 
-            display_name = getattr(related_entity, 'name', str(related_entity))
+            display_name = getattr(related_entity, "name", str(related_entity))
 
-            result.append({
-                'id': rel.id,
-                'entity_type': related_type,
-                'entity_id': related_id,
-                'entity_name': display_name,
-                'relationship_type': rel.relationship_type
-            })
+            result.append(
+                {
+                    "id": rel.id,
+                    "entity_type": related_type,
+                    "entity_id": related_id,
+                    "entity_name": display_name,
+                    "relationship_type": rel.relationship_type,
+                }
+            )
 
         return result

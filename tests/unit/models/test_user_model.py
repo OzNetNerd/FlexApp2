@@ -10,7 +10,7 @@ import sys
 import os
 
 # Add the parent directory to sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
 
 def test_user_model_exists():
@@ -22,6 +22,7 @@ def test_user_model_exists():
         - The `User` class is not None.
     """
     from app.models.user import User
+
     assert User is not None
 
 
@@ -41,11 +42,11 @@ def test_user_attributes():
     user = User()
 
     # Test that expected attributes/methods exist
-    assert hasattr(user, 'id')
-    assert hasattr(user, 'email')
-    assert hasattr(user, 'username')
-    assert hasattr(user, 'password_hash')
+    assert hasattr(user, "id")
+    assert hasattr(user, "email")
+    assert hasattr(user, "username")
+    assert hasattr(user, "password_hash")
 
     # Test authentication-related functionality
-    assert hasattr(user, 'is_authenticated')
-    assert hasattr(user, 'get_id')
+    assert hasattr(user, "is_authenticated")
+    assert hasattr(user, "get_id")

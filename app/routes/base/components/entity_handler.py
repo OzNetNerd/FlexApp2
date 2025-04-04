@@ -10,7 +10,6 @@ from app.utils.app_logging import log_instance_vars
 logger = logging.getLogger(__name__)
 
 
-
 @dataclass
 class Context:
     """Base context class for rendering views with optional dynamic attributes.
@@ -125,10 +124,7 @@ class ResourceContext:
     def __post_init__(self) -> None:
         self.current_user = current_user
 
-        self.submit_url = (
-            url_for(f"{self.blueprint_name}.create")
-            if not self.read_only else ""
-        )
+        self.submit_url = url_for(f"{self.blueprint_name}.create") if not self.read_only else ""
         self.model_name = self.model.__name__
         self.id = str(self.item_dict.get("id", ""))
 

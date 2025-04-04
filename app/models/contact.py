@@ -5,6 +5,7 @@ from sqlalchemy.orm import foreign
 
 logger = logging.getLogger(__name__)
 
+
 class Contact(BaseModel):
     __tablename__ = "contacts"
 
@@ -27,7 +28,7 @@ class Contact(BaseModel):
 
     # --- Skill Level ---
     primary_skill_area = db.Column(db.String(50))  # dropdown: Cloud, DevOps, etc.
-    skill_level = db.Column(db.String(50))           # dropdown: Beginner, Intermediate, Advanced, Expert
+    skill_level = db.Column(db.String(50))  # dropdown: Beginner, Intermediate, Advanced, Expert
     certifications = db.Column(db.Text)
 
     # --- Technologies Used ---
@@ -50,22 +51,17 @@ class Contact(BaseModel):
         "Relationship",
         primaryjoin="and_(foreign(Relationship.entity1_id)==Contact.id, Relationship.entity1_type=='contact')",
         back_populates="contact",
-        overlaps="user,relationships"  # Add "relationships" to the overlaps
+        overlaps="user,relationships",  # Add "relationships" to the overlaps
     )
 
     # Tasks imported from the tasks table; assumes a Task model exists.
     tasks = db.relationship(
-        "Task",
-        primaryjoin="and_(Task.notable_type=='contact', foreign(Task.notable_id)==Contact.id)",
-        backref="contact",
-        lazy="dynamic"
+        "Task", primaryjoin="and_(Task.notable_type=='contact', foreign(Task.notable_id)==Contact.id)", backref="contact", lazy="dynamic"
     )
 
     # Notes using the polymorphic Note model.
     notes = db.relationship(
-        "Note",
-        primaryjoin="and_(Note.notable_type=='Contact', foreign(Note.notable_id)==Contact.id)",
-        backref="contact"
+        "Note", primaryjoin="and_(Note.notable_type=='Contact', foreign(Note.notable_id)==Contact.id)", backref="contact"
     )
 
     @property
@@ -80,11 +76,9 @@ class Contact(BaseModel):
         Uses the Relationship model where this contact is linked to an opportunity.
         """
         from app.models.opportunity import Opportunity
+
         relationships = Relationship.get_relationships("contact", self.id, "opportunity")
-        opp_ids = [
-            rel.entity2_id if rel.entity1_type == "contact" else rel.entity1_id
-            for rel in relationships
-        ]
+        opp_ids = [rel.entity2_id if rel.entity1_type == "contact" else rel.entity1_id for rel in relationships]
         return Opportunity.query.filter(Opportunity.id.in_(opp_ids)).all()
 
     @property
@@ -94,15 +88,12 @@ class Contact(BaseModel):
         Looks for relationships where this contact is the target (entity2)
         and the relationship_type is 'manager'.
         """
-        rels = Relationship.query.filter_by(
-            entity2_type="contact",
-            entity2_id=self.id,
-            relationship_type="manager"
-        ).all()
+        rels = Relationship.query.filter_by(entity2_type="contact", entity2_id=self.id, relationship_type="manager").all()
         managers = []
         for rel in rels:
             if rel.entity1_type == "user":
                 from app.models.user import User
+
                 manager = User.query.get(rel.entity1_id)
             elif rel.entity1_type == "contact":
                 manager = Contact.query.get(rel.entity1_id)
@@ -117,17 +108,14 @@ class Contact(BaseModel):
         Looks for relationships where this contact is the source (entity1)
         and the relationship_type is 'manager'.
         """
-        rels = Relationship.query.filter_by(
-            entity1_type="contact",
-            entity1_id=self.id,
-            relationship_type="manager"
-        ).all()
+        rels = Relationship.query.filter_by(entity1_type="contact", entity1_id=self.id, relationship_type="manager").all()
         subs = []
         for rel in rels:
             if rel.entity2_type == "contact":
                 subordinate = Contact.query.get(rel.entity2_id)
             elif rel.entity2_type == "user":
                 from app.models.user import User
+
                 subordinate = User.query.get(rel.entity2_id)
             if subordinate:
                 subs.append(subordinate)

@@ -42,11 +42,7 @@ def render_create_form(ctx: Any) -> Any:
     item_dict: Dict[str, Any] = {}
 
     context = ResourceContext(
-        model=ctx.model,
-        blueprint_name=ctx.blueprint.name,
-        item_dict=item_dict,
-        title=f"Create a {ctx.model.__name__}",
-        read_only=False
+        model=ctx.model, blueprint_name=ctx.blueprint.name, item_dict=item_dict, title=f"Create a {ctx.model.__name__}", read_only=False
     )
     return render_safely(ctx.create_template, context, f"Error rendering create form for {ctx.model.__name__}")
 

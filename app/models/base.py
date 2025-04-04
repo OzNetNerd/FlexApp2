@@ -19,6 +19,7 @@ class BaseModel(db.Model):
         created_at (datetime): Timestamp when the record was created.
         updated_at (datetime): Timestamp when the record was last updated.
     """
+
     __abstract__ = True
 
     id = db.Column(db.Integer, primary_key=True)

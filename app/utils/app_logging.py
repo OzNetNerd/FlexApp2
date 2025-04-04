@@ -2,6 +2,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def log_instance_vars(instance, exclude: list[str] = None) -> None:
     """Logs all instance variables of a class.
 

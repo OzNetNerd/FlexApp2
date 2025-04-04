@@ -13,7 +13,7 @@ class OpportunityCRUDRoutes(GenericWebRoutes):
     """
 
     def _preprocess_form_data(self, form_data):
-        if hasattr(form_data, 'form'):  # Check if it's a Request object
+        if hasattr(form_data, "form"):  # Check if it's a Request object
             # Safely extract data from form
             form_dict = {}
             for k, v in form_data.form.items():

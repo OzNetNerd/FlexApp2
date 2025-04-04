@@ -5,6 +5,7 @@ from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEn
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class AboutTab(TabBuilder):
     tab_name: str = "About"
@@ -21,21 +22,11 @@ class AboutTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="name",
-                    label="Name",
-                    type="text",
-                    required=True,
-                    value=self.item.get("name")
-                ),
-                TabEntry(
-                    entry_name="description",
-                    label="Description",
-                    type="text",
-                    value=self.item.get("description")
-                ),
-            ]
+                TabEntry(entry_name="name", label="Name", type="text", required=True, value=self.item.get("name")),
+                TabEntry(entry_name="description", label="Description", type="text", value=self.item.get("description")),
+            ],
         )
+
 
 @dataclass
 class InsightsTab(TabBuilder):
@@ -53,13 +44,8 @@ class InsightsTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="crisp",
-                    label="CRISP",
-                    type="custom",
-                    value=self.item.get("crisp")
-                ),
-            ]
+                TabEntry(entry_name="crisp", label="CRISP", type="custom", value=self.item.get("crisp")),
+            ],
         )
 
 
@@ -79,20 +65,11 @@ class RelationshipsTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(
-                    entry_name="users",
-                    label="Users",
-                    type="custom",
-                    value=self.item.get("users")
-                ),
-                TabEntry(
-                    entry_name="companies",
-                    label="Companies",
-                    type="custom",
-                    value=self.item.get("companies")
-                ),
-            ]
+                TabEntry(entry_name="users", label="Users", type="custom", value=self.item.get("users")),
+                TabEntry(entry_name="companies", label="Companies", type="custom", value=self.item.get("companies")),
+            ],
         )
+
 
 # Constant list of tabs for a company
 COMPANIES_TABS = [AboutTab, InsightsTab, RelationshipsTab]
