@@ -1,82 +1,40 @@
-{#
-  base/common/_footer_buttons.html - Form footer with submit/cancel buttons
+{# templates/base/common/_footer_buttons.html #}
+{% if request.endpoint is not defined %}
+  <div class="alert alert-danger">
+    Error: No request.endpoint available for navigation.
+  </div>
+  <script type="module">
+    import log from '/static/js/logger.js';
+    log("error", "_footer_buttons.html", "context_check", "Missing required template context: request.endpoint");
+  </script>
+{% else %}
+  <script>
+    window.footerButtonsConfig = {
+      hasId: {{ (id is defined and id is not none) | tojson }},
+      endpoint: "{{ request.endpoint }}",
+      baseRoute: "{{ request.endpoint.rsplit('.', 1)[0] }}",
+      viewUrl: {% if id is defined and id is not none %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}"{% else %}null{% endif %},
+      indexUrl: {% if not (id is defined and id is not none) %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"{% else %}null{% endif %}
+    };
+  </script>
 
-  This template renders the form footer action buttons that adapt based on context.
-  It provides different button text (Create/Update) based on whether an ID is present,
-  and routes the Cancel button to either view or index pages as appropriate.
+  <div class="footer-buttons-container mt-4 d-flex justify-content-end gap-2">
+    {% if id is defined and id is not none %}
+      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}" class="btn btn-secondary">
+        <i class="fas fa-times me-1"></i> Cancel
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> Update
+      </button>
+    {% else %}
+      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
+        <i class="fas fa-times me-1"></i> Cancel
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> Create
+      </button>
+    {% endif %}
+  </div>
 
-  Features:
-    - Adaptive button text (Create/Update based on id presence)
-    - Cancel routes to view or index
-    - Extensive logging for debugging
-    - DOM verification checks
-
-  Context variables:
-    - id: When present, indicates edit mode; when absent indicates create mode
-    - request.endpoint: Required for generating navigation URLs
-
-  Dependencies:
-    - Requires logger.js for diagnostic logging
-    - Uses Font Awesome icons for button visuals
-#}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Footer Buttons</title>
-  <!-- Link to custom CSS file -->
-  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/footer_buttons.css') }}" /> -->
-  <!-- Optionally include Bootstrap if needed -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-  {% if request.endpoint is not defined %}
-    <div class="alert alert-danger">
-      Error: No request.endpoint available for navigation.
-    </div>
-    <script type="module">
-      import log from '/static/js/logger.js';
-      log("error", "_footer_buttons.html", "context_check", "Missing required template context: request.endpoint");
-    </script>
-  {% else %}
-
-    <!-- Global configuration for footer buttons JS -->
-    <script>
-      window.footerButtonsConfig = {
-          hasId: {{ (id is defined and id is not none) | tojson }},
-          endpoint: "{{ request.endpoint }}",
-          baseRoute: "{{ request.endpoint.rsplit('.', 1)[0] }}",
-          viewUrl: {% if id is defined and id is not none %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}"{% else %}null{% endif %},
-          indexUrl: {% if not (id is defined and id is not none) %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"{% else %}null{% endif %}
-      };
-    </script>
-
-    <div class="footer-buttons-container">
-      <div class="footer-button-group">
-        {% if id is defined and id is not none %}
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}" class="btn btn-secondary">
-            <i class="fas fa-times me-1"></i> Cancel
-          </a>
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save me-1"></i> Update
-          </button>
-        {% else %}
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
-            <i class="fas fa-times me-1"></i> Cancel
-          </a>
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save me-1"></i> Create
-          </button>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- External JavaScript file -->
-    <script type="module" src="{{ url_for('static', filename='js/pages/footer_buttons.js') }}"></script>
-  {% endif %}
-</body>
-</html>
+  <script type="module" src="{{ url_for('static', filename='js/pages/footer_buttons.js') }}"></script>
+{% endif %}

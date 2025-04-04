@@ -1,92 +1,40 @@
 <!-- START TEMPLATE: render_field.html -->
+
 {# ------------------------------------------------------------------------------ #}
+{# base/common/render_field.html                                                 #}
+{# Renders the dynamic form UI sections inside a card layout, without full HTML  #}
+{# ------------------------------------------------------------------------------ #}
+
 {% import "macros/form_fields/_render_sections.html" as sections %}
 
-<!DOCTYPE html>
-<html lang="en">
-  {% include 'base/core/_head.html' %}
-  <body>
-    {% include "base/core/_toasts.html" %}
-
-    {%- set show_navbar = show_navbar %}  {# Precompute the variable before including #}
-
-    {% include 'base/core/_navbar.html' with context %}  {# Explicitly pass context to include current_user and others #}
-
-    <main class="py-4">
-      <div class="container">
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white py-3">
-            <div class="row align-items-center">
-              <div class="col">
-                <div class="d-flex align-items-center">
-                  {# {% include 'base/content_pane/_header.html' %}  #}
-                </div>
-              </div>
-              <div class="col-auto">
-                {% include 'base/content_pane/_header_buttons.html' %}
-              </div>
-            </div>
-          </div>
-
-          <div class="card-body">
-            <form method="POST">
-              {% if ui %}
-                {% include 'base/common/_pills_nav_content.html' %}
-              {% else %}
-                {% include 'base/content_pane/_section_layout.html' %}
-              {% endif %}
-
-              {% if not read_only %}
-                {% include 'base/common/_footer_buttons.html' %}
-              {% endif %}
-            </form>
-          </div>
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white py-3">
+    <div class="row align-items-center">
+      <div class="col">
+        <div class="d-flex align-items-center">
+          {# Optional header content can go here #}
         </div>
       </div>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="{{ url_for('static', filename='js/autoComplete.js') }}"></script>
-
-    <script type="module">
-      import log from "{{ url_for('static', filename='js/logger.js') }}";
-      const context = {
-        title: "{{ title }}",  {# Precomputed values before passing into JS #}
-        readOnly: {{ read_only | tojson }},
-        hasUi: {{ ui is defined and ui is not none | tojson }},
-        layout: "{{ 'Tabbed' if ui else 'Sectioned' }}",
-        includes: [
-          "base/content_pane/_header.html",
-          "base/core/_toasts.html",
-          {% if ui %}"form/_pills_nav_content.html",{% else %}"base/content_pane/_section_layout.html",{% endif %}
-          {% if not read_only %}"create_view_edit/_footer.html",{% endif %}
-          {% if show_navbar is undefined or show_navbar %}"base/common/_navbar.html"{% endif %}
-        ].filter(Boolean)
-      };
-      log("info", "create_view_edit.html", "pageRender", context);
-    </script>
-
-    {%- if id %}
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-            <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            Are you sure you want to delete this item?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.delete', item_id=id) }}" class="btn btn-danger">
-              Delete
-            </a>
-          </div>
-        </div>
+      <div class="col-auto">
+        {% include 'base/content_pane/_header_buttons.html' %}
       </div>
     </div>
-    {%- endif %}
-  </body>
-</html>
+  </div>
+
+  <div class="card-body">
+    <form method="POST">
+      {% if ui %}
+        {% include 'base/common/_pills_nav_content.html' %}
+      {% else %}
+        {% include 'base/content_pane/_section_layout.html' %}
+      {% endif %}
+
+      {% if not read_only and (include_footer_buttons is undefined or include_footer_buttons) %}
+        {% include 'base/common/_footer_buttons.html' %}
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+
 <!-- END TEMPLATE: render_field.html -->

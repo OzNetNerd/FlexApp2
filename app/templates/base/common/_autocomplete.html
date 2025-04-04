@@ -1,23 +1,18 @@
 {#
-  base/common/_autocomplete.html - Dynamic form template with tabbed interface
+  base/common/_autocomplete.html - Dynamic form template for tabbed autocomplete-enabled inputs
 
-  This template renders a tabbed interface for creating, viewing, or editing data.
-  It dynamically generates form fields based on the 'ui' structure provided and
-  includes autocomplete functionality via main.js.
+  This template renders a tabbed interface for forms with optional autocomplete features.
+  It is meant to be embedded in a larger page, which should handle form wrappers and footers.
 
   Context variables:
-    - ui: A nested structure containing tabs, sections, and form entries
-    - model_name: String representing the model being created/edited
-    - error_message: Optional error message to display
-    - macros: Object containing the render_field macro for form field generation
-
-  Template inheritance:
-    - Extends _create_view_edit.html base template
-    - Includes _footer_buttons.html for form submission controls
+    - ui: List of tabs, each with sections and entries
+    - model_name: String label for the model (used in error messaging)
+    - error_message: Optional error string to trigger a toast
+    - macros: Expects 'render_field' macro for field rendering
 
   Dependencies:
-    - Requires main.js for autocomplete functionality
-    - Uses toasts.js for error notifications
+    - /static/js/main.js for Tagify/autocomplete
+    - /static/js/toasts.js for toast notifications
 #}
 
 {% extends "base/pages/_create_view_edit_template.html" %}
@@ -41,13 +36,9 @@
     {% endfor %}
   </div>
 
-  {# Include footer component #}
-  {% include 'base/common/_footer_buttons.html' %}
-
-  {# Add the main.js script which will handle autocomplete functionality #}
+  {# Autocomplete behavior (Tagify, etc.) initialized in main.js #}
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 
-  {# If there's an error, show a toast message using toasts.js #}
   {% if error_message %}
     <script type="module">
       import { showToast } from "/static/js/toasts.js";
