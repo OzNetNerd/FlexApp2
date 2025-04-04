@@ -28,7 +28,7 @@ from .task import Task
 from .table_config import TableConfig
 from .relationship import Relationship
 from .crisp_score import CRISPScore
-from .setting import Setting  # ✅ Added Setting model here
+from .setting import Setting
 
 __all__ = [
     "db",
