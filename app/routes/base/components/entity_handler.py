@@ -1,11 +1,12 @@
 import logging
 from flask import url_for
-from flask_login import UserMixin
+from flask_login import current_user, UserMixin
 from app.routes.base.tabs import UI_TAB_MAPPING
 from app.routes.base.components.tab_builder import create_tabs
 from app.utils.app_logging import log_instance_vars
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, List
+from app.utils.table_helpers import get_table_id_by_name
 
 
 logger = logging.getLogger(__name__)
@@ -25,15 +26,15 @@ class SimpleContext(BaseContext):
 
     title: str
     read_only: bool = True
-    current_user: Optional[UserMixin] = None
     action: Optional[str] = False
 
-    def __init__(self, title: str, read_only: bool = True, current_user: Optional[UserMixin] = None, action: Optional[str] = False, **kwargs):
+    def __init__(self, title: str, read_only: bool = True, action: Optional[str] = False, **kwargs):
         super().__init__(
             title=title,
             read_only=read_only,
-            current_user=current_user,
             action=action,
+            current_user=current_user,
+            show_navbar=True,
             **kwargs
         )
 
