@@ -34,15 +34,18 @@ def render_safely(
 
     Returns a tuple (HTML, status_code) on error, or a rendered string on success.
     """
+
+    current_endpoint = endpoint_name or request.endpoint or "unknown endpoint"
+    logger.info(f"🔍 Routing to endpoint: {current_endpoint}")
+
+    log_title = f"🔍 Context vars in {template_name}:"
     kwargs = {
         "context": context,
         "fallback_error_message": fallback_error_message,
         "endpoint_name": endpoint_name,
     }
-    title = f"Rendering '{template_name}' with the following {len(kwargs)} items:"
-    log_kwargs(title, **kwargs)
+    log_kwargs(log_title=log_title, **context.__dict__, **kwargs)
 
-    current_endpoint = endpoint_name or request.endpoint or "unknown endpoint"
     current_path = request.path
 
     template_env = Environment(
