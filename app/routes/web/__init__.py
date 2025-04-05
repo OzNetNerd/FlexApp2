@@ -23,12 +23,20 @@ def register_web_blueprints(app):
     crisp_scores_bp = create_blueprint("crisp_scores")
 
     @settings_bp.route("/")
-    def settings_index():
+    def index():
         """Settings page."""
         from app.routes.base.components.template_renderer import render_safely
         from app.routes.base.components.entity_handler import Context
         context = Context(title="Settings")
         return render_safely("pages/misc/settings.html", context, "Failed to load settings.")
+
+    @users_bp.route("/")
+    def index():
+        """Settings page."""
+        from app.routes.base.components.template_renderer import render_safely
+        from app.routes.base.components.entity_handler import Context
+        context = Context(title="Settings")
+        return render_safely("pages/users.html", context, "Failed to load settings.")
 
     @relationships_bp.route("/")
     def relationships_index():

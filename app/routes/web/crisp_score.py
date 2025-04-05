@@ -1,13 +1,18 @@
+import logging
 from flask import Blueprint, request, redirect, flash, url_for
 from flask_login import login_required
 from app.models import db, CRISPScore, Relationship
 
-crisp_scores_bp = Blueprint("crisp_scores", __name__)
+logger = logging.getLogger(__name__)
+
+# Define blueprint with explicit prefix
+crisp_scores_bp = Blueprint("crisp_scores", __name__, url_prefix="/crisp_scores")
 
 
-@crisp_scores_bp.route("/crisp_scores/<int:relationship_id>", methods=["POST"])
+@crisp_scores_bp.route("/<int:relationship_id>", methods=["POST"])
 @login_required
 def submit(relationship_id):
+    """Submit a CRISP score for a relationship."""
     relationship = Relationship.query.get_or_404(relationship_id)
 
     try:
@@ -26,3 +31,6 @@ def submit(relationship_id):
         flash(f"Error submitting CRISP score: {str(e)}", "danger")
 
     return redirect(url_for("contacts.view", item_id=relationship.contact_id))
+
+
+logger.info("CRISP Score routes setup successfully.")

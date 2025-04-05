@@ -1,17 +1,18 @@
+import logging
 from flask import Blueprint, request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash
+
 from app.models import User
-import logging
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import Context
 
 logger = logging.getLogger(__name__)
 
-# Create the blueprint
-auth_bp = Blueprint("auth_bp", __name__)
+# Define the auth blueprint with a URL prefix
+auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth")
 
-# Define the routes using decorators (this is the preferred way)
+
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     """Handle login form submission and authentication.
@@ -55,8 +56,8 @@ def login():
         flash("Invalid email or password.", "danger")
         logger.warning(f"Failed login attempt for email: {email}")
 
-    context = Context(title="TBA")
-    return render_safely("pages/misc/login.html", context)  # Use render_safely for safe rendering
+    context = Context(title="Login")
+    return render_safely("pages/misc/login.html", context)
 
 
 @auth_bp.route("/logout")
@@ -71,5 +72,5 @@ def logout():
     logger.info("User logged out.")
     return redirect(url_for("auth_bp.login"))
 
-# IMPORTANT: Remove the add_url_rule lines from both the api and web __init__.py files
-# They're no longer needed since we're using decorators
+
+logger.info("Auth routes setup successfully.")

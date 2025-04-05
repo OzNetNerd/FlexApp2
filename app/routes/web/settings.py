@@ -1,12 +1,14 @@
 import logging
+from flask import Blueprint, abort, render_template
 from flask_login import current_user
-from flask import abort, render_template
 
 from app.models.setting import Setting
-from app.routes.web import settings_bp
-from app.routes.web.generic_crud.generic_crud_routes import GenericWebRoutes
+from app.routes.web.crud.components.generic_crud_routes import GenericWebRoutes
 
 logger = logging.getLogger(__name__)
+
+# Define the blueprint for this module
+settings_bp = Blueprint("settings", __name__, url_prefix="/settings")
 
 
 class SettingsCRUDRoutes(GenericWebRoutes):
@@ -35,6 +37,7 @@ class SettingsCRUDRoutes(GenericWebRoutes):
         )
 
 
+# Bind the CRUD routes to the settings blueprint
 settings_routes = SettingsCRUDRoutes(
     blueprint=settings_bp,
     model=Setting,

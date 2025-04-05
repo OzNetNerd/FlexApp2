@@ -1,26 +1,24 @@
 import logging
+from flask import Blueprint, request, redirect, url_for
 from app.models import Opportunity, Company, db
-from app.routes.blueprint_factory import create_blueprint
-from app.routes.base.crud_factory import register_crud_routes
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import Context
+from app.routes.base.crud_factory import register_crud_routes
 
 logger = logging.getLogger(__name__)
 
-# Create blueprint
-opportunities_bp = create_blueprint("opportunities")
+# Define the blueprint
+opportunities_bp = Blueprint("opportunities", __name__, url_prefix="/opportunities")
 
 # Register standard CRUD routes
 register_crud_routes(opportunities_bp, "opportunity")
 
 
-# Add custom route handlers
-@opportunities_bp.route('/custom-create', methods=['GET', 'POST'])
+# Custom route: Create opportunity with company handling
+@opportunities_bp.route("/custom-create", methods=["GET", "POST"])
 def custom_create():
     """Custom opportunity creation route with company handling."""
-    from flask import request, redirect, url_for
-
-    if request.method == 'POST':
+    if request.method == "POST":
         form_data = request.form.to_dict()
 
         # Process company name
@@ -34,7 +32,7 @@ def custom_create():
                 db.session.commit()
             form_data["company_id"] = company.id
 
-        # Remove 'company_name' as it's not a valid model field
+        # Remove invalid model field
         form_data.pop("company_name", None)
 
         # Validate required fields
@@ -46,22 +44,19 @@ def custom_create():
             context = Context(title="Create Opportunity", errors=errors, form_data=form_data)
             return render_safely("pages/crud/create.html", context, "Failed to create opportunity.")
 
-        # Create opportunity
         opportunity = Opportunity(**form_data)
         db.session.add(opportunity)
         db.session.commit()
 
-        return redirect(url_for('opportunities.view', item_id=opportunity.id))
+        return redirect(url_for("opportunities.view", item_id=opportunity.id))
 
-    # GET request
     context = Context(title="Create Opportunity")
     return render_safely("pages/crud/create.html", context, "Failed to load create opportunity form.")
 
 
-# Helper function to preprocess opportunity form data
+# Helper: Preprocess form data
 def preprocess_opportunity_form(form_data):
     """Process form data for opportunities, handling company relationships."""
-    # Process company name
     company_name = form_data.get("company_name", "").strip()
     if company_name:
         company = Company.query.filter_by(name=company_name).first()
@@ -72,6 +67,8 @@ def preprocess_opportunity_form(form_data):
             db.session.commit()
         form_data["company_id"] = company.id
 
-    # Remove 'company_name' as it's not a valid model field
     form_data.pop("company_name", None)
     return form_data
+
+
+logger.info("Opportunity routes setup successfully.")
