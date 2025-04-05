@@ -4,6 +4,14 @@ from app.routes.base.components.entity_handler import Context
 
 logger = logging.getLogger(__name__)
 
+PLURAL_MAP = {
+    "company": "companies",
+    "opportunity": "opportunities",
+    "category": "categories",
+    "capability": "capabilities",
+    "contact": "contacts",
+}
+
 
 def register_crud_routes(blueprint, entity_name, template_dir="pages/crud", table_template="pages/tables"):
     """
@@ -16,11 +24,16 @@ def register_crud_routes(blueprint, entity_name, template_dir="pages/crud", tabl
         table_template: Directory containing table templates
     """
     entity_title = entity_name.capitalize()
+    plural_name = PLURAL_MAP.get(entity_name, f"{entity_name}s")
 
     @blueprint.route("/")
     def index():
-        context = Context(title=f"{entity_title}s")
-        return render_safely(f"{table_template}/{entity_name}s.html", context, f"Failed to load {entity_name}s.")
+        context = Context(title=plural_name.capitalize())
+        return render_safely(
+            f"{table_template}/{plural_name}.html",
+            context,
+            f"Failed to load {plural_name}."
+        )
 
     @blueprint.route('/create')
     def create():
