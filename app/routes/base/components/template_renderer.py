@@ -36,9 +36,9 @@ def render_safely(
     """
 
     current_endpoint = endpoint_name or request.endpoint or "unknown endpoint"
-    logger.info(f"🔍 Routing to endpoint: {current_endpoint}")
+    logger.info(f"🔍 Routing to endpoint {current_endpoint}: {template_name}")
 
-    log_title = f"🔍 Context vars in {template_name}:"
+    log_title = f"🔍 Passing the following context vars to the template:"
     kwargs = {
         "context": context,
         "fallback_error_message": fallback_error_message,
@@ -80,7 +80,7 @@ def render_safely(
             details = str(e)
             status_code = 500
 
-        logger.error(f"{error_type} in '{template_name}' for {current_endpoint} ({current_path}): {details}")
+        # logger.error(f"{error_type} in '{template_name}' for {current_endpoint} ({current_path}): {details}")
         logger.debug(f"🔧 Error Context Data: {context}")
 
         if current_app.debug:
@@ -94,7 +94,7 @@ def render_safely(
             return template.render(**flask_globals, **context.__dict__), status_code
 
         except Exception as e2:
-            logger.critical(f"❌  Failed to re-render '{template_name}' with error context: {e2} for {current_endpoint} ({current_path})")
+            # logger.critical(f"❌  Failed to re-render '{template_name}' with error context: {e2} for {current_endpoint} ({current_path})")
 
             try:
                 return (

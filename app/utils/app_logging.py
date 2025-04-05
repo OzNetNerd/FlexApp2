@@ -76,12 +76,18 @@ def log_kwargs(log_title: str, **kwargs: dict) -> None:
 
         for key, value in kwargs.items():
             is_empty = not value and value is not False
-            icon = "⚠️" if is_empty else "📝"
+            # Only use ❓ for extra, otherwise use ⚠️ for empty values
+            icon = "⚠️" if is_empty and key != "extra" else "📝"
+
+            # Use ❓ specifically for empty "extra" field
+            if is_empty and key == "extra":
+                icon = "❓"
 
             if isinstance(value, dict):
                 caller_logger.info(f"  {icon} {key}:")
                 for subkey, sub_value in value.items():
-                    sub_icon = "⚠️" if not sub_value and sub_value is not False else "📝"
+                    sub_is_empty = not sub_value and sub_value is not False
+                    sub_icon = "⚠️" if sub_is_empty else "📝"
                     caller_logger.info(f"    {sub_icon} {subkey}: {sub_value!r}")
             else:
                 caller_logger.info(f"  {icon} {key}: {value!r}")
@@ -95,5 +101,5 @@ class LoggingUndefined(DebugUndefined):
     """Custom Jinja2 Undefined that logs access to undefined variables."""
 
     def _fail_with_undefined_error(self, *args, **kwargs):
-        logger.error(f"❌ Undefined Jinja variable accessed: {self._undefined_name}")
+        logger.error(f"❌  Undefined Jinja variable accessed: {self._undefined_name}")
         return super()._fail_with_undefined_error(*args, **kwargs)
