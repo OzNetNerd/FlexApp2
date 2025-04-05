@@ -15,28 +15,9 @@ def register_web_blueprints(app):
     from app.routes.web.crud.opportunities import opportunities_bp
     from app.routes.web.crud.users import users_bp
     from app.routes.web.crud.tasks import tasks_bp
-    from app.routes.blueprint_factory import create_blueprint
-
-    # Create blueprints for sections without dedicated modules
-    settings_bp = create_blueprint("settings")
-    relationships_bp = create_blueprint("relationships")
-    crisp_scores_bp = create_blueprint("crisp_scores")
-
-    @settings_bp.route("/")
-    def settings_index():
-        """Settings page."""
-        from app.routes.base.components.template_renderer import render_safely
-        from app.routes.base.components.entity_handler import Context
-        context = Context(title="Settings")
-        return render_safely("pages/misc/settings.html", context, "Failed to load settings.")
-
-    @relationships_bp.route("/")
-    def relationships_index():
-        """Relationships list page."""
-        from app.routes.base.components.template_renderer import render_safely
-        from app.routes.base.components.entity_handler import Context
-        context = Context(title="Relationships")
-        return render_safely("pages/tables/relationships.html", context, "Failed to load relationships.")
+    from app.routes.web.settings import settings_bp
+    from app.routes.web.relationships import relationships_bp
+    from app.routes.web.crisp_score import crisp_scores_bp
 
     # Register all blueprints
     app.register_blueprint(index_bp)
