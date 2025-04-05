@@ -1,30 +1,33 @@
 import logging
-from app.models import Company
-from app.routes.web import companies_bp
-from app.routes.web.crud.components.generic_crud_routes import GenericWebRoutes
-
-
+from app.routes.base.components.template_renderer import render_safely
+from app.routes.base.components.entity_handler import Context
+from app.routes.blueprint_factory import create_blueprint
 
 logger = logging.getLogger(__name__)
 
+# Create blueprint
+companies_bp = create_blueprint("companies")
 
-class CompanyCRUDRoutes(GenericWebRoutes):
-    pass
+# Don't use register_crud_routes AND define the routes manually
+# Just define them manually
 
+@companies_bp.route("/")
+def index():
+    """Companies list page."""
+    context = Context(title="Companies")
+    return render_safely("pages/tables/companies.html", context, "Failed to load companies.")
 
-# Set up CRUD routes for managing companies within the 'companies_bp' blueprint.
-# This configures routes for creating, reading, updating, and deleting companies.
-# The setup includes:
-# - The `Company` model as the target for CRUD operations.
-# - A required field for company creation: `name`.
-# - A uniqueness constraint on the `name` field to prevent duplicate entries.
-# - The template used for rendering the companies table: `pages/tables/companies.html`.
-# - A custom function (`get_company_tabs`) to define the tabs displayed on the company creation page.
-company_routes = CompanyCRUDRoutes(
-    blueprint=companies_bp,
-    model=Company,
-    required_fields=["name"],
-    unique_fields=["name"],
-    index_template="pages/tables/companies.html",
-    # create_tabs_function=get_company_tabs,
-)
+@companies_bp.route('/create')
+def create():
+    context = Context(title="Create Company")
+    return render_safely("pages/crud/create.html", context, "Failed to load create company form.")
+
+@companies_bp.route('/<int:item_id>')
+def view(item_id):
+    context = Context(title="View Company")
+    return render_safely("pages/crud/view.html", context, "Failed to load company details.")
+
+@companies_bp.route('/<int:item_id>/edit')
+def edit(item_id):
+    context = Context(title="Edit Company")
+    return render_safely("pages/crud/edit.html", context, "Failed to load edit company form.")

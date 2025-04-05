@@ -86,7 +86,7 @@
           {%- set is_active = request.endpoint and request.endpoint.startswith(item.name + '.') -%}
           <li class="nav-item">
             <a class="nav-link {% if is_active %}active{% endif %}"
-               href="{{ url_for(endpoint) }}"
+               href="{{ url_for('settings.settings_index') }}"
                {% if is_active %}aria-current="page"{% endif %}>
               <i class="fas {{ item.icon }} nav-icon me-1"></i>
               {{ item.display_name }}

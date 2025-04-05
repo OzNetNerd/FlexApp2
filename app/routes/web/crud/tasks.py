@@ -1,40 +1,49 @@
-from app.models import Task
-from app.routes.web import tasks_bp
-from app.routes.web.generic_crud.generic_crud_routes import GenericWebRoutes
-
 import logging
+from app.models import Task
+from app.routes.blueprint_factory import create_blueprint
+from app.routes.base.crud_factory import register_crud_routes
+from app.routes.base.components.template_renderer import render_safely
+from app.routes.base.components.entity_handler import Context
 
 logger = logging.getLogger(__name__)
 
+# Create blueprint
+tasks_bp = create_blueprint("tasks")
 
-# Create a custom CRUD routes class for Tasks
-class TaskCRUDRoutes(GenericWebRoutes):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def add_view_context(self, item, context):
-        """Add notes_model to the view context."""
-        # logger.debug(f"Adding 'notes_model' to the view context for Task {item.id}.")
-        # context["notes_model"] = Note
-        pass
+# Register standard CRUD routes
+register_crud_routes(tasks_bp, "task")
 
 
-# Set up CRUD routes for managing tasks within the 'tasks_bp' blueprint.
-# This configures routes for creating, reading, updating, and deleting tasks.
-# The setup includes:
-# - The `Task` model as the target for CRUD operations.
-# - Required fields for task creation: `title` and `status`.
-# - No uniqueness constraint is applied to any fields.
-# - The template used for rendering the tasks table: `pages/tables/tasks.html`.
-# - A custom function (`get_task_tabs`) to define the tabs displayed on the task creation page.
-logger.debug("Setting up CRUD routes for Task model.")
-task_routes = TaskCRUDRoutes(
-    model=Task,
-    blueprint=tasks_bp,
-    index_template="pages/tables/tasks.html",
-    required_fields=["title", "status"],
-    unique_fields=[],
-    # create_tabs_function=get_task_tabs,
-)
+# Add custom route handlers for tasks
+@tasks_bp.route('/overdue')
+def overdue_tasks():
+    """Show overdue tasks."""
+    from datetime import datetime
+    from flask_login import current_user
 
-logger.info("Task CRUD routes setup successfully.")
+    overdue = Task.query.filter(
+        Task.due_date < datetime.utcnow(),
+        Task.status != 'completed',
+        Task.assigned_to == current_user.id
+    ).all()
+
+    context = Context(title="Overdue Tasks", items=overdue)
+    return render_safely("pages/tasks/overdue.html", context, "Failed to load overdue tasks.")
+
+
+# Custom task view with additional context
+@tasks_bp.route('/<int:item_id>/extended')
+def view_extended(item_id):
+    """View task with additional context."""
+    task = Task.query.get_or_404(item_id)
+
+    context = Context(title=f"Task: {task.title}", item=task)
+
+    # Add additional context that was in the original add_view_context method
+    # This can include notes or other related information
+    # context.notes_model = Note
+
+    return render_safely("pages/crud/view.html", context, "Failed to load task details.")
+
+
+logger.info("Task routes setup successfully.")

@@ -8,9 +8,10 @@ from app.routes.base.components.entity_handler import Context
 
 logger = logging.getLogger(__name__)
 
+# Create the blueprint
 auth_bp = Blueprint("auth_bp", __name__)
 
-
+# Define the routes using decorators (this is the preferred way)
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     """Handle login form submission and authentication.
@@ -69,3 +70,6 @@ def logout():
     flash("Logged out.", "info")
     logger.info("User logged out.")
     return redirect(url_for("auth_bp.login"))
+
+# IMPORTANT: Remove the add_url_rule lines from both the api and web __init__.py files
+# They're no longer needed since we're using decorators
