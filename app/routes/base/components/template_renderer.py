@@ -1,6 +1,8 @@
 from typing import Union, Optional, Tuple, Dict, Any
 import traceback
 import logging
+import json
+
 from flask import (
     render_template,
     request,
@@ -9,21 +11,84 @@ from flask import (
     get_flashed_messages,
     session,
 )
-from jinja2 import Environment
+from jinja2 import Environment, DebugUndefined
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
+from markupsafe import Markup, escape
 
-from app.routes.base.components.entity_handler import Context, TableContext, ResourceContext
-from app.utils.app_logging import log_kwargs, LoggingUndefined
+from app.routes.base.components.entity_handler import SimpleContext, TableContext, ResourceContext
+from app.utils.app_logging import log_kwargs
 
 logger = logging.getLogger(__name__)
+
+
+class LoggingUndefined(DebugUndefined):
+    """Tracks and logs all missing variables used in templates."""
+
+    _missing_variables = set()
+
+    def _log(self, msg: str):
+        var_name = self._undefined_name
+        self.__class__._missing_variables.add(var_name)
+        logger.warning(f"⚠️  {msg}: '{var_name}'")
+
+    def __str__(self):
+        self._log("Undefined variable rendered as string")
+        return f"<<undefined:{self._undefined_name}>>"
+
+    __repr__ = __str__
+    __html__ = __str__
+
+    def __getitem__(self, key):
+        self._log(f"Attempted to access key '{key}' on undefined variable")
+        return self.__class__(
+            hint=self._undefined_hint,
+            obj=self._undefined_obj,
+            name=f"{self._undefined_name}[{key!r}]"
+        )
+
+    def __getattr__(self, attr):
+        self._log(f"Attempted to access attribute '{attr}' on undefined variable")
+        return self.__class__(
+            hint=self._undefined_hint,
+            obj=self._undefined_obj,
+            name=f"{self._undefined_name}.{attr}"
+        )
+
+    @classmethod
+    def clear_missing_variables(cls):
+        cls._missing_variables.clear()
+
+    @classmethod
+    def raise_if_missing(cls):
+        if cls._missing_variables:
+            missing_list = "\n".join(f"- {v}" for v in sorted(cls._missing_variables))
+            raise RuntimeError(f"❌ Missing template variables:\n{missing_list}")
+
+
+def safe_json_default(obj):
+    if isinstance(obj, DebugUndefined):  # Includes LoggingUndefined
+        return str(obj)
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+
+
+def htmlsafe_json_dumps(obj):
+    return Markup(escape(json.dumps(obj, default=safe_json_default)))
+
+
+def create_template_environment() -> Environment:
+    env = Environment(
+        loader=current_app.jinja_loader,
+        undefined=LoggingUndefined,
+    )
+    env.filters["tojson"] = lambda value: htmlsafe_json_dumps(value)
+    return env
 
 
 def get_flask_globals() -> Dict[str, Any]:
     """
     Returns a dictionary of Flask global objects needed for template rendering.
     """
-
-    logger.info(f"Fetching Flask global objects for template rendering")
+    logger.info("Fetching Flask global objects for template rendering")
 
     globals_dict = {
         "url_for": url_for,
@@ -35,22 +100,9 @@ def get_flask_globals() -> Dict[str, Any]:
     return globals_dict
 
 
-def create_template_environment() -> Environment:
-    """
-    Creates and returns a configured Jinja2 Environment.
-    """
-    return Environment(
-        loader=current_app.jinja_loader,
-        undefined=LoggingUndefined,
-    )
-
-
 def handle_template_error(e: Exception, template_name: str, endpoint_name: str, fallback_error_message: str) -> Tuple[str, int]:
     """
     Handles template rendering errors and returns a debug panel response.
-
-    Returns:
-        Tuple containing (HTML error page, status_code)
     """
     current_path = request.path
 
@@ -117,7 +169,7 @@ def render_debug_panel(
 
 def render_safely(
     template_name: str,
-    context: Union[Context, TableContext, ResourceContext],
+    context: Union[SimpleContext, TableContext, ResourceContext],
     fallback_error_message: str = "An error occurred while rendering the page",
     endpoint_name: Optional[str] = None,
 ) -> Union[Tuple[str, int], str]:
@@ -125,18 +177,13 @@ def render_safely(
     Safely renders a Jinja2 template with error handling, fallback rendering,
     and structured logging for debugging purposes.
 
-    If the first attempt to render fails, it tries to inject an error message
-    into the context and re-render the same template. If that fails too,
-    it attempts to render a debug panel. If that also fails, it returns static HTML.
-
     Returns a tuple (HTML, status_code) on error, or a rendered string on success.
     """
     current_endpoint = endpoint_name or request.endpoint or "unknown endpoint"
     logger.info(f"🔍 Routing to endpoint: {current_endpoint}")
     logger.info(f"🔍 Using template: {template_name}")
 
-    # Log context variables
-    log_title = f"🔍 Passing the following context vars to the template:"
+    log_title = "🔍 Passing the following context vars to the template:"
     kwargs = {
         "context": context,
         "fallback_error_message": fallback_error_message,
@@ -144,17 +191,21 @@ def render_safely(
     }
     log_kwargs(log_title=log_title, **context.__dict__, **kwargs)
 
-    # Get environment and globals
     template_env = create_template_environment()
-    # flask_globals = get_flask_globals()
-
     current_path = request.path
+
     logger.debug(f"🔍 Attempting to render template '{template_name}' for {endpoint_name} ({current_path})")
     logger.debug(f"🔧 Context Data: {context}")
 
     try:
         template = template_env.get_template(template_name)
-        return template.render(**get_flask_globals(), **context.__dict__)
+
+        LoggingUndefined.clear_missing_variables()
+        rendered = template.render(**get_flask_globals(), **context.__dict__)
+        LoggingUndefined.raise_if_missing()
+
+        return rendered
+
     except Exception as e:
         logger.exception(f"❌ Error rendering template '{template_name}' at endpoint '{endpoint_name}'")
         return handle_template_error(e, template_name, endpoint_name, fallback_error_message)

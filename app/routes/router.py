@@ -42,16 +42,16 @@ def register_routes(app: Flask):
 def register_error_handlers(app: Flask):
     """Register error handlers for the application."""
     from app.routes.base.components.template_renderer import render_safely
-    from app.routes.base.components.entity_handler import Context
+    from app.routes.base.components.entity_handler import SimpleContext
 
     @app.errorhandler(404)
     def page_not_found(e):
-        context = Context(title="404 Not Found", item=str(e), read_only=True)
+        context = SimpleContext(title="404 Not Found", item=str(e), read_only=True)
         return render_safely("base/errors/404.html", context, "Page not found."), 404
 
     @app.errorhandler(500)
     def internal_server_error(e):
-        context = Context(title="500 Internal Server Error", item=str(e), read_only=True)
+        context = SimpleContext(title="500 Internal Server Error", item=str(e), read_only=True)
         return render_safely("base/errors/500.html", context, "Internal server error."), 500
 
     logger.debug("Error handlers registered")
@@ -82,9 +82,9 @@ def register_special_routes(app: Flask):
 def settings_index():
     """Settings page."""
     from app.routes.base.components.template_renderer import render_safely
-    from app.routes.base.components.entity_handler import Context
+    from app.routes.base.components.entity_handler import SimpleContext
 
-    context = Context(title="Settings")
+    context = SimpleContext(title="Settings")
     return render_safely("pages/misc/settings.html", context, "Failed to load settings.")
 
 
@@ -92,9 +92,9 @@ def settings_index():
 def relationships_index():
     """Relationships list page."""
     from app.routes.base.components.template_renderer import render_safely
-    from app.routes.base.components.entity_handler import Context
+    from app.routes.base.components.entity_handler import SimpleContext
 
-    context = Context(title="Relationships")
+    context = SimpleContext(title="Relationships")
     return render_safely("pages/tables/relationships.html", context, "Failed to load relationships.")
 
 

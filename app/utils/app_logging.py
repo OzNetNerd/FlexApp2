@@ -98,8 +98,44 @@ def log_kwargs(log_title: str, **kwargs: dict) -> None:
 
 
 class LoggingUndefined(DebugUndefined):
-    """Custom Jinja2 Undefined that logs access to undefined variables."""
+    """Tracks and logs all missing variables used in templates."""
 
-    def _fail_with_undefined_error(self, *args, **kwargs):
-        logger.error(f"❌  Undefined Jinja variable accessed: {self._undefined_name}")
-        return super()._fail_with_undefined_error(*args, **kwargs)
+    _missing_variables = set()
+
+    def _log(self, msg: str):
+        var_name = self._undefined_name
+        self.__class__._missing_variables.add(var_name)
+        logger.warning(f"⚠️  {msg}: '{var_name}'")
+
+    def __str__(self):
+        self._log("Undefined variable rendered as string")
+        return f"<<undefined:{self._undefined_name}>>"
+
+    __repr__ = __str__
+    __html__ = __str__
+
+    def __getitem__(self, key):
+        self._log(f"Attempted to access key '{key}' on undefined variable")
+        return self.__class__(
+            hint=self._undefined_hint,
+            obj=self._undefined_obj,
+            name=f"{self._undefined_name}[{key!r}]"
+        )
+
+    def __getattr__(self, attr):
+        self._log(f"Attempted to access attribute '{attr}' on undefined variable")
+        return self.__class__(
+            hint=self._undefined_hint,
+            obj=self._undefined_obj,
+            name=f"{self._undefined_name}.{attr}"
+        )
+
+    @classmethod
+    def clear_missing_variables(cls):
+        cls._missing_variables.clear()
+
+    @classmethod
+    def raise_if_missing(cls):
+        if cls._missing_variables:
+            missing_list = "\n".join(f"- {v}" for v in sorted(cls._missing_variables))
+            raise RuntimeError(f"❌ Missing template variables:\n{missing_list}")
