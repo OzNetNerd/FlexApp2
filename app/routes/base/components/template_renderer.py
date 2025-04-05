@@ -1,10 +1,19 @@
 from typing import Union, Optional
 import traceback
-from flask import render_template, request, current_app
-from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
 import logging
+from flask import (
+    render_template,
+    request,
+    current_app,
+    url_for,
+    get_flashed_messages,
+    session,
+)
+from jinja2 import Environment
+from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
+
 from app.routes.base.components.entity_handler import Context, TableContext, ResourceContext
-from app.utils.app_logging import log_kwargs
+from app.utils.app_logging import log_kwargs, LoggingUndefined
 
 logger = logging.getLogger(__name__)
 
@@ -25,23 +34,34 @@ def render_safely(
 
     Returns a tuple (HTML, status_code) on error, or a rendered string on success.
     """
-
     kwargs = {
-        "template_name": template_name,
         "context": context,
         "fallback_error_message": fallback_error_message,
         "endpoint_name": endpoint_name,
     }
-
-    log_kwargs(**kwargs)
+    title = f"Rendering '{template_name}' with the following {len(kwargs)} items:"
+    log_kwargs(title, **kwargs)
 
     current_endpoint = endpoint_name or request.endpoint or "unknown endpoint"
     current_path = request.path
 
+    template_env = Environment(
+        loader=current_app.jinja_loader,
+        undefined=LoggingUndefined,
+    )
+
+    flask_globals = {
+        "url_for": url_for,
+        "get_flashed_messages": get_flashed_messages,
+        "request": request,
+        "session": session,
+    }
+
     try:
         logger.debug(f"🔍 Rendering template: {template_name} for {current_endpoint} ({current_path})")
         logger.debug(f"🔧 Context Data: {context}")
-        return render_template(template_name, **context.__dict__)
+        template = template_env.get_template(template_name)
+        return template.render(**flask_globals, **context.__dict__)
 
     except (TemplateNotFound, TemplateSyntaxError, Exception) as e:
         if isinstance(e, TemplateNotFound):
@@ -67,13 +87,13 @@ def render_safely(
 
         try:
             logger.debug(f"🔁 Fallback render attempt for: {template_name}")
-            return render_template(template_name, **context.__dict__), status_code
+            template = template_env.get_template(template_name)
+            return template.render(**flask_globals, **context.__dict__), status_code
 
         except Exception as e2:
             logger.critical(f"❌  Failed to re-render '{template_name}' with error context: {e2} for {current_endpoint} ({current_path})")
 
             try:
-                # Attempt to render the _debug_panel.html as a final fallback
                 return (
                     render_template(
                         "base/core/_debug_panel.html",
