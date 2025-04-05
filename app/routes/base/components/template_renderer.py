@@ -22,12 +22,17 @@ def get_flask_globals() -> Dict[str, Any]:
     """
     Returns a dictionary of Flask global objects needed for template rendering.
     """
-    return {
+
+    logger.info(f"Fetching Flask global objects for template rendering")
+
+    globals_dict = {
         "url_for": url_for,
         "get_flashed_messages": get_flashed_messages,
         "request": request,
         "session": session,
     }
+    logger.info(f"Got them: {globals_dict}")
+    return globals_dict
 
 
 def create_template_environment() -> Environment:
@@ -39,28 +44,17 @@ def create_template_environment() -> Environment:
         undefined=LoggingUndefined,
     )
 
-
-def log_render_attempt(template_name: str, endpoint_name: str,
-                       context: Union[Context, TableContext, ResourceContext]) -> None:
-    """
-    Logs information about a template rendering attempt.
-    """
-    current_path = request.path
-    logger.debug(f"🔍 Rendering template: {template_name} for {endpoint_name} ({current_path})")
-    logger.debug(f"🔧 Context Data: {context}")
-
-
 def handle_template_error(
         e: Exception,
         template_name: str,
         endpoint_name: str,
         fallback_error_message: str
-) -> Tuple[str, int, str]:
+) -> Tuple[str, int]:
     """
-    Handles template rendering errors and returns appropriate error information.
+    Handles template rendering errors and returns a debug panel response.
 
     Returns:
-        Tuple containing (error_type, status_code, error_details)
+        Tuple containing (HTML error page, status_code)
     """
     current_path = request.path
 
@@ -73,18 +67,24 @@ def handle_template_error(
         details = f"Syntax error in template '{template_name}': {str(e)}"
         status_code = 500
     else:
-        error_type = "❌  Rendering error"
+        error_type = "❌ Rendering Error"
         details = str(e)
         status_code = 500
 
     logger.debug(f"🔧 Error Context Data: {endpoint_name}")
 
-    if current_app.debug:
-        logger.debug(f"Traceback:\n{traceback.format_exc()}")
+    render_fallback_error = (
+        traceback.format_exc() if current_app.debug else fallback_error_message
+    )
 
-    error_message = f"{error_type}: {details}" if current_app.debug else fallback_error_message
+    return render_debug_panel(
+        template_name=template_name,
+        original_error=details,
+        render_fallback_error=render_fallback_error,
+        endpoint_name=endpoint_name,
+        status_code=status_code,
+    )
 
-    return error_type, status_code, error_message
 
 
 def render_debug_panel(
@@ -157,35 +157,15 @@ def render_safely(
 
     # Get environment and globals
     template_env = create_template_environment()
-    flask_globals = get_flask_globals()
+    # flask_globals = get_flask_globals()
 
-    # First render attempt
+    current_path = request.path
+    logger.debug(f"🔍 Attempting to render template '{template_name}' for {endpoint_name} ({current_path})")
+    logger.debug(f"🔧 Context Data: {context}")
+
     try:
-        log_render_attempt(template_name, current_endpoint, context)
         template = template_env.get_template(template_name)
-        return template.render(**flask_globals, **context.__dict__)
-
+        return template.render(**get_flask_globals(), **context.__dict__)
     except Exception as e:
-        # Handle the error
-        error_type, status_code, error_message = handle_template_error(
-            e, template_name, current_endpoint, fallback_error_message
-        )
-
-        # Add error message to context
-        context.error_message = error_message
-
-        # Fallback render attempt
-        try:
-            logger.debug(f"🔁 Fallback render attempt for: {template_name}")
-            template = template_env.get_template(template_name)
-            return template.render(**flask_globals, **context.__dict__), status_code
-
-        except Exception as e2:
-            # Final fallback - debug panel or static HTML
-            return render_debug_panel(
-                template_name=template_name,
-                original_error=str(e),
-                render_fallback_error=str(e2),
-                endpoint_name=current_endpoint,
-                status_code=status_code
-            )
+        logger.exception(f"❌ Error rendering template '{template_name}' at endpoint '{endpoint_name}'")
+        return handle_template_error(e, template_name, endpoint_name, fallback_error_message)
