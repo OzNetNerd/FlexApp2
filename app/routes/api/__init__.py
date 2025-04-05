@@ -1,9 +1,7 @@
 import logging
 from flask import Blueprint
-from app.routes.base.components.template_renderer import render_safely
-from app.routes.base.components.entity_handler import Context
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("flex_logger")
 
 # Create API blueprints
 companies_api_bp = Blueprint('api_companies', __name__, url_prefix='/api/companies')
@@ -16,8 +14,11 @@ generic_api_bp = Blueprint('api_generic', __name__, url_prefix='/api/generic')
 
 
 def register_api_blueprints(app):
-    """Register all API blueprints with the Flask application."""
+    """Register all API blueprints with the Flask application. Delayed import avoids circular imports."""
     logger.debug("Registering API blueprints...")
+
+    # Delayed import to avoid circular imports
+    from app.routes.api import companies, contacts, opportunities, users, tasks, search, generic
 
     app.register_blueprint(companies_api_bp)
     app.register_blueprint(contacts_api_bp)
@@ -28,32 +29,3 @@ def register_api_blueprints(app):
     app.register_blueprint(generic_api_bp)
 
     logger.debug("API blueprints registered successfully.")
-
-
-# Import routes after blueprint definitions to avoid circular imports
-from app.routes.api import companies, contacts, opportunities, users, tasks, search, generic
-
-# API index routes — now bound to API blueprints (not web blueprints)
-@contacts_api_bp.route("/")
-def contacts_index():
-    """API: Contacts list."""
-    context = Context(title="Contacts")
-    return render_safely("pages/tables/contacts.html", context, "Failed to load contacts.")
-
-@opportunities_api_bp.route("/")
-def opportunities_index():
-    """API: Opportunities list."""
-    context = Context(title="Opportunities")
-    return render_safely("pages/tables/opportunities.html", context, "Failed to load opportunities.")
-
-@users_api_bp.route("/")
-def users_index():
-    """API: Users list."""
-    context = Context(title="Users")
-    return render_safely("pages/tables/users.html", context, "Failed to load users.")
-
-@tasks_api_bp.route("/")
-def tasks_index():
-    """API: Tasks list."""
-    context = Context(title="Tasks")
-    return render_safely("pages/tables/tasks.html", context, "Failed to load tasks.")

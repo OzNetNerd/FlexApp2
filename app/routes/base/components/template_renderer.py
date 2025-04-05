@@ -4,6 +4,7 @@ from flask import render_template, request, current_app
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
 import logging
 from app.routes.base.components.entity_handler import Context, TableContext, ResourceContext
+from app.utils.app_logging import log_kwargs
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,15 @@ def render_safely(
 
     Returns a tuple (HTML, status_code) on error, or a rendered string on success.
     """
+
+    kwargs = {
+        "template_name": template_name,
+        "context": context,
+        "fallback_error_message": fallback_error_message,
+        "endpoint_name": endpoint_name,
+    }
+
+    log_kwargs(**kwargs)
 
     current_endpoint = endpoint_name or request.endpoint or "unknown endpoint"
     current_path = request.path

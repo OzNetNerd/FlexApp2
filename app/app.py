@@ -1,11 +1,9 @@
-import logging
 from datetime import datetime
 from flask import (
     Flask,
     request,
     redirect,
     url_for,
-    session as flask_session,
     make_response,
 )
 from flask_migrate import Migrate
@@ -14,93 +12,25 @@ from config import Config
 from app.models.base import db
 from app.models import User, Setting
 from app.routes.router import register_routes
-
-# ---------------------------------------------
-# Logging
-# ---------------------------------------------
-
-
-class IndentationPreservingFormatter(logging.Formatter):
-    """Formatter that preserves leading whitespace by re-injecting it after log formatting."""
-
-    def __init__(self, fmt=None, datefmt=None, style="%"):
-        super().__init__(fmt, datefmt, style)
-        self.indent_level = 0
-        self.indent_char = "  "
-
-    def format(self, record):
-        original_msg = record.getMessage()
-
-        # Add indentation to the message if needed
-        if hasattr(record, "indent_level"):
-            indent_level = record.indent_level
-        else:
-            indent_level = self.indent_level
-
-        # Save leading whitespace (if any)
-        leading_ws = ""
-        if isinstance(record.msg, str):
-            stripped = record.msg.lstrip()
-            leading_ws = record.msg[: len(record.msg) - len(stripped)]
-            # Add indentation
-            if not leading_ws.startswith(self.indent_char * indent_level):
-                record.msg = self.indent_char * indent_level + record.msg
-
-        # Format the record using the base logic
-        formatted = super().format(record)
-
-        return formatted
-
-
-def configure_logging() -> None:
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
-    logger.handlers.clear()
-
-    handler = logging.StreamHandler()
-    formatter = IndentationPreservingFormatter(
-        "%(asctime)s - %(name)s - %(filename)s - %(funcName)s - %(lineno)d - %(levelname)s - %(message)s"
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
-    # Add indentation control methods to the logger
-    def increase_indent():
-        formatter.indent_level += 1
-
-    def decrease_indent():
-        if formatter.indent_level > 0:
-            formatter.indent_level -= 1
-
-    def set_indent(level):
-        formatter.indent_level = max(0, level)
-
-    logger.increase_indent = increase_indent
-    logger.decrease_indent = decrease_indent
-    logger.set_indent = set_indent
-
+from app.utils.app_logging import configure_logging
 
 # ---------------------------------------------
 # Flask Extensions
 # ---------------------------------------------
 
-logger = logging.getLogger(__name__)
 login_manager = LoginManager()
 migrate = Migrate()
-
 
 @login_manager.unauthorized_handler
 def unauthorized():
     return make_response("🔒 Unauthorized - Please log in first", 401)
 
-
 # ---------------------------------------------
 # App Factory
 # ---------------------------------------------
 
-
 def create_app(config_class=Config):
-    configure_logging()
+    custom_logger = configure_logging()
 
     app = Flask(__name__, static_folder="static", static_url_path="/static")
     app.config.from_object(config_class)
@@ -146,19 +76,24 @@ def create_app(config_class=Config):
     # Register all routes
     register_routes(app)
 
+    # Inject global context
     @app.context_processor
-    def inject_now():
-        return {"now": datetime.utcnow()}
+    def inject_globals():
+        return {
+            "now": datetime.utcnow(),
+            "logger": app.custom_logger
+        }
 
-    # Create all tables and seed known app settings
+    # Attach logger to app
+    app.logger = custom_logger
+    app.custom_logger = custom_logger
+
     with app.app_context():
-        from app import models  # Ensure all models are loaded
-
+        from app import models
         Setting.seed()
         db.create_all()
 
     return app
-
 
 # ---------------------------------------------
 # Entrypoint
