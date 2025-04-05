@@ -42,15 +42,12 @@ tasks_routes = TasksCRUDRoutes(
     unique_fields=[],
 )
 
+
 # Custom route: Show overdue tasks
 @tasks_bp.route("/overdue")
 def overdue_tasks():
     """Show overdue tasks."""
-    overdue = Task.query.filter(
-        Task.due_date < datetime.utcnow(),
-        Task.status != "completed",
-        Task.assigned_to == current_user.id
-    ).all()
+    overdue = Task.query.filter(Task.due_date < datetime.utcnow(), Task.status != "completed", Task.assigned_to == current_user.id).all()
 
     context = Context(title="Overdue Tasks", items=overdue)
     return render_safely("pages/tasks/overdue.html", context, "Failed to load overdue tasks.")

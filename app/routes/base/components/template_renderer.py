@@ -44,12 +44,8 @@ def create_template_environment() -> Environment:
         undefined=LoggingUndefined,
     )
 
-def handle_template_error(
-        e: Exception,
-        template_name: str,
-        endpoint_name: str,
-        fallback_error_message: str
-) -> Tuple[str, int]:
+
+def handle_template_error(e: Exception, template_name: str, endpoint_name: str, fallback_error_message: str) -> Tuple[str, int]:
     """
     Handles template rendering errors and returns a debug panel response.
 
@@ -73,9 +69,7 @@ def handle_template_error(
 
     logger.debug(f"🔧 Error Context Data: {endpoint_name}")
 
-    render_fallback_error = (
-        traceback.format_exc() if current_app.debug else fallback_error_message
-    )
+    render_fallback_error = traceback.format_exc() if current_app.debug else fallback_error_message
 
     return render_debug_panel(
         template_name=template_name,
@@ -86,13 +80,8 @@ def handle_template_error(
     )
 
 
-
 def render_debug_panel(
-        template_name: str,
-        original_error: str,
-        render_fallback_error: str,
-        endpoint_name: str,
-        status_code: int
+    template_name: str, original_error: str, render_fallback_error: str, endpoint_name: str, status_code: int
 ) -> Tuple[str, int]:
     """
     Renders a debug panel with error information.
@@ -127,10 +116,10 @@ def render_debug_panel(
 
 
 def render_safely(
-        template_name: str,
-        context: Union[Context, TableContext, ResourceContext],
-        fallback_error_message: str = "An error occurred while rendering the page",
-        endpoint_name: Optional[str] = None,
+    template_name: str,
+    context: Union[Context, TableContext, ResourceContext],
+    fallback_error_message: str = "An error occurred while rendering the page",
+    endpoint_name: Optional[str] = None,
 ) -> Union[Tuple[str, int], str]:
     """
     Safely renders a Jinja2 template with error handling, fallback rendering,

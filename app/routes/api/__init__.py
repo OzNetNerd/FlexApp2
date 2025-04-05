@@ -4,13 +4,13 @@ from flask import Blueprint
 logger = logging.getLogger("flex_logger")
 
 # Create API blueprints
-companies_api_bp = Blueprint('api_companies', __name__, url_prefix='/api/companies')
-contacts_api_bp = Blueprint('api_contacts', __name__, url_prefix='/api/contacts')
-opportunities_api_bp = Blueprint('api_opportunities', __name__, url_prefix='/api/opportunities')
-users_api_bp = Blueprint('api_users', __name__, url_prefix='/api/users')
-tasks_api_bp = Blueprint('api_tasks', __name__, url_prefix='/api/tasks')
-search_api_bp = Blueprint('api_search', __name__, url_prefix='/api/search')
-generic_api_bp = Blueprint('api_generic', __name__, url_prefix='/api/generic')
+companies_api_bp = Blueprint("api_companies", __name__, url_prefix="/api/companies")
+contacts_api_bp = Blueprint("api_contacts", __name__, url_prefix="/api/contacts")
+opportunities_api_bp = Blueprint("api_opportunities", __name__, url_prefix="/api/opportunities")
+users_api_bp = Blueprint("api_users", __name__, url_prefix="/api/users")
+tasks_api_bp = Blueprint("api_tasks", __name__, url_prefix="/api/tasks")
+search_api_bp = Blueprint("api_search", __name__, url_prefix="/api/search")
+generic_api_bp = Blueprint("api_generic", __name__, url_prefix="/api/generic")
 
 
 def register_api_blueprints(app):

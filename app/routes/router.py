@@ -29,6 +29,7 @@ def register_routes(app: Flask):
 
     # Import and register blueprints
     from app.routes import register_blueprints
+
     register_blueprints(app)
 
     # Register any ad-hoc routes that don't fit into the blueprint structure
@@ -75,22 +76,27 @@ def register_special_routes(app: Flask):
 
     logger.debug("Special routes registered")
 
+
 # Add routes for blueprints that don't follow the standard CRUD pattern
 @settings_bp.route("/")
 def settings_index():
     """Settings page."""
     from app.routes.base.components.template_renderer import render_safely
     from app.routes.base.components.entity_handler import Context
+
     context = Context(title="Settings")
     return render_safely("pages/misc/settings.html", context, "Failed to load settings.")
+
 
 @relationships_bp.route("/")
 def relationships_index():
     """Relationships list page."""
     from app.routes.base.components.template_renderer import render_safely
     from app.routes.base.components.entity_handler import Context
+
     context = Context(title="Relationships")
     return render_safely("pages/tables/relationships.html", context, "Failed to load relationships.")
+
 
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""

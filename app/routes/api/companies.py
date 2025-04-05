@@ -7,11 +7,13 @@ from app.services.crud_service import CRUDService
 companies_api_bp = create_blueprint("api_companies", url_prefix="/api/companies")
 company_service = CRUDService(Company)
 
+
 @companies_api_bp.route("/", methods=["GET"])
 def get_all():
     """Get all companies."""
     companies = company_service.get_all()
     return jsonify([company.to_dict() for company in companies])
+
 
 @companies_api_bp.route("/<int:item_id>", methods=["GET"])
 def get_one(item_id):
@@ -20,6 +22,7 @@ def get_one(item_id):
     if not company:
         return jsonify({"error": "Company not found"}), 404
     return jsonify(company.to_dict())
+
 
 @companies_api_bp.route("/", methods=["POST"])
 def create():
@@ -30,6 +33,7 @@ def create():
         return jsonify(result), 400
     return jsonify(result), 201
 
+
 @companies_api_bp.route("/<int:item_id>", methods=["PUT"])
 def update(item_id):
     """Update a company."""
@@ -38,6 +42,7 @@ def update(item_id):
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
+
 
 @companies_api_bp.route("/<int:item_id>", methods=["DELETE"])
 def delete(item_id):

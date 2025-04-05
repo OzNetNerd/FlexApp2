@@ -20,8 +20,9 @@ class Context:
     # These fields will be required in ALL child classes
     title: str
     read_only: bool
+    # entity_name: Optional[str] = None
     current_user: Optional[UserMixin] = None
-    item: Optional[Any] = None
+    # item: Optional[Any] = None
     action: Optional[str] = False
     extra: Dict[str, Any] = field(default_factory=dict)
 

@@ -58,7 +58,7 @@ def log_kwargs(log_title: str, **kwargs: dict) -> None:
     """
     # Get the caller's frame, module name, and function name
     caller_frame = inspect.currentframe().f_back
-    caller_module = caller_frame.f_globals['__name__']
+    caller_module = caller_frame.f_globals["__name__"]
     caller_function = caller_frame.f_code.co_name
 
     # Get a logger for the caller's module

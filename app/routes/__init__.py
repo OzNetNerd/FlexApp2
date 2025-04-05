@@ -16,6 +16,7 @@ def register_blueprints(app):
     # Try-except for API blueprints to handle case where API module doesn't exist yet
     try:
         from app.routes.api import register_api_blueprints
+
         register_api_blueprints(app)
     except (ImportError, AttributeError) as e:
         logger.warning(f"API blueprints could not be registered: {e}")

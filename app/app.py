@@ -21,13 +21,16 @@ from app.utils.app_logging import configure_logging
 login_manager = LoginManager()
 migrate = Migrate()
 
+
 @login_manager.unauthorized_handler
 def unauthorized():
     return make_response("🔒 Unauthorized - Please log in first", 401)
 
+
 # ---------------------------------------------
 # App Factory
 # ---------------------------------------------
+
 
 def create_app(config_class=Config):
     custom_logger = configure_logging()
@@ -79,10 +82,7 @@ def create_app(config_class=Config):
     # Inject global context
     @app.context_processor
     def inject_globals():
-        return {
-            "now": datetime.utcnow(),
-            "logger": app.custom_logger
-        }
+        return {"now": datetime.utcnow(), "logger": app.custom_logger}
 
     # Attach logger to app
     app.logger = custom_logger
@@ -90,10 +90,12 @@ def create_app(config_class=Config):
 
     with app.app_context():
         from app import models
+
         Setting.seed()
         db.create_all()
 
     return app
+
 
 # ---------------------------------------------
 # Entrypoint

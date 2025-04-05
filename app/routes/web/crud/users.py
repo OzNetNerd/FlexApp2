@@ -41,6 +41,7 @@ users_routes = UsersCRUDRoutes(
     unique_fields=[],
 )
 
+
 # Optional: Custom route (not part of CRUD)
 @users_bp.route("/dashboard")
 def dashboard():

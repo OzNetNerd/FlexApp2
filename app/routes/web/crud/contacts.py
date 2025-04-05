@@ -45,6 +45,7 @@ contacts_routes = ContactsCRUDRoutes(
     unique_fields=[],
 )
 
+
 # Custom route: View contact with extra context
 @contacts_bp.route("/<int:item_id>/view-extended")
 def view_extended(item_id):
