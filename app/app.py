@@ -11,7 +11,8 @@ from flask_login import LoginManager, current_user
 from config import Config
 from app.models.base import db
 from app.models import User, Setting
-from app.routes.router import register_routes
+from app.routes.api_router import register_api_routes
+from app.routes.web_router import register_routes
 from app.utils.app_logging import configure_logging
 
 # ---------------------------------------------
@@ -77,6 +78,7 @@ def create_app(config_class=Config):
             return redirect(url_for("auth_bp.login", next=request.path))
 
     # Register all routes
+    register_api_routes(app)
     register_routes(app)
 
     # Inject global context
