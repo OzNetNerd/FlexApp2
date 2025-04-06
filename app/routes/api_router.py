@@ -22,11 +22,19 @@ def register_api_routes(app: Flask):
     register_api_error_handlers(app)
     register_api_special_routes(app)
 
+    # Add this line to register all API blueprints
+    from app.routes.api import register_api_blueprints
+    register_api_blueprints(app)
+
+    # Register the misc_api_bp blueprint
+    app.register_blueprint(misc_api_bp)
+
     logger.info("Additional API routes registered successfully.")
 
 
 def register_api_error_handlers(app: Flask):
     """Register API error handlers for the application."""
+
     @app.errorhandler(404)
     def api_page_not_found(e):
         return jsonify({"error": "API endpoint not found"}), 404
@@ -40,6 +48,7 @@ def register_api_error_handlers(app: Flask):
 
 def register_api_special_routes(app: Flask):
     """Register special API routes that don't fit the standard pattern."""
+
     @app.route("/api/debug")
     def api_debug():
         result = {
