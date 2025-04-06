@@ -1,8 +1,9 @@
 import logging
-from multiprocessing.context import BaseContext
+from app.routes.base.components.template_renderer import render_safely
+from app.routes.base.components.entity_handler import BaseContext
 
 from app.routes.web.auth import auth_bp
-from app.routes.web.index import index_bp
+# from app.routes.web.index import index_bp
 from app.routes.web.crud.companies import companies_bp
 from app.routes.web.crud.contacts import contacts_bp
 from app.routes.web.crud.opportunities import opportunities_bp
@@ -43,8 +44,6 @@ def register_routes(app: Flask):
 
 def register_error_handlers(app: Flask):
     """Register error handlers for the application."""
-    from app.routes.base.components.template_renderer import render_safely
-    from app.routes.base.components.entity_handler import BaseContext
 
     @app.errorhandler(404)
     def page_not_found(e):
@@ -63,6 +62,14 @@ def register_special_routes(app: Flask):
     """Register special routes that don't fit the standard pattern."""
     from flask import jsonify, session as flask_session
     from flask_login import current_user
+
+    @app.route("/")
+    def index():
+        """Main dashboard/home page."""
+        logger.info("Rendering dashboard/home page.")
+        context = BaseContext(title="Dashboard", info="")
+        fallback_message = "Sorry, we couldn't load the dashboard. Please try again later."
+        return render_safely("index.html", context, fallback_message)
 
     @app.route("/debug-session")
     def debug_session():
@@ -83,8 +90,6 @@ def register_special_routes(app: Flask):
 @settings_bp.route("/")
 def settings_index():
     """Settings page."""
-    from app.routes.base.components.template_renderer import render_safely
-    from app.routes.base.components.entity_handler import BaseContext
 
     context = BaseContext(title="Settings")
     return render_safely("pages/misc/settings.html", context, "Failed to load settings.")
@@ -93,8 +98,6 @@ def settings_index():
 @relationships_bp.route("/")
 def relationships_index():
     """Relationships list page."""
-    from app.routes.base.components.template_renderer import render_safely
-    from app.routes.base.components.entity_handler import BaseContext
 
     context = BaseContext(title="Relationships")
     return render_safely("pages/tables/relationships.html", context, "Failed to load relationships.")
@@ -104,7 +107,7 @@ def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""
     logger.info("Registering web blueprints...")
 
-    app.register_blueprint(index_bp)
+    # app.register_blueprint(index_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(companies_bp)
     app.register_blueprint(contacts_bp)
