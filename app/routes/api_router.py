@@ -4,37 +4,25 @@ from app.routes.blueprint_factory import create_blueprint
 
 logger = logging.getLogger(__name__)
 
-# Import API blueprints that have dedicated modules
-from app.routes.api.companies import companies_api_bp
-from app.routes.api.contacts import contacts_api_bp
-from app.routes.api.opportunities import opportunities_api_bp
-from app.routes.api.users import users_api_bp
-from app.routes.api.tasks import tasks_api_bp
-from app.routes.api.search import search_api_bp
-from app.routes.api.generic import generic_api_bp
-
-# Create blueprints for remaining API routes that don't have dedicated modules yet
+# Create blueprints for API routes that don't have dedicated modules
 misc_api_bp = create_blueprint("misc_api", url_prefix="/api/misc")
 
 
 def register_api_routes(app: Flask):
     """
     Central API routing registration function for the entire application.
-    This is the main entry point for all API route registration.
+    This handles non-blueprint API functionality.
 
     Args:
         app: Flask application instance
     """
-    logger.info("Registering all API routes...")
+    logger.info("Registering additional API routes...")
 
-    # Import and register blueprints
-    register_api_blueprints(app)
-
-    # Register any ad-hoc API routes that don't fit into the blueprint structure
+    # Register API error handlers and special routes
     register_api_error_handlers(app)
     register_api_special_routes(app)
 
-    logger.info("All API routes registered successfully.")
+    logger.info("Additional API routes registered successfully.")
 
 
 def register_api_error_handlers(app: Flask):
@@ -69,19 +57,3 @@ def register_api_special_routes(app: Flask):
 def misc_index():
     """Miscellaneous API index."""
     return jsonify({"message": "Welcome to the Misc API endpoint"})
-
-
-def register_api_blueprints(app: Flask):
-    """Register all API blueprints with the Flask application."""
-    logger.debug("Registering API blueprints...")
-
-    app.register_blueprint(companies_api_bp)
-    app.register_blueprint(contacts_api_bp)
-    app.register_blueprint(opportunities_api_bp)
-    app.register_blueprint(users_api_bp)
-    app.register_blueprint(tasks_api_bp)
-    app.register_blueprint(search_api_bp)
-    app.register_blueprint(generic_api_bp)
-    app.register_blueprint(misc_api_bp)
-
-    logger.debug("API blueprints registered successfully.")

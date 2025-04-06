@@ -1,10 +1,15 @@
-from flask import jsonify, request
-from app.routes.blueprint_factory import create_blueprint
+import logging
+from flask import Blueprint, jsonify, request
 from app.models.company import Company
 from app.services.crud_service import CRUDService
 
-# Create API blueprint with /api prefix
-companies_api_bp = create_blueprint("api_companies", url_prefix="/api/companies")
+logger = logging.getLogger(__name__)
+
+TABLE_NAME = 'Company'
+
+# Define the blueprint
+companies_api_bp = Blueprint("api_companies", __name__, url_prefix="/api/companies")
+
 company_service = CRUDService(Company)
 
 
@@ -51,3 +56,6 @@ def delete(item_id):
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
+
+
+logger.info("Company API routes setup successfully.")
