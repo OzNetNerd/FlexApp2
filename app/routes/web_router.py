@@ -12,23 +12,23 @@ relationships_bp = Blueprint('relationships', __name__, url_prefix='/relationshi
 crisp_scores_bp = Blueprint('crisp_scores', __name__, url_prefix='/crisp_scores')
 
 
-# Define blueprint routes
+# Define blueprint routes with blueprint-scoped function names
 @settings_bp.route("/")
-def index():
+def settings_index():
     """Settings page."""
     context = BaseContext(title="Settings")
     return render_safely("pages/misc/settings.html", context, "Failed to load settings.")
 
 
 @relationships_bp.route("/")
-def index():
+def relationships_index():
     """Relationships list page."""
     context = BaseContext(title="Relationships")
     return render_safely("pages/tables/relationships.html", context, "Failed to load relationships.")
 
 
 @crisp_scores_bp.route("/")
-def index():
+def crisp_scores_index():
     """Crisp scores page."""
     context = BaseContext(title="Crisp Scores")
     return render_safely("pages/tables/crisp_scores.html", context, "Failed to load crisp scores.")
@@ -76,10 +76,10 @@ def register_special_routes(app: Flask):
     from flask import jsonify, session as flask_session
 
     @app.route("/")
-    def index():
+    def main_index():
         """Main dashboard/home page."""
         logger.info("Rendering dashboard/home page.")
-        context = BaseContext(title="Dashboard", info="")
+        context = BaseContext(title="Dashboard", info="", current_user=current_user, show_navbar=True)
         fallback_message = "Sorry, we couldn't load the dashboard. Please try again later."
         return render_safely("index.html", context, fallback_message)
 
