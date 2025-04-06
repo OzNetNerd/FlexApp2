@@ -1,3 +1,5 @@
+# template_renderer.py
+
 from typing import Union, Optional, Tuple, Dict, Any
 import traceback
 import logging
@@ -81,6 +83,7 @@ def create_template_environment() -> Environment:
         undefined=LoggingUndefined,
     )
     env.filters["tojson"] = lambda value: htmlsafe_json_dumps(value)
+    logger.debug(f"🔧 Created template environment with loader {current_app.jinja_loader}")
     return env
 
 
@@ -97,14 +100,25 @@ def get_flask_globals() -> Dict[str, Any]:
         "session": session,
     }
     logger.info(f"Got them: {globals_dict}")
+    # Log request details
+    logger.debug(f"📝 Request method: {request.method}")
+    logger.debug(f"📝 Request path: {request.path}")
+    logger.debug(f"📝 Request args: {request.args}")
+    logger.debug(f"📝 Request headers: {dict(request.headers)}")
+    logger.debug(f"📝 Request cookies: {request.cookies}")
+    logger.debug(f"📝 Request form: {request.form}")
     return globals_dict
 
 
-def handle_template_error(e: Exception, template_name: str, endpoint_name: str, fallback_error_message: str) -> Tuple[str, int]:
+def handle_template_error(e: Exception, template_name: str, endpoint_name: str, fallback_error_message: str) -> Tuple[
+    str, int]:
     """
     Handles template rendering errors and returns a debug panel response.
     """
     current_path = request.path
+    logger.error(f"❌ Template error for '{template_name}' at path '{current_path}'")
+    logger.error(f"❌ Exception: {type(e).__name__}: {str(e)}")
+    logger.error(f"❌ Traceback: {traceback.format_exc()}")
 
     if isinstance(e, TemplateNotFound):
         error_type = "Template Not Found"
@@ -120,6 +134,8 @@ def handle_template_error(e: Exception, template_name: str, endpoint_name: str, 
         status_code = 500
 
     logger.debug(f"🔧 Error Context data: {endpoint_name}")
+    logger.debug(f"🔧 Error type: {error_type}")
+    logger.debug(f"🔧 Error details: {details}")
 
     render_fallback_error = traceback.format_exc() if current_app.debug else fallback_error_message
 
@@ -133,45 +149,47 @@ def handle_template_error(e: Exception, template_name: str, endpoint_name: str, 
 
 
 def render_debug_panel(
-    template_name: str, original_error: str, render_fallback_error: str, endpoint_name: str, status_code: int
+        template_name: str, original_error: str, render_fallback_error: str, endpoint_name: str, status_code: int
 ) -> Tuple[str, int]:
     """
     Renders a debug panel with error information.
     """
     current_path = request.path
+    logger.info(f"🛠️ Rendering debug panel for template '{template_name}' at path '{current_path}'")
 
     try:
-        return (
-            render_template(
-                "base/core/_debug_panel.html",
-                template_name=template_name,
-                debug_title="Fatal Rendering Error",
-                debug_severity="error",
-                debug_context={
-                    "original_error": original_error,
-                    "render_fallback_error": render_fallback_error,
-                    "template_name": template_name,
-                    "endpoint": endpoint_name,
-                    "path": current_path,
-                },
-                debug_data=None,
-                debug_id="fatal",
-                debug_expanded=True,
-                debug_show_toggle=False,
-                debug_capture_console=False,
-            ),
-            status_code,
+        html_response = render_template(
+            "base/core/_debug_panel.html",
+            template_name=template_name,
+            debug_title="Fatal Rendering Error",
+            debug_severity="error",
+            debug_context={
+                "original_error": original_error,
+                "render_fallback_error": render_fallback_error,
+                "template_name": template_name,
+                "endpoint": endpoint_name,
+                "path": current_path,
+            },
+            debug_data=None,
+            debug_id="fatal",
+            debug_expanded=True,
+            debug_show_toggle=False,
+            debug_capture_console=False,
         )
+        logger.info(f"✅ Debug panel rendered successfully with status code {status_code}")
+        logger.debug(f"📝 Response length: {len(html_response)} chars")
+        return html_response, status_code
     except Exception as e3:
         logger.critical(f"❌ Even the debug panel failed: {e3}")
-        return f"<h1>{fallback_error_message}</h1><p>{error_type}</p>", status_code
+        logger.critical(f"❌ Debug panel error traceback: {traceback.format_exc()}")
+        return f"<h1>{fallback_error_message}</h1><p>{original_error}</p>", status_code
 
 
 def render_safely(
-    template_name: str,
-    context: Union[BaseContext],
-    fallback_error_message: str = "An error occurred while rendering the page",
-    endpoint_name: Optional[str] = None,
+        template_name: str,
+        context: Union[BaseContext],
+        fallback_error_message: str = "An error occurred while rendering the page",
+        endpoint_name: Optional[str] = None,
 ) -> Union[Tuple[str, int], str]:
     """
     Safely renders a Jinja2 template with error handling, fallback rendering,
@@ -182,6 +200,11 @@ def render_safely(
     current_endpoint = endpoint_name or request.endpoint or "unknown endpoint"
     logger.info(f"🔍 Routing to endpoint: {current_endpoint}")
     logger.info(f"🔍 Using template: {template_name}")
+    logger.debug(f"📝 Request ID: {id(request)}")
+    logger.debug(f"📝 Request method: {request.method}")
+    logger.debug(f"📝 Request path: {request.path}")
+    logger.debug(f"📝 Request args: {request.args}")
+    logger.debug(f"📝 Request headers: {dict(request.headers)}")
 
     log_title = "🔍 Passing the following context vars to the template:"
     kwargs = {
@@ -199,13 +222,20 @@ def render_safely(
 
     try:
         template = template_env.get_template(template_name)
+        logger.debug(f"✅ Template '{template_name}' loaded successfully")
 
         LoggingUndefined.clear_missing_variables()
+        logger.debug(f"📝 Starting template rendering process")
         rendered = template.render(**get_flask_globals(), **context.__dict__)
+        logger.debug(f"✅ Template rendered successfully with length {len(rendered)} chars")
+
         LoggingUndefined.raise_if_missing()
+        logger.info(f"✅ Template '{template_name}' rendered successfully")
+        logger.debug(f"📝 Response content length: {len(rendered)} chars")
 
         return rendered
 
     except Exception as e:
         logger.exception(f"❌ Error rendering template '{template_name}' at endpoint '{endpoint_name}'")
+        logger.error(f"❌ Exception details: {type(e).__name__}: {str(e)}")
         return handle_template_error(e, template_name, endpoint_name, fallback_error_message)

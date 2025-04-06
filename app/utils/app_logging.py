@@ -1,8 +1,15 @@
+# app_logging.py
+
 from jinja2 import DebugUndefined
 import logging
 import inspect
+import time
+import uuid
 
 logger = logging.getLogger(__name__)
+
+# Store request IDs to help trace request flow
+REQUEST_IDS = {}
 
 
 def configure_logging(level=logging.INFO) -> None:
@@ -15,7 +22,38 @@ def configure_logging(level=logging.INFO) -> None:
         level=level,
         format=log_format,
     )
+
+    # Add a filter to inject request IDs into log records
+    root_logger = logging.getLogger()
+    root_logger.addFilter(RequestIDFilter())
+
     logger.info("✅ Logging is configured.")
+
+
+class RequestIDFilter(logging.Filter):
+    """Filter that adds request ID to log records."""
+
+    def filter(self, record):
+        try:
+            from flask import request, has_request_context
+            if has_request_context():
+                # Generate or retrieve request ID
+                if id(request) not in REQUEST_IDS:
+                    REQUEST_IDS[id(request)] = str(uuid.uuid4())[:8]
+                record.request_id = REQUEST_IDS[id(request)]
+
+                # Add extra request info
+                record.request_method = request.method
+                record.request_path = request.path
+
+                # Update log format to include request info
+                record.msg = f"[{record.request_id}] {record.msg}"
+            else:
+                record.request_id = '-'
+        except Exception:
+            record.request_id = '-'
+
+        return True
 
 
 def log_instance_vars(instance, exclude: list[str] = None) -> None:
@@ -95,6 +133,17 @@ def log_kwargs(log_title: str, **kwargs: dict) -> None:
     finally:
         # Always remove the filter when done
         caller_logger.removeFilter(function_filter)
+
+
+def start_timer():
+    """Start a timer for performance tracking"""
+    return time.time()
+
+
+def log_elapsed(timer_start, message):
+    """Log elapsed time with a custom message"""
+    elapsed = time.time() - timer_start
+    logger.debug(f"⏱️ {message}: {elapsed:.4f} seconds")
 
 
 class LoggingUndefined(DebugUndefined):

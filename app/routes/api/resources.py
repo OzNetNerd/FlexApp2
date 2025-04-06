@@ -1,4 +1,7 @@
+# api/resources.py
+
 import logging
+import traceback
 from flask import Blueprint, request, jsonify
 from sqlalchemy import inspect, desc
 from werkzeug.exceptions import BadRequest
@@ -35,7 +38,8 @@ class GenericDataAPI:
         Args:
             app: Flask application instance
         """
-        for blueprint in self.resource_blueprints.values():
+        for resource_type, blueprint in self.resource_blueprints.items():
+            logger.info(f"📌 Registering API blueprint for resource: {resource_type}")
             app.register_blueprint(blueprint)
 
     def register_resource(self,
@@ -61,6 +65,13 @@ class GenericDataAPI:
         if resource_type in self.resources:
             logger.warning(f"Resource type {resource_type} already registered, overwriting.")
 
+        logger.info(f"🔧 Registering resource type: {resource_type}")
+        logger.debug(f"📝 Model: {model.__name__}")
+        logger.debug(f"📝 Search fields: {search_fields or ['name']}")
+        logger.debug(f"📝 Default sort: {default_sort}")
+        logger.debug(f"📝 Custom query handler: {query_handler.__name__ if query_handler else None}")
+        logger.debug(f"📝 Custom formatter: {formatter.__name__ if formatter else None}")
+
         self.resources[resource_type] = {
             'model': model,
             'search_fields': search_fields or ['name'],
@@ -82,10 +93,16 @@ class GenericDataAPI:
         # Register the data endpoint on the blueprint
         @blueprint.route("/data", methods=["GET"])
         def get_data():
+            logger.info(f"🔍 API data request for resource: {resource_type}")
+            logger.debug(f"📝 Request ID: {id(request)}")
+            logger.debug(f"📝 Request method: {request.method}")
+            logger.debug(f"📝 Request path: {request.path}")
+            logger.debug(f"📝 Request args: {request.args}")
+            logger.debug(f"📝 Request headers: {dict(request.headers)}")
             return self._handle_data_request(resource_type)
 
         self.resource_blueprints[resource_type] = blueprint
-        logger.info(f"Registered resource type {resource_type} with blueprint {bp_name}")
+        logger.info(f"✅ Registered resource type {resource_type} with blueprint {bp_name}")
 
         return blueprint
 
@@ -99,10 +116,14 @@ class GenericDataAPI:
         Returns:
             Flask response with JSON data
         """
+        request_start_log = f"🔄 Processing API data request for {resource_type}"
+        logger.info(request_start_log)
+
         try:
             # Get resource configuration
             resource_config = self.resources.get(resource_type)
             if not resource_config:
+                logger.warning(f"❌ Resource type {resource_type} not found")
                 return jsonify({"error": f"Resource type {resource_type} not found"}), 404
 
             model = resource_config['model']
@@ -116,14 +137,19 @@ class GenericDataAPI:
             sort_by = request.args.get('sort', default_sort)
             order = request.args.get('order', 'asc')
 
+            logger.debug(f"📝 Request parameters - page: {page}, per_page: {per_page}")
+            logger.debug(f"📝 Search term: '{search}'")
+            logger.debug(f"📝 Sort by: {sort_by}, Order: {order}")
+
             # Validate sort field exists on model
             model_columns = [column.key for column in inspect(model).columns]
             if sort_by not in model_columns and sort_by != default_sort:
-                logger.warning(f"Invalid sort field: {sort_by}, defaulting to {default_sort}")
+                logger.warning(f"⚠️ Invalid sort field: {sort_by}, defaulting to {default_sort}")
                 sort_by = default_sort
 
             # Check if there's a custom query handler for this resource
             if resource_type in self.custom_query_handlers:
+                logger.debug(f"🔧 Using custom query handler for {resource_type}")
                 query = self.custom_query_handlers[resource_type](
                     model=model,
                     search=search,
@@ -133,10 +159,12 @@ class GenericDataAPI:
                 )
             else:
                 # Start with base query
+                logger.debug(f"🔧 Building standard query for {resource_type}")
                 query = model.query
 
                 # Apply search if provided
                 if search and search_fields:
+                    logger.debug(f"🔍 Applying search filter: '{search}' on fields {search_fields}")
                     search_filters = []
                     for field in search_fields:
                         if hasattr(model, field):
@@ -149,19 +177,24 @@ class GenericDataAPI:
 
                 # Apply sorting
                 if hasattr(model, sort_by):
+                    logger.debug(f"🔄 Applying sort: {sort_by} {order}")
                     if order.lower() == 'desc':
                         query = query.order_by(desc(getattr(model, sort_by)))
                     else:
                         query = query.order_by(getattr(model, sort_by))
 
             # Apply pagination
+            logger.debug(f"📄 Applying pagination: page {page}, per_page {per_page}")
             paginated = query.paginate(page=page, per_page=per_page)
+            logger.debug(f"📊 Query returned {paginated.total} total records across {paginated.pages} pages")
 
             # Format items
             if resource_type in self.custom_formatters:
+                logger.debug(f"🔧 Using custom formatter for {resource_type}")
                 formatted_items = self.custom_formatters[resource_type](paginated.items)
             else:
                 # Default formatting - try to_dict() or fallback to dynamic attribute mapping
+                logger.debug(f"🔧 Using default formatter for {resource_type}")
                 formatted_items = []
                 for item in paginated.items:
                     if hasattr(item, 'to_dict'):
@@ -181,61 +214,14 @@ class GenericDataAPI:
                 "pages": paginated.pages
             }
 
+            logger.info(f"✅ Successfully processed API data request for {resource_type}")
+            logger.debug(f"📝 Response contains {len(formatted_items)} items")
+            logger.debug(f"📝 Response JSON size: {len(str(response))} chars")
+
             return jsonify(response)
 
         except Exception as e:
-            logger.exception(f"Error handling data request for {resource_type}: {str(e)}")
-            return jsonify({"error": str(e)}), 500
-
-
-# Example usage in app.py or a similar file where Flask is initialized
-"""
-from app import app
-from app.models import User, Company, Contact, Opportunity
-from app.api.resources import GenericDataAPI
-
-# Initialize the Generic Data API
-data_api = GenericDataAPI(app)
-
-# Register resources
-data_api.register_resource('users', User, search_fields=['username', 'name', 'email'])
-data_api.register_resource('companies', Company, search_fields=['name'])
-data_api.register_resource('opportunities', Opportunity, search_fields=['name', 'description'])
-
-# Example with custom formatter
-def format_contacts(contacts):
-    return [{
-        'id': contact.id,
-        'name': contact.name,
-        'email': contact.email,
-        'company_name': contact.company.name if contact.company else None,
-        'phone': contact.phone
-    } for contact in contacts]
-
-data_api.register_resource('contacts', Contact, search_fields=['name', 'email'], 
-                          formatter=format_contacts)
-
-# Example with custom query handler
-def custom_user_query(model, search, sort_by, order, **kwargs):
-    query = model.query
-
-    # Filter by role if specified
-    role = kwargs.get('role')
-    if role:
-        query = query.filter(model.role == role)
-
-    # Apply standard search
-    if search:
-        query = query.filter(model.name.ilike(f'%{search}%'))
-
-    # Apply sorting
-    if order.lower() == 'desc':
-        query = query.order_by(desc(getattr(model, sort_by)))
-    else:
-        query = query.order_by(getattr(model, sort_by))
-
-    return query
-
-data_api.register_resource('admin_users', User, 
-                          query_handler=custom_user_query)
-"""
+            logger.exception(f"❌ Error handling data request for {resource_type}: {str(e)}")
+            logger.error(f"❌ Exception type: {type(e).__name__}")
+            logger.error(f"❌ Traceback: {traceback.format_exc()}")
+            return jsonify({"error": str(e), "type": type(e).__name__}), 500
