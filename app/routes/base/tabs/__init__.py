@@ -5,7 +5,6 @@ from app.routes.base.tabs.users import USERS_TABS
 from app.routes.base.tabs.tasks import TASKS_TABS
 from app.routes.base.tabs.settings import SETTINGS_TABS
 
-# In your tabs module or a dedicated registry file
 UI_TAB_MAPPING = {
     "Contact": CONTACTS_TABS,
     "Company": COMPANIES_TABS,

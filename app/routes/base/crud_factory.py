@@ -1,16 +1,9 @@
 import logging
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import SimpleContext
+from app.utils.table_helpers import PLURAL_MAP
 
 logger = logging.getLogger(__name__)
-
-PLURAL_MAP = {
-    "company": "companies",
-    "opportunity": "opportunities",
-    "category": "categories",
-    "capability": "capabilities",
-    "contact": "contacts",
-}
 
 
 def register_crud_routes(blueprint, entity_name, template_dir="pages/crud", table_template="pages/tables"):

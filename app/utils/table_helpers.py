@@ -1,6 +1,14 @@
 from typing import Any
 
 
+PLURAL_MAP = {
+    "company": "companies",
+    "opportunity": "opportunities",
+    "category": "categories",
+    "capability": "capabilities",
+    "contact": "contacts",
+}
+
 def get_table_id_by_model(model: Any) -> str:
     """
     Generate a table ID string from a SQLAlchemy model object.
