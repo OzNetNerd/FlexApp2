@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""
-    logger.debug("Registering web blueprints...")
+    logger.info("Registering web blueprints...")
 
     from app.routes.web.crud.companies import companies_bp
     from app.routes.web.crud.contacts import contacts_bp
@@ -26,4 +26,4 @@ def register_web_blueprints(app):
     # app.register_blueprint(search_bp)
     # app.register_blueprint(generic_bp)
 
-    logger.debug("Web blueprints registered successfully.")
+    logger.info("Web blueprints registered successfully.")

@@ -17,7 +17,7 @@ def get_config(table_name):
     Returns:
         Response: JSON configuration for the table.
     """
-    logger.debug(f"Fetching configuration for table: {table_name}")
+    logger.info(f"Fetching configuration for table: {table_name}")
     config = TableConfig.get_config(table_name)
     logger.info(f"Configuration for table '{table_name}' fetched successfully.")
     return jsonify(config)
@@ -56,7 +56,7 @@ def reset_config(table_name):
     Returns:
         Response: JSON indicating success or failure.
     """
-    logger.debug(f"Resetting configuration to default for table: {table_name}")
+    logger.info(f"Resetting configuration to default for table: {table_name}")
 
     default_configs = {
         "users": [

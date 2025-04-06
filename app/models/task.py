@@ -60,14 +60,14 @@ class Task(BaseModel):
         if not self.notable_type or not self.notable_id:
             raise ValueError("Both 'notable_type' and 'notable_id' must be provided.")
 
-        logger.debug(f"Saving task '{self.title}' with status {self.status}")
+        logger.info(f"Saving task '{self.title}' with status {self.status}")
         super().save()
         logger.info(f"Task '{self.title}' saved successfully.")
         return self
 
     def delete(self) -> None:
         """Remove task from the database with logging."""
-        logger.debug(f"Deleting task '{self.title}'")
+        logger.info(f"Deleting task '{self.title}'")
         super().delete()
         logger.info(f"Task '{self.title}' deleted successfully.")
 

@@ -29,7 +29,7 @@ class CRUDRoutesBase:
 
     def __post_init__(self):
         """Initialize the service with the model."""
-        logger.debug(f"Initializing CRUD routes base for {self.model.__name__}")
+        logger.info(f"Initializing CRUD routes base for {self.model.__name__}")
         self.service = CRUDService(self.model)
 
     def _preprocess_form_data(self, request_obj):
@@ -68,7 +68,7 @@ class CRUDRoutesBase:
         Returns:
             List[str]: A list of validation error messages.
         """
-        logger.debug(f"Validating create data for {self.model.__name__}")
+        logger.info(f"Validating create data for {self.model.__name__}")
         errors = []
 
         for field in self.required_fields:
@@ -96,7 +96,7 @@ class CRUDRoutesBase:
         Returns:
             List[str]: A list of validation error messages.
         """
-        logger.debug(f"Validating edit data for {self.model.__name__} with id {item.id}")
+        logger.info(f"Validating edit data for {self.model.__name__} with id {item.id}")
         errors = []
 
         for field in self.required_fields:

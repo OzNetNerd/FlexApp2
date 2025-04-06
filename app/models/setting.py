@@ -23,13 +23,13 @@ class Setting(BaseModel):
         return f"<Setting {self.key}: {self.value}>"
 
     def save(self) -> "Setting":
-        logger.debug(f"Saving setting '{self.key}' with value '{self.value}'")
+        logger.info(f"Saving setting '{self.key}' with value '{self.value}'")
         super().save()
         logger.info(f"Setting '{self.key}' saved successfully.")
         return self
 
     def delete(self) -> None:
-        logger.debug(f"Deleting setting '{self.key}'")
+        logger.info(f"Deleting setting '{self.key}'")
         super().delete()
         logger.info(f"Setting '{self.key}' deleted successfully.")
 
@@ -60,7 +60,7 @@ class Setting(BaseModel):
     @classmethod
     def get_value(cls, key: str, fallback: str = None) -> str:
         """Retrieve the current value for a setting, with fallback."""
-        logger.debug(f"Getting value for setting '{key}'")
+        logger.info(f"Getting value for setting '{key}'")
         setting = cls.query.filter_by(key=key).first()
         if setting:
             logger.info(f"🔎 Found '{key}' = '{setting.value}'")

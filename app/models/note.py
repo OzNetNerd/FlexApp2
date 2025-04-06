@@ -89,14 +89,14 @@ class Note(BaseModel):
         Returns:
             Note: The saved note instance.
         """
-        logger.debug(f"Saving note with id {self.id} for {self.notable_type} ID {self.notable_id}")
+        logger.info(f"Saving note with id {self.id} for {self.notable_type} ID {self.notable_id}")
         super().save()
         logger.info(f"Note with id {self.id} saved successfully.")
         return self
 
     def delete(self) -> None:
         """Remove note from the database with logging."""
-        logger.debug(f"Deleting note with id {self.id}")
+        logger.info(f"Deleting note with id {self.id}")
         super().delete()
         logger.info(f"Note with id {self.id} deleted successfully.")
 

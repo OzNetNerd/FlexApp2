@@ -72,12 +72,12 @@ def get_autocomplete_field(title, relationships=None, field_id=None, placeholder
     else:
         entity_type = title_lower.rstrip("s")
 
-    logger.debug(f"Derived entity_type '{entity_type}' from title '{title}'.")
+    logger.info(f"Derived entity_type '{entity_type}' from title '{title}'.")
 
     related_ids = []
     if relationships is not None:
         related_ids = [rel["entity_id"] for rel in relationships if rel.get("entity_type") == entity_type]
-        logger.debug(f"Extracted related IDs for entity_type '{entity_type}': {related_ids}")
+        logger.info(f"Extracted related IDs for entity_type '{entity_type}': {related_ids}")
 
     # Make sure to use related_ids to match template expectations
     field = AutoCompleteField(title=title, id=field_id, placeholder=placeholder, name=name, data_url=data_url, related_ids=related_ids)

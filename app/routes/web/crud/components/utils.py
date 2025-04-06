@@ -62,7 +62,7 @@ def add_context(ctx: Any, item: Any, context: Dict[str, Any], edit_mode: bool) -
         context (Dict[str, Any]): The current context dictionary to update.
         edit_mode (bool): Flag indicating whether the context is for edit mode.
     """
-    logger.debug(f"Adding relationships to the context for {ctx.model.__name__} {item.id}.")
+    logger.info(f"Adding relationships to the context for {ctx.model.__name__} {item.id}.")
     relationships = RelationshipService.get_relationships_for_entity("user", item.id)
     logger.info(f"Retrieved {len(relationships)} relationships for user with ID {item.id}.")
     logger.debug(f"Payload: {relationships}")

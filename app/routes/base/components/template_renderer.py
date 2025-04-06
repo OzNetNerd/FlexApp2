@@ -119,7 +119,7 @@ def handle_template_error(e: Exception, template_name: str, endpoint_name: str, 
         details = str(e)
         status_code = 500
 
-    logger.debug(f"🔧 Error Context Data: {endpoint_name}")
+    logger.debug(f"🔧 Error Context data: {endpoint_name}")
 
     render_fallback_error = traceback.format_exc() if current_app.debug else fallback_error_message
 
@@ -194,8 +194,8 @@ def render_safely(
     template_env = create_template_environment()
     current_path = request.path
 
-    logger.debug(f"🔍 Attempting to render template '{template_name}' for {endpoint_name} ({current_path})")
-    logger.debug(f"🔧 Context Data: {context}")
+    logger.info(f"🔍 Attempting to render template '{template_name}' for {endpoint_name} ({current_path})")
+    logger.debug(f"🔧 Context data: {context}")
 
     try:
         template = template_env.get_template(template_name)

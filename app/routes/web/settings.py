@@ -28,7 +28,7 @@ class SettingsCRUDRoutes(GenericWebRoutes):
         if not setting:
             setting = Setting(key="debug", value="false").save()
 
-        logger.debug(f"Loaded setting: {setting}")
+        logger.info(f"Loaded setting: {setting}")
 
         return render_template(
             self.index_template,

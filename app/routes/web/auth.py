@@ -31,17 +31,17 @@ def login():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
-        logger.debug(f"Attempting login for email: {email}")
+        logger.info(f"Attempting login for email: {email}")
 
         user = User.query.filter_by(email=email).first()
 
         if user:
-            logger.debug(f"User found: {user.email}")
+            logger.info(f"User found: {user.email}")
         else:
-            logger.debug(f"User not found for email: {email}")
+            logger.info(f"User not found for email: {email}")
 
         if user and check_password_hash(user.password_hash, password):
-            logger.debug(f"Password valid for user: {user.email}")
+            logger.info(f"Password valid for user: {user.email}")
             session.permanent = True
             login_user(user, remember=True)
 

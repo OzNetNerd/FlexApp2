@@ -22,6 +22,6 @@ def create_blueprint(name, import_name=None, url_prefix=None):
     if url_prefix is None:
         url_prefix = f"/{name.replace('_', '-')}"
 
-    logger.debug(f"Creating blueprint: {name} with prefix {url_prefix}")
+    logger.info(f"Creating blueprint: {name} with prefix {url_prefix}")
     blueprint = Blueprint(name, import_name, url_prefix=url_prefix)
     return blueprint

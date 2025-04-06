@@ -35,7 +35,7 @@ class TableConfig(BaseModel):
         Returns:
             dict: Parsed JSON configuration.
         """
-        logger.debug(f"Getting configuration for table '{self.table_name}'")
+        logger.info(f"Getting configuration for table '{self.table_name}'")
         return json.loads(self.column_config)
 
     @config.setter
@@ -45,7 +45,7 @@ class TableConfig(BaseModel):
         Args:
             value (dict): Table configuration to store.
         """
-        logger.debug(f"Setting configuration for table '{self.table_name}'")
+        logger.info(f"Setting configuration for table '{self.table_name}'")
         self.column_config = json.dumps(value)
 
     @classmethod
@@ -59,13 +59,13 @@ class TableConfig(BaseModel):
         Returns:
             dict: Normalized configuration.
         """
-        logger.debug(f"Fetching configuration for table '{table_name}'")
+        logger.info(f"Fetching configuration for table '{table_name}'")
         config = cls.query.filter_by(table_name=table_name).first()
 
         if config:
             config_dict = config.config
             if isinstance(config_dict, list):
-                logger.debug(f"Converting legacy format for table '{table_name}'")
+                logger.info(f"Converting legacy format for table '{table_name}'")
                 column_overrides = {col["field"]: {k: v for k, v in col.items() if k != "field"} for col in config_dict if "field" in col}
                 return {
                     "autoGenerateColumns": True,
@@ -80,7 +80,7 @@ class TableConfig(BaseModel):
                 }
             return config_dict
 
-        logger.debug(f"No configuration found for '{table_name}', using default.")
+        logger.info(f"No configuration found for '{table_name}', using default.")
         return default or {
             "autoGenerateColumns": True,
             "columnOverrides": {},
@@ -103,7 +103,7 @@ class TableConfig(BaseModel):
         Returns:
             TableConfig: The updated or created instance.
         """
-        logger.debug(f"Setting full configuration for table '{table_name}'")
+        logger.info(f"Setting full configuration for table '{table_name}'")
         config = cls.query.filter_by(table_name=table_name).first() or cls(table_name=table_name)
         config.config = config_dict
         db.session.add(config)
@@ -122,7 +122,7 @@ class TableConfig(BaseModel):
         Returns:
             TableConfig: Updated instance.
         """
-        logger.debug(f"Setting column overrides for table '{table_name}'")
+        logger.info(f"Setting column overrides for table '{table_name}'")
         config = cls.get_config(table_name)
         config["columnOverrides"] = column_overrides
         return cls.set_config(table_name, config)
@@ -139,7 +139,7 @@ class TableConfig(BaseModel):
         Returns:
             TableConfig: Updated instance.
         """
-        logger.debug(f"Updating column override for '{field_name}' in table '{table_name}'")
+        logger.info(f"Updating column override for '{field_name}' in table '{table_name}'")
         config = cls.get_config(table_name)
         config.setdefault("columnOverrides", {})[field_name] = override_properties
         return cls.set_config(table_name, config)
@@ -155,7 +155,7 @@ class TableConfig(BaseModel):
         Returns:
             TableConfig: Updated instance.
         """
-        logger.debug(f"Set autoGenerateColumns to {auto_generate} for '{table_name}'")
+        logger.info(f"Set autoGenerateColumns to {auto_generate} for '{table_name}'")
         config = cls.get_config(table_name)
         config["autoGenerateColumns"] = auto_generate
         return cls.set_config(table_name, config)
@@ -171,7 +171,7 @@ class TableConfig(BaseModel):
         Returns:
             TableConfig: Updated instance.
         """
-        logger.debug(f"Updating defaultColDef for table '{table_name}'")
+        logger.info(f"Updating defaultColDef for table '{table_name}'")
         config = cls.get_config(table_name)
         config["defaultColDef"] = default_col_def
         return cls.set_config(table_name, config)

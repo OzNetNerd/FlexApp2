@@ -34,7 +34,7 @@ class User(BaseModel, UserMixin):
         password = kwargs.pop("password", None)
         super().__init__(*args, **kwargs)
         if password:
-            logger.debug("Hashing password before saving user.")
+            logger.info("Hashing password before saving user.")
             self.password_hash = generate_password_hash(password)
 
     def __repr__(self) -> str:

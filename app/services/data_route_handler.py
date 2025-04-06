@@ -41,7 +41,7 @@ class DataRouteHandler:
         page_size = end_row - start_row
         page = (start_row // page_size) + 1 if page_size > 0 else 1
 
-        logger.debug(f"Pagination: page={page}, page_size={page_size}")
+        logger.info(f"Pagination: page={page}, page_size={page_size}")
 
         sort_model = request.args.get("sortModel", "[]")
         try:
@@ -99,7 +99,7 @@ class DataRouteHandler:
                 filters=filter_model,
             )
 
-            logger.debug(f"Found {len(items.items)} items out of {items.total} total")
+            logger.info(f"Found {len(items.items)} items out of {items.total} total")
 
             data = self.format_data_items(items.items)
 

@@ -34,11 +34,11 @@ class GenericAPIRoutes(CRUDRoutesBase):
         super().__post_init__()
         self.service = CRUDService(model_class=self.model)
         self._register_routes()
-        logger.debug(f"API routes registered for {self.model.__name__}.")
+        logger.info(f"API routes registered for {self.model.__name__}.")
 
     def _register_routes(self):
         """Registers the standard list, get, create, update, and delete routes."""
-        logger.debug(f"Registering API routes for {self.model.__name__}.")
+        logger.info(f"Registering API routes for {self.model.__name__}.")
         self.blueprint.add_url_rule("/", "list", self._list_route, methods=["GET"])
         self.blueprint.add_url_rule("/<int:item_id>", "get", self._get_route, methods=["GET"])
         self.blueprint.add_url_rule("/", "create", self._create_route, methods=["POST"])
@@ -52,7 +52,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
         Returns:
             Response: A JSON response containing a list of items and pagination metadata.
         """
-        logger.debug(f"Handling API list route for {self.model.__name__}")
+        logger.info(f"Handling API list route for {self.model.__name__}")
         try:
             page = request.args.get("page", 1, type=int)
             per_page = request.args.get("per_page", 25, type=int)
@@ -98,7 +98,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
         Returns:
             Response: A JSON response containing the item or error message.
         """
-        logger.debug(f"Handling API get route for {self.model.__name__} with ID {item_id}")
+        logger.info(f"Handling API get route for {self.model.__name__} with ID {item_id}")
         try:
             item = self.service.get_by_id(self.model, item_id)
             return jsonify({"data": self._ensure_json_serializable(item.to_dict())}), 200
@@ -119,7 +119,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
         Returns:
             Response: A JSON response containing the new item or validation errors.
         """
-        logger.debug(f"Handling API create route for {self.model.__name__}")
+        logger.info(f"Handling API create route for {self.model.__name__}")
         try:
             data = request.get_json() if request.is_json else request.form.to_dict()
             errors = self._validate_create(data)
@@ -151,7 +151,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
         Returns:
             Response: A JSON response with the updated item or validation errors.
         """
-        logger.debug(f"Handling API update route for {self.model.__name__} with ID {item_id}")
+        logger.info(f"Handling API update route for {self.model.__name__} with ID {item_id}")
         try:
             item = self.service.get_by_id(self.model, item_id)
             data = request.get_json() if request.is_json else request.form.to_dict()
@@ -184,7 +184,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
         Returns:
             Response: A confirmation JSON message.
         """
-        logger.debug(f"Handling API delete route for {self.model.__name__} with ID {item_id}")
+        logger.info(f"Handling API delete route for {self.model.__name__} with ID {item_id}")
         try:
             item = self.service.get_by_id(self.model, item_id)
             self.service.delete(item)

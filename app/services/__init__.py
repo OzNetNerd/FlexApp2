@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Log that the modules have been imported and initialized
-logger.debug("Initializing services module.")
+logger.info("Initializing services module.")
 
 
 # Don't import anything here - we'll define the init_db function that will be imported by app.py

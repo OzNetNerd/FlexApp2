@@ -115,7 +115,7 @@ class SkillsAndTechnologiesTab(TabBuilder):
                 TabEntry(entry_name="certifications", label="Certifications", type="textarea", value=self.item.get("certifications")),
             ],
         )
-        logger.debug(f"Created {skill_level_section} section")
+        logger.info(f"Created {skill_level_section} section")
         return skill_level_section
 
     def _technologies_used_section(self):

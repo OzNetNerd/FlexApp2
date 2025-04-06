@@ -56,7 +56,7 @@ def register_error_handlers(app: Flask):
         context = BaseContext(title="500 Internal Server Error", item=str(e), read_only=True)
         return render_safely("base/errors/500.html", context, "Internal server error."), 500
 
-    logger.debug("Error handlers registered")
+    logger.info("Error handlers registered")
 
 
 def register_special_routes(app: Flask):
@@ -76,7 +76,7 @@ def register_special_routes(app: Flask):
         }
         return jsonify(result)
 
-    logger.debug("Special routes registered")
+    logger.info("Special routes registered")
 
 
 # Add routes for blueprints that don't follow the standard CRUD pattern
@@ -102,7 +102,7 @@ def relationships_index():
 
 def register_web_blueprints(app):
     """Register all web blueprints with the Flask application."""
-    logger.debug("Registering web blueprints...")
+    logger.info("Registering web blueprints...")
 
     app.register_blueprint(index_bp)
     app.register_blueprint(users_bp)
@@ -115,4 +115,4 @@ def register_web_blueprints(app):
     app.register_blueprint(tasks_bp)
     app.register_blueprint(settings_bp)
 
-    logger.debug("Web blueprints registered successfully.")
+    logger.info("Web blueprints registered successfully.")

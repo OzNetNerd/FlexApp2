@@ -79,7 +79,7 @@ class Company(BaseModel):
         Returns:
             list: List of Company objects matching the query.
         """
-        logger.debug(f"Searching for companies with name starting with '{query}'")
+        logger.info(f"Searching for companies with name starting with '{query}'")
         result = Company.query.filter(Company.name.ilike(f"{query}%")).all()
-        logger.debug(f"Found {len(result)} companies matching the query '{query}'")
+        logger.info(f"Found {len(result)} companies matching the query '{query}'")
         return result

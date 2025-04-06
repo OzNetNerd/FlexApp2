@@ -50,14 +50,14 @@ class Opportunity(BaseModel):
         Returns:
             Opportunity: The saved instance.
         """
-        logger.debug(f"Saving opportunity with name {self.name} and status {self.status}")
+        logger.info(f"Saving opportunity with name {self.name} and status {self.status}")
         super().save()
         logger.info(f"Opportunity '{self.name}' saved successfully.")
         return self
 
     def delete(self) -> None:
         """Remove opportunity from the database with logging."""
-        logger.debug(f"Deleting opportunity with name {self.name}")
+        logger.info(f"Deleting opportunity with name {self.name}")
         super().delete()
         logger.info(f"Opportunity '{self.name}' deleted successfully.")
 

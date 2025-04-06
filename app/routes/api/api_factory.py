@@ -51,4 +51,4 @@ def register_api_crud_routes(blueprint: Blueprint, service: CRUDService, entity_
             return jsonify(result), 400
         return jsonify(result)
 
-    logger.debug(f"Registered API CRUD routes for {entity_name}")
+    logger.info(f"Registered API CRUD routes for {entity_name}")

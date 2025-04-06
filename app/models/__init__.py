@@ -49,4 +49,4 @@ __all__ = [
 ]
 
 # Log that the models module has been loaded
-logger.debug(f"Loaded models: {', '.join(__all__)}")
+logger.info(f"Loaded models: {', '.join(__all__)}")

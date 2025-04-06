@@ -67,6 +67,6 @@ class CRISPScore(BaseModel):
         Returns:
             CRISPScore: The saved instance.
         """
-        logger.debug("Calculating CRISP total score before saving.")
+        logger.info("Calculating CRISP total score before saving.")
         self.calculate_total()
         return super().save()

@@ -64,7 +64,7 @@ class ItemManager:
                 # Combine all relationships
                 item.all_relationships = entity1_relationships + entity2_relationships
 
-            logger.debug(f"Item found with id {item_id}")
+            logger.info(f"Item found with id {item_id}")
             return item, None
 
         except Exception as e:
@@ -84,7 +84,7 @@ class ItemManager:
             Tuple containing a redirect response (or None) and an error message (or None).
         """
         try:
-            logger.debug(f"Creating new {self.model.__name__} with data: {list(form_data.keys())}")
+            logger.info(f"Creating new {self.model.__name__} with data: {list(form_data.keys())}")
             item = self.service.create(form_data)
             logger.info(f"{self.model.__name__} created successfully with id {item.id}")
             flash(f"{self.model.__name__} created successfully", "success")
@@ -109,7 +109,7 @@ class ItemManager:
             Tuple containing a redirect response (or None) and an error message (or None).
         """
         try:
-            logger.debug(f"Updating {self.model.__name__} with id {item.id}, fields: {list(form_data.keys())}")
+            logger.info(f"Updating {self.model.__name__} with id {item.id}, fields: {list(form_data.keys())}")
 
             # Handle relationships separately from regular attributes
             relationship_fields = ["users", "companies"]

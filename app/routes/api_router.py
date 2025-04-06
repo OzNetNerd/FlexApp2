@@ -35,7 +35,7 @@ def register_api_error_handlers(app: Flask):
     def api_internal_server_error(e):
         return jsonify({"error": "Internal API error"}), 500
 
-    logger.debug("API error handlers registered")
+    logger.info("API error handlers registered")
 
 
 def register_api_special_routes(app: Flask):
@@ -49,7 +49,7 @@ def register_api_special_routes(app: Flask):
         }
         return jsonify(result)
 
-    logger.debug("API special routes registered")
+    logger.info("API special routes registered")
 
 
 # Add routes for blueprints that don't follow the standard CRUD pattern

@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 
 def register_api_blueprints(app):
     """Register all API blueprints with the Flask application."""
-    logger.debug("Registering API blueprints...")
+    logger.info("Registering API blueprints...")
 
     # Import blueprints here to avoid circular imports
     from app.routes.api.companies import companies_api_bp
@@ -25,4 +25,4 @@ def register_api_blueprints(app):
     # app.register_blueprint(search_api_bp)
     # app.register_blueprint(generic_api_bp)
 
-    logger.debug("API blueprints registered successfully.")
+    logger.info("API blueprints registered successfully.")

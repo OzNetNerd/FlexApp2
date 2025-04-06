@@ -52,7 +52,7 @@ class GenericWebRoutes(CRUDRoutesBase):
         self.item_manager: ItemManager = ItemManager(self.model, self.service, self.blueprint.name)
         self.entity_handler: EntityHandler = self._create_entity_handler()
         self._register_routes()
-        logger.debug(f"Web CRUD routes registered for {self.model.__name__} model.")
+        logger.info(f"Web CRUD routes registered for {self.model.__name__} model.")
 
     def _create_entity_handler(self) -> EntityHandler:
         """

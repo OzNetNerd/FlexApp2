@@ -83,7 +83,7 @@ class BaseModel(db.Model):
         Returns:
             BaseModel: The saved instance for chaining.
         """
-        logger.debug(f"Saving {self.__class__.__name__} instance to the database.")
+        logger.info(f"Saving {self.__class__.__name__} instance to the database.")
         db.session.add(self)
         db.session.commit()
         logger.info(f"{self.__class__.__name__} instance saved to the database.")
@@ -93,7 +93,7 @@ class BaseModel(db.Model):
         """
         Remove the model instance from the database.
         """
-        logger.debug(f"Deleting {self.__class__.__name__} instance from the database.")
+        logger.info(f"Deleting {self.__class__.__name__} instance from the database.")
         db.session.delete(self)
         db.session.commit()
         logger.info(f"{self.__class__.__name__} instance deleted from the database.")
