@@ -22,3 +22,17 @@ def register_blueprints(app):
         logger.warning("API routes will not be available")
 
     logger.info("Blueprint registration completed")
+
+
+def register_web_with_exclusions(app, exclusions=None):
+    """
+    Register web blueprints while excluding certain blueprints that may be registered elsewhere.
+
+    Args:
+        app: Flask application instance
+        exclusions: List of blueprint names to exclude
+    """
+    from app.routes.web import register_web_blueprints_with_exclusions
+    if exclusions is None:
+        exclusions = []
+    register_web_blueprints_with_exclusions(app, exclusions)

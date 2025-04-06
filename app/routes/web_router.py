@@ -1,43 +1,56 @@
 import logging
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import BaseContext
-
-from app.routes.web.auth import auth_bp
-# from app.routes.web.index import index_bp
-from app.routes.web.crud.companies import companies_bp
-from app.routes.web.crud.contacts import contacts_bp
-from app.routes.web.crud.opportunities import opportunities_bp
-from app.routes.web.crud.users import users_bp
-from app.routes.web.crud.tasks import tasks_bp
-from app.routes.blueprint_factory import create_blueprint
-from flask import Flask, request
+from flask import Flask, request, Blueprint, jsonify
+from flask_login import current_user
 
 logger = logging.getLogger(__name__)
 
-# Create blueprints for remaining routes that don't have dedicated modules yet
-settings_bp = create_blueprint("settings")
-relationships_bp = create_blueprint("relationships")
-crisp_scores_bp = create_blueprint("crisp_scores")
+# Define blueprints with original names for template compatibility
+settings_bp = Blueprint('settings', __name__, url_prefix='/settings')
+relationships_bp = Blueprint('relationships', __name__, url_prefix='/relationships')
+crisp_scores_bp = Blueprint('crisp_scores', __name__, url_prefix='/crisp_scores')
+
+
+# Define blueprint routes
+@settings_bp.route("/")
+def index():
+    """Settings page."""
+    context = BaseContext(title="Settings")
+    return render_safely("pages/misc/settings.html", context, "Failed to load settings.")
+
+
+@relationships_bp.route("/")
+def index():
+    """Relationships list page."""
+    context = BaseContext(title="Relationships")
+    return render_safely("pages/tables/relationships.html", context, "Failed to load relationships.")
+
+
+@crisp_scores_bp.route("/")
+def index():
+    """Crisp scores page."""
+    context = BaseContext(title="Crisp Scores")
+    return render_safely("pages/tables/crisp_scores.html", context, "Failed to load crisp scores.")
 
 
 def register_routes(app: Flask):
     """
     Central routing registration function for the entire application.
-    This is the main entry point for all route registration.
-
-    Args:
-        app: Flask application instance
     """
     logger.info("Registering all application routes...")
 
-    # Import and register blueprints
-    from app.routes import register_blueprints
-
-    register_blueprints(app)
-
-    # Register any ad-hoc routes that don't fit into the blueprint structure
+    # Step 1: First register special routes and error handlers
     register_error_handlers(app)
     register_special_routes(app)
+
+    # Step 2: Register misc blueprints defined in this file
+    register_misc_blueprints(app)
+
+    # Step 3: Register web blueprints from web/__init__.py
+    # But modify the function to exclude blueprints we've already registered
+    from app.routes import register_web_with_exclusions
+    register_web_with_exclusions(app, ['settings', 'relationships', 'crisp_scores'])
 
     logger.info("All routes registered successfully.")
 
@@ -61,7 +74,6 @@ def register_error_handlers(app: Flask):
 def register_special_routes(app: Flask):
     """Register special routes that don't fit the standard pattern."""
     from flask import jsonify, session as flask_session
-    from flask_login import current_user
 
     @app.route("/")
     def index():
@@ -86,36 +98,9 @@ def register_special_routes(app: Flask):
     logger.info("Special routes registered")
 
 
-# Add routes for blueprints that don't follow the standard CRUD pattern
-@settings_bp.route("/")
-def settings_index():
-    """Settings page."""
-
-    context = BaseContext(title="Settings")
-    return render_safely("pages/misc/settings.html", context, "Failed to load settings.")
-
-
-@relationships_bp.route("/")
-def relationships_index():
-    """Relationships list page."""
-
-    context = BaseContext(title="Relationships")
-    return render_safely("pages/tables/relationships.html", context, "Failed to load relationships.")
-
-
-def register_web_blueprints(app):
-    """Register all web blueprints with the Flask application."""
-    logger.info("Registering web blueprints...")
-
-    # app.register_blueprint(index_bp)
-    app.register_blueprint(users_bp)
-    app.register_blueprint(companies_bp)
-    app.register_blueprint(contacts_bp)
-    app.register_blueprint(opportunities_bp)
+def register_misc_blueprints(app):
+    """Register miscellaneous blueprints."""
+    app.register_blueprint(settings_bp)
     app.register_blueprint(relationships_bp)
     app.register_blueprint(crisp_scores_bp)
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(tasks_bp)
-    app.register_blueprint(settings_bp)
-
-    logger.info("Web blueprints registered successfully.")
+    logger.info("Miscellaneous blueprints registered successfully")
