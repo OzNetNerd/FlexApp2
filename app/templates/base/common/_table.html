@@ -3,7 +3,7 @@
   File: _table.html | Purpose: Renders AG Grid table view with search + actions
   Inputs:
     - title: Page title
-    - entity_name: Used in the Add button label
+    - table_name: Used in the Add button label
     - data_url: API endpoint for loading table data
   Blocks:
     - table_actions: Optional custom buttons
@@ -20,7 +20,7 @@
     <div>
       {% block table_actions %}
         <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}" class="btn btn-primary btn-lg fw-bold shadow-sm">
-          <i class="fas fa-plus me-2"></i> Add {{ entity_name|default('item') }}
+          <i class="fas fa-plus me-2"></i> Add {{ table_name|default('item') }}
         </a>
       {% endblock %}
     </div>
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
   import log from '/static/js/logger.js';
 
   const title = {{ title | tojson | safe }};
-  const entityName = {{ entity_name | tojson | safe }};
+  const entityName = {{ table_name | tojson | safe }};
   const dataUrl = document.getElementById('table-container')?.dataset.apiUrl;
 
   log("info", "table.html", "render", "📄 Page title", title);

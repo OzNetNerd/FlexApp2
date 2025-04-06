@@ -11,26 +11,33 @@ from app.utils.table_helpers import get_table_id_by_name
 
 logger = logging.getLogger(__name__)
 
-
-
 class BaseContext:
     def __init__(self, **kwargs):
+
+        # avoid IDE error
+        self.table_name = ""
+
         # Set each keyword argument as an attribute on the instance.
         for key, value in kwargs.items():
             setattr(self, key, value)
+            logger.info(f"Set attribute '{key}' = {value}")
+
+        # Set the table_id using the provided table_name
+        self.table_id = get_table_id_by_name(self.table_name)
+        logger.info(f"Set attribute table_id = {self.table_id} (from {self.table_name} = {self.table_name})")
+
+        self.data_url = f"{self.table_name}/data"
+        logger.info(f"Set attribute data_url = {self.data_url} (from table_name = {self.table_name})")
 
 
 @dataclass
 class SimpleContext(BaseContext):
     """Context class for rendering views with optional dynamic attributes."""
 
-    title: str
-    read_only: bool = True
-    action: Optional[str] = False
-
-    def __init__(self, title: str, read_only: bool = True, action: Optional[str] = False, **kwargs):
+    def __init__(self, title: str, table_name: str, read_only: bool = True, action: Optional[str] = False, **kwargs):
         super().__init__(
             title=title,
+            table_name=table_name,
             read_only=read_only,
             action=action,
             current_user=current_user,

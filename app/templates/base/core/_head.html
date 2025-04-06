@@ -33,7 +33,7 @@
   <!-- Head Debug Logger -->
   <script type="module">
     import log from '/static/js/logger.js';
-    log("info", "_head.html", "head", "🎯 Page title set", {{ (title or "CRM") | tojson | safe }});
+    log("info", "_head.html", "head", "🎯 Page title set", "{{ (title or "CRM") }}");
     log("debug", "_head.html", "head", "📦 Head assets loaded");
   </script>
   <!-- Toast Module Loader: Always load toasts.js and expose showToast globally -->
