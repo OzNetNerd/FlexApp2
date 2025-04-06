@@ -96,7 +96,7 @@ def mentions_search():
     return jsonify(results)
 
 
-@search_bp.route("/users/data")
+@search_bp.route("/api/users/data")
 def users_data():
     users = User.query.order_by(User.name).all()
     data = [
@@ -112,7 +112,7 @@ def users_data():
     return jsonify({"data": data})
 
 
-@search_bp.route("/companies/data")
+@search_bp.route("/api/companies/data")
 def companies_data():
     companies = Company.query.order_by(Company.name).all()
     data = [

@@ -2,6 +2,18 @@ add 'reports' tab - report on what tools and technologies companies are using
 add 'explore' tab - used for applying different filters to draw diagrams based on technologies etc
 add 'admin' tab to view db/table entries
 
+----
+
+replace - ctx.model.__tablename__ - with one of the lookup funcs
+
+finish this - from app.utils.table_helpers import get_table_id_by_name
+
+replace _table.html with _table_template.html
+
+
+resources.py  - /data
+
+----
 
 Run tests:
 ```

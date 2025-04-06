@@ -50,7 +50,7 @@ class SimpleContext(BaseContext):
         self.table_id = get_table_id_by_name(self.table_name)
         logger.info(f"Set attribute table_id = {self.table_id} (from {self.table_name} = {self.table_name})")
 
-        self.data_url = f"{lower_table_name}/data"
+        self.data_url = f"api/{lower_table_name}/data"
         logger.info(f"Set attribute data_url = {self.data_url} (from table_name = {self.table_name})")
 
 
