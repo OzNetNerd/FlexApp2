@@ -6,7 +6,7 @@ from datetime import datetime
 from app.models.task import Task
 from app.routes.web.crud.components.generic_crud_routes import GenericWebRoutes
 from app.routes.base.components.template_renderer import render_safely
-from app.routes.base.components.entity_handler import SimpleContext
+from app.routes.base.components.entity_handler import BaseContext
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ def overdue_tasks():
     """Show overdue tasks."""
     overdue = Task.query.filter(Task.due_date < datetime.utcnow(), Task.status != "completed", Task.assigned_to == current_user.id).all()
 
-    context = SimpleContext(title="Overdue Tasks", items=overdue)
+    context = BaseContext(title="Overdue Tasks", items=overdue)
     return render_safely("pages/tasks/overdue.html", context, "Failed to load overdue tasks.")
 
 
@@ -58,7 +58,7 @@ def overdue_tasks():
 def view_extended(item_id):
     """View task with additional context."""
     task = Task.query.get_or_404(item_id)
-    context = SimpleContext(title=f"Task: {task.title}", item=task)
+    context = BaseContext(title=f"Task: {task.title}", item=task)
     return render_safely("pages/crud/view.html", context, "Failed to load task details.")
 
 

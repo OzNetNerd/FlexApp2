@@ -5,7 +5,7 @@ from flask_login import current_user
 from app.models.user import User
 from app.routes.web.crud.components.generic_crud_routes import GenericWebRoutes
 from app.routes.base.components.template_renderer import render_safely
-from app.routes.base.components.entity_handler import SimpleContext
+from app.routes.base.components.entity_handler import BaseContext
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ users_routes = UsersCRUDRoutes(
 @users_bp.route("/dashboard")
 def dashboard():
     """User dashboard with additional statistics and information."""
-    context = SimpleContext(title="User Dashboard")
+    context = BaseContext(title="User Dashboard")
     return render_safely("pages/users/dashboard.html", context, "Failed to load user dashboard.")
 
 

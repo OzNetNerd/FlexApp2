@@ -15,7 +15,7 @@ from jinja2 import Environment, DebugUndefined
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
 from markupsafe import Markup, escape
 
-from app.routes.base.components.entity_handler import SimpleContext, TableContext, ResourceContext
+from app.routes.base.components.entity_handler import BaseContext
 from app.utils.app_logging import log_kwargs
 
 logger = logging.getLogger(__name__)
@@ -169,7 +169,7 @@ def render_debug_panel(
 
 def render_safely(
     template_name: str,
-    context: Union[SimpleContext, TableContext, ResourceContext],
+    context: Union[BaseContext],
     fallback_error_message: str = "An error occurred while rendering the page",
     endpoint_name: Optional[str] = None,
 ) -> Union[Tuple[str, int], str]:

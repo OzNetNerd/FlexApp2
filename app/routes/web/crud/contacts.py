@@ -5,7 +5,7 @@ from flask_login import current_user
 
 from app.models import Contact, Company, db, User, CRISPScore
 from app.routes.web.crud.components.generic_crud_routes import GenericWebRoutes
-from app.routes.base.components.entity_handler import SimpleContext
+from app.routes.base.components.entity_handler import BaseContext
 from app.routes.base.components.template_renderer import render_safely
 
 logger = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ def view_extended(item_id):
     """View contact with additional relationship and CRISP score information."""
     contact = Contact.query.get_or_404(item_id)
 
-    context = SimpleContext(title=f"View Contact: {contact.first_name} {contact.last_name}", item_id=item_id)
+    context = BaseContext(title=f"View Contact: {contact.first_name} {contact.last_name}", item_id=item_id)
 
     relationship = contact.get_relationship_with(current_user)
     context.relationship = relationship
