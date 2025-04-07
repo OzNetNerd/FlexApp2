@@ -1,7 +1,73 @@
+# New Web Strucure
+
+```
+outes/base/crud_factory.py - Our new utility functions would replace this
+routes/blueprint_factory.py - No longer needed with our approach
+routes/web/crud/components/generic_crud_routes.py - Redundant with our new utilities
+Potentially some of the individual component files in routes/web/crud/components/ (create.py, edit.py, view.py, index.py) - depends on how specialized they are
+
+2. Recommended structure:
+Given the complexity of your application, I'd recommend:
+Copyroutes/
+├── base/
+│   ├── route_utils.py         # Our new utility functions
+│   └── components/            # Keep specialized components
+├── web/
+│   ├── companies.py           # All company routes (including CRUD)
+│   ├── contacts.py            # All contact routes
+│   ├── tasks.py               # All task routes
+│   ├── opportunities.py       # All opportunity routes
+│   └── ...                    # Other entity routes
+└── api/                       # Keep your API structure
+This simplifies your structure by:
+
+Consolidating entity routes: Keep all routes for a single entity in one file (instead of separate CRUD files)
+Using utility functions: Replace factories and generic components with our flexible utility functions
+Maintaining separation: Still keep entities separate from each other and web routes separate from API routes```
+
+
 add 'reports' tab - report on what tools and technologies companies are using
 add 'explore' tab - used for applying different filters to draw diagrams based on technologies etc
 add 'admin' tab to view db/table entries
+```
 
+# New API Srtucture
+
+```
+Would app/routes/base/route_utils.py be used for API routes as well? Or should we have a separate file file for it? Or is there no point
+
+
+Concluded API routes need separate utility file for clarity.
+5s
+
+
+
+
+
+
+Great question! I recommend creating a separate utility file for API routes for these reasons:
+
+Different patterns: API routes follow REST conventions and return JSON responses rather than rendering templates
+Different error handling: API routes return status codes rather than Flash messages or redirects
+Different request/response cycles: APIs don't need template rendering, form handling, etc.
+I'd suggest:
+
+routes/
+├── base/
+│   ├── route_utils.py         # Web route utilities (HTML templates, redirects)
+│   └── api_utils.py           # API route utilities (JSON responses, status codes)
+Here's what api_utils.py might focus on:
+
+Standard CRUD operations returning JSON
+Consistent error response format
+Authorization handling
+Input validation for API requests
+Each file would focus on its specific domain:
+
+route_utils.py for page rendering, redirects, and session-based interactions
+api_utils.py for structured data exchange and REST conventions
+This separation maintains the DRY principle within each context while acknowledging the fundamental differences between web and API routes.
+```
 ----
 
 replace - ctx.model.__tablename__ - with one of the lookup funcs

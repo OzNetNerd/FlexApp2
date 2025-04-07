@@ -69,7 +69,7 @@
         {%- for item in nav_items %}
           {# Updated to handle the renamed route functions with blueprint prefixes #}
           {%- if item.name == 'settings' %}
-            {%- set endpoint = 'settings.settings_index' -%}
+            {%- set endpoint = 'settings.index' -%}
           {%- elif item.name == 'relationships' %}
             {%- set endpoint = 'relationships.relationships_index' -%}
           {%- elif item.name == 'crisp_scores' %}
@@ -80,7 +80,7 @@
 
           {# Check if current endpoint matches this nav item's endpoint #}
           {%- if item.name == 'settings' %}
-            {%- set is_active = request.endpoint == 'settings.settings_index' -%}
+            {%- set is_active = request.endpoint == 'settings.index' -%}
           {%- elif item.name == 'relationships' %}
             {%- set is_active = request.endpoint == 'relationships.relationships_index' -%}
           {%- elif item.name == 'crisp_scores' %}
@@ -93,7 +93,7 @@
             <a class="nav-link {% if is_active %}active{% endif %}"
                {# Updated URL generation for the renamed routes with blueprint prefixes #}
                {% if item.name == 'settings' %}
-                 href="{{ url_for('settings.settings_index') }}"
+                 href="{{ url_for('settings.index') }}"
                {% elif item.name == 'relationships' %}
                  href="{{ url_for('relationships.relationships_index') }}"
                {% elif item.name == 'crisp_scores' %}
@@ -190,7 +190,7 @@
                 <hr class="dropdown-divider m-0">
               </li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('settings.settings_index') }}"><i class="fas fa-cog me-2"></i> Settings</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('settings.index') }}"><i class="fas fa-cog me-2"></i> Settings</a></li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i> Help Center</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item logout-item" href="{{ url_for('auth_bp.logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
