@@ -2,7 +2,7 @@
 # app/routes/companies.py
 import logging
 from flask import Blueprint
-from app.routes.base.web_utils import register_routes
+from app.routes.base.web_utils import register_blueprint_routes
 from app.services.crud_service import CRUDService
 from app.models.contact import Contact
 
@@ -15,4 +15,4 @@ contacts_bp = Blueprint("contacts", __name__, url_prefix="/contacts")
 contact_service = CRUDService(Contact)
 
 # Register all standard CRUD routes
-register_routes(contacts_bp, "Contact", service=contact_service)
+register_blueprint_routes(contacts_bp, "Contact", service=contact_service)

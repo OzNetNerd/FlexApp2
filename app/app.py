@@ -12,7 +12,7 @@ from config import Config
 from app.models.base import db
 from app.models import User, Setting
 from app.routes.api_router import register_api_routes
-from app.routes.web_router import register_routes
+from app.routes.web_router import register_application_blueprints
 from app.utils.app_logging import configure_logging
 
 # ---------------------------------------------
@@ -79,7 +79,7 @@ def create_app(config_class=Config):
 
     # Register all routes
     register_api_routes(app)
-    register_routes(app)
+    register_application_blueprints(app)
 
     # Inject global context
     @app.context_processor

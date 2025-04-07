@@ -53,11 +53,25 @@ crisp_scores_bp = Blueprint('crisp_scores', __name__, url_prefix='/crisp_scores'
 #     return render_safely("pages/tables/crisp_scores.html", context, "Failed to load crisp scores.")
 #
 #
-def register_routes(app: Flask):
+def register_application_blueprints(app: Flask) -> None:
     """
-    Central routing registration function for the entire application.
+    Central function for registering all blueprints in the application.
+
+    This function serves as the single point of registration for all blueprints
+    in the application. Each blueprint represents a distinct functional area or
+    feature set within the application. Adding new blueprints to this function
+    will make them available throughout the application.
+
+    Args:
+        app (Flask): The Flask application instance to which blueprints will be registered
+
+    Returns:
+        None: This function modifies the app in-place and does not return a value
+
+    Example:
+        register_application_blueprints(app)
     """
-    logger.info("Registering all application routes...")
+    logger.info("Registering all application blueprints...")
 
     app.register_blueprint(companies_bp)
     app.register_blueprint(contacts_bp)

@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint
-from app.routes.base.web_utils import register_routes
+from app.routes.base.web_utils import register_blueprint_routes
 from app.services.crud_service import CRUDService
 from app.models.setting import Setting
 
@@ -13,4 +13,4 @@ settings_bp = Blueprint("settings", __name__, url_prefix="/settings")
 settings_service = CRUDService(Setting)
 
 # Register all standard CRUD routes
-register_routes(settings_bp, "Setting", service=settings_service)
+register_blueprint_routes(settings_bp, "Setting", service=settings_service)

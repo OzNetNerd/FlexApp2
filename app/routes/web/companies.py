@@ -2,7 +2,7 @@
 # app/routes/companies.py
 import logging
 from flask import Blueprint
-from app.routes.base.web_utils import register_routes
+from app.routes.base.web_utils import register_blueprint_routes
 from app.services.crud_service import CRUDService
 from app.models.company import Company
 
@@ -15,14 +15,14 @@ companies_bp = Blueprint("companies", __name__, url_prefix="/companies")
 company_service = CRUDService(Company)
 
 # Register all standard CRUD routes
-register_routes(companies_bp, "Company", service=company_service)
+register_blueprint_routes(companies_bp, "Company", service=company_service)
 
 #
 # # Example 2: Index-only Entity
 # # app/routes/dashboard.py
 # import logging
 # from flask import Blueprint
-# from app.routes.base.web_utils import register_routes
+# from app.routes.base.web_utils import register_blueprint_routes
 #
 # logger = logging.getLogger(__name__)
 #
@@ -30,7 +30,7 @@ register_routes(companies_bp, "Company", service=company_service)
 # dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 #
 # # Register only the index route
-# register_routes(dashboard_bp, "Dashboard", routes=['index'])
+# register_blueprint_routes(dashboard_bp, "Dashboard", routes=['index'])
 #
 #
 # # Example 3: Entity with selective routes and a custom route

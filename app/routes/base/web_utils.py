@@ -162,8 +162,10 @@ def register_route(blueprint, route_type, table_name, service=None, template_ove
         'edit': create_edit_route
     }
 
-    if route_type not in route_creators:
-        raise ValueError(f"Unknown route type: {route_type}")
+    if route_type == 'login':
+        blueprint.route("/login", methods=["GET", "POST"])(service.handle_login)
+    elif route_type == 'logout':
+        blueprint.route("/logout")(service.handle_logout)
 
     # Default URL patterns
     url_patterns = {
@@ -189,21 +191,39 @@ def register_route(blueprint, route_type, table_name, service=None, template_ove
     logger.info(f"Registered '{route_type}' route for '{table_name}'")
 
 
-def register_routes(blueprint, table_name, routes=None, service=None):
+from flask import Blueprint
+from typing import Optional, List, Any
+
+
+def register_blueprint_routes(
+        blueprint: Blueprint,
+        table_name: str,
+        routes: Optional[List[str]] = None,
+        service: Optional[Any] = None
+) -> None:
     """Register specified routes on a blueprint.
 
+    This function adds multiple routes to a given blueprint based on the provided
+    route types list. For each route type, it calls register_route to set up the
+    appropriate handlers.
+
     Args:
-        blueprint (Blueprint): The Flask blueprint
-        table_name (str): The name of the entity table
-        routes (list, optional): List of route types to register
-                                 e.g. ['index', 'create', 'view', 'edit']
-                                 Defaults to all standard routes
-        service (object, optional): Service with get_by_id method
+        blueprint (Blueprint): The Flask blueprint to register routes on
+        table_name (str): The name of the entity table (used for templates and logging)
+        routes (Optional[List[str]]): List of route types to register
+                                     e.g. ['index', 'create', 'view', 'edit']
+                                     Defaults to all standard routes if None
+        service (Optional[Any]): Service object with necessary handler methods
+
+    Returns:
+        None: This function modifies the blueprint in-place
+
+    Example:
+        register_blueprint_routes(companies_bp, "Company", service=company_service)
     """
     # Default to all standard routes if not specified
     if routes is None:
         routes = ['index', 'create', 'view', 'edit']
-
 
     for route_type in routes:
         register_route(blueprint, route_type, table_name, service)
