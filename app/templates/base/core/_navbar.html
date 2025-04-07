@@ -217,7 +217,7 @@
 <script type="module">
   import log from '/static/js/logger.js';
   document.addEventListener('DOMContentLoaded', () => {
-    log("info", "_navbar.html", "dom", "✅ DOM fully loaded and navbar visible");
+    log("info", "_navbar.html", "dom", "DOM fully loaded and navbar visible");
     // Check if navbar is actually visible
     const navbar = document.querySelector('nav.navbar');
     if (navbar) {
@@ -238,7 +238,7 @@
   // Check if Bootstrap JS is loaded
   setTimeout(() => {
     if (typeof bootstrap !== 'undefined') {
-      log("info", "_navbar.html", "deps", "✅ Bootstrap JS is loaded");
+      log("info", "_navbar.html", "deps", "Bootstrap JS is loaded");
     } else {
       log("error", "_navbar.html", "deps", "❌ Bootstrap JS not found - navigation may not work");
     }
@@ -248,7 +248,7 @@
     if (iconElement) {
       const iconStyle = window.getComputedStyle(iconElement, ':before');
       if (iconStyle.content && iconStyle.content !== 'none' && iconStyle.content !== 'normal') {
-        log("info", "_navbar.html", "deps", "✅ FontAwesome icons loaded correctly");
+        log("info", "_navbar.html", "deps", "FontAwesome icons loaded correctly");
       } else {
         log("error", "_navbar.html", "deps", "❌ FontAwesome icons not rendering properly");
       }
@@ -259,7 +259,7 @@
 <!-- Log Final Template Render -->
 <script type="module">
   import log from '/static/js/logger.js';
-  log("info", "_navbar.html", "final", "✅ Navbar rendered successfully");
+  log("info", "_navbar.html", "final", "Navbar rendered successfully");
 </script>
 
 <!-- END TEMPLATE: _navbar.html -->

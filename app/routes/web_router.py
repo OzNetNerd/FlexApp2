@@ -76,7 +76,7 @@ def register_routes(app: Flask):
     # Step 3: Register web blueprints from web/__init__.py
     # But modify the function to exclude blueprints we've already registered
     from app.routes import register_web_with_exclusions
-    logger.info("🔄 Starting web blueprint registration with exclusions")
+    logger.info("Starting web blueprint registration with exclusions")
     register_web_with_exclusions(app, ['settings', 'relationships', 'crisp_scores'])
 
     logger.info("All routes registered successfully.")
@@ -128,32 +128,32 @@ def register_special_routes(app: Flask):
         fallback_message = "Sorry, we couldn't load the dashboard. Please try again later."
         return render_safely("index.html", context, fallback_message)
 
-    @app.route("/debug-session")
-    def debug_session():
-        logger.info(f"📝 Debug session endpoint called: {request.method} {request.path}")
-        result = {
-            "is_authenticated": current_user.is_authenticated,
-            "session_keys": list(flask_session.keys()) if flask_session else [],
-            "permanent": flask_session.permanent if flask_session else None,
-            "user_id": current_user.get_id() if current_user.is_authenticated else None,
-            "remember_token": request.cookies.get("remember_token") is not None,
-            "cookies": {k: v for k, v in request.cookies.items()},
-        }
-        logger.debug(f"📝 Debug session response: {result}")
-        return jsonify(result)
+    # @app.route("/debug-session")
+    # def debug_session():
+    #     logger.info(f"📝 Debug session endpoint called: {request.method} {request.path}")
+    #     result = {
+    #         "is_authenticated": current_user.is_authenticated,
+    #         "session_keys": list(flask_session.keys()) if flask_session else [],
+    #         "permanent": flask_session.permanent if flask_session else None,
+    #         "user_id": current_user.get_id() if current_user.is_authenticated else None,
+    #         "remember_token": request.cookies.get("remember_token") is not None,
+    #         "cookies": {k: v for k, v in request.cookies.items()},
+    #     }
+    #     logger.debug(f"📝 Debug session response: {result}")
+    #     return jsonify(result)
 
     logger.info("Special routes registered")
 
 
 def register_misc_blueprints(app):
     """Register miscellaneous blueprints."""
-    logger.info(f"📌 Registering blueprint: {settings_bp.name} with url_prefix: {settings_bp.url_prefix}")
+    logger.info(f"Registering blueprint: {settings_bp.name} with url_prefix: {settings_bp.url_prefix}")
     app.register_blueprint(settings_bp)
 
-    logger.info(f"📌 Registering blueprint: {relationships_bp.name} with url_prefix: {relationships_bp.url_prefix}")
+    logger.info(f"Registering blueprint: {relationships_bp.name} with url_prefix: {relationships_bp.url_prefix}")
     app.register_blueprint(relationships_bp)
 
-    logger.info(f"📌 Registering blueprint: {crisp_scores_bp.name} with url_prefix: {crisp_scores_bp.url_prefix}")
+    logger.info(f"Registering blueprint: {crisp_scores_bp.name} with url_prefix: {crisp_scores_bp.url_prefix}")
     app.register_blueprint(crisp_scores_bp)
 
     logger.info("Miscellaneous blueprints registered successfully")

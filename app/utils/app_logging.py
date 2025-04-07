@@ -5,6 +5,7 @@ import logging
 import inspect
 import time
 import uuid
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +24,11 @@ def configure_logging(level=logging.INFO) -> None:
         format=log_format,
     )
 
-    # Add a filter to inject request IDs into log records
+    # Add filters to inject request IDs and emojis into log records
+    # Important: RequestIDFilter first, then EmojiLogFilter second
     root_logger = logging.getLogger()
-    root_logger.addFilter(RequestIDFilter())
+    root_logger.addFilter(RequestIDFilter())  # This one should go first
+    root_logger.addFilter(EmojiLogFilter())  # This one should go second
 
     logger.info("✅ Logging is configured.")
 
@@ -53,6 +56,36 @@ class RequestIDFilter(logging.Filter):
         except Exception:
             record.request_id = '-'
 
+        return True
+
+
+class EmojiLogFilter(logging.Filter):
+    """Filter that adds appropriate emojis based on log message content."""
+
+    def filter(self, record):
+        # Only process string messages
+        if record.msg and isinstance(record.msg, str):
+            # Skip emoji addition if message already has an emoji
+            if re.match(r'^\s*[^\w\s]', record.msg):
+                return True
+
+            msg = record.msg.strip()
+
+            # Directly check for known prefixes
+            if msg.startswith("Registering"):
+                record.msg = f"🔧 {record.msg}"
+            elif msg.startswith("Registered"):
+                record.msg = f"✅ {record.msg}"
+            elif msg.startswith("Successfully"):
+                record.msg = f"✅ {record.msg}"
+            elif msg.startswith("Set"):
+                record.msg = f"🔠 {record.msg}"
+            elif msg.startswith("Initializing"):
+                record.msg = f"🔧 {record.msg}"
+            elif msg.startswith("Web Request"):
+                record.msg = f"📥 {record.msg}"
+
+        # Always process the record
         return True
 
 

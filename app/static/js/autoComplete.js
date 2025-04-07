@@ -26,7 +26,7 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
   }
 
   log("info", scriptName, functionName, `🎯 Initializing autocomplete for '${inputName}' using endpoint ${dataUrl}`);
-  log("debug", scriptName, functionName, "📌 Initial IDs:", initialIds);
+  log("debug", scriptName, functionName, "Initial IDs:", initialIds);
 
   const container = document.createElement('div');
   const badgeContainer = document.createElement('div');
@@ -47,8 +47,8 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
   let suggestions = [];
   let highlightIndex = -1;
 
-  log("info", scriptName, functionName, `🔄 Fetching data from: ${dataUrl}`);
-  console.log(`🔄 Fetching data from: ${dataUrl}`);
+  log("info", scriptName, functionName, `Fetching data from: ${dataUrl}`);
+  console.log(`Fetching data from: ${dataUrl}`);
 
   const fetchPromise = fetch(dataUrl)
     .then(res => {
@@ -85,7 +85,7 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
 
         selected = prefillItems;
         renderBadges();
-        log('debug', scriptName, functionName, "✅ Prefilled items:", prefillItems);
+        log('debug', scriptName, functionName, "Prefilled items:", prefillItems);
       }
     })
     .catch(err => {
@@ -163,7 +163,7 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
     } else if (e.key === 'Enter' || e.key === 'Tab') {
       if (highlightIndex >= 0 && highlightIndex < items.length) {
         e.preventDefault();
-        log('debug', scriptName, innerFunctionName, `✅ Selection confirmed for item at index ${highlightIndex}`);
+        log('debug', scriptName, innerFunctionName, `Selection confirmed for item at index ${highlightIndex}`);
         items[highlightIndex].click();
       }
     } else if (e.key === 'Backspace' && input.value === '' && selected.length > 0) {
@@ -210,7 +210,7 @@ export function setupAutoComplete({ inputSelector, dataUrl, inputName, initialId
     const innerFunctionName = 'renderBadges';
     badgeContainer.innerHTML = '';
 
-    log('debug', scriptName, innerFunctionName, `🔄 Rendering ${selected.length} badges`);
+    log('debug', scriptName, innerFunctionName, `Rendering ${selected.length} badges`);
 
     selected.forEach(item => {
       const badge = document.createElement('div');
@@ -279,6 +279,6 @@ export function initAutoCompleteFields(config = []) {
   });
 
   return Promise.all(promises).then(() => {
-    log("info", scriptName, "final", "✅ Autocomplete initialization complete");
+    log("info", scriptName, "final", "Autocomplete initialization complete");
   });
 }

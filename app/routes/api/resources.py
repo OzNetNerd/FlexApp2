@@ -39,7 +39,7 @@ class GenericDataAPI:
             app: Flask application instance
         """
         for resource_type, blueprint in self.resource_blueprints.items():
-            logger.info(f"📌 Registering API blueprint for resource: {resource_type}")
+            logger.info(f"Registering API blueprint for resource: {resource_type}")
             app.register_blueprint(blueprint)
 
     def register_resource(self,
@@ -102,7 +102,7 @@ class GenericDataAPI:
             return self._handle_data_request(resource_type)
 
         self.resource_blueprints[resource_type] = blueprint
-        logger.info(f"✅ Registered resource type {resource_type} with blueprint {bp_name}")
+        logger.info(f"Registered resource type {resource_type} with blueprint {bp_name}")
 
         return blueprint
 
@@ -116,7 +116,7 @@ class GenericDataAPI:
         Returns:
             Flask response with JSON data
         """
-        request_start_log = f"🔄 Processing API data request for {resource_type}"
+        request_start_log = f"Processing API data request for {resource_type}"
         logger.info(request_start_log)
 
         try:
@@ -177,7 +177,7 @@ class GenericDataAPI:
 
                 # Apply sorting
                 if hasattr(model, sort_by):
-                    logger.debug(f"🔄 Applying sort: {sort_by} {order}")
+                    logger.debug(f"Applying sort: {sort_by} {order}")
                     if order.lower() == 'desc':
                         query = query.order_by(desc(getattr(model, sort_by)))
                     else:
@@ -214,7 +214,7 @@ class GenericDataAPI:
                 "pages": paginated.pages
             }
 
-            logger.info(f"✅ Successfully processed API data request for {resource_type}")
+            logger.info(f"Successfully processed API data request for {resource_type}")
             logger.debug(f"📝 Response contains {len(formatted_items)} items")
             logger.debug(f"📝 Response JSON size: {len(str(response))} chars")
 

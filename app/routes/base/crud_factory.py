@@ -3,7 +3,7 @@
 import logging
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import BaseContext
-from app.utils.table_helpers import PLURAL_MAP
+from app.utils.table_helpers import get_plural_name
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ def register_crud_routes(blueprint, entity_name, template_dir="pages/crud", tabl
     logger.info(f"Starting route registration with entity_name={entity_name}, template_dir={template_dir}, table_template={table_template}")
 
     entity_title = entity_name.capitalize()
-    plural_name = PLURAL_MAP.get(entity_name, f"{entity_name}s")
+    plural_name = get_plural_name(entity_name)
 
     logger.info(f"Derived entity_title={entity_title}, plural_name={plural_name}")
 

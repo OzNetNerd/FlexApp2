@@ -40,7 +40,7 @@ class TableConfigManager:
                 table_config = {}
 
             if "columns" in table_config:
-                logger.error(f"✅  'columns' found: {table_config['columns']}")
+                logger.error(f" 'columns' found: {table_config['columns']}")
 
             else:
                 logger.error(f"❌  No 'columns' found in table")

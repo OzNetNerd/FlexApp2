@@ -6,8 +6,11 @@ PLURAL_MAP = {
     "opportunity": "opportunities",
     "category": "categories",
     "capability": "capabilities",
-    "contact": "contacts",
 }
+
+def get_plural_name(table_name):
+    return PLURAL_MAP.get(table_name, f"{table_name}s")
+
 
 def get_table_id_by_model(model: Any) -> str:
     """

@@ -18,4 +18,4 @@
 #     return render_safely("index.html", context, fallback_message)
 #
 #
-# logger.info("Index route setup successfully.")
+# logger.info("Successfully set up 'Index' route.")

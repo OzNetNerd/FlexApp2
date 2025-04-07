@@ -42,7 +42,7 @@ class Setting(BaseModel):
         if cls.__tablename__ not in inspector.get_table_names():
             logger.warning(f"⚠️ Table '{cls.__tablename__}' does not exist. Creating")
             db.create_all()
-            logger.info(f"✅ Table '{cls.__tablename__}' created successfully.")
+            logger.info(f"Table '{cls.__tablename__}' created successfully.")
 
         logger.info("🔍 Verifying required settings in the database")
 
@@ -55,7 +55,7 @@ class Setting(BaseModel):
                 db.session.add(cls(key=key, value=default_value))
 
         db.session.commit()
-        logger.info("✅  Setting check complete. All required settings are now in the database")
+        logger.info(" Setting check complete. All required settings are now in the database")
 
     @classmethod
     def get_value(cls, key: str, fallback: str = None) -> str:

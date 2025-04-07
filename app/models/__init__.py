@@ -41,7 +41,7 @@ __all__ = [
     "TableConfig",
     "Relationship",
     "CRISPScore",
-    "Setting",  # ✅ Added to export list
+    "Setting",  # Added to export list
     "contact_user_association",
     "CapabilityCategory",
     "Capability",

@@ -39,4 +39,4 @@ def edit(item_id):
     return render_safely("pages/crud/edit.html", context, "Failed to load edit company form.")
 
 
-logger.info("Company routes setup successfully.")
+logger.info("Successfully set up 'Company' routes.")

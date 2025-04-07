@@ -176,7 +176,7 @@ def render_debug_panel(
             debug_show_toggle=False,
             debug_capture_console=False,
         )
-        logger.info(f"✅ Debug panel rendered successfully with status code {status_code}")
+        logger.info(f"Debug panel rendered successfully with status code {status_code}")
         logger.debug(f"📝 Response length: {len(html_response)} chars")
         return html_response, status_code
     except Exception as e3:
@@ -222,15 +222,15 @@ def render_safely(
 
     try:
         template = template_env.get_template(template_name)
-        logger.debug(f"✅ Template '{template_name}' loaded successfully")
+        logger.debug(f"Template '{template_name}' loaded successfully")
 
         LoggingUndefined.clear_missing_variables()
         logger.debug(f"📝 Starting template rendering process")
         rendered = template.render(**get_flask_globals(), **context.__dict__)
-        logger.debug(f"✅ Template rendered successfully with length {len(rendered)} chars")
+        logger.debug(f"Template rendered successfully with length {len(rendered)} chars")
 
         LoggingUndefined.raise_if_missing()
-        logger.info(f"✅ Template '{template_name}' rendered successfully")
+        logger.info(f"Template '{template_name}' rendered successfully")
         logger.debug(f"📝 Response content length: {len(rendered)} chars")
 
         return rendered

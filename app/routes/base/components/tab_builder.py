@@ -85,5 +85,5 @@ def create_tabs(item: Any, tabs: List[Callable], add_metadata_tab=True) -> List[
         tab_entry = tab_obj.create_tab()
         grouped_tabs.append(tab_entry)
 
-    logger.info(f"✅  Successfully added {len(grouped_tabs)} tabs")
+    logger.info(f" Successfully added {len(grouped_tabs)} tabs")
     return grouped_tabs

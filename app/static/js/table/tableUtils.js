@@ -11,7 +11,7 @@ export function waitForAgGrid() {
         try {
             // Immediately resolve if AG Grid is already loaded
             if (typeof Grid !== "undefined") {
-                log("info", scriptName, functionName, "✅ AG Grid library is fully loaded and ready for use");
+                log("info", scriptName, functionName, "AG Grid library is fully loaded and ready for use");
                 return resolve(Grid);
             }
 
@@ -21,7 +21,7 @@ export function waitForAgGrid() {
             const checkInterval = setInterval(() => {
                 if (typeof Grid !== "undefined") {
                     clearInterval(checkInterval);
-                    log("info", scriptName, functionName, "✅ AG Grid has loaded.");
+                    log("info", scriptName, functionName, "AG Grid has loaded.");
                     resolve(Grid);
                 }
             }, 100);

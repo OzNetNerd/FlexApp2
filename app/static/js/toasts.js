@@ -10,7 +10,7 @@ const ToastSystem = {
   init: function() {
     if (this.initialized) return;
 
-    log("debug", "toasts.js", "init", "🔄 Initializing simplified toast system");
+    log("debug", "toasts.js", "init", "Initializing simplified toast system");
 
     // Create container if it doesn't exist
     this.container = document.querySelector('.toast-container');
@@ -30,7 +30,7 @@ const ToastSystem = {
     this.template = document.getElementById('liveToast');
 
     this.initialized = true;
-    log("info", "toasts.js", "init", "✅ Simplified toast system initialized");
+    log("info", "toasts.js", "init", "Simplified toast system initialized");
 
     // Process any queued toasts
     this.processQueue();
@@ -101,7 +101,7 @@ const ToastSystem = {
 
 // Initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
-  log("debug", "toasts.js", "DOMContentLoaded", "🔄 Initializing toast notifications");
+  log("debug", "toasts.js", "DOMContentLoaded", "Initializing toast notifications");
 
   // Initialize in a small delay to ensure DOM is ready
   setTimeout(() => {

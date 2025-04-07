@@ -64,5 +64,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  log("info", "_header_buttons.html", "final", "✅ Buttons template finished rendering");
+  log("info", "_header_buttons.html", "final", "Buttons template finished rendering");
 });

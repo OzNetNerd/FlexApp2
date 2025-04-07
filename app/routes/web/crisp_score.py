@@ -33,4 +33,4 @@ def submit(relationship_id):
     return redirect(url_for("contacts.view", item_id=relationship.contact_id))
 
 
-logger.info("CRISP Score routes setup successfully.")
+logger.info("Successfully set up ' CRISP Score' routes.")

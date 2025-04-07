@@ -58,4 +58,4 @@ def delete(item_id):
     return jsonify(result)
 
 
-logger.info("Company API routes setup successfully.")
+logger.info("Successfully set up 'Company' API routes.")

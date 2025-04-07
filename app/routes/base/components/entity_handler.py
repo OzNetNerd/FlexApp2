@@ -6,7 +6,7 @@ from app.routes.base.components.tab_builder import create_tabs
 from app.utils.app_logging import log_instance_vars
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, List
-from app.utils.table_helpers import get_table_id_by_name, PLURAL_MAP
+from app.utils.table_helpers import get_table_id_by_name, get_plural_name
 
 
 logger = logging.getLogger(__name__)
@@ -40,17 +40,11 @@ class SimpleContext(BaseContext):
             self.title = f'{self.action} {table_name}'
             logger.info(f"self.title was not provided. set it to: {self.title}")
 
-
-        # Set each keyword argument as an attribute on the instance.
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-            logger.info(f"Set attribute '{key}' = {value}")
-
         # Set the table_id using the provided table_name
         self.table_id = get_table_id_by_name(self.table_name)
         logger.info(f"Set attribute table_id = {self.table_id} (from {self.table_name} = {self.table_name})")
 
-        self.data_url = f"api/{lower_table_name}/data"
+        self.data_url = f"/api/{get_plural_name(lower_table_name)}/data"
         logger.info(f"Set attribute data_url = {self.data_url} (from table_name = {self.table_name})")
 
 

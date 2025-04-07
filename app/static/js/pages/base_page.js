@@ -15,7 +15,7 @@ log("debug", "base_template", "content", "Content block rendering complete");
 
 // Log inclusion of additional scripts and final rendering
 log("debug", "base_template", "component", "Scripts component included");
-log("info", "base_template", "final", "✅ Base template finished rendering");
+log("info", "base_template", "final", "Base template finished rendering");
 
 // DOM verification on load
 document.addEventListener('DOMContentLoaded', () => {

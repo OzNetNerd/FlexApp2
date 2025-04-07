@@ -45,7 +45,7 @@
   if ({{ tabs is defined | tojson }}) received.push('tabs'); else missing.push('tabs');
   if ({{ read_only is defined | tojson }}) received.push('read_only'); else missing.push('read_only');
 
-  log("info", scriptName, functionName, `✅ Received variables: ${received.join(', ') || 'None'}`);
+  log("info", scriptName, functionName, `Received variables: ${received.join(', ') || 'None'}`);
   log("warn", scriptName, functionName, `❌ Missing variables: ${missing.join(', ') || 'None'}`);
 </script>
 

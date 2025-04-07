@@ -1,65 +1,49 @@
 import logging
-from flask import Blueprint, abort, render_template
-from flask_login import current_user
-from datetime import datetime
-
-from app.models.task import Task
-from app.routes.web.crud.components.generic_crud_routes import GenericWebRoutes
+from flask import Blueprint
 from app.routes.base.components.template_renderer import render_safely
-from app.routes.base.components.entity_handler import BaseContext
+from app.routes.base.components.entity_handler import SimpleContext
 
 logger = logging.getLogger(__name__)
 
-# Define the blueprint
+TABLE_NAME = 'Task'
+
+# Define the blueprint manually for consistency with other modules
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
-class TasksCRUDRoutes(GenericWebRoutes):
-    """
-    Custom CRUD routes for Task model.
-    """
-
-    def _preprocess_form_data(self, form_data):
-        return form_data
-
-    def index(self):
-        """Overrides the default index for Tasks."""
-        if not current_user.is_authenticated:
-            abort(403)
-
-        return render_template(
-            self.index_template,
-            title="Tasks",
-        )
+@tasks_bp.route("/")
+def index():
+    """Tasks list page."""
+    context = SimpleContext(title="Tasks", table_name=TABLE_NAME)
+    return render_safely("pages/tables/tasks.html", context, "Failed to load tasks.")
 
 
-# Register the CRUD route handler
-tasks_routes = TasksCRUDRoutes(
-    blueprint=tasks_bp,
-    model=Task,
-    index_template="pages/tables/tasks.html",
-    required_fields=[],
-    unique_fields=[],
-)
+@tasks_bp.route("/create")
+def create():
+    """Create task form."""
+    context = SimpleContext(action="Create", table_name=TABLE_NAME)
+    return render_safely("pages/crud/create.html", context, "Failed to load create task form.")
 
 
-# Custom route: Show overdue tasks
-@tasks_bp.route("/overdue")
-def overdue_tasks():
-    """Show overdue tasks."""
-    overdue = Task.query.filter(Task.due_date < datetime.utcnow(), Task.status != "completed", Task.assigned_to == current_user.id).all()
-
-    context = BaseContext(title="Overdue Tasks", items=overdue)
-    return render_safely("pages/tasks/overdue.html", context, "Failed to load overdue tasks.")
-
-
-# Custom route: Extended task view
-@tasks_bp.route("/<int:item_id>/extended")
-def view_extended(item_id):
-    """View task with additional context."""
-    task = Task.query.get_or_404(item_id)
-    context = BaseContext(title=f"Task: {task.title}", item=task)
+@tasks_bp.route("/<int:item_id>")
+def view(item_id):
+    """View task details."""
+    context = SimpleContext(action="View", table_name=TABLE_NAME)
     return render_safely("pages/crud/view.html", context, "Failed to load task details.")
 
 
-logger.info("Task routes setup successfully.")
+@tasks_bp.route("/<int:item_id>/edit")
+def edit(item_id):
+    """Edit task form."""
+    context = SimpleContext(action="Edit", table_name=TABLE_NAME)
+    return render_safely("pages/crud/edit.html", context, "Failed to load edit task form.")
+
+
+@tasks_bp.route("/overdue")
+def overdue_tasks():
+    """Show overdue tasks."""
+    context = SimpleContext(title="Overdue Tasks", table_name=TABLE_NAME)
+    return render_safely("pages/tasks/overdue.html", context, "Failed to load overdue tasks.")
+
+
+logger.info("Successfully set up 'Task' routes.")

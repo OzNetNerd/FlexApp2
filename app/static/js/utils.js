@@ -10,7 +10,7 @@ import log from '/static/js/logger.js';
  * @returns {Promise<any>} Resolves with API data or rejects with an error.
  */
 export async function fetchApiData(scriptName, functionName, apiUrl) {
-    log("info", scriptName, functionName, `🔄 Fetching data from API: ${apiUrl}`);
+    log("info", scriptName, functionName, `Fetching data from API: ${apiUrl}`);
 
     try {
         const response = await fetch(apiUrl);
@@ -69,7 +69,7 @@ export function getDatasetValue(scriptName, payload, variableName) {
     log("info", scriptName, functionName, `Looking for ${variableName} in dataset:`,  {...payload});
 
     if (payload && payload[variableName]) {
-        log("info", scriptName, functionName, `✅ Found it. It's value is: ${payload[variableName]}`);
+        log("info", scriptName, functionName, `Found it. It's value is: ${payload[variableName]}`);
         return payload[variableName];
     } else {
         log("error", scriptName, functionName, `❌ Missing or invalid ${variableName} in dataset`, {...payload});

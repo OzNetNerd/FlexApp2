@@ -27,12 +27,12 @@ def register_api_routes(app: Flask):
 
     # Add this line to register all API blueprints
     from app.routes.api import register_api_blueprints
-    logger.info("🔄 Starting API blueprint registration")
+    logger.info("Starting API blueprint registration")
     register_api_blueprints(app)
-    logger.info("✅ API blueprints registered")
+    logger.info("API blueprints registered")
 
     # Register the misc_api_bp blueprint
-    logger.info(f"📌 Registering misc API blueprint: {misc_api_bp.name}")
+    logger.info(f"Registering misc API blueprint: {misc_api_bp.name}")
     app.register_blueprint(misc_api_bp)
 
     # Add request tracing middleware

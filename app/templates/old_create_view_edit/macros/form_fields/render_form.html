@@ -30,7 +30,7 @@
     const btnText = {{ button_text | tojson | safe }};
 
     log("info", filename, "render_form", `🧾 Rendering form in ${mode === "true" ? "read-only" : "editable"} mode`);
-    log("debug", filename, "render_form", "📌 Sections", sectionNames);
+    log("debug", filename, "render_form", "Sections", sectionNames);
     log("debug", filename, "render_form", "➡️ Submit URL", submitUrl);
     log("debug", filename, "render_form", "✏️ Edit URL", editUrl);
     log("debug", filename, "render_form", "🔘 Button text", btnText);

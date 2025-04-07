@@ -129,7 +129,7 @@ export default async function initTable() {
 
     let data;
     try {
-        log("info", scriptName, functionName, `🔄 Fetching data from API: ${apiUrl}`);
+        log("info", scriptName, functionName, `Fetching data from API: ${apiUrl}`);
         data = await fetchApiData(scriptName, functionName, apiUrl);
         log("info", scriptName, functionName, `✅📥 API data received: `, data);
     } catch (error) {
@@ -183,7 +183,7 @@ export default async function initTable() {
             log("warn", scriptName, functionName, "📋 Column selector element (#columnSelectorItems) not found. Skipping column selector setup.");
         }
 
-        log("info", scriptName, functionName, "✅ Table data initialized successfully");
+        log("info", scriptName, functionName, "Table data initialized successfully");
     };
 
     new createGrid(gridDiv, gridOptions);

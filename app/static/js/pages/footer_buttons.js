@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Final logging and event monitoring
-  log("info", "_footer_buttons.html", "final", "✅ Footer buttons template finished rendering");
+  log("info", "_footer_buttons.html", "final", "Footer buttons template finished rendering");
 
   const buttons = document.querySelectorAll('.footer-buttons-container a, .footer-buttons-container button');
   buttons.forEach(button => {

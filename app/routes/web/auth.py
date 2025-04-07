@@ -73,4 +73,4 @@ def logout():
     return redirect(url_for("auth_bp.login"))
 
 
-logger.info("Auth routes setup successfully.")
+logger.info("Successfully set up 'Auth' routes.")

@@ -140,4 +140,4 @@ relationship_routes = RelationshipCRUDRoutes(
     index_template="relationships.html",
 )
 
-# logger.info("Relationship CRUD routes setup successfully.")
+# logger.info("Successfully set up 'Relationship CRUD' routes.")
