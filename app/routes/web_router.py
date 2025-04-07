@@ -13,6 +13,7 @@ from app.routes.web.opportunities import opportunities_bp
 from app.routes.web.users import users_bp
 from app.routes.web.tasks import tasks_bp
 from app.routes.web.settings import settings_bp
+from app.routes.web.auth import auth_bp
 
 # Register the blueprint with your Flask app
 
@@ -79,6 +80,7 @@ def register_application_blueprints(app: Flask) -> None:
     app.register_blueprint(users_bp)
     app.register_blueprint(tasks_bp)
     app.register_blueprint(settings_bp)
+    app.register_blueprint(auth_bp)
 
 #     # Add request tracing middleware
 #     @app.before_request

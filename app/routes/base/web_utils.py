@@ -1,8 +1,9 @@
 # app/routes/base/web_utils.py
 import logging
-from flask import url_for, redirect, flash
+from flask import url_for, redirect, flash, Blueprint
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import SimpleContext
+from typing import Optional, List, Any
 
 
 logger = logging.getLogger(__name__)
@@ -149,23 +150,31 @@ def register_route(blueprint, route_type, table_name, service=None, template_ove
 
     Args:
         blueprint (Blueprint): The Flask blueprint
-        route_type (str): One of 'index', 'create', 'view', 'edit'
+        route_type (str): One of 'index', 'create', 'view', 'edit', 'login', 'logout'
         table_name (str): The name of the entity table
         service (object, optional): Service with get_by_id method
         template_override (str, optional): Custom template path if needed
         url (str, optional): Custom URL pattern
     """
+    # Handle special auth routes first
+    if route_type == 'login':
+        # Register login route with the explicit endpoint name "login"
+        blueprint.route("/login", methods=["GET", "POST"], endpoint="login")(service.handle_login)
+        logger.info(f"Registered 'login' route with endpoint '{blueprint.name}.login'")
+        return
+    elif route_type == 'logout':
+        # Register logout route with the explicit endpoint name "logout"
+        blueprint.route("/logout", endpoint="logout")(service.handle_logout)
+        logger.info(f"Registered 'logout' route with endpoint '{blueprint.name}.logout'")
+        return
+
+    # Standard CRUD routes
     route_creators = {
         'index': create_index_route,
         'create': create_create_route,
         'view': create_view_route,
         'edit': create_edit_route
     }
-
-    if route_type == 'login':
-        blueprint.route("/login", methods=["GET", "POST"])(service.handle_login)
-    elif route_type == 'logout':
-        blueprint.route("/logout")(service.handle_logout)
 
     # Default URL patterns
     url_patterns = {
@@ -176,6 +185,9 @@ def register_route(blueprint, route_type, table_name, service=None, template_ove
     }
 
     # Create the route function
+    if route_type not in route_creators:
+        raise ValueError(f"Unsupported route type: {route_type}")
+
     if route_type == 'view':
         route_func = route_creators[route_type](table_name, service, template_override)
     else:
@@ -191,41 +203,60 @@ def register_route(blueprint, route_type, table_name, service=None, template_ove
     logger.info(f"Registered '{route_type}' route for '{table_name}'")
 
 
-from flask import Blueprint
-from typing import Optional, List, Any
-
-
-def register_blueprint_routes(
-        blueprint: Blueprint,
-        table_name: str,
-        routes: Optional[List[str]] = None,
-        service: Optional[Any] = None
-) -> None:
-    """Register specified routes on a blueprint.
-
-    This function adds multiple routes to a given blueprint based on the provided
-    route types list. For each route type, it calls register_route to set up the
-    appropriate handlers.
+def register_blueprint_routes(blueprint, table_name, routes=None, service=None, template_overrides=None):
+    """Register a set of standard routes on a blueprint.
 
     Args:
-        blueprint (Blueprint): The Flask blueprint to register routes on
-        table_name (str): The name of the entity table (used for templates and logging)
-        routes (Optional[List[str]]): List of route types to register
-                                     e.g. ['index', 'create', 'view', 'edit']
-                                     Defaults to all standard routes if None
-        service (Optional[Any]): Service object with necessary handler methods
-
-    Returns:
-        None: This function modifies the blueprint in-place
-
-    Example:
-        register_blueprint_routes(companies_bp, "Company", service=company_service)
+        blueprint (Blueprint): The Flask blueprint
+        table_name (str): The name of the entity table
+        routes (list, optional): List of route types to register.
+                                Defaults to ['index', 'create', 'view', 'edit'].
+        service (object, optional): Service with appropriate methods
+        template_overrides (dict, optional): Custom template paths for specific routes
     """
-    # Default to all standard routes if not specified
+    # Default routes if none specified
     if routes is None:
         routes = ['index', 'create', 'view', 'edit']
 
-    for route_type in routes:
-        register_route(blueprint, route_type, table_name, service)
+    # Default empty dict for template overrides
+    if template_overrides is None:
+        template_overrides = {}
 
-    logger.info(f"Registered {len(routes)} routes for '{table_name}'")
+    logger.info(f"Registering {len(routes)} routes for {table_name} on {blueprint.name} blueprint")
+
+    # Register each specified route
+    for route_type in routes:
+        try:
+            template_override = template_overrides.get(route_type)
+
+            # For auth-specific routes we need to pass the service
+            if route_type in ['login', 'logout']:
+                if service is None:
+                    logger.error(f"Cannot register {route_type} route without a service")
+                    continue
+
+                register_route(
+                    blueprint,
+                    route_type,
+                    table_name,
+                    service=service,
+                    template_override=template_override
+                )
+            else:
+                # Standard CRUD routes
+                register_route(
+                    blueprint,
+                    route_type,
+                    table_name,
+                    service=service,
+                    template_override=template_override
+                )
+
+            logger.info(f"Successfully registered {route_type} route for {table_name}")
+        except Exception as e:
+            logger.error(f"Failed to register {route_type} route for {table_name}: {str(e)}")
+            # Optionally re-raise the exception if you want it to bubble up
+            # raise
+
+    logger.info(f"Completed registration of routes for {table_name}")
+    return blueprint

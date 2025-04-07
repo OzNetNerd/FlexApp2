@@ -14,5 +14,5 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 # Create a service instance
 auth_service = AuthService(User)
 
-# Register auth routes
+# Register auth routes - make sure route names match what's in the template
 register_blueprint_routes(auth_bp, "Auth", routes=['login', 'logout'], service=auth_service)
