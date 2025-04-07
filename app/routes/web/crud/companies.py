@@ -1,7 +1,8 @@
 import logging
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import SimpleContext
-from flask import Blueprint, request, url_for, redirect, flash
+from flask import Blueprint, url_for, redirect, flash
+import requests
 
 
 
@@ -26,8 +27,6 @@ def create():
     context = SimpleContext(action="Create", table_name=TABLE_NAME)
     return render_safely("pages/crud/create.html", context, "Failed to load create company form.")
 
-
-import requests
 
 @companies_bp.route("/<int:item_id>")
 def view(item_id):
