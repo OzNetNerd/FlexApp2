@@ -44,7 +44,7 @@ class AutoCompleteField:
 #             id="users-input",
 #             placeholder="Search for users...",
 #             name="users",
-#             data_url="/users/data",
+#             data_url="/api/users",
 #             related_ids=related_user_ids
 #         ),
 #         AutoCompleteField(
@@ -52,7 +52,7 @@ class AutoCompleteField:
 #             id="companies-input",
 #             placeholder="Search for companies...",
 #             name="companies",
-#             data_url="/companies/data",
+#             data_url="/api/companies",
 #             related_ids=related_company_ids
 #         )
 #     ]
@@ -64,7 +64,7 @@ def get_autocomplete_field(title, relationships=None, field_id=None, placeholder
     field_id = field_id or f"{title_lower}-input"
     placeholder = placeholder or f"Search for {title_lower}..."
     name = name or title_lower
-    data_url = data_url or f"/api//{title_lower}/data"
+    data_url = data_url or f"/api//{title_lower}"
 
     # Fix entity type derivation with special cases
     if title_lower == "companies":

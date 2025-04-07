@@ -123,15 +123,22 @@ export default async function initTable() {
         return;
     }
 
+    // Ensure the grid container has a defined height
+    if (!gridDiv.style.height && !gridDiv.classList.contains('ag-theme-alpine')) {
+        gridDiv.style.height = '500px'; // Default height if none specified
+        gridDiv.classList.add('ag-theme-alpine'); // Add theme class if missing
+    }
+
     const datasetVariables = getDatasetVariables(tableContainerId);
     const apiUrl = getDatasetValue(scriptName, datasetVariables, "apiUrl");
     log("info", scriptName, functionName, `✅🌐 API URL Retrieved: ${apiUrl}`);
 
     let data;
     try {
-        log("info", scriptName, functionName, `Fetching data from API: ${apiUrl}`);
+        // Get data from API
         data = await fetchApiData(scriptName, functionName, apiUrl);
-        log("info", scriptName, functionName, `✅📥 API data received: `, data);
+        // Log the actual data for debugging
+        log("info", scriptName, functionName, "📊 Table data structure:", data);
     } catch (error) {
         log("error", scriptName, functionName, "❌ Failed to fetch data from API", { error: error.message || String(error) });
         return;
@@ -139,8 +146,11 @@ export default async function initTable() {
 
     const gridOptions = getGridOptions();
 
-    if (data?.data?.[0]) {
-        const sampleRow = data.data[0];
+    // Handle both data structures: data = [{...}] or data = {data: [{...}]}
+    let actualData = Array.isArray(data) ? data : (data.data || []);
+    let sampleRow = actualData[0];
+
+    if (sampleRow) {
         const columnDefs = Object.keys(sampleRow).map(key => ({
             field: key,
             headerName: formatColumnHeader(key),
@@ -148,6 +158,8 @@ export default async function initTable() {
             filter: true
         }));
         gridOptions.columnDefs = columnDefs;
+    } else {
+        log("warn", scriptName, functionName, "No data available to generate columns");
     }
 
     // Function to format column header text consistently
@@ -169,23 +181,31 @@ export default async function initTable() {
         // Pass the correct grid and column APIs
         setGridApi(params.api, params.columnApi);
 
-        // Update rowData using the recommended setGridOption
-        params.api.setGridOption('rowData', data.data || data);
+        // Update rowData using the recommended setGridOption method
+        params.api.setGridOption('rowData', actualData);
 
         setupGlobalSearch(params.api, scriptName, functionName);
 
-        // Check if the column selector element exists in the DOM
-        const columnSelectorExists = document.getElementById('columnSelectorItems');
-        if (columnSelectorExists) {
-            // In AG Grid 31.0.1, we pass the main grid API instead of columnApi
-            setupColumnSelector(params.api, scriptName, functionName);
-        } else {
-            log("warn", scriptName, functionName, "📋 Column selector element (#columnSelectorItems) not found. Skipping column selector setup.");
-        }
+        // Setup column selector after columns are fully initialized
+        // Use grid columns changed event to ensure columns are ready
+        params.api.addEventListener('gridColumnsChanged', () => {
+            // Check if the column selector element exists in the DOM
+            const columnSelectorExists = document.getElementById('columnSelectorItems');
+            if (columnSelectorExists) {
+                // In AG Grid 31.0.1, we pass the main grid API instead of columnApi
+                setupColumnSelector(params.api, scriptName, functionName);
+            } else {
+                log("warn", scriptName, functionName, "📋 Column selector element (#columnSelectorItems) not found. Skipping column selector setup.");
+            }
+        });
+
+        // Force column visibility update
+        params.api.refreshHeader();
 
         log("info", scriptName, functionName, "Table data initialized successfully");
     };
 
+    // Create the grid with proper dimensions
     new createGrid(gridDiv, gridOptions);
 
     return gridOptions;

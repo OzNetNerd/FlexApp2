@@ -100,4 +100,4 @@ class GenericWebRoutes(CRUDRoutesBase):
         self.blueprint.add_url_rule("/create", "create", login_required(create_route.__get__(self)), methods=["GET", "POST"])
         self.blueprint.add_url_rule("/<int:item_id>/edit", "edit", login_required(edit_route.__get__(self)), methods=["GET", "POST"])
         self.blueprint.add_url_rule("/<int:item_id>/delete", "delete", login_required(delete_route.__get__(self)), methods=["POST"])
-        self.blueprint.add_url_rule("/data", "data", login_required(data_route.__get__(self)), methods=["GET"])
+        self.blueprint.add_url_rule("/", "data", login_required(data_route.__get__(self)), methods=["GET"])
