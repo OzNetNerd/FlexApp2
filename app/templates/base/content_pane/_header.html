@@ -70,7 +70,7 @@
       log("debug", "_header.html", "icon", "Using create icon (plus)");
     </script>
   {% endif %}
-  {{ title|default('') }} {{ model_name|default('') }}: <span class="text-info">{{ item_name|default('') }}</span>
+  {{ title }}: <span class="text-info">{{ item_name|default('') }}</span>
 </h3>
 
 {% if ui is defined and ui %}

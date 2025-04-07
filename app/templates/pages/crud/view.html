@@ -1,8 +1,6 @@
 {% extends "base/page_templates/_create_view_edit_template.html" %}
 
-{% block content %}
-  {{ super() }}
-
+{% block create_view_edit_content %}
   <div class="tab-content">
     {% for tab in ui %}
       <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
@@ -12,7 +10,6 @@
         {% for section in tab.sections %}
           <h5 class="mt-3">{{ section.section_name }}</h5>
           {% for entry in section.entries %}
-            {# For special mapping fields, you can add custom logic here if needed #}
             {{ macros.render_field(entry, read_only=True) }}
           {% endfor %}
         {% endfor %}

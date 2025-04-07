@@ -36,7 +36,9 @@
   <div class="card-body">
     <form method="POST">
       {% if ui %}
-        {% include 'base/common/_pills_nav_content.html' %}
+        {% block create_view_edit_content %}
+          {% include 'base/common/_pills_nav_content.html' %}
+        {% endblock %}
       {% else %}
         {% include 'base/content_pane/_section_layout.html' %}
       {% endif %}

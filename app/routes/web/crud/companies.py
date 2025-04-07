@@ -1,7 +1,9 @@
 import logging
-from flask import Blueprint
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import SimpleContext
+from flask import Blueprint, request, url_for, redirect, flash
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -25,11 +27,23 @@ def create():
     return render_safely("pages/crud/create.html", context, "Failed to load create company form.")
 
 
+import requests
+
 @companies_bp.route("/<int:item_id>")
 def view(item_id):
-    """View company details."""
-    context = SimpleContext(action="View", table_name=TABLE_NAME)
+    """View company details via API call."""
+    resp = requests.get(url_for('companies_api.get_one', item_id=item_id, _external=True))
+    if resp.status_code != 200:
+        flash("Company not found.", "danger")
+        return redirect(url_for("companies.list"))
+
+    context = SimpleContext(
+        action="View",
+        table_name=TABLE_NAME,
+        item=resp.json()
+    )
     return render_safely("pages/crud/view.html", context, "Failed to load company details.")
+
 
 
 @companies_bp.route("/<int:item_id>/edit")
