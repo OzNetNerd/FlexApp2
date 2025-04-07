@@ -3,8 +3,9 @@
 const scriptName = "tableInit.js";
 
 import log from '/static/js/logger.js';
-import { getDatasetVariables, getDatasetValue, fetchApiData } from '../utils.js';
-import getGridOptions, { setGridApi } from './tableConfig.js';
+import { getDatasetVariables, getDatasetValue } from '/static/js/utils.js';
+import { fetchApiDataFromContainer, normalizeData, formatDisplayText } from '/static/js/apiService.js';
+import getGridOptions, { setGridApi } from '/static/js/table/tableConfig.js';
 
 import { createGrid, ModuleRegistry } from 'https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.esm.min.js';
 import { ClientSideRowModelModule } from 'https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.esm.min.js';
@@ -113,6 +114,28 @@ function setupColumnSelector(api, scriptName, functionName) {
 }
 
 /**
+ * Generates column definitions based on the data
+ * @param {Array} data - The processed data array
+ * @returns {Array} - Column definitions for AG Grid
+ */
+function generateColumnDefs(data) {
+    const functionName = "generateColumnDefs";
+
+    if (!data || data.length === 0) {
+        log("warn", scriptName, functionName, "No data available to generate columns");
+        return [];
+    }
+
+    const sampleRow = data[0];
+    return Object.keys(sampleRow).map(key => ({
+        field: key,
+        headerName: formatDisplayText(key),
+        sortable: true,
+        filter: true
+    }));
+}
+
+/**
  * Initializes the AG Grid table and applies search + column toggle functionality.
  */
 export default async function initTable() {
@@ -129,46 +152,25 @@ export default async function initTable() {
         gridDiv.classList.add('ag-theme-alpine'); // Add theme class if missing
     }
 
-    const datasetVariables = getDatasetVariables(tableContainerId);
-    const apiUrl = getDatasetValue(scriptName, datasetVariables, "apiUrl");
-    log("info", scriptName, functionName, `✅🌐 API URL Retrieved: ${apiUrl}`);
-
-    let data;
+    let actualData;
     try {
-        // Get data from API
-        data = await fetchApiData(scriptName, functionName, apiUrl);
-        // Log the actual data for debugging
-        log("info", scriptName, functionName, "📊 Table data structure:", data);
+        // Get data from API using our new service
+        const rawData = await fetchApiDataFromContainer(tableContainerId);
+        // Process the data
+        actualData = normalizeData(rawData);
+        log("info", scriptName, functionName, `Processed ${actualData.length} rows of data`);
     } catch (error) {
-        log("error", scriptName, functionName, "❌ Failed to fetch data from API", { error: error.message || String(error) });
+        log("error", scriptName, functionName, "❌ Failed to fetch or process data", { error: error.message || String(error) });
         return;
     }
 
     const gridOptions = getGridOptions();
 
-    // Handle both data structures: data = [{...}] or data = {data: [{...}]}
-    let actualData = Array.isArray(data) ? data : (data.data || []);
-    let sampleRow = actualData[0];
-
-    if (sampleRow) {
-        const columnDefs = Object.keys(sampleRow).map(key => ({
-            field: key,
-            headerName: formatColumnHeader(key),
-            sortable: true,
-            filter: true
-        }));
-        gridOptions.columnDefs = columnDefs;
+    // Generate column definitions from data
+    if (actualData.length > 0) {
+        gridOptions.columnDefs = generateColumnDefs(actualData);
     } else {
         log("warn", scriptName, functionName, "No data available to generate columns");
-    }
-
-    // Function to format column header text consistently
-    function formatColumnHeader(headerText) {
-        return headerText
-            .replace(/_/g, ' ') // Replace underscores with spaces
-            .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()) // Capitalize first letter
-            .replace(/\bId\b/g, 'ID') // Make "Id" into "ID"
-            .replace(/\bAt\b/g, 'at'); // Make "At" into "at"
     }
 
     const originalOnGridReady = gridOptions.onGridReady;

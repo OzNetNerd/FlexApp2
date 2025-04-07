@@ -2,9 +2,8 @@ import logging
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import SimpleContext
 from flask import Blueprint, url_for, redirect, flash
-import requests
-
-
+from app.services.crud_service import CRUDService
+from app.models.company import Company
 
 logger = logging.getLogger(__name__)
 
@@ -12,6 +11,9 @@ TABLE_NAME = 'Company'
 
 # Define the blueprint manually for consistency with other modules
 companies_bp = Blueprint("companies", __name__, url_prefix="/companies")
+
+# Create a service instance for company operations
+company_service = CRUDService(Company)
 
 
 @companies_bp.route("/")
@@ -30,19 +32,23 @@ def create():
 
 @companies_bp.route("/<int:item_id>")
 def view(item_id):
-    """View company details via API call."""
-    resp = requests.get(url_for('companies_api.get_one', item_id=item_id, _external=True))
-    if resp.status_code != 200:
+    """View company details directly using service."""
+    # Get company directly using the service instead of making an API call
+    company = company_service.get_by_id(item_id)
+
+    if not company:
         flash("Company not found.", "danger")
-        return redirect(url_for("companies.list"))
+        return redirect(url_for("companies.index"))
+
+    # Convert company object to dictionary
+    company_data = company.to_dict()
 
     context = SimpleContext(
         action="View",
         table_name=TABLE_NAME,
-        item=resp.json()
+        item=company_data
     )
     return render_safely("pages/crud/view.html", context, "Failed to load company details.")
-
 
 
 @companies_bp.route("/<int:item_id>/edit")
