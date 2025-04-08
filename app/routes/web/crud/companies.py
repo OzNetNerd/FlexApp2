@@ -10,7 +10,7 @@
 # TABLE_NAME = 'Company'
 #
 # # Define the blueprint manually for consistency with other modules
-# companies_bp = Blueprint("companies", __name__, url_prefix="/companies")
+# companies_bp = Blueprint("companies_bp", __name__, url_prefix="/companies")
 #
 # # Create a service instance for company operations
 # company_service = CRUDService(Company)

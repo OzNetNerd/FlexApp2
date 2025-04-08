@@ -18,21 +18,16 @@ from app.utils.app_logging import configure_logging
 # ---------------------------------------------
 # Flask Extensions
 # ---------------------------------------------
-
 login_manager = LoginManager()
 migrate = Migrate()
-
 
 @login_manager.unauthorized_handler
 def unauthorized():
     return make_response("🔒 Unauthorized - Please log in first", 401)
 
-
 # ---------------------------------------------
 # App Factory
 # ---------------------------------------------
-
-
 def create_app(config_class=Config):
     custom_logger = configure_logging()
 
@@ -61,6 +56,29 @@ def create_app(config_class=Config):
     def load_user(user_id):
         return db.session.get(User, int(user_id))
 
+    # ----------------------------
+    # Blueprint and route registration
+    # ----------------------------
+    register_api_routes(app)
+    register_application_blueprints(app)
+
+    # ---------------------------------------------
+    # Attach logger to app
+    # ---------------------------------------------
+    app.logger = custom_logger
+    app.custom_logger = custom_logger
+
+    # ---------------------------------------------
+    # Global before_request logging
+    # ---------------------------------------------
+    @app.before_request
+    def log_request():
+        custom_logger.info(f"Web Request {request.method} {request.path} from {request.remote_addr}")
+
+    # ---------------------------------------------
+    # Global before_request for login requirement
+    # (This callback now comes *after* routes are registered)
+    # ---------------------------------------------
     @app.before_request
     def require_login():
         whitelisted = [
@@ -73,36 +91,30 @@ def create_app(config_class=Config):
         if endpoint is None:
             return
         if not current_user.is_authenticated:
-            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
+            if (endpoint in whitelisted or
+                endpoint.startswith("static") or
+                endpoint.startswith("api_") or
+                endpoint.endswith(".data")):
                 return
             return redirect(url_for("auth_bp.login", next=request.path))
 
-    # Register all routes
-    register_api_routes(app)
-    register_application_blueprints(app)
-
-    # Inject global context
+    # ---------------------------------------------
+    # Global context injection
+    # ---------------------------------------------
     @app.context_processor
     def inject_globals():
         return {"now": datetime.utcnow(), "logger": app.custom_logger}
 
-    # Attach logger to app
-    app.logger = custom_logger
-    app.custom_logger = custom_logger
-
     with app.app_context():
         from app import models
-
         Setting.seed()
         db.create_all()
 
     return app
 
-
 # ---------------------------------------------
 # Entrypoint
 # ---------------------------------------------
-
 app = create_app()
 
 if __name__ == "__main__":

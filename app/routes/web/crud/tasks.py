@@ -8,7 +8,7 @@
 # TABLE_NAME = 'Task'
 #
 # # Define the blueprint manually for consistency with other modules
-# tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+# tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 #
 #
 # @tasks_bp.route("/")

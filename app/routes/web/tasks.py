@@ -7,7 +7,7 @@ from app.models.task import Task
 logger = logging.getLogger(__name__)
 
 # Define the blueprint
-tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 # Create a service instance
 task_service = CRUDService(Task)

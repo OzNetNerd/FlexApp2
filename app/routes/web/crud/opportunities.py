@@ -8,7 +8,7 @@
 # TABLE_NAME = 'Opportunity'
 #
 # # Define the blueprint manually for consistency with other modules
-# opportunities_bp = Blueprint("opportunities", __name__, url_prefix="/opportunities")
+# opportunities_bp = Blueprint("opportunities_bp", __name__, url_prefix="/opportunities")
 #
 #
 # @opportunities_bp.route("/")

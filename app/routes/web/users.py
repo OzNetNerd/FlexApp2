@@ -7,7 +7,7 @@ from app.models.user import User
 logger = logging.getLogger(__name__)
 
 # Define the blueprint
-users_bp = Blueprint("users", __name__, url_prefix="/users")
+users_bp = Blueprint("users_bp", __name__, url_prefix="/users")
 
 # Create a service instance
 user_service = CRUDService(User)

@@ -6,7 +6,7 @@ from app.routes.base.web_utils import register_page_route
 logger = logging.getLogger(__name__)
 
 # Define the blueprint
-home_bp = Blueprint("home", __name__, url_prefix="/")
+home_bp = Blueprint("home_bp", __name__, url_prefix="/")
 
 # Register the home page route
 register_page_route(

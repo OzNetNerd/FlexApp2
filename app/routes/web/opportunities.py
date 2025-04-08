@@ -7,7 +7,7 @@ from app.models.opportunity import Opportunity
 logger = logging.getLogger(__name__)
 
 # Define the blueprint
-opportunities_bp = Blueprint("opportunities", __name__, url_prefix="/opportunities")
+opportunities_bp = Blueprint("opportunities_bp", __name__, url_prefix="/opportunities")
 
 # Create a service instance
 opportunity_service = CRUDService(Opportunity)

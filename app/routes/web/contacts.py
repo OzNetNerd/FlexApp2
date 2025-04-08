@@ -9,7 +9,7 @@ from app.models.contact import Contact
 logger = logging.getLogger(__name__)
 
 # Define the blueprint
-contacts_bp = Blueprint("contacts", __name__, url_prefix="/contacts")
+contacts_bp = Blueprint("contacts_bp", __name__, url_prefix="/contacts")
 
 # Create a service instance
 contact_service = CRUDService(Contact)

@@ -8,7 +8,7 @@
 # TABLE_NAME = 'Contact'
 #
 # # Define the blueprint manually for consistency with other modules
-# contacts_bp = Blueprint("contacts", __name__, url_prefix="/contacts")
+# contacts_bp = Blueprint("contacts_bp", __name__, url_prefix="/contacts")
 #
 #
 # @contacts_bp.route("/")

@@ -9,7 +9,7 @@ from app.models.company import Company
 logger = logging.getLogger(__name__)
 
 # Define the blueprint
-companies_bp = Blueprint("companies", __name__, url_prefix="/companies")
+companies_bp = Blueprint("companies_bp", __name__, url_prefix="/companies")
 
 # Create a service instance
 company_service = CRUDService(Company)
@@ -27,7 +27,7 @@ register_crud_routes(companies_bp, "Company", service=company_service)
 # logger = logging.getLogger(__name__)
 #
 # # Define the blueprint
-# dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
+# dashboard_bp = Blueprint("dashboard_bp", __name__, url_prefix="/dashboard")
 #
 # # Register only the index route
 # register_crud_routes(dashboard_bp, "Dashboard", routes=['index'])
@@ -46,7 +46,7 @@ register_crud_routes(companies_bp, "Company", service=company_service)
 # logger = logging.getLogger(__name__)
 #
 # # Define the blueprint
-# tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+# tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 #
 # # Create a service instance
 # task_service = CRUDService(Task)
@@ -80,7 +80,7 @@ register_crud_routes(companies_bp, "Company", service=company_service)
 # logger = logging.getLogger(__name__)
 #
 # # Define the blueprint
-# users_bp = Blueprint("users", __name__, url_prefix="/users")
+# users_bp = Blueprint("users_bp", __name__, url_prefix="/users")
 #
 # # Create a service instance
 # user_service = CRUDService(User)

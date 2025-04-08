@@ -6,7 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-search_bp = Blueprint("search", __name__, url_prefix="/api/search")
+search_bp = Blueprint("search_bp", __name__, url_prefix="/api/search")
 
 
 @search_bp.route("/")

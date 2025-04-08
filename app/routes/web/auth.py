@@ -9,7 +9,7 @@ from app.models.user import User
 logger = logging.getLogger(__name__)
 
 # Define the blueprint
-auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth")
 
 # Create a service instance
 auth_service = AuthService(User)

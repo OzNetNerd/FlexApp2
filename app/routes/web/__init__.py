@@ -32,17 +32,17 @@
 #     if 'settings' not in exclusions:
 #         # Conditionally create and register settings_bp
 #         from app.routes.blueprint_factory import create_blueprint
-#         settings_bp = create_blueprint("settings")
+#         settings_bp = create_blueprint("settings_bp")
 #         app.register_blueprint(settings_bp)
 #     if 'relationships' not in exclusions:
 #         # Conditionally create and register relationships_bp
 #         from app.routes.blueprint_factory import create_blueprint
-#         relationships_bp = create_blueprint("relationships")
+#         relationships_bp = create_blueprint("relationships_bp")
 #         app.register_blueprint(relationships_bp)
 #     if 'crisp_scores' not in exclusions:
 #         # Conditionally create and register crisp_scores_bp
 #         from app.routes.blueprint_factory import create_blueprint
-#         crisp_scores_bp = create_blueprint("crisp_scores")
+#         crisp_scores_bp = create_blueprint("crisp_scores_bp")
 #         app.register_blueprint(crisp_scores_bp)
 #
 #     logger.info("Web blueprints registered successfully (with exclusions).")

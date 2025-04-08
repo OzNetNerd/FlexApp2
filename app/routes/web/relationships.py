@@ -8,7 +8,7 @@ from app.services.relationship_service import RelationshipService
 logger = logging.getLogger(__name__)
 
 # Define the blueprint
-relationships_bp = Blueprint("relationships", __name__, url_prefix="/relationships")
+relationships_bp = Blueprint("relationships_bp", __name__, url_prefix="/relationships")
 
 
 class RelationshipCRUDRoutes(GenericWebRoutes):

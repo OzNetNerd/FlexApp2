@@ -6,7 +6,7 @@ from app.models import db, CRISPScore, Relationship
 logger = logging.getLogger(__name__)
 
 # Define blueprint with explicit prefix
-crisp_scores_bp = Blueprint("crisp_scores", __name__, url_prefix="/crisp_scores")
+crisp_scores_bp = Blueprint("crisp_scores_bp", __name__, url_prefix="/crisp_scores")
 
 
 @crisp_scores_bp.route("/<int:relationship_id>", methods=["POST"])
