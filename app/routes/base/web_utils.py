@@ -249,13 +249,13 @@ def _get_item_context(service, entity_name, item_id, action, title=""):
         title (str): Optional title for the page
 
     Returns:
-        SimpleContext or redirect
+        TableContext or redirect
     """
     logger.info(f"Getting context for entity '{entity_name}', ID={item_id}, action='{action}'")
 
     if not service:
-        logger.info(f"No service provided for '{entity_name}'. Returning default SimpleContext.")
-        return SimpleContext(action=action, table_name=entity_name, title=title)
+        logger.info(f"No service provided for '{entity_name}'. Returning default TableContext.")
+        return TableContext(action=action, table_name=entity_name, title=title)
 
     try:
         item = service.get_by_id(item_id)
@@ -286,20 +286,20 @@ def _get_item_context(service, entity_name, item_id, action, title=""):
 
         logger.info(f"Context prepared for '{entity_name}' ID={item_id} with action '{action}'")
 
-        return SimpleContext(
+        return TableContext(
             action=action,
             table_name=entity_name,
-            item=item_data,  # Added missing comma here
+            item=item_data,
             title=title
         )
     except Exception as e:
         logger.error(f"Error getting context for {entity_name} ID={item_id}: {e}")
         # Return a minimal context that won't cause template errors
-        return SimpleContext(
+        return TableContext(
             action=action,
             table_name=entity_name,
             item={'id': item_id, 'error': f"Error loading {entity_name}: {str(e)}"},
-            error_message=f"Failed to load {entity_name}",  # Added missing comma here
+            error_message=f"Failed to load {entity_name}",
             title=title
         )
 
