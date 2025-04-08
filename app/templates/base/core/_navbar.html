@@ -193,13 +193,13 @@
               <li><a class="dropdown-item" href="{{ url_for('settings.index') }}"><i class="fas fa-cog me-2"></i> Settings</a></li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i> Help Center</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item logout-item" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+              <li><a class="dropdown-item logout-item" href="{{ url_for('auth_bp.logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
               <script type="module">
                 import log from '/static/js/logger.js';
                 log("debug", "_navbar.html", "auth", "Authenticated user menu items rendered");
               </script>
             {% else %}
-              <li><a class="dropdown-item" href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt me-2"></i> Login</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('auth_bp.login') }}"><i class="fas fa-sign-in-alt me-2"></i> Login</a></li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus me-2"></i> Register</a></li>
               <script type="module">
                 import log from '/static/js/logger.js';

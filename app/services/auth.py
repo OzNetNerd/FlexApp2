@@ -29,7 +29,7 @@ class AuthService:
 
                 next_page = request.args.get("next")
                 if not next_page or not next_page.startswith("/"):
-                    next_page = url_for("main.index")
+                    next_page = url_for("home.index")
 
                 flash("Logged in successfully.", "success")
                 logger.info(f"User {user.email} logged in.")
@@ -45,4 +45,4 @@ class AuthService:
         logout_user()
         flash("Logged out.", "info")
         logger.info("User logged out.")
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("auth_bp.login"))

@@ -47,7 +47,7 @@ def login():
 
             next_page = request.args.get("next")
             if not next_page or not next_page.startswith("/"):
-                next_page = url_for("main.index")
+                next_page = url_for("home.index")
 
             flash("Logged in successfully.", "success")
             logger.info(f"User {user.email} logged in.")

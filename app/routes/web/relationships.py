@@ -30,7 +30,7 @@ class RelationshipCRUDRoutes(GenericWebRoutes):
 #             entity = RelationshipService.get_entity(entity_type, entity_id)
 #             if not entity:
 #                 flash(f"{entity_type.capitalize()} not found", "error")
-#                 return redirect(url_for("main.index"))
+#                 return redirect(url_for("home.index"))
 #
 #             if request.method == "POST":
 #                 related_entity_type = request.form.get("related_entity_type")
@@ -59,7 +59,7 @@ class RelationshipCRUDRoutes(GenericWebRoutes):
 #                 elif entity_type == "company":
 #                     return redirect(url_for("companies.view", item_id=entity_id))
 #                 else:
-#                     return redirect(url_for("main.index"))
+#                     return redirect(url_for("home.index"))
 #
 #             entity_types = [
 #                 {"value": "user", "label": "User"},
@@ -96,7 +96,7 @@ class RelationshipCRUDRoutes(GenericWebRoutes):
 #             elif source_type == "company":
 #                 return redirect(url_for("companies.view", item_id=source_id))
 #             else:
-#                 return redirect(url_for("main.index"))
+#                 return redirect(url_for("home.index"))
 #
 #         @bp.route("/api/get_entities/<entity_type>", methods=["GET"])
 #         def get_entities(entity_type):
