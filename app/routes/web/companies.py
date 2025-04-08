@@ -15,7 +15,7 @@ companies_bp = Blueprint("companies_bp", __name__, url_prefix="/companies")
 company_service = CRUDService(Company)
 
 # Register all standard CRUD routes
-register_crud_routes(companies_bp, "Company", service=company_service)
+register_crud_routes(blueprint=companies_bp, entity_name="Company", service=company_service)
 
 #
 # # Example 2: Index-only Entity
