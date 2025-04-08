@@ -2,7 +2,7 @@
 import logging
 from flask import url_for, redirect, flash, Blueprint, request
 from app.routes.base.components.template_renderer import render_safely
-from app.routes.base.components.entity_handler import SimpleContext, TableContext
+from app.routes.base.components.entity_handler import SimpleContext, TableContext, EntityContext
 from typing import Optional, List, Any, Callable, Dict, Union, Tuple
 
 logger = logging.getLogger(__name__)
@@ -286,18 +286,18 @@ def _get_item_context(service, entity_name, item_id, action, title=""):
 
         logger.info(f"Context prepared for '{entity_name}' ID={item_id} with action '{action}'")
 
-        return TableContext(
+        return EntityContext(
             action=action,
-            table_name=entity_name,
+            # table_name=entity_name,
             item=item_data,
             title=title
         )
     except Exception as e:
         logger.error(f"Error getting context for {entity_name} ID={item_id}: {e}")
         # Return a minimal context that won't cause template errors
-        return TableContext(
+        return EntityContext(
             action=action,
-            table_name=entity_name,
+            # table_name=entity_name,
             item={'id': item_id, 'error': f"Error loading {entity_name}: {str(e)}"},
             error_message=f"Failed to load {entity_name}",
             title=title

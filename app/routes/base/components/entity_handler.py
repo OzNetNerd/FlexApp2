@@ -65,65 +65,71 @@ class TableContext(SimpleContext):
         self.data_url = f"/api/{get_plural_name(lower_table_name)}"
         logger.info(f"Set attribute data_url = {self.data_url} (from table_name = {self.table_name})")
 
-@dataclass
-class ResourceContext(BaseContext):
-    """Holds context data for rendering resource-related views."""
 
-    model: Any
-    blueprint_name: str
-    item_dict: dict
+@dataclass
+class EntityContext(BaseContext):
+    """Holds context data for rendering resource-related views."""
 
     autocomplete_fields: List[dict] = field(default_factory=list)
     error_message: str = ""
-
     title: str = ""
     item: Any = None
     read_only: bool = True
     action: str = "Viewing"
-    current_user: Optional['UserMixin'] = None  # Replace if needed
+    current_user: Optional['UserMixin'] = None
 
+    # Fields initialized in __post_init__
     tabs: list = field(default_factory=list, init=False)
     item_name: str = field(default="", init=False)
     submit_url: str = field(default="", init=False)
     id: str = field(default="", init=False)
     model_name: str = field(default="", init=False)
 
-    def __init__(self, model: Any, blueprint_name: str, item_dict: dict,
+    def __init__(self,
                  autocomplete_fields: Optional[List[dict]] = None,
                  error_message: str = "", title: str = "", item: Any = None,
                  read_only: bool = True, action: str = "Viewing",
                  current_user: Optional['UserMixin'] = None, **kwargs):
-        if not title:
-            title = action
-        if current_user is None:
-            current_user = current_user  # fallback to global if needed
+        """Initialize the context with proper parent class handling."""
+        # Call parent class initializer with all required params
+        super().__init__(**kwargs)
 
-        super().__init__(
-            model=model,
-            blueprint_name=blueprint_name,
-            item_dict=item_dict,
-            autocomplete_fields=autocomplete_fields or [],
-            error_message=error_message,
-            title=title,
-            item=item,
-            read_only=read_only,
-            action=action,
-            current_user=current_user,
-            **kwargs
-        )
+        # Set instance attributes
+        self.autocomplete_fields = autocomplete_fields or []
+        self.error_message = error_message
+        self.title = title or action
+        self.item = item
+        self.read_only = read_only
+        self.action = action
+        self.current_user = current_user
 
-        self.submit_url = url_for(f"{self.blueprint_name}.create") if not read_only else ""
-        self.model_name = model.__name__
-        self.id = str(item_dict.get("id", ""))
+        # Set derived fields
+        self._initialize_derived_fields()
 
-        logger.info(f"📜 Building '{action}' page for '{blueprint_name}' blueprint (RO={read_only})")
+    def _initialize_derived_fields(self):
+        """Initialize derived fields."""
+        model_name = self.__class__.__name__
+        id_value = getattr(self, 'id', "")
+
+        # Get blueprint_name and item_dict from kwargs if available
+        blueprint_name = getattr(self, 'blueprint_name', "")
+        item_dict = getattr(self, 'item_dict', {})
+
+        self.submit_url = url_for(f"{blueprint_name}.create") if not self.read_only else ""
+        self.model_name = model_name
+        self.id = str(id_value)
+
+        logger.info(f"📜 Building '{self.action}' page for '{blueprint_name}' blueprint (RO={self.read_only})")
         log_instance_vars(self)
 
-        tab_entries = UI_TAB_MAPPING[self.model_name]
-        logger.debug(f"Tab entries for model '{self.model_name}': {tab_entries}")
+        # Process tab entries
+        tab_entries = UI_TAB_MAPPING.get(model_name, [])
+        logger.debug(f"Tab entries for model '{model_name}': {tab_entries}")
         self.tabs = create_tabs(item=item_dict, tabs=tab_entries)
         logger.debug(f"Tabs created: {self.tabs}")
 
+        # Set item_name from the first available field
+        self.item_name = ""
         for key in ("name", "title", "email", "username"):
             if item_dict.get(key):
                 self.item_name = item_dict[key]

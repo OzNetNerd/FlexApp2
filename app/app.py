@@ -111,6 +111,14 @@ def create_app(config_class=Config):
     def inject_globals():
         return {"now": datetime.utcnow(), "logger": app.custom_logger}
 
+    # @app.context_processor
+    # def inject_template_globals():
+    #     return {
+    #         "is_authenticated": current_user.is_authenticated,
+    #         "name": getattr(current_user, "name", "Guest"),
+    #         # "show_navbar": True,
+    #     }
+
     with app.app_context():
         from app import models
         custom_logger.info("Seeding settings and creating database tables.")

@@ -4,6 +4,7 @@ from typing import Union, Optional, Tuple, Dict, Any
 import traceback
 import logging
 import json
+import inspect
 
 from flask import (
     render_template,
@@ -28,10 +29,18 @@ class LoggingUndefined(DebugUndefined):
 
     _missing_variables = set()
 
+    # def _log(self, msg: str):
+    #     var_name = self._undefined_name
+    #     self.__class__._missing_variables.add(var_name)
+    #     logger.warning(f"⚠️  {msg}: '{var_name}'")
+
     def _log(self, msg: str):
         var_name = self._undefined_name
+        frame = inspect.stack()[2]
+        logger.warning(
+            f"⚠️  {msg}: '{var_name}' (template file: {frame.filename}, line: {frame.lineno})"
+        )
         self.__class__._missing_variables.add(var_name)
-        logger.warning(f"⚠️  {msg}: '{var_name}'")
 
     def __str__(self):
         self._log("Undefined variable rendered as string")
