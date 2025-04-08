@@ -48,12 +48,14 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     migrate.init_app(app, db)
 
+    # Set the login view—check that the blueprint’s name matches!
     login_manager.login_view = "auth_bp.login"
     login_manager.login_message = "Please log in to access this page."
     login_manager.login_message_category = "info"
 
     @login_manager.user_loader
     def load_user(user_id):
+        custom_logger.info(f"Loading user with ID: {user_id}")
         return db.session.get(User, int(user_id))
 
     # ----------------------------
@@ -88,14 +90,18 @@ def create_app(config_class=Config):
             "debug_session",
         ]
         endpoint = request.endpoint
+        custom_logger.info(f"require_login: endpoint = {endpoint}, user authenticated = {current_user.is_authenticated}")
         if endpoint is None:
+            custom_logger.info("No endpoint found; skipping login check.")
             return
         if not current_user.is_authenticated:
             if (endpoint in whitelisted or
                 endpoint.startswith("static") or
                 endpoint.startswith("api_") or
                 endpoint.endswith(".data")):
+                custom_logger.info(f"Access allowed for endpoint: {endpoint}")
                 return
+            custom_logger.info(f"Access denied for endpoint: {endpoint}; redirecting to login with next={request.path}")
             return redirect(url_for("auth_bp.login", next=request.path))
 
     # ---------------------------------------------
@@ -107,6 +113,7 @@ def create_app(config_class=Config):
 
     with app.app_context():
         from app import models
+        custom_logger.info("Seeding settings and creating database tables.")
         Setting.seed()
         db.create_all()
 

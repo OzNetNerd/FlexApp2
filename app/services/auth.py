@@ -29,7 +29,11 @@ class AuthService:
 
                 next_page = request.args.get("next")
                 if not next_page or not next_page.startswith("/"):
-                    next_page = url_for("home.index")
+                    try:
+                        next_page = url_for("home_bp.index")
+                        logger.info(f"Redirecting to home page at '{next_page}'")
+                    except Exception as e:
+                        logger.error(f"Failed to build URL for 'home.index': {e}")
 
                 flash("Logged in successfully.", "success")
                 logger.info(f"User {user.email} logged in.")

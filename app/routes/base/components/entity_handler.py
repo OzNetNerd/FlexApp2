@@ -117,48 +117,48 @@ class ResourceContext(BaseContext):
             logger.info(f"item_name defaulted to id: '{self.item_name}'")
 
 
-@dataclass
-class TableContext(BaseContext):
-    """Context class for rendering table views with full metadata."""
-
-    page_type: str
-    table_config: dict
-    table_id: str
-    data_url: str
-    entity_name: str
-    add_url: str
-    columns: List[Any]
-
-    title: str = ""
-    item: Any = None
-    read_only: bool = True
-    action: str = "Viewing"
-    current_user: Optional['UserMixin'] = None  # Replace if needed
-
-    def __init__(self, page_type: str, table_config: dict, table_id: str, data_url: str,
-                 entity_name: str, add_url: str, columns: List[Any], title: str = "",
-                 item: Any = None, read_only: bool = True, action: str = "Viewing",
-                 current_user: Optional['UserMixin'] = None, **kwargs):
-        if not title:
-            title = action
-        if current_user is None:
-            current_user = current_user  # fallback to global if needed
-
-        super().__init__(
-            page_type=page_type,
-            table_config=table_config,
-            table_id=table_id,
-            data_url=data_url,
-            entity_name=entity_name,
-            add_url=add_url,
-            columns=columns,
-            title=title,
-            item=item,
-            read_only=read_only,
-            action=action,
-            current_user=current_user,
-            **kwargs
-        )
+# @dataclass
+# class TableContext(BaseContext):
+#     """Context class for rendering table views with full metadata."""
+#
+#     page_type: str
+#     table_config: dict
+#     table_id: str
+#     data_url: str
+#     entity_name: str
+#     add_url: str
+#     columns: List[Any]
+#
+#     title: str = ""
+#     item: Any = None
+#     read_only: bool = True
+#     action: str = "Viewing"
+#     current_user: Optional['UserMixin'] = None  # Replace if needed
+#
+#     def __init__(self, page_type: str, table_config: dict, table_id: str, data_url: str,
+#                  entity_name: str, add_url: str, columns: List[Any], title: str = "",
+#                  item: Any = None, read_only: bool = True, action: str = "Viewing",
+#                  current_user: Optional['UserMixin'] = None, **kwargs):
+#         if not title:
+#             title = action
+#         if current_user is None:
+#             current_user = current_user  # fallback to global if needed
+#
+#         super().__init__(
+#             page_type=page_type,
+#             table_config=table_config,
+#             table_id=table_id,
+#             data_url=data_url,
+#             entity_name=entity_name,
+#             add_url=add_url,
+#             columns=columns,
+#             title=title,
+#             item=item,
+#             read_only=read_only,
+#             action=action,
+#             current_user=current_user,
+#             **kwargs
+#         )
 
 
 class EntityHandler:
