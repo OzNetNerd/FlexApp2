@@ -369,7 +369,7 @@ def register_auth_conditional_route(
         template = authenticated_template if is_authenticated else unauthenticated_template
         logger.info(f"User {'is' if is_authenticated else 'is not'} authenticated. Rendering template '{template}' for endpoint '{endpoint}'")
 
-        context = SimpleContext()
+        context = SimpleContext(title)
         error_message = f"Failed to render {template}"
 
         return render_safely(template, context, error_message, endpoint_name=endpoint)
