@@ -11,8 +11,15 @@ from app.utils.table_helpers import get_table_id_by_name, get_plural_name
 
 logger = logging.getLogger(__name__)
 
+
 class BaseContext:
-    def __init__(self, **kwargs):
+    def __init__(self, title, show_navbar, read_only, **kwargs):
+        # Set attributes moved from SimpleContext
+        self.title = title
+        self.current_user = current_user  # From flask_login
+        self.show_navbar = show_navbar
+        self.read_only = read_only
+
         # Set each keyword argument as an attribute on the instance.
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -26,7 +33,6 @@ class SimpleContext(BaseContext):
     def __init__(self, title: str, show_navbar=True, read_only=True, **kwargs):
         super().__init__(
             title=title,
-            current_user=current_user,
             show_navbar=show_navbar,
             read_only=read_only,
             **kwargs

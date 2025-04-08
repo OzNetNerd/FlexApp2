@@ -14,6 +14,7 @@ from app.models import User, Setting
 from app.routes.api_router import register_api_routes
 from app.routes.web_router import register_application_blueprints
 from app.utils.app_logging import configure_logging
+from app.routes.base.components.template_renderer import handle_template_error
 
 # ---------------------------------------------
 # Flask Extensions
@@ -48,10 +49,20 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     migrate.init_app(app, db)
 
-    # Set the login view—check that the blueprint’s name matches!
+    # Set the login view—check that the blueprint's name matches!
     login_manager.login_view = "auth_bp.login"
     login_manager.login_message = "Please log in to access this page."
     login_manager.login_message_category = "info"
+
+    # Register TypeError handler
+    @app.errorhandler(TypeError)
+    def handle_type_error(e):
+        return handle_template_error(
+            e,
+            request.endpoint,
+            request.path,
+            "An error occurred while preparing the page context"
+        )
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -110,14 +121,6 @@ def create_app(config_class=Config):
     @app.context_processor
     def inject_globals():
         return {"now": datetime.utcnow(), "logger": app.custom_logger}
-
-    # @app.context_processor
-    # def inject_template_globals():
-    #     return {
-    #         "is_authenticated": current_user.is_authenticated,
-    #         "name": getattr(current_user, "name", "Guest"),
-    #         # "show_navbar": True,
-    #     }
 
     with app.app_context():
         from app import models
