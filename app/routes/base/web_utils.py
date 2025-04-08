@@ -134,7 +134,6 @@ def register_page_route(
 def register_crud_routes(
         blueprint: Blueprint,
         entity_name: str,
-        title="TBA",
         service=None,
         templates: Optional[Dict[str, str]] = None,
         include_routes: Optional[List[str]] = None
@@ -189,21 +188,21 @@ def register_crud_routes(
     }
 
     context_providers = {
-        'index': lambda: TableContext(
+        'index': lambda title=None, **kwargs: TableContext(
             title=f"{entity_name.title()}s",
             table_name=entity_name
         ),
-        'create': lambda: TableContext(
+        'create': lambda title=None, **kwargs: TableContext(
             action="Create",
             table_name=entity_name
         ),
-        'view': lambda item_id: _get_item_context(
+        'view': lambda item_id, title=None, **kwargs: _get_item_context(
             service, entity_name, item_id, "View"
         ) if service else TableContext(
             action="View",
             table_name=entity_name
         ),
-        'edit': lambda item_id: _get_item_context(
+        'edit': lambda item_id, title=None, **kwargs: _get_item_context(
             service, entity_name, item_id, "Edit"
         ) if service else TableContext(
             action="Edit",
@@ -239,7 +238,7 @@ def register_crud_routes(
 
 
 
-def _get_item_context(service, entity_name, item_id, action):
+def _get_item_context(service, entity_name, item_id, action, title=""):
     """Helper to get context for item detail routes.
 
     Args:
@@ -247,6 +246,7 @@ def _get_item_context(service, entity_name, item_id, action):
         entity_name (str): Name of the entity
         item_id: ID of the item to retrieve
         action (str): Action being performed ('View', 'Edit', etc.)
+        title (str): Optional title for the page
 
     Returns:
         SimpleContext or redirect
@@ -255,26 +255,53 @@ def _get_item_context(service, entity_name, item_id, action):
 
     if not service:
         logger.info(f"No service provided for '{entity_name}'. Returning default SimpleContext.")
-        return SimpleContext(action=action, table_name=entity_name)
+        return SimpleContext(action=action, table_name=entity_name, title=title)
 
-    item = service.get_by_id(item_id)
-    logger.info(f"Service call to get '{entity_name}' by ID={item_id} returned: {'found' if item else 'not found'}")
+    try:
+        item = service.get_by_id(item_id)
+        logger.info(f"Service call to get '{entity_name}' by ID={item_id} returned: {'found' if item else 'not found'}")
 
-    if not item:
-        flash(f"{entity_name.title()} not found.", "danger")
-        redirect_target = url_for(f"{entity_name.lower()}s.index")
-        logger.info(f"Redirecting to '{redirect_target}' due to missing item")
-        return redirect(redirect_target)
+        if not item:
+            flash(f"{entity_name.title()} not found.", "danger")
+            redirect_target = url_for(f"{entity_name.lower()}s.index")
+            logger.info(f"Redirecting to '{redirect_target}' due to missing item")
+            return redirect(redirect_target)
 
-    item_data = item.to_dict() if hasattr(item, 'to_dict') else item
-    logger.info(f"Context prepared for '{entity_name}' ID={item_id} with action '{action}'")
+        # Safe conversion of item to dictionary
+        try:
+            if hasattr(item, 'to_dict'):
+                item_data = item.to_dict()
+            elif hasattr(item, '__table__'):
+                # SQLAlchemy model - get column values
+                item_data = {}
+                for column in item.__table__.columns:
+                    item_data[column.name] = getattr(item, column.name)
+            else:
+                # Last resort - try to convert object vars to dict
+                item_data = vars(item)
+        except Exception as e:
+            logger.error(f"Error converting {entity_name} to dictionary: {e}")
+            # Fallback with minimal data
+            item_data = {'id': getattr(item, 'id', item_id), 'error': 'Unable to convert item to dictionary'}
 
-    return SimpleContext(
-        action=action,
-        table_name=entity_name,
-        item=item_data
-    )
+        logger.info(f"Context prepared for '{entity_name}' ID={item_id} with action '{action}'")
 
+        return SimpleContext(
+            action=action,
+            table_name=entity_name,
+            item=item_data,  # Added missing comma here
+            title=title
+        )
+    except Exception as e:
+        logger.error(f"Error getting context for {entity_name} ID={item_id}: {e}")
+        # Return a minimal context that won't cause template errors
+        return SimpleContext(
+            action=action,
+            table_name=entity_name,
+            item={'id': item_id, 'error': f"Error loading {entity_name}: {str(e)}"},
+            error_message=f"Failed to load {entity_name}",  # Added missing comma here
+            title=title
+        )
 
 def register_auth_route(
         blueprint: Blueprint,
@@ -359,10 +386,6 @@ def register_auth_conditional_route(
     logger.info(f"Registered auth conditional route '{endpoint}' at '{url}'")
 
     return blueprint
-
-
-
-
 
 def register_blueprint_routes(blueprint, table_name, include_routes=None, service=None,
                               template_overrides=None, auth_templates=None):

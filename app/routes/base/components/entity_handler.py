@@ -36,7 +36,7 @@ class SimpleContext(BaseContext):
 class TableContext(SimpleContext):
     """Context class for rendering table views with table-specific attributes."""
 
-    def __init__(self, table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = None,
+    def __init__(self, table_name: str, title: str =  "", read_only: bool = True, action: Optional[str] = None,
                  **kwargs):
         # Initialize the base SimpleContext first
         super().__init__(title=title, **kwargs)
