@@ -2,7 +2,7 @@
 
 import logging
 from flask import Blueprint
-from app.routes.base.web_utils import register_blueprint_routes
+from app.routes.base.web_utils import register_auth_route
 from app.services.auth import AuthService
 from app.models.user import User
 
@@ -14,5 +14,6 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 # Create a service instance
 auth_service = AuthService(User)
 
-# Register auth routes - make sure route names match what's in the template
-register_blueprint_routes(auth_bp, "Auth", routes=['login', 'logout'], service=auth_service)
+# Register routes using AuthService handlers
+register_auth_route(auth_bp, "/login", auth_service.handle_login, "login", methods=["GET", "POST"])
+register_auth_route(auth_bp, "/logout", auth_service.handle_logout, "logout", methods=["GET"])
