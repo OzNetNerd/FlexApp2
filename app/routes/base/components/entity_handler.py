@@ -18,35 +18,47 @@ class BaseContext:
             setattr(self, key, value)
             logger.info(f"Set attribute '{key}' = {value}")
 
+
 @dataclass
 class SimpleContext(BaseContext):
-    """Context class for rendering views with optional dynamic attributes."""
+    """Context class for rendering views with basic attributes."""
 
-    def __init__(self, table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = False, **kwargs):
+    def __init__(self, title: str, show_navbar=True, read_only=True, **kwargs):
         super().__init__(
             title=title,
-            table_name=table_name,
-            read_only=read_only,
-            action=action,
             current_user=current_user,
-            show_navbar=True,
+            show_navbar=show_navbar,
+            read_only=read_only,
             **kwargs
         )
+
+@dataclass
+class TableContext(SimpleContext):
+    """Context class for rendering table views with table-specific attributes."""
+
+    def __init__(self, table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = None,
+                 **kwargs):
+        # Initialize the base SimpleContext first
+        super().__init__(title=title, **kwargs)
+
+        # Add table-specific attributes
+        self.table_name = table_name
+        self.read_only = read_only
+        self.action = action
 
         lower_table_name = self.table_name.lower()
         logger.info(f'Set lower table name: {lower_table_name}')
 
         if not self.title:
-            self.title = f'{self.action} {table_name}'
+            self.title = f'{self.action} {table_name}' if self.action else table_name
             logger.info(f"self.title was not provided. set it to: {self.title}")
 
         # Set the table_id using the provided table_name
         self.table_id = get_table_id_by_name(self.table_name)
-        logger.info(f"Set attribute table_id = {self.table_id} (from {self.table_name} = {self.table_name})")
+        logger.info(f"Set attribute table_id = {self.table_id} (from {self.table_name})")
 
         self.data_url = f"/api/{get_plural_name(lower_table_name)}"
         logger.info(f"Set attribute data_url = {self.data_url} (from table_name = {self.table_name})")
-
 
 @dataclass
 class ResourceContext(BaseContext):

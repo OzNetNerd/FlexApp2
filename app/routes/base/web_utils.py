@@ -2,7 +2,7 @@
 import logging
 from flask import url_for, redirect, flash, Blueprint, request
 from app.routes.base.components.template_renderer import render_safely
-from app.routes.base.components.entity_handler import SimpleContext
+from app.routes.base.components.entity_handler import SimpleContext, TableContext
 from typing import Optional, List, Any, Callable, Dict, Union
 
 logger = logging.getLogger(__name__)
@@ -136,23 +136,23 @@ def register_crud_routes(
     logger.info(f"Plural form for '{entity_name}': '{plural_form}'")
 
     context_providers = {
-        'index': lambda: SimpleContext(
+        'index': lambda: TableContext(
             title=f"{entity_name.title()}s",
             table_name=entity_name
         ),
-        'create': lambda: SimpleContext(
+        'create': lambda: TableContext(
             action="Create",
             table_name=entity_name
         ),
         'view': lambda item_id: _get_item_context(
             service, entity_name, item_id, "View"
-        ) if service else SimpleContext(
+        ) if service else TableContext(
             action="View",
             table_name=entity_name
         ),
         'edit': lambda item_id: _get_item_context(
             service, entity_name, item_id, "Edit"
-        ) if service else SimpleContext(
+        ) if service else TableContext(
             action="Edit",
             table_name=entity_name
         )

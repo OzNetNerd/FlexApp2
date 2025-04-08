@@ -23,7 +23,6 @@
   {'name': 'settings', 'display_name': 'Settings', 'icon': 'fa-cog'}
 ] -%}
 
-
 {# Log Initial Template Load #}
 <script type="module">
   import log from '/static/js/logger.js';
@@ -67,39 +66,39 @@
       </script>
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         {%- for item in nav_items %}
-          {# Updated to handle the renamed route functions with blueprint prefixes #}
+          {# Updated to include the _bp suffix for blueprint endpoints #}
           {%- if item.name == 'settings' %}
-            {%- set endpoint = 'settings.index' -%}
+            {%- set endpoint = 'settings_bp.index' -%}
           {%- elif item.name == 'relationships' %}
-            {%- set endpoint = 'relationships.index' -%}
+            {%- set endpoint = 'relationships_bp.index' -%}
           {%- elif item.name == 'crisp_scores' %}
-            {%- set endpoint = 'crisp_scores.index' -%}
+            {%- set endpoint = 'crisp_scores_bp.index' -%}
           {%- else %}
-            {%- set endpoint = item.name + '.index' -%}
+            {%- set endpoint = item.name + '_bp.index' -%}
           {%- endif %}
 
           {# Check if current endpoint matches this nav item's endpoint #}
           {%- if item.name == 'settings' %}
-            {%- set is_active = request.endpoint == 'settings.index' -%}
+            {%- set is_active = request.endpoint == 'settings_bp.index' -%}
           {%- elif item.name == 'relationships' %}
-            {%- set is_active = request.endpoint == 'relationships.index' -%}
+            {%- set is_active = request.endpoint == 'relationships_bp.index' -%}
           {%- elif item.name == 'crisp_scores' %}
-            {%- set is_active = request.endpoint == 'crisp_scores.index' -%}
+            {%- set is_active = request.endpoint == 'crisp_scores_bp.index' -%}
           {%- else %}
-            {%- set is_active = request.endpoint and request.endpoint.startswith(item.name + '.') -%}
+            {%- set is_active = request.endpoint and request.endpoint.startswith(item.name + '_bp.') -%}
           {%- endif %}
 
           <li class="nav-item">
             <a class="nav-link {% if is_active %}active{% endif %}"
                {# Updated URL generation for the renamed routes with blueprint prefixes #}
                {% if item.name == 'settings' %}
-                 href="{{ url_for('settings.index') }}"
+                 href="{{ url_for('settings_bp.index') }}"
                {% elif item.name == 'relationships' %}
-                 href="{{ url_for('relationships.index') }}"
+                 href="{{ url_for('relationships_bp.index') }}"
                {% elif item.name == 'crisp_scores' %}
-                 href="{{ url_for('crisp_scores.index') }}"
+                 href="{{ url_for('crisp_scores_bp.index') }}"
                {% else %}
-                 href="{{ url_for(item.name + '.index') }}"
+                 href="{{ url_for(item.name + '_bp.index') }}"
                {% endif %}
                {% if is_active %}aria-current="page"{% endif %}>
               <i class="fas {{ item.icon }} nav-icon me-1"></i>
@@ -190,7 +189,7 @@
                 <hr class="dropdown-divider m-0">
               </li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('settings.index') }}"><i class="fas fa-cog me-2"></i> Settings</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('settings_bp.index') }}"><i class="fas fa-cog me-2"></i> Settings</a></li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i> Help Center</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item logout-item" href="{{ url_for('auth_bp.logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
