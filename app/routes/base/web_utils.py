@@ -80,12 +80,13 @@ def prepare_route_config(
 
 def register_page_route(
         blueprint: Blueprint,
+        title: str,
         url: str,
         template_path: str,
         endpoint: str = None,
         methods: Optional[List[str]] = None,
         context_provider: Optional[Callable] = None,
-        error_message: str = "Failed to load the page"
+        error_message: str = "Failed to load the page",
 ):
     """Register a route that renders a specific template with optional context."""
     # Prepare route configuration
@@ -98,7 +99,7 @@ def register_page_route(
         # If a context provider was specified, call it to get template data
         if context_provider:
             logger.info(f"Calling context provider for endpoint '{endpoint}'")
-            context = context_provider(*args, **kwargs)
+            context = context_provider(title=title, *args, **kwargs)
             if not context:
                 logger.warning(f"Context provider returned None for endpoint '{endpoint}'")
                 context = SimpleContext(title=endpoint)
@@ -133,6 +134,7 @@ def register_page_route(
 def register_crud_routes(
         blueprint: Blueprint,
         entity_name: str,
+        title="TBA",
         service=None,
         templates: Optional[Dict[str, str]] = None,
         include_routes: Optional[List[str]] = None
@@ -224,6 +226,7 @@ def register_crud_routes(
             register_page_route(
                 blueprint=blueprint,
                 url=url_patterns[route_type],
+                title="TBA",
                 template_path=template,
                 endpoint=route_type,
                 context_provider=context_providers[route_type],

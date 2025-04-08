@@ -8,14 +8,13 @@ logger = logging.getLogger(__name__)
 # Define the blueprint
 home_bp = Blueprint("home_bp", __name__, url_prefix="/")
 
-def home_context_provider():
-    return SimpleContext(title="hello World")
 
 # Register the home page route
 register_page_route(
     blueprint=home_bp,
+    title="Welcome",
     url="/",
     template_path="home.html",
     endpoint="home",
-    context_provider=home_context_provider,
+    context_provider=SimpleContext,
 )
