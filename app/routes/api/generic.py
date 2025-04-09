@@ -47,10 +47,10 @@ class GenericAPIRoutes(CRUDRoutesBase):
 
     def _list_route(self):
         """
-        Handle GET request to list all items with pagination, sorting, and filtering.
+        Handle GET request to list all entities with pagination, sorting, and filtering.
 
         Returns:
-            Response: A JSON response containing a list of items and pagination metadata.
+            Response: A JSON response containing a list of entities and pagination metadata.
         """
         logger.info(f"Handling API list route for {self.model.__name__}")
         try:
@@ -60,7 +60,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
             sort_direction = request.args.get("order", "asc")
             filters = {k.split(".")[1]: {"type": "contains", "filter": v} for k, v in request.args.items() if k.startswith("filter.")}
 
-            items = self.service.get_all(
+            entities = self.service.get_all(
                 page=page,
                 per_page=per_page,
                 sort_column=sort_column,
@@ -68,7 +68,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
                 filters=filters,
             )
 
-            data = [self._ensure_json_serializable(item.to_dict()) for item in items.items]
+            data = [self._ensure_json_serializable(entity.to_dict()) for entity in entities.entities]
             return (
                 jsonify(
                     {
@@ -76,8 +76,8 @@ class GenericAPIRoutes(CRUDRoutesBase):
                         "meta": {
                             "page": page,
                             "per_page": per_page,
-                            "total": items.total,
-                            "pages": items.pages,
+                            "total": entities.total,
+                            "pages": entties.pages,
                         },
                     }
                 ),
@@ -90,18 +90,18 @@ class GenericAPIRoutes(CRUDRoutesBase):
 
     def _get_route(self, entity_id: int):
         """
-        Handle GET request for a single item by ID.
+        Handle GET request for a single entity by ID.
 
         Args:
-            entity_id (int): The ID of the item.
+            entity_id (int): The ID of the entity.
 
         Returns:
-            Response: A JSON response containing the item or error message.
+            Response: A JSON response containing the entity or error message.
         """
         logger.info(f"Handling API get route for {self.model.__name__} with ID {entity_id}")
         try:
-            item = self.service.get_by_id(self.model, entity_id)
-            return jsonify({"data": self._ensure_json_serializable(item.to_dict())}), 200
+            entity = self.service.get_by_id(self.model, entity_id)
+            return jsonify({"data": self._ensure_json_serializable(entity.to_dict())}), 200
         except Exception as e:
             logger.error(f"❌  Error in get route: {str(e)}")
             logger.error(traceback.format_exc())
@@ -114,10 +114,10 @@ class GenericAPIRoutes(CRUDRoutesBase):
 
     def _create_route(self):
         """
-        Handle POST request to create a new item.
+        Handle POST request to create a new entity.
 
         Returns:
-            Response: A JSON response containing the new item or validation errors.
+            Response: A JSON response containing the entity or validation errors.
         """
         logger.info(f"Handling API create route for {self.model.__name__}")
         try:
@@ -130,7 +130,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
             return (
                 jsonify(
                     {
-                        "data": self._ensure_json_serializable(item.to_dict()),
+                        "data": self._ensure_json_serializable(entity.to_dict()),
                         "message": f"{self.model.__name__} created successfully",
                     }
                 ),
@@ -143,13 +143,13 @@ class GenericAPIRoutes(CRUDRoutesBase):
 
     def _update_route(self, entity_id: int):
         """
-        Handle PUT/PATCH request to update an item.
+        Handle PUT/PATCH request to update an entity.
 
         Args:
-            entity_id (int): The ID of the item to update.
+            entity_id (int): The ID of the entity to update.
 
         Returns:
-            Response: A JSON response with the updated item or validation errors.
+            Response: A JSON response with the updated entity or validation errors.
         """
         logger.info(f"Handling API update route for {self.model.__name__} with ID {entity_id}")
         try:

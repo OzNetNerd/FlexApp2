@@ -21,15 +21,15 @@ class AboutTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="title", label="Title", type="text", required=True, value=self.item.get("title")),
-                TabEntry(entry_name="description", label="Description", type="textarea", value=self.item.get("description")),
-                TabEntry(entry_name="due_date", label="Due Date", type="date", value=self.item.get("due_date")),
+                TabEntry(entry_name="title", label="Title", type="text", required=True, value=self.entity.get("title")),
+                TabEntry(entry_name="description", label="Description", type="textarea", value=self.entity.get("description")),
+                TabEntry(entry_name="due_date", label="Due Date", type="date", value=self.entity.get("due_date")),
                 TabEntry(
                     entry_name="status",
                     label="Status",
                     type="select",
                     required=True,
-                    value=self.item.get("status"),
+                    value=self.entity.get("status"),
                     options=[
                         {"value": "Pending", "label": "Pending"},
                         {"value": "In Progress", "label": "In Progress"},
@@ -40,7 +40,7 @@ class AboutTab(TabBuilder):
                     entry_name="priority",
                     label="Priority",
                     type="select",
-                    value=self.item.get("priority"),
+                    value=self.entity.get("priority"),
                     options=[
                         {"value": "Low", "label": "Low"},
                         {"value": "Medium", "label": "Medium"},
@@ -67,8 +67,8 @@ class DetailsTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="notable_type", label="Linked To (Type)", type="hidden", value=self.item.get("notable_type", "User")),
-                TabEntry(entry_name="notable_id", label="Linked To (ID)", type="hidden", value=self.item.get("notable_id", "1")),
+                TabEntry(entry_name="notable_type", label="Linked To (Type)", type="hidden", value=self.entity.get("notable_type", "User")),
+                TabEntry(entry_name="notable_id", label="Linked To (ID)", type="hidden", value=self.entity.get("notable_id", "1")),
             ],
         )
 

@@ -21,8 +21,8 @@ class AboutTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="name", label="Name", type="text", required=True, value=self.item.get("name")),
-                TabEntry(entry_name="description", label="Description", type="text", value=self.item.get("description")),
+                TabEntry(entry_name="name", label="Name", type="text", required=True, value=self.entity.get("name")),
+                TabEntry(entry_name="description", label="Description", type="text", value=self.entity.get("description")),
             ],
         )
 
@@ -43,7 +43,7 @@ class InsightsTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="crisp", label="CRISP", type="custom", value=self.item.get("crisp")),
+                TabEntry(entry_name="crisp", label="CRISP", type="custom", value=self.entity.get("crisp")),
             ],
         )
 
@@ -64,8 +64,8 @@ class RelationshipsTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="users", label="Users", type="custom", value=self.item.get("users")),
-                TabEntry(entry_name="companies", label="Companies", type="custom", value=self.item.get("companies")),
+                TabEntry(entry_name="users", label="Users", type="custom", value=self.entity.get("users")),
+                TabEntry(entry_name="companies", label="Companies", type="custom", value=self.entity.get("companies")),
             ],
         )
 

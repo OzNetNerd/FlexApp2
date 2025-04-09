@@ -106,12 +106,11 @@ class EntityContext(BaseContext):
         autocomplete_fields: Optional[List[dict]] = None,
         error_message: str = "",
         title: str = "",
-        item: Any = None,
+        entity: Any = None,
         read_only: bool = True,
         action: str = "",
-        table_name: str = "",  # Add table_name parameter
-        entity: Any = None,    # Add entity parameter
-        entity_id: Any = None, # Add entity_id parameter
+        table_name: str = "",
+        entity_id: Any = None,
         **kwargs,
     ):
         """Initialize the context with proper parent class handling."""
@@ -122,18 +121,17 @@ class EntityContext(BaseContext):
         self.autocomplete_fields = autocomplete_fields or []
         self.error_message = error_message
         self.title = title or action
-        self.item = item
+        self.entity = entity
         self.read_only = read_only
         self.action = action
         self.name = "tba"
         self.current_user = current_user
         self.table_name = table_name  # Store table_name
-        self.entity = entity          # Store entity
         self.entity_id = entity_id    # Store entity_id
 
         # Derived fields initialized in __init__
         self.tabs = []
-        self.item_name = ""
+        self.entity_name = ""
         self.submit_url = ""
         self.id = ""
         self.model_name = ""
@@ -143,7 +141,7 @@ class EntityContext(BaseContext):
 
     def __str__(self):
         """Return a user-friendly string representation focusing on key entity attributes."""
-        return f"EntityContext(model='{self.model_name}', action='{self.action}', item='{self.item_name}')"
+        return f"EntityContext(model='{self.model_name}', action='{self.action}', entity='{self.entity_name}')"
 
     def __repr__(self):
         """Return a detailed string representation of the entity context."""
@@ -151,7 +149,7 @@ class EntityContext(BaseContext):
         primary_attrs = {
             "model_name": self.model_name,
             "action": self.action,
-            "item_name": self.item_name,
+            "entity_name": self.entity_name,
             "read_only": self.read_only,
             "id": self.id,
         }

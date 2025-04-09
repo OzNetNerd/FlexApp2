@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class CrudRouteConfig:
     blueprint: Any
     entity_name: str
-    service: Optional[Any] = None
+    service: Optional[Any]
     include_routes: List[str] = field(default_factory=lambda: ["index", "create", "view", "edit"])
     templates: Dict[str, str] = field(default_factory=dict)
 
@@ -202,6 +202,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             title=f"Edit {entity_name}",
             read_only=False,
             id=entity_id,
+            entity=service.get_by_id(entity_id),
         ),
     }
 

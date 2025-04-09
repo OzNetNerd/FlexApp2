@@ -4,13 +4,13 @@ from app.services.relationship_service import RelationshipService
 logger = logging.getLogger(__name__)
 
 
-def get_relationships(item, entity_type="user"):
+def get_relationships(entity, entity_type="user"):
     """
-    Retrieve and log relationships for a given item.
+    Retrieve and log relationships for a given entity.
     Returns the list of relationships.
     """
-    logger.info(f"Adding relationships to the context for {item.__class__.__name__} {item.id}.")
-    relationships = RelationshipService.get_relationships_for_entity(entity_type, item.id)
-    logger.info(f"Retrieved {len(relationships)} relationships for {entity_type} with ID {item.id}.")
+    logger.info(f"Adding relationships to the context for {entity.__class__.__name__} {entity.id}.")
+    relationships = RelationshipService.get_relationships_for_entity(entity_type, entity.id)
+    logger.info(f"Retrieved {len(relationships)} relationships for {entity_type} with ID {entity.id}.")
     logger.debug(f"Payload: {relationships}")
     return relationships

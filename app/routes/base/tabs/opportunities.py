@@ -23,9 +23,9 @@ class OverviewTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="name", label="Name", type="text", required=True, value=self.item.get("name")),
-                TabEntry(entry_name="description", label="Description", type="textarea", value=self.item.get("description")),
-                TabEntry(entry_name="company.name", label="Company Name", type="text", value=self.item.get("company.name")),
+                TabEntry(entry_name="name", label="Name", type="text", required=True, value=self.entity.get("name")),
+                TabEntry(entry_name="description", label="Description", type="textarea", value=self.entity.get("description")),
+                TabEntry(entry_name="company.name", label="Company Name", type="text", value=self.entity.get("company.name")),
             ],
         )
 
@@ -34,8 +34,8 @@ class OverviewTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="stage", label="Stage", type="text", required=True, value=self.item.get("stage")),
-                TabEntry(entry_name="status", label="Status", type="text", value=self.item.get("status")),
+                TabEntry(entry_name="stage", label="Stage", type="text", required=True, value=self.entity.get("stage")),
+                TabEntry(entry_name="status", label="Status", type="text", value=self.entity.get("status")),
             ],
         )
 
@@ -57,7 +57,7 @@ class DealTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="value", label="Value", type="number", required=True, value=self.item.get("value")),
+                TabEntry(entry_name="value", label="Value", type="number", required=True, value=self.entity.get("value")),
             ],
         )
 
@@ -66,7 +66,7 @@ class DealTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="crisp", label="CRISP", type="string", required=True, value=self.item.get("crisp")),
+                TabEntry(entry_name="crisp", label="CRISP", type="string", required=True, value=self.entity.get("crisp")),
             ],
         )
 

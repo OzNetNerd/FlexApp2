@@ -69,7 +69,7 @@ class BaseModel(db.Model):
                 data[rel.key] = None
             elif isinstance(value, list):
                 # For a list of related objects, return a list of their IDs.
-                data[rel.key] = [item.id for item in value if hasattr(item, "id")]
+                data[rel.key] = [entity.id for entity in value if hasattr(entity, "id")]
             else:
                 # For a single related object, return its ID.
                 data[rel.key] = value.id if hasattr(value, "id") else None

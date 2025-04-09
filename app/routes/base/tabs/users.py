@@ -23,8 +23,8 @@ class AboutTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="username", label="Username", type="text", required=True, value=self.item.get("username")),
-                TabEntry(entry_name="name", label="Name", type="text", required=True, value=self.item.get("name")),
+                TabEntry(entry_name="username", label="Username", type="text", required=True, value=self.entity.get("username")),
+                TabEntry(entry_name="name", label="Name", type="text", required=True, value=self.entity.get("name")),
             ],
         )
 
@@ -33,7 +33,7 @@ class AboutTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="email", label="Email", type="email", required=True, value=self.item.get("email")),
+                TabEntry(entry_name="email", label="Email", type="email", required=True, value=self.entity.get("email")),
             ],
         )
 
@@ -42,8 +42,8 @@ class AboutTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="created_at", label="Created At", type="datetime", value=self.item.get("created_at")),
-                TabEntry(entry_name="updated_at", label="Updated At", type="datetime", value=self.item.get("updated_at")),
+                TabEntry(entry_name="created_at", label="Created At", type="datetime", value=self.entity.get("created_at")),
+                TabEntry(entry_name="updated_at", label="Updated At", type="datetime", value=self.entity.get("updated_at")),
             ],
         )
 
@@ -64,7 +64,7 @@ class InsightsTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="crisp", label="CRISP", type="custom", value=self.item.get("crisp")),
+                TabEntry(entry_name="crisp", label="CRISP", type="custom", value=self.entity.get("crisp")),
             ],
         )
 
@@ -85,8 +85,8 @@ class RelationshipsTab(TabBuilder):
         return TabSection(
             section_name=section_name,
             entries=[
-                TabEntry(entry_name="users", label="Users", type="custom", value=self.item.get("users")),
-                TabEntry(entry_name="companies", label="Companies", type="custom", value=self.item.get("companies")),
+                TabEntry(entry_name="users", label="Users", type="custom", value=self.entity.get("users")),
+                TabEntry(entry_name="companies", label="Companies", type="custom", value=self.entity.get("companies")),
             ],
         )
 

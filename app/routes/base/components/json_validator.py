@@ -34,9 +34,9 @@ class JSONValidator:
                 if isinstance(value, dict):
                     issues.extend(self.validate_json_serializable(value, current_path))
                 elif isinstance(value, list):
-                    for i, item in enumerate(value):
-                        if isinstance(item, dict):
-                            issues.extend(self.validate_json_serializable(item, f"{current_path}[{i}]"))
+                    for i, entity in enumerate(value):
+                        if isinstance(entity, dict):
+                            issues.extend(self.validate_json_serializable(entity, f"{current_path}[{i}]"))
 
         return issues
 
@@ -53,7 +53,7 @@ class JSONValidator:
         if isinstance(data, dict):
             return {k: self.ensure_json_serializable(v) for k, v in data.items()}
         elif isinstance(data, list):
-            return [self.ensure_json_serializable(item) for item in data]
+            return [self.ensure_json_serializable(entity) for entity in data]
         elif hasattr(data, "__dict__"):
             return self.ensure_json_serializable(data.__dict__)
         return data

@@ -9,5 +9,5 @@ class ValidatorMixin:
     def validate_create(self, data: dict) -> list[str]:
         return []
 
-    def validate_update(self, item, data: dict) -> list[str]:
+    def validate_update(self, entity, data: dict) -> list[str]:
         return []

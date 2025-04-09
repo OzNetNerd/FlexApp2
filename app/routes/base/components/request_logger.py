@@ -15,9 +15,9 @@ class RequestLogger:
         Args:
             model_name (str): The name of the model being accessed.
             route_name (str): The route or endpoint name.
-            entity_id (int, optional): The ID of the item, if available.
+            entity_id (int, optional): The ID of the entity, if available.
         """
-        item_info = f" with id {entity_id}" if entity_id else ""
-        logger.info(f"Request to {route_name} route for {model_name}{item_info}")
+        entity_info = f" with id {entity_id}" if entity_id else ""
+        logger.info(f"Request to {route_name} route for {model_name}{entity_info}")
         logger.info(f"Path: {request.path} | Method: {request.method} | Args: {dict(request.args)}")
         # logger.debug(f"Headers: {dict(request.headers)}")

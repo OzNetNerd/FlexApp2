@@ -21,17 +21,17 @@ class UserService(CRUDService, ValidatorMixin):
 
         return errors
 
-    def validate_update(self, item, data):
+    def validate_update(self, entity, data):
         errors = []
 
         username = data.get("username")
         email = data.get("email")
 
-        if username and username != item.username:
+        if username and username != entity.username:
             if User.query.filter_by(username=username).first():
                 errors.append("Username must be unique.")
 
-        if email and email != item.email:
+        if email and email != entity.email:
             if User.query.filter_by(email=email).first():
                 errors.append("Email must be unique.")
 

@@ -71,24 +71,24 @@ def mentions_search():
 
     logger.debug(f"Searching for mentions with query: {query} and type: {mention_type}")
     results = []
-    items = search_mentions(query, mention_type)
+    entities = search_mentions(query, mention_type)
 
-    for item in items:
+    for entity in entities:
         if mention_type == "user":
             results.append(
                 {
-                    "id": item.id,
-                    "username": item.username,
-                    "name": item.name,
-                    "text": f"@{item.username}",
+                    "id": entity.id,
+                    "username": entity.username,
+                    "name": entity.name,
+                    "text": f"@{entity.username}",
                 }
             )
         elif mention_type == "company":
             results.append(
                 {
-                    "id": item.id,
-                    "name": item.name,
-                    "text": f"#{item.name}",
+                    "id": entity.id,
+                    "name": entity.name,
+                    "text": f"#{entity.name}",
                 }
             )
 
