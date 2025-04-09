@@ -3,27 +3,16 @@
 {# Import the field macros #}
 {% import 'macros/render_form_fields.html' as field_macros with context %}
 
-<script type="module">
-  import log from '/static/js/logger.js';
-
-  const scriptName = '_section_layout.html';
-  const functionName = 'template_init';
-
-  const expected = ['tabs', 'read_only'];
-  const received = [];
-  const missing = [];
-
-  log("info", scriptName, functionName, `🔍 Expecting variables: ${expected.join(', ')}`);
-
-  if ({{ tabs is defined | tojson }}) received.push('tabs'); else missing.push('tabs');
-  if ({{ read_only is defined | tojson }}) received.push('read_only'); else missing.push('read_only');
-
-  log("info", scriptName, functionName, `Received variables: ${received.join(', ') || 'None'}`);
-  log("warn", scriptName, functionName, `❌ Missing variables: ${missing.join(', ') || 'None'}`);
-</script>
+<!-- Store template information in data attributes -->
+<div id="template-data"
+     data-script-name="_section_layout.html"
+     data-tabs-defined="{{ tabs is defined|tojson }}"
+     data-read-only-defined="{{ read_only is defined|tojson }}">
+</div>
 
 {% if tabs %}
-  <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
+  <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist"
+      data-tab-names="{{ tabs|map(attribute='tab_name')|list|tojson }}">
     {%- for tab in tabs %}
       <li class="nav-item" role="presentation">
         <button class="nav-link {% if loop.first %}active{% endif %}"
@@ -31,7 +20,9 @@
                 data-bs-toggle="tab"
                 data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
                 type="button"
-                role="tab">
+                role="tab"
+                aria-controls="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+                aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
           {{ tab.tab_name }}
         </button>
       </li>
@@ -42,7 +33,9 @@
     {%- for tab in tabs %}
       <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
            id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
-           role="tabpanel">
+           role="tabpanel"
+           aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
+           data-section-names="{{ tab.sections|map(attribute='section_name')|list|tojson }}">
         {%- for section in tab.sections %}
           <div class="card shadow-sm border-0 mb-4">
             <div class="card-header bg-white">
@@ -74,32 +67,46 @@
     {%- endfor %}
   </div>
 
-  <script type="module">
-    import log from '/static/js/logger.js';
+<script type="module">
+  import log from '/static/js/logger.js';
 
-    const scriptName = '_section_layout.html';
-    const functionName = 'template_render';
+  // Run logging after page load to avoid HTML entity issues
+  document.addEventListener('DOMContentLoaded', () => {
+    const templateData = document.getElementById('template-data');
+    const scriptName = templateData.dataset.scriptName;
 
-    const tabSummaries = {{ tabs | map(attribute='tab_name') | list | tojson | safe }};
-    log("info", scriptName, functionName, "🧩 Tabs rendered:", tabSummaries);
+    // Log initialization info
+    const functionName = 'template_init';
+    const expected = ['tabs', 'read_only'];
+    const received = [];
+    const missing = [];
 
-    {%- for tab in tabs %}
-      {% set section_names = [] %}
-      {%- for section in tab.sections %}
-        {% set _ = section_names.append(section.section_name) %}
-      {%- endfor %}
-      const sectionsInTab_{{ loop.index }} = {{ section_names | tojson | safe }};
-      log("debug", scriptName, functionName, "📁 Sections in tab '{{ tab.tab_name }}':", sectionsInTab_{{ loop.index }});
-    {%- endfor %}
-  </script>
-{% else %}
-  <div class="alert alert-warning">
-    No tabs available for display.
-  </div>
-  <script type="module">
-    import log from '/static/js/logger.js';
-    log("warn", "_section_layout.html", "template_render", "⚠️ No tabs passed into template.");
-  </script>
+    if (JSON.parse(templateData.dataset.tabsDefined)) received.push('tabs'); else missing.push('tabs');
+    if (JSON.parse(templateData.dataset.readOnlyDefined)) received.push('read_only'); else missing.push('read_only');
+
+    log("info", scriptName, functionName, `🔍 Expecting variables: ${expected.join(', ')}`);
+    log("info", scriptName, functionName, `Received variables: ${received.join(', ') || 'None'}`);
+    if (missing.length > 0) {
+      log("warn", scriptName, functionName, `❌ Missing variables: ${missing.join(', ')}`);
+    } else {
+      log("info", scriptName, functionName, `✅ All expected variables present`);
+    }
+
+    // Log tab render info if tabs exist
+    const formTabs = document.getElementById('formTabs');
+    if (formTabs) {
+      const tabRenderFuncName = 'template_render';
+      const tabNames = JSON.parse(formTabs.dataset.tabNames);
+      log("info", scriptName, tabRenderFuncName, "🧩 Tabs rendered:", tabNames);
+
+      // Log sections for each tab
+      document.querySelectorAll('.tab-pane').forEach((tabPane, index) => {
+        const sectionNames = JSON.parse(tabPane.dataset.sectionNames);
+        log("debug", scriptName, tabRenderFuncName, `📁 Sections in tab '${tabNames[index]}':`, sectionNames);
+      });
+    }
+  });
+</script>
 {% endif %}
 
 <!-- END TEMPLATE: _section_layout.html -->
