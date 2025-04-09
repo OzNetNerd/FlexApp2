@@ -1,7 +1,67 @@
 # Research
 Defensive programming?
 
-# New Web Strucure
+
+# Request Flow
+
+```
++---------------------------------------------------------------+
+|                          User Browses                        |
+|            (Visits URL e.g., '/opportunities/1')              |
++---------------------------------------------------------------+
+                          |
+                          v
+          +----------------------------------------------------+
+          |       Flask Web Route Handler (e.g., /view/<id>)  |
+          |   (Triggered by user browsing to the route)       |
+          +----------------------------------------------------+
+                          |
+                          v
+          +----------------------------------------------------+
+          |       register_crud_routes (CRUD routes reg.)     |
+          |   (Called with opportunities_bp, "Opportunity",   |
+          |        and opportunity_service as params)          |
+          +----------------------------------------------------+
+                          |
+                          v
+          +---------------------------------------------+
+          |        context_providers (Dictionary)       |
+          |  (Defines lambdas for each CRUD action)    |
+          +---------------------------------------------+
+                          |
+    +---------------------+---------------------+ 
+    |                                           |
+    v                                           v
++-------------------+                       +-------------------+
+| 'view' Lambda     |                       | 'edit' Lambda     |
+| (calls _get_entity_context)                | (calls _get_entity_context)   |
++-------------------+                       +-------------------+
+         |                                            |
+         v                                            v
++---------------------------------------------------------------+
+|                _get_entity_context (retrieves entity data)     |
+|  (Uses opportunity_service.get_by_id(entity_id))               |
+|         (Service layer to fetch data from the database)         |
++---------------------------------------------------------------+
+         |                                            |
+         v                                            v
++---------------------------------------------------------------+
+|  Returns context object (EntityContext or TableContext)        |
+|       Passes data to Jinja template for rendering               |
++---------------------------------------------------------------+
+         |
+         v
+   Template Rendering
+         |
+         v
++---------------------------------------------------------------+
+|               Flask Web Route - e.g., /opportunities/1        |
+|   (User browses to '/opportunities/<entity_id>' URL)           |
+|   - URL triggers the route and processes via the lambda       |
+|   - Returns the context to render the 'view' template         |
++---------------------------------------------------------------+
+```
+
 
 ```
 outes/base/crud_factory.py - Our new utility functions would replace this
