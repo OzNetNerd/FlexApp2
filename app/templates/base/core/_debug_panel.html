@@ -13,7 +13,7 @@
     - debug_expanded: Optional boolean to expand panel by default (default: false)
 ------------------------------------------------------------------------------ #}
 
-{% if config and config.get('ENV') == 'development' or config.get('DEBUG') == True %}
+{% if current_app.config.get('ENV') == 'development' or current_app.config.get('DEBUG') == True %}
 <div id="debug-panel-{{ debug_id | default('main') }}" class="debug-panel">
   <div class="debug-panel-header {% if debug_severity == 'error' %}debug-error{% elif debug_severity == 'warning' %}debug-warning{% else %}debug-info{% endif %}">
     <span class="debug-panel-title">{{ debug_title | default(template_name | default('Debug Panel')) }}</span>

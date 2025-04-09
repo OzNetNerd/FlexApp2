@@ -5,6 +5,7 @@ from flask import (
     redirect,
     url_for,
     make_response,
+    current_app
 )
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
@@ -83,7 +84,8 @@ def create_app(config_class=Config):
     # ---------------------------------------------
     @app.before_request
     def log_request():
-        custom_logger.info(f"Web Request {request.method} {request.path} from {request.remote_addr}")
+        request_id = getattr(request, 'id', hex(id(request))[2:])
+        custom_logger.info(f"[{request_id}] Web Request {request.method} {request.path} from {request.remote_addr}")
 
     # ---------------------------------------------
     # Global before_request for login requirement
@@ -110,11 +112,16 @@ def create_app(config_class=Config):
             return redirect(url_for("auth_bp.login", next=request.path))
 
     # ---------------------------------------------
-    # Global context injection
+    # Global context injection - Add current_app to all templates
     # ---------------------------------------------
     @app.context_processor
     def inject_globals():
-        return {"now": datetime.utcnow(), "logger": app.custom_logger}
+        return {
+            "now": datetime.utcnow(),
+            "logger": app.custom_logger,
+            "current_app": current_app,  # Add this line
+            "is_debug_mode": app.debug  # Optional helper variable
+        }
 
     with app.app_context():
         from app import models

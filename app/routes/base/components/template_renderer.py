@@ -100,12 +100,14 @@ def get_flask_globals() -> Dict[str, Any]:
     """
     logger.info("Fetching Flask global objects for template rendering")
 
-    globals_dict = {
-        "url_for": url_for,
-        "get_flashed_messages": get_flashed_messages,
-        "request": request,
-        "session": session,
+    globals_dict =  {
+        'url_for': url_for,
+        'get_flashed_messages': get_flashed_messages,
+        'request': request,
+        'session': request.environ.get('flask.session'),
+        'current_app': current_app  # Make sure this line is included
     }
+
     logger.info(f"Got them: {globals_dict}")
     # Log request details
     logger.debug(f"📝 Request method: {request.method}")
