@@ -185,21 +185,23 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
         "create": lambda title=None, **kwargs: EntityContext(
             action="Create",
             table_name=entity_name,
-            title=f"Create {entity_name}"  # Add title parameter
+            title=f"Create {entity_name}",
+            read_only=False,
+            # Don't include any id parameter here since we're creating a new entity
         ),
         "view": lambda entity_id, title=None, **kwargs: EntityContext(
             action="View",
             table_name=entity_name,
-            entity_id=entity_id,
-            entity=service.get_by_id(entity_id) if service else None,
-            title=plural_form.title(),
+            title=f"View {entity_name}",
+            read_only=True,
+            id=entity_id,
         ),
         "edit": lambda entity_id, title=None, **kwargs: EntityContext(
             action="Edit",
             table_name=entity_name,
-            entity_id=entity_id,
-            entity=service.get_by_id(entity_id) if service else None,
-            title=plural_form.title(),
+            title=f"Edit {entity_name}",
+            read_only=False,
+            id=entity_id,
         ),
     }
 
