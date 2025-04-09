@@ -45,7 +45,8 @@ class AuthService:
         context = BaseContext(title="Login")
         return render_safely("pages/misc/login.html", context)
 
-    def handle_logout(self):
+    @staticmethod
+    def handle_logout():
         logout_user()
         flash("Logged out.", "info")
         logger.info("User logged out.")

@@ -109,7 +109,6 @@ class EntityContext(BaseContext):
         item: Any = None,
         read_only: bool = True,
         action: str = "",
-        name="tba",
         **kwargs,
     ):
         """Initialize the context with proper parent class handling."""
