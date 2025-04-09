@@ -196,13 +196,13 @@ def register_crud_routes(
             action="Create",
             table_name=entity_name
         ),
-        'view': lambda item_id, title=None, **kwargs: _get_item_context(
+        'view': lambda item_id, title=None, **kwargs: _get_entity_context(
             service, entity_name, item_id, "View"
         ) if service else TableContext(
             action="View",
             table_name=entity_name
         ),
-        'edit': lambda item_id, title=None, **kwargs: _get_item_context(
+        'edit': lambda item_id, title=None, **kwargs: _get_entity_context(
             service, entity_name, item_id, "Edit"
         ) if service else TableContext(
             action="Edit",
@@ -238,7 +238,7 @@ def register_crud_routes(
 
 
 
-def _get_item_context(service, entity_name, item_id, action, title=""):
+def _get_entity_context(service, entity_name, item_id, action, title=""):
     """Helper to get context for item detail routes.
 
     Args:
