@@ -173,13 +173,13 @@ def register_crud_routes(blueprint, entity_name, service=None, include_routes=No
     def get_context_provider(route_type):
         """Create appropriate context provider function for each route type."""
         if route_type == 'index':
-            return lambda title=None, **kwargs: TableContext(title=f"{entity_name.title()}s", table_name=entity_name)
+            return lambda title=None, **kwargs: TableContext(title=plural_form.title(), table_name=entity_name)
         elif route_type == 'create':
             return lambda title=None, **kwargs: TableContext(action="Create", table_name=entity_name)
         else:  # view or edit
             action = route_type.capitalize()
             return lambda entity_id, title=None, **kwargs: (
-                _get_entity_context(service, entity_name, entity_id, action)
+                _get_entity_context(service, entity_name, entity_id, action, title=plural_form.title())
                 if service else TableContext(action=action, table_name=entity_name)
             )
 
@@ -192,20 +192,20 @@ def register_crud_routes(blueprint, entity_name, service=None, include_routes=No
     }
 
     # Register each requested route
-    for route_type in [r for r in include_routes if r in route_urls]:
+    for route_type_entry in [r for r in include_routes if r in route_urls]:
         # Generate appropriate error message based on route type
-        error_message = f"Failed to {route_type} {plural_form if route_type == 'index' else entity_name_lower}"
+        error_message = f"Failed to {route_type_entry} {plural_form if route_type_entry == 'index' else entity_name_lower}"
 
         # Allow custom template override, otherwise use default template
-        template_path = templates.get(route_type, get_template(route_type))
+        template_path = templates.get(route_type_entry, get_template(route_type_entry))
 
         register_page_route(
             blueprint=blueprint,
-            url=route_urls[route_type],
+            url=route_urls[route_type_entry],
             title="TBA",  # Title to be assigned later
             template_path=template_path,
-            endpoint=route_type,
-            context_provider=get_context_provider(route_type),
+            endpoint=route_type_entry,
+            context_provider=get_context_provider(route_type_entry),
             error_message=error_message
         )
 
