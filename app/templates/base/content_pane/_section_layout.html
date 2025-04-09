@@ -56,15 +56,14 @@
                   {%- if field.entry_name == 'crisp' and read_only %}
                     {% include 'components/_crisp.html' with context %}
                   {%- else %}
-                    {{ field_macros.render_field(
-                      entry_name=field.entry_name,
-                      label=field.label,
-                      type=field.type,
-                      value=field.value,
-                      required=field.required,
-                      options=field.options,
-                      read_only=read_only
-                    ) }}
+                    {{ field_macros.render_field({
+                      "entry_name": field.entry_name,
+                      "label": field.label,
+                      "type": field.type,
+                      "value": field.value,
+                      "required": field.required,
+                      "options": field.options
+                    }, read_only=read_only) }}
                   {%- endif %}
                 {%- endfor %}
               </div>
