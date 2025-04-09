@@ -6,7 +6,7 @@ import re
 import sys
 from jinja2 import DebugUndefined
 
-logger = logging.getLogger("app")
+logger = logging.getLogger(__name__)
 
 REQUEST_IDS = {}
 

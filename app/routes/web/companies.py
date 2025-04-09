@@ -1,14 +1,23 @@
+# At the top of companies.py
+import logging
+logger = logging.getLogger(__name__)
+print(f"COMPANIES LOGGER NAME: {logger.name}")
+print(f"COMPANIES LOGGER LEVEL: {logger.level}")
+print(f"COMPANIES LOGGER EFFECTIVE LEVEL: {logger.getEffectiveLevel()}")
+print(f"COMPANIES LOGGER HANDLERS: {logger.handlers}")
+print(f"COMPANIES LOGGER PROPAGATE: {logger.propagate}")
+
+
 # Example 1: Full CRUD Entity
 # app/routes/companies.py
-import logging
 from flask import Blueprint
 from app.routes.base.web_utils import register_crud_routes
 from app.services.crud_service import CRUDService
 from app.models.company import Company
 from app.routes.base.web_utils import CrudRouteConfig
+import logging
 
 logger = logging.getLogger(__name__)
-
 # Define the blueprint
 companies_bp = Blueprint("companies_bp", __name__, url_prefix="/companies")
 
@@ -16,6 +25,7 @@ companies_bp = Blueprint("companies_bp", __name__, url_prefix="/companies")
 company_service = CRUDService(Company)
 
 # Register all standard CRUD routes
+
 company_crud_config = CrudRouteConfig(blueprint=companies_bp, entity_name="Company", service=company_service)
 register_crud_routes(company_crud_config)
 

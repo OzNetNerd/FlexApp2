@@ -1,5 +1,15 @@
-from datetime import datetime
 import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+logger = logging.getLogger(__name__)
+logger.info("Starting application initialization")
+
+
+from datetime import datetime
 from flask import (
     Flask,
     request,
@@ -33,16 +43,6 @@ def unauthorized():
 # App Factory
 # ---------------------------------------------
 def create_app(config_class=Config):
-    # Configure standard Python logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S,%f'
-    )
-
-    logger = logging.getLogger(__name__)
-    logger.info("Starting application initialization")
-
     app = Flask(__name__, static_folder="static", static_url_path="/static")
     app.config.from_object(config_class)
 

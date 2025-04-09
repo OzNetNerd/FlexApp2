@@ -103,12 +103,12 @@ class EntityContext(BaseContext):
 
     def __init__(
         self,
+        action: str,
         autocomplete_fields: Optional[List[dict]] = None,
         error_message: str = "",
         title: str = "",
         entity: Any = None,
         read_only: bool = True,
-        action: str = "",
         table_name: str = "",
         entity_id: Any = None,
         **kwargs,

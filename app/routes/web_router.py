@@ -22,6 +22,20 @@ logger = logging.getLogger(__name__)
 relationships_bp = Blueprint("relationships", __name__, url_prefix="/relationships")
 crisp_scores_bp = Blueprint("crisp_scores", __name__, url_prefix="/crisp_scores")
 
+# List of blueprints to register
+BLUEPRINTS = [
+    companies_bp,
+    contacts_bp,
+    opportunities_bp,
+    users_bp,
+    tasks_bp,
+    settings_bp,
+    auth_bp,
+    home_bp,
+    relationships_bp,
+    crisp_scores_bp
+]
+
 
 def register_application_blueprints(app: Flask) -> None:
     """
@@ -41,13 +55,9 @@ def register_application_blueprints(app: Flask) -> None:
     Example:
         register_application_blueprints(app)
     """
-    logger.info("Registering all application blueprints...")
+    logger.info("Registering all web blueprints...")
 
-    app.register_blueprint(companies_bp)
-    app.register_blueprint(contacts_bp)
-    app.register_blueprint(opportunities_bp)
-    app.register_blueprint(users_bp)
-    app.register_blueprint(tasks_bp)
-    app.register_blueprint(settings_bp)
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(home_bp)
+    # Loop through blueprints and register each one
+    for bp in BLUEPRINTS:
+        app.register_blueprint(bp)
+        logger.info(f"Blueprint '{bp.name}' registered successfully")
