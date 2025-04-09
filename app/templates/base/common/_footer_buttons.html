@@ -10,29 +10,31 @@
 {% else %}
   <script>
     window.footerButtonsConfig = {
-      hasId: {{ (id is defined and id is not none) | tojson }},
+      hasId: {{ (id is defined and id is not none and id != 'None' and id != '') | tojson }},
       endpoint: "{{ request.endpoint }}",
       baseRoute: "{{ request.endpoint.rsplit('.', 1)[0] }}",
-      viewUrl: {% if id is defined and id is not none %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}"{% else %}null{% endif %},
-      indexUrl: {% if not (id is defined and id is not none) %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"{% else %}null{% endif %}
+      viewUrl: {% if id is defined and id is not none and id != 'None' and id != '' %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}"{% else %}null{% endif %},
+      indexUrl: "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
     };
   </script>
 
   <div class="footer-buttons-container mt-4 d-flex justify-content-end gap-2">
-    {% if id is defined and id is not none %}
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}" class="btn btn-secondary">
-        <i class="fas fa-times me-1"></i> Cancel
-      </a>
-      <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save me-1"></i> Update
-      </button>
-    {% else %}
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
-        <i class="fas fa-times me-1"></i> Cancel
-      </a>
-      <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save me-1"></i> Create
-      </button>
+    {% if not read_only %}
+      {% if id is defined and id is not none and id != 'None' and id != '' %}
+        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}" class="btn btn-secondary">
+          <i class="fas fa-times me-1"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save me-1"></i> Update
+        </button>
+      {% else %}
+        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
+          <i class="fas fa-times me-1"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save me-1"></i> Create
+        </button>
+      {% endif %}
     {% endif %}
   </div>
 
