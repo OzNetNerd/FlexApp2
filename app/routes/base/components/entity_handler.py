@@ -29,10 +29,10 @@ class BaseContext:
             ValueError: If neither title nor table_name is provided
         """
         logging.info("Building Base Context")
-        if not title and not kwargs.get('table_name'):
+        if not title and not kwargs.get("table_name"):
             raise ValueError("Either 'title' or 'table_name' must be provided.")
 
-        self.title = title or kwargs['table_name']
+        self.title = title or kwargs["table_name"]
         self.current_user = current_user
         self.show_navbar = show_navbar
         self.read_only = read_only
@@ -44,9 +44,7 @@ class BaseContext:
 
     def __repr__(self):
         """Return a detailed string representation of the context."""
-        attributes = ", ".join(f"{key}={repr(value)}"
-                               for key, value in vars(self).items()
-                               if not key.startswith('_'))
+        attributes = ", ".join(f"{key}={repr(value)}" for key, value in vars(self).items() if not key.startswith("_"))
         return f"{self.__class__.__name__}({attributes})"
 
     def __str__(self):
@@ -55,27 +53,20 @@ class BaseContext:
 
     def to_dict(self):
         """Convert context to dictionary for template rendering."""
-        return {key: value for key, value in vars(self).items()
-                if not key.startswith('_')}
+        return {key: value for key, value in vars(self).items() if not key.startswith("_")}
 
 
 class SimpleContext(BaseContext):
     """Context class for rendering views with basic attributes."""
 
     def __init__(self, title: str, show_navbar=True, read_only=True, **kwargs):
-        super().__init__(
-            title=title,
-            show_navbar=show_navbar,
-            read_only=read_only,
-            **kwargs
-        )
+        super().__init__(title=title, show_navbar=show_navbar, read_only=read_only, **kwargs)
 
 
 class TableContext(SimpleContext):
     """Context class for rendering table views with table-specific attributes."""
 
-    def __init__(self, table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = None,
-                 **kwargs):
+    def __init__(self, table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = None, **kwargs):
 
         # Add table-specific attributes
         self.table_name = table_name
@@ -87,14 +78,14 @@ class TableContext(SimpleContext):
             logger.info(f"title was provided. Set self.title to: {self.title}")
 
         else:
-            self.title = f'{self.action} {self.table_name}' if self.action else self.table_name
+            self.title = f"{self.action} {self.table_name}" if self.action else self.table_name
             logger.info(f"title was not provided. Set self.title to table name: {self.title}")
 
         # Initialize the base SimpleContext
         super().__init__(title=self.title, **kwargs)
 
         lower_table_name = self.table_name.lower()
-        logger.info(f'Set lower table name: {lower_table_name}')
+        logger.info(f"Set lower table name: {lower_table_name}")
 
         # Set the table_id using the provided table_name
         self.table_id = get_table_id_by_name(self.table_name)
@@ -111,16 +102,22 @@ class TableContext(SimpleContext):
 class EntityContext(BaseContext):
     """Holds context data for rendering resource-related views."""
 
-    def __init__(self,
-                 autocomplete_fields: Optional[List[dict]] = None,
-                 error_message: str = "", title: str = "", item: Any = None,
-                 read_only: bool = True, action: str = "", name="tba",
-                 **kwargs):
+    def __init__(
+        self,
+        autocomplete_fields: Optional[List[dict]] = None,
+        error_message: str = "",
+        title: str = "",
+        item: Any = None,
+        read_only: bool = True,
+        action: str = "",
+        name="tba",
+        **kwargs,
+    ):
         """Initialize the context with proper parent class handling."""
         # Call parent class initializer with all required params
         super().__init__(title=title, read_only=read_only, **kwargs)
 
-        logger.info('initial...')
+        logger.info("initial...")
 
         # Set instance attributes
         self.autocomplete_fields = autocomplete_fields or []
@@ -150,29 +147,28 @@ class EntityContext(BaseContext):
         """Return a detailed string representation of the entity context."""
         # Include important fields first, then all others
         primary_attrs = {
-            'model_name': self.model_name,
-            'action': self.action,
-            'item_name': self.item_name,
-            'read_only': self.read_only,
-            'id': self.id
+            "model_name": self.model_name,
+            "action": self.action,
+            "item_name": self.item_name,
+            "read_only": self.read_only,
+            "id": self.id,
         }
 
         # Format primary attributes
         primary_str = ", ".join(f"{key}={repr(value)}" for key, value in primary_attrs.items())
 
         # Get all other attributes (excluding private ones)
-        other_attrs = {key: value for key, value in vars(self).items()
-                       if not key.startswith('_') and key not in primary_attrs}
+        other_attrs = {key: value for key, value in vars(self).items() if not key.startswith("_") and key not in primary_attrs}
 
         # Add summary of complex attributes
         if self.autocomplete_fields:
-            other_attrs['autocomplete_fields'] = f"[{len(self.autocomplete_fields)} fields]"
+            other_attrs["autocomplete_fields"] = f"[{len(self.autocomplete_fields)} fields]"
         if self.tabs:
-            other_attrs['tabs'] = f"[{len(self.tabs)} tabs]"
+            other_attrs["tabs"] = f"[{len(self.tabs)} tabs]"
         if isinstance(self.item, dict) and self.item:
-            other_attrs['item'] = f"[{len(self.item)} keys]"
+            other_attrs["item"] = f"[{len(self.item)} keys]"
         elif self.item:
-            other_attrs['item'] = f"<{type(self.item).__name__}>"
+            other_attrs["item"] = f"<{type(self.item).__name__}>"
 
         # Format other attributes
         other_str = ", ".join(f"{key}={repr(value)}" for key, value in other_attrs.items())
@@ -188,18 +184,19 @@ class EntityContext(BaseContext):
     def _initialize_derived_fields(self):
         """Initialize derived fields."""
         model_name = self.__class__.__name__
-        id_value = getattr(self, 'id', "")
+        id_value = getattr(self, "id", "")
 
         # Get blueprint_name and item_dict from kwargs if available
-        blueprint_name = getattr(self, 'blueprint_name', "")
-        item_dict = getattr(self, 'item_dict', {})
+        blueprint_name = getattr(self, "blueprint_name", "")
+        item_dict = getattr(self, "item_dict", {})
 
         self.submit_url = url_for(f"{blueprint_name}.create") if not self.read_only else ""
         self.model_name = model_name
         self.id = str(id_value)
 
         logger.info(f"📜 Building '{self.action}' page for '{blueprint_name}' blueprint (RO={self.read_only})")
-        log_instance_vars(self)
+        instance_details = "EntityContext (_initialize_derived_fields)"
+        log_instance_vars(instance_details, self)
 
         # Process tab entries
         tab_entries = UI_TAB_MAPPING.get(model_name, [])
@@ -217,53 +214,3 @@ class EntityContext(BaseContext):
         else:
             self.item_name = self.id
             logger.info(f"item_name defaulted to id: '{self.item_name}'")
-
-
-class EntityHandler:
-    """Handles preparation and validation of dynamic form inputs for web routes."""
-
-    def __init__(self, model: Any, service: Any, json_validator: Any) -> None:
-        """
-        Initialize the EntityHandler.
-        """
-        self.model = model
-        self.service = service
-        self.json_validator = json_validator
-
-    @staticmethod
-    def resolve_value(item: Any, name: str) -> str:
-        """Resolve a value from a nested object attribute name."""
-        try:
-            if name == "company_name":
-                return item.company.name if item.company else ""
-            if name == "crisp":
-                return item.crisp_summary if hasattr(item, "crisp_summary") else ""
-
-            for part in name.split("."):
-                item = getattr(item, part)
-            return item
-        except AttributeError:
-            logger.warning(f"Unable to resolve value for '{name}'")
-            return ""
-
-    @staticmethod
-    def validate_create(form_data: Dict[str, Any]) -> List[str]:
-        """Validate form data before creating a new record."""
-        users = form_data.getlist("users")
-        companies = form_data.getlist("companies")
-
-        logger.info(f"👥 Selected user IDs: {users}")
-        logger.info(f"🏢 Selected company IDs: {companies}")
-
-        return []
-
-    @staticmethod
-    def validate_edit(item: Any, form_data: Dict[str, Any]) -> List[str]:
-        """Validate form data before updating an existing record."""
-        users = form_data.getlist("users")
-        companies = form_data.getlist("companies")
-
-        logger.info(f"✏️ [Edit] Selected user IDs: {users}")
-        logger.info(f"✏️ [Edit] Selected company IDs: {companies}")
-
-        return []

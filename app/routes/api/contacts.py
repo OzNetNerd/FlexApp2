@@ -10,11 +10,13 @@ logger = logging.getLogger(__name__)
 contacts_api_bp = create_blueprint("api_contacts", url_prefix="/api/contacts")
 contact_service = CRUDService(Contact)
 
+
 @contacts_api_bp.route("/", methods=["GET"])
 def get_all_contacts():
     """Get all contacts."""
     contacts = contact_service.get_all()
     return jsonify([contact.to_dict() for contact in contacts])
+
 
 @contacts_api_bp.route("/<int:entity_id>", methods=["GET"])
 def get_contact(entity_id):
@@ -23,6 +25,7 @@ def get_contact(entity_id):
     if not contact:
         return jsonify({"error": "Contact not found"}), 404
     return jsonify(contact.to_dict())
+
 
 @contacts_api_bp.route("/", methods=["POST"])
 def create_contact():
@@ -37,6 +40,7 @@ def create_contact():
         return jsonify(result), 400
     return jsonify(result), 201
 
+
 @contacts_api_bp.route("/<int:entity_id>", methods=["PUT"])
 def update_contact(entity_id):
     """Update a contact."""
@@ -46,6 +50,7 @@ def update_contact(entity_id):
         return jsonify(result), 400
     return jsonify(result)
 
+
 @contacts_api_bp.route("/<int:entity_id>", methods=["DELETE"])
 def delete_contact(entity_id):
     """Delete a contact."""
@@ -53,5 +58,6 @@ def delete_contact(entity_id):
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
+
 
 logger.info("Contact API routes instantiated successfully.")

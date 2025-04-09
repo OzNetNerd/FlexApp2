@@ -39,7 +39,8 @@ class TabBuilder(ABC):
     section_method_order: List[Callable] = field(default_factory=list, init=False)
 
     def __post_init__(self):
-        log_instance_vars(self, exclude=["item"])
+        instance_details = "TabBuilder (__post_init__)"
+        log_instance_vars(instance_details, self, exclude=["item"])
 
     def create_tab(self) -> Tab:
         sections = [method() for method in self.section_method_order]

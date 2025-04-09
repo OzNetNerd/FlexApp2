@@ -17,9 +17,8 @@ from flask import (
 from jinja2 import Environment, DebugUndefined
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
 from markupsafe import Markup, escape
-
 from app.routes.base.components.entity_handler import BaseContext
-from app.utils.app_logging import log_kwargs
+
 
 logger = logging.getLogger(__name__)
 
@@ -37,9 +36,7 @@ class LoggingUndefined(DebugUndefined):
     def _log(self, msg: str):
         var_name = self._undefined_name
         frame = inspect.stack()[2]
-        logger.warning(
-            f"⚠️  {msg}: '{var_name}' (template file: {frame.filename}, line: {frame.lineno})"
-        )
+        logger.warning(f"⚠️  {msg}: '{var_name}' (template file: {frame.filename}, line: {frame.lineno})")
         self.__class__._missing_variables.add(var_name)
 
     def __str__(self):
@@ -51,19 +48,11 @@ class LoggingUndefined(DebugUndefined):
 
     def __getitem__(self, key):
         self._log(f"Attempted to access key '{key}' on undefined variable")
-        return self.__class__(
-            hint=self._undefined_hint,
-            obj=self._undefined_obj,
-            name=f"{self._undefined_name}[{key!r}]"
-        )
+        return self.__class__(hint=self._undefined_hint, obj=self._undefined_obj, name=f"{self._undefined_name}[{key!r}]")
 
     def __getattr__(self, attr):
         self._log(f"Attempted to access attribute '{attr}' on undefined variable")
-        return self.__class__(
-            hint=self._undefined_hint,
-            obj=self._undefined_obj,
-            name=f"{self._undefined_name}.{attr}"
-        )
+        return self.__class__(hint=self._undefined_hint, obj=self._undefined_obj, name=f"{self._undefined_name}.{attr}")
 
     @classmethod
     def clear_missing_variables(cls):
@@ -119,8 +108,7 @@ def get_flask_globals() -> Dict[str, Any]:
     return globals_dict
 
 
-def handle_template_error(e: Exception, template_name: str, endpoint_name: str, fallback_error_message: str) -> Tuple[
-    str, int]:
+def handle_template_error(e: Exception, template_name: str, endpoint_name: str, fallback_error_message: str) -> Tuple[str, int]:
     """
     Handles template rendering errors and returns a debug panel response.
     """
@@ -158,7 +146,7 @@ def handle_template_error(e: Exception, template_name: str, endpoint_name: str, 
 
 
 def render_debug_panel(
-        template_name: str, original_error: str, render_fallback_error: str, endpoint_name: str, status_code: int
+    template_name: str, original_error: str, render_fallback_error: str, endpoint_name: str, status_code: int
 ) -> Tuple[str, int]:
     """
     Renders a debug panel with error information.
@@ -195,10 +183,10 @@ def render_debug_panel(
 
 
 def render_safely(
-        template_name: str,
-        context: Union[BaseContext],
-        fallback_error_message: str = "An error occurred while rendering the page",
-        endpoint_name: Optional[str] = None,
+    template_name: str,
+    context: Union[BaseContext],
+    fallback_error_message: str = "An error occurred while rendering the page",
+    endpoint_name: Optional[str] = None,
 ) -> Union[Tuple[str, int], str]:
     """
     Safely renders a Jinja2 template with error handling, fallback rendering,
@@ -221,7 +209,6 @@ def render_safely(
         "fallback_error_message": fallback_error_message,
         "endpoint_name": endpoint_name,
     }
-    log_kwargs(log_title=log_title, **context.__dict__, **kwargs)
 
     template_env = create_template_environment()
     current_path = request.path

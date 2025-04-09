@@ -10,11 +10,13 @@ logger = logging.getLogger(__name__)
 tasks_api_bp = create_blueprint("api_tasks", url_prefix="/api/tasks")
 task_service = CRUDService(Task)
 
+
 @tasks_api_bp.route("/", methods=["GET"])
 def get_all_tasks():
     """Get all tasks."""
     tasks = task_service.get_all()
     return jsonify([task.to_dict() for task in tasks])
+
 
 @tasks_api_bp.route("/<int:entity_id>", methods=["GET"])
 def get_task(entity_id):
@@ -23,6 +25,7 @@ def get_task(entity_id):
     if not task:
         return jsonify({"error": "Task not found"}), 404
     return jsonify(task.to_dict())
+
 
 @tasks_api_bp.route("/", methods=["POST"])
 def create_task():
@@ -37,6 +40,7 @@ def create_task():
         return jsonify(result), 400
     return jsonify(result), 201
 
+
 @tasks_api_bp.route("/<int:entity_id>", methods=["PUT"])
 def update_task(entity_id):
     """Update a task."""
@@ -46,6 +50,7 @@ def update_task(entity_id):
         return jsonify(result), 400
     return jsonify(result)
 
+
 @tasks_api_bp.route("/<int:entity_id>", methods=["DELETE"])
 def delete_task(entity_id):
     """Delete a task."""
@@ -53,5 +58,6 @@ def delete_task(entity_id):
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
+
 
 logger.info("Task API routes instantiated successfully.")

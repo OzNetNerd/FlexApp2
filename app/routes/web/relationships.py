@@ -19,6 +19,8 @@ class RelationshipCRUDRoutes(GenericWebRoutes):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # self.register_custom_routes()
+
+
 #
 #     def register_custom_routes(self):
 #         """Register custom routes for relationship management."""

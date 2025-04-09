@@ -10,11 +10,13 @@ logger = logging.getLogger(__name__)
 opportunities_api_bp = create_blueprint("api_opportunities", url_prefix="/api/opportunities")
 opportunity_service = CRUDService(Opportunity)
 
+
 @opportunities_api_bp.route("/", methods=["GET"])
 def get_all_opportunities():
     """Get all opportunities."""
     opportunities = opportunity_service.get_all()
     return jsonify([opportunity.to_dict() for opportunity in opportunities])
+
 
 @opportunities_api_bp.route("/<int:entity_id>", methods=["GET"])
 def get_opportunity(entity_id):
@@ -23,6 +25,7 @@ def get_opportunity(entity_id):
     if not opportunity:
         return jsonify({"error": "Opportunity not found"}), 404
     return jsonify(opportunity.to_dict())
+
 
 @opportunities_api_bp.route("/", methods=["POST"])
 def create_opportunity():
@@ -33,6 +36,7 @@ def create_opportunity():
         return jsonify(result), 400
     return jsonify(result), 201
 
+
 @opportunities_api_bp.route("/<int:entity_id>", methods=["PUT"])
 def update_opportunity(entity_id):
     """Update an opportunity."""
@@ -42,6 +46,7 @@ def update_opportunity(entity_id):
         return jsonify(result), 400
     return jsonify(result)
 
+
 @opportunities_api_bp.route("/<int:entity_id>", methods=["DELETE"])
 def delete_opportunity(entity_id):
     """Delete an opportunity."""
@@ -49,5 +54,6 @@ def delete_opportunity(entity_id):
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
+
 
 logger.info("Opportunities API routes instantiated successfully.")

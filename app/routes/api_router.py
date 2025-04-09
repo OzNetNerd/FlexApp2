@@ -27,6 +27,7 @@ def register_api_routes(app: Flask):
 
     # Add this line to register all API blueprints
     from app.routes.api import register_api_blueprints
+
     logger.info("Starting API blueprint registration")
     register_api_blueprints(app)
     logger.info("API blueprints registered")
@@ -38,7 +39,7 @@ def register_api_routes(app: Flask):
     # Add request tracing middleware
     @app.before_request
     def log_request_info():
-        if request.path.startswith('/api'):
+        if request.path.startswith("/api"):
             logger.info(f"📥 API Request: {request.method} {request.path}")
             logger.debug(f"📝 Request ID: {id(request)}")
             logger.debug(f"📝 Request args: {request.args}")
@@ -48,7 +49,7 @@ def register_api_routes(app: Flask):
 
     @app.after_request
     def log_response_info(response):
-        if request.path.startswith('/api'):
+        if request.path.startswith("/api"):
             logger.info(f"📤 API Response: {response.status_code} for {request.method} {request.path}")
             logger.debug(f"📝 Response headers: {dict(response.headers)}")
             logger.debug(f"📝 Response length: {response.content_length} bytes")
@@ -63,7 +64,7 @@ def register_api_error_handlers(app: Flask):
 
     @app.errorhandler(404)
     def api_page_not_found(e):
-        if request.path.startswith('/api'):
+        if request.path.startswith("/api"):
             logger.warning(f"⚠️ API 404 error: {request.method} {request.path}")
             logger.debug(f"📝 Request args: {request.args}")
             return jsonify({"error": "API endpoint not found", "path": request.path}), 404
@@ -71,7 +72,7 @@ def register_api_error_handlers(app: Flask):
 
     @app.errorhandler(500)
     def api_internal_server_error(e):
-        if request.path.startswith('/api'):
+        if request.path.startswith("/api"):
             logger.error(f"❌ API 500 error: {request.method} {request.path}")
             logger.error(f"❌ Exception: {str(e)}")
             logger.error(f"❌ Traceback: {traceback.format_exc()}")
@@ -80,15 +81,11 @@ def register_api_error_handlers(app: Flask):
 
     @app.errorhandler(Exception)
     def handle_unexpected_error(e):
-        if request.path.startswith('/api'):
+        if request.path.startswith("/api"):
             logger.error(f"❌ Unhandled API exception: {type(e).__name__}: {str(e)}")
             logger.error(f"❌ Request: {request.method} {request.path}")
             logger.error(f"❌ Traceback: {traceback.format_exc()}")
-            return jsonify({
-                "error": "Unexpected error",
-                "type": type(e).__name__,
-                "message": str(e)
-            }), 500
+            return jsonify({"error": "Unexpected error", "type": type(e).__name__, "message": str(e)}), 500
         return e  # Let the web error handler handle non-API routes
 
     logger.info("API error handlers registered")

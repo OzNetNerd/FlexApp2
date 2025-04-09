@@ -14,9 +14,5 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 task_service = CRUDService(Task)
 
 # Register all standard CRUD routes
-task_crud_config = CrudRouteConfig(
-    blueprint=tasks_bp,
-    entity_name="Task",
-    service=task_service
-)
+task_crud_config = CrudRouteConfig(blueprint=tasks_bp, entity_name="Task", service=task_service)
 register_crud_routes(task_crud_config)

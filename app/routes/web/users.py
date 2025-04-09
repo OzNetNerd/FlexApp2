@@ -14,9 +14,5 @@ users_bp = Blueprint("users_bp", __name__, url_prefix="/users")
 user_service = CRUDService(User)
 
 # Register all standard CRUD routes
-user_crud_config = CrudRouteConfig(
-    blueprint=users_bp,
-    entity_name="User",
-    service=user_service
-)
+user_crud_config = CrudRouteConfig(blueprint=users_bp, entity_name="User", service=user_service)
 register_crud_routes(user_crud_config)

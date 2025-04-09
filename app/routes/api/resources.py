@@ -42,14 +42,16 @@ class GenericDataAPI:
             logger.info(f"Registering API blueprint for resource: {resource_type}")
             app.register_blueprint(blueprint)
 
-    def register_resource(self,
-                          resource_type: str,
-                          model: Type[Any],
-                          search_fields: List[str] = None,
-                          default_sort: str = 'id',
-                          query_handler: Callable = None,
-                          formatter: Callable = None,
-                          url_prefix: str = "/api"):
+    def register_resource(
+        self,
+        resource_type: str,
+        model: Type[Any],
+        search_fields: List[str] = None,
+        default_sort: str = "id",
+        query_handler: Callable = None,
+        formatter: Callable = None,
+        url_prefix: str = "/api",
+    ):
         """
         Register a resource type with the API.
 
@@ -72,11 +74,7 @@ class GenericDataAPI:
         logger.debug(f"📝 Custom query handler: {query_handler.__name__ if query_handler else None}")
         logger.debug(f"📝 Custom formatter: {formatter.__name__ if formatter else None}")
 
-        self.resources[resource_type] = {
-            'model': model,
-            'search_fields': search_fields or ['name'],
-            'default_sort': default_sort
-        }
+        self.resources[resource_type] = {"model": model, "search_fields": search_fields or ["name"], "default_sort": default_sort}
 
         self.resource_models[resource_type] = model
 
@@ -126,16 +124,16 @@ class GenericDataAPI:
                 logger.warning(f"❌ Resource type {resource_type} not found")
                 return jsonify({"error": f"Resource type {resource_type} not found"}), 404
 
-            model = resource_config['model']
-            search_fields = resource_config['search_fields']
-            default_sort = resource_config['default_sort']
+            model = resource_config["model"]
+            search_fields = resource_config["search_fields"]
+            default_sort = resource_config["default_sort"]
 
             # Parse query parameters
-            page = request.args.get('page', 1, type=int)
-            per_page = request.args.get('per_page', 10, type=int)
-            search = request.args.get('search', '')
-            sort_by = request.args.get('sort', default_sort)
-            order = request.args.get('order', 'asc')
+            page = request.args.get("page", 1, type=int)
+            per_page = request.args.get("per_page", 10, type=int)
+            search = request.args.get("search", "")
+            sort_by = request.args.get("sort", default_sort)
+            order = request.args.get("order", "asc")
 
             logger.debug(f"📝 Request parameters - page: {page}, per_page: {per_page}")
             logger.debug(f"📝 Search term: '{search}'")
@@ -151,11 +149,7 @@ class GenericDataAPI:
             if resource_type in self.custom_query_handlers:
                 logger.debug(f"🔧 Using custom query handler for {resource_type}")
                 query = self.custom_query_handlers[resource_type](
-                    model=model,
-                    search=search,
-                    sort_by=sort_by,
-                    order=order,
-                    **request.args.to_dict()
+                    model=model, search=search, sort_by=sort_by, order=order, **request.args.to_dict()
                 )
             else:
                 # Start with base query
@@ -169,16 +163,17 @@ class GenericDataAPI:
                     for field in search_fields:
                         if hasattr(model, field):
                             column = getattr(model, field)
-                            search_filters.append(column.ilike(f'%{search}%'))
+                            search_filters.append(column.ilike(f"%{search}%"))
 
                     if search_filters:
                         from sqlalchemy import or_
+
                         query = query.filter(or_(*search_filters))
 
                 # Apply sorting
                 if hasattr(model, sort_by):
                     logger.debug(f"Applying sort: {sort_by} {order}")
-                    if order.lower() == 'desc':
+                    if order.lower() == "desc":
                         query = query.order_by(desc(getattr(model, sort_by)))
                     else:
                         query = query.order_by(getattr(model, sort_by))
@@ -197,7 +192,7 @@ class GenericDataAPI:
                 logger.debug(f"🔧 Using default formatter for {resource_type}")
                 formatted_items = []
                 for item in paginated.items:
-                    if hasattr(item, 'to_dict'):
+                    if hasattr(item, "to_dict"):
                         formatted_items.append(item.to_dict())
                     else:
                         item_dict = {}
@@ -206,13 +201,7 @@ class GenericDataAPI:
                         formatted_items.append(item_dict)
 
             # Prepare response
-            response = {
-                "data": formatted_items,
-                "total": paginated.total,
-                "page": page,
-                "per_page": per_page,
-                "pages": paginated.pages
-            }
+            response = {"data": formatted_items, "total": paginated.total, "page": page, "per_page": per_page, "pages": paginated.pages}
 
             logger.info(f"Successfully processed API data request for {resource_type}")
             logger.debug(f"📝 Response contains {len(formatted_items)} items")

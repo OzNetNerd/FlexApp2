@@ -8,6 +8,7 @@ PLURAL_MAP = {
     "capability": "capabilities",
 }
 
+
 def get_plural_name(table_name):
     return PLURAL_MAP.get(table_name, f"{table_name}s")
 

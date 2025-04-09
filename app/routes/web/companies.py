@@ -16,11 +16,7 @@ companies_bp = Blueprint("companies_bp", __name__, url_prefix="/companies")
 company_service = CRUDService(Company)
 
 # Register all standard CRUD routes
-company_crud_config = CrudRouteConfig(
-    blueprint=companies_bp,
-    entity_name="Company",
-    service=company_service
-)
+company_crud_config = CrudRouteConfig(blueprint=companies_bp, entity_name="Company", service=company_service)
 register_crud_routes(company_crud_config)
 
 #

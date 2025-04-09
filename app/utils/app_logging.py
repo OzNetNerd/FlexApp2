@@ -17,9 +17,7 @@ def configure_logging(level=logging.INFO) -> logging.Logger:
 
     if not logger.handlers:
         handler = logging.StreamHandler(sys.stdout)
-        formatter = logging.Formatter(
-            "%(asctime)s [%(levelname)s] %(name)s.%(funcName)s: %(message)s"
-        )
+        formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s.%(funcName)s: %(message)s")
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
@@ -38,6 +36,7 @@ class RequestIDFilter(logging.Filter):
     def filter(self, record):
         try:
             from flask import request, has_request_context
+
             if has_request_context():
                 if id(request) not in REQUEST_IDS:
                     REQUEST_IDS[id(request)] = str(uuid.uuid4())[:8]
@@ -57,7 +56,7 @@ class EmojiLogFilter(logging.Filter):
 
     def filter(self, record):
         if record.msg and isinstance(record.msg, str):
-            if re.match(r'^\s*[^\w\s]', record.msg):
+            if re.match(r"^\s*[^\w\s]", record.msg):
                 return True
 
             msg = record.msg.strip()
@@ -78,9 +77,9 @@ class EmojiLogFilter(logging.Filter):
         return True
 
 
-def log_instance_vars(instance, exclude: list[str] = None) -> None:
+def log_instance_vars(instance_details, instance, exclude: list[str] = None) -> None:
     exclude = exclude or []
-    logger.info(f"📋 Attributes for {instance.__class__.__name__}:")
+    logger.info(f"📋 Attributes for {instance_details}:")
     for attr, value in vars(instance).items():
         if attr in exclude:
             continue
@@ -99,6 +98,7 @@ def log_message_and_vars(message: str, vars: dict) -> None:
     for key, value in vars.items():
         logger.info(f"  📝 {key}: {value}")
 
+
 class FunctionNameFilter(logging.Filter):
     def __init__(self, function_name):
         super().__init__()
@@ -107,34 +107,6 @@ class FunctionNameFilter(logging.Filter):
     def filter(self, record):
         record.funcName = self.function_name
         return True
-
-
-def log_kwargs(log_title: str, **kwargs: dict) -> None:
-    caller_frame = inspect.currentframe().f_back
-    caller_module = caller_frame.f_globals["__name__"]
-    caller_function = caller_frame.f_code.co_name
-    caller_logger = logging.getLogger(caller_module)
-    function_filter = FunctionNameFilter(caller_function)
-
-    try:
-        caller_logger.addFilter(function_filter)
-        caller_logger.info(f"{log_title}")
-        for key, value in kwargs.items():
-            is_empty = not value and value is not False
-            icon = "⚠️" if is_empty and key != "extra" else "📝"
-            if is_empty and key == "extra":
-                icon = "❓"
-
-            if isinstance(value, dict):
-                caller_logger.info(f"  {icon} {key}:")
-                for subkey, sub_value in value.items():
-                    sub_is_empty = not sub_value and sub_value is not False
-                    sub_icon = "⚠️" if sub_is_empty else "📝"
-                    caller_logger.info(f"    {sub_icon} {subkey}: {sub_value!r}")
-            else:
-                caller_logger.info(f"  {icon} {key}: {value!r}")
-    finally:
-        caller_logger.removeFilter(function_filter)
 
 
 def start_timer():
@@ -163,19 +135,11 @@ class LoggingUndefined(DebugUndefined):
 
     def __getitem__(self, key):
         self._log(f"Attempted to access key '{key}' on undefined variable")
-        return self.__class__(
-            hint=self._undefined_hint,
-            obj=self._undefined_obj,
-            name=f"{self._undefined_name}[{key!r}]"
-        )
+        return self.__class__(hint=self._undefined_hint, obj=self._undefined_obj, name=f"{self._undefined_name}[{key!r}]")
 
     def __getattr__(self, attr):
         self._log(f"Attempted to access attribute '{attr}' on undefined variable")
-        return self.__class__(
-            hint=self._undefined_hint,
-            obj=self._undefined_obj,
-            name=f"{self._undefined_name}.{attr}"
-        )
+        return self.__class__(hint=self._undefined_hint, obj=self._undefined_obj, name=f"{self._undefined_name}.{attr}")
 
     @classmethod
     def clear_missing_variables(cls):

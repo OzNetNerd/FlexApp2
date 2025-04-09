@@ -6,23 +6,28 @@ from app.routes.base.components.entity_handler import SimpleContext, TableContex
 from typing import Optional, List, Any, Callable, Dict, Tuple
 from dataclasses import dataclass, field
 
+
+@dataclass
+class RenderSafelyConfig:
+    template_path: str
+    context: dict
+    error_message: str
+    endpoint_name: str
+
+
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class CrudRouteConfig:
     blueprint: Any
     entity_name: str
     service: Optional[Any] = None
-    include_routes: List[str] = field(default_factory=lambda: ['index', 'create', 'view', 'edit'])
+    include_routes: List[str] = field(default_factory=lambda: ["index", "create", "view", "edit"])
     templates: Dict[str, str] = field(default_factory=dict)
 
 
-def prepare_route_config(
-        url: str,
-        template_path: str,
-        endpoint: str = None,
-        methods: Optional[List[str]] = None
-) -> Tuple[str, List[str]]:
+def prepare_route_config(url: str, template_path: str, endpoint: str = None, methods: Optional[List[str]] = None) -> Tuple[str, List[str]]:
     """Prepares Flask route configuration by setting defaults and deriving endpoint names.
 
     This utility function handles common route configuration tasks, providing
@@ -66,7 +71,7 @@ def prepare_route_config(
     # Auto-generate endpoint name if none provided
     if not endpoint:
         # Split template path to get component parts
-        parts = template_path.split('/')
+        parts = template_path.split("/")
 
         if len(parts) > 1:
             # For nested templates (e.g., "users/profile.html"),
@@ -76,7 +81,7 @@ def prepare_route_config(
         else:
             # For top-level templates (e.g., "home.html"),
             # just use the filename without extension
-            endpoint = template_path.split('.')[0]
+            endpoint = template_path.split(".")[0]
             logger.info(f"Derived endpoint from root template: '{template_path.split('.')[0]}'")
 
         logger.info(f"No endpoint provided. Using derived endpoint: '{endpoint}'")
@@ -88,14 +93,14 @@ def prepare_route_config(
 
 
 def register_route(
-        blueprint: Blueprint,
-        title: str,
-        url: str,
-        template_path: str,
-        context_provider: Callable,
-        endpoint: str = None,
-        methods: Optional[List[str]] = None,
-        error_message: str = "Failed to load the page",
+    blueprint: Blueprint,
+    title: str,
+    url: str,
+    template_path: str,
+    context_provider: Callable,
+    endpoint: str = None,
+    methods: Optional[List[str]] = None,
+    error_message: str = "Failed to load the page",
 ):
     """Register a route that renders a specific template with optional context."""
     # Prepare route configuration
@@ -121,23 +126,13 @@ def register_route(
         logger.info(f"template path: {template_path}")
         logger.info(f"context: {context}")
 
-        return render_safely(
-            template_path,
-            context,
-            error_message,
-            endpoint_name=endpoint
-        )
+        return render_safely(RenderSafelyConfig)
 
     # Set the function name for Flask (needed for proper endpoint registration)
     route_handler.__name__ = endpoint
 
     # Register the route with Flask
-    blueprint.add_url_rule(
-        url,
-        endpoint=endpoint,
-        view_func=route_handler,
-        methods=methods
-    )
+    blueprint.add_url_rule(url, endpoint=endpoint, view_func=route_handler, methods=methods)
 
     logger.info(f"Registered route '{endpoint}' at '{url}' for template '{template_path}' with methods {methods}")
 
@@ -175,7 +170,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
         raise ValueError("The 'entity_name' must be a string.")
 
     # Ensure default routes and templates are applied if not provided.
-    include_routes = crud_route_config.include_routes or ['index', 'create', 'view', 'edit']
+    include_routes = crud_route_config.include_routes or ["index", "create", "view", "edit"]
     templates = crud_route_config.templates or {}
 
     logger.info(f"Registering CRUD routes for entity '{entity_name}' with routes {include_routes}")
@@ -193,36 +188,30 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
 
     # Direct context creation in dictionary
     context_providers = {
-        'index': lambda title=None, **kwargs: TableContext(
-            title=plural_form.title(),
-            table_name=entity_name
-        ),
-        'create': lambda title=None, **kwargs: EntityContext(
-            action="Create",
-            table_name=entity_name
-        ),
-        'view': lambda entity_id, title=None, **kwargs: EntityContext(
+        "index": lambda title=None, **kwargs: TableContext(title=plural_form.title(), table_name=entity_name),
+        "create": lambda title=None, **kwargs: EntityContext(action="Create", table_name=entity_name),
+        "view": lambda entity_id, title=None, **kwargs: EntityContext(
             action="View",
             table_name=entity_name,
             entity_id=entity_id,
             entity=service.get_by_id(entity_id) if service else None,
-            title=plural_form.title()
+            title=plural_form.title(),
         ),
-        'edit': lambda entity_id, title=None, **kwargs: EntityContext(
+        "edit": lambda entity_id, title=None, **kwargs: EntityContext(
             action="Edit",
             table_name=entity_name,
             entity_id=entity_id,
             entity=service.get_by_id(entity_id) if service else None,
-            title=plural_form.title()
-        )
+            title=plural_form.title(),
+        ),
     }
 
     # Define URL patterns for each route type.
     route_urls = {
-        'index': '/',
-        'create': '/create',
-        'view': '/<int:entity_id>',
-        'edit': '/<int:entity_id>/edit',
+        "index": "/",
+        "create": "/create",
+        "view": "/<int:entity_id>",
+        "edit": "/<int:entity_id>/edit",
     }
 
     # Iterate over the routes to be included and register each with the blueprint.
@@ -232,13 +221,12 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
 
         # Use a custom template if provided; otherwise, determine the default template.
         template_path = templates.get(
-            route_type,
-            f"pages/tables/{plural_form}.html" if route_type == 'index' else f"pages/crud/{route_type}.html"
+            route_type, f"pages/tables/{plural_form}.html" if route_type == "index" else f"pages/crud/{route_type}.html"
         )
 
-        logging.info('Registering route wiht the following settings:')
-        logging.info(f'blueprint={blueprint}')
-        logging.info(f'context_provider = {context_providers[route_type]}')
+        logging.info("Registering route wiht the following settings:")
+        logging.info(f"blueprint={blueprint}")
+        logging.info(f"context_provider = {context_providers[route_type]}")
 
         register_route(
             blueprint=blueprint,
@@ -247,7 +235,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             template_path=template_path,
             endpoint=route_type,
             context_provider=context_providers[route_type],
-            error_message=error_message
+            error_message=error_message,
         )
 
     logger.info(f"Finished registering CRUD routes for '{entity_name}'")
@@ -266,18 +254,13 @@ def _handle_error(entity_name, entity_id, action, exception, title):
     # Return a minimal context that won't cause template errors
     return EntityContext(
         action=action,
-        item={'id': entity_id, 'error': f"Error loading {entity_name}: {str(exception)}"},
+        item={"id": entity_id, "error": f"Error loading {entity_name}: {str(exception)}"},
         error_message=f"Failed to load {entity_name}",
-        title=title
+        title=title,
     )
 
-def register_auth_route(
-        blueprint: Blueprint,
-        url: str,
-        handler: Callable,
-        endpoint: str,
-        methods: Optional[List[str]] = None
-):
+
+def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint: str, methods: Optional[List[str]] = None):
     """Register an authentication route with a custom handler.
 
     Args:
@@ -293,12 +276,7 @@ def register_auth_route(
 
     logger.info(f"Registering auth route '{endpoint}' at '{url}' with methods {methods}")
 
-    blueprint.add_url_rule(
-        url,
-        endpoint=endpoint,
-        view_func=handler,
-        methods=methods
-    )
+    blueprint.add_url_rule(url, endpoint=endpoint, view_func=handler, methods=methods)
 
     logger.info(f"Registered auth route '{endpoint}' at '{url}'")
 

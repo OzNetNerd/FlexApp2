@@ -22,9 +22,11 @@ from app.routes.base.components.template_renderer import handle_template_error
 login_manager = LoginManager()
 migrate = Migrate()
 
+
 @login_manager.unauthorized_handler
 def unauthorized():
     return make_response("🔒 Unauthorized - Please log in first", 401)
+
 
 # ---------------------------------------------
 # App Factory
@@ -57,12 +59,7 @@ def create_app(config_class=Config):
     # Register TypeError handler
     @app.errorhandler(TypeError)
     def handle_type_error(e):
-        return handle_template_error(
-            e,
-            request.endpoint,
-            request.path,
-            "An error occurred while preparing the page context"
-        )
+        return handle_template_error(e, request.endpoint, request.path, "An error occurred while preparing the page context")
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -106,10 +103,7 @@ def create_app(config_class=Config):
             custom_logger.info("No endpoint found; skipping login check.")
             return
         if not current_user.is_authenticated:
-            if (endpoint in whitelisted or
-                endpoint.startswith("static") or
-                endpoint.startswith("api_") or
-                endpoint.endswith(".data")):
+            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
                 custom_logger.info(f"Access allowed for endpoint: {endpoint}")
                 return
             custom_logger.info(f"Access denied for endpoint: {endpoint}; redirecting to login with next={request.path}")
@@ -124,11 +118,13 @@ def create_app(config_class=Config):
 
     with app.app_context():
         from app import models
+
         custom_logger.info("Seeding settings and creating database tables.")
         Setting.seed()
         db.create_all()
 
     return app
+
 
 # ---------------------------------------------
 # Entrypoint

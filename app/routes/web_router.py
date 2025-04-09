@@ -19,8 +19,9 @@ logger = logging.getLogger(__name__)
 
 
 # Define blueprints with original names for template compatibility
-relationships_bp = Blueprint('relationships', __name__, url_prefix='/relationships')
-crisp_scores_bp = Blueprint('crisp_scores', __name__, url_prefix='/crisp_scores')
+relationships_bp = Blueprint("relationships", __name__, url_prefix="/relationships")
+crisp_scores_bp = Blueprint("crisp_scores", __name__, url_prefix="/crisp_scores")
+
 
 def register_application_blueprints(app: Flask) -> None:
     """
