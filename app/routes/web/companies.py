@@ -1,12 +1,5 @@
 # At the top of companies.py
 import logging
-logger = logging.getLogger(__name__)
-print(f"COMPANIES LOGGER NAME: {logger.name}")
-print(f"COMPANIES LOGGER LEVEL: {logger.level}")
-print(f"COMPANIES LOGGER EFFECTIVE LEVEL: {logger.getEffectiveLevel()}")
-print(f"COMPANIES LOGGER HANDLERS: {logger.handlers}")
-print(f"COMPANIES LOGGER PROPAGATE: {logger.propagate}")
-
 
 # Example 1: Full CRUD Entity
 # app/routes/companies.py

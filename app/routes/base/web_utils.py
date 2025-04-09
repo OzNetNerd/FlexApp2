@@ -47,7 +47,7 @@ def prepare_route_config(url: str, template_path: str, endpoint: str = None, met
     # Set default methods if not provided
     if not methods:
         methods = ["GET"]
-        logger.info(f"No 'methods' param provided for '{url}'. Defaulting to: {methods}")
+        logger.warning(f"No 'methods' param provided for '{url}'. Defaulting to: {methods}")
     else:
         logger.info(f"Route '{url}' configured with methods: {methods}")
 
