@@ -14,37 +14,32 @@
    - Shows "Cancel" if editing (id exists and not read_only)
    - Shows Add, Edit, Delete, Back buttons if in read-only mode with id
    - Shows no buttons in other contexts
-
- Features:
-   - Automatically generates appropriate URLs based on current endpoint
-   - Delete button triggers a modal dialog (#deleteModal)
-   - Comprehensive logging for debugging and monitoring
-   - DOM verification to ensure proper rendering
-
- Notes:
-   - Uses request.endpoint to infer base route names
-   - Uses Font Awesome icons for button visuals
-   - Tracks button interactions via event listeners
 #}
 
 <div class="d-flex justify-content-end align-items-center gap-2">
-  {% if id and not read_only %}
+  {% if id is defined and id is not none and not read_only %}
     <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}"
        class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
       <i class="fas fa-times me-1"></i> Cancel
     </a>
-  {% elif id and read_only %}
+  {% endif %}
+
+  {% if id is defined and id is not none and read_only %}
     <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}"
        class="btn btn-primary fw-bold">
       <i class="fas fa-plus me-1"></i> Add
     </a>
-    <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', entity_id=id) }}"
+
+    {# Use a different approach for the edit link to avoid int() conversion issues #}
+    <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', entity_id=id|string) if id is defined and id is not none and id != 'None' and id != '' else '#' }}"
        class="btn btn-warning text-dark fw-bold">
       <i class="fas fa-edit me-1"></i> Edit
     </a>
+
     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
       <i class="fas fa-trash me-1"></i> Delete
     </button>
+
     <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
        class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
       <i class="fas fa-arrow-left me-1"></i> Back
@@ -56,13 +51,13 @@
 <script type="text/javascript">
   window.headerButtonsData = {
     hasId: {{ (id is defined and id is not none) | tojson }},
-    readOnly: {{ read_only | tojson }},
+    readOnly: {{ read_only | default(false) | tojson }},
     endpoint: "{{ request.endpoint }}",
     baseRoute: "{{ request.endpoint.rsplit('.', 1)[0] }}",
     // Calculate expected button labels based on logic:
-    buttons: {% if id and not read_only %}
+    buttons: {% if id is defined and id is not none and not read_only %}
                 ["Cancel"]
-             {% elif id and read_only %}
+             {% elif id is defined and id is not none and read_only %}
                 ["Add", "Edit", "Delete", "Back"]
              {% else %}
                 []

@@ -182,7 +182,11 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
     # Direct context creation in dictionary
     context_providers = {
         "index": lambda title=None, **kwargs: TableContext(title=plural_form.title(), table_name=entity_name),
-        "create": lambda title=None, **kwargs: EntityContext(action="Create", table_name=entity_name),
+        "create": lambda title=None, **kwargs: EntityContext(
+            action="Create",
+            table_name=entity_name,
+            title=f"Create {entity_name}"  # Add title parameter
+        ),
         "view": lambda entity_id, title=None, **kwargs: EntityContext(
             action="View",
             table_name=entity_name,
