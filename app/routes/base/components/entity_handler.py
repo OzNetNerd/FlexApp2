@@ -1,11 +1,10 @@
 import logging
 from flask import url_for
-from flask_login import current_user, UserMixin
+from flask_login import current_user
 from app.routes.base.tabs import UI_TAB_MAPPING
 from app.routes.base.components.tab_builder import create_tabs
 from app.utils.app_logging import log_instance_vars
-from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, List
+from typing import Any, Optional, List
 from app.utils.table_helpers import get_table_id_by_name, get_plural_name
 
 
@@ -116,8 +115,6 @@ class EntityContext(BaseContext):
         """Initialize the context with proper parent class handling."""
         # Call parent class initializer with all required params
         super().__init__(title=title, read_only=read_only, **kwargs)
-
-        logger.info("initial...")
 
         # Set instance attributes
         self.autocomplete_fields = autocomplete_fields or []

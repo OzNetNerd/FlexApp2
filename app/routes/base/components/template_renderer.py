@@ -1,6 +1,6 @@
 # template_renderer.py
 
-from typing import Union, Optional, Tuple, Dict, Any
+from typing import Union, Tuple, Dict, Any
 import traceback
 import logging
 import json
@@ -17,10 +17,19 @@ from flask import (
 from jinja2 import Environment, DebugUndefined
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
 from markupsafe import Markup, escape
+from dataclasses import dataclass
+
 from app.routes.base.components.entity_handler import BaseContext
 
-
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class RenderSafelyConfig:
+    template_path: str
+    context: BaseContext
+    error_message: str
+    endpoint_name: str
 
 
 class LoggingUndefined(DebugUndefined):
@@ -182,56 +191,44 @@ def render_debug_panel(
         return f"<h1>{fallback_error_message}</h1><p>{original_error}</p>", status_code
 
 
-def render_safely(
-    template_name: str,
-    context: Union[BaseContext],
-    fallback_error_message: str = "An error occurred while rendering the page",
-    endpoint_name: Optional[str] = None,
-) -> Union[Tuple[str, int], str]:
+def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, int], str]:
     """
     Safely renders a Jinja2 template with error handling, fallback rendering,
     and structured logging for debugging purposes.
 
     Returns a tuple (HTML, status_code) on error, or a rendered string on success.
     """
-    current_endpoint = endpoint_name or request.endpoint or "unknown endpoint"
+    current_endpoint = render_safely_config.endpoint_name or request.endpoint or "unknown endpoint"
     logger.info(f"🔍 Routing to endpoint: {current_endpoint}")
-    logger.info(f"🔍 Using template: {template_name}")
+    logger.info(f"🔍 Using template: {render_safely_config.template_path}")
     logger.debug(f"📝 Request ID: {id(request)}")
     logger.debug(f"📝 Request method: {request.method}")
     logger.debug(f"📝 Request path: {request.path}")
     logger.debug(f"📝 Request args: {request.args}")
     logger.debug(f"📝 Request headers: {dict(request.headers)}")
 
-    log_title = "🔍 Passing the following context vars to the template:"
-    kwargs = {
-        "context": context,
-        "fallback_error_message": fallback_error_message,
-        "endpoint_name": endpoint_name,
-    }
-
     template_env = create_template_environment()
     current_path = request.path
 
-    logger.info(f"🔍 Attempting to render template '{template_name}' for {endpoint_name} ({current_path})")
-    logger.debug(f"🔧 Context data: {context}")
+    logger.info(f"🔍 Attempting to render template '{render_safely_config.template_path}' for {render_safely_config.endpoint_name} ({current_path})")
+    logger.debug(f"🔧 Context data: {render_safely_config.context}")
 
     try:
-        template = template_env.get_template(template_name)
-        logger.debug(f"Template '{template_name}' loaded successfully")
+        template = template_env.get_template(render_safely_config.template_path)
+        logger.debug(f"Template '{render_safely_config.template_path}' loaded successfully")
 
         LoggingUndefined.clear_missing_variables()
         logger.debug(f"📝 Starting template rendering process")
-        rendered = template.render(**get_flask_globals(), **context.__dict__)
+        rendered = template.render(**get_flask_globals(), **render_safely_config.context.to_dict())
         logger.debug(f"Template rendered successfully with length {len(rendered)} chars")
 
         LoggingUndefined.raise_if_missing()
-        logger.info(f"Template '{template_name}' rendered successfully")
+        logger.info(f"Template '{render_safely_config.template_path}' rendered successfully")
         logger.debug(f"📝 Response content length: {len(rendered)} chars")
 
         return rendered
 
     except Exception as e:
-        logger.exception(f"❌ Error rendering template '{template_name}' at endpoint '{endpoint_name}'")
+        logger.exception(f"❌ Error rendering template '{render_safely_config.template_path}' at endpoint '{render_safely_config.endpoint_name}'")
         logger.error(f"❌ Exception details: {type(e).__name__}: {str(e)}")
-        return handle_template_error(e, template_name, endpoint_name, fallback_error_message)
+        return handle_template_error(e, render_safely_config.template_path, render_safely_config.endpoint_name, render_safely_config.error_message)

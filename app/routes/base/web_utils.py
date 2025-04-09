@@ -1,18 +1,13 @@
 # app/routes/base/web_utils.py
 import logging
-from flask import Blueprint, request
-from app.routes.base.components.template_renderer import render_safely
+from flask import Blueprint
+from app.routes.base.components.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.base.components.entity_handler import SimpleContext, TableContext, EntityContext
 from typing import Optional, List, Any, Callable, Dict, Tuple
 from dataclasses import dataclass, field
 
 
-@dataclass
-class RenderSafelyConfig:
-    template_path: str
-    context: dict
-    error_message: str
-    endpoint_name: str
+
 
 
 logger = logging.getLogger(__name__)
@@ -126,7 +121,12 @@ def register_route(
         logger.info(f"template path: {template_path}")
         logger.info(f"context: {context}")
 
-        return render_safely(RenderSafelyConfig)
+        return render_safely(RenderSafelyConfig(
+            template_path,
+            context,
+            error_message,
+            endpoint,
+        ))
 
     # Set the function name for Flask (needed for proper endpoint registration)
     route_handler.__name__ = endpoint
