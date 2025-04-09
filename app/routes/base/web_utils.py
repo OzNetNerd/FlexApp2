@@ -187,33 +187,38 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
     }
     plural_form = plural_mapping.get(entity_name_lower, f"{entity_name_lower}s")
 
-    def get_template(route_type: str) -> str:
-        """
-        Determines the default template path based on the route type.
-        """
-        return f"pages/tables/{plural_form}.html" if route_type == 'index' else f"pages/crud/{route_type}.html"
-
-    def get_context_provider(route_type: str) -> Callable:
-        """
-        Creates and returns a context provider function for the given route type.
-        """
-        if route_type == 'index':
-            return lambda title=None, **kwargs: TableContext(title=plural_form.title(), table_name=entity_name)
-        elif route_type == 'create':
-            return lambda title=None, **kwargs: TableContext(action="Create", table_name=entity_name)
-        else:  # For 'view' or 'edit'
-            action = route_type.capitalize()
-            return lambda entity_id, title=None, **kwargs: (
-                _get_entity_context(service, entity_name, entity_id, action, title=plural_form.title())
-                if service else TableContext(action=action, table_name=entity_name)
-            )
+    # Direct context creation in dictionary
+    context_providers = {
+        'index': lambda title=None, **kwargs: TableContext(
+            title=plural_form.title(),
+            table_name=entity_name
+        ),
+        'create': lambda title=None, **kwargs: TableContext(
+            action="Create",
+            table_name=entity_name
+        ),
+        'view': lambda entity_id, title=None, **kwargs: TableContext(
+            action="View",
+            table_name=entity_name,
+            entity_id=entity_id,
+            entity=service.get_by_id(entity_id) if service else None,
+            title=plural_form.title()
+        ),
+        'edit': lambda entity_id, title=None, **kwargs: TableContext(
+            action="Edit",
+            table_name=entity_name,
+            entity_id=entity_id,
+            entity=service.get_by_id(entity_id) if service else None,
+            title=plural_form.title()
+        )
+    }
 
     # Define URL patterns for each route type.
-    route_urls: Dict[str, str] = {
+    route_urls = {
         'index': '/',
         'create': '/create',
-        'view': '/<int:entity_id>',      # Requires entity_id as a parameter.
-        'edit': '/<int:entity_id>/edit',  # Requires entity_id as a parameter.
+        'view': '/<int:entity_id>',
+        'edit': '/<int:entity_id>/edit',
     }
 
     # Iterate over the routes to be included and register each with the blueprint.
@@ -222,7 +227,10 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
         error_message = f"Failed to {route_type} {plural_form if route_type == 'index' else entity_name_lower}"
 
         # Use a custom template if provided; otherwise, determine the default template.
-        template_path = templates.get(route_type, get_template(route_type))
+        template_path = templates.get(
+            route_type,
+            f"pages/tables/{plural_form}.html" if route_type == 'index' else f"pages/crud/{route_type}.html"
+        )
 
         register_page_route(
             blueprint=blueprint,
@@ -230,56 +238,12 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             title="TBA",  # Title to be dynamically assigned later.
             template_path=template_path,
             endpoint=route_type,
-            context_provider=get_context_provider(route_type),
+            context_provider=context_providers[route_type],
             error_message=error_message
         )
 
     logger.info(f"Finished registering CRUD routes for '{entity_name}'")
     return blueprint
-
-
-def _get_entity_context(service, entity_name: str, entity_id: str, action: str, title: str):
-    """Helper to retrieve the appropriate context for entity detail routes and pass it to Jinja templates.
-
-    Args:
-        service: Service with a get_by_id method to retrieve the entity
-        entity_name (str): Name of the entity (e.g., 'user', 'product')
-        entity_id: ID of the item to retrieve
-        action (str): Action being performed ('View', 'Edit', etc.)
-        title (str): Optional title for the page, defaults to an empty string
-
-    Returns:
-        TableContext or redirect: The context object to be used for rendering the template, or a redirect if necessary
-    """
-    logger.info(f"Getting entity context for '{entity_name}' with the following settings:")
-    logger.info(f"service: {service}")
-    logger.info(f"entity_name: {entity_name}")
-    logger.info(f"entity_id: {entity_id}")
-    logger.info(f"action: {action}")
-    logger.info(f"title: {title}")
-
-    if not service:
-        return _create_default_context(entity_name, action, title)
-
-    try:
-        item = service.get_by_id(entity_id)
-        logger.info(
-            f"Service call to get '{entity_name}' by ID={entity_id} returned: {'found' if item else 'not found'}")
-
-    except Exception as e:
-        # Render debug panel with error information
-        template_name = f"{entity_name}_detail.html"
-        endpoint_name = request.endpoint or "unknown"
-        return render_debug_panel(
-            template_name=template_name,
-            original_error=str(e),
-            render_fallback_error=f"Failed to retrieve {entity_name} with ID {entity_id}",
-            endpoint_name=endpoint_name,
-            status_code=500
-        )
-
-    logger.info('ret entity')
-    # return EntityContext(title=title)
 
 
 def _create_default_context(entity_name, action, title):
