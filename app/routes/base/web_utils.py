@@ -1,7 +1,7 @@
 # app/routes/base/web_utils.py
 import logging
 from flask import Blueprint, request
-from app.routes.base.components.template_renderer import render_safely, render_debug_panel
+from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import SimpleContext, TableContext, EntityContext
 from typing import Optional, List, Any, Callable, Dict, Tuple
 from dataclasses import dataclass, field
@@ -87,14 +87,14 @@ def prepare_route_config(
     return endpoint, methods
 
 
-def register_page_route(
+def register_route(
         blueprint: Blueprint,
         title: str,
         url: str,
         template_path: str,
+        context_provider: Callable,
         endpoint: str = None,
         methods: Optional[List[str]] = None,
-        context_provider: Optional[Callable] = None,
         error_message: str = "Failed to load the page",
 ):
     """Register a route that renders a specific template with optional context."""
@@ -117,6 +117,10 @@ def register_page_route(
             context = SimpleContext(title=endpoint)
 
         # Render the template safely, handling exceptions
+        logger.info(f"Rendering with the following vars:")
+        logger.info(f"template path: {template_path}")
+        logger.info(f"context: {context}")
+
         return render_safely(
             template_path,
             context,
@@ -193,18 +197,18 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             title=plural_form.title(),
             table_name=entity_name
         ),
-        'create': lambda title=None, **kwargs: TableContext(
+        'create': lambda title=None, **kwargs: EntityContext(
             action="Create",
             table_name=entity_name
         ),
-        'view': lambda entity_id, title=None, **kwargs: TableContext(
+        'view': lambda entity_id, title=None, **kwargs: EntityContext(
             action="View",
             table_name=entity_name,
             entity_id=entity_id,
             entity=service.get_by_id(entity_id) if service else None,
             title=plural_form.title()
         ),
-        'edit': lambda entity_id, title=None, **kwargs: TableContext(
+        'edit': lambda entity_id, title=None, **kwargs: EntityContext(
             action="Edit",
             table_name=entity_name,
             entity_id=entity_id,
@@ -232,7 +236,11 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             f"pages/tables/{plural_form}.html" if route_type == 'index' else f"pages/crud/{route_type}.html"
         )
 
-        register_page_route(
+        logging.info('Registering route wiht the following settings:')
+        logging.info(f'blueprint={blueprint}')
+        logging.info(f'context_provider = {context_providers[route_type]}')
+
+        register_route(
             blueprint=blueprint,
             url=route_urls[route_type],
             title="TBA",  # Title to be dynamically assigned later.

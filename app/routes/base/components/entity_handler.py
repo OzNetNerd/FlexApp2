@@ -13,12 +13,26 @@ logger = logging.getLogger(__name__)
 
 
 class BaseContext:
+    """Base context class for template rendering with common attributes."""
+
     def __init__(self, title="", show_navbar=True, read_only=True, **kwargs):
+        """
+        Initialize the base context with common template variables.
+
+        Args:
+            title (str): The page title
+            show_navbar (bool): Whether to display the navigation bar
+            read_only (bool): Whether the view is in read-only mode
+            **kwargs: Additional attributes to set on the context
+
+        Raises:
+            ValueError: If neither title nor table_name is provided
+        """
         logging.info("Building Base Context")
         if not title and not kwargs.get('table_name'):
             raise ValueError("Either 'title' or 'table_name' must be provided.")
-        self.title = title or kwargs['table_name']
 
+        self.title = title or kwargs['table_name']
         self.current_user = current_user
         self.show_navbar = show_navbar
         self.read_only = read_only
@@ -28,8 +42,23 @@ class BaseContext:
             setattr(self, key, value)
             logger.info(f"Set attribute '{key}' = {value}")
 
+    def __repr__(self):
+        """Return a detailed string representation of the context."""
+        attributes = ", ".join(f"{key}={repr(value)}"
+                               for key, value in vars(self).items()
+                               if not key.startswith('_'))
+        return f"{self.__class__.__name__}({attributes})"
 
-@dataclass
+    def __str__(self):
+        """Return a user-friendly string representation of the context."""
+        return f"{self.__class__.__name__}(title='{self.title}', attrs={len(vars(self))})"
+
+    def to_dict(self):
+        """Convert context to dictionary for template rendering."""
+        return {key: value for key, value in vars(self).items()
+                if not key.startswith('_')}
+
+
 class SimpleContext(BaseContext):
     """Context class for rendering views with basic attributes."""
 
@@ -42,7 +71,6 @@ class SimpleContext(BaseContext):
         )
 
 
-@dataclass
 class TableContext(SimpleContext):
     """Context class for rendering table views with table-specific attributes."""
 
@@ -75,15 +103,18 @@ class TableContext(SimpleContext):
         self.data_url = f"/api/{get_plural_name(lower_table_name)}"
         logger.info(f"Set attribute data_url = {self.data_url} (from table_name = {self.table_name})")
 
+    def __str__(self):
+        """Return a user-friendly string representation focusing on table attributes."""
+        return f"TableContext(table_name='{self.table_name}', table_id={self.table_id}, title='{self.title}')"
 
-@dataclass
+
 class EntityContext(BaseContext):
     """Holds context data for rendering resource-related views."""
 
     def __init__(self,
                  autocomplete_fields: Optional[List[dict]] = None,
                  error_message: str = "", title: str = "", item: Any = None,
-                 read_only: bool = True, action: str = "",
+                 read_only: bool = True, action: str = "", name="tba",
                  **kwargs):
         """Initialize the context with proper parent class handling."""
         # Call parent class initializer with all required params
@@ -98,6 +129,7 @@ class EntityContext(BaseContext):
         self.item = item
         self.read_only = read_only
         self.action = action
+        self.name = "tba"
         self.current_user = current_user
 
         # Derived fields initialized in __init__
@@ -142,49 +174,6 @@ class EntityContext(BaseContext):
         else:
             self.item_name = self.id
             logger.info(f"item_name defaulted to id: '{self.item_name}'")
-
-# @dataclass
-# class TableContext(BaseContext):
-#     """Context class for rendering table views with full metadata."""
-#
-#     page_type: str
-#     table_config: dict
-#     table_id: str
-#     data_url: str
-#     entity_name: str
-#     add_url: str
-#     columns: List[Any]
-#
-#     title: str = ""
-#     item: Any = None
-#     read_only: bool = True
-#     action: str = "Viewing"
-#     current_user: Optional['UserMixin'] = None  # Replace if needed
-#
-#     def __init__(self, page_type: str, table_config: dict, table_id: str, data_url: str,
-#                  entity_name: str, add_url: str, columns: List[Any], title: str = "",
-#                  item: Any = None, read_only: bool = True, action: str = "Viewing",
-#                  current_user: Optional['UserMixin'] = None, **kwargs):
-#         if not title:
-#             title = action
-#         if current_user is None:
-#             current_user = current_user  # fallback to global if needed
-#
-#         super().__init__(
-#             page_type=page_type,
-#             table_config=table_config,
-#             table_id=table_id,
-#             data_url=data_url,
-#             entity_name=entity_name,
-#             add_url=add_url,
-#             columns=columns,
-#             title=title,
-#             item=item,
-#             read_only=read_only,
-#             action=action,
-#             current_user=current_user,
-#             **kwargs
-#         )
 
 
 class EntityHandler:
