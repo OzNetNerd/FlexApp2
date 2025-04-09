@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CrudRouteConfig:
     blueprint: Any
-    entity: Any
+    entity_name: str
     service: Optional[Any] = None
     include_routes: List[str] = field(default_factory=lambda: ['index', 'create', 'view', 'edit'])
     templates: Dict[str, str] = field(default_factory=dict)
@@ -140,86 +140,103 @@ def register_page_route(
     return route_handler
 
 
-def register_crud_routes(blueprint, entity_name, service=None, include_routes=None, templates=None):
-    """Registers standard CRUD routes for an entity on a Flask blueprint.
+def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
+    """
+    Registers standard CRUD routes for an entity on a Flask blueprint.
 
-    Creates and registers index, create, view, and edit routes for an entity.
-    Handles template selection, context generation, and error messages for each route.
-    Properly manages entity name pluralization for display and URL construction.
+    This function creates and registers index, create, view, and edit routes for an entity.
+    It handles template selection, context generation, and error message formation for each route.
+    It also manages the pluralization of the entity name for display and URL construction.
 
     Args:
-        blueprint (flask.Blueprint): The Flask blueprint to register routes on.
-        entity_name (str): Name of the entity (e.g., 'company', 'opportunity').
-        service (object, optional): Service object with data access methods. If provided,
-            will be used to fetch entity data for view/edit routes. Defaults to None.
-        include_routes (list, optional): List of route types to include.
-            Defaults to ['index', 'create', 'view', 'edit'].
-        templates (dict, optional): Custom template paths for specific route types.
-            Keys should be route types, values should be template paths. Defaults to {}.
+        crud_route_config (CrudRouteConfig): A configuration dataclass containing:
+            - blueprint (flask.Blueprint): The Flask blueprint on which to register routes.
+            - entity_name (str): The name of the entity for which routes are to be registered.
+            - service (object, optional): An optional service with data access methods. If provided,
+              it will be used to fetch entity data for view/edit routes. Defaults to None.
+            - include_routes (List[str], optional): A list of route types to include.
+              Defaults to ['index', 'create', 'view', 'edit'].
+            - templates (Dict[str, str], optional): A dictionary of custom template paths keyed by
+              route type. Defaults to {}.
 
     Returns:
-        flask.Blueprint: The blueprint with registered routes.
-
+        flask.Blueprint: The blueprint with the registered CRUD routes.
     """
-    # Default to all CRUD routes if none specified
-    include_routes = include_routes or ['index', 'create', 'view', 'edit']
-    templates = templates or {}
+    # Extract configuration parameters from the dataclass.
+    blueprint = crud_route_config.blueprint
+    entity_name = crud_route_config.entity_name
+    service = crud_route_config.service
+
+    if not isinstance(entity_name, str):
+        raise ValueError("The 'entity_name' must be a string.")
+
+    # Ensure default routes and templates are applied if not provided.
+    include_routes = crud_route_config.include_routes or ['index', 'create', 'view', 'edit']
+    templates = crud_route_config.templates or {}
 
     logger.info(f"Registering CRUD routes for entity '{entity_name}' with routes {include_routes}")
 
-    # Handle pluralization of entity names
+    # Lowercase the entity name and determine its plural form for URLs and display.
     entity_name_lower = entity_name.lower()
     plural_mapping = {
-        "company": "companies", "opportunity": "opportunities",
-        "category": "categories", "capability": "capabilities", "home": "home",
+        "company": "companies",
+        "opportunity": "opportunities",
+        "category": "categories",
+        "capability": "capabilities",
+        "home": "home",
     }
     plural_form = plural_mapping.get(entity_name_lower, f"{entity_name_lower}s")
 
-    def get_template(route_type):
-        """Determine template path based on route type."""
+    def get_template(route_type: str) -> str:
+        """
+        Determines the default template path based on the route type.
+        """
         return f"pages/tables/{plural_form}.html" if route_type == 'index' else f"pages/crud/{route_type}.html"
 
-    def get_context_provider(route_type):
-        """Create appropriate context provider function for each route type."""
+    def get_context_provider(route_type: str) -> Callable:
+        """
+        Creates and returns a context provider function for the given route type.
+        """
         if route_type == 'index':
             return lambda title=None, **kwargs: TableContext(title=plural_form.title(), table_name=entity_name)
         elif route_type == 'create':
             return lambda title=None, **kwargs: TableContext(action="Create", table_name=entity_name)
-        else:  # view or edit
+        else:  # For 'view' or 'edit'
             action = route_type.capitalize()
             return lambda entity_id, title=None, **kwargs: (
                 _get_entity_context(service, entity_name, entity_id, action, title=plural_form.title())
                 if service else TableContext(action=action, table_name=entity_name)
             )
 
-    # Define URL patterns for each route type
-    route_urls = {
+    # Define URL patterns for each route type.
+    route_urls: Dict[str, str] = {
         'index': '/',
         'create': '/create',
-        'view': '/<int:entity_id>',  # Requires entity_id parameter
-        'edit': '/<int:entity_id>/edit'  # Requires entity_id parameter
+        'view': '/<int:entity_id>',      # Requires entity_id as a parameter.
+        'edit': '/<int:entity_id>/edit',  # Requires entity_id as a parameter.
     }
 
-    # Register each requested route
-    for route_type_entry in [r for r in include_routes if r in route_urls]:
-        # Generate appropriate error message based on route type
-        error_message = f"Failed to {route_type_entry} {plural_form if route_type_entry == 'index' else entity_name_lower}"
+    # Iterate over the routes to be included and register each with the blueprint.
+    for route_type in [r for r in include_routes if r in route_urls]:
+        # Generate an appropriate error message for logging and potential error handling.
+        error_message = f"Failed to {route_type} {plural_form if route_type == 'index' else entity_name_lower}"
 
-        # Allow custom template override, otherwise use default template
-        template_path = templates.get(route_type_entry, get_template(route_type_entry))
+        # Use a custom template if provided; otherwise, determine the default template.
+        template_path = templates.get(route_type, get_template(route_type))
 
         register_page_route(
             blueprint=blueprint,
-            url=route_urls[route_type_entry],
-            title="TBA",  # Title to be assigned later
+            url=route_urls[route_type],
+            title="TBA",  # Title to be dynamically assigned later.
             template_path=template_path,
-            endpoint=route_type_entry,
-            context_provider=get_context_provider(route_type_entry),
+            endpoint=route_type,
+            context_provider=get_context_provider(route_type),
             error_message=error_message
         )
 
     logger.info(f"Finished registering CRUD routes for '{entity_name}'")
     return blueprint
+
 
 
 

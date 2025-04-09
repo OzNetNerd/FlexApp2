@@ -1,6 +1,93 @@
 # Research
 Defensive programming?
 
+# SImplified code - register_page_route 
+
+```
+from dataclasses import dataclass, field
+from typing import List, Optional, Callable
+from flask import Blueprint
+
+@dataclass
+class RouteConfig:
+    url: str
+    template_path: str
+    title: str
+    endpoint: Optional[str] = None
+    methods: List[str] = field(default_factory=lambda: ["GET"])
+    context_provider: Optional[Callable] = None
+    error_message: str = "Failed to load the page"
+    
+    def __post_init__(self):
+        """Derive endpoint name from template path if not provided"""
+        if not self.endpoint:
+            parts = self.template_path.split('/')
+            if len(parts) > 1:
+                # For nested templates (e.g., "users/profile.html")
+                self.endpoint = f"{parts[-2]}_{parts[-1].split('.')[0]}"
+            else:
+                # For top-level templates (e.g., "home.html")
+                self.endpoint = self.template_path.split('.')[0]
+            
+            logger.info(f"No endpoint provided. Using derived endpoint: '{self.endpoint}'")
+        else:
+            logger.info(f"Using provided endpoint: '{self.endpoint}'")
+        
+        logger.info(f"Route configuration prepared: URL='{self.url}', endpoint='{self.endpoint}', methods={self.methods}")
+```
+
+register_page_route 
+
+```
+def register_page_route(blueprint: Blueprint, config: RouteConfig):
+    """Register a route that renders a specific template with optional context."""
+    def route_handler(*args, **kwargs):
+        """Handle requests to this route by rendering the template with context."""
+        logger.info(f"Handling request for endpoint '{config.endpoint}' with args={args}, kwargs={kwargs}")
+
+        # If a context provider was specified, call it to get template data
+        if config.context_provider:
+            logger.info(f"Calling context provider for endpoint '{config.endpoint}'")
+            context = config.context_provider(title=config.title, *args, **kwargs)
+            if not context:
+                logger.warning(f"Context provider returned None for endpoint '{config.endpoint}'")
+                context = SimpleContext(title=config.endpoint)
+        else:
+            logger.info(f"No context provider for endpoint '{config.endpoint}', using default SimpleContext")
+            context = SimpleContext(title=config.title)  # Using title instead of endpoint name
+
+        # Render the template safely, handling exceptions
+        return render_safely(
+            config.template_path,
+            context,
+            config.error_message,
+            endpoint_name=config.endpoint
+        )
+
+    # Set the function name for Flask (needed for proper endpoint registration)
+    route_handler.__name__ = config.endpoint
+
+    # Register the route with Flask
+    blueprint.add_url_rule(
+        config.url,
+        endpoint=config.endpoint,
+        view_func=route_handler,
+        methods=config.methods
+    )
+
+    logger.info(f"Registered route '{config.endpoint}' at '{config.url}' for template '{config.template_path}' with methods {config.methods}")
+
+    return route_handler
+```
+
+```
+config = RouteConfig(
+    url='/users',
+    template_path='users/index.html',
+    title='User List'
+)
+register_page_route(my_blueprint, config)
+```
 
 # Request Flow
 

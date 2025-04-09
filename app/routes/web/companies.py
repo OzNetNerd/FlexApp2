@@ -5,6 +5,7 @@ from flask import Blueprint
 from app.routes.base.web_utils import register_crud_routes
 from app.services.crud_service import CRUDService
 from app.models.company import Company
+from app.routes.base.web_utils import CrudRouteConfig
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +16,12 @@ companies_bp = Blueprint("companies_bp", __name__, url_prefix="/companies")
 company_service = CRUDService(Company)
 
 # Register all standard CRUD routes
-register_crud_routes(blueprint=companies_bp, entity_name="Company", service=company_service)
+company_crud_config = CrudRouteConfig(
+    blueprint=companies_bp,
+    entity_name="Company",
+    service=company_service
+)
+register_crud_routes(company_crud_config)
 
 #
 # # Example 2: Index-only Entity
