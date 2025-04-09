@@ -40,6 +40,7 @@ class SimpleContext(BaseContext):
             **kwargs
         )
 
+
 @dataclass
 class TableContext(SimpleContext):
     """Context class for rendering table views with table-specific attributes."""
@@ -78,26 +79,11 @@ class TableContext(SimpleContext):
 class EntityContext(BaseContext):
     """Holds context data for rendering resource-related views."""
 
-    autocomplete_fields: List[dict] = field(default_factory=list)
-    error_message: str = ""
-    title: str = ""
-    item: Any = None
-    read_only: bool = True
-    action: str = "Viewing"
-    current_user: Optional['UserMixin'] = None
-
-    # Fields initialized in __post_init__
-    tabs: list = field(default_factory=list, init=False)
-    item_name: str = field(default="", init=False)
-    submit_url: str = field(default="", init=False)
-    id: str = field(default="", init=False)
-    model_name: str = field(default="", init=False)
-
     def __init__(self,
                  autocomplete_fields: Optional[List[dict]] = None,
                  error_message: str = "", title: str = "", item: Any = None,
                  read_only: bool = True, action: str = "Viewing",
-                 current_user: Optional['UserMixin'] = None, **kwargs):
+                 **kwargs):
         """Initialize the context with proper parent class handling."""
         # Call parent class initializer with all required params
         super().__init__(**kwargs)
@@ -110,6 +96,13 @@ class EntityContext(BaseContext):
         self.read_only = read_only
         self.action = action
         self.current_user = current_user
+
+        # Derived fields initialized in __init__
+        self.tabs = []
+        self.item_name = ""
+        self.submit_url = ""
+        self.id = ""
+        self.model_name = ""
 
         # Set derived fields
         self._initialize_derived_fields()
@@ -146,7 +139,6 @@ class EntityContext(BaseContext):
         else:
             self.item_name = self.id
             logger.info(f"item_name defaulted to id: '{self.item_name}'")
-
 
 # @dataclass
 # class TableContext(BaseContext):
