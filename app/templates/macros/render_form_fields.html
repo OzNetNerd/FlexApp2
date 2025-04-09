@@ -5,53 +5,47 @@
  using Bootstrap 5 classes. It supports various field types including text inputs,
  textareas, selects, checkboxes, and date pickers.
 
- @param {Object} field - The field configuration object
- @param {string} field.name - The field name (used for id and name attributes)
- @param {string} [field.label] - The field label (defaults to capitalized name if not provided)
- @param {string} [field.type='text'] - The input type (text, textarea, select, checkbox, date, readonly)
- @param {*} [field.value] - The current field value
- @param {boolean} [field.required=false] - Whether the field is required
- @param {Object} [field.options] - Key-value pairs for select options where key is the value and value is the label
- @param {boolean} [field.readonly=false] - Whether the field is read-only
+ @param {string} entry_name - The field name (used for id and name attributes)
+ @param {string} [label] - The field label (defaults to capitalized entry_name if not provided)
+ @param {string} [type='text'] - The input type (text, textarea, select, checkbox, date, readonly)
+ @param {*} [value] - The current field value
+ @param {boolean} [required=false] - Whether the field is required
+ @param {Object} [options] - Key-value pairs for select options where key is the value and value is the label
+ @param {boolean} [readonly=false] - Whether the field is read-only
  @param {boolean} [read_only=false] - Global parameter to make all fields read-only
 
  @returns {HTML} Bootstrap 5 styled form field HTML
 
  @example
- {{ render_field({
-    name: 'first_name',
-    label: 'First Name',
-    value: user.first_name,
-    required: true
- }) }}
+ {{ render_field(
+    entry_name='first_name',
+    label='First Name',
+    value=user.first_name,
+    required=true
+ ) }}
 
  @example
- {{ render_field({
-    name: 'user_type',
-    type: 'select',
-    options: {'admin': 'Administrator', 'user': 'Regular User'},
-    value: user.type
- }) }}
+ {{ render_field(
+    entry_name='user_type',
+    type='select',
+    options={'admin': 'Administrator', 'user': 'Regular User'},
+    value=user.type
+ ) }}
 
  @example
- {{ render_field({
-    name: 'is_active',
-    type: 'checkbox',
-    value: user.is_active
- }) }}
+ {{ render_field(
+    entry_name='is_active',
+    type='checkbox',
+    value=user.is_active
+ ) }}
 #}
 
-{% macro render_field(field, read_only=False) %}
-  {% set name = field.name %}
-  {% set label = field.label or name|capitalize %}
-  {% set type = field.type or 'text' %}
-  {% set value = field.value or '' %}
-  {% set required = field.required or false %}
-  {% set options = field.options or [] %}
-  {% set readonly = read_only or field.readonly or type == 'readonly' %}
+{% macro render_field(entry_name, label=None, type='text', value='', required=false, options=[], readonly=false, read_only=false) %}
+  {% set label = label or entry_name|capitalize %}
+  {% set readonly = read_only or readonly or type == 'readonly' %}
 
   <div class="col-md-6 mb-3">
-    <label for="{{ name }}" class="form-label fw-semibold">{{ label }}</label>
+    <label for="{{ entry_name }}" class="form-label fw-semibold">{{ label }}</label>
 
     {# -------- READONLY MODE -------- #}
     {% if readonly %}
@@ -69,21 +63,21 @@
 
     {# -------- TEXTAREA -------- #}
     {% elif type == 'textarea' %}
-      <textarea id="{{ name }}"
-                name="{{ name }}"
+      <textarea id="{{ entry_name }}"
+                name="{{ entry_name }}"
                 class="form-control"
                 rows="4"
                 {% if required %}required{% endif %}>{{ value }}</textarea>
 
     {# -------- SELECT -------- #}
     {% elif type == 'select' %}
-      <select id="{{ name }}"
-              name="{{ name }}"
+      <select id="{{ entry_name }}"
+              name="{{ entry_name }}"
               class="form-select"
               {% if required %}required{% endif %}>
         <option value="">Select {{ label }}</option>
-        {% for key, label in options.items() %}
-          <option value="{{ key }}" {% if value == key %}selected{% endif %}>{{ label }}</option>
+        {% for key, option_label in options.items() %}
+          <option value="{{ key }}" {% if value == key %}selected{% endif %}>{{ option_label }}</option>
         {% endfor %}
       </select>
 
@@ -92,10 +86,10 @@
       <div class="form-check">
         <input class="form-check-input"
                type="checkbox"
-               id="{{ name }}"
-               name="{{ name }}"
+               id="{{ entry_name }}"
+               name="{{ entry_name }}"
                {% if value %}checked{% endif %}>
-        <label class="form-check-label" for="{{ name }}">
+        <label class="form-check-label" for="{{ entry_name }}">
           {{ label }}
         </label>
       </div>
@@ -103,8 +97,8 @@
     {# -------- DATE -------- #}
     {% elif type == 'date' %}
       <input type="date"
-             id="{{ name }}"
-             name="{{ name }}"
+             id="{{ entry_name }}"
+             name="{{ entry_name }}"
              class="form-control"
              value="{{ value }}"
              {% if required %}required{% endif %}>
@@ -112,8 +106,8 @@
     {# -------- DEFAULT INPUT -------- #}
     {% else %}
       <input type="{{ type }}"
-             id="{{ name }}"
-             name="{{ name }}"
+             id="{{ entry_name }}"
+             name="{{ entry_name }}"
              class="form-control"
              value="{{ value }}"
              {% if required %}required{% endif %}>

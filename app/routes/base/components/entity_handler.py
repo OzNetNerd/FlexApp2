@@ -118,7 +118,7 @@ class EntityContext(BaseContext):
                  **kwargs):
         """Initialize the context with proper parent class handling."""
         # Call parent class initializer with all required params
-        super().__init__(**kwargs)
+        super().__init__(title=title, read_only=read_only, **kwargs)
 
         logger.info('initial...')
 
@@ -141,6 +141,49 @@ class EntityContext(BaseContext):
 
         # Set derived fields
         self._initialize_derived_fields()
+
+    def __str__(self):
+        """Return a user-friendly string representation focusing on key entity attributes."""
+        return f"EntityContext(model='{self.model_name}', action='{self.action}', item='{self.item_name}')"
+
+    def __repr__(self):
+        """Return a detailed string representation of the entity context."""
+        # Include important fields first, then all others
+        primary_attrs = {
+            'model_name': self.model_name,
+            'action': self.action,
+            'item_name': self.item_name,
+            'read_only': self.read_only,
+            'id': self.id
+        }
+
+        # Format primary attributes
+        primary_str = ", ".join(f"{key}={repr(value)}" for key, value in primary_attrs.items())
+
+        # Get all other attributes (excluding private ones)
+        other_attrs = {key: value for key, value in vars(self).items()
+                       if not key.startswith('_') and key not in primary_attrs}
+
+        # Add summary of complex attributes
+        if self.autocomplete_fields:
+            other_attrs['autocomplete_fields'] = f"[{len(self.autocomplete_fields)} fields]"
+        if self.tabs:
+            other_attrs['tabs'] = f"[{len(self.tabs)} tabs]"
+        if isinstance(self.item, dict) and self.item:
+            other_attrs['item'] = f"[{len(self.item)} keys]"
+        elif self.item:
+            other_attrs['item'] = f"<{type(self.item).__name__}>"
+
+        # Format other attributes
+        other_str = ", ".join(f"{key}={repr(value)}" for key, value in other_attrs.items())
+
+        # Combine both parts
+        full_repr = f"EntityContext({primary_str}"
+        if other_str:
+            full_repr += f", {other_str}"
+        full_repr += ")"
+
+        return full_repr
 
     def _initialize_derived_fields(self):
         """Initialize derived fields."""
