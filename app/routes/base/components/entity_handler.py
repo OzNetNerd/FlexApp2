@@ -83,11 +83,13 @@ class EntityContext(BaseContext):
     def __init__(self,
                  autocomplete_fields: Optional[List[dict]] = None,
                  error_message: str = "", title: str = "", item: Any = None,
-                 read_only: bool = True, action: str = "Viewing",
+                 read_only: bool = True, action: str = "",
                  **kwargs):
         """Initialize the context with proper parent class handling."""
         # Call parent class initializer with all required params
         super().__init__(**kwargs)
+
+        logger.info('initial...')
 
         # Set instance attributes
         self.autocomplete_fields = autocomplete_fields or []

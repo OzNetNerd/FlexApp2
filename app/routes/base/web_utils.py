@@ -1,7 +1,7 @@
 # app/routes/base/web_utils.py
 import logging
-from flask import url_for, redirect, flash, Blueprint
-from app.routes.base.components.template_renderer import render_safely
+from flask import Blueprint, request
+from app.routes.base.components.template_renderer import render_safely, render_debug_panel
 from app.routes.base.components.entity_handler import SimpleContext, TableContext, EntityContext
 from typing import Optional, List, Any, Callable, Dict, Tuple
 from dataclasses import dataclass, field
@@ -261,70 +261,31 @@ def _get_entity_context(service, entity_name: str, entity_id: str, action: str, 
     if not service:
         return _create_default_context(entity_name, action, title)
 
-
-
     try:
-        item = _fetch_entity(service, entity_id, entity_name)
-        if not item:
-            return _handle_missing_entity(entity_name)
-
-        item_data = _convert_item_to_dict(item, entity_name, entity_id)
-        return _create_entity_context(action, item_data, title)
+        item = service.get_by_id(entity_id)
+        logger.info(
+            f"Service call to get '{entity_name}' by ID={entity_id} returned: {'found' if item else 'not found'}")
 
     except Exception as e:
-        return _handle_error(entity_name, entity_id, action, e, title)
+        # Render debug panel with error information
+        template_name = f"{entity_name}_detail.html"
+        endpoint_name = request.endpoint or "unknown"
+        return render_debug_panel(
+            template_name=template_name,
+            original_error=str(e),
+            render_fallback_error=f"Failed to retrieve {entity_name} with ID {entity_id}",
+            endpoint_name=endpoint_name,
+            status_code=500
+        )
+
+    logger.info('ret entity')
+    # return EntityContext(title=title)
 
 
 def _create_default_context(entity_name, action, title):
     """Create a default context when no service is provided."""
     logger.info(f"No service provided for '{entity_name}'. Returning default TableContext.")
     return TableContext(action=action, table_name=entity_name, title=title)
-
-
-def _fetch_entity(service, entity_id, entity_name):
-    """Fetch the entity using the provided service."""
-    item = service.get_by_id(entity_id)
-    logger.info(f"Service call to get '{entity_name}' by ID={entity_id} returned: {'found' if item else 'not found'}")
-    return item
-
-
-def _handle_missing_entity(entity_name):
-    """Handle the case when the entity is not found."""
-    flash(f"{entity_name.title()} not found.", "danger")
-    redirect_target = url_for(f"{entity_name.lower()}s.index")
-    logger.info(f"Redirecting to '{redirect_target}' due to missing item")
-    return redirect(redirect_target)
-
-
-def _convert_item_to_dict(item, entity_name, entity_id):
-    """Convert an entity to a dictionary representation."""
-    logger.info(f"About to convert...")
-    logger.info(f'Converting item to dict: {item}, {entity_name}, {entity_id}')
-    try:
-        if hasattr(item, 'to_dict'):
-            return item.to_dict()
-        elif hasattr(item, '__table__'):
-            # SQLAlchemy model - get column values
-            item_data = {}
-            for column in item.__table__.columns:
-                item_data[column.name] = getattr(item, column.name)
-            return item_data
-        else:
-            # Last resort - try to convert object vars to dict
-            return vars(item)
-    except Exception as e:
-        logger.error(f"Error converting {entity_name} to dictionary: {e}")
-        # Fallback with minimal data
-        return {'id': getattr(item, 'id', entity_id), 'error': 'Unable to convert item to dictionary'}
-
-
-def _create_entity_context(action, item_data, title):
-    """Create an EntityContext with the item data."""
-    return EntityContext(
-        action=action,
-        item=item_data,
-        title=title
-    )
 
 
 def _handle_error(entity_name, entity_id, action, exception, title):
