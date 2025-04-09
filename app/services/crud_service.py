@@ -127,22 +127,23 @@ class CRUDService:
                 if errors:
                     raise ValueError(f"Validation failed: {errors}")
 
-            item = self.model_class(**data)
-            db.session.add(item)
+            entity = self.model_class(**data)
+            db.session.add(entity)
             db.session.commit()
-            return item
+            return entity
+
         except Exception as e:
             db.session.rollback()
             logger.error(f"❌  Error creating {self.model_class.__name__}: {e}")
             logger.error(traceback.format_exc())
             raise
 
-    def update(self, item: Any, data: dict) -> Any:
+    def update(self, entity: Any, data: dict) -> Any:
         """
         Update an existing instance.
 
         Args:
-            item (Any): The existing instance.
+            entity (Any): The existing instance.
             data (dict): New values.
 
         Returns:
@@ -152,14 +153,14 @@ class CRUDService:
             data = {k: v for k, v in data.items() if v != ""}
             data = self._convert_dates(data)
 
-            if isinstance(item, ValidatorMixin):
-                errors = item.validate_update(data)
+            if isinstance(entity, ValidatorMixin):
+                errors = entity.validate_update(data)
                 if errors:
                     raise ValueError(f"Validation failed: {errors}")
 
             for key, value in data.items():
-                if hasattr(item, key):
-                    setattr(item, key, value)
+                if hasattr(entity, key):
+                    setattr(entity, key, value)
             db.session.commit()
             return item
         except Exception as e:

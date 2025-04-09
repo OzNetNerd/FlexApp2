@@ -126,7 +126,7 @@ class GenericAPIRoutes(CRUDRoutesBase):
             if errors:
                 return jsonify({"error": "Validation Error", "messages": errors}), 400
 
-            item = self.service.create(self.model, data)
+            entity = self.service.create(self.model, data)
             return (
                 jsonify(
                     {
@@ -153,17 +153,17 @@ class GenericAPIRoutes(CRUDRoutesBase):
         """
         logger.info(f"Handling API update route for {self.model.__name__} with ID {entity_id}")
         try:
-            item = self.service.get_by_id(self.model, entity_id)
+            entity = self.service.get_by_id(self.model, entity_id)
             data = request.get_json() if request.is_json else request.form.to_dict()
-            errors = self._validate_edit(item, data)
+            errors = self._validate_edit(entity, data)
             if errors:
                 return jsonify({"error": "Validation Error", "messages": errors}), 400
 
-            item = self.service.update(item, data)
+            entity = self.service.update(entity, data)
             return (
                 jsonify(
                     {
-                        "data": self._ensure_json_serializable(item.to_dict()),
+                        "data": self._ensure_json_serializable(entity.to_dict()),
                         "message": f"{self.model.__name__} updated successfully",
                     }
                 ),
@@ -176,18 +176,18 @@ class GenericAPIRoutes(CRUDRoutesBase):
 
     def _delete_route(self, entity_id: int):
         """
-        Handle DELETE request to remove an item.
+        Handle DELETE request to remove an entity.
 
         Args:
-            entity_id (int): The ID of the item to delete.
+            entity_id (int): The ID of the entity to delete.
 
         Returns:
             Response: A confirmation JSON message.
         """
         logger.info(f"Handling API delete route for {self.model.__name__} with ID {entity_id}")
         try:
-            item = self.service.get_by_id(self.model, entity_id)
-            self.service.delete(item)
+            entity = self.service.get_by_id(self.model, entity_id)
+            self.service.delete(entity)
             return jsonify({"message": f"{self.model.__name__} deleted successfully"}), 200
         except Exception as e:
             logger.error(f"❌  Error in delete route: {str(e)}")

@@ -1,12 +1,11 @@
 import logging
 from flask import url_for
 from flask_login import current_user
-from app.routes.base.tabs import UI_TAB_MAPPING
+from app.utils.table_helpers import get_page_tabs, get_plural_name, get_table_id_by_name
 from app.routes.base.components.tab_builder import create_tabs
 from app.utils.app_logging import log_instance_vars
 from typing import Any, Optional, List
-from app.utils.table_helpers import get_table_id_by_name, get_plural_name
-
+from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
 
@@ -213,19 +212,50 @@ class EntityContext(BaseContext):
         instance_details = "EntityContext (_initialize_derived_fields)"
         log_instance_vars(instance_details, self)
 
-        # Process tab entries using table_name to lookup in UI_TAB_MAPPING
-        tab_entries = UI_TAB_MAPPING.get(self.model_name, [])
+        tab_entries = get_page_tabs(self.model_name)
         logger.debug(f"Tab entries for model '{self.model_name}': {tab_entries}")
         self.tabs = create_tabs(entity=entity_dict, tabs=tab_entries)
         logger.debug(f"Tabs created: {self.tabs}")
 
-        # Set item_name from the first available field
+        # Set entity_name from the first available field
         self.entity_name = ""
         for key in ("name", "title", "email", "username"):
             if entity_dict.get(key):
                 self.entity_name = entity_dict[key]
-                logger.info(f"ℹ️ item_name set using key '{key}': '{self.entity_name}'")
+                logger.info(f"ℹ️ entity_name set using key '{key}': '{self.entity_name}'")
                 break
         else:
             self.entity_name = self.id
-            logger.info(f"item_name defaulted to id: '{self.entity_name}'")
+            logger.info(f"entity_name defaulted to id: '{self.entity_name}'")
+
+
+@dataclass
+class BaseContextConfig:
+    table_name: str
+    action: str
+    title: Optional[str] = None
+
+    def __post_init__(self):
+        # If title is not provided, set it to 'action + table_name'
+        if not self.title:
+            self.title = f"{self.action} {self.table_name}"
+
+# TableContextConfig class for the 'index' context
+@dataclass
+class TableContextConfig(BaseContextConfig):
+    read_only: bool = True
+
+# EntityContextConfig class for 'create', 'view', and 'edit' contexts
+@dataclass
+class EntityContextConfig(BaseContextConfig):
+    read_only: bool = field(init=False)  # Will be set in __post_init__
+    id: Optional[int] = None
+    entity: Optional[object] = None  # Adjust based on your actual entity type
+
+    def __post_init__(self):
+        super().__post_init__()  # Call parent class __post_init__
+        # Set read_only based on action
+        if self.action in ['create', 'edit']:
+            self.read_only = False  # Write actions
+        else:
+            self.read_only = True  # Read-only actions

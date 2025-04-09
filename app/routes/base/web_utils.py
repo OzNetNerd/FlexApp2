@@ -2,7 +2,7 @@
 import logging
 from flask import Blueprint
 from app.routes.base.components.template_renderer import render_safely, RenderSafelyConfig
-from app.routes.base.components.entity_handler import SimpleContext, TableContext, EntityContext
+from app.routes.base.components.context import SimpleContext, TableContext, EntityContext, TableContextConfig, EntityContextConfig
 from typing import Optional, List, Any, Callable, Dict, Tuple
 from dataclasses import dataclass, field
 
@@ -180,40 +180,26 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
     entity_name_lower = entity_name.lower()
     logger.info(f"Converted entity name to lowercase: {entity_name_lower}")
 
-    plural_mapping = {
-        "company": "companies",
-        "opportunity": "opportunities",
-        "category": "categories",
-        "capability": "capabilities",
-        "home": "home",
-    }
-    plural_form = plural_mapping.get(entity_name_lower, f"{entity_name_lower}s")
-    logger.info(f"Determined plural form: {plural_form}")
-
     # Direct context creation in dictionary
     context_providers = {
-        "index": lambda title=None, **kwargs: TableContext(title=plural_form.title(), table_name=entity_name),
-        "create": lambda title=None, **kwargs: EntityContext(
-            action="Create",
+        "index": lambda: TableContextConfig(
             table_name=entity_name,
-            title=f"Create {entity_name}",
-            read_only=False,
-            # Don't include any id parameter here since we're creating a new entity
+            action="index"
         ),
-        "view": lambda entity_id, title=None, **kwargs: EntityContext(
-            action="View",
+        "create": lambda: EntityContextConfig(
             table_name=entity_name,
-            title=f"View {entity_name}",
-            read_only=True,
-            id=entity_id,
+            action="create"
         ),
-        "edit": lambda entity_id, title=None, **kwargs: EntityContext(
-            action="Edit",
+        "view": lambda entity_id: EntityContextConfig(
             table_name=entity_name,
-            title=f"Edit {entity_name}",
-            read_only=False,
+            action="view",
+            id=entity_id
+        ),
+        "edit": lambda entity_id: EntityContextConfig(
+            table_name=entity_name,
+            action="edit",
             id=entity_id,
-            entity=service.get_by_id(entity_id),
+            entity=service.get_by_id(entity_id)
         ),
     }
     logger.info("Context providers have been initialized.")

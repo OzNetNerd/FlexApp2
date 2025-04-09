@@ -44,7 +44,7 @@ register_crud_routes(company_crud_config)
 # from flask import Blueprint
 # from app.routes.base.route_utils import register_routes
 # from app.routes.base.components.template_renderer import render_safely
-# from app.routes.base.components.entity_handler import SimpleContext
+# from app.routes.base.components.context import SimpleContext
 # from app.services.crud_service import CRUDService
 # from app.models.task import Task
 #
