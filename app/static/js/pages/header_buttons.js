@@ -10,9 +10,9 @@ log("debug", "_header_buttons.html", "config", `Read-only mode: ${data.readOnly}
 log("debug", "_header_buttons.html", "route", `Current endpoint: ${data.endpoint}`);
 
 if (data.hasId) {
-  log("debug", "_header_buttons.html", "item_id", "Working with provided item ID");
+  log("debug", "_header_buttons.html", "entity_id", "Working with provided item ID");
 } else {
-  log("debug", "_header_buttons.html", "item_id", "No item ID provided");
+  log("debug", "_header_buttons.html", "entity_id", "No item ID provided");
 }
 
 if (data.hasId && !data.readOnly) {

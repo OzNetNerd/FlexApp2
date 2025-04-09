@@ -13,9 +13,9 @@
   log("debug", "_footer_buttons.html", "route", "Current endpoint: {{ request.endpoint }}");
 
   {% if id is defined and id is not none %}
-    log("debug", "_footer_buttons.html", "item_id", "Working with item ID: {{ id }}");
+    log("debug", "_footer_buttons.html", "entity_id", "Working with item ID: {{ id }}");
   {% else %}
-    log("debug", "_footer_buttons.html", "item_id", "No item ID provided - new item mode");
+    log("debug", "_footer_buttons.html", "entity_id", "No item ID provided - new item mode");
   {% endif %}
 </script>
 
@@ -25,10 +25,10 @@
       <script type="module">
         import log from '/static/js/logger.js';
         log("debug", "_footer_buttons.html", "mode", "Edit mode - rendering Cancel and Update buttons");
-        log("debug", "_footer_buttons.html", "url_gen", "Generating view URL with item_id={{ id }}");
+        log("debug", "_footer_buttons.html", "url_gen", "Generating view URL with entity_id={{ id }}");
       </script>
 
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}" class="btn btn-secondary">
+      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}" class="btn btn-secondary">
         <i class="fas fa-times me-1"></i> Cancel
       </a>
 

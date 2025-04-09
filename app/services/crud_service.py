@@ -73,20 +73,20 @@ class CRUDService:
             logger.error(traceback.format_exc())
             raise
 
-    def get_by_id(self, item_id: int) -> Any:
+    def get_by_id(self, entity_id: int) -> Any:
         """
         Fetch a single record by its ID.
 
         Args:
-            item_id (int): Primary key.
+            entity_id (int): Primary key.
 
         Returns:
             Any: The found model instance or 404 error.
         """
         try:
-            return self.model_class.query.get_or_404(item_id)
+            return self.model_class.query.get_or_404(entity_id)
         except Exception as e:
-            logger.error(f"❌  Error in get_by_id for {self.model_class.__name__} with id {item_id}: {e}")
+            logger.error(f"❌  Error in get_by_id for {self.model_class.__name__} with id {entity_id}: {e}")
             logger.error(traceback.format_exc())
             raise
 

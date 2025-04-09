@@ -25,12 +25,12 @@ class ItemManager:
         self.service = service
         self.blueprint_name = blueprint_name
 
-    def get_item_by_id(self, item_id) -> Tuple[Optional[Any], Optional[str]]:
+    def get_item_by_id(self, entity_id) -> Tuple[Optional[Any], Optional[str]]:
         """
         Fetch an item by ID with eager loading for supported relationships.
 
         Args:
-            item_id: The primary key of the item.
+            entity_id: The primary key of the item.
 
         Returns:
             Tuple containing the item (or None) and an error message (or None).
@@ -46,7 +46,7 @@ class ItemManager:
                     if isinstance(prop, RelationshipProperty) and prop.lazy != "dynamic":
                         query = query.options(joinedload(getattr(self.model, rel)))
 
-            item = query.filter_by(id=item_id).first()
+            item = query.filter_by(id=entity_id).first()
 
             if not item:
                 return None, f"{self.model.__name__} not found"
@@ -56,19 +56,19 @@ class ItemManager:
                 from app.models.relationship import Relationship
 
                 # Load relationships where this user is entity1
-                entity1_relationships = Relationship.query.filter_by(entity1_type="user", entity1_id=item_id).all()
+                entity1_relationships = Relationship.query.filter_by(entity1_type="user", entity1_id=entity_id).all()
 
                 # Load relationships where this user is entity2
-                entity2_relationships = Relationship.query.filter_by(entity2_type="user", entity2_id=item_id).all()
+                entity2_relationships = Relationship.query.filter_by(entity2_type="user", entity2_id=entity_id).all()
 
                 # Combine all relationships
                 item.all_relationships = entity1_relationships + entity2_relationships
 
-            logger.info(f"Item found with id {item_id}")
+            logger.info(f"Item found with id {entity_id}")
             return item, None
 
         except Exception as e:
-            error_msg = f"Error accessing {self.model.__name__} with id {item_id}: {str(e)}"
+            error_msg = f"Error accessing {self.model.__name__} with id {entity_id}: {str(e)}"
             logger.error(error_msg)
             logger.error(f"❌  Traceback: {traceback.format_exc()}")
             return None, error_msg
@@ -144,7 +144,7 @@ class ItemManager:
 
             logger.info(f"{self.model.__name__} with id {item.id} updated successfully")
             flash(f"{self.model.__name__} updated successfully", "success")
-            return redirect(url_for(f"{self.blueprint_name}.view", item_id=item.id)), None
+            return redirect(url_for(f"{self.blueprint_name}.view", entity_id=item.id)), None
 
         except ValueError as ve:
             logger.warning(f"Validation error during update: {ve}")

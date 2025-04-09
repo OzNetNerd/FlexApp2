@@ -14,9 +14,11 @@ logger = logging.getLogger(__name__)
 
 class BaseContext:
     def __init__(self, title, show_navbar, read_only, **kwargs):
-        # Set attributes moved from SimpleContext
-        self.title = title
-        self.current_user = current_user  # From flask_login
+        if not title and not kwargs.get('table_name'):
+            raise ValueError("Either 'title' or 'table_name' must be provided.")
+        self.title = title or kwargs['table_name']
+
+        self.current_user = current_user
         self.show_navbar = show_navbar
         self.read_only = read_only
 

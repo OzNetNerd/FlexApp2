@@ -21,9 +21,9 @@ def register_api_crud_routes(blueprint: Blueprint, service: CRUDService, entity_
         items = service.get_all()
         return jsonify([item.to_dict() for item in items])
 
-    @blueprint.route("/<int:item_id>", methods=["GET"])
-    def get_one(item_id):
-        item = service.get_by_id(item_id)
+    @blueprint.route("/<int:entity_id>", methods=["GET"])
+    def get_one(entity_id):
+        item = service.get_by_id(entity_id)
         if not item:
             return jsonify({"error": f"{entity_title} not found"}), 404
         return jsonify(item.to_dict())
@@ -36,17 +36,17 @@ def register_api_crud_routes(blueprint: Blueprint, service: CRUDService, entity_
             return jsonify(result), 400
         return jsonify(result), 201
 
-    @blueprint.route("/<int:item_id>", methods=["PUT"])
-    def update(item_id):
+    @blueprint.route("/<int:entity_id>", methods=["PUT"])
+    def update(entity_id):
         data = request.get_json()
-        result = service.update(item_id, data)
+        result = service.update(entity_id, data)
         if "error" in result:
             return jsonify(result), 400
         return jsonify(result)
 
-    @blueprint.route("/<int:item_id>", methods=["DELETE"])
-    def delete(item_id):
-        result = service.delete(item_id)
+    @blueprint.route("/<int:entity_id>", methods=["DELETE"])
+    def delete(entity_id):
+        result = service.delete(entity_id)
         if "error" in result:
             return jsonify(result), 400
         return jsonify(result)

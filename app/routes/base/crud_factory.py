@@ -39,17 +39,17 @@
 #         logger.info(f"Create context: {context}")
 #         return render_safely(f"{template_dir}/create.html", context, f"Failed to load create {entity_name} form.")
 #
-#     @blueprint.route("/<int:item_id>")
-#     def view(item_id):
-#         logger.info(f"Executing view route for {entity_name} with item_id={item_id}")
-#         context = BaseContext(title=f"View {entity_title}", item_id=item_id)
+#     @blueprint.route("/<int:entity_id>")
+#     def view(entity_id):
+#         logger.info(f"Executing view route for {entity_name} with entity_id={entity_id}")
+#         context = BaseContext(title=f"View {entity_title}", entity_id=entity_id)
 #         logger.info(f"View context: {context}")
 #         return render_safely(f"{template_dir}/view.html", context, f"Failed to load {entity_name} details.")
 #
-#     @blueprint.route("/<int:item_id>/edit")
-#     def edit(item_id):
-#         logger.info(f"Executing edit route for {entity_name} with item_id={item_id}")
-#         context = BaseContext(title=f"Edit {entity_title}", item_id=item_id)
+#     @blueprint.route("/<int:entity_id>/edit")
+#     def edit(entity_id):
+#         logger.info(f"Executing edit route for {entity_name} with entity_id={entity_id}")
+#         context = BaseContext(title=f"Edit {entity_title}", entity_id=entity_id)
 #         logger.info(f"Edit context: {context}")
 #         return render_safely(f"{template_dir}/edit.html", context, f"Failed to load edit {entity_name} form.")
 #

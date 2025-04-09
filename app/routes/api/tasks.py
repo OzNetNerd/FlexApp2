@@ -16,10 +16,10 @@ def get_all_tasks():
     tasks = task_service.get_all()
     return jsonify([task.to_dict() for task in tasks])
 
-@tasks_api_bp.route("/<int:item_id>", methods=["GET"])
-def get_task(item_id):
+@tasks_api_bp.route("/<int:entity_id>", methods=["GET"])
+def get_task(entity_id):
     """Get a specific task."""
-    task = task_service.get_by_id(item_id)
+    task = task_service.get_by_id(entity_id)
     if not task:
         return jsonify({"error": "Task not found"}), 404
     return jsonify(task.to_dict())
@@ -37,19 +37,19 @@ def create_task():
         return jsonify(result), 400
     return jsonify(result), 201
 
-@tasks_api_bp.route("/<int:item_id>", methods=["PUT"])
-def update_task(item_id):
+@tasks_api_bp.route("/<int:entity_id>", methods=["PUT"])
+def update_task(entity_id):
     """Update a task."""
     data = request.get_json()
-    result = task_service.update(item_id, data)
+    result = task_service.update(entity_id, data)
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
 
-@tasks_api_bp.route("/<int:item_id>", methods=["DELETE"])
-def delete_task(item_id):
+@tasks_api_bp.route("/<int:entity_id>", methods=["DELETE"])
+def delete_task(entity_id):
     """Delete a task."""
-    result = task_service.delete(item_id)
+    result = task_service.delete(entity_id)
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)

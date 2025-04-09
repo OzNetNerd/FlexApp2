@@ -13,14 +13,14 @@
       hasId: {{ (id is defined and id is not none) | tojson }},
       endpoint: "{{ request.endpoint }}",
       baseRoute: "{{ request.endpoint.rsplit('.', 1)[0] }}",
-      viewUrl: {% if id is defined and id is not none %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}"{% else %}null{% endif %},
+      viewUrl: {% if id is defined and id is not none %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}"{% else %}null{% endif %},
       indexUrl: {% if not (id is defined and id is not none) %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"{% else %}null{% endif %}
     };
   </script>
 
   <div class="footer-buttons-container mt-4 d-flex justify-content-end gap-2">
     {% if id is defined and id is not none %}
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}" class="btn btn-secondary">
+      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}" class="btn btn-secondary">
         <i class="fas fa-times me-1"></i> Cancel
       </a>
       <button type="submit" class="btn btn-primary">

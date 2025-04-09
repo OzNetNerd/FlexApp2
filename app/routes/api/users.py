@@ -16,10 +16,10 @@ def get_all_users():
     users = user_service.get_all()
     return jsonify([user.to_dict() for user in users])
 
-@users_api_bp.route("/<int:item_id>", methods=["GET"])
-def get_user(item_id):
+@users_api_bp.route("/<int:entity_id>", methods=["GET"])
+def get_user(entity_id):
     """Get a specific user."""
-    user = user_service.get_by_id(item_id)
+    user = user_service.get_by_id(entity_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
     return jsonify(user.to_dict())
@@ -37,19 +37,19 @@ def create_user():
         return jsonify(result), 400
     return jsonify(result), 201
 
-@users_api_bp.route("/<int:item_id>", methods=["PUT"])
-def update_user(item_id):
+@users_api_bp.route("/<int:entity_id>", methods=["PUT"])
+def update_user(entity_id):
     """Update a user."""
     data = request.get_json()
-    result = user_service.update(item_id, data)
+    result = user_service.update(entity_id, data)
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
 
-@users_api_bp.route("/<int:item_id>", methods=["DELETE"])
-def delete_user(item_id):
+@users_api_bp.route("/<int:entity_id>", methods=["DELETE"])
+def delete_user(entity_id):
     """Delete a user."""
-    result = user_service.delete(item_id)
+    result = user_service.delete(entity_id)
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)

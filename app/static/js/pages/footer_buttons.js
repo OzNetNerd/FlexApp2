@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Mode-specific logging
   if (window.footerButtonsConfig.hasId) {
-    log("debug", "_footer_buttons.html", "item_id", "Working with item ID");
+    log("debug", "_footer_buttons.html", "entity_id", "Working with item ID");
     try {
       const viewUrl = window.footerButtonsConfig.viewUrl;
       log("debug", "_footer_buttons.html", "url_gen", "Generated view URL: " + viewUrl);
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
       log("error", "_footer_buttons.html", "url_gen", "Failed to generate view URL: " + e.message);
     }
   } else {
-    log("debug", "_footer_buttons.html", "item_id", "No item ID provided - new item mode");
+    log("debug", "_footer_buttons.html", "entity_id", "No item ID provided - new item mode");
     try {
       const indexUrl = window.footerButtonsConfig.indexUrl;
       log("debug", "_footer_buttons.html", "url_gen", "Generated index URL: " + indexUrl);

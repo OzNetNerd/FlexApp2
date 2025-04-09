@@ -183,8 +183,8 @@ def register_crud_routes(
     url_patterns = {
         'index': '/',
         'create': '/create',
-        'view': '/<int:item_id>',
-        'edit': '/<int:item_id>/edit'
+        'view': '/<int:entity_id>',
+        'edit': '/<int:entity_id>/edit'
     }
 
     context_providers = {
@@ -196,14 +196,14 @@ def register_crud_routes(
             action="Create",
             table_name=entity_name
         ),
-        'view': lambda item_id, title=None, **kwargs: _get_entity_context(
-            service, entity_name, item_id, "View"
+        'view': lambda entity_id, title=None, **kwargs: _get_entity_context(
+            service, entity_name, entity_id, "View"
         ) if service else TableContext(
             action="View",
             table_name=entity_name
         ),
-        'edit': lambda item_id, title=None, **kwargs: _get_entity_context(
-            service, entity_name, item_id, "Edit"
+        'edit': lambda entity_id, title=None, **kwargs: _get_entity_context(
+            service, entity_name, entity_id, "Edit"
         ) if service else TableContext(
             action="Edit",
             table_name=entity_name
@@ -238,28 +238,28 @@ def register_crud_routes(
 
 
 
-def _get_entity_context(service, entity_name, item_id, action, title=""):
+def _get_entity_context(service, entity_name, entity_id, action, title=""):
     """Helper to get context for item detail routes.
 
     Args:
         service: Service with get_by_id method
         entity_name (str): Name of the entity
-        item_id: ID of the item to retrieve
+        entity_id: ID of the item to retrieve
         action (str): Action being performed ('View', 'Edit', etc.)
         title (str): Optional title for the page
 
     Returns:
         TableContext or redirect
     """
-    logger.info(f"Getting context for entity '{entity_name}', ID={item_id}, action='{action}'")
+    logger.info(f"Getting context for entity '{entity_name}', ID={entity_id}, action='{action}'")
 
     if not service:
         logger.info(f"No service provided for '{entity_name}'. Returning default TableContext.")
         return TableContext(action=action, table_name=entity_name, title=title)
 
     try:
-        item = service.get_by_id(item_id)
-        logger.info(f"Service call to get '{entity_name}' by ID={item_id} returned: {'found' if item else 'not found'}")
+        item = service.get_by_id(entity_id)
+        logger.info(f"Service call to get '{entity_name}' by ID={entity_id} returned: {'found' if item else 'not found'}")
 
         if not item:
             flash(f"{entity_name.title()} not found.", "danger")
@@ -282,9 +282,9 @@ def _get_entity_context(service, entity_name, item_id, action, title=""):
         except Exception as e:
             logger.error(f"Error converting {entity_name} to dictionary: {e}")
             # Fallback with minimal data
-            item_data = {'id': getattr(item, 'id', item_id), 'error': 'Unable to convert item to dictionary'}
+            item_data = {'id': getattr(item, 'id', entity_id), 'error': 'Unable to convert item to dictionary'}
 
-        logger.info(f"Context prepared for '{entity_name}' ID={item_id} with action '{action}'")
+        logger.info(f"Context prepared for '{entity_name}' ID={entity_id} with action '{action}'")
 
         return EntityContext(
             action=action,
@@ -293,12 +293,12 @@ def _get_entity_context(service, entity_name, item_id, action, title=""):
             title=title
         )
     except Exception as e:
-        logger.error(f"Error getting context for {entity_name} ID={item_id}: {e}")
+        logger.error(f"Error getting context for {entity_name} ID={entity_id}: {e}")
         # Return a minimal context that won't cause template errors
         return EntityContext(
             action=action,
             # table_name=entity_name,
-            item={'id': item_id, 'error': f"Error loading {entity_name}: {str(e)}"},
+            item={'id': entity_id, 'error': f"Error loading {entity_name}: {str(e)}"},
             error_message=f"Failed to load {entity_name}",
             title=title
         )

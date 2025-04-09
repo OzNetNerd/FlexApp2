@@ -16,10 +16,10 @@ def get_all_contacts():
     contacts = contact_service.get_all()
     return jsonify([contact.to_dict() for contact in contacts])
 
-@contacts_api_bp.route("/<int:item_id>", methods=["GET"])
-def get_contact(item_id):
+@contacts_api_bp.route("/<int:entity_id>", methods=["GET"])
+def get_contact(entity_id):
     """Get a specific contact."""
-    contact = contact_service.get_by_id(item_id)
+    contact = contact_service.get_by_id(entity_id)
     if not contact:
         return jsonify({"error": "Contact not found"}), 404
     return jsonify(contact.to_dict())
@@ -37,19 +37,19 @@ def create_contact():
         return jsonify(result), 400
     return jsonify(result), 201
 
-@contacts_api_bp.route("/<int:item_id>", methods=["PUT"])
-def update_contact(item_id):
+@contacts_api_bp.route("/<int:entity_id>", methods=["PUT"])
+def update_contact(entity_id):
     """Update a contact."""
     data = request.get_json()
-    result = contact_service.update(item_id, data)
+    result = contact_service.update(entity_id, data)
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
 
-@contacts_api_bp.route("/<int:item_id>", methods=["DELETE"])
-def delete_contact(item_id):
+@contacts_api_bp.route("/<int:entity_id>", methods=["DELETE"])
+def delete_contact(entity_id):
     """Delete a contact."""
-    result = contact_service.delete(item_id)
+    result = contact_service.delete(entity_id)
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)

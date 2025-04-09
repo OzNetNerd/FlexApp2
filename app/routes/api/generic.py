@@ -40,10 +40,10 @@ class GenericAPIRoutes(CRUDRoutesBase):
         """Registers the standard list, get, create, update, and delete routes."""
         logger.info(f"Registering API routes for {self.model.__name__}.")
         self.blueprint.add_url_rule("/", "list", self._list_route, methods=["GET"])
-        self.blueprint.add_url_rule("/<int:item_id>", "get", self._get_route, methods=["GET"])
+        self.blueprint.add_url_rule("/<int:entity_id>", "get", self._get_route, methods=["GET"])
         self.blueprint.add_url_rule("/", "create", self._create_route, methods=["POST"])
-        self.blueprint.add_url_rule("/<int:item_id>", "update", self._update_route, methods=["PUT", "PATCH"])
-        self.blueprint.add_url_rule("/<int:item_id>", "delete", self._delete_route, methods=["DELETE"])
+        self.blueprint.add_url_rule("/<int:entity_id>", "update", self._update_route, methods=["PUT", "PATCH"])
+        self.blueprint.add_url_rule("/<int:entity_id>", "delete", self._delete_route, methods=["DELETE"])
 
     def _list_route(self):
         """
@@ -88,19 +88,19 @@ class GenericAPIRoutes(CRUDRoutesBase):
             logger.error(traceback.format_exc())
             return jsonify({"error": "Internal Server Error", "message": str(e)}), 500
 
-    def _get_route(self, item_id: int):
+    def _get_route(self, entity_id: int):
         """
         Handle GET request for a single item by ID.
 
         Args:
-            item_id (int): The ID of the item.
+            entity_id (int): The ID of the item.
 
         Returns:
             Response: A JSON response containing the item or error message.
         """
-        logger.info(f"Handling API get route for {self.model.__name__} with ID {item_id}")
+        logger.info(f"Handling API get route for {self.model.__name__} with ID {entity_id}")
         try:
-            item = self.service.get_by_id(self.model, item_id)
+            item = self.service.get_by_id(self.model, entity_id)
             return jsonify({"data": self._ensure_json_serializable(item.to_dict())}), 200
         except Exception as e:
             logger.error(f"❌  Error in get route: {str(e)}")
@@ -141,19 +141,19 @@ class GenericAPIRoutes(CRUDRoutesBase):
             logger.error(traceback.format_exc())
             return jsonify({"error": "Internal Server Error", "message": str(e)}), 500
 
-    def _update_route(self, item_id: int):
+    def _update_route(self, entity_id: int):
         """
         Handle PUT/PATCH request to update an item.
 
         Args:
-            item_id (int): The ID of the item to update.
+            entity_id (int): The ID of the item to update.
 
         Returns:
             Response: A JSON response with the updated item or validation errors.
         """
-        logger.info(f"Handling API update route for {self.model.__name__} with ID {item_id}")
+        logger.info(f"Handling API update route for {self.model.__name__} with ID {entity_id}")
         try:
-            item = self.service.get_by_id(self.model, item_id)
+            item = self.service.get_by_id(self.model, entity_id)
             data = request.get_json() if request.is_json else request.form.to_dict()
             errors = self._validate_edit(item, data)
             if errors:
@@ -174,19 +174,19 @@ class GenericAPIRoutes(CRUDRoutesBase):
             logger.error(traceback.format_exc())
             return jsonify({"error": "Internal Server Error", "message": str(e)}), 500
 
-    def _delete_route(self, item_id: int):
+    def _delete_route(self, entity_id: int):
         """
         Handle DELETE request to remove an item.
 
         Args:
-            item_id (int): The ID of the item to delete.
+            entity_id (int): The ID of the item to delete.
 
         Returns:
             Response: A confirmation JSON message.
         """
-        logger.info(f"Handling API delete route for {self.model.__name__} with ID {item_id}")
+        logger.info(f"Handling API delete route for {self.model.__name__} with ID {entity_id}")
         try:
-            item = self.service.get_by_id(self.model, item_id)
+            item = self.service.get_by_id(self.model, entity_id)
             self.service.delete(item)
             return jsonify({"message": f"{self.model.__name__} deleted successfully"}), 200
         except Exception as e:

@@ -142,7 +142,7 @@
         try {
           // Use the same URL logic as in the _footer_buttons template
           {% if id is defined and id is not none %}
-            const viewUrl = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', item_id=id) }}";
+            const viewUrl = "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}";
             log("debug", "edit.html", "navigation", "Generated view URL: " + viewUrl);
             window.location.href = viewUrl;
           {% else %}

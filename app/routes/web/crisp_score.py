@@ -30,7 +30,7 @@ def submit(relationship_id):
         db.session.rollback()
         flash(f"Error submitting CRISP score: {str(e)}", "danger")
 
-    return redirect(url_for("contacts.view", item_id=relationship.contact_id))
+    return redirect(url_for("contacts.view", entity_id=relationship.contact_id))
 
 
 logger.info("Successfully set up ' CRISP Score' routes.")

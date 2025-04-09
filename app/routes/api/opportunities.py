@@ -16,10 +16,10 @@ def get_all_opportunities():
     opportunities = opportunity_service.get_all()
     return jsonify([opportunity.to_dict() for opportunity in opportunities])
 
-@opportunities_api_bp.route("/<int:item_id>", methods=["GET"])
-def get_opportunity(item_id):
+@opportunities_api_bp.route("/<int:entity_id>", methods=["GET"])
+def get_opportunity(entity_id):
     """Get a specific opportunity."""
-    opportunity = opportunity_service.get_by_id(item_id)
+    opportunity = opportunity_service.get_by_id(entity_id)
     if not opportunity:
         return jsonify({"error": "Opportunity not found"}), 404
     return jsonify(opportunity.to_dict())
@@ -33,19 +33,19 @@ def create_opportunity():
         return jsonify(result), 400
     return jsonify(result), 201
 
-@opportunities_api_bp.route("/<int:item_id>", methods=["PUT"])
-def update_opportunity(item_id):
+@opportunities_api_bp.route("/<int:entity_id>", methods=["PUT"])
+def update_opportunity(entity_id):
     """Update an opportunity."""
     data = request.get_json()
-    result = opportunity_service.update(item_id, data)
+    result = opportunity_service.update(entity_id, data)
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
 
-@opportunities_api_bp.route("/<int:item_id>", methods=["DELETE"])
-def delete_opportunity(item_id):
+@opportunities_api_bp.route("/<int:entity_id>", methods=["DELETE"])
+def delete_opportunity(entity_id):
     """Delete an opportunity."""
-    result = opportunity_service.delete(item_id)
+    result = opportunity_service.delete(entity_id)
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)

@@ -53,11 +53,11 @@ class RelationshipCRUDRoutes(GenericWebRoutes):
 #
 #                 # Redirect to view page for entity
 #                 if entity_type == "user":
-#                     return redirect(url_for("users.view", item_id=entity_id))
+#                     return redirect(url_for("users.view", entity_id=entity_id))
 #                 elif entity_type == "contact":
-#                     return redirect(url_for("contacts.view", item_id=entity_id))
+#                     return redirect(url_for("contacts.view", entity_id=entity_id))
 #                 elif entity_type == "company":
-#                     return redirect(url_for("companies.view", item_id=entity_id))
+#                     return redirect(url_for("companies.view", entity_id=entity_id))
 #                 else:
 #                     return redirect(url_for("home.index"))
 #
@@ -90,11 +90,11 @@ class RelationshipCRUDRoutes(GenericWebRoutes):
 #             flash(message, "success" if success else "error")
 #
 #             if source_type == "user":
-#                 return redirect(url_for("users.view", item_id=source_id))
+#                 return redirect(url_for("users.view", entity_id=source_id))
 #             elif source_type == "contact":
-#                 return redirect(url_for("contacts.view", item_id=source_id))
+#                 return redirect(url_for("contacts.view", entity_id=source_id))
 #             elif source_type == "company":
-#                 return redirect(url_for("companies.view", item_id=source_id))
+#                 return redirect(url_for("companies.view", entity_id=source_id))
 #             else:
 #                 return redirect(url_for("home.index"))
 #

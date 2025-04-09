@@ -17,10 +17,10 @@ def get_all():
     companies = company_service.get_all()
     return jsonify([company.to_dict() for company in companies])
 
-@companies_api_bp.route("/<int:item_id>", methods=["GET"])
-def get_one(item_id):
+@companies_api_bp.route("/<int:entity_id>", methods=["GET"])
+def get_one(entity_id):
     """Get a specific company."""
-    company = company_service.get_by_id(item_id)
+    company = company_service.get_by_id(entity_id)
     if not company:
         return jsonify({"error": "Company not found"}), 404
     return jsonify(company.to_dict())
@@ -34,19 +34,19 @@ def create():
         return jsonify(result), 400
     return jsonify(result), 201
 
-@companies_api_bp.route("/<int:item_id>", methods=["PUT"])
-def update(item_id):
+@companies_api_bp.route("/<int:entity_id>", methods=["PUT"])
+def update(entity_id):
     """Update a company."""
     data = request.get_json()
-    result = company_service.update(item_id, data)
+    result = company_service.update(entity_id, data)
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
 
-@companies_api_bp.route("/<int:item_id>", methods=["DELETE"])
-def delete(item_id):
+@companies_api_bp.route("/<int:entity_id>", methods=["DELETE"])
+def delete(entity_id):
     """Delete a company."""
-    result = company_service.delete(item_id)
+    result = company_service.delete(entity_id)
     if "error" in result:
         return jsonify(result), 400
     return jsonify(result)
