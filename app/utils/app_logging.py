@@ -91,6 +91,14 @@ def log_instance_vars(instance, exclude: list[str] = None) -> None:
         logger.info("  ℹ️ (No exclusions)")
 
 
+def log_message_and_vars(message: str, vars: dict) -> None:
+    # Log the provided message
+    logger.info(message)
+
+    # Log each variable with indentation
+    for key, value in vars.items():
+        logger.info(f"  📝 {key}: {value}")
+
 class FunctionNameFilter(logging.Filter):
     def __init__(self, function_name):
         super().__init__()
