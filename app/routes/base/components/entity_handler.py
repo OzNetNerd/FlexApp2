@@ -165,10 +165,10 @@ class EntityContext(BaseContext):
             other_attrs["autocomplete_fields"] = f"[{len(self.autocomplete_fields)} fields]"
         if self.tabs:
             other_attrs["tabs"] = f"[{len(self.tabs)} tabs]"
-        if isinstance(self.item, dict) and self.item:
-            other_attrs["item"] = f"[{len(self.item)} keys]"
-        elif self.item:
-            other_attrs["item"] = f"<{type(self.item).__name__}>"
+        if isinstance(self.entity, dict) and self.entity:
+            other_attrs["entity"] = f"[{len(self.entity)} keys]"
+        elif self.entity:
+            other_attrs["entity"] = f"<{type(self.entity).__name__}>"
 
         # Format other attributes
         other_str = ", ".join(f"{key}={repr(value)}" for key, value in other_attrs.items())
@@ -190,22 +190,22 @@ class EntityContext(BaseContext):
         # Get blueprint_name from kwargs if available
         blueprint_name = getattr(self, "blueprint_name", "")
 
-        # Create item_dict from entity if available
-        item_dict = {}
+        # Create entity_dict from entity if available
+        entity_dict = {}
         if self.entity:
             # Convert entity to dictionary if it's not already
             if isinstance(self.entity, dict):
-                item_dict = self.entity
+                entity_dict = self.entity
             elif hasattr(self.entity, "__dict__"):
                 # For ORM models or objects with __dict__
-                item_dict = {k: v for k, v in self.entity.__dict__.items()
+                entity_dict = {k: v for k, v in self.entity.__dict__.items()
                            if not k.startswith('_')}
             elif hasattr(self.entity, "to_dict"):
                 # For objects with to_dict method
-                item_dict = self.entity.to_dict()
-        # Fallback to self.item if it's a dict
-        elif isinstance(self.item, dict):
-            item_dict = self.item
+                entity_dict = self.entity.to_dict()
+        # Fallback to self.entity if it's a dict
+        elif isinstance(self.entity, dict):
+            entity_dict = self.entity
 
         self.submit_url = url_for(f"{blueprint_name}.create") if not self.read_only else ""
 
@@ -216,16 +216,16 @@ class EntityContext(BaseContext):
         # Process tab entries using table_name to lookup in UI_TAB_MAPPING
         tab_entries = UI_TAB_MAPPING.get(self.model_name, [])
         logger.debug(f"Tab entries for model '{self.model_name}': {tab_entries}")
-        self.tabs = create_tabs(item=item_dict, tabs=tab_entries)
+        self.tabs = create_tabs(entity=entity_dict, tabs=tab_entries)
         logger.debug(f"Tabs created: {self.tabs}")
 
         # Set item_name from the first available field
-        self.item_name = ""
+        self.entity_name = ""
         for key in ("name", "title", "email", "username"):
-            if item_dict.get(key):
-                self.item_name = item_dict[key]
-                logger.info(f"ℹ️ item_name set using key '{key}': '{self.item_name}'")
+            if entity_dict.get(key):
+                self.entity_name = entity_dict[key]
+                logger.info(f"ℹ️ item_name set using key '{key}': '{self.entity_name}'")
                 break
         else:
-            self.item_name = self.id
-            logger.info(f"item_name defaulted to id: '{self.item_name}'")
+            self.entity_name = self.id
+            logger.info(f"item_name defaulted to id: '{self.entity_name}'")

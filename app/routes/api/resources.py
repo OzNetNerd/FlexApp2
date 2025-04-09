@@ -195,10 +195,10 @@ class GenericDataAPI:
                     if hasattr(item, "to_dict"):
                         formatted_items.append(item.to_dict())
                     else:
-                        item_dict = {}
+                        entity_dict = {}
                         for column in model_columns:
-                            item_dict[column] = getattr(item, column, None)
-                        formatted_items.append(item_dict)
+                            entity_dict[column] = getattr(item, column, None)
+                        formatted_items.append(entity_dict)
 
             # Prepare response
             response = {"data": formatted_items, "total": paginated.total, "page": page, "per_page": per_page, "pages": paginated.pages}
