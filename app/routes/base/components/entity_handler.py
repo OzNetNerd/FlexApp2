@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class BaseContext:
-    def __init__(self, title, show_navbar, read_only, **kwargs):
+    def __init__(self, title="", show_navbar=True, read_only=True, **kwargs):
+        logging.info("Building Base Context")
         if not title and not kwargs.get('table_name'):
             raise ValueError("Either 'title' or 'table_name' must be provided.")
         self.title = title or kwargs['table_name']
