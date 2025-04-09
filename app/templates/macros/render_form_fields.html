@@ -1,116 +1,68 @@
-{#
- Renders a form field with various input types and states.
+{# macros/render_form_fields.html #}
 
- This macro generates HTML for different form field types with consistent styling
- using Bootstrap 5 classes. It supports various field types including text inputs,
- textareas, selects, checkboxes, and date pickers.
-
- @param {string} entry_name - The field name (used for id and name attributes)
- @param {string} [label] - The field label (defaults to capitalized entry_name if not provided)
- @param {string} [type='text'] - The input type (text, textarea, select, checkbox, date, readonly)
- @param {*} [value] - The current field value
- @param {boolean} [required=false] - Whether the field is required
- @param {Object} [options] - Key-value pairs for select options where key is the value and value is the label
- @param {boolean} [readonly=false] - Whether the field is read-only
- @param {boolean} [read_only=false] - Global parameter to make all fields read-only
-
- @returns {HTML} Bootstrap 5 styled form field HTML
-
- @example
- {{ render_field(
-    entry_name='first_name',
-    label='First Name',
-    value=user.first_name,
-    required=true
- ) }}
-
- @example
- {{ render_field(
-    entry_name='user_type',
-    type='select',
-    options={'admin': 'Administrator', 'user': 'Regular User'},
-    value=user.type
- ) }}
-
- @example
- {{ render_field(
-    entry_name='is_active',
-    type='checkbox',
-    value=user.is_active
- ) }}
-#}
-
-{% macro render_field(entry_name, label=None, type='text', value='', required=false, options=[], readonly=false, read_only=false) %}
-  {% set label = label or entry_name|capitalize %}
-  {% set readonly = read_only or readonly or type == 'readonly' %}
-
+{% macro render_field(entry, read_only=True) %}
   <div class="col-md-6 mb-3">
-    <label for="{{ entry_name }}" class="form-label fw-semibold">{{ label }}</label>
+    <label for="{{ entry.entry_name }}" class="form-label fw-semibold">{{ entry.label }}</label>
 
-    {# -------- READONLY MODE -------- #}
-    {% if readonly %}
+    {% if read_only %}
       <div class="form-control-plaintext bg-light border rounded px-3 py-2">
-        {% if type == 'checkbox' %}
-          <i class="fas fa-{{ 'check' if value else 'times' }}"></i> {{ 'Yes' if value else 'No' }}
-        {% elif type == 'select' %}
-          {{ options[value] if value in options else value }}
-        {% elif type == 'date' %}
-          {{ value.strftime('%Y-%m-%d') if value else '' }}
+        {% if entry.type == 'checkbox' %}
+          <i class="fas fa-{{ 'check' if entry.value else 'times' }}"></i> {{ 'Yes' if entry.value else 'No' }}
+        {% elif entry.type == 'select' and entry.options %}
+          {# Loop through the options to find and display the matching label #}
+          {% for option in entry.options %}
+            {% if entry.value == option.value %}
+              {{ option.label }}
+            {% endif %}
+          {% endfor %}
+        {% elif entry.type == 'date' %}
+          {{ entry.value.strftime('%Y-%m-%d') if entry.value else '' }}
         {% else %}
-          {{ value }}
+          {% if entry.value is not none %}
+            {{ entry.value }}
+          {% endif %}
         {% endif %}
       </div>
 
-    {# -------- TEXTAREA -------- #}
-    {% elif type == 'textarea' %}
-      <textarea id="{{ entry_name }}"
-                name="{{ entry_name }}"
-                class="form-control"
-                rows="4"
-                {% if required %}required{% endif %}>{{ value }}</textarea>
-
-    {# -------- SELECT -------- #}
-    {% elif type == 'select' %}
-      <select id="{{ entry_name }}"
-              name="{{ entry_name }}"
-              class="form-select"
-              {% if required %}required{% endif %}>
-        <option value="">Select {{ label }}</option>
-        {% for key, option_label in options.items() %}
-          <option value="{{ key }}" {% if value == key %}selected{% endif %}>{{ option_label }}</option>
-        {% endfor %}
-      </select>
-
-    {# -------- CHECKBOX -------- #}
-    {% elif type == 'checkbox' %}
-      <div class="form-check">
-        <input class="form-check-input"
-               type="checkbox"
-               id="{{ entry_name }}"
-               name="{{ entry_name }}"
-               {% if value %}checked{% endif %}>
-        <label class="form-check-label" for="{{ entry_name }}">
-          {{ label }}
-        </label>
-      </div>
-
-    {# -------- DATE -------- #}
-    {% elif type == 'date' %}
-      <input type="date"
-             id="{{ entry_name }}"
-             name="{{ entry_name }}"
-             class="form-control"
-             value="{{ value }}"
-             {% if required %}required{% endif %}>
-
-    {# -------- DEFAULT INPUT -------- #}
     {% else %}
-      <input type="{{ type }}"
-             id="{{ entry_name }}"
-             name="{{ entry_name }}"
-             class="form-control"
-             value="{{ value }}"
-             {% if required %}required{% endif %}>
+      {% if entry.type == 'textarea' %}
+        <textarea class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+                  {% if entry.required %}required{% endif %}>{{ entry.value or '' }}</textarea>
+
+      {% elif entry.type == 'select' and entry.options %}
+        <select class="form-select" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+                {% if entry.required %}required{% endif %}>
+          <option value="">-- Select {{ entry.label }} --</option>
+          {% for option in entry.options %}
+            <option value="{{ option.value }}" {% if entry.value == option.value %}selected{% endif %}>
+              {{ option.label }}
+            </option>
+          {% endfor %}
+        </select>
+
+      {% elif entry.type == 'checkbox' %}
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+                 {% if entry.value %}checked{% endif %}>
+          <label class="form-check-label" for="{{ entry.entry_name }}">{{ entry.label }}</label>
+        </div>
+
+      {% elif entry.type == 'date' %}
+        <input type="date" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+               value="{{ entry.value }}" {% if entry.required %}required{% endif %}>
+
+      {% elif entry.type == 'number' %}
+        <input type="number" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+               value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
+
+      {% elif entry.type == 'readonly' %}
+        <div class="form-control-plaintext">{{ entry.value }}</div>
+
+      {% else %}
+        {# Default to a text input field #}
+        <input type="text" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+               value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
+      {% endif %}
     {% endif %}
   </div>
 {% endmacro %}
