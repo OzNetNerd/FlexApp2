@@ -1,11 +1,20 @@
 # app/routes/base/web_utils.py
 import logging
-from flask import url_for, redirect, flash, Blueprint, request
+from flask import url_for, redirect, flash, Blueprint
 from app.routes.base.components.template_renderer import render_safely
 from app.routes.base.components.entity_handler import SimpleContext, TableContext, EntityContext
-from typing import Optional, List, Any, Callable, Dict, Union, Tuple
+from typing import Optional, List, Any, Callable, Dict, Tuple
+from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
+
+@dataclass
+class CrudRouteConfig:
+    blueprint: Any
+    entity: Any
+    service: Optional[Any] = None
+    include_routes: List[str] = field(default_factory=lambda: ['index', 'create', 'view', 'edit'])
+    templates: Dict[str, str] = field(default_factory=dict)
 
 
 def prepare_route_config(
