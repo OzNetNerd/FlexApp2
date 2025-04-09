@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 from flask import (
     Flask,
     request,
@@ -14,7 +15,6 @@ from app.models.base import db
 from app.models import User, Setting
 from app.routes.api_router import register_api_routes
 from app.routes.web_router import register_application_blueprints
-from app.utils.app_logging import configure_logging
 from app.routes.base.components.template_renderer import handle_template_error
 
 # ---------------------------------------------
@@ -33,7 +33,15 @@ def unauthorized():
 # App Factory
 # ---------------------------------------------
 def create_app(config_class=Config):
-    custom_logger = configure_logging()
+    # Configure standard Python logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S,%f'
+    )
+
+    logger = logging.getLogger(__name__)
+    logger.info("Starting application initialization")
 
     app = Flask(__name__, static_folder="static", static_url_path="/static")
     app.config.from_object(config_class)
@@ -60,24 +68,22 @@ def create_app(config_class=Config):
     # Register TypeError handler
     @app.errorhandler(TypeError)
     def handle_type_error(e):
-        return handle_template_error(e, request.endpoint, request.path, "An error occurred while preparing the page context")
+        logger.error(f"TypeError: {str(e)}")
+        return handle_template_error(e, request.endpoint, request.path,
+                                     "An error occurred while preparing the page context")
 
     @login_manager.user_loader
     def load_user(user_id):
-        custom_logger.info(f"Loading user with ID: {user_id}")
+        logger.info(f"Loading user with ID: {user_id}")
         return db.session.get(User, int(user_id))
 
     # ----------------------------
     # Blueprint and route registration
     # ----------------------------
+    logger.info("Registering API routes")
     register_api_routes(app)
+    logger.info("Registering application blueprints")
     register_application_blueprints(app)
-
-    # ---------------------------------------------
-    # Attach logger to app
-    # ---------------------------------------------
-    app.logger = custom_logger
-    app.custom_logger = custom_logger
 
     # ---------------------------------------------
     # Global before_request logging
@@ -85,7 +91,7 @@ def create_app(config_class=Config):
     @app.before_request
     def log_request():
         request_id = getattr(request, 'id', hex(id(request))[2:])
-        custom_logger.info(f"[{request_id}] Web Request {request.method} {request.path} from {request.remote_addr}")
+        logger.info(f"[{request_id}] Web Request {request.method} {request.path} from {request.remote_addr}")
 
     # ---------------------------------------------
     # Global before_request for login requirement
@@ -100,15 +106,16 @@ def create_app(config_class=Config):
             "debug_session",
         ]
         endpoint = request.endpoint
-        custom_logger.info(f"require_login: endpoint = {endpoint}, user authenticated = {current_user.is_authenticated}")
+        logger.info(f"require_login: endpoint = {endpoint}, user authenticated = {current_user.is_authenticated}")
         if endpoint is None:
-            custom_logger.info("No endpoint found; skipping login check.")
+            logger.info("No endpoint found; skipping login check.")
             return
         if not current_user.is_authenticated:
-            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
-                custom_logger.info(f"Access allowed for endpoint: {endpoint}")
+            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith(
+                    "api_") or endpoint.endswith(".data"):
+                logger.info(f"Access allowed for endpoint: {endpoint}")
                 return
-            custom_logger.info(f"Access denied for endpoint: {endpoint}; redirecting to login with next={request.path}")
+            logger.info(f"Access denied for endpoint: {endpoint}; redirecting to login with next={request.path}")
             return redirect(url_for("auth_bp.login", next=request.path))
 
     # ---------------------------------------------
@@ -118,18 +125,19 @@ def create_app(config_class=Config):
     def inject_globals():
         return {
             "now": datetime.utcnow(),
-            "logger": app.custom_logger,
-            "current_app": current_app,  # Add this line
-            "is_debug_mode": app.debug  # Optional helper variable
+            "logger": logger,  # Pass standard logger to templates
+            "current_app": current_app,
+            "is_debug_mode": app.debug
         }
 
     with app.app_context():
         from app import models
 
-        custom_logger.info("Seeding settings and creating database tables.")
+        logger.info("Seeding settings and creating database tables.")
         Setting.seed()
         db.create_all()
 
+    logger.info("Application initialization complete")
     return app
 
 
