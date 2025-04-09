@@ -1,33 +1,6 @@
 <!-- START TEMPLATE: _section_layout.html -->
 
-{#
- base/content_pane/_section_layout.html - Form content organized in tabs and sections
-
- This template renders a tabbed interface with form fields organized into sections,
- providing a structured layout for data entry and display.
-
- Inputs:
-   - tabs: List of tab objects containing sections and fields
-   - read_only: Boolean indicating if the form should be in read-only mode
-
- Features:
-   - Bootstrap tab navigation with automatic activation of the first tab
-   - Hierarchical organization with tabs containing sections containing fields
-   - Section cards with clean styling and consistent spacing
-   - Special handling for "crisp" component in read-only mode
-   - Comprehensive logging of tab and section structures
-
- Dependencies:
-   - Imports field rendering macros from render_field.html
-   - Uses Bootstrap 5 tab components and card styling
-   - Requires logger.js for diagnostic logging
-
- Notes:
-   - Can gracefully handle empty tab configurations with a warning
-   - Maintains consistent styling with shadow-sm and border-0 card design
-#}
-
-{# Import the field macros - adjust the path if your macros are located elsewhere #}
+{# Import the field macros #}
 {% import 'macros/render_form_fields.html' as field_macros with context %}
 
 <script type="module">
@@ -48,8 +21,6 @@
   log("info", scriptName, functionName, `Received variables: ${received.join(', ') || 'None'}`);
   log("warn", scriptName, functionName, `❌ Missing variables: ${missing.join(', ') || 'None'}`);
 </script>
-
-
 
 {% if tabs %}
   <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
@@ -85,7 +56,15 @@
                   {%- if field.entry_name == 'crisp' and read_only %}
                     {% include 'components/_crisp.html' with context %}
                   {%- else %}
-                    {{ field_macros.render_field(field, read_only) }}
+                    {{ field_macros.render_field(
+                      entry_name=field.entry_name,
+                      label=field.label,
+                      type=field.type,
+                      value=field.value,
+                      required=field.required,
+                      options=field.options,
+                      read_only=read_only
+                    ) }}
                   {%- endif %}
                 {%- endfor %}
               </div>
