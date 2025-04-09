@@ -212,16 +212,31 @@ def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, 
     template_env = create_template_environment()
     current_path = request.path
 
-    logger.info(f"🔍 Attempting to render template '{render_safely_config.template_path}' for {render_safely_config.endpoint_name} ({current_path})")
+    logger.info(
+        f"🔍 Attempting to render template '{render_safely_config.template_path}' for {render_safely_config.endpoint_name} ({current_path})")
     logger.debug(f"🔧 Context data: {render_safely_config.context}")
 
     try:
+        # Convert context to dictionary here, catching any ValueErrors that might occur
+        try:
+            context_dict = render_safely_config.context.to_dict()
+        except ValueError as ve:
+            # Log the ValueError but don't let it escape
+            logger.error(f"❌ Error converting context to dictionary: {ve}")
+            # Return a more helpful error page
+            return handle_template_error(
+                ve,
+                render_safely_config.template_path,
+                render_safely_config.endpoint_name,
+                f"Error preparing data: {str(ve)}"
+            )
+
         template = template_env.get_template(render_safely_config.template_path)
         logger.debug(f"Template '{render_safely_config.template_path}' loaded successfully")
 
         LoggingUndefined.clear_missing_variables()
         logger.debug(f"📝 Starting template rendering process")
-        rendered = template.render(**get_flask_globals(), **render_safely_config.context.to_dict())
+        rendered = template.render(**get_flask_globals(), **context_dict)
         logger.debug(f"Template rendered successfully with length {len(rendered)} chars")
 
         LoggingUndefined.raise_if_missing()
@@ -231,6 +246,8 @@ def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, 
         return rendered
 
     except Exception as e:
-        logger.exception(f"❌ Error rendering template '{render_safely_config.template_path}' at endpoint '{render_safely_config.endpoint_name}'")
+        logger.exception(
+            f"❌ Error rendering template '{render_safely_config.template_path}' at endpoint '{render_safely_config.endpoint_name}'")
         logger.error(f"❌ Exception details: {type(e).__name__}: {str(e)}")
-        return handle_template_error(e, render_safely_config.template_path, render_safely_config.endpoint_name, render_safely_config.error_message)
+        return handle_template_error(e, render_safely_config.template_path, render_safely_config.endpoint_name,
+                                     render_safely_config.error_message)

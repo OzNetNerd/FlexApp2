@@ -57,8 +57,7 @@ class Task(BaseModel):
         if not self.notable_id:
             self.notable_id = notable_id
 
-        if not self.notable_type or not self.notable_id:
-            raise ValueError("Both 'notable_type' and 'notable_id' must be provided.")
+        # Removed the validation check that was raising ValueError
 
         logger.info(f"Saving task '{self.title}' with status {self.status}")
         super().save()

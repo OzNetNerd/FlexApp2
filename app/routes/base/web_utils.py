@@ -93,28 +93,33 @@ def register_route(
         """Handle requests to this route by rendering the template with context."""
         logger.info(f"Handling request for endpoint '{endpoint}' with args={args}, kwargs={kwargs}")
 
-        # If a context provider was specified, call it to get template data
-        if context_provider:
-            logger.info(f"Calling context provider for endpoint '{endpoint}'")
-            context = context_provider(title=title, *args, **kwargs)
-            if not context:
-                logger.warning(f"Context provider returned None for endpoint '{endpoint}'")
+        try:
+            # If a context provider was specified, call it to get template data
+            if context_provider:
+                logger.info(f"Calling context provider for endpoint '{endpoint}'")
+                context = context_provider(title=title, *args, **kwargs)
+                if not context:
+                    logger.warning(f"Context provider returned None for endpoint '{endpoint}'")
+                    context = SimpleContext(title=endpoint)
+            else:
+                logger.info(f"No context provider for endpoint '{endpoint}', using default SimpleContext")
                 context = SimpleContext(title=endpoint)
-        else:
-            logger.info(f"No context provider for endpoint '{endpoint}', using default SimpleContext")
-            context = SimpleContext(title=endpoint)
 
-        # Render the template safely, handling exceptions
-        logger.info(f"Rendering with the following vars:")
-        logger.info(f"template path: {template_path}")
-        logger.info(f"context: {context}")
+            # Render the template safely, handling exceptions
+            logger.info(f"Rendering with the following vars:")
+            logger.info(f"template path: {template_path}")
+            logger.info(f"context: {context}")
 
-        return render_safely(RenderSafelyConfig(
-            template_path,
-            context,
-            error_message,
-            endpoint,
-        ))
+            return render_safely(RenderSafelyConfig(
+                template_path,
+                context,
+                error_message,
+                endpoint,
+            ))
+        except ValueError as ve:
+            # Properly handle ValueError by returning an error page
+            logger.error(f"ValueError in route handler for endpoint '{endpoint}': {ve}")
+            return f"<h1>Error in route handler</h1><p>{str(ve)}</p>", 500
 
     # Set the function name for Flask (needed for proper endpoint registration)
     route_handler.__name__ = endpoint
