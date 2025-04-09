@@ -238,16 +238,8 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
     return blueprint
 
 
-
-
-
-def _get_entity_context(service, entity_name: str, entity_id: str, action:str, title: str=""):
+def _get_entity_context(service, entity_name: str, entity_id: str, action: str, title: str):
     """Helper to retrieve the appropriate context for entity detail routes and pass it to Jinja templates.
-
-    This function prepares and returns the right context object (e.g., BasicContext, TableContext, EntityContext)
-    for rendering the view associated with an entity. It ensures that all necessary variables for rendering
-    the template are passed along, including details about the entity, the action being performed (View, Edit, etc.),
-    and any additional metadata such as the page title.
 
     Args:
         service: Service with a get_by_id method to retrieve the entity
@@ -259,58 +251,92 @@ def _get_entity_context(service, entity_name: str, entity_id: str, action:str, t
     Returns:
         TableContext or redirect: The context object to be used for rendering the template, or a redirect if necessary
     """
-
-    logger.info(f"Getting entity context for '{entity_name}', ID={entity_id}, action='{action}'")
+    logger.info(f"Getting entity context for '{entity_name}' with the following settings:")
+    logger.info(f"service: {service}")
+    logger.info(f"entity_name: {entity_name}")
+    logger.info(f"entity_id: {entity_id}")
+    logger.info(f"action: {action}")
+    logger.info(f"title: {title}")
 
     if not service:
-        logger.info(f"No service provided for '{entity_name}'. Returning default TableContext.")
-        return TableContext(action=action, table_name=entity_name, title=title)
+        return _create_default_context(entity_name, action, title)
+
+
 
     try:
-        item = service.get_by_id(entity_id)
-        logger.info(f"Service call to get '{entity_name}' by ID={entity_id} returned: {'found' if item else 'not found'}")
-
+        item = _fetch_entity(service, entity_id, entity_name)
         if not item:
-            flash(f"{entity_name.title()} not found.", "danger")
-            redirect_target = url_for(f"{entity_name.lower()}s.index")
-            logger.info(f"Redirecting to '{redirect_target}' due to missing item")
-            return redirect(redirect_target)
+            return _handle_missing_entity(entity_name)
 
-        # Safe conversion of item to dictionary
-        try:
-            if hasattr(item, 'to_dict'):
-                item_data = item.to_dict()
-            elif hasattr(item, '__table__'):
-                # SQLAlchemy model - get column values
-                item_data = {}
-                for column in item.__table__.columns:
-                    item_data[column.name] = getattr(item, column.name)
-            else:
-                # Last resort - try to convert object vars to dict
-                item_data = vars(item)
-        except Exception as e:
-            logger.error(f"Error converting {entity_name} to dictionary: {e}")
-            # Fallback with minimal data
-            item_data = {'id': getattr(item, 'id', entity_id), 'error': 'Unable to convert item to dictionary'}
+        item_data = _convert_item_to_dict(item, entity_name, entity_id)
+        return _create_entity_context(action, item_data, title)
 
-        logger.info(f"Context prepared for '{entity_name}' ID={entity_id} with action '{action}'")
-
-        return EntityContext(
-            action=action,
-            # table_name=entity_name,
-            item=item_data,
-            title=title
-        )
     except Exception as e:
-        logger.error(f"Error getting context for {entity_name} ID={entity_id}: {e}")
-        # Return a minimal context that won't cause template errors
-        return EntityContext(
-            action=action,
-            # table_name=entity_name,
-            item={'id': entity_id, 'error': f"Error loading {entity_name}: {str(e)}"},
-            error_message=f"Failed to load {entity_name}",
-            title=title
-        )
+        return _handle_error(entity_name, entity_id, action, e, title)
+
+
+def _create_default_context(entity_name, action, title):
+    """Create a default context when no service is provided."""
+    logger.info(f"No service provided for '{entity_name}'. Returning default TableContext.")
+    return TableContext(action=action, table_name=entity_name, title=title)
+
+
+def _fetch_entity(service, entity_id, entity_name):
+    """Fetch the entity using the provided service."""
+    item = service.get_by_id(entity_id)
+    logger.info(f"Service call to get '{entity_name}' by ID={entity_id} returned: {'found' if item else 'not found'}")
+    return item
+
+
+def _handle_missing_entity(entity_name):
+    """Handle the case when the entity is not found."""
+    flash(f"{entity_name.title()} not found.", "danger")
+    redirect_target = url_for(f"{entity_name.lower()}s.index")
+    logger.info(f"Redirecting to '{redirect_target}' due to missing item")
+    return redirect(redirect_target)
+
+
+def _convert_item_to_dict(item, entity_name, entity_id):
+    """Convert an entity to a dictionary representation."""
+    logger.info(f"About to convert...")
+    logger.info(f'Converting item to dict: {item}, {entity_name}, {entity_id}')
+    try:
+        if hasattr(item, 'to_dict'):
+            return item.to_dict()
+        elif hasattr(item, '__table__'):
+            # SQLAlchemy model - get column values
+            item_data = {}
+            for column in item.__table__.columns:
+                item_data[column.name] = getattr(item, column.name)
+            return item_data
+        else:
+            # Last resort - try to convert object vars to dict
+            return vars(item)
+    except Exception as e:
+        logger.error(f"Error converting {entity_name} to dictionary: {e}")
+        # Fallback with minimal data
+        return {'id': getattr(item, 'id', entity_id), 'error': 'Unable to convert item to dictionary'}
+
+
+def _create_entity_context(action, item_data, title):
+    """Create an EntityContext with the item data."""
+    return EntityContext(
+        action=action,
+        item=item_data,
+        title=title
+    )
+
+
+def _handle_error(entity_name, entity_id, action, exception, title):
+    """Handle exceptions during entity processing."""
+    logger.error(f"Error getting context for {entity_name} ID={entity_id}: {exception}")
+    # Return a minimal context that won't cause template errors
+    return EntityContext(
+        action=action,
+        item={'id': entity_id, 'error': f"Error loading {entity_name}: {str(exception)}"},
+        error_message=f"Failed to load {entity_name}",
+        title=title
+    )
 
 def register_auth_route(
         blueprint: Blueprint,
