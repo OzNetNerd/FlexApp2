@@ -7,9 +7,6 @@ from typing import Optional, List, Any, Callable, Dict, Tuple
 from dataclasses import dataclass, field
 
 
-
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -44,15 +41,6 @@ def prepare_route_config(url: str, template_path: str, endpoint: str = None, met
             - endpoint_name (str): The final endpoint name (either provided or derived)
             - methods_list (List[str]): The final list of HTTP methods
 
-    Examples:
-        >>> prepare_route_config('/users', 'users/index.html')
-        ('users_index', ['GET'])
-
-        >>> prepare_route_config('/login', 'auth/login.html', methods=['GET', 'POST'])
-        ('auth_login', ['GET', 'POST'])
-
-        >>> prepare_route_config('/profile', 'profile.html', endpoint='user_profile')
-        ('user_profile', ['GET'])
     """
     logger.info(f"Preparing route configuration for URL '{url}' with template '{template_path}'")
 

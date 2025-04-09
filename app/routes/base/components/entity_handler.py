@@ -109,6 +109,9 @@ class EntityContext(BaseContext):
         item: Any = None,
         read_only: bool = True,
         action: str = "",
+        table_name: str = "",  # Add table_name parameter
+        entity: Any = None,    # Add entity parameter
+        entity_id: Any = None, # Add entity_id parameter
         **kwargs,
     ):
         """Initialize the context with proper parent class handling."""
@@ -124,6 +127,9 @@ class EntityContext(BaseContext):
         self.action = action
         self.name = "tba"
         self.current_user = current_user
+        self.table_name = table_name  # Store table_name
+        self.entity = entity          # Store entity
+        self.entity_id = entity_id    # Store entity_id
 
         # Derived fields initialized in __init__
         self.tabs = []
@@ -179,24 +185,39 @@ class EntityContext(BaseContext):
 
     def _initialize_derived_fields(self):
         """Initialize derived fields."""
-        model_name = self.__class__.__name__
-        id_value = getattr(self, "id", "")
+        # Use table_name for model_name if available, otherwise use class name
+        self.model_name = self.table_name or self.__class__.__name__
+        self.id = str(getattr(self, "entity_id", ""))
 
-        # Get blueprint_name and item_dict from kwargs if available
+        # Get blueprint_name from kwargs if available
         blueprint_name = getattr(self, "blueprint_name", "")
-        item_dict = getattr(self, "item_dict", {})
+
+        # Create item_dict from entity if available
+        item_dict = {}
+        if self.entity:
+            # Convert entity to dictionary if it's not already
+            if isinstance(self.entity, dict):
+                item_dict = self.entity
+            elif hasattr(self.entity, "__dict__"):
+                # For ORM models or objects with __dict__
+                item_dict = {k: v for k, v in self.entity.__dict__.items()
+                           if not k.startswith('_')}
+            elif hasattr(self.entity, "to_dict"):
+                # For objects with to_dict method
+                item_dict = self.entity.to_dict()
+        # Fallback to self.item if it's a dict
+        elif isinstance(self.item, dict):
+            item_dict = self.item
 
         self.submit_url = url_for(f"{blueprint_name}.create") if not self.read_only else ""
-        self.model_name = model_name
-        self.id = str(id_value)
 
         logger.info(f"📜 Building '{self.action}' page for '{blueprint_name}' blueprint (RO={self.read_only})")
         instance_details = "EntityContext (_initialize_derived_fields)"
         log_instance_vars(instance_details, self)
 
-        # Process tab entries
-        tab_entries = UI_TAB_MAPPING.get(model_name, [])
-        logger.debug(f"Tab entries for model '{model_name}': {tab_entries}")
+        # Process tab entries using table_name to lookup in UI_TAB_MAPPING
+        tab_entries = UI_TAB_MAPPING.get(self.model_name, [])
+        logger.debug(f"Tab entries for model '{self.model_name}': {tab_entries}")
         self.tabs = create_tabs(item=item_dict, tabs=tab_entries)
         logger.debug(f"Tabs created: {self.tabs}")
 
