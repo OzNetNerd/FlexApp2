@@ -1,11 +1,11 @@
 from typing import Any
 
-from app.routes.base.tabs.contacts import CONTACTS_TABS
-from app.routes.base.tabs.companies import COMPANIES_TABS
-from app.routes.base.tabs.opportunities import OPPORTUNITIES_TABS
-from app.routes.base.tabs.users import USERS_TABS
-from app.routes.base.tabs.tasks import TASKS_TABS
-from app.routes.base.tabs.settings import SETTINGS_TABS
+from app.routes.web.tabs.contacts import CONTACTS_TABS
+from app.routes.web.tabs.companies import COMPANIES_TABS
+from app.routes.web.tabs.opportunities import OPPORTUNITIES_TABS
+from app.routes.web.tabs.users import USERS_TABS
+from app.routes.web.tabs.tasks import TASKS_TABS
+from app.routes.web.tabs.settings import SETTINGS_TABS
 
 UI_TAB_MAPPING = {
     "Contact": CONTACTS_TABS,

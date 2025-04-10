@@ -24,7 +24,7 @@ from config import Config
 from app.models.base import db
 from app.models import User, Setting
 from app.routes.api_router import register_api_routes
-from app.routes.web_router import register_application_blueprints
+from app.routes.web_router import register_web_blueprints
 from app.routes.web.components.template_renderer import handle_template_error
 
 # ---------------------------------------------
@@ -83,7 +83,7 @@ def create_app(config_class=Config):
     logger.info("Registering API routes")
     register_api_routes(app)
     logger.info("Registering application blueprints")
-    register_application_blueprints(app)
+    register_web_blueprints(app)
 
     # ---------------------------------------------
     # Global before_request logging
