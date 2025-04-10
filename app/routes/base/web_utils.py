@@ -80,14 +80,14 @@ def prepare_route_config(url: str, template_path: str, endpoint: str = None, met
 
 
 def register_route(
-    blueprint: Blueprint,
-    url: str,
-    template_path: str,
-    context_provider: Callable,
-    title: str = None,
-    endpoint: str = None,
-    methods: Optional[List[str]] = None,
-    error_message: str = "Failed to load the page",
+        blueprint: Blueprint,
+        url: str,
+        template_path: str,
+        context_provider: Callable,
+        title: str = None,
+        endpoint: str = None,
+        methods: Optional[List[str]] = None,
+        error_message: str = "Failed to load the page",
 ):
     """Register a route that renders a specific template with optional context."""
     # Prepare route configuration
@@ -103,7 +103,18 @@ def register_route(
             # If a context provider was specified, call it to get template data
             if context_provider:
                 logger.info(f"Calling context provider ({context_provider}) for endpoint '{endpoint}'")
-                context = context_provider(title=title, *args, **kwargs)
+                try:
+                    # First try calling without title parameter
+                    context = context_provider(*args, **kwargs)
+                except TypeError as e:
+                    if "got an unexpected keyword argument" in str(e):
+                        # If that fails, try with title parameter
+                        logger.info(f"Context provider doesn't accept kwargs, trying with title")
+                        context = context_provider(title=title, *args, **kwargs)
+                    else:
+                        # If it's some other TypeError, re-raise
+                        raise
+
                 if not context:
                     logger.warning(f"Context provider returned None for endpoint '{endpoint}'")
                     context = SimpleContext(title=title)
