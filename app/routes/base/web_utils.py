@@ -91,8 +91,6 @@ def register_route(
         methods: Optional[List[str]] = None,
         error_message: str = "Failed to load the page",
 ):
-    """Register a route that renders a specific template with optional context."""
-    # Prepare route configuration
     endpoint, methods = prepare_route_config(url, template_path, endpoint, methods)
     logger.info(f'debugger - title: {title} - endpoint: {endpoint}')
     title = title or endpoint
@@ -104,13 +102,23 @@ def register_route(
                 entity_id = kwargs.get('entity_id')
                 form_data = request.form.to_dict()
                 logger.info(f"Form data received: {form_data}")
+
                 service = None
-                if hasattr(context_provider, "__closure__"):
+                # Attempt to find the service in context_provider's closure (works for 'edit')
+                if hasattr(context_provider, "__closure__") and context_provider.__closure__:
                     for closure in context_provider.__closure__:
-                        cell_contents = closure.cell_contents
-                        if hasattr(cell_contents, "get_by_id") and hasattr(cell_contents, "update"):
-                            service = cell_contents
-                            logger.info(f"Found service in context_provider: {service}")
+                        candidate = closure.cell_contents
+                        if hasattr(candidate, "get_by_id") and hasattr(candidate, "update"):
+                            service = candidate
+                            logger.info(f"Found service in context_provider's closure: {service}")
+                            break
+
+                # If not found, also check the default parameters (covers 'create')
+                if not service and hasattr(context_provider, "__defaults__") and context_provider.__defaults__:
+                    for candidate in context_provider.__defaults__:
+                        if hasattr(candidate, "get_by_id") and hasattr(candidate, "update"):
+                            service = candidate
+                            logger.info(f"Found service in context_provider's defaults: {service}")
                             break
 
                 if service:
@@ -139,18 +147,12 @@ def register_route(
                     logger.error(f"Could not find service for {endpoint}")
                     flash("Error: Service not available for this operation", "error")
 
-            # For GET requests or if POST handling didn't redirect:
-            # Get context data for rendering the template
             if context_provider:
                 logger.info(f"Calling context provider for endpoint '{endpoint}'")
-
-                # Check if context_provider is a class or function
                 if isinstance(context_provider, type):
-                    # It's a class, instantiate with title
                     logger.info(f"Context provider is a class, instantiating with title: {title}")
                     context = context_provider(title=title)
                 else:
-                    # It's a function, call it with args/kwargs
                     context = context_provider(*args, **kwargs)
 
                 if not context:
@@ -160,7 +162,6 @@ def register_route(
                 logger.info(f"No context provider for '{endpoint}', using default SimpleContext")
                 context = SimpleContext(title=title)
 
-            # Render the template
             logger.info(f"Rendering template '{template_path}' with context: {context}")
             result = render_safely(RenderSafelyConfig(
                 template_path,
@@ -169,7 +170,6 @@ def register_route(
                 endpoint,
             ))
 
-            # Ensure we return something valid
             if result is None:
                 logger.error(f"Template renderer returned None for '{endpoint}'")
                 return f"<h1>Error rendering template</h1><p>No response from template renderer.</p>", 500
@@ -177,18 +177,13 @@ def register_route(
             return result
 
         except ValueError as ve:
-            # Handle ValueError
             logger.error(f"ValueError in route handler for '{endpoint}': {ve}")
             return f"<h1>Error in route handler</h1><p>{str(ve)}</p>", 500
         except Exception as e:
-            # Handle other exceptions
             logger.error(f"Exception in route handler for '{endpoint}': {str(e)}", exc_info=True)
             return f"<h1>Unexpected error</h1><p>{str(e)}</p>", 500
 
-    # Set function name for Flask
     route_handler.__name__ = endpoint
-
-    # Register route with Flask
     blueprint.add_url_rule(url, endpoint=endpoint, view_func=route_handler, methods=methods)
     logger.info(f"Registered route '{endpoint}' at '{url}' with methods {methods}")
 
@@ -229,14 +224,15 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             "url": "/create",
             "template_default": f"pages/crud/create.html",
             "error_message": f"Failed to create {entity_table_name}",
-            "context_provider": lambda: EntityContext(
+            "context_provider": lambda service=service: EntityContext(
                 action="create",
                 entity_table_name=entity_table_name,
                 title=f"Create {entity_table_name}",
-                read_only=False  # Make the form editable
+                read_only=False
             ),
             "methods": ["GET", "POST"],
         },
+
         "view": {
             "url": "/<int:entity_id>",
             "template_default": f"pages/crud/view.html",
@@ -247,7 +243,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 entity=service.get_by_id(entity_id),
                 title=f"View {entity_table_name}",
             ),
-            "methods": ["GET"],  # Add this line
+            "methods": ["GET"],
         },
         "edit": {
             "url": "/<int:entity_id>/edit",
