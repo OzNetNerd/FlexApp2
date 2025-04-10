@@ -9,15 +9,16 @@ from typing import Optional, List, Any, Callable, Dict, Tuple
 from dataclasses import dataclass, field
 
 from app.utils.table_helpers import get_table_plural_name
+from app.services.crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class CrudRouteConfig:
-    blueprint: Any
+    blueprint: Blueprint
     entity_table_name: str
-    service: Optional[Any]
+    service: CRUDService
     include_routes: List[str] = field(default_factory=lambda: ["index", "create", "view", "edit"])
     templates: Dict[str, str] = field(default_factory=dict)
 
@@ -80,7 +81,6 @@ def prepare_route_config(url: str, template_path: str, endpoint: str = None, met
 
 def register_route(
     blueprint: Blueprint,
-    title: str,
     url: str,
     template_path: str,
     context_provider: Callable,
@@ -111,7 +111,7 @@ def register_route(
             # Render the template safely, handling exceptions
             logger.info(f"Rendering with the following vars:")
             logger.info(f"template path: {template_path}")
-            logger.info(f"context: {context}")
+            logger.info(f"Context: {context}")
 
             return render_safely(RenderSafelyConfig(
                 template_path,
@@ -180,7 +180,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             "context_provider": lambda entity_id: EntityContext(
                 action="view",
                 entity_table_name=entity_table_name,
-                entity_id=entity_id,
+                entity=service.get_by_id(entity_id),
                 title=f"View {entity_table_name}",
             ),
         },
@@ -192,7 +192,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 action="edit",
                 entity_table_name=entity_table_name,
                 entity_id=entity_id,
-                entity=service.get_by_id(entity_id) if service else None,
+                entity=service.get_by_id(entity_id),
                 title=f"Edit {entity_table_name}",
             ),
         },
@@ -208,7 +208,6 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
         register_route(
             blueprint=blueprint,
             url=config["url"],
-            title="TBA",  # Note: This differs from "TBA2" in context providers
             template_path=template_path,
             endpoint=route_type,
             context_provider=config["context_provider"],

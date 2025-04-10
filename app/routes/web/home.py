@@ -12,7 +12,6 @@ home_bp = Blueprint("home_bp", __name__, url_prefix="/")
 # Register the home page route
 register_route(
     blueprint=home_bp,
-    title="Welcome",
     url="/",
     template_path="home.html",
     endpoint="home",
