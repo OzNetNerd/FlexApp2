@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEntry
+from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEntry, InsightsTab
 
 logger = logging.getLogger(__name__)
 
@@ -23,27 +23,6 @@ class AboutTab(TabBuilder):
             entries=[
                 TabEntry(entry_name="name", label="Name", type="text", required=True, value=self.entity.get("name")),
                 TabEntry(entry_name="description", label="Description", type="text", value=self.entity.get("description")),
-            ],
-        )
-
-
-@dataclass
-class InsightsTab(TabBuilder):
-    tab_name: str = "Insights"
-
-    def __post_init__(self):
-        self.section_method_order = [
-            self._crisp_score_section,
-        ]
-
-        super().__post_init__()
-
-    def _crisp_score_section(self):
-        section_name = "CRISP Score"
-        return TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(entry_name="crisp", label="CRISP", type="custom", value=self.entity.get("crisp")),
             ],
         )
 

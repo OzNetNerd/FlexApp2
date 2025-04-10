@@ -37,10 +37,8 @@ class TabVisibility:
         return True  # Default to visible if no rules match
 
 
-# Keep your existing dataclasses but add visibility to Tab
 @dataclass
 class TabEntry:
-    # [Unchanged]
     entry_name: str
     label: str
     type: str
@@ -52,7 +50,6 @@ class TabEntry:
 
 @dataclass
 class TabSection:
-    # [Unchanged]
     section_name: str
     entries: List[TabEntry] = field(default_factory=list)
 
@@ -83,6 +80,29 @@ class TabBuilder(ABC):
 
 
 @dataclass
+class InsightsTab(TabBuilder):
+    tab_name: str = "Insights"
+
+    def __post_init__(self):
+        # Set visibility to only show on view page
+        self.visibility = TabVisibility(show_only_on={PageType.VIEW})
+
+        self.section_method_order = [
+            self._crisp_score_section,
+        ]
+
+        super().__post_init__()
+
+    def _crisp_score_section(self):
+        section_name = "CRISP Score"
+        return TabSection(
+            section_name=section_name,
+            entries=[
+                TabEntry(entry_name="crisp", label="CRISP", type="custom", value=self.entity.get("crisp")),
+            ],
+        )
+
+@dataclass
 class MetadataTab(TabBuilder):
     tab_name: str = "Metadata"
 
@@ -94,7 +114,6 @@ class MetadataTab(TabBuilder):
         ]
 
     def _metadata_section(self):
-        # [Unchanged]
         section_name = "Metadata"
         return TabSection(
             section_name=section_name,
@@ -107,8 +126,26 @@ class MetadataTab(TabBuilder):
         )
 
 
-def create_tabs(entity: Any, tabs: List[Callable], current_page: PageType, add_metadata_tab=True) -> List[Tab]:
-    logger.info(f"ℹ️ About to start creating tabs for UI on {current_page.value} page")
+from flask import request
+
+
+def create_tabs(entity: Any, tabs: List[Callable], current_page=None, add_metadata_tab=True) -> List[Tab]:
+    # Auto-detect current page from request if not provided
+    if current_page is None:
+        # Extract page type from endpoint name
+        endpoint = request.endpoint if hasattr(request, 'endpoint') else ""
+        if endpoint.endswith('.view'):
+            current_page = PageType.VIEW
+        elif endpoint.endswith('.edit'):
+            current_page = PageType.EDIT
+        elif endpoint.endswith('.create'):
+            current_page = PageType.CREATE
+        else:
+            # Default to showing all tabs if we can't determine the page type
+            logger.warning(f"Could not determine page type from endpoint: {endpoint}")
+            current_page = None
+
+    logger.info(f"ℹ️ About to start creating tabs for UI on {current_page.value if current_page else 'unknown'} page")
 
     if add_metadata_tab:
         all_tabs = list(tabs) + ([MetadataTab])
@@ -121,9 +158,9 @@ def create_tabs(entity: Any, tabs: List[Callable], current_page: PageType, add_m
     for tab_class in all_tabs:
         tab_obj = tab_class(entity)
 
-        # Check if this tab should be visible on the current page
-        if tab_obj.visibility.is_visible(current_page):
-            logger.info(f"📂 Creating tab: {tab_obj.tab_name} for {current_page.value} page")
+        # Only check visibility if we know the current page
+        if current_page is None or tab_obj.visibility.is_visible(current_page):
+            logger.info(f"📂 Creating tab: {tab_obj.tab_name}")
             tab_entry = tab_obj.create_tab()
             grouped_tabs.append(tab_entry)
         else:

@@ -14,6 +14,6 @@ register_route(
     blueprint=home_bp,
     url="/",
     template_path="home.html",
-    endpoint="home",
+    title="home",
     context_provider=SimpleContext,
 )

@@ -84,6 +84,7 @@ def register_route(
     url: str,
     template_path: str,
     context_provider: Callable,
+    title: str = None,
     endpoint: str = None,
     methods: Optional[List[str]] = None,
     error_message: str = "Failed to load the page",
@@ -91,6 +92,8 @@ def register_route(
     """Register a route that renders a specific template with optional context."""
     # Prepare route configuration
     endpoint, methods = prepare_route_config(url, template_path, endpoint, methods)
+    logger.info(f'debugger - title: {title} - endpoint: {endpoint}')
+    title = title or endpoint
 
     def route_handler(*args, **kwargs):
         """Handle requests to this route by rendering the template with context."""
@@ -100,13 +103,13 @@ def register_route(
             # If a context provider was specified, call it to get template data
             if context_provider:
                 logger.info(f"Calling context provider ({context_provider}) for endpoint '{endpoint}'")
-                context = context_provider(*args, **kwargs)
+                context = context_provider(title=title, *args, **kwargs)
                 if not context:
                     logger.warning(f"Context provider returned None for endpoint '{endpoint}'")
-                    context = SimpleContext(title=endpoint)
+                    context = SimpleContext(title=title)
             else:
                 logger.info(f"No context provider for endpoint '{endpoint}', using default SimpleContext")
-                context = SimpleContext(title=endpoint)
+                context = SimpleContext(title=title)
 
             # Render the template safely, handling exceptions
             logger.info(f"Rendering with the following vars:")
