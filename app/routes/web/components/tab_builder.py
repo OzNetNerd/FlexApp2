@@ -140,7 +140,7 @@ class NotesTab(TabBuilder):
 
     def _notes_section(self):
         from app.models import Note, User
-        from flask import render_template
+        from flask import render_template_string
 
         section_name = "Notes"
         entity_id = self.entity.get('id')
@@ -150,25 +150,27 @@ class NotesTab(TabBuilder):
             notable_id=entity_id
         ).order_by(Note.created_at.desc()).all()
 
-        # Format notes for template
+        # Format notes for activity-style display
         formatted_notes = []
-        authors = set()
 
         for note in notes:
             user = User.query.get(note.user_id) if note.user_id else None
             author_name = user.username if user else "Unknown"
-            authors.add(author_name)
 
             formatted_notes.append({
-                'author': author_name,
-                'avatar': f"https://ui-avatars.com/api/?name={author_name}&background=random",
-                'created_at': note.created_at,
-                'content': note.processed_content if note.processed_content else note.content
+                'icon_bg_class': 'bg-primary rounded-circle p-2',
+                'icon_class': 'fas fa-comment-alt fa-sm',
+                'description': f"<strong>{author_name}</strong> added a note: {note.content}",
+                'timestamp': note.created_at.strftime('%d %b %Y, %H:%M')
             })
 
-        notes_html = render_template('components/notes_tab.html',
-                                     notes=formatted_notes,
-                                     authors=list(authors))
+        # Use Flask's render_template_string which has access to the application's Jinja environment
+        template_str = """
+            {% from 'macros/render_notes.html' import render_notes %}
+            {{ render_notes(notes) }}
+        """
+
+        notes_html = render_template_string(template_str, notes=formatted_notes)
 
         return TabSection(section_name=section_name, entries=[
             TabEntry(entry_name="notes", label="Notes", type="custom", value=notes_html)
