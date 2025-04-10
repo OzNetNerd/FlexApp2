@@ -1,8 +1,10 @@
 import logging
-from typing import Any, List, Optional, Callable, Set, Union
+from typing import Any, List, Optional, Callable, Set
 from dataclasses import dataclass, field
 from abc import ABC
-from enum import Enum, auto
+from enum import Enum
+
+from flask import request
 
 from app.utils.app_logging import log_instance_vars
 
@@ -125,11 +127,49 @@ class MetadataTab(TabBuilder):
             ],
         )
 
+@dataclass
+class NotesTab(TabBuilder):
+    tab_name: str = "Notes"
 
-from flask import request
+    def __post_init__(self):
+        # Show notes only on the view page
+        self.visibility = TabVisibility(show_only_on={PageType.VIEW})
+        # Define the order of sections for this tab. In this example, we have one section.
+        self.section_method_order = [self._notes_section]
+        super().__post_init__()
 
+    def _notes_section(self):
+        section_name = "Notes"
+        # Assume that self.entity.get("notes") returns a list of Note objects.
+        notes = self.entity.get("notes", [])
+        # Build a custom HTML snippet for all notes; you can enhance this formatting as needed.
+        notes_html = ""
+        for note in notes:
+            # Check if the note has an author; if not, set to 'Unknown'
+            author = getattr(note, "author", None)
+            author_name = author.username if author else "Unknown"
+            # Format the creation date if available
+            created_at = note.created_at.strftime("%Y-%m-%d %H:%M") if note.created_at else ""
+            # Choose processed content if available, otherwise fall back to raw content
+            content = note.processed_content if note.processed_content else note.content
+            notes_html += (
+                f"<div class='note-entry mb-3 border-bottom pb-2'>"
+                f"  <div class='note-content'>{content}</div>"
+                f"  <div class='note-meta text-muted small'>"
+                f"    By {author_name} on {created_at}"
+                f"  </div>"
+                f"</div>"
+            )
+        # Create a single custom field to hold the HTML for the notes.
+        entry = TabEntry(
+            entry_name="notes",
+            label="Notes",
+            type="custom",
+            value=notes_html
+        )
+        return TabSection(section_name=section_name, entries=[entry])
 
-def create_tabs(entity: Any, tabs: List[Callable], current_page=None, add_metadata_tab=True) -> List[Tab]:
+def create_tabs(entity: Any, tabs: List[Callable], current_page=None, add_metadata_tab=True, add_notes_tab=True) -> List[Tab]:
     # Auto-detect current page from request if not provided
     if current_page is None:
         # Extract page type from endpoint name
@@ -152,6 +192,13 @@ def create_tabs(entity: Any, tabs: List[Callable], current_page=None, add_metada
         logger.info("ℹ️ Add 'metadata' option is enabled. Will add the tab to the UI if visible for this page")
     else:
         logger.info("ℹ️ Add 'metadata' option is disabled. Will NOT add the tab to the UI")
+        all_tabs = tabs
+
+    if add_notes_tab:
+        all_tabs = list(tabs) + ([NotesTab])
+        logger.info("ℹ️ Add 'notes' option is enabled. Will add the tab to the UI if visible for this page")
+    else:
+        logger.info("ℹ️ Add 'notes' option is disabled. Will NOT add the tab to the UI")
         all_tabs = tabs
 
     grouped_tabs = []

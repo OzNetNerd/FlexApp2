@@ -1,5 +1,5 @@
 from app.app import create_app
-from app.models import db, User, Company, Contact, CapabilityCategory, Capability, CompanyCapability, Opportunity, Task
+from app.models import db, User, Company, Contact, CapabilityCategory, Capability, CompanyCapability, Opportunity, Task, Note
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
 import logging
@@ -51,34 +51,6 @@ def seed_users():
     print("✅ Users seeded.")
 
 
-def seed_opportunities():
-    """Seed opportunities into the database."""
-    companies = Company.query.all()
-    opportunities = [
-        ("Cloud Expansion", "Opportunity to expand our cloud services.", "New", "Prospecting", 50000.0),
-        ("Security Partnership", "Partnership with a major security firm.", "New", "Prospecting", 100000.0),
-        ("Data Analytics Project", "Project for a large data analytics firm.", "Won", "Negotiation", 150000.0),
-        ("Software Licensing", "Renewal of software licenses for an enterprise.", "Lost", "Closed", 30000.0),
-        ("Cybersecurity Solutions", "Comprehensive cybersecurity solutions for a client.", "New", "Prospecting", 200000.0),
-    ]
-
-    for name, description, status, stage, value in opportunities:
-        company = companies[len(opportunities) % len(companies)]
-        create_or_update(
-            Opportunity,
-            {"name": name},
-            {
-                "description": description,
-                "status": status,
-                "stage": stage,
-                "value": value,
-                "company_id": company.id,
-            },
-        )
-    db.session.commit()
-    print("✅ Opportunities seeded.")
-
-
 def seed_companies():
     """Seed companies into the database."""
     companies = [
@@ -98,7 +70,6 @@ def seed_companies():
 def seed_contacts():
     """Seed contacts into the database."""
     companies = Company.query.all()
-    users = User.query.all()
     first_names = ["Liam", "Noah", "Olivia", "Emma", "Ava"]
     last_names = ["Walker", "Lee", "Davis", "Martin", "Lopez"]
 
@@ -158,6 +129,7 @@ def seed_company_capabilities():
 
 
 def seed_tasks():
+    """Seed tasks into the database."""
     users = User.query.all()
     opportunities = Opportunity.query.all()
 
@@ -211,7 +183,15 @@ def seed_tasks():
             "Opportunity",
             opportunities[4].id,
         ),
-        ("User feedback analysis", "Analyze user feedback on the latest release.", "2025-05-01", "Pending", "Medium", "User", users[0].id),
+        (
+            "User feedback analysis",
+            "Analyze user feedback on the latest release.",
+            "2025-05-01",
+            "Pending",
+            "Medium",
+            "User",
+            users[0].id,
+        ),
         (
             "Internal team meeting",
             "Schedule an internal team meeting for next week.",
@@ -223,7 +203,6 @@ def seed_tasks():
         ),
     ]
 
-    # Handle cases where there are fewer users or opportunities than tasks
     task_assignments = min(len(users), len(opportunities))
 
     for i in range(task_assignments):
@@ -245,6 +224,79 @@ def seed_tasks():
     print("✅ Tasks seeded.")
 
 
+def seed_opportunities():
+    """Seed opportunities into the database."""
+    companies = Company.query.all()
+    opportunities = [
+        ("Cloud Expansion", "Opportunity to expand our cloud services.", "New", "Prospecting", 50000.0),
+        ("Security Partnership", "Partnership with a major security firm.", "New", "Prospecting", 100000.0),
+        ("Data Analytics Project", "Project for a large data analytics firm.", "Won", "Negotiation", 150000.0),
+        ("Software Licensing", "Renewal of software licenses for an enterprise.", "Lost", "Closed", 30000.0),
+        ("Cybersecurity Solutions", "Comprehensive cybersecurity solutions for a client.", "New", "Prospecting", 200000.0),
+    ]
+
+    for name, description, status, stage, value in opportunities:
+        # Select a company using a consistent method; here using modulus so that one company is selected for all opportunities
+        company = companies[len(opportunities) % len(companies)]
+        create_or_update(
+            Opportunity,
+            {"name": name},
+            {
+                "description": description,
+                "status": status,
+                "stage": stage,
+                "value": value,
+                "company_id": company.id,
+            },
+        )
+    db.session.commit()
+    print("✅ Opportunities seeded.")
+
+
+def seed_notes():
+    """Seed notes for Companies, Contacts, and Opportunities."""
+    user = User.query.first()
+    if not user:
+        print("❌ No user available to assign notes.")
+        return
+
+    # Seed notes for companies
+    for company in Company.query.all():
+        create_or_update(
+            Note,
+            {"notable_type": "Company", "notable_id": company.id, "user_id": user.id},
+            {
+                "content": f"Note for company {company.name}",
+                "processed_content": f"<p>Note for company {company.name}</p>"
+            },
+        )
+
+    # Seed notes for contacts
+    for contact in Contact.query.all():
+        full_name = f"{contact.first_name} {contact.last_name}"
+        create_or_update(
+            Note,
+            {"notable_type": "Contact", "notable_id": contact.id, "user_id": user.id},
+            {
+                "content": f"Note for contact {full_name}",
+                "processed_content": f"<p>Note for contact {full_name}</p>"
+            },
+        )
+
+    # Seed notes for opportunities
+    for opportunity in Opportunity.query.all():
+        create_or_update(
+            Note,
+            {"notable_type": "Opportunity", "notable_id": opportunity.id, "user_id": user.id},
+            {
+                "content": f"Note for opportunity {opportunity.name}",
+                "processed_content": f"<p>Note for opportunity {opportunity.name}</p>"
+            },
+        )
+    db.session.commit()
+    print("✅ Notes seeded.")
+
+
 def seed_relationships():
     """Seed relationships between entities in the database."""
     from app.models.relationship import Relationship
@@ -262,11 +314,16 @@ def seed_relationships():
         user2 = users[i + 1]
         rel_type = relationship_types[i % len(relationship_types)]
 
-        existing = Relationship.query.filter_by(entity1_type="user", entity1_id=user1.id, entity2_type="user", entity2_id=user2.id).first()
+        existing = Relationship.query.filter_by(
+            entity1_type="user", entity1_id=user1.id,
+            entity2_type="user", entity2_id=user2.id
+        ).first()
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user1.id, entity2_type="user", entity2_id=user2.id, relationship_type=rel_type
+                entity1_type="user", entity1_id=user1.id,
+                entity2_type="user", entity2_id=user2.id,
+                relationship_type=rel_type
             )
             db.session.add(relationship)
             logger.info(f"Created relationship: User {user1.username} {rel_type} User {user2.username}")
@@ -278,15 +335,18 @@ def seed_relationships():
         rel_type = relationship_types[(i + 2) % len(relationship_types)]
 
         existing = Relationship.query.filter_by(
-            entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id
+            entity1_type="user", entity1_id=user.id,
+            entity2_type="contact", entity2_id=contact.id
         ).first()
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id, relationship_type=rel_type
+                entity1_type="user", entity1_id=user.id,
+                entity2_type="contact", entity2_id=contact.id,
+                relationship_type=rel_type
             )
             db.session.add(relationship)
-            logger.info(f"Created relationship: User {user.username} {rel_type} Contact {contact.full_name}")
+            logger.info(f"Created relationship: User {user.username} {rel_type} Contact {contact.first_name} {contact.last_name}")
 
     # Create user-to-company relationships
     for i in range(min(len(users), len(companies))):
@@ -295,12 +355,15 @@ def seed_relationships():
         rel_type = relationship_types[(i + 4) % len(relationship_types)]
 
         existing = Relationship.query.filter_by(
-            entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id
+            entity1_type="user", entity1_id=user.id,
+            entity2_type="company", entity2_id=company.id
         ).first()
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id, relationship_type=rel_type
+                entity1_type="user", entity1_id=user.id,
+                entity2_type="company", entity2_id=company.id,
+                relationship_type=rel_type
             )
             db.session.add(relationship)
             logger.info(f"Created relationship: User {user.username} {rel_type} Company {company.name}")
@@ -309,7 +372,6 @@ def seed_relationships():
     print("✅ Relationships seeded.")
 
 
-# Update the seed_demo_data function to include the new seed_relationships function
 def seed_demo_data():
     """Seed all demo data into the database."""
     entries = [
@@ -320,16 +382,17 @@ def seed_demo_data():
         seed_company_capabilities,
         seed_tasks,
         seed_opportunities,
+        seed_notes,
         seed_relationships,
     ]
 
     app = create_app()
     with app.app_context():
         for entry in entries:
-            entry_name = entry.__name__  # Get the function name
+            entry_name = entry.__name__
             print(f"Seeding entry {entry_name}")
             try:
-                entry()  # Call the function
+                entry()  # Call the seed function
                 print(f"🎉 {entry_name} Done")
             except IntegrityError as e:
                 db.session.rollback()

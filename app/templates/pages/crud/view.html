@@ -18,4 +18,12 @@
       </div>
     {% endfor %}
   </div>
+
+  {# Render the recent activity/notes section if activity_notes is available #}
+  {% if activity_notes is defined and activity_notes|length > 0 %}
+    {% from "macros/render_notes.html" import render_notes %}
+    {{ render_notes(activity_notes) }}
+  {% endif %}
 {% endblock %}
+
+<!-- END TEMPLATE: view.html -->
