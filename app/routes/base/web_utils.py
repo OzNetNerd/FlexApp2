@@ -233,8 +233,9 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 action="create",
                 entity_table_name=entity_table_name,
                 title=f"Create {entity_table_name}",
+                read_only=False  # Make the form editable
             ),
-            "methods": ["GET", "POST"],  # Add this line for form submission
+            "methods": ["GET", "POST"],
         },
         "view": {
             "url": "/<int:entity_id>",
