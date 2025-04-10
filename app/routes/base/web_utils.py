@@ -134,122 +134,86 @@ def register_route(
 
 
 def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
-    """
-    Registers standard CRUD routes for an entity on a Flask blueprint.
-
-    This function creates and registers index, create, view, and edit routes for an entity.
-    It handles template selection, context generation, and error message formation for each route.
-    It also manages the pluralization of the entity name for display and URL construction.
-
-    Args:
-        crud_route_config (CrudRouteConfig): A configuration dataclass containing:
-            - blueprint (flask.Blueprint): The Flask blueprint on which to register routes.
-            - entity_name (str): The name of the entity for which routes are to be registered.
-            - service (object, optional): An optional service with data access methods. If provided,
-              it will be used to fetch entity data for view/edit routes. Defaults to None.
-            - include_routes (List[str], optional): A list of route types to include.
-              Defaults to ['index', 'create', 'view', 'edit'].
-            - templates (Dict[str, str], optional): A dictionary of custom template paths keyed by
-              route type. Defaults to {}.
-
-    Returns:
-        flask.Blueprint: The blueprint with the registered CRUD routes.
-    """
-    # Extract configuration parameters from the dataclass.
+    # Extract configuration parameters
     logger.info("Starting registration of CRUD routes.")
-
     blueprint = crud_route_config.blueprint
     entity_table_name = crud_route_config.entity_table_name
     service = crud_route_config.service
-    logger.info(f"Retrieved blueprint: {blueprint}")
-    logger.info(f"Retrieved entity table name: {entity_table_name}")
-    logger.info(f"Retrieved service: {service}")
 
     if not isinstance(entity_table_name, str):
         logger.error("Invalid entity_table_name type; expected a string.")
         raise ValueError("The 'entity_table_name' must be a string.")
 
-    # Ensure default routes and templates are applied if not provided.
     include_routes = crud_route_config.include_routes or ["index", "create", "view", "edit"]
     templates = crud_route_config.templates or {}
-    logger.info(f"Using include_routes: {include_routes}")
-    logger.info(f"Using templates: {templates}")
-
-    logger.info(f"Registering CRUD routes for entity '{entity_table_name}' with routes {include_routes}")
-
-    # Lowercase the entity name and determine its plural form for URLs and display.
-    entity_table_name_lower = entity_table_name.lower()
-    logger.info(f"Converted entity table name name to lowercase: {entity_table_name_lower}")
-
-    # Direct context creation in dictionary
-    context_providers = {
-        "index": lambda: TableContext(
-            entity_table_name=entity_table_name,
-            action="index",
-            title = "TBA2",
-        ),
-        "create": lambda: EntityContext(
-            action="create",
-            entity_table_name=entity_table_name,
-            title = "TBA2",
-        ),
-        "view": lambda entity_id: EntityContext(
-            action="view",
-            entity_table_name=entity_table_name,
-            entity_id=entity_id,
-            title = "TBA2",
-        ),
-        "edit": lambda entity_id: EntityContext(
-            action="edit",
-            entity_table_name=entity_table_name,
-            entity_id=entity_id,
-            entity=service.get_by_id(entity_id) if service else None,
-            title = "TBA2",
-        ),
-    }
-    logger.info("Context providers have been initialized.")
-
-    # Define URL patterns for each route type.
-    route_urls = {
-        "index": "/",
-        "create": "/create",
-        "view": "/<int:entity_id>",
-        "edit": "/<int:entity_id>/edit",
-    }
-    logger.info("URL patterns for routes have been defined.")
 
     entity_table_plural_name = get_table_plural_name(entity_table_name)
 
-    # Iterate over the routes to be included and register each with the blueprint.
-    for route_type in [r for r in include_routes if r in route_urls]:
+    # Consolidate all route configuration in one place
+    route_configs = {
+        "index": {
+            "url": "/",
+            "template_default": f"pages/tables/{entity_table_plural_name}.html",
+            "error_message": f"Failed to index {entity_table_plural_name}",
+            "context_provider": lambda: TableContext(
+                entity_table_name=entity_table_name,
+                action="index",
+                title="TBA2",
+            ),
+        },
+        "create": {
+            "url": "/create",
+            "template_default": f"pages/crud/create.html",
+            "error_message": f"Failed to create {entity_table_name}",
+            "context_provider": lambda: EntityContext(
+                action="create",
+                entity_table_name=entity_table_name,
+                title="TBA2",
+            ),
+        },
+        "view": {
+            "url": "/<int:entity_id>",
+            "template_default": f"pages/crud/view.html",
+            "error_message": f"Failed to view {entity_table_name}",
+            "context_provider": lambda entity_id: EntityContext(
+                action="view",
+                entity_table_name=entity_table_name,
+                entity_id=entity_id,
+                title="TBA2",
+            ),
+        },
+        "edit": {
+            "url": "/<int:entity_id>/edit",
+            "template_default": f"pages/crud/edit.html",
+            "error_message": f"Failed to edit {entity_table_name}",
+            "context_provider": lambda entity_id: EntityContext(
+                action="edit",
+                entity_table_name=entity_table_name,
+                entity_id=entity_id,
+                entity=service.get_by_id(entity_id) if service else None,
+                title="TBA2",
+            ),
+        },
+    }
+
+    # Register routes based on configuration
+    for route_type in [r for r in include_routes if r in route_configs]:
+        config = route_configs[route_type]
         logger.info(f"Processing registration for route type: '{route_type}'")
-        error_message = f"Failed to {route_type} {entity_table_plural_name} if route_type == 'index' else {entity_table_plural_name}"
-        logger.info(f"Setting error message set for route '{route_type}': {error_message}")
 
-        # Use a custom template if provided; otherwise, determine the default template.
-        template_path = templates.get(
-            route_type, f"pages/tables/{entity_table_plural_name}.html" if route_type == "index" else f"pages/crud/{route_type}.html"
-        )
-        logger.info(f"Using template '{template_path}' for route '{route_type}'")
-
-        logger.info("Registering route with the following settings:")
-        logger.info(f"  blueprint: {blueprint}")
-        logger.info(f"  URL: {route_urls[route_type]}")
-        logger.info(f"  endpoint: {route_type}")
-        logger.info(f"  context_provider: {context_providers[route_type]}")
+        template_path = templates.get(route_type, config["template_default"])
 
         register_route(
             blueprint=blueprint,
-            url=route_urls[route_type],
-            title="TBA",  # Title to be dynamically assigned later.
+            url=config["url"],
+            title="TBA",  # Note: This differs from "TBA2" in context providers
             template_path=template_path,
             endpoint=route_type,
-            context_provider=context_providers[route_type],
-            error_message=error_message,
+            context_provider=config["context_provider"],
+            error_message=config["error_message"],
         )
         logger.info(f"Successfully registered route '{route_type}'.")
 
-    logger.info(f"Finished registering CRUD routes for entity '{entity_table_plural_name}'.")
     return blueprint
 
 
