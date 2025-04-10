@@ -2,10 +2,11 @@
 import logging
 from flask import Blueprint
 from app.routes.base.components.template_renderer import render_safely, RenderSafelyConfig
-from app.routes.base.components.context import SimpleContext, TableContext, EntityContext, TableContextConfig, EntityContextConfig
+from app.routes.base.components.context import SimpleContext, TableContext, EntityContext
 from typing import Optional, List, Any, Callable, Dict, Tuple
 from dataclasses import dataclass, field
 
+from app.utils.table_helpers import get_plural_name
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +98,7 @@ def register_route(
             # If a context provider was specified, call it to get template data
             if context_provider:
                 logger.info(f"Calling context provider for endpoint '{endpoint}'")
-                context = context_provider(title=title, *args, **kwargs)
+                context = context_provider(*args, **kwargs)
                 if not context:
                     logger.warning(f"Context provider returned None for endpoint '{endpoint}'")
                     context = SimpleContext(title=endpoint)
@@ -182,24 +183,24 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
 
     # Direct context creation in dictionary
     context_providers = {
-        "index": lambda: TableContextConfig(
+        "index": lambda: TableContext(
             table_name=entity_name,
             action="index"
         ),
-        "create": lambda: EntityContextConfig(
-            table_name=entity_name,
-            action="create"
+        "create": lambda: EntityContext(
+            action="create",
+            table_name=entity_name
         ),
-        "view": lambda entity_id: EntityContextConfig(
-            table_name=entity_name,
+        "view": lambda entity_id: EntityContext(
             action="view",
-            id=entity_id
-        ),
-        "edit": lambda entity_id: EntityContextConfig(
             table_name=entity_name,
+            entity_id=entity_id
+        ),
+        "edit": lambda entity_id: EntityContext(
             action="edit",
-            id=entity_id,
-            entity=service.get_by_id(entity_id)
+            table_name=entity_name,
+            entity_id=entity_id,
+            entity=service.get_by_id(entity_id) if service else None
         ),
     }
     logger.info("Context providers have been initialized.")
@@ -216,12 +217,12 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
     # Iterate over the routes to be included and register each with the blueprint.
     for route_type in [r for r in include_routes if r in route_urls]:
         logger.info(f"Processing registration for route type: '{route_type}'")
-        error_message = f"Failed to {route_type} {plural_form if route_type == 'index' else entity_name_lower}"
+        error_message = f"Failed to {route_type} {get_plural_name(entity_name) if route_type == 'index' else entity_name_lower}"
         logger.info(f"Error message set for route '{route_type}': {error_message}")
 
         # Use a custom template if provided; otherwise, determine the default template.
         template_path = templates.get(
-            route_type, f"pages/tables/{plural_form}.html" if route_type == "index" else f"pages/crud/{route_type}.html"
+            route_type, f"pages/tables/{get_plural_name(entity_name)}.html" if route_type == "index" else f"pages/crud/{route_type}.html"
         )
         logger.info(f"Using template '{template_path}' for route '{route_type}'")
 
