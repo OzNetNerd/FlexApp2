@@ -187,26 +187,22 @@ class CRUDService:
             logger.error(traceback.format_exc())
             raise
 
-    @staticmethod
-    def delete(entity: Any) -> bool:
-        """
-        Delete an instance from the database.
+    def delete(self, entity_or_id):
+        if isinstance(entity_or_id, int):
+            entity = self.get_by_id(entity_or_id)
+        else:
+            entity = entity_or_id
 
-        Args:
-            entity (Any): Instance to be deleted.
-
-        Returns:
-            bool: True if successful.
-        """
         try:
             db.session.delete(entity)
             db.session.commit()
+            logger.info(f"✅ Successfully deleted {entity.__class__.__name__} with id {entity.id}")
             return True
+
         except Exception as e:
             db.session.rollback()
-            logger.error(f"❌  Error deleting {entity.__class__.__name__} with id {entity.id}: {e}")
-            logger.error(traceback.format_exc())
-            raise
+            logger.error(f"❌ Error deleting {entity.__class__.__name__} with id {entity.id}: {e}")
+            raise e
 
     def validate_create(self, data: dict) -> list:
         """
