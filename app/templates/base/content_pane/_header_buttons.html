@@ -18,12 +18,12 @@
 
 <div class="d-flex justify-content-end align-items-center gap-2">
   {% if not read_only %}
-    {% if id is defined and id is not none and id != 'None' and id != '' %}
+    {% if entity is defined and entity.id is not none and entity.id != 'None' and entity.id != '' %}
       <!-- Edit mode -->
       <button type="submit" class="btn btn-success fw-bold">
         <i class="fas fa-save me-1"></i> Save
       </button>
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}"
+      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}"
          class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
         <i class="fas fa-times me-1"></i> Cancel
       </a>
@@ -44,8 +44,8 @@
       <i class="fas fa-plus me-1"></i> Add
     </a>
 
-    {% if id is defined and id is not none and id != 'None' and id != '' %}
-      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', entity_id=id) }}"
+    {% if entity is defined and entity.id is not none and entity.id != 'None' and entity.id != '' %}
+      <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', entity_id=entity.id) }}"
          class="btn btn-warning text-dark fw-bold">
         <i class="fas fa-edit me-1"></i> Edit
       </a>
@@ -65,20 +65,20 @@
 <!-- Pass dynamic data from Jinja to JavaScript -->
 <script type="text/javascript">
   window.headerButtonsData = {
-    hasId: {{ 'true' if id is defined and id is not none and id != 'None' and id != '' else 'false' }},
+    hasId: {{ 'true' if entity is defined and entity.id is not none and entity.id != 'None' and entity.id != '' else 'false' }},
     readOnly: {{ 'true' if read_only else 'false' }},
     endpoint: "{{ request.endpoint }}",
     baseRoute: "{{ request.endpoint.rsplit('.', 1)[0] }}",
     // Calculate expected button labels based on logic:
     buttons:
               {% if not read_only %}
-                {% if id is defined and id is not none and id != 'None' and id != '' %}
+                {% if entity is defined and entity.id is not none and entity.id != 'None' and entity.id != '' %}
                   ["Save", "Cancel"]
                 {% else %}
                   ["Save", "Cancel"]
                 {% endif %}
               {% else %}
-                ["Add", {% if id is defined and id is not none and id != 'None' and id != '' %}"Edit", "Delete", {% endif %}"Back"]
+                ["Add", {% if entity is defined and entity.id is not none and entity.id != 'None' and entity.id != '' %}"Edit", "Delete", {% endif %}"Back"]
               {% endif %}
   };
 </script>

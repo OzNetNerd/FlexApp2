@@ -83,8 +83,12 @@ class CRUDService:
         Returns:
             Any: The found model instance or 404 error.
         """
+        logger.info(f'self: {self}')
+        logger.info(f'entity_id: {entity_id}')
         try:
-            return self.model_class.query.get_or_404(entity_id)
+            lookup_result = self.model_class.query.get_or_404(entity_id)
+            logger.info(f'lookup_result: {lookup_result.__dict__}')
+            return lookup_result
         except Exception as e:
             logger.error(f"❌  Error in get_by_id for {self.model_class.__name__} with id {entity_id}: {e}")
             logger.error(traceback.format_exc())
