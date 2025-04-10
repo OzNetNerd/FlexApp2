@@ -166,30 +166,30 @@ class CRUDService:
                 if hasattr(entity, key):
                     setattr(entity, key, value)
             db.session.commit()
-            return item
+            return entity
         except Exception as e:
             db.session.rollback()
-            logger.error(f"❌  Error updating {item.__class__.__name__} with id {item.id}: {e}")
+            logger.error(f"❌  Error updating {entity.__class__.__name__} with id {enitty.id}: {e}")
             logger.error(traceback.format_exc())
             raise
 
-    def delete(self, item: Any) -> bool:
+    def delete(self, entity: Any) -> bool:
         """
         Delete an instance from the database.
 
         Args:
-            item (Any): Instance to be deleted.
+            entity (Any): Instance to be deleted.
 
         Returns:
             bool: True if successful.
         """
         try:
-            db.session.delete(item)
+            db.session.delete(enitty)
             db.session.commit()
             return True
         except Exception as e:
             db.session.rollback()
-            logger.error(f"❌  Error deleting {item.__class__.__name__} with id {item.id}: {e}")
+            logger.error(f"❌  Error deleting {entity.__class__.__name__} with id {entity.id}: {e}")
             logger.error(traceback.format_exc())
             raise
 
@@ -205,12 +205,12 @@ class CRUDService:
         """
         return []
 
-    def validate_update(self, item: Any, data: dict) -> list:
+    def validate_update(self, entity: Any, data: dict) -> list:
         """
         Validate input data for updating. Override in subclasses.
 
         Args:
-            item (Any): Existing instance.
+            entity (Any): Existing instance.
             data (dict): Updated data.
 
         Returns:

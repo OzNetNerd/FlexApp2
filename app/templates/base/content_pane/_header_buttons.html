@@ -4,22 +4,22 @@
   {% if not read_only %}
     {% if entity is defined and entity is not none and entity.id is defined and entity.id is not none and entity.id != 'None' and entity.id != '' %}
       <!-- Edit mode -->
-      <button type="submit" class="btn btn-success fw-bold">
-        <i class="fas fa-save me-1"></i> Save
-      </button>
       <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}"
-         class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+         class="btn btn-secondary">
         <i class="fas fa-times me-1"></i> Cancel
       </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> Update
+      </button>
     {% else %}
       <!-- Create mode -->
-      <button type="submit" class="btn btn-success fw-bold">
-        <i class="fas fa-save me-1"></i> Save
-      </button>
       <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
-         class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+         class="btn btn-secondary">
         <i class="fas fa-times me-1"></i> Cancel
       </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> Save
+      </button>
     {% endif %}
   {% else %}
     <!-- View mode -->
@@ -40,7 +40,7 @@
     {% endif %}
 
     <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
-       class="btn btn-secondary bg-opacity-75 fw-semibold text-white">
+       class="btn btn-secondary">
       <i class="fas fa-arrow-left me-1"></i> Back
     </a>
   {% endif %}
@@ -56,9 +56,9 @@
     buttons:
               {% if not read_only %}
                 {% if entity is defined and entity is not none and entity.id is defined and entity.id is not none and entity.id != 'None' and entity.id != '' %}
-                  ["Save", "Cancel"]
+                  ["Cancel", "Update"]
                 {% else %}
-                  ["Save", "Cancel"]
+                  ["Cancel", "Save"]
                 {% endif %}
               {% else %}
                 ["Add", {% if entity is defined and entity is not none and entity.id is defined and entity.id is not none and entity.id != 'None' and entity.id != '' %}"Edit", "Delete", {% endif %}"Back"]

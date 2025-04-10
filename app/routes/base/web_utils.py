@@ -1,7 +1,7 @@
 # app/routes/base/web_utils.py
 import logging
-from flask import Blueprint
-from mypy.dmypy.client import action
+from flask import Blueprint, request, redirect, flash, url_for
+
 
 from app.routes.base.components.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.base.components.context import SimpleContext, TableContext, EntityContext
@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 
 from app.utils.table_helpers import get_table_plural_name
 from app.services.crud_service import CRUDService
+
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,8 @@ class CrudRouteConfig:
     templates: Dict[str, str] = field(default_factory=dict)
 
 
-def prepare_route_config(url: str, template_path: str, endpoint: str = None, methods: Optional[List[str]] = None) -> Tuple[str, List[str]]:
+def prepare_route_config(url: str, template_path: str, endpoint: str = None, methods: Optional[List[str]] = None) -> \
+Tuple[str, List[str]]:
     """Prepares Flask route configuration by setting defaults and deriving endpoint names.
 
     This utility function handles common route configuration tasks, providing
@@ -96,53 +98,99 @@ def register_route(
     title = title or endpoint
 
     def route_handler(*args, **kwargs):
-        """Handle requests to this route by rendering the template with context."""
         logger.info(f"Handling request for endpoint '{endpoint}' with args={args}, kwargs={kwargs}")
-
         try:
-            # If a context provider was specified, call it to get template data
-            if context_provider:
-                logger.info(f"Calling context provider ({context_provider}) for endpoint '{endpoint}'")
+            if request.method == "POST" and endpoint in ["edit", "create"]:
+                entity_id = kwargs.get('entity_id')
+                form_data = request.form.to_dict()
+                logger.info(f"Form data received: {form_data}")
+                service = None
+                if hasattr(context_provider, "__closure__"):
+                    for closure in context_provider.__closure__:
+                        cell_contents = closure.cell_contents
+                        if hasattr(cell_contents, "get_by_id") and hasattr(cell_contents, "update"):
+                            service = cell_contents
+                            logger.info(f"Found service in context_provider: {service}")
+                            break
 
-                # Check if context_provider is a class (like SimpleContext)
+                if service:
+                    if endpoint == "edit" and entity_id:
+                        # Retrieve the entity instance using the provided ID
+                        entity = service.get_by_id(entity_id)
+                        # Update the entity instance with form data
+                        updated_entity = service.update(entity, form_data)
+                        flash("Successfully updated record", "success")
+                        view_url = url_for(f"{blueprint.name}.view", entity_id=entity_id)
+                        logger.info(f"Redirecting to view URL: {view_url}")
+                        return redirect(view_url)
+                    elif endpoint == "create":
+                        new_entity = service.create(form_data)
+                        flash("Successfully created record", "success")
+                        entity_id = getattr(new_entity, 'id', None)
+                        if entity_id:
+                            view_url = url_for(f"{blueprint.name}.view", entity_id=entity_id)
+                            logger.info(f"Redirecting to view URL for new entity: {view_url}")
+                            return redirect(view_url)
+                        else:
+                            index_url = url_for(f"{blueprint.name}.index")
+                            logger.info(f"Redirecting to index URL: {index_url}")
+                            return redirect(index_url)
+                else:
+                    logger.error(f"Could not find service for {endpoint}")
+                    flash("Error: Service not available for this operation", "error")
+
+            # For GET requests or if POST handling didn't redirect:
+            # Get context data for rendering the template
+            if context_provider:
+                logger.info(f"Calling context provider for endpoint '{endpoint}'")
+
+                # Check if context_provider is a class or function
                 if isinstance(context_provider, type):
-                    # It's a class, instantiate it with title
+                    # It's a class, instantiate with title
                     logger.info(f"Context provider is a class, instantiating with title: {title}")
                     context = context_provider(title=title)
                 else:
-                    # It's a function (lambda or regular), call it normally
+                    # It's a function, call it with args/kwargs
                     context = context_provider(*args, **kwargs)
 
                 if not context:
-                    logger.warning(f"Context provider returned None for endpoint '{endpoint}'")
+                    logger.warning(f"Context provider returned None for '{endpoint}'")
                     context = SimpleContext(title=title)
             else:
-                logger.info(f"No context provider for endpoint '{endpoint}', using default SimpleContext")
+                logger.info(f"No context provider for '{endpoint}', using default SimpleContext")
                 context = SimpleContext(title=title)
 
-            # Render the template safely, handling exceptions
-            logger.info(f"Rendering with the following vars:")
-            logger.info(f"template path: {template_path}")
-            logger.info(f"Context: {context}")
-
-            return render_safely(RenderSafelyConfig(
+            # Render the template
+            logger.info(f"Rendering template '{template_path}' with context: {context}")
+            result = render_safely(RenderSafelyConfig(
                 template_path,
                 context,
                 error_message,
                 endpoint,
             ))
-        except ValueError as ve:
-            # Properly handle ValueError by returning an error page
-            logger.error(f"ValueError in route handler for endpoint '{endpoint}': {ve}")
-            return f"<h1>Error in route handler</h1><p>{str(ve)}</p>", 500
 
-    # Set the function name for Flask (needed for proper endpoint registration)
+            # Ensure we return something valid
+            if result is None:
+                logger.error(f"Template renderer returned None for '{endpoint}'")
+                return f"<h1>Error rendering template</h1><p>No response from template renderer.</p>", 500
+
+            return result
+
+        except ValueError as ve:
+            # Handle ValueError
+            logger.error(f"ValueError in route handler for '{endpoint}': {ve}")
+            return f"<h1>Error in route handler</h1><p>{str(ve)}</p>", 500
+        except Exception as e:
+            # Handle other exceptions
+            logger.error(f"Exception in route handler for '{endpoint}': {str(e)}", exc_info=True)
+            return f"<h1>Unexpected error</h1><p>{str(e)}</p>", 500
+
+    # Set function name for Flask
     route_handler.__name__ = endpoint
 
-    # Register the route with Flask
+    # Register route with Flask
     blueprint.add_url_rule(url, endpoint=endpoint, view_func=route_handler, methods=methods)
-
-    logger.info(f"Registered route '{endpoint}' at '{url}' for template '{template_path}' with methods {methods}")
+    logger.info(f"Registered route '{endpoint}' at '{url}' with methods {methods}")
 
     return route_handler
 
@@ -164,6 +212,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
     entity_table_plural_name = get_table_plural_name(entity_table_name)
 
     # Consolidate all route configuration in one place
+    # Inside register_crud_routes function, update the route_configs dictionary:
     route_configs = {
         "index": {
             "url": "/",
@@ -174,6 +223,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 action="index",
                 title=entity_table_plural_name.capitalize(),
             ),
+            "methods": ["GET"],  # Add this line
         },
         "create": {
             "url": "/create",
@@ -184,6 +234,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 entity_table_name=entity_table_name,
                 title=f"Create {entity_table_name}",
             ),
+            "methods": ["GET", "POST"],  # Add this line for form submission
         },
         "view": {
             "url": "/<int:entity_id>",
@@ -195,6 +246,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 entity=service.get_by_id(entity_id),
                 title=f"View {entity_table_name}",
             ),
+            "methods": ["GET"],  # Add this line
         },
         "edit": {
             "url": "/<int:entity_id>/edit",
@@ -206,7 +258,10 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 entity_id=entity_id,
                 entity=service.get_by_id(entity_id),
                 title=f"Edit {entity_table_name}",
+                read_only=False,
+                blueprint_name=blueprint.name,
             ),
+            "methods": ["GET", "POST"],  # Add this line for form submission
         },
     }
 
@@ -224,12 +279,15 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             endpoint=route_type,
             context_provider=config["context_provider"],
             error_message=config["error_message"],
+            methods=config.get("methods", ["GET"]),
         )
         logger.info(f"Successfully registered route '{route_type}'.")
 
     return blueprint
 
-def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint: str, methods: Optional[List[str]] = None):
+
+def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint: str,
+                        methods: Optional[List[str]] = None):
     """Register an authentication route with a custom handler.
 
     Args:
