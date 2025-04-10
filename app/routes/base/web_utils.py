@@ -1,6 +1,8 @@
 # app/routes/base/web_utils.py
 import logging
 from flask import Blueprint
+from mypy.dmypy.client import action
+
 from app.routes.base.components.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.base.components.context import SimpleContext, TableContext, EntityContext
 from typing import Optional, List, Any, Callable, Dict, Tuple
@@ -158,7 +160,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             "context_provider": lambda: TableContext(
                 entity_table_name=entity_table_name,
                 action="index",
-                title="TBA2",
+                title=entity_table_plural_name.capitalize(),
             ),
         },
         "create": {
@@ -168,7 +170,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             "context_provider": lambda: EntityContext(
                 action="create",
                 entity_table_name=entity_table_name,
-                title="TBA2",
+                title=f"Create {entity_table_name}",
             ),
         },
         "view": {
@@ -179,7 +181,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 action="view",
                 entity_table_name=entity_table_name,
                 entity_id=entity_id,
-                title="TBA2",
+                title=f"View {entity_table_name}",
             ),
         },
         "edit": {
@@ -191,7 +193,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 entity_table_name=entity_table_name,
                 entity_id=entity_id,
                 entity=service.get_by_id(entity_id) if service else None,
-                title="TBA2",
+                title=f"Edit {entity_table_name}",
             ),
         },
     }
@@ -215,25 +217,6 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
         logger.info(f"Successfully registered route '{route_type}'.")
 
     return blueprint
-
-
-def _create_default_context(entity_name, action, title):
-    """Create a default context when no service is provided."""
-    logger.info(f"No service provided for '{entity_name}'. Returning default TableContext.")
-    return TableContext(action=action, entity_table_name=entity_name, title=title)
-
-
-def _handle_error(entity_name, entity_id, action, exception, title):
-    """Handle exceptions during entity processing."""
-    logger.error(f"Error getting context for {entity_name} ID={entity_id}: {exception}")
-    # Return a minimal context that won't cause template errors
-    return EntityContext(
-        action=action,
-        item={"id": entity_id, "error": f"Error loading {entity_name}: {str(exception)}"},
-        error_message=f"Failed to load {entity_name}",
-        title=title,
-    )
-
 
 def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint: str, methods: Optional[List[str]] = None):
     """Register an authentication route with a custom handler.

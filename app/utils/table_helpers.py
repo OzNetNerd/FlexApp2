@@ -28,7 +28,7 @@ def get_page_tabs(table_name):
     return UI_TAB_MAPPING[table_name]
 
 def get_table_plural_name(table_name):
-    return PLURAL_MAP.get(table_name, f"{table_name}s")
+    return PLURAL_MAP.get(table_name, f"{table_name.lower()}s")
 
 
 def get_table_id_by_model(model: Any) -> str:
