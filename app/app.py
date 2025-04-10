@@ -25,7 +25,7 @@ from app.models.base import db
 from app.models import User, Setting
 from app.routes.api_router import register_api_routes
 from app.routes.web_router import register_application_blueprints
-from app.routes.base.components.template_renderer import handle_template_error
+from app.routes.web.components.template_renderer import handle_template_error
 
 # ---------------------------------------------
 # Flask Extensions
@@ -131,7 +131,6 @@ def create_app(config_class=Config):
         }
 
     with app.app_context():
-        from app import models
 
         logger.info("Seeding settings and creating database tables.")
         Setting.seed()

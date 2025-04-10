@@ -12,14 +12,13 @@ from flask import (
     current_app,
     url_for,
     get_flashed_messages,
-    session,
 )
 from jinja2 import Environment, DebugUndefined
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
 from markupsafe import Markup, escape
 from dataclasses import dataclass
 
-from app.routes.base.components.context import BaseContext
+from app.routes.web.components.context import BaseContext
 
 logger = logging.getLogger(__name__)
 

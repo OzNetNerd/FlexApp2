@@ -1,9 +1,8 @@
 import logging
 from flask import Blueprint
-from app.routes.base.web_utils import register_crud_routes
+from app.routes.web.components.web_utils import register_crud_routes, CrudRouteConfig
 from app.services.crud_service import CRUDService
 from app.models.user import User
-from app.routes.base.web_utils import CrudRouteConfig
 
 logger = logging.getLogger(__name__)
 

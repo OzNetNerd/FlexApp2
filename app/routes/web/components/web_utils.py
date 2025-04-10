@@ -3,8 +3,8 @@ import logging
 from flask import Blueprint, request, redirect, flash, url_for
 
 
-from app.routes.base.components.template_renderer import render_safely, RenderSafelyConfig
-from app.routes.base.components.context import SimpleContext, TableContext, EntityContext
+from app.routes.web.components.template_renderer import render_safely, RenderSafelyConfig
+from app.routes.web.components.context import SimpleContext, TableContext, EntityContext
 from typing import Optional, List, Any, Callable, Dict, Tuple
 from dataclasses import dataclass, field
 

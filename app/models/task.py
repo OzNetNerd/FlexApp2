@@ -1,7 +1,6 @@
 import logging
 from app.models.base import db, BaseModel
 from datetime import datetime
-from app.routes.base.components.tab_builder import Tab, TabSection, TabEntry
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from app.routes.base.components.tab_builder import TabBuilder, TabSection, TabEntry, InsightsTab
+from app.routes.web.components.tab_builder import TabBuilder, TabSection, TabEntry, InsightsTab
 
 logger = logging.getLogger(__name__)
 
