@@ -103,17 +103,15 @@ def register_route(
             # If a context provider was specified, call it to get template data
             if context_provider:
                 logger.info(f"Calling context provider ({context_provider}) for endpoint '{endpoint}'")
-                try:
-                    # First try calling without title parameter
+
+                # Check if context_provider is a class (like SimpleContext)
+                if isinstance(context_provider, type):
+                    # It's a class, instantiate it with title
+                    logger.info(f"Context provider is a class, instantiating with title: {title}")
+                    context = context_provider(title=title)
+                else:
+                    # It's a function (lambda or regular), call it normally
                     context = context_provider(*args, **kwargs)
-                except TypeError as e:
-                    if "got an unexpected keyword argument" in str(e):
-                        # If that fails, try with title parameter
-                        logger.info(f"Context provider doesn't accept kwargs, trying with title")
-                        context = context_provider(title=title, *args, **kwargs)
-                    else:
-                        # If it's some other TypeError, re-raise
-                        raise
 
                 if not context:
                     logger.warning(f"Context provider returned None for endpoint '{endpoint}'")
