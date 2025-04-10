@@ -96,7 +96,7 @@ class CRUDService:
 
     def _convert_dates(self, data: dict) -> dict:
         """
-        Converts any date strings into datetime objects (currently only handles 'due_date').
+        Converts date strings into datetime objects.
 
         Args:
             data (dict): Input form data.
@@ -104,12 +104,26 @@ class CRUDService:
         Returns:
             dict: Transformed data.
         """
+        # Handle due_date
         if "due_date" in data and isinstance(data["due_date"], str):
             try:
                 data["due_date"] = datetime.strptime(data["due_date"], "%Y-%m-%d")
             except ValueError:
                 logger.warning("Invalid due_date format; setting to None")
                 data["due_date"] = None
+
+        # Handle created_at and updated_at
+        for field in ["created_at", "updated_at"]:
+            if field in data and isinstance(data[field], str):
+                try:
+                    data[field] = datetime.strptime(data[field], "%Y-%m-%d %H:%M:%S.%f")
+                except ValueError:
+                    try:
+                        # Try without microseconds
+                        data[field] = datetime.strptime(data[field], "%Y-%m-%d %H:%M:%S")
+                    except ValueError:
+                        logger.warning(f"Invalid {field} format; keeping original")
+
         return data
 
     def create(self, data: dict) -> Any:
@@ -169,11 +183,12 @@ class CRUDService:
             return entity
         except Exception as e:
             db.session.rollback()
-            logger.error(f"❌  Error updating {entity.__class__.__name__} with id {enitty.id}: {e}")
+            logger.error(f"❌  Error updating {entity.__class__.__name__} with id {entity.id}: {e}")
             logger.error(traceback.format_exc())
             raise
 
-    def delete(self, entity: Any) -> bool:
+    @staticmethod
+    def delete(entity: Any) -> bool:
         """
         Delete an instance from the database.
 
@@ -184,7 +199,7 @@ class CRUDService:
             bool: True if successful.
         """
         try:
-            db.session.delete(enitty)
+            db.session.delete(entity)
             db.session.commit()
             return True
         except Exception as e:
