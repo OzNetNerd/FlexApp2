@@ -10,18 +10,18 @@
 {% else %}
   <script>
     window.footerButtonsConfig = {
-      hasId: {{ (id is defined and id is not none and id != 'None' and id != '') | tojson }},
+      hasId: {{ (entity is defined and entity.id is not none and entity.id != 'None' and entity.id != '') | tojson }},
       endpoint: "{{ request.endpoint }}",
       baseRoute: "{{ request.endpoint.rsplit('.', 1)[0] }}",
-      viewUrl: {% if id is defined and id is not none and id != 'None' and id != '' %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}"{% else %}null{% endif %},
+      viewUrl: {% if entity is defined and entity.id is not none and entity.id != 'None' and entity.id != '' %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}"{% else %}null{% endif %},
       indexUrl: "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
     };
   </script>
 
   <div class="footer-buttons-container mt-4 d-flex justify-content-end gap-2">
     {% if not read_only %}
-      {% if id is defined and id is not none and id != 'None' and id != '' %}
-        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=id) }}" class="btn btn-secondary">
+      {% if entity is defined and entity.id is not none and entity.id != 'None' and entity.id != '' %}
+        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}" class="btn btn-secondary">
           <i class="fas fa-times me-1"></i> Cancel
         </a>
         <button type="submit" class="btn btn-primary">
