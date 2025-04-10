@@ -14,5 +14,5 @@ opportunities_bp = Blueprint("opportunities_bp", __name__, url_prefix="/opportun
 opportunity_service = CRUDService(Opportunity)
 
 # Register all standard CRUD routes
-opportunity_crud_config = CrudRouteConfig(blueprint=opportunities_bp, entity_name="Opportunity", service=opportunity_service)
+opportunity_crud_config = CrudRouteConfig(blueprint=opportunities_bp, entity_table_name="Opportunity", service=opportunity_service)
 register_crud_routes(opportunity_crud_config)

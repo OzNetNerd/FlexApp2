@@ -1,11 +1,10 @@
 import logging
 from flask import url_for
 from flask_login import current_user
-from app.utils.table_helpers import get_page_tabs, get_plural_name, get_table_id_by_name
+from app.utils.table_helpers import get_page_tabs, get_table_plural_name, get_table_id_by_name
 from app.routes.base.components.tab_builder import create_tabs
 from app.utils.app_logging import log_instance_vars
 from typing import Any, Optional, List
-from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +88,7 @@ class TableContext(SimpleContext):
         self.table_id = get_table_id_by_name(self.table_name)
         logger.info(f"Set attribute table_id = {self.table_id} (from {self.table_name})")
 
-        self.data_url = f"/api/{get_plural_name(lower_table_name)}"
+        self.data_url = f"/api/{get_table_plural_name(lower_table_name)}"
         logger.info(f"Set attribute data_url = {self.data_url} (from table_name = {self.table_name})")
 
     def __str__(self):

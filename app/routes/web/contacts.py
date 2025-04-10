@@ -16,5 +16,5 @@ contacts_bp = Blueprint("contacts_bp", __name__, url_prefix="/contacts")
 contact_service = CRUDService(Contact)
 
 # Register all standard CRUD routes
-contact_crud_config = CrudRouteConfig(blueprint=contacts_bp, entity_name="Contact", service=contact_service)
+contact_crud_config = CrudRouteConfig(blueprint=contacts_bp, entity_table_name="Contact", service=contact_service)
 register_crud_routes(contact_crud_config)

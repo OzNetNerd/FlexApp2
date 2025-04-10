@@ -15,5 +15,5 @@ settings_bp = Blueprint("settings_bp", __name__, url_prefix="/settings")
 setting_service = CRUDService(Setting)
 
 # Register all standard CRUD routes
-setting_crud_config = CrudRouteConfig(blueprint=settings_bp, entity_name="Setting", service=setting_service)
+setting_crud_config = CrudRouteConfig(blueprint=settings_bp, entity_table_name="Setting", service=setting_service)
 register_crud_routes(setting_crud_config)

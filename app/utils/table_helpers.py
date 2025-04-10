@@ -17,17 +17,17 @@ UI_TAB_MAPPING = {
 }
 
 PLURAL_MAP = {
-    "company": "companies",
-    "opportunity": "opportunities",
-    "category": "categories",
-    "capability": "capabilities",
+    "Company": "companies",
+    "Opportunity": "opportunities",
+    "Category": "categories",
+    "Capability": "capabilities",
 }
 
 
 def get_page_tabs(table_name):
     return UI_TAB_MAPPING[table_name]
 
-def get_plural_name(table_name):
+def get_table_plural_name(table_name):
     return PLURAL_MAP.get(table_name, f"{table_name}s")
 
 
