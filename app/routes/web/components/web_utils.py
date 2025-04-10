@@ -20,7 +20,7 @@ class CrudRouteConfig:
     blueprint: Blueprint
     entity_table_name: str
     service: CRUDService
-    include_routes: List[str] = field(default_factory=lambda: ["index", "create", "view", "edit"])
+    include_routes: List[str] = field(default_factory=lambda: ["index", "create", "view", "edit", "delete"])
     templates: Dict[str, str] = field(default_factory=dict)
 
 
@@ -98,7 +98,7 @@ def register_route(
     def route_handler(*args, **kwargs):
         logger.info(f"Handling request for endpoint '{endpoint}' with args={args}, kwargs={kwargs}")
         try:
-            if request.method == "POST" and endpoint in ["edit", "create"]:
+            if request.method == "POST" and endpoint in ["edit", "create", "delete"]:
                 entity_id = kwargs.get('entity_id')
                 form_data = request.form.to_dict()
                 logger.info(f"Form data received: {form_data}")
@@ -143,6 +143,13 @@ def register_route(
                             index_url = url_for(f"{blueprint.name}.index")
                             logger.info(f"Redirecting to index URL: {index_url}")
                             return redirect(index_url)
+                    elif endpoint == "delete" and entity_id:
+                        # Delete the entity using the provided ID
+                        service.delete(entity_id)
+                        flash("Successfully deleted record", "success")
+                        index_url = url_for(f"{blueprint.name}.index")
+                        logger.info(f"Redirecting to index URL after deletion: {index_url}")
+                        return redirect(index_url)
                 else:
                     logger.error(f"Could not find service for {endpoint}")
                     flash("Error: Service not available for this operation", "error")
@@ -201,7 +208,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
         logger.error("Invalid entity_table_name type; expected a string.")
         raise ValueError("The 'entity_table_name' must be a string.")
 
-    include_routes = crud_route_config.include_routes or ["index", "create", "view", "edit"]
+    include_routes = crud_route_config.include_routes or ["index", "create", "view", "edit", "delete"]
     templates = crud_route_config.templates or {}
 
     entity_table_plural_name = get_table_plural_name(entity_table_name)
@@ -259,6 +266,21 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 blueprint_name=blueprint.name,
             ),
             "methods": ["GET", "POST"],  # Add this line for form submission
+        },
+        "delete": {
+            "url": "/<int:entity_id>/delete",
+            "template_default": f"pages/crud/delete.html",
+            "error_message": f"Failed to delete {entity_table_name}",
+            "context_provider": lambda entity_id: EntityContext(
+                action="delete",
+                entity_table_name=entity_table_name,
+                entity_id=entity_id,
+                entity=service.get_by_id(entity_id),
+                title=f"Delete {entity_table_name}",
+                read_only=True,
+                blueprint_name=blueprint.name,
+            ),
+            "methods": ["GET", "POST"],  # GET for confirmation page, POST for deletion
         },
     }
 

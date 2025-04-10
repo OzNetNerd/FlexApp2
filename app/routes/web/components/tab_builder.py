@@ -140,7 +140,7 @@ class NotesTab(TabBuilder):
 
     def _notes_section(self):
         from app.models import Note, User
-        from flask import render_template_string
+        from flask import render_template
 
         section_name = "Notes"
         entity_id = self.entity.get('id')
@@ -151,26 +151,21 @@ class NotesTab(TabBuilder):
         ).order_by(Note.created_at.desc()).all()
 
         # Format notes for activity-style display
-        formatted_notes = []
+        activity_notes = []
 
         for note in notes:
             user = User.query.get(note.user_id) if note.user_id else None
             author_name = user.username if user else "Unknown"
 
-            formatted_notes.append({
+            activity_notes.append({
                 'icon_bg_class': 'bg-primary rounded-circle p-2',
                 'icon_class': 'fas fa-comment-alt fa-sm',
                 'description': f"<strong>{author_name}</strong> added a note: {note.content}",
                 'timestamp': note.created_at.strftime('%d %b %Y, %H:%M')
             })
 
-        # Use Flask's render_template_string which has access to the application's Jinja environment
-        template_str = """
-            {% from 'macros/render_notes.html' import render_notes %}
-            {{ render_notes(notes) }}
-        """
-
-        notes_html = render_template_string(template_str, notes=formatted_notes)
+        # Render the template with the notes data
+        notes_html = render_template('components/notes_section.html', activity_notes=activity_notes)
 
         return TabSection(section_name=section_name, entries=[
             TabEntry(entry_name="notes", label="Notes", type="custom", value=notes_html)
