@@ -25,9 +25,11 @@ class BaseContext:
         Raises:
             ValueError: If neither title nor table_name is provided
         """
-        logging.info("Building Base Context")
-        if not title and not kwargs.get("table_name"):
-            raise ValueError("Either 'title' or 'table_name' must be provided.")
+        instance_details = "BaseContext (__init__)"
+        log_instance_vars(instance_details, self)
+
+        if not title and not kwargs.get("entity_table_name"):
+            raise ValueError("Either 'title' or 'entity_table_name' must be provided.")
 
         self.title = title or kwargs["table_name"]
         self.current_user = current_user

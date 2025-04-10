@@ -18,7 +18,7 @@
                     <span class="avatar-circle avatar-sm bg-{% if item.relationship_type == 'Manages' %}primary{% elif item.relationship_type == 'Works With' %}success{% elif item.relationship_type == 'Vendor' %}purple{% else %}secondary{% endif %} me-3">
                       <i class="fas fa-{% if entity_type == 'users' %}user{% else %}building{% endif %}-alt text-white"></i>
                     </span>
-                    <strong>{{ item.table_name }}</strong>
+                    <strong>{{ item.entity_table_name }}</strong>
                   </div>
                   <div class="text-muted small mt-1">
                     ID: {{ item.id }} • Type: {{ item.entity_type }}

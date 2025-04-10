@@ -97,7 +97,7 @@ def register_route(
         try:
             # If a context provider was specified, call it to get template data
             if context_provider:
-                logger.info(f"Calling context provider for endpoint '{endpoint}'")
+                logger.info(f"Calling context provider ({context_provider}) for endpoint '{endpoint}'")
                 context = context_provider(*args, **kwargs)
                 if not context:
                     logger.warning(f"Context provider returned None for endpoint '{endpoint}'")
@@ -184,23 +184,27 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
     # Direct context creation in dictionary
     context_providers = {
         "index": lambda: TableContext(
-            table_name=entity_table_name,
-            action="index"
+            entity_table_name=entity_table_name,
+            action="index",
+            title = "TBA2",
         ),
         "create": lambda: EntityContext(
             action="create",
-            table_name=entity_table_name
+            entity_table_name=entity_table_name,
+            title = "TBA2",
         ),
         "view": lambda entity_id: EntityContext(
             action="view",
-            table_name=entity_table_name,
-            entity_id=entity_id
+            entity_table_name=entity_table_name,
+            entity_id=entity_id,
+            title = "TBA2",
         ),
         "edit": lambda entity_id: EntityContext(
             action="edit",
-            table_name=entity_table_name,
+            entity_table_name=entity_table_name,
             entity_id=entity_id,
-            entity=service.get_by_id(entity_id) if service else None
+            entity=service.get_by_id(entity_id) if service else None,
+            title = "TBA2",
         ),
     }
     logger.info("Context providers have been initialized.")
@@ -252,7 +256,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
 def _create_default_context(entity_name, action, title):
     """Create a default context when no service is provided."""
     logger.info(f"No service provided for '{entity_name}'. Returning default TableContext.")
-    return TableContext(action=action, table_name=entity_name, title=title)
+    return TableContext(action=action, entity_table_name=entity_name, title=title)
 
 
 def _handle_error(entity_name, entity_id, action, exception, title):

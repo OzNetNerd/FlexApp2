@@ -35,7 +35,7 @@
           <tbody>
             {% for user in field.value %}
               <tr>
-                <td>{{ user.table_name }}</td>
+                <td>{{ user.entity_table_name }}</td>
                 <td><span class="badge bg-secondary">{{ user.relationship_type }}</span></td>
               </tr>
             {% endfor %}
@@ -60,7 +60,7 @@
           <tbody>
             {% for company in field.value %}
               <tr>
-                <td>{{ company.table_name }}</td>
+                <td>{{ company.entity_table_name }}</td>
                 <td><span class="badge bg-secondary">{{ company.relationship_type }}</span></td>
               </tr>
             {% endfor %}

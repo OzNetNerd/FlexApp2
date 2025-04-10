@@ -2,7 +2,7 @@
 
 {% block content %}
   {# Hidden element to pass configuration values to JS #}
-  <div id="table-config" data-title="{{ title }}" data-entity-name="{{ table_name }}"></div>
+  <div id="table-config" data-title="{{ title }}" data-entity-name="{{ entity_table_name }}"></div>
 
   <div class="card border-0 shadow-sm">
     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
@@ -10,7 +10,7 @@
       <div>
         {% block table_actions %}
           <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}" class="btn btn-primary btn-lg fw-bold shadow-sm">
-            <i class="fas fa-plus me-2"></i> Add {{ table_name|default('item') }}
+            <i class="fas fa-plus me-2"></i> Add {{ entity_table_name|default('item') }}
           </a>
         {% endblock %}
       </div>

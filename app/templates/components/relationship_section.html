@@ -24,7 +24,7 @@
                         <td>{{ rel.entity_type|capitalize }}</td>
                         <td>
                             <a href="{{ url_for(rel.entity_type + 's.view', id=rel.entity_id) }}">
-                                {{ rel.table_name }}
+                                {{ rel.entity_table_name }}
                             </a>
                         </td>
                         <td>{{ rel.relationship_type }}</td>
