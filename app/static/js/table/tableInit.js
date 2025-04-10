@@ -198,7 +198,10 @@ export default async function initTable() {
 
     let actualData;
     try {
-        log("info", scriptName, functionName, `Fetching data from API: ${apiUrl}`);
+        // Get data API URL from the dataset attribute or fallback to default
+        const data_api_url = getDatasetValue(gridDiv, 'apiUrl', null);
+        log("info", scriptName, functionName, `Fetching data from API: ${data_api_url}`);
+
         // Get data from API using our new service
         const rawData = await fetchApiDataFromContainer(tableContainerId);
         log("debug", scriptName, functionName, `Raw data retrieved, size: ${JSON.stringify(rawData).length} bytes`);

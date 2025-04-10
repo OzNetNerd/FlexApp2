@@ -4,7 +4,7 @@
   Inputs:
     - title: Page title
     - table_name: Used in the Add button label
-    - data_url: API endpoint for loading table data
+    - data_api_url: API endpoint for loading table data
   Blocks:
     - table_actions: Optional custom buttons
   Features:
@@ -56,7 +56,7 @@
       </div>
     </div>
 
-    <div id="table-container" class="ag-theme-alpine w-100" data-api-url="{{ data_url }}" style="min-height: 420px;"></div>
+    <div id="table-container" class="ag-theme-alpine w-100" data-api-url="{{ data_api_url }}" style="min-height: 420px;"></div>
   </div>
 </div>
 

@@ -13,7 +13,7 @@ class AutoCompleteField:
     id: str
     placeholder: str
     name: str
-    data_url: str
+    data_api_url: str
     related_ids: List[str]
 
 
@@ -58,13 +58,13 @@ class AutoCompleteField:
 #     ]
 
 
-def get_autocomplete_field(title, relationships=None, field_id=None, placeholder=None, name=None, data_url=None):
+def get_autocomplete_field(title, relationships=None, field_id=None, placeholder=None, name=None, data_api_url=None):
     """Get an AutoCompleteField instance with defaults derived from the title."""
     title_lower = title.lower()
     field_id = field_id or f"{title_lower}-input"
     placeholder = placeholder or f"Search for {title_lower}..."
     name = name or title_lower
-    data_url = data_url or f"/api//{title_lower}"
+    data_api_url = data_api_url or f"/api//{title_lower}"
 
     # Fix entity type derivation with special cases
     if title_lower == "companies":
@@ -80,5 +80,5 @@ def get_autocomplete_field(title, relationships=None, field_id=None, placeholder
         logger.info(f"Extracted related IDs for entity_type '{entity_type}': {related_ids}")
 
     # Make sure to use related_ids to match template expectations
-    field = AutoCompleteField(title=title, id=field_id, placeholder=placeholder, name=name, data_url=data_url, related_ids=related_ids)
+    field = AutoCompleteField(title=title, id=field_id, placeholder=placeholder, name=name, data_api_url=data_api_url, related_ids=related_ids)
     return field

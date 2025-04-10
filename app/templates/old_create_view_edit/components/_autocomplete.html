@@ -7,7 +7,7 @@
         - id: string (HTML id for the input, without #)
         - placeholder: string (placeholder text)
         - name: string (form field name)
-        - data_url: string (API endpoint for data)
+        - data_api_url: string (API endpoint for data)
         - related_ids: List[int] (related IDs)
   Features:
     - Bootstrap card-based inputs with data-initial JSON
@@ -17,7 +17,7 @@
   Notes:
     - The `autocomplete_fields` variable is passed from the Python backend to this template, and it contains the configuration for each autocomplete field.
     - The `related_ids` are provided via the `data-initial` attribute, which is parsed by JavaScript to prepopulate the selected items in the autocomplete list.
-    - Hydrated by `autoComplete.js`, which initializes autocomplete functionality, fetches data from the specified `data_url`, and uses the `related_ids` for pre-selected values.
+    - Hydrated by `autoComplete.js`, which initializes autocomplete functionality, fetches data from the specified `data_api_url`, and uses the `related_ids` for pre-selected values.
     - JavaScript logs are included for diagnostics, such as successful parsing of `related_ids` and warnings if the values could not be parsed correctly.
 ------------------------------------------------------------------------------ #}
 
@@ -114,7 +114,7 @@
       {% for field in autocomplete_fields %}
       autoCompleteConfig.push({
         selector: '#{{ field.id }}',
-        dataUrl: '{{ field.data_url }}',
+        dataUrl: '{{ field.data_api_url }}',
         inputName: '{{ field.name }}'
       });
 
