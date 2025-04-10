@@ -23,7 +23,7 @@ from flask_login import LoginManager, current_user
 from config import Config
 from app.models.base import db
 from app.models import User, Setting
-from app.routes.api_router import register_api_routes
+from app.routes.api_router import register_api_blueprints
 from app.routes.web_router import register_web_blueprints
 from app.routes.web.components.template_renderer import handle_template_error
 
@@ -81,7 +81,7 @@ def create_app(config_class=Config):
     # Blueprint and route registration
     # ----------------------------
     logger.info("Registering API routes")
-    register_api_routes(app)
+    register_api_blueprints(app)
     logger.info("Registering application blueprints")
     register_web_blueprints(app)
 

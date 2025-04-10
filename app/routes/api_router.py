@@ -36,7 +36,7 @@ BLUEPRINTS = [
 ]
 
 
-def register_web_blueprints(app: Flask) -> None:
+def register_api_blueprints(app: Flask) -> None:
     """
     Central function for registering all blueprints in the application.
 

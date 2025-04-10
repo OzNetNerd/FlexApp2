@@ -1,9 +1,8 @@
 import logging
 from flask import Blueprint
-from app.routes.web.components.web_utils import register_crud_routes, CrudRouteConfig
+from app.routes.web.components.web_utils import register_route, CrudRouteConfig, SimpleContext
 from app.services.crud_service import CRUDService
 from app.models.setting import Setting
-
 
 logger = logging.getLogger(__name__)
 
@@ -15,4 +14,12 @@ setting_service = CRUDService(Setting)
 
 # Register all standard CRUD routes
 setting_crud_config = CrudRouteConfig(blueprint=settings_bp, entity_table_name="Setting", service=setting_service)
-register_crud_routes(setting_crud_config)
+
+register_route(
+    blueprint=settings_bp,
+    url="/",
+    template_path="pages/settings.html",
+    title="Settings",
+    context_provider=SimpleContext,
+    endpoint="index",
+)
