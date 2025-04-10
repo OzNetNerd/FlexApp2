@@ -63,10 +63,10 @@ class SimpleContext(BaseContext):
 class TableContext(SimpleContext):
     """Context class for rendering table views with table-specific attributes."""
 
-    def __init__(self, table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = None, **kwargs):
+    def __init__(self, entity_table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = None, **kwargs):
 
         # Add table-specific attributes
-        self.table_name = table_name
+        self.entity_table_name = entity_table_name
         self.read_only = read_only
         self.action = action
 
@@ -75,26 +75,26 @@ class TableContext(SimpleContext):
             logger.info(f"title was provided. Set self.title to: {self.title}")
 
         else:
-            self.title = f"{self.action} {self.table_name}" if self.action else self.table_name
+            self.title = f"{self.action} {self.entity_table_name}" if self.action else self.entity_table_name
             logger.info(f"title was not provided. Set self.title to table name: {self.title}")
 
         # Initialize the base SimpleContext
         super().__init__(title=self.title, **kwargs)
 
-        lower_table_name = self.table_name.lower()
-        logger.info(f"Set lower table name: {lower_table_name}")
+        lower_entity_table_name = self.entity_table_name.lower()
+        logger.info(f"Set lower table name: {lower_entity_table_name}")
 
-        # Set the table_id using the provided table_name
-        self.table_id = get_table_id_by_name(self.table_name)
-        logger.info(f"Set attribute table_id = {self.table_id} (from {self.table_name})")
+        # Set the table_id using the provided entity_table_name
+        self.table_id = get_table_id_by_name(self.entity_table_name)
+        logger.info(f"Set attribute table_id = {self.table_id} (from {self.entity_table_name})")
 
-        entity_table_name = get_table_plural_name(self.table_name)
-        self.data_api_url = f"/api/{entity_table_name}"
-        logger.info(f"Set attribute data_url = {self.data_api_url} (from table_name = {self.table_name})")
+        plural_entity_table_name = get_table_plural_name(self.entity_table_name)
+        self.data_api_url = f"/api/{plural_entity_table_name}"
+        logger.info(f"Set attribute data_url = {self.data_api_url} (from table_name = {self.entity_table_name})")
 
     def __str__(self):
         """Return a user-friendly string representation focusing on table attributes."""
-        return f"TableContext(table_name='{self.table_name}', table_id={self.table_id}, title='{self.title}')"
+        return f"TableContext(entity_table_name='{self.entity_table_name}', table_id={self.table_id}, title='{self.title}')"
 
 
 class EntityContext(BaseContext):
@@ -108,7 +108,7 @@ class EntityContext(BaseContext):
         title: str = "",
         entity: Any = None,
         read_only: bool = True,
-        table_name: str = "",
+        entity_table_name: str = "",
         entity_id: Any = None,
         **kwargs,
     ):
@@ -125,7 +125,7 @@ class EntityContext(BaseContext):
         self.action = action
         self.name = "tba"
         self.current_user = current_user
-        self.table_name = table_name  # Store table_name
+        self.entity_table_name = entity_table_name  # Store table_name
         self.entity_id = entity_id    # Store entity_id
 
         # Derived fields initialized in __init__
@@ -182,8 +182,8 @@ class EntityContext(BaseContext):
 
     def _initialize_derived_fields(self):
         """Initialize derived fields."""
-        # Use table_name for model_name if available, otherwise use class name
-        self.model_name = self.table_name or self.__class__.__name__
+        # Use entity_table_name for model_name if available, otherwise use class name
+        self.model_name = self.entity_table_name or self.__class__.__name__
         self.id = str(getattr(self, "entity_id", ""))
 
         # Get blueprint_name from kwargs if available
