@@ -18,7 +18,7 @@ setting_crud_config = CrudRouteConfig(blueprint=settings_bp, entity_table_name="
 register_route(
     blueprint=settings_bp,
     url="/",
-    template_path="pages/settings.html",
+    template_path="pages/misc/settings.html",
     title="Settings",
     context_provider=SimpleContext,
     endpoint="index",

@@ -68,7 +68,7 @@ Tuple[str, List[str]]:
             endpoint = f"{parts[-2]}_{parts[-1].split('.')[0]}"
             logger.info(f"Derived endpoint from nested template: '{parts[-2]}_{parts[-1].split('.')[0]}'")
         else:
-            # For top-level templates (e.g., "pages/home.html"),
+            # For top-level templates (e.g., "pages/misc/home.html"),
             # just use the filename without extension
             endpoint = template_path.split(".")[0]
             logger.info(f"Derived endpoint from root template: '{template_path.split('.')[0]}'")

@@ -13,7 +13,7 @@ home_bp = Blueprint("home_bp", __name__, url_prefix="/")
 register_route(
     blueprint=home_bp,
     url="/",
-    template_path="pages/home.html",
+    template_path="pages/misc/home.html",
     title="home",
     context_provider=SimpleContext,
 )

@@ -1,6 +1,6 @@
 <!-- START TEMPLATE: view.html -->
 
-{% extends "pages/page_templates/_create_view_edit_template.html" %}
+{% extends "page_templates/_create_view_edit_template.html" %}
 
 {% block create_view_edit_content %}
   <div class="tab-content">
@@ -20,7 +20,7 @@
   </div>
 
   {% if activity_notes is defined and activity_notes|length > 0 %}
-    {% from "macros/render_notes.html" import render_notes %}
+    {% from "base/macros/render_notes.html" import render_notes %}
     {{ render_notes(activity_notes) }}
   {% endif %}
 <!--
