@@ -1,5 +1,14 @@
+ <!-- START TEMPLATE: _header_tabs.html -->
+
 {% if tabs %}
-  <!-- Tabs Navigation -->
+ <!-- Tabs Navigation -->
+<!-- Store template information in data attributes -->
+<div id="template-data"
+     data-script-name="_section_layout.html"
+     data-tabs-defined="{{ tabs is defined|tojson }}"
+     data-read-only-defined="{{ read_only is defined|tojson }}">
+</div>
+
   <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist"
       data-tab-names="{{ tabs|map(attribute='tab_name')|list|tojson }}">
     {%- for tab in tabs %}
@@ -18,3 +27,5 @@
     {%- endfor %}
   </ul>
 {% endif %}
+
+ <!-- END TEMPLATE: _header_tabs.html -->

@@ -1,4 +1,4 @@
-<!-- START TEMPLATE: _create_view_edit_template.html -->
+<!-- START TEMPLATE: _create_view_edit.html -->
 
 {#
  create_view_edit/components/_create_view_edit.html - Standardized CRUD form container template
@@ -8,15 +8,13 @@
  the context (create, view, or edit mode).
 
  Context variables:
-   - ui: If present, indicates a tabbed interface should be used
+   - ui: If present, indicates a pills interface should be used instead of tabs
+   - tabs: Array of tab definitions with:
+       - tab_name: Display name for the tab
+       - template: Path to template to use for this tab (optional)
+       - sections: Array of section data if using _section_layout (optional)
    - read_only: Boolean that controls whether edit controls are displayed
    - entity: The data entity being worked with (containing id attribute)
-
- Component structure:
-   - Card header with title and action buttons
-   - Form body with either tabbed navigation or section layout
-   - Conditional footer buttons for form submission
-   - Conditional delete modal for existing records
 #}
 
 {% extends "base/core/_base.html" %}
@@ -38,8 +36,26 @@
           {% include 'base/common/_pills_nav_content.html' %}
         {% endblock %}
       {% else %}
+        <!-- Tab Navigation -->
         {% include 'base/content_pane/_header_tabs.html' %}
-        {% include 'base/content_pane/_section_layout.html' %}
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="formTabsContent">
+          {% for tab in tabs %}
+            <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+                 id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+                 role="tabpanel"
+                 aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
+
+              {% if tab.template %}
+                {% include tab.template %}
+              {% else %}
+                {% include 'base/content_pane/_section_layout.html' with context %}
+              {% endif %}
+
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
 
       {% if not read_only %}
@@ -48,6 +64,10 @@
     </form>
   </div>
 </div>
+
+{% block scripts %}
+<script type="module" src="/static/js/pages/create_view_edit.js"></script>
+{% endblock %}
 {% endblock %}
 
-<!-- END TEMPLATE: _create_view_edit_template.html -->
+<!-- END TEMPLATE: _create_view_edit.html -->

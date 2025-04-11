@@ -59,18 +59,18 @@ class TabSection:
 @dataclass
 class Tab:
     tab_name: str
+    template: str
     sections: List[TabSection] = field(default_factory=list)
     visibility: TabVisibility = field(default_factory=TabVisibility)
-    template: str = "components/default_tab.html"  # Default template
 
 
 @dataclass
 class TabBuilder(ABC):
     entity: Any
     tab_name: str
+    template: str
     section_method_order: List[Callable] = field(default_factory=list, init=False)
     visibility: TabVisibility = field(default_factory=TabVisibility)
-    template: str = "components/default_tab.html"  # Default template
 
     def __post_init__(self):
         instance_details = "TabBuilder (__post_init__)"

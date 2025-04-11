@@ -3,13 +3,6 @@
 {# Import the field macros #}
 {% import 'base/macros/render_form_fields.html' as field_macros with context %}
 
-<!-- Store template information in data attributes -->
-<div id="template-data"
-     data-script-name="_section_layout.html"
-     data-tabs-defined="{{ tabs is defined|tojson }}"
-     data-read-only-defined="{{ read_only is defined|tojson }}">
-</div>
-
 {% if tabs %}
   <div class="tab-content" id="formTabsContent">
     {%- for tab in tabs %}
