@@ -1,20 +1,32 @@
-# At the top of companies.py
-
-# Example 1: Full CRUD Entity
 # app/routes/companies.py
+import logging
 from flask import Blueprint
-from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig
+from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig, CrudTemplates
 from app.services.crud_service import CRUDService
 from app.models.company import Company
-import logging
 
 logger = logging.getLogger(__name__)
+
 # Define the blueprint
 companies_bp = Blueprint("companies_bp", __name__, url_prefix="/companies")
 
 # Create a service instance
 company_service = CRUDService(Company)
 
-# Register all standard CRUD routes
-company_crud_config = CrudRouteConfig(blueprint=companies_bp, entity_table_name="Company", service=company_service)
+# Define custom templates
+custom_templates = CrudTemplates(
+    # The route_type here is "view", so the template file is named accordingly.
+    view="pages/crud/view_companies.html"
+)
+
+# Add debug logging to verify templates are set correctly
+logger.info(f"Custom templates: {custom_templates.to_dict()}")
+
+# Register all standard CRUD routes with custom templates
+company_crud_config = CrudRouteConfig(
+    blueprint=companies_bp,
+    entity_table_name="Company",
+    service=company_service,
+    templates=custom_templates
+)
 register_crud_routes(company_crud_config)
