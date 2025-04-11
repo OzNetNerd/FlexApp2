@@ -1,31 +1,31 @@
-<!-- CRISP Score History with Graph -->
-<div class="card shadow-sm border-0 mb-4">
-  <div class="card-header bg-white d-flex justify-content-between align-items-center">
-    <h3 class="h5 text-primary fw-semibold mb-0"><i class="fas fa-history me-2"></i>CRISP Score History</h3>
-    <div class="btn-group">
-      <button class="btn btn-sm btn-outline-primary active" id="view-table-btn">
-        <i class="fas fa-table me-1"></i> Table
-      </button>
-      <button class="btn btn-sm btn-outline-primary" id="view-chart-btn">
-        <i class="fas fa-chart-line me-1"></i> Chart
-      </button>
-    </div>
-  </div>
 
-  <div class="card-body">
-    <h4 class="h6 text-primary fw-semibold mb-3">Trend Analysis</h4>
+<!-- CRISP Score History with Graph -->
+<!-- CRISP Score History with Graph -->
+<div class="card-body py-2">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="h6 text-primary fw-semibold mb-0">Trend Analysis</h4>
+        <div class="btn-group">
+            <button class="btn btn-primary btn-sm" id="view-table-btn">
+                <i class="fas fa-table me-1"></i> Table
+            </button>
+            <button class="btn btn-outline-primary btn-sm" id="view-chart-btn">
+                <i class="fas fa-chart-line me-1"></i> Chart
+            </button>
+        </div>
+    </div>
 
     <!-- Chart View -->
     <div id="chart-view" style="display: none;">
-      <div class="bg-light p-3 rounded mb-3" style="height: 300px;">
-        <!-- Chart Canvas -->
-        <canvas id="crispChart"></canvas>
-      </div>
-      <div class="alert alert-info small">
-        <i class="fas fa-info-circle me-2"></i>
-        Hover over data points to see submission notes. Click on legend items to show/hide users.
-      </div>
+        <div class="bg-light p-3 rounded mb-3" style="height: 300px;">
+            <!-- Chart Canvas -->
+            <canvas id="crispChart"></canvas>
+        </div>
+        <div class="alert alert-info small">
+            <i class="fas fa-info-circle me-2"></i>
+            Hover over data points to see submission notes. Click on legend items to show/hide users.
+        </div>
     </div>
+</div>
 
     <!-- Table View -->
     <div id="table-view">

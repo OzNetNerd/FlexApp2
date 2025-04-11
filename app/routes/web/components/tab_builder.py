@@ -96,7 +96,8 @@ class InsightsTab(TabBuilder):
         super().__post_init__()
 
     def _crisp_score_section(self):
-        section_name = "CRISP Score"
+        section_name = '<i class="fas fa-history me-2"></i>CRISP Score History</h3>'
+
         return TabSection(
             section_name=section_name,
             entries=[
