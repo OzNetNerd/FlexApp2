@@ -132,10 +132,10 @@
         </script>
       </div>
 
-      <!-- Theme Toggle Button -->
-      <div class="d-flex align-items-center me-3">
-        <button class="btn btn-light" onclick="toggleTheme()">
-          <i class="fas fa-adjust"></i> Toggle Theme
+      <!-- Theme Toggle Button (Fixed) -->
+      <div class="notification-icon me-3 d-none d-md-block">
+        <button class="btn btn-icon" id="themeToggleBtn">
+          <i class="fas fa-adjust"></i>
         </button>
       </div>
 
@@ -265,9 +265,10 @@
   log("info", "_navbar.html", "final", "Navbar rendered successfully");
 </script>
 
-<!-- JavaScript for Theme Toggle -->
-<script type="module">
-  function toggleTheme() {
+<!-- JavaScript for Theme Toggle - Make the function globally available -->
+<script>
+  // Make toggleTheme globally available
+  window.toggleTheme = function() {
     const currentTheme = document.body.getAttribute('data-theme');
     if (currentTheme === 'dark') {
       document.body.setAttribute('data-theme', 'light');
@@ -275,5 +276,37 @@
       document.body.setAttribute('data-theme', 'dark');
     }
   }
+
+  // Add event listener after DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('themeToggleBtn').addEventListener('click', window.toggleTheme);
+  });
 </script>
+
+<!-- Add CSS for the theme button to match other icon buttons -->
+<style>
+  .btn-icon {
+    background: transparent;
+    border: none;
+    color: #495057;
+    padding: 0.375rem;
+    line-height: 1;
+    border-radius: 50%;
+  }
+
+  .btn-icon:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #000;
+  }
+
+  /* Optional dark mode styles */
+  [data-theme="dark"] .btn-icon {
+    color: #e9ecef;
+  }
+
+  [data-theme="dark"] .btn-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+</style>
 <!-- END TEMPLATE: _navbar.html -->
