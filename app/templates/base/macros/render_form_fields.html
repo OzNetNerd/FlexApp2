@@ -1,7 +1,5 @@
 <!-- START TEMPLATE: base/macros/render_form_fields.html -->
 
-{# base/macros/render_form_fields.html #}
-
 {% macro render_field(entry, read_only=True) %}
   <div class="col-md-6 mb-3">
     <label for="{{ entry.entry_name }}" class="form-label fw-semibold">{{ entry.label }}</label>
@@ -11,7 +9,6 @@
         {% if entry.type == 'checkbox' %}
           <i class="fas fa-{{ 'check' if entry.value else 'times' }}"></i> {{ 'Yes' if entry.value else 'No' }}
         {% elif entry.type == 'select' and entry.options %}
-          {# Loop through the options to find and display the matching label #}
           {% for option in entry.options %}
             {% if entry.value == option.value %}
               {{ option.label }}
@@ -25,12 +22,10 @@
           {% endif %}
         {% endif %}
       </div>
-
     {% else %}
       {% if entry.type == 'textarea' %}
         <textarea class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
                   {% if entry.required %}required{% endif %}>{{ entry.value or '' }}</textarea>
-
       {% elif entry.type == 'select' and entry.options %}
         <select class="form-select" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
                 {% if entry.required %}required{% endif %}>
@@ -41,27 +36,21 @@
             </option>
           {% endfor %}
         </select>
-
       {% elif entry.type == 'checkbox' %}
         <div class="form-check">
           <input type="checkbox" class="form-check-input" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
                  {% if entry.value %}checked{% endif %}>
           <label class="form-check-label" for="{{ entry.entry_name }}">{{ entry.label }}</label>
         </div>
-
       {% elif entry.type == 'date' %}
         <input type="date" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
                value="{{ entry.value }}" {% if entry.required %}required{% endif %}>
-
       {% elif entry.type == 'number' %}
         <input type="number" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
                value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
-
       {% elif entry.type == 'readonly' %}
         <div class="form-control-plaintext">{{ entry.value }}</div>
-
       {% else %}
-        {# Default to a text input field #}
         <input type="text" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
                value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
       {% endif %}
