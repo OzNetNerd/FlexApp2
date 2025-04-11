@@ -5,7 +5,7 @@ from flask import request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash
 from app.routes.web.components.template_renderer import render_safely
-from app.routes.web.components.context import BaseContext
+from app.routes.web.context import BaseContext
 
 logger = logging.getLogger(__name__)
 

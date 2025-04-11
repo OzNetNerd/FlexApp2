@@ -18,7 +18,7 @@ from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
 from markupsafe import Markup, escape
 from dataclasses import dataclass
 
-from app.routes.web.components.context import BaseContext
+from app.routes.web.context import BaseContext
 
 logger = logging.getLogger(__name__)
 

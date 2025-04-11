@@ -1,329 +1,329 @@
-# app/routes/base/web_utils.py
-import logging
-from flask import Blueprint, request, redirect, flash, url_for
-
-
-from app.routes.web.components.template_renderer import render_safely, RenderSafelyConfig
-from app.routes.web.components.context import SimpleContext, TableContext, EntityContext
-from typing import Optional, List, Any, Callable, Dict, Tuple
-from dataclasses import dataclass, field
-
-from app.utils.table_helpers import get_table_plural_name
-from app.services.crud_service import CRUDService
-
-
-logger = logging.getLogger(__name__)
-
-
-@dataclass
-class CrudRouteConfig:
-    blueprint: Blueprint
-    entity_table_name: str
-    service: CRUDService
-    include_routes: List[str] = field(default_factory=lambda: ["index", "create", "view", "edit", "delete"])
-    templates: Dict[str, str] = field(default_factory=dict)
-
-
-def prepare_route_config(url: str, template_path: str, endpoint: str = None, methods: Optional[List[str]] = None) -> \
-Tuple[str, List[str]]:
-    """Prepares Flask route configuration by setting defaults and deriving endpoint names.
-
-    This utility function handles common route configuration tasks, providing
-    sensible defaults and deriving endpoint names from template paths when not
-    explicitly provided. It ensures consistent route configuration across the
-    application and centralizes the endpoint name generation logic.
-
-    Args:
-        url: URL pattern for the route (e.g., '/', '/users/<int:user_id>')
-        template_path: Path to the template file to render (e.g., 'home.html',
-            'users/profile.html')
-        endpoint: Optional custom endpoint name. If not provided, one will be
-            derived from template_path following naming conventions
-        methods: Optional list of HTTP methods the route responds to. Defaults
-            to ["GET"] if not specified
-
-    Returns:
-        tuple: A tuple containing (endpoint_name, methods_list) where:
-            - endpoint_name (str): The final endpoint name (either provided or derived)
-            - methods_list (List[str]): The final list of HTTP methods
-
-    """
-    logger.info(f"Preparing route configuration for URL '{url}' with template '{template_path}'")
-
-    # Set default methods if not provided
-    if not methods:
-        methods = ["GET"]
-        logger.warning(f"No 'methods' param provided for '{url}'. Defaulting to: {methods}")
-    else:
-        logger.info(f"Route '{url}' configured with methods: {methods}")
-
-    # Auto-generate endpoint name if none provided
-    if not endpoint:
-        # Split template path to get component parts
-        parts = template_path.split("/")
-
-        if len(parts) > 1:
-            # For nested templates (e.g., "users/profile.html"),
-            # combine the directory and filename without extension
-            endpoint = f"{parts[-2]}_{parts[-1].split('.')[0]}"
-            logger.info(f"Derived endpoint from nested template: '{parts[-2]}_{parts[-1].split('.')[0]}'")
-        else:
-            # For top-level templates (e.g., "pages/misc/home.html"),
-            # just use the filename without extension
-            endpoint = template_path.split(".")[0]
-            logger.info(f"Derived endpoint from root template: '{template_path.split('.')[0]}'")
-
-        logger.info(f"No endpoint provided. Using derived endpoint: '{endpoint}'")
-    else:
-        logger.info(f"Using provided endpoint: '{endpoint}'")
-
-    logger.info(f"Route configuration prepared: URL='{url}', endpoint='{endpoint}', methods={methods}")
-    return endpoint, methods
-
-
-def register_route(
-        blueprint: Blueprint,
-        url: str,
-        template_path: str,
-        context_provider: Callable,
-        title: str = None,
-        endpoint: str = None,
-        methods: Optional[List[str]] = None,
-        error_message: str = "Failed to load the page",
-):
-    endpoint, methods = prepare_route_config(url, template_path, endpoint, methods)
-    logger.info(f'debugger - title: {title} - endpoint: {endpoint}')
-    title = title or endpoint
-
-    def route_handler(*args, **kwargs):
-        logger.info(f"Handling request for endpoint '{endpoint}' with args={args}, kwargs={kwargs}")
-        try:
-            if request.method == "POST" and endpoint in ["edit", "create", "delete"]:
-                entity_id = kwargs.get('entity_id')
-                form_data = request.form.to_dict()
-                logger.info(f"Form data received: {form_data}")
-
-                service = None
-                # Attempt to find the service in context_provider's closure (works for 'edit')
-                if hasattr(context_provider, "__closure__") and context_provider.__closure__:
-                    for closure in context_provider.__closure__:
-                        candidate = closure.cell_contents
-                        if hasattr(candidate, "get_by_id") and hasattr(candidate, "update"):
-                            service = candidate
-                            logger.info(f"Found service in context_provider's closure: {service}")
-                            break
-
-                # If not found, also check the default parameters (covers 'create')
-                if not service and hasattr(context_provider, "__defaults__") and context_provider.__defaults__:
-                    for candidate in context_provider.__defaults__:
-                        if hasattr(candidate, "get_by_id") and hasattr(candidate, "update"):
-                            service = candidate
-                            logger.info(f"Found service in context_provider's defaults: {service}")
-                            break
-
-                if service:
-                    if endpoint == "edit" and entity_id:
-                        # Retrieve the entity instance using the provided ID
-                        entity = service.get_by_id(entity_id)
-                        # Update the entity instance with form data
-                        updated_entity = service.update(entity, form_data)
-                        flash("Successfully updated record", "success")
-                        view_url = url_for(f"{blueprint.name}.view", entity_id=entity_id)
-                        logger.info(f"Redirecting to view URL: {view_url}")
-                        return redirect(view_url)
-                    elif endpoint == "create":
-                        new_entity = service.create(form_data)
-                        flash("Successfully created record", "success")
-                        entity_id = getattr(new_entity, 'id', None)
-                        if entity_id:
-                            view_url = url_for(f"{blueprint.name}.view", entity_id=entity_id)
-                            logger.info(f"Redirecting to view URL for new entity: {view_url}")
-                            return redirect(view_url)
-                        else:
-                            index_url = url_for(f"{blueprint.name}.index")
-                            logger.info(f"Redirecting to index URL: {index_url}")
-                            return redirect(index_url)
-                    elif endpoint == "delete" and entity_id:
-                        # Delete the entity using the provided ID
-                        service.delete(entity_id)
-                        flash("Successfully deleted record", "success")
-                        index_url = url_for(f"{blueprint.name}.index")
-                        logger.info(f"Redirecting to index URL after deletion: {index_url}")
-                        return redirect(index_url)
-                else:
-                    logger.error(f"Could not find service for {endpoint}")
-                    flash("Error: Service not available for this operation", "error")
-
-            if context_provider:
-                logger.info(f"Calling context provider for endpoint '{endpoint}'")
-                if isinstance(context_provider, type):
-                    logger.info(f"Context provider is a class, instantiating with title: {title}")
-                    context = context_provider(title=title)
-                else:
-                    context = context_provider(*args, **kwargs)
-
-                if not context:
-                    logger.warning(f"Context provider returned None for '{endpoint}'")
-                    context = SimpleContext(title=title)
-            else:
-                logger.info(f"No context provider for '{endpoint}', using default SimpleContext")
-                context = SimpleContext(title=title)
-
-            logger.info(f"Rendering template '{template_path}' with context: {context}")
-            result = render_safely(RenderSafelyConfig(
-                template_path,
-                context,
-                error_message,
-                endpoint,
-            ))
-
-            if result is None:
-                logger.error(f"Template renderer returned None for '{endpoint}'")
-                return f"<h1>Error rendering template</h1><p>No response from template renderer.</p>", 500
-
-            return result
-
-        except ValueError as ve:
-            logger.error(f"ValueError in route handler for '{endpoint}': {ve}")
-            return f"<h1>Error in route handler</h1><p>{str(ve)}</p>", 500
-        except Exception as e:
-            logger.error(f"Exception in route handler for '{endpoint}': {str(e)}", exc_info=True)
-            return f"<h1>Unexpected error</h1><p>{str(e)}</p>", 500
-
-    route_handler.__name__ = endpoint
-    blueprint.add_url_rule(url, endpoint=endpoint, view_func=route_handler, methods=methods)
-    logger.info(f"Registered route '{endpoint}' at '{url}' with methods {methods}")
-
-    return route_handler
-
-
-def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
-    # Extract configuration parameters
-    logger.info("Starting registration of CRUD routes.")
-    blueprint = crud_route_config.blueprint
-    entity_table_name = crud_route_config.entity_table_name
-    service = crud_route_config.service
-
-    if not isinstance(entity_table_name, str):
-        logger.error("Invalid entity_table_name type; expected a string.")
-        raise ValueError("The 'entity_table_name' must be a string.")
-
-    include_routes = crud_route_config.include_routes or ["index", "create", "view", "edit", "delete"]
-    templates = crud_route_config.templates or {}
-
-    entity_table_plural_name = get_table_plural_name(entity_table_name)
-
-    # Consolidate all route configuration in one place
-    # Inside register_crud_routes function, update the route_configs dictionary:
-    route_configs = {
-        "index": {
-            "url": "/",
-            "template_default": f"pages/tables/{entity_table_plural_name}.html",
-            "error_message": f"Failed to index {entity_table_plural_name}",
-            "context_provider": lambda: TableContext(
-                entity_table_name=entity_table_name,
-                action="index",
-                title=entity_table_plural_name.capitalize(),
-            ),
-            "methods": ["GET"],  # Add this line
-        },
-        "create": {
-            "url": "/create",
-            "template_default": f"pages/crud/create.html",
-            "error_message": f"Failed to create {entity_table_name}",
-            "context_provider": lambda service=service: EntityContext(
-                action="create",
-                entity_table_name=entity_table_name,
-                title=f"Create {entity_table_name}",
-                read_only=False
-            ),
-            "methods": ["GET", "POST"],
-        },
-
-        "view": {
-            "url": "/<int:entity_id>",
-            "template_default": f"pages/crud/view.html",
-            "error_message": f"Failed to view {entity_table_name}",
-            "context_provider": lambda entity_id: EntityContext(
-                action="view",
-                entity_table_name=entity_table_name,
-                entity=service.get_by_id(entity_id),
-                title=f"View {entity_table_name}",
-            ),
-            "methods": ["GET"],
-        },
-        "edit": {
-            "url": "/<int:entity_id>/edit",
-            "template_default": f"pages/crud/edit.html",
-            "error_message": f"Failed to edit {entity_table_name}",
-            "context_provider": lambda entity_id: EntityContext(
-                action="edit",
-                entity_table_name=entity_table_name,
-                entity_id=entity_id,
-                entity=service.get_by_id(entity_id),
-                title=f"Edit {entity_table_name}",
-                read_only=False,
-                blueprint_name=blueprint.name,
-            ),
-            "methods": ["GET", "POST"],  # Add this line for form submission
-        },
-        "delete": {
-            "url": "/<int:entity_id>/delete",
-            "template_default": f"pages/crud/delete.html",
-            "error_message": f"Failed to delete {entity_table_name}",
-            "context_provider": lambda entity_id: EntityContext(
-                action="delete",
-                entity_table_name=entity_table_name,
-                entity_id=entity_id,
-                entity=service.get_by_id(entity_id),
-                title=f"Delete {entity_table_name}",
-                read_only=True,
-                blueprint_name=blueprint.name,
-            ),
-            "methods": ["GET", "POST"],  # GET for confirmation page, POST for deletion
-        },
-    }
-
-    # Register routes based on configuration
-    for route_type in [r for r in include_routes if r in route_configs]:
-        config = route_configs[route_type]
-        logger.info(f"Processing registration for route type: '{route_type}'")
-
-        template_path = templates.get(route_type, config["template_default"])
-
-        register_route(
-            blueprint=blueprint,
-            url=config["url"],
-            template_path=template_path,
-            endpoint=route_type,
-            context_provider=config["context_provider"],
-            error_message=config["error_message"],
-            methods=config.get("methods", ["GET"]),
-        )
-        logger.info(f"Successfully registered route '{route_type}'.")
-
-    return blueprint
-
-
-def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint: str,
-                        methods: Optional[List[str]] = None):
-    """Register an authentication route with a custom handler.
-
-    Args:
-        blueprint (Blueprint): The Flask blueprint
-        url (str): URL pattern for the route
-        handler (Callable): Function that handles the route
-        endpoint (str): Endpoint name
-        methods (list, optional): HTTP methods
-    """
-    if methods is None:
-        methods = ["GET"]
-        logger.info(f"No methods provided for auth route '{endpoint}', defaulting to ['GET']")
-
-    logger.info(f"Registering auth route '{endpoint}' at '{url}' with methods {methods}")
-
-    blueprint.add_url_rule(url, endpoint=endpoint, view_func=handler, methods=methods)
-
-    logger.info(f"Registered auth route '{endpoint}' at '{url}'")
-
-    return blueprint
+# # app/routes/base/web_utils.py
+# import logging
+# from flask import Blueprint, request, redirect, flash, url_for
+#
+#
+# from app.routes.web.components.template_renderer import render_safely, RenderSafelyConfig
+# from app.routes.web.components.context import SimpleContext, TableContext, EntityContext
+# from typing import Optional, List, Any, Callable, Dict, Tuple
+# from dataclasses import dataclass, field
+#
+# from app.utils.table_helpers import get_table_plural_name
+# from app.services.crud_service import CRUDService
+#
+#
+# logger = logging.getLogger(__name__)
+#
+#
+# @dataclass
+# class CrudRouteConfig:
+#     blueprint: Blueprint
+#     entity_table_name: str
+#     service: CRUDService
+#     include_routes: List[str] = field(default_factory=lambda: ["index", "create", "view", "edit", "delete"])
+#     templates: Dict[str, str] = field(default_factory=dict)
+#
+#
+# def prepare_route_config(url: str, template_path: str, endpoint: str = None, methods: Optional[List[str]] = None) -> \
+# Tuple[str, List[str]]:
+#     """Prepares Flask route configuration by setting defaults and deriving endpoint names.
+#
+#     This utility function handles common route configuration tasks, providing
+#     sensible defaults and deriving endpoint names from template paths when not
+#     explicitly provided. It ensures consistent route configuration across the
+#     application and centralizes the endpoint name generation logic.
+#
+#     Args:
+#         url: URL pattern for the route (e.g., '/', '/users/<int:user_id>')
+#         template_path: Path to the template file to render (e.g., 'home.html',
+#             'users/profile.html')
+#         endpoint: Optional custom endpoint name. If not provided, one will be
+#             derived from template_path following naming conventions
+#         methods: Optional list of HTTP methods the route responds to. Defaults
+#             to ["GET"] if not specified
+#
+#     Returns:
+#         tuple: A tuple containing (endpoint_name, methods_list) where:
+#             - endpoint_name (str): The final endpoint name (either provided or derived)
+#             - methods_list (List[str]): The final list of HTTP methods
+#
+#     """
+#     logger.info(f"Preparing route configuration for URL '{url}' with template '{template_path}'")
+#
+#     # Set default methods if not provided
+#     if not methods:
+#         methods = ["GET"]
+#         logger.warning(f"No 'methods' param provided for '{url}'. Defaulting to: {methods}")
+#     else:
+#         logger.info(f"Route '{url}' configured with methods: {methods}")
+#
+#     # Auto-generate endpoint name if none provided
+#     if not endpoint:
+#         # Split template path to get component parts
+#         parts = template_path.split("/")
+#
+#         if len(parts) > 1:
+#             # For nested templates (e.g., "users/profile.html"),
+#             # combine the directory and filename without extension
+#             endpoint = f"{parts[-2]}_{parts[-1].split('.')[0]}"
+#             logger.info(f"Derived endpoint from nested template: '{parts[-2]}_{parts[-1].split('.')[0]}'")
+#         else:
+#             # For top-level templates (e.g., "pages/misc/home.html"),
+#             # just use the filename without extension
+#             endpoint = template_path.split(".")[0]
+#             logger.info(f"Derived endpoint from root template: '{template_path.split('.')[0]}'")
+#
+#         logger.info(f"No endpoint provided. Using derived endpoint: '{endpoint}'")
+#     else:
+#         logger.info(f"Using provided endpoint: '{endpoint}'")
+#
+#     logger.info(f"Route configuration prepared: URL='{url}', endpoint='{endpoint}', methods={methods}")
+#     return endpoint, methods
+#
+#
+# def register_route(
+#         blueprint: Blueprint,
+#         url: str,
+#         template_path: str,
+#         context_provider: Callable,
+#         title: str = None,
+#         endpoint: str = None,
+#         methods: Optional[List[str]] = None,
+#         error_message: str = "Failed to load the page",
+# ):
+#     endpoint, methods = prepare_route_config(url, template_path, endpoint, methods)
+#     logger.info(f'debugger - title: {title} - endpoint: {endpoint}')
+#     title = title or endpoint
+#
+#     def route_handler(*args, **kwargs):
+#         logger.info(f"Handling request for endpoint '{endpoint}' with args={args}, kwargs={kwargs}")
+#         try:
+#             if request.method == "POST" and endpoint in ["edit", "create", "delete"]:
+#                 entity_id = kwargs.get('entity_id')
+#                 form_data = request.form.to_dict()
+#                 logger.info(f"Form data received: {form_data}")
+#
+#                 service = None
+#                 # Attempt to find the service in context_provider's closure (works for 'edit')
+#                 if hasattr(context_provider, "__closure__") and context_provider.__closure__:
+#                     for closure in context_provider.__closure__:
+#                         candidate = closure.cell_contents
+#                         if hasattr(candidate, "get_by_id") and hasattr(candidate, "update"):
+#                             service = candidate
+#                             logger.info(f"Found service in context_provider's closure: {service}")
+#                             break
+#
+#                 # If not found, also check the default parameters (covers 'create')
+#                 if not service and hasattr(context_provider, "__defaults__") and context_provider.__defaults__:
+#                     for candidate in context_provider.__defaults__:
+#                         if hasattr(candidate, "get_by_id") and hasattr(candidate, "update"):
+#                             service = candidate
+#                             logger.info(f"Found service in context_provider's defaults: {service}")
+#                             break
+#
+#                 if service:
+#                     if endpoint == "edit" and entity_id:
+#                         # Retrieve the entity instance using the provided ID
+#                         entity = service.get_by_id(entity_id)
+#                         # Update the entity instance with form data
+#                         updated_entity = service.update(entity, form_data)
+#                         flash("Successfully updated record", "success")
+#                         view_url = url_for(f"{blueprint.name}.view", entity_id=entity_id)
+#                         logger.info(f"Redirecting to view URL: {view_url}")
+#                         return redirect(view_url)
+#                     elif endpoint == "create":
+#                         new_entity = service.create(form_data)
+#                         flash("Successfully created record", "success")
+#                         entity_id = getattr(new_entity, 'id', None)
+#                         if entity_id:
+#                             view_url = url_for(f"{blueprint.name}.view", entity_id=entity_id)
+#                             logger.info(f"Redirecting to view URL for new entity: {view_url}")
+#                             return redirect(view_url)
+#                         else:
+#                             index_url = url_for(f"{blueprint.name}.index")
+#                             logger.info(f"Redirecting to index URL: {index_url}")
+#                             return redirect(index_url)
+#                     elif endpoint == "delete" and entity_id:
+#                         # Delete the entity using the provided ID
+#                         service.delete(entity_id)
+#                         flash("Successfully deleted record", "success")
+#                         index_url = url_for(f"{blueprint.name}.index")
+#                         logger.info(f"Redirecting to index URL after deletion: {index_url}")
+#                         return redirect(index_url)
+#                 else:
+#                     logger.error(f"Could not find service for {endpoint}")
+#                     flash("Error: Service not available for this operation", "error")
+#
+#             if context_provider:
+#                 logger.info(f"Calling context provider for endpoint '{endpoint}'")
+#                 if isinstance(context_provider, type):
+#                     logger.info(f"Context provider is a class, instantiating with title: {title}")
+#                     context = context_provider(title=title)
+#                 else:
+#                     context = context_provider(*args, **kwargs)
+#
+#                 if not context:
+#                     logger.warning(f"Context provider returned None for '{endpoint}'")
+#                     context = SimpleContext(title=title)
+#             else:
+#                 logger.info(f"No context provider for '{endpoint}', using default SimpleContext")
+#                 context = SimpleContext(title=title)
+#
+#             logger.info(f"Rendering template '{template_path}' with context: {context}")
+#             result = render_safely(RenderSafelyConfig(
+#                 template_path,
+#                 context,
+#                 error_message,
+#                 endpoint,
+#             ))
+#
+#             if result is None:
+#                 logger.error(f"Template renderer returned None for '{endpoint}'")
+#                 return f"<h1>Error rendering template</h1><p>No response from template renderer.</p>", 500
+#
+#             return result
+#
+#         except ValueError as ve:
+#             logger.error(f"ValueError in route handler for '{endpoint}': {ve}")
+#             return f"<h1>Error in route handler</h1><p>{str(ve)}</p>", 500
+#         except Exception as e:
+#             logger.error(f"Exception in route handler for '{endpoint}': {str(e)}", exc_info=True)
+#             return f"<h1>Unexpected error</h1><p>{str(e)}</p>", 500
+#
+#     route_handler.__name__ = endpoint
+#     blueprint.add_url_rule(url, endpoint=endpoint, view_func=route_handler, methods=methods)
+#     logger.info(f"Registered route '{endpoint}' at '{url}' with methods {methods}")
+#
+#     return route_handler
+#
+#
+# def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
+#     # Extract configuration parameters
+#     logger.info("Starting registration of CRUD routes.")
+#     blueprint = crud_route_config.blueprint
+#     entity_table_name = crud_route_config.entity_table_name
+#     service = crud_route_config.service
+#
+#     if not isinstance(entity_table_name, str):
+#         logger.error("Invalid entity_table_name type; expected a string.")
+#         raise ValueError("The 'entity_table_name' must be a string.")
+#
+#     include_routes = crud_route_config.include_routes or ["index", "create", "view", "edit", "delete"]
+#     templates = crud_route_config.templates or {}
+#
+#     entity_table_plural_name = get_table_plural_name(entity_table_name)
+#
+#     # Consolidate all route configuration in one place
+#     # Inside register_crud_routes function, update the route_configs dictionary:
+#     route_configs = {
+#         "index": {
+#             "url": "/",
+#             "template_default": f"pages/tables/{entity_table_plural_name}.html",
+#             "error_message": f"Failed to index {entity_table_plural_name}",
+#             "context_provider": lambda: TableContext(
+#                 entity_table_name=entity_table_name,
+#                 action="index",
+#                 title=entity_table_plural_name.capitalize(),
+#             ),
+#             "methods": ["GET"],  # Add this line
+#         },
+#         "create": {
+#             "url": "/create",
+#             "template_default": f"pages/crud/create.html",
+#             "error_message": f"Failed to create {entity_table_name}",
+#             "context_provider": lambda service=service: EntityContext(
+#                 action="create",
+#                 entity_table_name=entity_table_name,
+#                 title=f"Create {entity_table_name}",
+#                 read_only=False
+#             ),
+#             "methods": ["GET", "POST"],
+#         },
+#
+#         "view": {
+#             "url": "/<int:entity_id>",
+#             "template_default": f"pages/crud/view.html",
+#             "error_message": f"Failed to view {entity_table_name}",
+#             "context_provider": lambda entity_id: EntityContext(
+#                 action="view",
+#                 entity_table_name=entity_table_name,
+#                 entity=service.get_by_id(entity_id),
+#                 title=f"View {entity_table_name}",
+#             ),
+#             "methods": ["GET"],
+#         },
+#         "edit": {
+#             "url": "/<int:entity_id>/edit",
+#             "template_default": f"pages/crud/edit.html",
+#             "error_message": f"Failed to edit {entity_table_name}",
+#             "context_provider": lambda entity_id: EntityContext(
+#                 action="edit",
+#                 entity_table_name=entity_table_name,
+#                 entity_id=entity_id,
+#                 entity=service.get_by_id(entity_id),
+#                 title=f"Edit {entity_table_name}",
+#                 read_only=False,
+#                 blueprint_name=blueprint.name,
+#             ),
+#             "methods": ["GET", "POST"],  # Add this line for form submission
+#         },
+#         "delete": {
+#             "url": "/<int:entity_id>/delete",
+#             "template_default": f"pages/crud/delete.html",
+#             "error_message": f"Failed to delete {entity_table_name}",
+#             "context_provider": lambda entity_id: EntityContext(
+#                 action="delete",
+#                 entity_table_name=entity_table_name,
+#                 entity_id=entity_id,
+#                 entity=service.get_by_id(entity_id),
+#                 title=f"Delete {entity_table_name}",
+#                 read_only=True,
+#                 blueprint_name=blueprint.name,
+#             ),
+#             "methods": ["GET", "POST"],  # GET for confirmation page, POST for deletion
+#         },
+#     }
+#
+#     # Register routes based on configuration
+#     for route_type in [r for r in include_routes if r in route_configs]:
+#         config = route_configs[route_type]
+#         logger.info(f"Processing registration for route type: '{route_type}'")
+#
+#         template_path = templates.get(route_type, config["template_default"])
+#
+#         register_route(
+#             blueprint=blueprint,
+#             url=config["url"],
+#             template_path=template_path,
+#             endpoint=route_type,
+#             context_provider=config["context_provider"],
+#             error_message=config["error_message"],
+#             methods=config.get("methods", ["GET"]),
+#         )
+#         logger.info(f"Successfully registered route '{route_type}'.")
+#
+#     return blueprint
+#
+#
+# def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint: str,
+#                         methods: Optional[List[str]] = None):
+#     """Register an authentication route with a custom handler.
+#
+#     Args:
+#         blueprint (Blueprint): The Flask blueprint
+#         url (str): URL pattern for the route
+#         handler (Callable): Function that handles the route
+#         endpoint (str): Endpoint name
+#         methods (list, optional): HTTP methods
+#     """
+#     if methods is None:
+#         methods = ["GET"]
+#         logger.info(f"No methods provided for auth route '{endpoint}', defaulting to ['GET']")
+#
+#     logger.info(f"Registering auth route '{endpoint}' at '{url}' with methods {methods}")
+#
+#     blueprint.add_url_rule(url, endpoint=endpoint, view_func=handler, methods=methods)
+#
+#     logger.info(f"Registered auth route '{endpoint}' at '{url}'")
+#
+#     return blueprint

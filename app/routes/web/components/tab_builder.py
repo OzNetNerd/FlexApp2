@@ -61,6 +61,7 @@ class Tab:
     tab_name: str
     sections: List[TabSection] = field(default_factory=list)
     visibility: TabVisibility = field(default_factory=TabVisibility)
+    template: str = "components/default_tab.html"  # Default template
 
 
 @dataclass
@@ -69,6 +70,7 @@ class TabBuilder(ABC):
     tab_name: str
     section_method_order: List[Callable] = field(default_factory=list, init=False)
     visibility: TabVisibility = field(default_factory=TabVisibility)
+    template: str = "components/default_tab.html"  # Default template
 
     def __post_init__(self):
         instance_details = "TabBuilder (__post_init__)"
@@ -76,7 +78,8 @@ class TabBuilder(ABC):
 
     def create_tab(self) -> Tab:
         sections = [method() for method in self.section_method_order]
-        tab = Tab(tab_name=self.tab_name, sections=sections, visibility=self.visibility)
+        tab = Tab(tab_name=self.tab_name, sections=sections,
+                 visibility=self.visibility, template=self.template)
         logger.debug(f"{self.tab_name} tabbing: {tab}")
         return tab
 
@@ -84,6 +87,7 @@ class TabBuilder(ABC):
 @dataclass
 class InsightsTab(TabBuilder):
     tab_name: str = "Insights"
+    template: str = "components/insights_tab.html"  # Custom template
 
     def __post_init__(self):
         # Set visibility to only show on view page

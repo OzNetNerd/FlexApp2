@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint
-from app.routes.web.components.web_utils import register_route, CrudRouteConfig, SimpleContext
+from app.routes.web.route_registration import register_route, CrudRouteConfig, SimpleContext
 from app.services.crud_service import CRUDService
 from app.models.setting import Setting
 

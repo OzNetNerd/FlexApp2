@@ -3,7 +3,7 @@
 # Example 1: Full CRUD Entity
 # app/routes/companies.py
 from flask import Blueprint
-from app.routes.web.components.web_utils import register_crud_routes, CrudRouteConfig
+from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig
 from app.services.crud_service import CRUDService
 from app.models.company import Company
 import logging
