@@ -7,7 +7,7 @@
  Inputs:
    - title      : str  → "Viewing", "Editing", etc.
    - model_name : str  → e.g. "User"
-   - item_name  : str  → e.g. "Jessie Smith"
+   - entity_name : str  → e.g. "Jessie Smith"
    - read_only  : bool → Controls icon
    - id         : Optional[str] → Presence determines view/edit icon
    - ui         : Optional[List] → If present, includes _pills_nav.html
@@ -30,7 +30,7 @@
   Inputs:
     - title      : str  → "Viewing", "Editing", etc.
     - model_name : str  → e.g. "User"
-    - item_name  : str  → e.g. "Jessie Smith"
+    - entity_name : str  → e.g. "Jessie Smith"
     - read_only  : bool → Controls icon
     - id         : Optional[str] → Presence determines view/edit icon
     - ui         : Optional[List] → If present, includes _pills_nav.html
@@ -39,7 +39,6 @@
     - Uses icon to indicate mode and logs render context
 ------------------------------------------------------------------------------ #}
 
-<!-- START HEADER MARKER - If you see this in the DOM, template is being included -->
 {% import "base/macros/render_form_fields.html" as macros %}
 
 <script type="module">
@@ -70,7 +69,14 @@
       log("debug", "_header_heading.html", "icon", "Using create icon (plus)");
     </script>
   {% endif %}
-  {{ title }}: <span class="text-info">{{ item_name|default('') }}</span>
+
+  {% if (read_only and id is defined and id) %}
+    View {{ model_name }}: <span class="text-info">{{ entity_name|default('') }}</span>
+  {% elif (id is defined and id) %}
+    Edit {{ model_name }}: <span class="text-info">{{ entity_name|default('') }}</span>
+  {% else %}
+    Create {{ model_name }}
+  {% endif %}
 </h3>
 
 {% if ui is defined and ui %}
@@ -96,7 +102,7 @@
     const headerContext = {
       title: "{{ title|default('undefined') }}",
       model: "{{ model_name|default('undefined') }}",
-      itemName: "{{ item_name|default('undefined') }}",
+      entityName: "{{ entity_name|default('undefined') }}",
       readOnly: {{ read_only|default('false')|tojson }},
       hasId: {{ (id is defined and id is not none)|default('false')|tojson }},
       hasUi: {{ (ui is defined and ui is not none)|default('false')|tojson }}
