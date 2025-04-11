@@ -1,206 +1,206 @@
-import logging
-from dataclasses import dataclass, field
-from typing import List, Callable, Any
-from app.routes.web.components.tab_builder import TabBuilder, TabSection, TabEntry
-
-logger = logging.getLogger(__name__)
-
-
-@dataclass
-class BasicInfoTab(TabBuilder):
-    # Only override the default for tab_name; do not re-declare 'entity'
-    tab_name: str = "Basic Info"
-
-    def __post_init__(self):
-        self.section_method_order = [
-            self._basic_info_section,
-            self._role_info_section,
-        ]
-
-        super().__post_init__()
-
-    def _basic_info_section(self):
-        section_name = "Contact"
-        return TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(entry_name="first_name", label="First Name", type="text", required=True, value=self.entity.get("first_name")),
-                TabEntry(entry_name="last_name", label="Last Name", type="text", required=True, value=self.entity.get("last_name")),
-                TabEntry(entry_name="email", label="Email", type="email", required=True, value=self.entity.get("email")),
-                TabEntry(entry_name="phone_number", label="Phone Number", type="text", value=self.entity.get("phone_number")),
-            ],
-        )
-
-    def _role_info_section(self):
-        section_name = "Role Information"
-        return TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(entry_name="role", label="Role", type="text", value=self.entity.get("role")),
-                TabEntry(
-                    entry_name="role_level",
-                    label="Role Level",
-                    type="dropdown",
-                    options=["Junior", "Mid", "Senior", "Lead"],
-                    value=self.entity.get("role_level"),
-                ),
-                TabEntry(entry_name="team_bu_name", label="Team Name", type="text", value=self.entity.get("team_bu_name")),
-            ],
-        )
-
-
-@dataclass
-class RoleAndResponsibilitiesTab(TabBuilder):
-    tab_name: str = "Roles and Responsibilities"
-    section_method_order: List[Callable] = field(init=False)
-
-    def __post_init__(self):
-        self.section_method_order = [
-            self._role_responsibilities_section,
-        ]
-
-        super().__post_init__()
-
-    def _role_responsibilities_section(self):
-        section_name = "Role and Responsibilities"
-        role_responsibilities_section = TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(
-                    entry_name="team_roles_responsibilities",
-                    label="Team's Roles and Responsibilities",
-                    type="textarea",
-                    value=self.entity.get("team_roles_responsibilities"),
-                ),
-                TabEntry(entry_name="role_description", label="Role Description", type="textarea", value=self.entity.get("role_description")),
-                TabEntry(entry_name="responsibilities", label="Responsibilities", type="textarea", value=self.entity.get("responsibilities")),
-            ],
-        )
-        return role_responsibilities_section
-
-
-@dataclass
-class SkillsAndTechnologiesTab(TabBuilder):
-    entity: Any
-    tab_name: str = "Skills and Technologies"
-    section_method_order: List[Callable] = field(init=False)
-
-    def __post_init__(self):
-        self.section_method_order = [
-            self._skill_level_section,
-            self._technologies_used_section,
-        ]
-
-        super().__post_init__()
-
-    def _skill_level_section(self):
-        section_name = "Skill Level"
-        skill_level_section = TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(
-                    entry_name="primary_skill_area",
-                    label="Primary Skill Area",
-                    type="dropdown",
-                    options=["Cloud", "DevOps", "Networking", "Programming", "Security"],
-                    value=self.entity.get("primary_skill_area"),
-                ),
-                TabEntry(
-                    entry_name="skill_level",
-                    label="Skill Level",
-                    type="dropdown",
-                    options=["Beginner", "Intermediate", "Advanced", "Expert"],
-                    value=self.entity.get("skill_level"),
-                ),
-                TabEntry(entry_name="certifications", label="Certifications", type="textarea", value=self.entity.get("certifications")),
-            ],
-        )
-        logger.info(f"Created {skill_level_section} section")
-        return skill_level_section
-
-    def _technologies_used_section(self):
-        section_name = "Technologies Used"
-        technologies_used_section = TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(
-                    entry_name="cloud_platforms",
-                    label="Cloud Platforms",
-                    type="dropdown",
-                    options=["AWS", "Azure", "Google Cloud", "IBM Cloud"],
-                    value=self.entity.get("cloud_platforms"),
-                ),
-                TabEntry(
-                    entry_name="devops_tools",
-                    label="DevOps Tools",
-                    type="dropdown",
-                    options=["Terraform", "Jenkins", "Ansible", "Docker", "Kubernetes"],
-                    value=self.entity.get("devops_tools"),
-                ),
-                TabEntry(
-                    entry_name="version_control_systems",
-                    label="Version Control Systems",
-                    type="dropdown",
-                    options=["Git", "SVN", "Mercurial"],
-                    value=self.entity.get("version_control_systems"),
-                ),
-                TabEntry(
-                    entry_name="programming_languages",
-                    label="Programming Languages",
-                    type="dropdown",
-                    options=["Python", "JavaScript", "Java", "Go", "Ruby"],
-                    value=self.entity.get("programming_languages"),
-                ),
-                TabEntry(
-                    entry_name="monitoring_logging",
-                    label="Monitoring & Logging",
-                    type="dropdown",
-                    options=["Prometheus", "Grafana", "Splunk", "ELK Stack"],
-                    value=self.entity.get("monitoring_logging"),
-                ),
-                TabEntry(
-                    entry_name="ci_cd_tools",
-                    label="CI/CD Tools",
-                    type="dropdown",
-                    options=["GitLab CI", "CircleCI", "Travis CI", "Azure DevOps"],
-                    value=self.entity.get("ci_cd_tools"),
-                ),
-                TabEntry(
-                    entry_name="other_technologies", label="Other Technologies", type="textarea", value=self.entity.get("other_technologies")
-                ),
-            ],
-        )
-        return technologies_used_section
-
-
-@dataclass
-class ExpertiseAndProjectsTab(TabBuilder):
-    entity: Any
-    tab_name: str = "Expertise and Projects"
-    section_method_order: List[Callable] = field(init=False)
-
-    def __post_init__(self):
-        self.section_method_order = [
-            self._expertise_section,
-        ]
-
-        super().__post_init__()
-
-    def _expertise_section(self):
-        section_name = "Expertise and Projects"
-        expertise_section = TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(entry_name="expertise_areas", label="Expertise Areas", type="text", value=self.entity.get("expertise_areas")),
-                TabEntry(
-                    entry_name="technologies_led",
-                    label="Technologies Led/Worked With",
-                    type="textarea",
-                    value=self.entity.get("technologies_led"),
-                ),
-            ],
-        )
-        return expertise_section
-
-
-CONTACTS_TABS = [BasicInfoTab, RoleAndResponsibilitiesTab, SkillsAndTechnologiesTab, ExpertiseAndProjectsTab]
+# import logging
+# from dataclasses import dataclass, field
+# from typing import List, Callable, Any
+# from app.routes.web.components.tab_builder import TabBuilder, TabSection, TabEntry
+#
+# logger = logging.getLogger(__name__)
+#
+#
+# @dataclass
+# class BasicInfoTab(TabBuilder):
+#     # Only override the default for tab_name; do not re-declare 'entity'
+#     tab_name: str = "Basic Info"
+#
+#     def __post_init__(self):
+#         self.section_method_order = [
+#             self._basic_info_section,
+#             self._role_info_section,
+#         ]
+#
+#         super().__post_init__()
+#
+#     def _basic_info_section(self):
+#         section_name = "Contact"
+#         return TabSection(
+#             section_name=section_name,
+#             entries=[
+#                 TabEntry(entry_name="first_name", label="First Name", type="text", required=True, value=self.entity.get("first_name")),
+#                 TabEntry(entry_name="last_name", label="Last Name", type="text", required=True, value=self.entity.get("last_name")),
+#                 TabEntry(entry_name="email", label="Email", type="email", required=True, value=self.entity.get("email")),
+#                 TabEntry(entry_name="phone_number", label="Phone Number", type="text", value=self.entity.get("phone_number")),
+#             ],
+#         )
+#
+#     def _role_info_section(self):
+#         section_name = "Role Information"
+#         return TabSection(
+#             section_name=section_name,
+#             entries=[
+#                 TabEntry(entry_name="role", label="Role", type="text", value=self.entity.get("role")),
+#                 TabEntry(
+#                     entry_name="role_level",
+#                     label="Role Level",
+#                     type="dropdown",
+#                     options=["Junior", "Mid", "Senior", "Lead"],
+#                     value=self.entity.get("role_level"),
+#                 ),
+#                 TabEntry(entry_name="team_bu_name", label="Team Name", type="text", value=self.entity.get("team_bu_name")),
+#             ],
+#         )
+#
+#
+# @dataclass
+# class RoleAndResponsibilitiesTab(TabBuilder):
+#     tab_name: str = "Roles and Responsibilities"
+#     section_method_order: List[Callable] = field(init=False)
+#
+#     def __post_init__(self):
+#         self.section_method_order = [
+#             self._role_responsibilities_section,
+#         ]
+#
+#         super().__post_init__()
+#
+#     def _role_responsibilities_section(self):
+#         section_name = "Role and Responsibilities"
+#         role_responsibilities_section = TabSection(
+#             section_name=section_name,
+#             entries=[
+#                 TabEntry(
+#                     entry_name="team_roles_responsibilities",
+#                     label="Team's Roles and Responsibilities",
+#                     type="textarea",
+#                     value=self.entity.get("team_roles_responsibilities"),
+#                 ),
+#                 TabEntry(entry_name="role_description", label="Role Description", type="textarea", value=self.entity.get("role_description")),
+#                 TabEntry(entry_name="responsibilities", label="Responsibilities", type="textarea", value=self.entity.get("responsibilities")),
+#             ],
+#         )
+#         return role_responsibilities_section
+#
+#
+# @dataclass
+# class SkillsAndTechnologiesTab(TabBuilder):
+#     entity: Any
+#     tab_name: str = "Skills and Technologies"
+#     section_method_order: List[Callable] = field(init=False)
+#
+#     def __post_init__(self):
+#         self.section_method_order = [
+#             self._skill_level_section,
+#             self._technologies_used_section,
+#         ]
+#
+#         super().__post_init__()
+#
+#     def _skill_level_section(self):
+#         section_name = "Skill Level"
+#         skill_level_section = TabSection(
+#             section_name=section_name,
+#             entries=[
+#                 TabEntry(
+#                     entry_name="primary_skill_area",
+#                     label="Primary Skill Area",
+#                     type="dropdown",
+#                     options=["Cloud", "DevOps", "Networking", "Programming", "Security"],
+#                     value=self.entity.get("primary_skill_area"),
+#                 ),
+#                 TabEntry(
+#                     entry_name="skill_level",
+#                     label="Skill Level",
+#                     type="dropdown",
+#                     options=["Beginner", "Intermediate", "Advanced", "Expert"],
+#                     value=self.entity.get("skill_level"),
+#                 ),
+#                 TabEntry(entry_name="certifications", label="Certifications", type="textarea", value=self.entity.get("certifications")),
+#             ],
+#         )
+#         logger.info(f"Created {skill_level_section} section")
+#         return skill_level_section
+#
+#     def _technologies_used_section(self):
+#         section_name = "Technologies Used"
+#         technologies_used_section = TabSection(
+#             section_name=section_name,
+#             entries=[
+#                 TabEntry(
+#                     entry_name="cloud_platforms",
+#                     label="Cloud Platforms",
+#                     type="dropdown",
+#                     options=["AWS", "Azure", "Google Cloud", "IBM Cloud"],
+#                     value=self.entity.get("cloud_platforms"),
+#                 ),
+#                 TabEntry(
+#                     entry_name="devops_tools",
+#                     label="DevOps Tools",
+#                     type="dropdown",
+#                     options=["Terraform", "Jenkins", "Ansible", "Docker", "Kubernetes"],
+#                     value=self.entity.get("devops_tools"),
+#                 ),
+#                 TabEntry(
+#                     entry_name="version_control_systems",
+#                     label="Version Control Systems",
+#                     type="dropdown",
+#                     options=["Git", "SVN", "Mercurial"],
+#                     value=self.entity.get("version_control_systems"),
+#                 ),
+#                 TabEntry(
+#                     entry_name="programming_languages",
+#                     label="Programming Languages",
+#                     type="dropdown",
+#                     options=["Python", "JavaScript", "Java", "Go", "Ruby"],
+#                     value=self.entity.get("programming_languages"),
+#                 ),
+#                 TabEntry(
+#                     entry_name="monitoring_logging",
+#                     label="Monitoring & Logging",
+#                     type="dropdown",
+#                     options=["Prometheus", "Grafana", "Splunk", "ELK Stack"],
+#                     value=self.entity.get("monitoring_logging"),
+#                 ),
+#                 TabEntry(
+#                     entry_name="ci_cd_tools",
+#                     label="CI/CD Tools",
+#                     type="dropdown",
+#                     options=["GitLab CI", "CircleCI", "Travis CI", "Azure DevOps"],
+#                     value=self.entity.get("ci_cd_tools"),
+#                 ),
+#                 TabEntry(
+#                     entry_name="other_technologies", label="Other Technologies", type="textarea", value=self.entity.get("other_technologies")
+#                 ),
+#             ],
+#         )
+#         return technologies_used_section
+#
+#
+# @dataclass
+# class ExpertiseAndProjectsTab(TabBuilder):
+#     entity: Any
+#     tab_name: str = "Expertise and Projects"
+#     section_method_order: List[Callable] = field(init=False)
+#
+#     def __post_init__(self):
+#         self.section_method_order = [
+#             self._expertise_section,
+#         ]
+#
+#         super().__post_init__()
+#
+#     def _expertise_section(self):
+#         section_name = "Expertise and Projects"
+#         expertise_section = TabSection(
+#             section_name=section_name,
+#             entries=[
+#                 TabEntry(entry_name="expertise_areas", label="Expertise Areas", type="text", value=self.entity.get("expertise_areas")),
+#                 TabEntry(
+#                     entry_name="technologies_led",
+#                     label="Technologies Led/Worked With",
+#                     type="textarea",
+#                     value=self.entity.get("technologies_led"),
+#                 ),
+#             ],
+#         )
+#         return expertise_section
+#
+#
+# CONTACTS_TABS = [BasicInfoTab, RoleAndResponsibilitiesTab, SkillsAndTechnologiesTab, ExpertiseAndProjectsTab]

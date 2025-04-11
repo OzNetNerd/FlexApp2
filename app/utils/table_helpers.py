@@ -1,20 +1,20 @@
 from typing import Any
 
-from app.routes.web.tabs.contacts import CONTACTS_TABS
-from app.routes.web.tabs.companies import COMPANIES_TABS
-from app.routes.web.tabs.opportunities import OPPORTUNITIES_TABS
-from app.routes.web.tabs.users import USERS_TABS
-from app.routes.web.tabs.tasks import TASKS_TABS
-from app.routes.web.tabs.settings import SETTINGS_TABS
+# from app.routes.web.tabs.contacts import CONTACTS_TABS
+# from app.routes.web.tabs.companies import COMPANIES_TABS
+# from app.routes.web.tabs.opportunities import OPPORTUNITIES_TABS
+# from app.routes.web.tabs.users import USERS_TABS
+# from app.routes.web.tabs.tasks import TASKS_TABS
+# from app.routes.web.tabs.settings import SETTINGS_TABS
 
-UI_TAB_MAPPING = {
-    "Contact": CONTACTS_TABS,
-    "Company": COMPANIES_TABS,
-    "Opportunity": OPPORTUNITIES_TABS,
-    "User": USERS_TABS,
-    "Task": TASKS_TABS,
-    "Setting": SETTINGS_TABS,
-}
+# UI_TAB_MAPPING = {
+#     "Contact": CONTACTS_TABS,
+#     "Company": COMPANIES_TABS,
+#     "Opportunity": OPPORTUNITIES_TABS,
+#     "User": USERS_TABS,
+#     "Task": TASKS_TABS,
+#     "Setting": SETTINGS_TABS,
+# }
 
 PLURAL_MAP = {
     "Company": "companies",

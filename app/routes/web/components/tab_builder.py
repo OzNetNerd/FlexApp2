@@ -84,97 +84,97 @@ class TabBuilder(ABC):
         return tab
 
 
-@dataclass
-class InsightsTab(TabBuilder):
-    tab_name: str = "Insights"
-    template: str = "components/insights_tab.html"  # Custom template
+# @dataclass
+# class InsightsTab(TabBuilder):
+#     tab_name: str = "Insights"
+#     template: str = "components/insights_tab.html"  # Custom template
+#
+#     def __post_init__(self):
+#         # Set visibility to only show on view page
+#         self.visibility = TabVisibility(show_only_on={PageType.VIEW})
+#
+#         self.section_method_order = [
+#             self._crisp_score_section,
+#         ]
+#
+#         super().__post_init__()
+#
+#     def _crisp_score_section(self):
+#         section_name = '<i class="fas fa-history me-2"></i>CRISP Score History</h3>'
+#
+#         return TabSection(
+#             section_name=section_name,
+#             entries=[
+#                 TabEntry(entry_name="crisp", label="CRISP", type="custom", value=self.entity.get("crisp")),
+#             ],
+#         )
 
-    def __post_init__(self):
-        # Set visibility to only show on view page
-        self.visibility = TabVisibility(show_only_on={PageType.VIEW})
-
-        self.section_method_order = [
-            self._crisp_score_section,
-        ]
-
-        super().__post_init__()
-
-    def _crisp_score_section(self):
-        section_name = '<i class="fas fa-history me-2"></i>CRISP Score History</h3>'
-
-        return TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(entry_name="crisp", label="CRISP", type="custom", value=self.entity.get("crisp")),
-            ],
-        )
-
-@dataclass
-class MetadataTab(TabBuilder):
-    tab_name: str = "Metadata"
-
-    def __post_init__(self):
-        # Show metadata only on view page
-        self.visibility = TabVisibility(show_only_on={PageType.VIEW})
-        self.section_method_order = [
-            self._metadata_section,
-        ]
-
-    def _metadata_section(self):
-        section_name = "Metadata"
-        return TabSection(
-            section_name=section_name,
-            entries=[
-                TabEntry(entry_name="created_at", label="Created At", type="readonly",
-                         value=self.entity.get("created_at")),
-                TabEntry(entry_name="updated_at", label="Updated At", type="readonly",
-                         value=self.entity.get("updated_at")),
-            ],
-        )
-
-@dataclass
-class NotesTab(TabBuilder):
-    tab_name: str = "Notes"
-
-    def __post_init__(self):
-        # Show notes only on the view page
-        self.visibility = TabVisibility(show_only_on={PageType.VIEW})
-        # Define the order of sections for this tab. In this example, we have one section.
-        self.section_method_order = [self._notes_section]
-        super().__post_init__()
-
-    def _notes_section(self):
-        from app.models import Note, User
-        from flask import render_template
-
-        section_name = "Notes"
-        entity_id = self.entity.get('id')
-
-        notes = Note.query.filter_by(
-            notable_type='Contact',
-            notable_id=entity_id
-        ).order_by(Note.created_at.desc()).all()
-
-        # Format notes for activity-style display
-        activity_notes = []
-
-        for note in notes:
-            user = User.query.get(note.user_id) if note.user_id else None
-            author_name = user.username if user else "Unknown"
-
-            activity_notes.append({
-                'icon_bg_class': 'bg-primary rounded-circle p-2',
-                'icon_class': 'fas fa-comment-alt fa-sm',
-                'description': f"<strong>{author_name}</strong> added a note: {note.content}",
-                'timestamp': note.created_at.strftime('%d %b %Y, %H:%M')
-            })
-
-        # Render the template with the notes data
-        notes_html = render_template('components/notes_section.html', activity_notes=activity_notes)
-
-        return TabSection(section_name=section_name, entries=[
-            TabEntry(entry_name="notes", label="Notes", type="custom", value=notes_html)
-        ])
+# @dataclass
+# class MetadataTab(TabBuilder):
+#     tab_name: str = "Metadata"
+#
+#     def __post_init__(self):
+#         # Show metadata only on view page
+#         self.visibility = TabVisibility(show_only_on={PageType.VIEW})
+#         self.section_method_order = [
+#             self._metadata_section,
+#         ]
+#
+#     def _metadata_section(self):
+#         section_name = "Metadata"
+#         return TabSection(
+#             section_name=section_name,
+#             entries=[
+#                 TabEntry(entry_name="created_at", label="Created At", type="readonly",
+#                          value=self.entity.get("created_at")),
+#                 TabEntry(entry_name="updated_at", label="Updated At", type="readonly",
+#                          value=self.entity.get("updated_at")),
+#             ],
+#         )
+#
+# @dataclass
+# class NotesTab(TabBuilder):
+#     tab_name: str = "Notes"
+#
+#     def __post_init__(self):
+#         # Show notes only on the view page
+#         self.visibility = TabVisibility(show_only_on={PageType.VIEW})
+#         # Define the order of sections for this tab. In this example, we have one section.
+#         self.section_method_order = [self._notes_section]
+#         super().__post_init__()
+#
+#     def _notes_section(self):
+#         from app.models import Note, User
+#         from flask import render_template
+#
+#         section_name = "Notes"
+#         entity_id = self.entity.get('id')
+#
+#         notes = Note.query.filter_by(
+#             notable_type='Contact',
+#             notable_id=entity_id
+#         ).order_by(Note.created_at.desc()).all()
+#
+#         # Format notes for activity-style display
+#         activity_notes = []
+#
+#         for note in notes:
+#             user = User.query.get(note.user_id) if note.user_id else None
+#             author_name = user.username if user else "Unknown"
+#
+#             activity_notes.append({
+#                 'icon_bg_class': 'bg-primary rounded-circle p-2',
+#                 'icon_class': 'fas fa-comment-alt fa-sm',
+#                 'description': f"<strong>{author_name}</strong> added a note: {note.content}",
+#                 'timestamp': note.created_at.strftime('%d %b %Y, %H:%M')
+#             })
+#
+#         # Render the template with the notes data
+#         notes_html = render_template('components/notes_section.html', activity_notes=activity_notes)
+#
+#         return TabSection(section_name=section_name, entries=[
+#             TabEntry(entry_name="notes", label="Notes", type="custom", value=notes_html)
+#         ])
 
 def create_tabs(entity: Any, tabs: List[Callable], current_page=None, add_metadata_tab=True, add_notes_tab=True) -> List[Tab]:
     # Auto-detect current page from request if not provided
