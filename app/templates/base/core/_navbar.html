@@ -132,6 +132,13 @@
         </script>
       </div>
 
+      <!-- Theme Toggle Button -->
+      <div class="d-flex align-items-center me-3">
+        <button class="btn btn-light" onclick="toggleTheme()">
+          <i class="fas fa-adjust"></i> Toggle Theme
+        </button>
+      </div>
+
       <div class="notification-icon me-3 d-none d-md-block">
         <a href="#" class="position-relative">
           <i class="fas fa-bell"></i>
@@ -233,15 +240,12 @@
 <!-- Bootstrap JS error checking -->
 <script type="module">
   import log from '/static/js/logger.js';
-
-  // Check if Bootstrap JS is loaded
   setTimeout(() => {
     if (typeof bootstrap !== 'undefined') {
       log("info", "_navbar.html", "deps", "Bootstrap JS is loaded");
     } else {
       log("error", "_navbar.html", "deps", "❌ Bootstrap JS not found - navigation may not work");
     }
-
     // Check if FontAwesome is loaded by testing an icon
     const iconElement = document.querySelector('.fas');
     if (iconElement) {
@@ -252,7 +256,7 @@
         log("error", "_navbar.html", "deps", "❌ FontAwesome icons not rendering properly");
       }
     }
-  }, 500);  // Small delay to ensure resources are checked after loading
+  }, 500);
 </script>
 
 <!-- Log Final Template Render -->
@@ -261,4 +265,15 @@
   log("info", "_navbar.html", "final", "Navbar rendered successfully");
 </script>
 
+<!-- JavaScript for Theme Toggle -->
+<script type="module">
+  function toggleTheme() {
+    const currentTheme = document.body.getAttribute('data-theme');
+    if (currentTheme === 'dark') {
+      document.body.setAttribute('data-theme', 'light');
+    } else {
+      document.body.setAttribute('data-theme', 'dark');
+    }
+  }
+</script>
 <!-- END TEMPLATE: _navbar.html -->
