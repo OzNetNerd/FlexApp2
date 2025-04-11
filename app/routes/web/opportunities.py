@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint
-from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig
+from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig, CrudTemplates
 from app.services.crud_service import CRUDService
 from app.models.opportunity import Opportunity
 
@@ -12,6 +12,19 @@ opportunities_bp = Blueprint("opportunities_bp", __name__, url_prefix="/opportun
 # Create a service instance
 opportunity_service = CRUDService(Opportunity)
 
-# Register all standard CRUD routes
-opportunity_crud_config = CrudRouteConfig(blueprint=opportunities_bp, entity_table_name="Opportunity", service=opportunity_service)
+# Define custom templates for opportunities
+custom_templates = CrudTemplates(
+    view="pages/crud/view_opportunities.html"
+)
+
+# Add debug logging to verify the templates are set correctly
+logger.info(f"Custom templates: {custom_templates.to_dict()}")
+
+# Register all standard CRUD routes with custom templates
+opportunity_crud_config = CrudRouteConfig(
+    blueprint=opportunities_bp,
+    entity_table_name="Opportunity",
+    service=opportunity_service,
+    templates=custom_templates
+)
 register_crud_routes(opportunity_crud_config)
