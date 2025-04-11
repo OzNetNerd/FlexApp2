@@ -1,6 +1,8 @@
+# api/opportunities.py
+
 import logging
-from flask import jsonify, request
 from app.routes.blueprint_factory import create_blueprint
+from app.routes.api.route_registration import register_api_crud_routes, ApiCrudRouteConfig
 from app.models import Opportunity
 from app.services.crud_service import CRUDService
 
@@ -10,50 +12,12 @@ logger = logging.getLogger(__name__)
 opportunities_api_bp = create_blueprint("api_opportunities", url_prefix="/api/opportunities")
 opportunity_service = CRUDService(Opportunity)
 
+# Register all standard CRUD API routes
+opportunity_api_crud_config = ApiCrudRouteConfig(
+    blueprint=opportunities_api_bp,
+    entity_table_name="Opportunity",
+    service=opportunity_service
+)
+register_api_crud_routes(opportunity_api_crud_config)
 
-@opportunities_api_bp.route("/", methods=["GET"])
-def get_all_opportunities():
-    """Get all opportunities."""
-    opportunities = opportunity_service.get_all()
-    return jsonify([opportunity.to_dict() for opportunity in opportunities])
-
-
-@opportunities_api_bp.route("/<int:entity_id>", methods=["GET"])
-def get_opportunity(entity_id):
-    """Get a specific opportunity."""
-    opportunity = opportunity_service.get_by_id(entity_id)
-    if not opportunity:
-        return jsonify({"error": "Opportunity not found"}), 404
-    return jsonify(opportunity.to_dict())
-
-
-@opportunities_api_bp.route("/", methods=["POST"])
-def create_opportunity():
-    """Create a new opportunity."""
-    data = request.get_json()
-    result = opportunity_service.create(data)
-    if "error" in result:
-        return jsonify(result), 400
-    return jsonify(result), 201
-
-
-@opportunities_api_bp.route("/<int:entity_id>", methods=["PUT"])
-def update_opportunity(entity_id):
-    """Update an opportunity."""
-    data = request.get_json()
-    result = opportunity_service.update(entity_id, data)
-    if "error" in result:
-        return jsonify(result), 400
-    return jsonify(result)
-
-
-@opportunities_api_bp.route("/<int:entity_id>", methods=["DELETE"])
-def delete_opportunity(entity_id):
-    """Delete an opportunity."""
-    result = opportunity_service.delete(entity_id)
-    if "error" in result:
-        return jsonify(result), 400
-    return jsonify(result)
-
-
-logger.info("Opportunities API routes instantiated successfully.")
+logger.info("Opportunities API routes registered successfully.")
