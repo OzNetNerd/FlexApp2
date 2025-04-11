@@ -229,35 +229,3 @@ class EntityContext(BaseContext):
         else:
             self.entity_name = self.id
             logger.info(f"entity_name defaulted to id: '{self.entity_name}'")
-
-#
-# @dataclass
-# class BaseContextConfig:
-#     table_name: str
-#     action: str
-#     title: Optional[str] = None
-#
-#     def __post_init__(self):
-#         # If title is not provided, set it to 'action + table_name'
-#         if not self.title:
-#             self.title = f"{self.action} {self.table_name}"
-#
-# # TableContextConfig class for the 'index' context
-# @dataclass
-# class TableContextConfig(BaseContextConfig):
-#     read_only: bool = True
-#
-# # EntityContextConfig class for 'create', 'view', and 'edit' contexts
-# @dataclass
-# class EntityContextConfig(BaseContextConfig):
-#     read_only: bool = field(init=False)  # Will be set in __post_init__
-#     id: Optional[int] = None
-#     entity: Optional[object] = None  # Adjust based on your actual entity type
-#
-#     def __post_init__(self):
-#         super().__post_init__()  # Call parent class __post_init__
-#         # Set read_only based on action
-#         if self.action in ['create', 'edit']:
-#             self.read_only = False  # Write actions
-#         else:
-#             self.read_only = True  # Read-only actions
