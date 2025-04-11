@@ -1,23 +1,25 @@
 # api/opportunities.py
 
 import logging
-from app.routes.blueprint_factory import create_blueprint
+from flask import Blueprint
 from app.routes.api.route_registration import register_api_crud_routes, ApiCrudRouteConfig
 from app.models import Opportunity
 from app.services.crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
-# Create API blueprint with /api prefix for opportunities
-opportunities_api_bp = create_blueprint("api_opportunities", url_prefix="/api/opportunities")
+ENTITY_NAME = "Opportunity"
+ENTITY_PLURAL_NAME = "Opportunities"
+
+opportunities_api_bp = Blueprint(f"api_{ENTITY_NAME.lower()}", url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 opportunity_service = CRUDService(Opportunity)
 
 # Register all standard CRUD API routes
 opportunity_api_crud_config = ApiCrudRouteConfig(
     blueprint=opportunities_api_bp,
-    entity_table_name="Opportunity",
+    entity_table_name=ENTITY_NAME,
     service=opportunity_service
 )
 register_api_crud_routes(opportunity_api_crud_config)
 
-logger.info("Opportunities API routes registered successfully.")
+logger.info(f"{ENTITY_PLURAL_NAME} API routes registered successfully.")

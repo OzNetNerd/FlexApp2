@@ -8,16 +8,16 @@ from app.services.user_service import UserService
 
 logger = logging.getLogger(__name__)
 
-# Create API blueprint
-users_api_bp = Blueprint("api_users", __name__, url_prefix="/api/users")
+ENTITY_NAME = "User"
+ENTITY_PLURAL_NAME = "Users"
 
-# Create a service instance
+users_api_bp = Blueprint(f"api_{ENTITY_NAME.lower()}", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 user_service = UserService(User)
 
 # Register all standard CRUD API routes
 user_api_crud_config = ApiCrudRouteConfig(
     blueprint=users_api_bp,
-    entity_table_name="User",
+    entity_table_name=ENTITY_NAME,
     service=user_service
 )
 register_api_crud_routes(user_api_crud_config)
@@ -30,4 +30,4 @@ register_api_crud_routes(user_api_crud_config)
 #     results = user_service.search(query)
 #     return jsonify([user.to_dict() for user in results])
 
-logger.info("User API routes registered successfully.")
+logger.info(f"{ENTITY_PLURAL_NAME} API routes registered successfully.")

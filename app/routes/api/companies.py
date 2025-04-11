@@ -8,17 +8,18 @@ from app.services.crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
-# Define the blueprint
-companies_api_bp = Blueprint("companies_api", __name__, url_prefix="/api/companies")
+ENTITY_NAME = "Company"
+ENTITY_PLURAL_NAME = "Companies"
 
+companies_api_bp = Blueprint(f"{ENTITY_PLURAL_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 company_service = CRUDService(Company)
 
 # Register all standard CRUD API routes
 company_api_crud_config = ApiCrudRouteConfig(
     blueprint=companies_api_bp,
-    entity_table_name="Company",
+    entity_table_name=ENTITY_NAME,
     service=company_service
 )
 register_api_crud_routes(company_api_crud_config)
 
-logger.info("Successfully set up 'Company' API routes.")
+logger.info(f"Successfully set up '{ENTITY_NAME}' API routes.")

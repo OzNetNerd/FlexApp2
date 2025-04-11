@@ -1,23 +1,25 @@
 # api/contacts.py
 
 import logging
-from app.routes.blueprint_factory import create_blueprint
+from flask import Blueprint
 from app.routes.api.route_registration import register_api_crud_routes, ApiCrudRouteConfig
 from app.models import Contact
 from app.services.crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
-# Create API blueprint with /api prefix for contacts
-contacts_api_bp = create_blueprint("api_contacts", url_prefix="/api/contacts")
+ENTITY_NAME = "Contact"
+ENTITY_PLURAL_NAME = "Contacts"
+
+contacts_api_bp = Blueprint(f"api_{ENTITY_NAME.lower()}", url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 contact_service = CRUDService(Contact)
 
 # Register all standard CRUD API routes
 contact_api_crud_config = ApiCrudRouteConfig(
     blueprint=contacts_api_bp,
-    entity_table_name="Contact",
+    entity_table_name=ENTITY_NAME,
     service=contact_service
 )
 register_api_crud_routes(contact_api_crud_config)
 
-logger.info("Contact API routes registered successfully.")
+logger.info(f"{ENTITY_PLURAL_NAME} API routes registered successfully.")

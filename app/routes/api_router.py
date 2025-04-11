@@ -1,7 +1,7 @@
 # api_router.py
 
 import logging
-from flask import Flask, Blueprint
+from flask import Flask
 
 from app.routes.api.companies import companies_api_bp
 from app.routes.api.contacts import contacts_api_bp
