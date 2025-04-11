@@ -256,33 +256,34 @@
     </div>
 
     <!-- Tab Pane: System Info -->
-    <div class="tab-pane fade" id="tab-system-info">
-      <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-white">
-          <h5 class="section-heading">System Information</h5>
-        </div>
-        <div class="card-body">
-          <div class="row g-3">
-            {{ field_macros.render_field({
-                "entry_name": "created_at",
-                "label": "Created At",
-                "type": "date",
-                "value": entity.created_at,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-            {{ field_macros.render_field({
-                "entry_name": "updated_at",
-                "label": "Updated At",
-                "type": "date",
-                "value": entity.updated_at,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-          </div>
-        </div>
+
+<div class="tab-pane fade" id="tab-system-info">
+  <div class="section-card card shadow-sm">
+    <div class="section-header">
+      <h5 class="section-heading">System Information</h5>
+    </div>
+    <div class="section-body">
+      <div class="row g-3">
+        {{ field_macros.render_field({
+            "entry_name": "created_at",
+            "label": "Created At",
+            "type": "date",
+            "value": entity.created_at,
+            "required": false,
+            "options": []
+         }, read_only=true) }}
+        {{ field_macros.render_field({
+            "entry_name": "updated_at",
+            "label": "Updated At",
+            "type": "date",
+            "value": entity.updated_at,
+            "required": false,
+            "options": []
+         }, read_only=true) }}
       </div>
     </div>
+  </div>
+</div>
 
   </div>
 </form>
