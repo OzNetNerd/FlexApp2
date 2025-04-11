@@ -250,6 +250,7 @@ def register_route(
 def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
     """Register CRUD routes based on configuration."""
     logger.info("Starting registration of CRUD routes.")
+
     blueprint = crud_route_config.blueprint
     entity_table_name = crud_route_config.entity_table_name
     service = crud_route_config.service
@@ -258,10 +259,17 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
         logger.error("Invalid entity_table_name type; expected a string.")
         raise ValueError("The 'entity_table_name' must be a string.")
 
+    logger.info(f"Entity table name is valid: {entity_table_name}")
+
     include_routes = crud_route_config.include_routes or ["index", "create", "view", "edit", "delete"]
     templates = crud_route_config.templates or CrudTemplates()
 
+    logger.info(f"Routes to include: {include_routes}")
+    logger.info(f"Templates configuration: {templates}")
+
     entity_table_plural_name = get_table_plural_name(entity_table_name)
+
+    logger.info(f"Plural name for the entity table '{entity_table_name}': {entity_table_plural_name}")
 
     # Consolidate all route configuration in one place
     route_configs = {
@@ -342,6 +350,8 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
         logger.info(f"For route '{route_type}', using template: {template_path}")
         logger.info(f"Custom template was: {templates.get(route_type, 'Not found')}")
 
+        logger.info(f"Registering route '{route_type}' with URL: {config['url']}")
+
         register_route(
             blueprint=blueprint,
             url=config["url"],
@@ -351,9 +361,12 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             error_message=config["error_message"],
             methods=config.get("methods", ["GET"]),
         )
+
         logger.info(f"Successfully registered route '{route_type}'.")
 
+    logger.info("CRUD route registration completed successfully.")
     return blueprint
+
 
 
 def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint: str,
