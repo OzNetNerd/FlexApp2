@@ -1,5 +1,250 @@
 {% extends "base/create_view_edit/_create_view_edit.html" %}
 
 {% block view_template_content %}
-{% include "pages/crud/entity_form.html" %}
+<form method="post">
+  <!-- Container for all tab panes -->
+  <div class="tab-content" id="formTabsContent">
+
+    <!-- Tab Pane: Personal Information -->
+    <div class="tab-pane fade show active" id="tab-personal-information">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+          <h5 class="h6 text-primary fw-semibold mb-0">Personal Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {{ field_macros.render_field({
+                "entry_name": "id",
+                "label": "ID",
+                "type": "readonly",
+                "value": entity.id,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "first_name",
+                "label": "First Name",
+                "type": "text",
+                "value": entity.first_name,
+                "required": true,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "last_name",
+                "label": "Last Name",
+                "type": "text",
+                "value": entity.last_name,
+                "required": true,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "email",
+                "label": "Email",
+                "type": "text",
+                "value": entity.email,
+                "required": true,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "phone_number",
+                "label": "Phone Number",
+                "type": "text",
+                "value": entity.phone_number,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Pane: Professional Details -->
+    <div class="tab-pane fade" id="tab-professional-details">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+          <h5 class="h6 text-primary fw-semibold mb-0">Professional Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {{ field_macros.render_field({
+                "entry_name": "role_level",
+                "label": "Role Level",
+                "type": "text",
+                "value": entity.role_level,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "certifications",
+                "label": "Certifications",
+                "type": "text",
+                "value": entity.certifications,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "expertise_areas",
+                "label": "Expertise Areas",
+                "type": "text",
+                "value": entity.expertise_areas,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "company_id",
+                "label": "Company ID",
+                "type": "text",
+                "value": entity.company_id,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "cloud_platforms",
+                "label": "Cloud Platforms",
+                "type": "text",
+                "value": entity.cloud_platforms,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "technologies_led",
+                "label": "Technologies Led",
+                "type": "text",
+                "value": entity.technologies_led,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            <!-- Additional professional details fields -->
+            {{ field_macros.render_field({
+                "entry_name": "team_roles_responsibilities",
+                "label": "Team Roles & Responsibilities",
+                "type": "text",
+                "value": entity.team_roles_responsibilities,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "devops_tools",
+                "label": "DevOps Tools",
+                "type": "text",
+                "value": entity.devops_tools,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "role_description",
+                "label": "Role Description",
+                "type": "textarea",
+                "value": entity.role_description,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "version_control_systems",
+                "label": "Version Control Systems",
+                "type": "text",
+                "value": entity.version_control_systems,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "responsibilities",
+                "label": "Responsibilities",
+                "type": "textarea",
+                "value": entity.responsibilities,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "programming_languages",
+                "label": "Programming Languages",
+                "type": "text",
+                "value": entity.programming_languages,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "primary_skill_area",
+                "label": "Primary Skill Area",
+                "type": "text",
+                "value": entity.primary_skill_area,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "monitoring_logging",
+                "label": "Monitoring & Logging",
+                "type": "text",
+                "value": entity.monitoring_logging,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "skill_level",
+                "label": "Skill Level",
+                "type": "text",
+                "value": entity.skill_level,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "ci_cd_tools",
+                "label": "CI/CD Tools",
+                "type": "text",
+                "value": entity.ci_cd_tools,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "role",
+                "label": "Role",
+                "type": "text",
+                "value": entity.role,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "other_technologies",
+                "label": "Other Technologies",
+                "type": "text",
+                "value": entity.other_technologies,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Pane: Timestamps -->
+    <div class="tab-pane fade" id="tab-timestamps">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+          <h5 class="h6 text-primary fw-semibold mb-0">Timestamps</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {{ field_macros.render_field({
+                "entry_name": "created_at",
+                "label": "Created At",
+                "type": "date",
+                "value": entity.created_at,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "updated_at",
+                "label": "Updated At",
+                "type": "date",
+                "value": entity.updated_at,
+                "required": false,
+                "options": []
+              }, read_only=true) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</form>
 {% endblock view_template_content %}
