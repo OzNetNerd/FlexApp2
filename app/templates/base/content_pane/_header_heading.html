@@ -1,5 +1,5 @@
 {#
- base/content_pane/_header.html - Heading + tab navigation for entity pages
+ base/content_pane/_header_heading.html - Heading + tab navigation for entity pages
 
  This template renders the page header with contextual icons and optional tabbed navigation
  for entity-related pages (view, create, edit).
@@ -24,9 +24,9 @@
    - Uses different Font Awesome icons to indicate view/edit/create mode
 #}
 
-<!-- START TEMPLATE: _header.html -->
+<!-- START TEMPLATE: _header_heading.html -->
 {# ------------------------------------------------------------------------------
-  File: _header.html | Purpose: Heading + tab nav for entity pages
+  File: _header_heading.html | Purpose: Heading + tab nav for entity pages
   Inputs:
     - title      : str  → "Viewing", "Editing", etc.
     - model_name : str  → e.g. "User"
@@ -44,10 +44,10 @@
 
 <script type="module">
   import log from '/static/js/logger.js';
-  log("info", "_header.html", "init", "🚀 Header template loaded");
-  log("debug", "_header.html", "config", "Read-only mode: {{ read_only|default('false') }}");
-  log("debug", "_header.html", "config", "Has ID: {{ id is defined and id is not none }}");
-  log("debug", "_header.html", "config", "Has UI config: {{ ui is defined and ui is not none }}");
+  log("info", "_header_heading.html", "init", "🚀 Header template loaded");
+  log("debug", "_header_heading.html", "config", "Read-only mode: {{ read_only|default('false') }}");
+  log("debug", "_header_heading.html", "config", "Has ID: {{ id is defined and id is not none }}");
+  log("debug", "_header_heading.html", "config", "Has UI config: {{ ui is defined and ui is not none }}");
 </script>
 
 <h3 class="h4 mb-0 text-primary me-3">
@@ -55,19 +55,19 @@
     <i class="fas fa-eye me-2"></i>
     <script type="module">
       import log from '/static/js/logger.js';
-      log("debug", "_header.html", "icon", "Using read-only icon (eye)");
+      log("debug", "_header_heading.html", "icon", "Using read-only icon (eye)");
     </script>
   {% elif id is defined and id %}
     <i class="fas fa-edit me-2"></i>
     <script type="module">
       import log from '/static/js/logger.js';
-      log("debug", "_header.html", "icon", "Using edit icon (pencil)");
+      log("debug", "_header_heading.html", "icon", "Using edit icon (pencil)");
     </script>
   {% else %}
     <i class="fas fa-plus-circle me-2"></i>
     <script type="module">
       import log from '/static/js/logger.js';
-      log("debug", "_header.html", "icon", "Using create icon (plus)");
+      log("debug", "_header_heading.html", "icon", "Using create icon (plus)");
     </script>
   {% endif %}
   {{ title }}: <span class="text-info">{{ item_name|default('') }}</span>
@@ -76,13 +76,13 @@
 {% if ui is defined and ui %}
   <script type="module">
     import log from '/static/js/logger.js';
-    log("debug", "_header.html", "ui", "Including pills navigation component");
+    log("debug", "_header_heading.html", "ui", "Including pills navigation component");
   </script>
   {% include 'create_view_edit/components/_pills_nav.html' %}
 {% else %}
   <script type="module">
     import log from '/static/js/logger.js';
-    log("debug", "_header.html", "ui", "No UI configuration - skipping pills navigation");
+    log("debug", "_header_heading.html", "ui", "No UI configuration - skipping pills navigation");
   </script>
 {% endif %}
 
@@ -91,7 +91,7 @@
   import log from '/static/js/logger.js';
 
   try {
-    log("debug", "_header.html", "context", "Collecting header context data");
+    log("debug", "_header_heading.html", "context", "Collecting header context data");
 
     const headerContext = {
       title: "{{ title|default('undefined') }}",
@@ -102,24 +102,24 @@
       hasUi: {{ (ui is defined and ui is not none)|default('false')|tojson }}
     };
 
-    log("info", "_header.html", "render", "🧠 Header context", headerContext);
+    log("info", "_header_heading.html", "render", "🧠 Header context", headerContext);
 
     // Monitor DOM to verify header rendered properly
     document.addEventListener('DOMContentLoaded', () => {
       const headerEl = document.querySelector('.h4.mb-0.text-primary');
       if (headerEl) {
-        log("info", "_header.html", "dom_check", "Header element found in DOM");
+        log("info", "_header_heading.html", "dom_check", "Header element found in DOM");
       } else {
-        log("warn", "_header.html", "dom_check", "Header element not found in DOM");
+        log("warn", "_header_heading.html", "dom_check", "Header element not found in DOM");
       }
     });
   } catch (error) {
-    log("warn", "_header.html", "error", "Error in header context logging: " + error.message);
+    log("warn", "_header_heading.html", "error", "Error in header context logging: " + error.message);
   }
 </script>
 
 <script type="module">
   import log from '/static/js/logger.js';
-  log("info", "_header.html", "final", "Header template finished rendering");
+  log("info", "_header_heading.html", "final", "Header template finished rendering");
 </script>
-<!-- END TEMPLATE: _header.html -->
+<!-- END TEMPLATE: _header_heading.html -->

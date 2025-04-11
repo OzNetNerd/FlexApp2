@@ -1,0 +1,20 @@
+{% if tabs %}
+  <!-- Tabs Navigation -->
+  <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist"
+      data-tab-names="{{ tabs|map(attribute='tab_name')|list|tojson }}">
+    {%- for tab in tabs %}
+      <li class="nav-item" role="presentation">
+        <button class="nav-link {% if loop.first %}active{% endif %}"
+                id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+                type="button"
+                role="tab"
+                aria-controls="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+                aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+          {{ tab.tab_name }}
+        </button>
+      </li>
+    {%- endfor %}
+  </ul>
+{% endif %}
