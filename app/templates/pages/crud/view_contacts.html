@@ -1,4 +1,10 @@
 {% extends "base/create_view_edit/_create_view_edit.html" %}
+{% set tabs = [
+    {'tab_name': 'Personal Information'},
+    {'tab_name': 'Professional Details'},
+    {'tab_name': 'Timestamps'}
+] %}
+{% import 'base/macros/render_form_fields.html' as field_macros with context %}
 
 {% block view_template_content %}
 <form method="post">
@@ -20,7 +26,7 @@
                 "value": entity.id,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "first_name",
                 "label": "First Name",
@@ -28,7 +34,7 @@
                 "value": entity.first_name,
                 "required": true,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "last_name",
                 "label": "Last Name",
@@ -36,7 +42,7 @@
                 "value": entity.last_name,
                 "required": true,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "email",
                 "label": "Email",
@@ -44,7 +50,7 @@
                 "value": entity.email,
                 "required": true,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "phone_number",
                 "label": "Phone Number",
@@ -52,7 +58,7 @@
                 "value": entity.phone_number,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
           </div>
         </div>
       </div>
@@ -73,7 +79,7 @@
                 "value": entity.role_level,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "certifications",
                 "label": "Certifications",
@@ -81,7 +87,7 @@
                 "value": entity.certifications,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "expertise_areas",
                 "label": "Expertise Areas",
@@ -89,7 +95,7 @@
                 "value": entity.expertise_areas,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "company_id",
                 "label": "Company ID",
@@ -97,7 +103,7 @@
                 "value": entity.company_id,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "cloud_platforms",
                 "label": "Cloud Platforms",
@@ -105,7 +111,7 @@
                 "value": entity.cloud_platforms,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "technologies_led",
                 "label": "Technologies Led",
@@ -113,8 +119,7 @@
                 "value": entity.technologies_led,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
-            <!-- Additional professional details fields -->
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "team_roles_responsibilities",
                 "label": "Team Roles & Responsibilities",
@@ -122,7 +127,7 @@
                 "value": entity.team_roles_responsibilities,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "devops_tools",
                 "label": "DevOps Tools",
@@ -130,7 +135,7 @@
                 "value": entity.devops_tools,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "role_description",
                 "label": "Role Description",
@@ -138,7 +143,7 @@
                 "value": entity.role_description,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "version_control_systems",
                 "label": "Version Control Systems",
@@ -146,7 +151,7 @@
                 "value": entity.version_control_systems,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "responsibilities",
                 "label": "Responsibilities",
@@ -154,7 +159,7 @@
                 "value": entity.responsibilities,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "programming_languages",
                 "label": "Programming Languages",
@@ -162,7 +167,7 @@
                 "value": entity.programming_languages,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "primary_skill_area",
                 "label": "Primary Skill Area",
@@ -170,7 +175,7 @@
                 "value": entity.primary_skill_area,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "monitoring_logging",
                 "label": "Monitoring & Logging",
@@ -178,7 +183,7 @@
                 "value": entity.monitoring_logging,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "skill_level",
                 "label": "Skill Level",
@@ -186,7 +191,7 @@
                 "value": entity.skill_level,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "ci_cd_tools",
                 "label": "CI/CD Tools",
@@ -194,7 +199,7 @@
                 "value": entity.ci_cd_tools,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "role",
                 "label": "Role",
@@ -202,7 +207,7 @@
                 "value": entity.role,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "other_technologies",
                 "label": "Other Technologies",
@@ -210,7 +215,7 @@
                 "value": entity.other_technologies,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
           </div>
         </div>
       </div>
@@ -231,7 +236,7 @@
                 "value": entity.created_at,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
             {{ field_macros.render_field({
                 "entry_name": "updated_at",
                 "label": "Updated At",
@@ -239,7 +244,7 @@
                 "value": entity.updated_at,
                 "required": false,
                 "options": []
-              }, read_only=true) }}
+             }, read_only=true) }}
           </div>
         </div>
       </div>
