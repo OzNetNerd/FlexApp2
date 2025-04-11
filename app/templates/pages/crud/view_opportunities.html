@@ -1,10 +1,11 @@
 {% extends "base/create_view_edit/_create_view_edit.html" %}
 {% set tabs = [
-    {'tab_name': 'Basic Info'},
-    {'tab_name': 'Company Details'},
-    {'tab_name': 'Pipeline Info'},
-    {'tab_name': 'Financial Details'},
-    {'tab_name': 'CRISP'},
+    {'tab_name': 'About'},
+    {'tab_name': 'Professional Profile'},
+    {'tab_name': 'Technical Skills'},
+    {'tab_name': 'Job Details'},
+    {'tab_name': 'Relationships'},
+    {'tab_name': 'Insights'},
     {'tab_name': 'System Info'}
 ] %}
 {% import 'base/macros/render_form_fields.html' as field_macros with context %}
@@ -14,20 +15,20 @@
   <!-- Container for all tab panes -->
   <div class="tab-content" id="formTabsContent">
 
-    <!-- Tab Pane: Basic Info -->
-    <div class="tab-pane fade show active" id="tab-basic-info">
+    <!-- Tab Pane: About -->
+    <div class="tab-pane fade show active" id="tab-about">
       <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-white">
-          <h5 class="h6 text-primary fw-semibold mb-0">Basic Information</h5>
+          <h5 class="h6 text-primary fw-semibold mb-0">Basic Info</h5>
         </div>
         <div class="card-body">
           <div class="row g-3">
             {{ field_macros.render_field({
-                "entry_name": "id",
-                "label": "ID",
-                "type": "readonly",
-                "value": entity.id,
-                "required": false,
+                "entry_name": "username",
+                "label": "Username",
+                "type": "text",
+                "value": entity.username,
+                "required": true,
                 "options": []
              }, read_only=true) }}
             {{ field_macros.render_field({
@@ -38,138 +39,47 @@
                 "required": true,
                 "options": []
              }, read_only=true) }}
-            {{ field_macros.render_field({
-                "entry_name": "description",
-                "label": "Description",
-                "type": "textarea",
-                "value": entity.description,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Tab Pane: Company Details -->
-    <div class="tab-pane fade" id="tab-company-details">
       <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-white">
-          <h5 class="h6 text-primary fw-semibold mb-0">Company Information</h5>
+          <h5 class="h6 text-primary fw-semibold mb-0">Contact</h5>
         </div>
         <div class="card-body">
           <div class="row g-3">
             {{ field_macros.render_field({
-                "entry_name": "company.name",
-                "label": "Company Name",
-                "type": "text",
-                "value": entity.company.name,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-            {{ field_macros.render_field({
-                "entry_name": "company.id",
-                "label": "Company ID",
-                "type": "text",
-                "value": entity.company.id,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-            {{ field_macros.render_field({
-                "entry_name": "contact_name",
-                "label": "Primary Contact",
-                "type": "text",
-                "value": entity.contact_name,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab Pane: Pipeline Info -->
-    <div class="tab-pane fade" id="tab-pipeline-info">
-      <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-white">
-          <h5 class="h6 text-primary fw-semibold mb-0">Pipeline Information</h5>
-        </div>
-        <div class="card-body">
-          <div class="row g-3">
-            {{ field_macros.render_field({
-                "entry_name": "stage",
-                "label": "Stage",
-                "type": "text",
-                "value": entity.stage,
+                "entry_name": "email",
+                "label": "Email",
+                "type": "email",
+                "value": entity.email,
                 "required": true,
                 "options": []
              }, read_only=true) }}
-            {{ field_macros.render_field({
-                "entry_name": "status",
-                "label": "Status",
-                "type": "text",
-                "value": entity.status,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-            {{ field_macros.render_field({
-                "entry_name": "probability",
-                "label": "Probability",
-                "type": "number",
-                "value": entity.probability,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-            {{ field_macros.render_field({
-                "entry_name": "next_steps",
-                "label": "Next Steps",
-                "type": "textarea",
-                "value": entity.next_steps,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Tab Pane: Financial Details -->
-    <div class="tab-pane fade" id="tab-financial-details">
       <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-white">
-          <h5 class="h6 text-primary fw-semibold mb-0">Financial Information</h5>
+          <h5 class="h6 text-primary fw-semibold mb-0">Record Info</h5>
         </div>
         <div class="card-body">
           <div class="row g-3">
             {{ field_macros.render_field({
-                "entry_name": "value",
-                "label": "Value",
-                "type": "number",
-                "value": entity.value,
-                "required": true,
-                "options": []
-             }, read_only=true) }}
-            {{ field_macros.render_field({
-                "entry_name": "currency",
-                "label": "Currency",
-                "type": "text",
-                "value": entity.currency,
+                "entry_name": "created_at",
+                "label": "Created At",
+                "type": "datetime",
+                "value": entity.created_at,
                 "required": false,
                 "options": []
              }, read_only=true) }}
             {{ field_macros.render_field({
-                "entry_name": "expected_close_date",
-                "label": "Expected Close Date",
-                "type": "date",
-                "value": entity.expected_close_date,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-            {{ field_macros.render_field({
-                "entry_name": "payment_terms",
-                "label": "Payment Terms",
-                "type": "text",
-                "value": entity.payment_terms,
+                "entry_name": "updated_at",
+                "label": "Updated At",
+                "type": "datetime",
+                "value": entity.updated_at,
                 "required": false,
                 "options": []
              }, read_only=true) }}
@@ -178,9 +88,219 @@
       </div>
     </div>
 
-    <!-- Tab Pane: CRISP -->
-    <div class="tab-pane fade" id="tab-crisp">
-      {% include 'components/_crisp.html' %}
+    <!-- Tab Pane: Professional Profile -->
+    <div class="tab-pane fade" id="tab-professional-profile">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+          <h5 class="h6 text-primary fw-semibold mb-0">Professional Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {{ field_macros.render_field({
+                "entry_name": "role",
+                "label": "Role",
+                "type": "text",
+                "value": entity.role,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "role_level",
+                "label": "Role Level",
+                "type": "text",
+                "value": entity.role_level,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "skill_level",
+                "label": "Skill Level",
+                "type": "text",
+                "value": entity.skill_level,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "primary_skill_area",
+                "label": "Primary Skill Area",
+                "type": "text",
+                "value": entity.primary_skill_area,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+          <h5 class="h6 text-primary fw-semibold mb-0">Credentials</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {{ field_macros.render_field({
+                "entry_name": "certifications",
+                "label": "Certifications",
+                "type": "text",
+                "value": entity.certifications,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "expertise_areas",
+                "label": "Expertise Areas",
+                "type": "text",
+                "value": entity.expertise_areas,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Pane: Technical Skills -->
+    <div class="tab-pane fade" id="tab-technical-skills">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+          <h5 class="h6 text-primary fw-semibold mb-0">Programming</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {{ field_macros.render_field({
+                "entry_name": "programming_languages",
+                "label": "Programming Languages",
+                "type": "text",
+                "value": entity.programming_languages,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+          <h5 class="h6 text-primary fw-semibold mb-0">Infrastructure</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {{ field_macros.render_field({
+                "entry_name": "cloud_platforms",
+                "label": "Cloud Platforms",
+                "type": "text",
+                "value": entity.cloud_platforms,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "devops_tools",
+                "label": "DevOps Tools",
+                "type": "text",
+                "value": entity.devops_tools,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+          <h5 class="h6 text-primary fw-semibold mb-0">Tools</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {{ field_macros.render_field({
+                "entry_name": "ci_cd_tools",
+                "label": "CI/CD Tools",
+                "type": "text",
+                "value": entity.ci_cd_tools,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "version_control_systems",
+                "label": "Version Control Systems",
+                "type": "text",
+                "value": entity.version_control_systems,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "monitoring_logging",
+                "label": "Monitoring & Logging",
+                "type": "text",
+                "value": entity.monitoring_logging,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Pane: Job Details -->
+    <div class="tab-pane fade" id="tab-job-details">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+          <h5 class="h6 text-primary fw-semibold mb-0">Job Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {{ field_macros.render_field({
+                "entry_name": "role_description",
+                "label": "Role Description",
+                "type": "textarea",
+                "value": entity.role_description,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "responsibilities",
+                "label": "Responsibilities",
+                "type": "textarea",
+                "value": entity.responsibilities,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Pane: Relationships -->
+    <div class="tab-pane fade" id="tab-relationships">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+          <h5 class="h6 text-primary fw-semibold mb-0">Relationships</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {{ field_macros.render_field({
+                "entry_name": "users",
+                "label": "Users",
+                "type": "custom",
+                "value": entity.users,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "companies",
+                "label": "Companies",
+                "type": "custom",
+                "value": entity.companies,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Pane: Insights -->
+    <div class="tab-pane fade" id="tab-insights">
+      {% include 'components/_insights.html' %}
     </div>
 
     <!-- Tab Pane: System Info -->
@@ -204,14 +324,6 @@
                 "label": "Updated At",
                 "type": "date",
                 "value": entity.updated_at,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-            {{ field_macros.render_field({
-                "entry_name": "owner",
-                "label": "Owner",
-                "type": "text",
-                "value": entity.owner,
                 "required": false,
                 "options": []
              }, read_only=true) }}
