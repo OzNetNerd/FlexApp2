@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 ENTITY_NAME = "Opportunity"
 ENTITY_PLURAL_NAME = "Opportunities"
 
-opportunities_api_bp = Blueprint(f"api_{ENTITY_NAME.lower()}", url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
+opportunities_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 opportunity_service = CRUDService(Opportunity)
 
 # Register all standard CRUD API routes

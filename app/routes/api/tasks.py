@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 ENTITY_NAME = "Task"
 ENTITY_PLURAL_NAME = "Tasks"
 
-tasks_api_bp = Blueprint(f"api_{ENTITY_NAME.lower()}", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
+tasks_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 task_service = CRUDService(Task)
 
 # Register all standard CRUD API routes

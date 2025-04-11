@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 ENTITY_NAME = "Contact"
 ENTITY_PLURAL_NAME = "Contacts"
 
-contacts_api_bp = Blueprint(f"api_{ENTITY_NAME.lower()}", url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
+contacts_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 contact_service = CRUDService(Contact)
 
 # Register all standard CRUD API routes
