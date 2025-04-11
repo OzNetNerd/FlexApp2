@@ -1,4 +1,4 @@
-# web_router.py
+# api_router.py
 
 import logging
 from flask import Flask, Blueprint
@@ -10,20 +10,7 @@ from app.routes.api.search import search_bp
 from app.routes.api.tasks import tasks_api_bp
 from app.routes.api.users import users_api_bp
 
-# from app.routes.web.settings import settings_bp
-# from app.routes.web.auth import auth_bp
-# from app.routes.web.home import home_bp
-
-
 logger = logging.getLogger(__name__)
-
-
-# Define blueprints with original names for template compatibility
-# relationships_bp = Blueprint("relationships", __name__, url_prefix="/relationships")
-# crisp_scores_bp = Blueprint("crisp_scores", __name__, url_prefix="/crisp_scores")
-# relationships_bp,
-# crisp_scores_bp
-
 
 # List of blueprints to register
 BLUEPRINTS = [

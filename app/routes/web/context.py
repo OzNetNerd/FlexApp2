@@ -1,3 +1,5 @@
+# web/context.py
+
 import logging
 from flask import url_for
 from flask_login import current_user

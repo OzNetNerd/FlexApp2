@@ -1,3 +1,5 @@
+# web/route_registration.py
+
 import jinja2.exceptions
 import logging
 from typing import Callable, List, Optional, Any, Dict, Tuple
