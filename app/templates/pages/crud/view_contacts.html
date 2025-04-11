@@ -286,4 +286,23 @@
 
   </div>
 </form>
+<!-- Static Panel (Does not change with tabs) -->
+<div class="card shadow-sm border-0 mb-4 mt-4">
+  <div class="card-header bg-white">
+    <h5 class="h6 text-primary fw-semibold mb-0">Static Information</h5>
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      {{ field_macros.render_field({
+          "entry_name": "additional_info",
+          "label": "Additional Info",
+          "type": "text",
+          "value": entity.additional_info,
+          "required": false,
+          "options": []
+       }, read_only=true) }}
+    </div>
+  </div>
+</div>
+
 {% endblock view_template_content %}
