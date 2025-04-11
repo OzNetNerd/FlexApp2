@@ -1,7 +1,8 @@
-# app/routes/contacts.py
+# Example 1: Full CRUD Entity
+# app/routes/companies.py
 import logging
 from flask import Blueprint
-from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig, CrudTemplates
+from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig
 from app.services.crud_service import CRUDService
 from app.models.contact import Contact
 
@@ -13,21 +14,6 @@ contacts_bp = Blueprint("contacts_bp", __name__, url_prefix="/contacts")
 # Create a service instance
 contact_service = CRUDService(Contact)
 
-# Define custom templates - FIXED VERSION
-custom_templates = CrudTemplates(
-    # Your custom template needs to be correctly capitalized to match the route_type
-    # In the code, "view" is used as the route_type, not "View"
-    view="pages/crud/view_users2.html"
-)
-
-# Add debug logging to verify templates are set correctly
-logger.info(f"Custom templates: {custom_templates.to_dict()}")
-
-# Register all standard CRUD routes with custom templates
-contact_crud_config = CrudRouteConfig(
-    blueprint=contacts_bp,
-    entity_table_name="Contact",
-    service=contact_service,
-    templates=custom_templates
-)
+# Register all standard CRUD routes
+contact_crud_config = CrudRouteConfig(blueprint=contacts_bp, entity_table_name="Contact", service=contact_service)
 register_crud_routes(contact_crud_config)
