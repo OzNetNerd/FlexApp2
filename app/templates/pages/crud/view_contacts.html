@@ -14,13 +14,15 @@
   <!-- Container for all tab panes -->
   <div class="tab-content" id="formTabsContent">
 
+
+
     <!-- Tab Pane: Basic Info -->
     <div class="tab-pane fade show active" id="tab-basic-info">
-      <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-white">
-          <h5 class="h6 text-primary fw-semibold mb-0">Basic Information</h5>
+<div class="section-card card shadow-sm border-0 mb-4 mt-4">
+  <div class="section-header">
+    <h5 class="section-heading">Basic Information</h5><!-- Ensure this is the same as System Information -->
         </div>
-        <div class="card-body">
+        <div class="section-body">
           <div class="row g-3">
             {{ field_macros.render_field({
                 "entry_name": "id",
@@ -67,11 +69,12 @@
       </div>
     </div>
 
+
     <!-- Tab Pane: Professional Profile -->
     <div class="tab-pane fade" id="tab-professional-profile">
-      <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-white">
-          <h5 class="h6 text-primary fw-semibold mb-0">Professional Profile</h5>
+<div class="section-card card shadow-sm border-0 mb-4 mt-4">
+  <div class="section-header">
+    <h5 class="section-heading">Professional Profile</h5>
         </div>
         <div class="card-body">
           <div class="row g-3">
@@ -130,9 +133,9 @@
 
     <!-- Tab Pane: Technical Skills -->
     <div class="tab-pane fade" id="tab-technical-skills">
-      <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-white">
-          <h5 class="h6 text-primary fw-semibold mb-0">Technical Skills</h5>
+<div class="section-card card shadow-sm border-0 mb-4 mt-4">
+  <div class="section-header">
+    <h5 class="section-heading">Technical Skills</h5>
         </div>
         <div class="card-body">
           <div class="row g-3">
@@ -207,9 +210,9 @@
 
     <!-- Tab Pane: Job Details -->
     <div class="tab-pane fade" id="tab-job-details">
-      <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-white">
-          <h5 class="h6 text-primary fw-semibold mb-0">Job Details</h5>
+<div class="section-card card shadow-sm border-0 mb-4 mt-4">
+  <div class="section-header">
+    <h5 class="section-heading">Professional Profile</h5>
         </div>
         <div class="card-body">
           <div class="row g-3">
@@ -258,10 +261,10 @@
     <!-- Tab Pane: System Info -->
 
 <div class="tab-pane fade" id="tab-system-info">
-  <div class="section-card card shadow-sm">
-    <div class="section-header">
-      <h5 class="section-heading">System Information</h5>
-    </div>
+<div class="section-card card shadow-sm border-0 mb-4 mt-4">
+  <div class="section-header">
+    <h5 class="section-heading">System Information</h5>
+        </div>
     <div class="section-body">
       <div class="row g-3">
         {{ field_macros.render_field({
@@ -288,11 +291,11 @@
   </div>
 </form>
 <!-- Static Panel (Does not change with tabs) -->
-<div class="card shadow-sm border-0 mb-4 mt-4">
-  <div class="card-header bg-white">
-    <h5 class="h6 text-primary fw-semibold mb-0">Static Information</h5>
+<div class="section-card card shadow-sm border-0 mb-4 mt-4">
+  <div class="section-header">
+    <h5 class="section-heading">Static Information</h5>
   </div>
-  <div class="card-body">
+  <div class="section-body">
     <div class="row g-3">
       {{ field_macros.render_field({
           "entry_name": "additional_info",
@@ -305,6 +308,7 @@
     </div>
   </div>
 </div>
+
 
 {% include 'components/_notes_section.html' %}
 

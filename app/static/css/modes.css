@@ -9,24 +9,22 @@
   --border-color: #dee2e6;
 }
 
-/* Section Components */
 .section-card {
-  border: 0;
   box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
-  margin-bottom: 1.5rem;
 }
 
 .section-header {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: none;
   padding: 0;
 }
+
 
 .section-heading {
   background-color: var(--bg-section-heading);
   color: var(--text-section-heading);
   padding: var(--padding-section);
   border-left: 4px solid var(--border-section-heading);
-  border-radius: var(--border-radius);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
   font-size: 1.1rem;
   margin: 0;
 }
