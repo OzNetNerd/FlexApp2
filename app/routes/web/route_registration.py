@@ -177,30 +177,42 @@ def register_route(
         error_message: str = "Failed to load the page",
 ):
     """Register a route with the given blueprint."""
+    logger.info(f"Starting route registration - URL: {url}, Template: {template_path}")
+
+    # Prepare route configuration
     endpoint, methods = prepare_route_config(url, template_path, endpoint, methods)
+    logger.info(f"Prepared route configuration - Endpoint: {endpoint}, Methods: {methods}")
+
+    # Set title
     title = title or endpoint
+    logger.info(f"Using title '{title}' for the route")
+
     logger.info(f'Registering route - title: {title} - endpoint: {endpoint}')
 
     def route_handler(*args, **kwargs):
         """Handle HTTP requests for this route."""
-        logger.info(f"Handling request for endpoint '{endpoint}'")
+        logger.info(f"Handling request for endpoint '{endpoint}' with args: {args}, kwargs: {kwargs}")
 
         try:
             # Handle CRUD operations
             if request.method == "POST" and CRUDEndpoint.is_valid(endpoint):
+                logger.info(f"Handling POST request for endpoint '{endpoint}'")
                 entity_id = kwargs.get('entity_id')
                 form_data = request.form.to_dict()
                 service = find_service(context_provider)
 
+                logger.info(f"Found service '{service}' for the operation")
                 result = handle_crud_operation(
                     endpoint, service, blueprint.name, entity_id, form_data
                 )
 
                 if result:
+                    logger.info(f"CRUD operation successful, returning result")
                     return result
 
             # Get context and render template
             context = get_context(context_provider, title, args, kwargs)
+            logger.info(f"Context prepared for template rendering - Context: {context}")
 
             logger.info(f"CRITICAL: About to render '{template_path}' for endpoint '{endpoint}'")
             logger.info(f"Blueprint name: {blueprint.name}, URL values: {kwargs}")
@@ -216,6 +228,7 @@ def register_route(
                 logger.error("Template renderer returned None")
                 return f"<h1>Error rendering template</h1>", 500
 
+            logger.info(f"Template rendered successfully for endpoint '{endpoint}'")
             return result
 
         except ValueError as ve:
@@ -228,9 +241,10 @@ def register_route(
     # Register route with blueprint
     route_handler.__name__ = endpoint
     blueprint.add_url_rule(url, endpoint=endpoint, view_func=route_handler, methods=methods)
-    logger.info(f"Registered route '{endpoint}' at '{url}'")
+    logger.info(f"Registered route '{endpoint}' at '{url}' with methods {methods}")
 
     return route_handler
+
 
 
 def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
