@@ -4,6 +4,7 @@
     {'tab_name': 'Professional Profile'},
     {'tab_name': 'Technical Skills'},
     {'tab_name': 'Job Details'},
+    {'tab_name': 'CRISP'},
     {'tab_name': 'System Info'}
 ] %}
 {% import 'base/macros/render_form_fields.html' as field_macros with context %}
@@ -247,6 +248,11 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Tab Pane: CRISP -->
+    <div class="tab-pane fade" id="tab-crisp">
+      {% include 'crisp.html' %}
     </div>
 
     <!-- Tab Pane: System Info -->
