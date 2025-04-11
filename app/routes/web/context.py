@@ -215,11 +215,6 @@ class EntityContext(BaseContext):
         instance_details = "EntityContext (_initialize_derived_fields)"
         log_instance_vars(instance_details, self)
 
-        # tab_entries = get_page_tabs(self.model_name)
-        # logger.debug(f"Tab entries for model '{self.model_name}': {tab_entries}")
-        # self.tabs = create_tabs(entity=entity_dict, tabs=tab_entries)
-        # logger.debug(f"Tabs created: {self.tabs}")
-
         # Set entity_name from the first available field
         self.entity_name = ""
         for key in ("name", "title", "email", "username"):

@@ -1,0 +1,29 @@
+{% extends "base/core/_base.html" %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      {% include 'base/create_view_edit/_header_heading.html' %}
+    </div>
+    <div class="d-flex gap-2">
+      {% include 'base/create_view_edit/_header_buttons.html' %}
+    </div>
+  </div>
+  <div class="card-body">
+    {% block main_content %}
+      {# Main content will be inserted here from other templates #}
+    {% endblock %}
+
+    {% if not read_only %}
+      {% include 'base/common/_footer_buttons.html' %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="/js/pages/create_view_edit.js"></script>
+{% endblock %}
+
+<!-- END TEMPLATE: _create_view_edit.html -->

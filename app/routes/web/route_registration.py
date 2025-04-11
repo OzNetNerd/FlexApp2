@@ -29,11 +29,35 @@ class RenderSafelyConfig:
 
 
 @dataclass
+class CrudTemplates:
+    index: Optional[str] = None
+    create: Optional[str] = None
+    view: Optional[str] = None
+    edit: Optional[str] = None
+    delete: Optional[str] = None
+
+    def get(self, route_type: str, default: str) -> str:
+        """Get the template path for the given route type or return the default."""
+        template = getattr(self, route_type, None)
+        return template if template is not None else default
+
+    def to_dict(self) -> Dict[str, Optional[str]]:
+        """Convert the dataclass to a dictionary."""
+        return {
+            'index': self.index,
+            'create': self.create,
+            'view': self.view,
+            'edit': self.edit,
+            'delete': self.delete
+        }
+
+
+@dataclass
 class CrudRouteConfig:
     blueprint: Blueprint
     entity_table_name: str
     service: Any
-    templates: Optional[Dict[str, str]] = None
+    templates: Optional[CrudTemplates] = None
     include_routes: Optional[List[str]] = None
 
 
@@ -212,7 +236,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
         raise ValueError("The 'entity_table_name' must be a string.")
 
     include_routes = crud_route_config.include_routes or ["index", "create", "view", "edit", "delete"]
-    templates = crud_route_config.templates or {}
+    templates = crud_route_config.templates or CrudTemplates()
 
     entity_table_plural_name = get_table_plural_name(entity_table_name)
 
