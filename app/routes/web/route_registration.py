@@ -1,3 +1,4 @@
+import jinja2.exceptions
 import logging
 from typing import Callable, List, Optional, Any, Dict, Tuple
 from dataclasses import dataclass
@@ -64,7 +65,12 @@ class CrudRouteConfig:
 def render_safely(config: RenderSafelyConfig):
     """Safely render a template with error handling."""
     try:
+        logger.info(f"Attempting to render template: {config.template_path}")
         return render_template(config.template_path, **config.context.to_dict())
+    except jinja2.exceptions.TemplateNotFound as e:
+        # Re-raise template not found errors
+        logger.error(f"Template not found: '{config.template_path}'")
+        raise  # Re-raise the exception
     except Exception as e:
         logger.error(f"Error rendering template '{config.template_path}': {e}", exc_info=True)
         return f"<h1>{config.error_message}</h1><p>Error: {str(e)}</p>", 500
@@ -196,6 +202,9 @@ def register_route(
             # Get context and render template
             context = get_context(context_provider, title, args, kwargs)
 
+            logger.info(f"CRITICAL: About to render '{template_path}' for endpoint '{endpoint}'")
+            logger.info(f"Blueprint name: {blueprint.name}, URL values: {kwargs}")
+
             result = render_safely(RenderSafelyConfig(
                 template_path,
                 context,
@@ -315,6 +324,9 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
         logger.info(f"Processing registration for route type: '{route_type}'")
 
         template_path = templates.get(route_type, config["template_default"])
+
+        logger.info(f"For route '{route_type}', using template: {template_path}")
+        logger.info(f"Custom template was: {templates.get(route_type, 'Not found')}")
 
         register_route(
             blueprint=blueprint,
