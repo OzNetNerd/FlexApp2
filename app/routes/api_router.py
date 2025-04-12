@@ -9,6 +9,7 @@ from app.routes.api.opportunities import opportunities_api_bp
 from app.routes.api.search import search_bp
 from app.routes.api.tasks import tasks_api_bp
 from app.routes.api.users import users_api_bp
+from app.routes.api.notes import notes_api_bp
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ BLUEPRINTS = [
     search_bp,
     tasks_api_bp,
     users_api_bp,
+    notes_api_bp,
 ]
 
 
