@@ -17,6 +17,9 @@ const tableContainerId = "table-container";
 const gridDiv = document.querySelector(`#${tableContainerId}`);
 log("info", scriptName, "module", `Looking for table container with ID: ${tableContainerId}`, { found: !!gridDiv });
 
+// Make gridApi global for other components to access
+window.gridApi = null;
+
 /**
  * Sets up the global search input to filter the AG Grid.
  */
@@ -38,6 +41,35 @@ function setupGlobalSearch(api, scriptName, functionName) {
 }
 
 /**
+ * Creates a value formatter for handling object data types.
+ * @param {Object} params - Cell params from AG Grid
+ * @returns {String} - Formatted cell value
+ */
+function objectValueFormatter(params) {
+    if (params.value === null || params.value === undefined) {
+        return '';
+    }
+
+    // Handle arrays (like notes array)
+    if (Array.isArray(params.value)) {
+        if (params.value.length === 0) return '';
+        return `${params.value.length} item${params.value.length > 1 ? 's' : ''}`;
+    }
+
+    // Handle objects
+    if (typeof params.value === 'object') {
+        // For company and similar references
+        return `Ref #${params.value}`;
+    }
+
+    // Default case - return the value as is
+    return params.value;
+}
+
+/**
+ * Sets up the column selector dropdown for toggling column visibility.
+ */
+/**
  * Sets up the column selector dropdown for toggling column visibility.
  */
 function setupColumnSelector(api, scriptName, functionName) {
@@ -58,12 +90,11 @@ function setupColumnSelector(api, scriptName, functionName) {
     }
 
     // Clear any previously inserted checkboxes
-    const previousCheckboxes = columnSelector.querySelectorAll('.form-check');
-    log("debug", scriptName, functionName, `Removing ${previousCheckboxes.length} existing column checkboxes`);
-    previousCheckboxes.forEach(el => el.remove());
+    columnSelector.innerHTML = '';
+    log("debug", scriptName, functionName, "Cleared existing column checkboxes");
 
-    // Use getAllColumns() for AG Grid 31.0.1 to get all column definitions
-    const allColumns = api.getAllColumns();
+    // Use getColumns() instead of getAllColumns()
+    const allColumns = api.getColumns();
 
     if (!allColumns || allColumns.length === 0) {
         log("warn", scriptName, functionName, "No columns found in the grid");
@@ -113,8 +144,6 @@ function setupColumnSelector(api, scriptName, functionName) {
                 if (checkbox) checkbox.checked = true;
             });
         });
-    } else {
-        log("warn", scriptName, functionName, "📋 Select all button (#selectAllColumns) not found");
     }
 
     if (clearAllBtn) {
@@ -128,8 +157,6 @@ function setupColumnSelector(api, scriptName, functionName) {
                 if (checkbox) checkbox.checked = false;
             });
         });
-    } else {
-        log("warn", scriptName, functionName, "📋 Clear all button (#clearAllColumns) not found");
     }
 
     log("info", scriptName, functionName, "Column selector setup complete");
@@ -158,12 +185,21 @@ function generateColumnDefs(data) {
     const columnDefs = columnKeys.map(key => {
         const headerName = formatDisplayText(key);
         log("debug", scriptName, functionName, `Creating column definition for: ${key} -> "${headerName}"`);
-        return {
+
+        const colDef = {
             field: key,
             headerName: headerName,
             sortable: true,
             filter: true
         };
+
+        // Add valueFormatter for object types based on field content
+        const sampleValue = sampleRow[key];
+        if (sampleValue !== null && typeof sampleValue === 'object') {
+            colDef.valueFormatter = objectValueFormatter;
+        }
+
+        return colDef;
     });
 
     log("info", scriptName, functionName, `Column definitions generated successfully: ${columnDefs.length} columns`);
@@ -201,7 +237,7 @@ export default async function initTable() {
         log("debug", scriptName, functionName, `Raw data retrieved, size: ${JSON.stringify(rawData).length} bytes`);
         log("info", scriptName, functionName, "Normalizing data");
         actualData = normalizeData(rawData);
-        log("info", scriptName, functionName, `Processed ${actualData.length} rows of data`);
+        log("info", scriptName, functionName, `Setting grid data with ${actualData.length} rows`);
         if (actualData.length > 0) {
             log("debug", scriptName, functionName, `Data sample (first row): ${JSON.stringify(actualData[0])}`);
         }
@@ -221,6 +257,9 @@ export default async function initTable() {
         log("info", scriptName, functionName, "Generating column definitions");
         gridOptions.columnDefs = generateColumnDefs(actualData);
         log("debug", scriptName, functionName, `Column definitions generated: ${gridOptions.columnDefs.length} columns`);
+
+        // Make columnDefs globally available
+        window.columnDefs = gridOptions.columnDefs;
     } else {
         log("warn", scriptName, functionName, "No data available to generate columns");
     }
@@ -234,23 +273,29 @@ export default async function initTable() {
             log("debug", scriptName, functionName, "Calling original onGridReady handler");
             originalOnGridReady(params);
         }
+
         log("debug", scriptName, functionName, "Setting grid API references");
         setGridApi(params.api, params.columnApi);
+
+        // Store grid API globally
+        window.gridApi = params.api;
+
         log("info", scriptName, functionName, `Setting grid data with ${actualData.length} rows`);
         params.api.setGridOption('rowData', actualData);
+
         log("info", scriptName, functionName, "Setting up global search functionality");
         setupGlobalSearch(params.api, scriptName, functionName);
-        log("info", scriptName, functionName, "Adding grid columns changed event listener");
+
+        // Initial setup of column selector
+        log("info", scriptName, functionName, "Setting up column selector");
+        setupColumnSelector(params.api, scriptName, functionName);
+
+        // Add the grid columns changed listener for future updates
         params.api.addEventListener('gridColumnsChanged', () => {
             log("debug", scriptName, functionName, "Grid columns changed event triggered");
-            const columnSelectorExists = document.getElementById('columnSelectorItems');
-            if (columnSelectorExists) {
-                log("info", scriptName, functionName, "Setting up column selector");
-                setupColumnSelector(params.api, scriptName, functionName);
-            } else {
-                log("warn", scriptName, functionName, "📋 Column selector element (#columnSelectorItems) not found. Skipping column selector setup.");
-            }
+            setupColumnSelector(params.api, scriptName, functionName);
         });
+
         log("debug", scriptName, functionName, "Refreshing grid header");
         params.api.refreshHeader();
         log("info", scriptName, functionName, "Table data initialized successfully");
