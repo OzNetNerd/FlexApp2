@@ -1,14 +1,16 @@
+{# view_edit_company.html #}
+
 {% extends "base/create_view_edit/_create_view_edit.html" %}
 {% set tabs = [
-    {'tab_name': 'Notes'},
+    {'tab_name': 'Notes'} if read_only else None,
     {'tab_name': 'About'},
     {'tab_name': 'Professional Profile'},
     {'tab_name': 'Technical Skills'},
     {'tab_name': 'Job Details'},
     {'tab_name': 'Relationships'},
-    {'tab_name': 'Insights'},
-    {'tab_name': 'System Info'}
-] %}
+    {'tab_name': 'Insights'} if read_only else None,
+    {'tab_name': 'System Info'} if read_only else None
+] | reject('none') | list %}
 {% import 'base/macros/render_form_fields.html' as field_macros with context %}
 
 {% block view_template_content %}
@@ -16,13 +18,15 @@
   <!-- Container for all tab panes -->
   <div class="tab-content" id="formTabsContent">
 
+    {% if read_only %}
     <!-- Tab Pane: Notes -->
     <div class="tab-pane fade show active" id="tab-notes">
       {% include 'components/_notes_section.html' %}
     </div>
+    {% endif %}
 
     <!-- Tab Pane: About -->
-    <div class="tab-pane fade" id="tab-about">
+    <div class="tab-pane fade {% if not read_only %}show active{% endif %}" id="tab-about">
       <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-white">
           <h5 class="h6 text-primary fw-semibold mb-0">Basic Info</h5>
@@ -304,6 +308,7 @@
       </div>
     </div>
 
+    {% if read_only %}
     <!-- Tab Pane: Insights -->
     <div class="tab-pane fade" id="tab-insights">
       {% include 'components/_crisp.html' %}
@@ -337,6 +342,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
   </div>
 </form>
