@@ -1,3 +1,7 @@
+```
+clear && python3 -m app.app
+```
+
 # Research
 Defensive programming?
 
