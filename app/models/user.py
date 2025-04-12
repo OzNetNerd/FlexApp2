@@ -52,9 +52,12 @@ class User(BaseModel, UserMixin):
         base_dict = super().to_dict()
         from app.services.relationship_service import RelationshipService
 
-        entity1_relationships = Relationship.query.filter_by(entity1_type="user", entity1_id=self.id).all()
-
-        entity2_relationships = Relationship.query.filter_by(entity2_type="user", entity2_id=self.id).all()
+        entity1_relationships = Relationship.query.filter_by(
+            entity1_type="user", entity1_id=self.id
+        ).all()
+        entity2_relationships = Relationship.query.filter_by(
+            entity2_type="user", entity2_id=self.id
+        ).all()
 
         related_users = []
         related_companies = []
@@ -73,18 +76,15 @@ class User(BaseModel, UserMixin):
 
             if related_type == "user":
                 related_users.append(
-                    {
-                        "id": related_entity.id,
-                        "name": related_entity.name,
-                        "username": related_entity.username,
-                        "relationship_type": rel.relationship_type,
-                    }
+                    f"{related_entity.name} ({rel.relationship_type})"
                 )
             elif related_type == "company":
-                related_companies.append({"id": related_entity.id, "name": related_entity.name, "relationship_type": rel.relationship_type})
+                related_companies.append(
+                    f"{related_entity.name} ({rel.relationship_type})"
+                )
 
-        base_dict["related_users"] = related_users
-        base_dict["related_companies"] = related_companies
+        # Join lists into a comma-separated string.
+        base_dict["related_users"] = ", ".join(related_users)
+        base_dict["related_companies"] = ", ".join(related_companies)
 
         return base_dict
-g
