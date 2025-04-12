@@ -87,3 +87,4 @@ class User(BaseModel, UserMixin):
         base_dict["related_companies"] = related_companies
 
         return base_dict
+g
