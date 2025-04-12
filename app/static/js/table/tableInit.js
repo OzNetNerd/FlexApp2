@@ -72,6 +72,12 @@ function objectValueFormatter(params) {
 /**
  * Sets up the column selector dropdown for toggling column visibility.
  */
+/**
+ * Sets up the column selector dropdown for toggling column visibility.
+ */
+/**
+ * Sets up the column selector dropdown for toggling column visibility.
+ */
 function setupColumnSelector(api, scriptName, functionName) {
     log("info", scriptName, functionName, "Setting up column selector functionality");
 
@@ -79,64 +85,92 @@ function setupColumnSelector(api, scriptName, functionName) {
     const selectAllBtn = document.getElementById('selectAllColumns');
     const clearAllBtn = document.getElementById('clearAllColumns');
 
-    if (!columnSelector) {
-        log("warn", scriptName, functionName, "📋 Column selector (#columnSelectorItems) not found");
-        return;
-    }
-
-    if (!api) {
-        log("warn", scriptName, functionName, "📋 Grid API not available");
+    if (!columnSelector || !api) {
+        log("warn", scriptName, functionName, "Column selector elements or grid API not found");
         return;
     }
 
     // Clear any previously inserted checkboxes
     columnSelector.innerHTML = '';
-    log("debug", scriptName, functionName, "Cleared existing column checkboxes");
 
-    // Use getColumns() instead of getAllColumns()
+    // Add container styling
+    columnSelector.style.maxHeight = '300px';
+    columnSelector.style.overflowY = 'auto';
+    columnSelector.style.padding = '0 10px';
+
+    // Get all columns
     const allColumns = api.getColumns();
-
     if (!allColumns || allColumns.length === 0) {
         log("warn", scriptName, functionName, "No columns found in the grid");
         return;
     }
 
-    log("info", scriptName, functionName, `Found ${allColumns.length} columns to display in selector`);
+    // Add custom styling to override any problematic CSS
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `
+        .column-selector-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 4px;
+            border-radius: 4px;
+            background: white;
+            border: none;
+        }
+        .column-selector-checkbox {
+            margin-right: 10px;
+            min-width: 16px;
+            min-height: 16px;
+        }
+        .column-selector-label {
+            margin-bottom: 0;
+            cursor: pointer;
+            user-select: none;
+        }
+    `;
+    document.head.appendChild(styleEl);
 
     allColumns.forEach(col => {
         const colId = col.getColId ? col.getColId() : col.getId();
         const colDef = col.getColDef();
-        // Format column name with special case handling for "ID" and "at"
         const colName = (colDef.headerName || colId)
             .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
             .replace(/\bId\b/g, 'ID')
             .replace(/\bAt\b/g, 'at');
 
-        const div = document.createElement('div');
-        div.classList.add('form-check', 'mb-1');
-
         const isVisible = !(api.getColumnState().find(c => c.colId === colId)?.hide === true);
-        log("debug", scriptName, functionName, `Adding column selector: ${colName} (${colId}), visible: ${isVisible}`);
 
-        div.innerHTML = `
-            <input class="form-check-input" type="checkbox" value="${colId}" id="chk-${colId}" ${isVisible ? 'checked' : ''}>
-            <label class="form-check-label" for="chk-${colId}">${colName}</label>
-        `;
+        // Create container div with custom class instead of form-check
+        const div = document.createElement('div');
+        div.className = 'column-selector-item';
 
-        const checkbox = div.querySelector('input');
-        checkbox.addEventListener('change', (e) => {
-            const isChecked = e.target.checked;
-            log("debug", scriptName, functionName, `Column visibility changed: ${colName} (${colId}) - ${isChecked ? 'visible' : 'hidden'}`);
-            api.setColumnVisible(colId, isChecked);
+        // Create checkbox with custom class
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.className = 'column-selector-checkbox';
+        input.id = `chk-${colId}`;
+        input.value = colId;
+        input.checked = isVisible;
+
+        // Create label with custom class
+        const label = document.createElement('label');
+        label.className = 'column-selector-label';
+        label.htmlFor = `chk-${colId}`;
+        label.textContent = colName;
+
+        // Add event listener
+        input.addEventListener('change', (e) => {
+            api.setColumnVisible(colId, e.target.checked);
         });
 
+        div.appendChild(input);
+        div.appendChild(label);
         columnSelector.appendChild(div);
     });
 
+    // Setup select/clear all buttons
     if (selectAllBtn) {
-        log("debug", scriptName, functionName, "Select all columns button found, attaching event listener");
         selectAllBtn.addEventListener('click', () => {
-            log("info", scriptName, functionName, "Select all columns button clicked");
             allColumns.forEach(col => {
                 const colId = col.getColId ? col.getColId() : col.getId();
                 api.setColumnVisible(colId, true);
@@ -147,9 +181,7 @@ function setupColumnSelector(api, scriptName, functionName) {
     }
 
     if (clearAllBtn) {
-        log("debug", scriptName, functionName, "Clear all columns button found, attaching event listener");
         clearAllBtn.addEventListener('click', () => {
-            log("info", scriptName, functionName, "Clear all columns button clicked");
             allColumns.forEach(col => {
                 const colId = col.getColId ? col.getColId() : col.getId();
                 api.setColumnVisible(colId, false);
@@ -158,8 +190,6 @@ function setupColumnSelector(api, scriptName, functionName) {
             });
         });
     }
-
-    log("info", scriptName, functionName, "Column selector setup complete");
 }
 
 /**
