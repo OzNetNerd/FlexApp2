@@ -1,9 +1,7 @@
-// table/tableInit.js
-
 const scriptName = "tableInit.js";
 
 import log from '/static/js/logger.js';
-import { getDatasetVariables, getDatasetValue } from '/static/js/utils.js';
+import { getDatasetVariables } from '/static/js/utils.js';
 import { fetchApiDataFromContainer, normalizeData, formatDisplayText } from '/static/js/apiService.js';
 import getGridOptions, { setGridApi } from '/static/js/table/tableConfig.js';
 
@@ -29,7 +27,6 @@ function setupGlobalSearch(api, scriptName, functionName) {
     if (input) {
         log("info", scriptName, functionName, "Global search input found, attaching event listener");
         input.addEventListener('input', () => {
-            // Use the AG Grid quick filter method
             const searchValue = input.value;
             log("debug", scriptName, functionName, `Applying quick filter with value: "${searchValue}"`);
             api.setQuickFilter(searchValue);
@@ -65,8 +62,8 @@ function setupColumnSelector(api, scriptName, functionName) {
     log("debug", scriptName, functionName, `Removing ${previousCheckboxes.length} existing column checkboxes`);
     previousCheckboxes.forEach(el => el.remove());
 
-    // In AG Grid 31.0.1, columnApi was merged into the main api
-    const allColumns = api.getColumns();
+    // Use getAllColumns() for AG Grid 31.0.1 to get all column definitions
+    const allColumns = api.getAllColumns();
 
     if (!allColumns || allColumns.length === 0) {
         log("warn", scriptName, functionName, "No columns found in the grid");
@@ -91,9 +88,7 @@ function setupColumnSelector(api, scriptName, functionName) {
         log("debug", scriptName, functionName, `Adding column selector: ${colName} (${colId}), visible: ${isVisible}`);
 
         div.innerHTML = `
-            <input class="form-check-input" type="checkbox" value="${colId}" id="chk-${colId}" ${
-            isVisible ? 'checked' : ''
-        }>
+            <input class="form-check-input" type="checkbox" value="${colId}" id="chk-${colId}" ${isVisible ? 'checked' : ''}>
             <label class="form-check-label" for="chk-${colId}">${colName}</label>
         `;
 
@@ -192,25 +187,21 @@ export default async function initTable() {
 
     if (!gridDiv.style.height && !gridDiv.classList.contains('ag-theme-alpine')) {
         log("info", scriptName, functionName, "Applying default height and theme to grid container");
-        gridDiv.style.height = '500px'; // Default height if none specified
-        gridDiv.classList.add('ag-theme-alpine'); // Add theme class if missing
+        gridDiv.style.height = '500px';
+        gridDiv.classList.add('ag-theme-alpine');
     }
+
+    // Directly read the API URL from the data attribute of the container
+    const data_api_url = gridDiv.dataset.apiUrl || null;
+    log("info", scriptName, functionName, `Fetching data from API: ${data_api_url}`);
 
     let actualData;
     try {
-        // Get data API URL from the dataset attribute or fallback to default
-        const data_api_url = getDatasetValue(gridDiv, 'apiUrl', null);
-        log("info", scriptName, functionName, `Fetching data from API: ${data_api_url}`);
-
-        // Get data from API using our new service
         const rawData = await fetchApiDataFromContainer(tableContainerId);
         log("debug", scriptName, functionName, `Raw data retrieved, size: ${JSON.stringify(rawData).length} bytes`);
-
-        // Process the data
         log("info", scriptName, functionName, "Normalizing data");
         actualData = normalizeData(rawData);
         log("info", scriptName, functionName, `Processed ${actualData.length} rows of data`);
-
         if (actualData.length > 0) {
             log("debug", scriptName, functionName, `Data sample (first row): ${JSON.stringify(actualData[0])}`);
         }
@@ -226,7 +217,6 @@ export default async function initTable() {
     const gridOptions = getGridOptions();
     log("debug", scriptName, functionName, "Grid options retrieved successfully", { options: gridOptions });
 
-    // Generate column definitions from data
     if (actualData.length > 0) {
         log("info", scriptName, functionName, "Generating column definitions");
         gridOptions.columnDefs = generateColumnDefs(actualData);
@@ -240,48 +230,32 @@ export default async function initTable() {
 
     gridOptions.onGridReady = (params) => {
         log("info", scriptName, functionName, "AG Grid onGridReady event triggered");
-
         if (originalOnGridReady) {
             log("debug", scriptName, functionName, "Calling original onGridReady handler");
             originalOnGridReady(params);
         }
-
-        // Pass the correct grid and column APIs
         log("debug", scriptName, functionName, "Setting grid API references");
         setGridApi(params.api, params.columnApi);
-
-        // Update rowData using the recommended setGridOption method
         log("info", scriptName, functionName, `Setting grid data with ${actualData.length} rows`);
         params.api.setGridOption('rowData', actualData);
-
         log("info", scriptName, functionName, "Setting up global search functionality");
         setupGlobalSearch(params.api, scriptName, functionName);
-
-        // Setup column selector after columns are fully initialized
-        // Use grid columns changed event to ensure columns are ready
         log("info", scriptName, functionName, "Adding grid columns changed event listener");
         params.api.addEventListener('gridColumnsChanged', () => {
             log("debug", scriptName, functionName, "Grid columns changed event triggered");
-
-            // Check if the column selector element exists in the DOM
             const columnSelectorExists = document.getElementById('columnSelectorItems');
             if (columnSelectorExists) {
                 log("info", scriptName, functionName, "Setting up column selector");
-                // In AG Grid 31.0.1, we pass the main grid API instead of columnApi
                 setupColumnSelector(params.api, scriptName, functionName);
             } else {
                 log("warn", scriptName, functionName, "📋 Column selector element (#columnSelectorItems) not found. Skipping column selector setup.");
             }
         });
-
-        // Force column visibility update
         log("debug", scriptName, functionName, "Refreshing grid header");
         params.api.refreshHeader();
-
         log("info", scriptName, functionName, "Table data initialized successfully");
     };
 
-    // Create the grid with proper dimensions
     log("info", scriptName, functionName, "Creating AG Grid instance");
     try {
         new createGrid(gridDiv, gridOptions);
@@ -291,7 +265,7 @@ export default async function initTable() {
             error: error.message || String(error),
             stack: error.stack
         });
-        throw error; // Re-throw to allow caller to handle
+        throw error;
     }
 
     log("info", scriptName, functionName, "Table initialization completed");
