@@ -4,7 +4,7 @@
 <div class="section-card card shadow-sm border-0 mb-4 mt-4">
   <div class="section-header">
     <h5 class="section-heading">Notes</h5>
-    <div class="dropdown">
+    <div class="dropdown" style="margin-left: auto;">
       <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="notesFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="fas fa-filter me-1"></i> Filter
       </button>
@@ -14,18 +14,13 @@
         <li><a class="dropdown-item note-filter" href="#" data-days="90">Last 90 days</a></li>
         <li><hr class="dropdown-divider"></li>
         <li>
-          <form class="px-3 py-2" id="dateRangeForm">
-            <div class="mb-2">
-              <label for="startDate" class="form-label small">Start Date</label>
-              <input type="date" class="form-control form-control-sm" id="startDate">
+          <form class="px-3 py-2" id="notesSearchForm">
+            <div class="input-group input-group-sm">
+              <input type="text" class="form-control" id="noteSearchInput" placeholder="Search...">
+              <button class="btn btn-outline-primary" type="submit">
+                <i class="fas fa-search"></i>
+              </button>
             </div>
-            <div class="mb-2">
-              <label for="endDate" class="form-label small">End Date</label>
-              <input type="date" class="form-control form-control-sm" id="endDate">
-            </div>
-            <button class="btn btn-sm btn-outline-primary w-100" type="submit">
-              Apply Range
-            </button>
           </form>
         </li>
       </ul>
@@ -79,230 +74,14 @@
   </div>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Variables
-    const notableType = '{{ entity.__class__.__name__ }}';
-    const notableId = '{{ entity.id }}';
-    const notesList = document.getElementById('notesList');
-    const notesLoading = document.getElementById('notesLoading');
-    const statusMessage = document.createElement('div');
-    statusMessage.className = 'alert mt-3 d-none';
+<!-- Add data attributes to store template variables for JavaScript -->
+<div id="notesData"
+     data-notable-type="{{ entity.__class__.__name__ }}"
+     data-notable-id="{{ entity.id }}"
+     data-user-id="{{ current_user.id }}"
+     data-username="{{ current_user.username|default(current_user.name|default(current_user.email|default(''))) }}">
+</div>
 
-    // Add status message container after the form
-    document.getElementById('newNoteForm').insertAdjacentElement('afterend', statusMessage);
-
-    // Initial notes load
-    loadNotes();
-
-    // Function to calculate time ago
-    function getTimeAgo(dateString) {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffMs = now - date;
-      const diffSec = Math.floor(diffMs / 1000);
-      const diffMin = Math.floor(diffSec / 60);
-      const diffHour = Math.floor(diffMin / 60);
-      const diffDays = Math.floor(diffHour / 24);
-
-      if (diffDays > 0) {
-        return `${diffDays}d ago`;
-      } else if (diffHour > 0) {
-        return `${diffHour}h ago`;
-      } else if (diffMin > 0) {
-        return `${diffMin}m ago`;
-      } else {
-        return 'just now';
-      }
-    }
-
-    // Load notes with optional filters
-    function loadNotes(filters = {}) {
-      notesLoading.style.display = 'block';
-
-      // Build query string
-      let queryParams = new URLSearchParams();
-      queryParams.append('notable_type', notableType);
-      queryParams.append('notable_id', notableId);
-
-      // Add additional filters
-      for (const [key, value] of Object.entries(filters)) {
-        queryParams.append(key, value);
-      }
-
-      // Fetch notes
-      fetch(`/api/notes/query?${queryParams.toString()}`)
-        .then(response => {
-          if (!response.ok) {
-            return response.json().then(errorData => {
-              throw new Error(`API responded with status: ${response.status}: ${JSON.stringify(errorData)}`);
-            }).catch(e => {
-              throw new Error(`API responded with status: ${response.status}`);
-            });
-          }
-          return response.json();
-        })
-        .then(data => {
-          notesLoading.style.display = 'none';
-          renderNotes(data.data);
-        })
-        .catch(error => {
-          notesLoading.style.display = 'none';
-          notesList.innerHTML = `<div class="alert alert-danger">Error loading notes: ${error.message}</div>`;
-          console.error('Notes loading error:', error);
-        });
-    }
-
-    // Render notes
-    function renderNotes(notes) {
-      if (!notes || notes.length === 0) {
-        notesList.innerHTML = '<div class="text-center py-3 text-muted">No notes found</div>';
-        return;
-      }
-
-      let html = '';
-      notes.forEach(note => {
-        const date = new Date(note.created_at).toLocaleString();
-        const timeAgo = getTimeAgo(note.created_at);
-
-        // Debug log to see what user data we're getting
-        console.log('Note user data:', note.user, 'user_id:', note.user_id);
-
-        // Use current username when displaying user's own notes
-        let username = 'Unknown User';
-        const currentUserId = '{{ current_user.id }}';
-
-        if (note.user_id && note.user_id.toString() === currentUserId) {
-          username = '{{ current_user.username|default(current_user.name|default(current_user.email|default("You"))) }}';
-        }
-        else if (note.user) {
-          if (typeof note.user === 'object') {
-            username = note.user.username || note.user.name || note.user.email || 'Unknown User';
-          } else if (typeof note.user === 'string') {
-            username = note.user;
-          }
-        } else if (note.username) {
-          username = note.username;
-        }
-
-        html += `
-          <div class="note-item mb-3 p-3 border rounded">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <strong>${username}</strong>
-              <small class="text-muted">${date} (${timeAgo})</small>
-            </div>
-            <div class="note-content">
-              ${note.processed_content || note.content}
-            </div>
-          </div>
-        `;
-      });
-
-      notesList.innerHTML = html;
-    }
-
-    // Filter by days
-    document.querySelectorAll('.note-filter').forEach(filter => {
-      filter.addEventListener('click', function(e) {
-        e.preventDefault();
-        const days = this.dataset.days;
-        loadNotes({days: days});
-      });
-    });
-
-    // Date range filter
-    const dateRangeForm = document.getElementById('dateRangeForm');
-    if (dateRangeForm) {
-      dateRangeForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-
-        if (startDate && endDate) {
-          loadNotes({
-            start_date: startDate,
-            end_date: endDate
-          });
-        } else {
-          showStatus('Please select both start and end dates', 'warning');
-        }
-      });
-    }
-
-    // Show status message
-    function showStatus(message, type = 'success') {
-      statusMessage.className = `alert alert-${type} mt-3`;
-      statusMessage.textContent = message;
-      statusMessage.classList.remove('d-none');
-
-      // Auto-hide after 5 seconds
-      setTimeout(() => {
-        statusMessage.classList.add('d-none');
-      }, 5000);
-    }
-
-    // Add new note with improved feedback
-    const newNoteForm = document.getElementById('newNoteForm');
-    if (newNoteForm) {
-      newNoteForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Basic validation
-        const contentField = document.getElementById('content');
-        if (!contentField || !contentField.value.trim()) {
-          showStatus('Please enter a note.', 'danger');
-          return;
-        }
-
-        // Disable submit button during submission
-        const submitBtn = newNoteForm.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Submitting...';
-
-        const formData = new FormData(newNoteForm);
-        const noteData = Object.fromEntries(formData.entries());
-
-        // Only keep the expected fields to avoid 500 errors
-        const cleanedData = {
-          content: noteData.content,
-          notable_type: noteData.notable_type,
-          notable_id: noteData.notable_id,
-          user_id: noteData.user_id
-        };
-
-        console.log('Submitting note with data:', cleanedData);
-
-        fetch('/api/notes/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(cleanedData)
-        })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`API responded with status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data.error) {
-            throw new Error(data.error.message);
-          }
-          newNoteForm.reset();
-          loadNotes();
-          showStatus('Note added successfully!');
-        })
-        .catch(error => {
-          showStatus(`Error adding note: ${error.message}`, 'danger');
-          console.error('Error adding note:', error);
-        })
-        .finally(() => {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<i class="fas fa-plus me-1"></i> Add Note';
-        });
-      });
-    }
-  });
-</script>
+<!-- Include the external JavaScript file -->
+<script src="/static/js/pages/notes_section.js"></script>
 <!-- END TEMPLATE: _notes_section.html -->

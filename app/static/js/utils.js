@@ -1,6 +1,6 @@
-const scriptName = "utils.js";
-
 import log from '/static/js/logger.js';
+
+const scriptName = "utils.js";
 
 // Cache to store API responses
 const apiCache = new Map();
