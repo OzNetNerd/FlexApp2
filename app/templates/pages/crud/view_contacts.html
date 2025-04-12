@@ -1,5 +1,6 @@
 {% extends "base/create_view_edit/_create_view_edit.html" %}
 {% set tabs = [
+    {'tab_name': 'Notes'},
     {'tab_name': 'Basic Info'},
     {'tab_name': 'Professional Profile'},
     {'tab_name': 'Technical Skills'},
@@ -14,13 +15,17 @@
   <!-- Container for all tab panes -->
   <div class="tab-content" id="formTabsContent">
 
-
+    <!-- Tab Pane: Notes -->
+    <div class="tab-pane fade show active" id="tab-notes">
+      {% include 'components/_notes_section.html' %}
+    </div>
 
     <!-- Tab Pane: Basic Info -->
-    <div class="tab-pane fade show active" id="tab-basic-info">
-<div class="section-card card shadow-sm border-0 mb-4 mt-4">
-  <div class="section-header">
-    <h5 class="section-heading">Basic Information</h5><!-- Ensure this is the same as System Information -->
+    <div class="tab-pane fade" id="tab-basic-info">
+      <div class="section-card card shadow-sm border-0 mb-4 mt-4">
+        <div class="section-header">
+          <h5 class="section-heading">Basic Information</h5>
+          <!-- Ensure this is the same as System Information -->
         </div>
         <div class="section-body">
           <div class="row g-3">
@@ -69,12 +74,11 @@
       </div>
     </div>
 
-
     <!-- Tab Pane: Professional Profile -->
     <div class="tab-pane fade" id="tab-professional-profile">
-<div class="section-card card shadow-sm border-0 mb-4 mt-4">
-  <div class="section-header">
-    <h5 class="section-heading">Professional Profile</h5>
+      <div class="section-card card shadow-sm border-0 mb-4 mt-4">
+        <div class="section-header">
+          <h5 class="section-heading">Professional Profile</h5>
         </div>
         <div class="card-body">
           <div class="row g-3">
@@ -133,9 +137,9 @@
 
     <!-- Tab Pane: Technical Skills -->
     <div class="tab-pane fade" id="tab-technical-skills">
-<div class="section-card card shadow-sm border-0 mb-4 mt-4">
-  <div class="section-header">
-    <h5 class="section-heading">Technical Skills</h5>
+      <div class="section-card card shadow-sm border-0 mb-4 mt-4">
+        <div class="section-header">
+          <h5 class="section-heading">Technical Skills</h5>
         </div>
         <div class="card-body">
           <div class="row g-3">
@@ -210,9 +214,9 @@
 
     <!-- Tab Pane: Job Details -->
     <div class="tab-pane fade" id="tab-job-details">
-<div class="section-card card shadow-sm border-0 mb-4 mt-4">
-  <div class="section-header">
-    <h5 class="section-heading">Professional Profile</h5>
+      <div class="section-card card shadow-sm border-0 mb-4 mt-4">
+        <div class="section-header">
+          <h5 class="section-heading">Professional Profile</h5>
         </div>
         <div class="card-body">
           <div class="row g-3">
@@ -259,37 +263,37 @@
     </div>
 
     <!-- Tab Pane: System Info -->
-
-<div class="tab-pane fade" id="tab-system-info">
-<div class="section-card card shadow-sm border-0 mb-4 mt-4">
-  <div class="section-header">
-    <h5 class="section-heading">System Information</h5>
+    <div class="tab-pane fade" id="tab-system-info">
+      <div class="section-card card shadow-sm border-0 mb-4 mt-4">
+        <div class="section-header">
+          <h5 class="section-heading">System Information</h5>
         </div>
-    <div class="section-body">
-      <div class="row g-3">
-        {{ field_macros.render_field({
-            "entry_name": "created_at",
-            "label": "Created At",
-            "type": "date",
-            "value": entity.created_at,
-            "required": false,
-            "options": []
-         }, read_only=true) }}
-        {{ field_macros.render_field({
-            "entry_name": "updated_at",
-            "label": "Updated At",
-            "type": "date",
-            "value": entity.updated_at,
-            "required": false,
-            "options": []
-         }, read_only=true) }}
+        <div class="section-body">
+          <div class="row g-3">
+            {{ field_macros.render_field({
+                "entry_name": "created_at",
+                "label": "Created At",
+                "type": "date",
+                "value": entity.created_at,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+            {{ field_macros.render_field({
+                "entry_name": "updated_at",
+                "label": "Updated At",
+                "type": "date",
+                "value": entity.updated_at,
+                "required": false,
+                "options": []
+             }, read_only=true) }}
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
   </div>
 </form>
+
 <!-- Static Panel (Does not change with tabs) -->
 <div class="section-card card shadow-sm border-0 mb-4 mt-4">
   <div class="section-header">
@@ -308,8 +312,5 @@
     </div>
   </div>
 </div>
-
-
-{% include 'components/_notes_section.html' %}
 
 {% endblock view_template_content %}
