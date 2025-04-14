@@ -1,5 +1,3 @@
-<!-- START TEMPLATE: view_edit_opportunities.html -->
-
 {% extends "base/create_view_edit/_create_view_edit.html" %}
 
 {% set tabs = [
@@ -13,18 +11,16 @@
 {% import 'base/macros/tabs.html' as tab_macros with context %}
 
 {% block view_template_content %}
-<form method="post" action="{{ submit_url }}">
+<form method="post" action="{{ submit_url }}" id="main-form">
   {{ csrf_input }}
   <div class="tab-content" id="formTabsContent">
 
     {% if read_only %}
-    <!-- Tab Pane: Notes -->
     {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
       {% include 'components/_notes_section.html' %}
     {% endcall %}
     {% endif %}
 
-    <!-- Tab Pane: About -->
     {% call tab_macros.render_tab_section('about', 'About', active=not read_only) %}
       {{ field_macros.render_field({
           "entry_name": "name",
@@ -35,7 +31,6 @@
           "options": []
       }, read_only=read_only) }}
 
-      <!-- Company Selection Field -->
       <div class="form-group">
         <label for="company-input">Company</label>
         <input type="text"
@@ -81,7 +76,6 @@
     {% endcall %}
 
     {% if read_only %}
-    <!-- Tab Pane: Insights -->
     {% call tab_macros.render_tab_section('insights', 'Insights') %}
       {% set crisp_score = "N/A" %}
       {% if entity.crisp_summary is not none %}
@@ -98,10 +92,8 @@
       }, read_only=true) }}
     {% endcall %}
 
-    <!-- Tab Pane: System Info -->
     {% call tab_macros.render_tab_section('system_info', 'System Info') %}
-      <!-- System info content goes here -->
-    {% endcall %}
+      {% endcall %}
     {% endif %}
 
   </div>
@@ -133,5 +125,3 @@
 </script>
 
 {% endblock view_template_content %}
-
-<!-- END TEMPLATE: view_edit_opportunities.html -->

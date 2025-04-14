@@ -24,26 +24,19 @@
         <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}" class="btn btn-secondary">
           <i class="fas fa-times me-1"></i> Cancel
         </a>
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="btn btn-primary" form="main-form">
           <i class="fas fa-save me-1"></i> Update
         </button>
       {% else %}
         <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
           <i class="fas fa-times me-1"></i> Cancel
         </a>
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="btn btn-primary" form="main-form">
           <i class="fas fa-save me-1"></i> Create
         </button>
       {% endif %}
     {% endif %}
   </div>
-
-  {# Removed the extra Save Changes block #}
-  {# {% if not read_only %}
-  <div class="d-flex justify-content-end mt-4">
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-  </div>
-  {% endif %} #}
 
   <script type="module" src="{{ url_for('static', filename='js/pages/footer_buttons.js') }}"></script>
 {% endif %}
