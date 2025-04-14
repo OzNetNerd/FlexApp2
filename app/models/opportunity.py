@@ -67,10 +67,29 @@ class Opportunity(BaseModel):
         Returns:
             float | None: Average CRISP score across all involved contacts.
         """
-        contacts = {rel.contact for note in self.notes for rel in note.author.relationships}
-        scores = [c.crisp_summary for c in contacts if c.crisp_summary is not None]
+        try:
+            contacts = set()
 
-        if not scores:
+            # Handle both cases: notes as a collection or as a single Note object
+            if hasattr(self.notes, '__iter__') and not isinstance(self.notes, str):
+                # It's iterable (like a list)
+                for note in self.notes:
+                    if hasattr(note, 'author') and hasattr(note.author, 'relationships'):
+                        for rel in note.author.relationships:
+                            if hasattr(rel, 'contact'):
+                                contacts.add(rel.contact)
+            elif hasattr(self.notes, 'author') and hasattr(self.notes.author, 'relationships'):
+                # It's a single Note object
+                for rel in self.notes.author.relationships:
+                    if hasattr(rel, 'contact'):
+                        contacts.add(rel.contact)
+
+            scores = [c.crisp_summary for c in contacts if hasattr(c, 'crisp_summary') and c.crisp_summary is not None]
+
+            if not scores:
+                return None
+
+            return round(sum(scores) / len(scores), 2)
+        except Exception as e:
+            logger.error(f"Error calculating CRISP summary: {e}")
             return None
-
-        return round(sum(scores) / len(scores), 2)
