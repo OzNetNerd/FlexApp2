@@ -1,3 +1,5 @@
+# contact.py
+
 import logging
 from app.models.base import db, BaseModel
 from app.models.relationship import Relationship  # reuse the generic Relationship model
@@ -123,3 +125,40 @@ class Contact(BaseModel):
 
     def __repr__(self) -> str:
         return f"<Contact {self.id} {self.full_name}>"
+
+    @managers.setter
+    def managers(self, manager_list):
+        """Set managers for this Contact by creating appropriate relationships."""
+        # Ensure contact has ID
+        if not self.id:
+            db.session.add(self)
+            db.session.flush()
+
+        # Clear existing manager relationships
+        Relationship.query.filter_by(
+            entity2_type="contact",
+            entity2_id=self.id,
+            relationship_type="manager"
+        ).delete()
+
+        # Add new manager relationships
+        if manager_list:
+            for manager in manager_list:
+                if isinstance(manager, dict):
+                    manager_type = manager.get('type', 'user')
+                    manager_id = manager.get('id')
+                elif hasattr(manager, 'id'):
+                    manager_type = manager.__class__.__name__.lower()
+                    manager_id = manager.id
+                else:
+                    manager_type = 'user'
+                    manager_id = int(manager)
+
+                relationship = Relationship(
+                    entity1_type=manager_type,
+                    entity1_id=manager_id,
+                    entity2_type="contact",
+                    entity2_id=self.id,
+                    relationship_type="manager"
+                )
+                db.session.add(relationship)

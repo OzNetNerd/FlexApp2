@@ -131,24 +131,41 @@ class CRUDService:
     def create(self, data: dict) -> Any:
         """
         Create and persist a new instance.
-
-        Args:
-            data (dict): Form data.
-
-        Returns:
-            Any: The created instance.
         """
         try:
             data = {k: v for k, v in data.items() if v != ""}
             data = self._convert_dates(data)
+
+            # Check for unique constraints
+            if self.model_class.__name__ == 'Contact' and 'email' in data:
+                existing = self.model_class.query.filter_by(email=data['email']).first()
+                if existing:
+                    raise ValueError(f"A contact with email '{data['email']}' already exists")
+
+            # Extract properties that need special handling
+            property_attrs = {}
+            for key in list(data.keys()):
+                if (hasattr(self.model_class, key) and
+                        isinstance(getattr(self.model_class, key), property)):
+                    property_attrs[key] = data.pop(key)
 
             if issubclass(self.model_class, ValidatorMixin):
                 errors = self.model_class().validate_create(data)
                 if errors:
                     raise ValueError(f"Validation failed: {errors}")
 
+            # Create entity without property attributes
             entity = self.model_class(**data)
             db.session.add(entity)
+            db.session.flush()  # Get ID without committing
+
+            # Handle properties after entity has ID
+            for key, value in property_attrs.items():
+                try:
+                    setattr(entity, key, value)
+                except Exception as e:
+                    logger.warning(f"Could not set property {key}: {e}")
+
             db.session.commit()
             return entity
 
