@@ -1,4 +1,4 @@
-<!-- START TEMPLATE: view_edit_tasks.html -->
+<!-- START TEMPLATE: create_view_edit_task.html -->
 
 {% extends "base/create_view_edit/_create_view_edit.html" %}
 
@@ -13,7 +13,8 @@
 {% import 'base/macros/entity_macros.html' as entity_macros with context %}
 
 {% block view_template_content %}
-<form method="post" action="{{ submit_url }}">
+<form method="post" action="{{ submit_url }}" id="main-form">
+  {{ csrf_input }}
   <div class="tab-content" id="formTabsContent">
 
     {% if read_only %}
@@ -65,22 +66,18 @@
           "required": true,
           "options": ["Low", "Medium", "High"]
       }, read_only=read_only) }}
-      {{ field_macros.render_field({
-          "entry_name": "notable_type",
-          "label": "Linked Entity Type",
-          "type": "text",
-          "value": entity.notable_type,
-          "required": true,
-          "options": []
-      }, read_only=read_only) }}
-      {{ field_macros.render_field({
-          "entry_name": "notable_id",
-          "label": "Linked Entity ID",
-          "type": "number",
-          "value": entity.notable_id,
-          "required": true,
-          "options": []
-      }, read_only=read_only) }}
+
+      <div class="form-group">
+        <label for="linked-entity-input">Linked Entity</label>
+        <input type="text"
+               id="linked-entity-input"
+               class="form-control"
+               placeholder="Search for an entity..."
+               data-initial="{{ [entity.notable_id] if entity.notable_id else '[]' }}"
+               {% if read_only %}disabled{% endif %}>
+        <input type="hidden" name="notable_id" id="notable_id" value="{{ entity.notable_id if entity.notable_id else '' }}">
+        <input type="hidden" name="notable_type" id="notable_type" value="{{ entity.notable_type if entity.notable_type else '' }}">
+      </div>
     {% endcall %}
 
     {% if read_only %}
@@ -107,6 +104,25 @@
 
   </div>
 </form>
+
+<script type="module">
+  import { setupAutoComplete } from '/static/js/autoComplete.js';
+
+  // Wait for page to fully load
+  window.addEventListener('load', function() {
+    // Setup autocomplete for linked entity
+    const linkedEntityInput = document.querySelector('#linked-entity-input');
+    if (linkedEntityInput) {
+      setupAutoComplete({
+        inputSelector: '#linked-entity-input',
+        dataUrl: '/api/entities',
+        inputName: 'notable_id',
+        entityTypeField: 'notable_type',
+        initialIds: JSON.parse(linkedEntityInput.dataset.initial || '[]')
+      });
+    }
+  });
+</script>
 {% endblock view_template_content %}
 
-<!-- END TEMPLATE: view_edit_tasks.html -->
+<!-- END TEMPLATE: create_view_g -->
