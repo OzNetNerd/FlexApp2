@@ -2,12 +2,6 @@
 
 {% extends "base/create_view_edit/_create_view_edit.html" %}
 
-{% set tabs = [
-    {'tab_name': 'Notes'} if read_only else None,
-    {'tab_name': 'About'},
-    {'tab_name': 'System Info'} if read_only else None
-] | reject('none') | list %}
-
 {% import 'base/macros/render_form_fields.html' as field_macros with context %}
 {% import 'base/macros/tabs.html' as tab_macros with context %}
 {% import 'base/macros/entity_macros.html' as entity_macros with context %}
@@ -15,17 +9,52 @@
 {% block view_template_content %}
 <form method="post" action="{{ submit_url }}" id="main-form">
   {{ csrf_input }}
+
+  <!-- Priority, Status, Due Date fields row -->
+  <div class="row mt-4">
+    <div class="col-md-4">
+      {{ field_macros.render_field({
+          "entry_name": "priority",
+          "label": "Priority",
+          "type": "select",
+          "value": entity.priority,
+          "required": true,
+          "options": [
+              {"value": "Low", "label": "Low"},
+              {"value": "Medium", "label": "Medium"},
+              {"value": "High", "label": "High"}
+          ]
+      }, read_only=read_only) }}
+    </div>
+    <div class="col-md-4">
+      {{ field_macros.render_field({
+          "entry_name": "status",
+          "label": "Status",
+          "type": "select",
+          "value": entity.status,
+          "required": true,
+          "options": [
+              {"value": "Pending", "label": "Pending"},
+              {"value": "In Progress", "label": "In Progress"},
+              {"value": "Completed", "label": "Completed"}
+          ]
+      }, read_only=read_only) }}
+    </div>
+    <div class="col-md-4">
+      {{ field_macros.render_field({
+          "entry_name": "due_date",
+          "label": "Due Date",
+          "type": "date",
+          "value": entity.due_date or "",
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+    </div>
+  </div>
+
   <div class="tab-content" id="formTabsContent">
-
-    {% if read_only %}
-    <!-- Tab Pane: Notes -->
-    {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
-      {% include 'components/_notes_section.html' %}
-    {% endcall %}
-    {% endif %}
-
     <!-- Tab Pane: About -->
-    {% call tab_macros.render_tab_section('about', 'Task Details', active=not read_only) %}
+    {% call tab_macros.render_tab_section('about', 'Task Details', active=true) %}
       {{ field_macros.render_field({
           "entry_name": "title",
           "label": "Title",
@@ -41,30 +70,6 @@
           "value": entity.description,
           "required": false,
           "options": []
-      }, read_only=read_only) }}
-      {{ field_macros.render_field({
-          "entry_name": "due_date",
-          "label": "Due Date",
-          "type": "date",
-          "value": entity.due_date or "",
-          "required": false,
-          "options": []
-      }, read_only=read_only) }}
-      {{ field_macros.render_field({
-          "entry_name": "status",
-          "label": "Status",
-          "type": "select",
-          "value": entity.status,
-          "required": true,
-          "options": ["Pending", "In Progress", "Completed"]
-      }, read_only=read_only) }}
-      {{ field_macros.render_field({
-          "entry_name": "priority",
-          "label": "Priority",
-          "type": "select",
-          "value": entity.priority,
-          "required": true,
-          "options": ["Low", "Medium", "High"]
       }, read_only=read_only) }}
 
       <div class="form-group">
@@ -100,8 +105,12 @@
           "options": []
       }, read_only=true) }}
     {% endcall %}
-    {% endif %}
 
+    <!-- Tab Pane: Notes -->
+    {% call tab_macros.render_tab_section('notes', 'Notes') %}
+      {% include 'components/_notes_section.html' %}
+    {% endcall %}
+    {% endif %}
   </div>
 </form>
 
@@ -125,4 +134,4 @@
 </script>
 {% endblock view_template_content %}
 
-<!-- END TEMPLATE: create_view_g -->
+<!-- END TEMPLATE: create_view_edit_task.html -->

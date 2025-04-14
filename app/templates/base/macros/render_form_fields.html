@@ -12,8 +12,12 @@
             <p><i class="fas fa-{{ 'check' if entry.value else 'times' }}"></i> {{ 'Yes' if entry.value else 'No' }}</p>
           {% elif entry.type == 'select' and entry.options %}
             {% for option in entry.options %}
-              {% if entry.value == option.value %}
-                <p>{{ option.label }}</p>
+              {% if option is string and option == entry.value %}
+                <p>{{ option }}</p>
+              {% elif option is mapping %}
+                {% if entry.value == option.value %}
+                  <p>{{ option.text or option.label }}</p>
+                {% endif %}
               {% endif %}
             {% endfor %}
           {% elif entry.type == 'date' %}
@@ -35,9 +39,15 @@
                 {% if entry.required %}required{% endif %}>
           <option value="">-- Select {{ entry.label }} --</option>
           {% for option in entry.options %}
-            <option value="{{ option.value }}" {% if entry.value == option.value %}selected{% endif %}>
-              {{ option.label }}
-            </option>
+            {% if option is string %}
+              <option value="{{ option }}" {% if entry.value == option %}selected{% endif %}>
+                {{ option }}
+              </option>
+            {% elif option is mapping %}
+              <option value="{{ option.value }}" {% if entry.value == option.value %}selected{% endif %}>
+                {{ option.text or option.label }}
+              </option>
+            {% endif %}
           {% endfor %}
         </select>
       {% elif entry.type == 'checkbox' %}
