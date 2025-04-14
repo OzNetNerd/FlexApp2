@@ -15,11 +15,7 @@ companies_api_bp = Blueprint(f"{ENTITY_PLURAL_NAME.lower()}_api", __name__, url_
 company_service = CRUDService(Company)
 
 # Register all standard CRUD API routes
-company_api_crud_config = ApiCrudRouteConfig(
-    blueprint=companies_api_bp,
-    entity_table_name=ENTITY_NAME,
-    service=company_service
-)
+company_api_crud_config = ApiCrudRouteConfig(blueprint=companies_api_bp, entity_table_name=ENTITY_NAME, service=company_service)
 register_api_crud_routes(company_api_crud_config)
 
 logger.info(f"Successfully set up '{ENTITY_NAME}' API routes.")

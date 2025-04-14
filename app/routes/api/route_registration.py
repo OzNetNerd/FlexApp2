@@ -27,6 +27,7 @@ class CRUDEndpoint(Enum):
 @dataclass
 class ApiCrudRouteConfig:
     """Configuration for API CRUD routes."""
+
     blueprint: Blueprint
     entity_table_name: str
     service: Any
@@ -35,7 +36,7 @@ class ApiCrudRouteConfig:
 
 def json_response(context: Any, status_code: int = 200) -> Tuple[Any, int]:
     """Convert a context object to a JSON response with proper status code."""
-    if hasattr(context, 'to_dict'):
+    if hasattr(context, "to_dict"):
         data = context.to_dict()
     elif isinstance(context, dict):
         data = context
@@ -43,124 +44,75 @@ def json_response(context: Any, status_code: int = 200) -> Tuple[Any, int]:
         data = {"data": str(context)}
 
     # If it's an error context, use its status code
-    if hasattr(context, 'status_code'):
+    if hasattr(context, "status_code"):
         status_code = context.status_code
 
     return jsonify(data), status_code
 
 
 def handle_api_crud_operation(
-        endpoint: str,
-        service: Any,
-        entity_table_name: str,
-        entity_id: Optional[Union[str, int]] = None,
-        data: Optional[Dict[str, Any]] = None
+    endpoint: str, service: Any, entity_table_name: str, entity_id: Optional[Union[str, int]] = None, data: Optional[Dict[str, Any]] = None
 ) -> Any:
     """Handle CRUD operations based on endpoint type."""
     if not service:
         logger.error(f"No service available for {endpoint}")
-        return ErrorAPIContext(
-            message="Service not available for this operation",
-            status_code=500
-        )
+        return ErrorAPIContext(message="Service not available for this operation", status_code=500)
 
     try:
         if endpoint == CRUDEndpoint.GET_ALL.value:
             query_result = service.get_all()
 
             # Handle pagination objects by extracting items and total_count
-            if hasattr(query_result, 'items'):
+            if hasattr(query_result, "items"):
                 items = query_result.items
-                total_count = getattr(query_result, 'total_count', None)
+                total_count = getattr(query_result, "total_count", None)
             else:
                 items = query_result
                 total_count = None
 
             # Create the context with extracted items
-            return ListAPIContext(
-                entity_table_name=entity_table_name,
-                items=items,
-                total_count=total_count
-            )
+            return ListAPIContext(entity_table_name=entity_table_name, items=items, total_count=total_count)
 
         elif endpoint == CRUDEndpoint.GET_BY_ID.value and entity_id:
             entity = service.get_by_id(entity_id)
             if not entity:
-                return ErrorAPIContext(
-                    message=f"{entity_table_name} not found",
-                    status_code=404
-                )
+                return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
             return EntityAPIContext(entity_table_name=entity_table_name, entity=entity)
 
         elif endpoint == CRUDEndpoint.CREATE.value and data:
             result = service.create(data)
             if isinstance(result, dict) and result.get("error"):
-                return ErrorAPIContext(
-                    message=result.get("error"),
-                    status_code=400
-                )
-            return EntityAPIContext(
-                entity_table_name=entity_table_name,
-                entity=result,
-                message=f"{entity_table_name} created successfully"
-            )
+                return ErrorAPIContext(message=result.get("error"), status_code=400)
+            return EntityAPIContext(entity_table_name=entity_table_name, entity=result, message=f"{entity_table_name} created successfully")
 
         elif endpoint == CRUDEndpoint.UPDATE.value and entity_id and data:
             entity = service.get_by_id(entity_id)
             if not entity:
-                return ErrorAPIContext(
-                    message=f"{entity_table_name} not found",
-                    status_code=404
-                )
+                return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
 
             result = service.update(entity, data)
             if isinstance(result, dict) and result.get("error"):
-                return ErrorAPIContext(
-                    message=result.get("error"),
-                    status_code=400
-                )
-            return EntityAPIContext(
-                entity_table_name=entity_table_name,
-                entity=result,
-                message=f"{entity_table_name} updated successfully"
-            )
+                return ErrorAPIContext(message=result.get("error"), status_code=400)
+            return EntityAPIContext(entity_table_name=entity_table_name, entity=result, message=f"{entity_table_name} updated successfully")
 
         elif endpoint == CRUDEndpoint.DELETE.value and entity_id:
             entity = service.get_by_id(entity_id)
             if not entity:
-                return ErrorAPIContext(
-                    message=f"{entity_table_name} not found",
-                    status_code=404
-                )
+                return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
 
             result = service.delete(entity_id)
             if isinstance(result, dict) and result.get("error"):
-                return ErrorAPIContext(
-                    message=result.get("error"),
-                    status_code=400
-                )
+                return ErrorAPIContext(message=result.get("error"), status_code=400)
             return {"message": f"{entity_table_name} deleted successfully"}
 
     except Exception as e:
         logger.error(f"Error in API operation: {e}", exc_info=True)
-        return ErrorAPIContext(
-            message=f"Error processing request: {str(e)}",
-            status_code=500
-        )
+        return ErrorAPIContext(message=f"Error processing request: {str(e)}", status_code=500)
 
-    return ErrorAPIContext(
-        message="Invalid operation or missing required parameters",
-        status_code=400
-    )
+    return ErrorAPIContext(message="Invalid operation or missing required parameters", status_code=400)
 
 
-def register_api_route(
-        blueprint: Blueprint,
-        url: str,
-        handler: Callable,
-        endpoint: str,
-        methods: Optional[List[str]] = None
-) -> Blueprint:
+def register_api_route(blueprint: Blueprint, url: str, handler: Callable, endpoint: str, methods: Optional[List[str]] = None) -> Blueprint:
     """Register an API route with the given blueprint."""
     if methods is None:
         methods = ["GET"]
@@ -186,9 +138,7 @@ def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:
 
     logger.info(f"Entity table name is valid: {entity_table_name}")
 
-    include_routes = config.include_routes or [
-        "get_all", "get_by_id", "create", "update", "delete"
-    ]
+    include_routes = config.include_routes or ["get_all", "get_by_id", "create", "update", "delete"]
 
     logger.info(f"Routes to include: {include_routes}")
 
@@ -200,63 +150,35 @@ def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:
         "get_all": {
             "url": "/",
             "methods": ["GET"],
-            "handler": lambda: json_response(
-                handle_api_crud_operation(
-                    CRUDEndpoint.GET_ALL.value,
-                    service,
-                    entity_table_name
-                )
-            )
+            "handler": lambda: json_response(handle_api_crud_operation(CRUDEndpoint.GET_ALL.value, service, entity_table_name)),
         },
         "get_by_id": {
             "url": "/<int:entity_id>",
             "methods": ["GET"],
             "handler": lambda entity_id: json_response(
-                handle_api_crud_operation(
-                    CRUDEndpoint.GET_BY_ID.value,
-                    service,
-                    entity_table_name,
-                    entity_id
-                )
-            )
+                handle_api_crud_operation(CRUDEndpoint.GET_BY_ID.value, service, entity_table_name, entity_id)
+            ),
         },
         "create": {
             "url": "/",
             "methods": ["POST"],
             "handler": lambda: json_response(
-                handle_api_crud_operation(
-                    CRUDEndpoint.CREATE.value,
-                    service,
-                    entity_table_name,
-                    data=request.get_json()
-                ),
-                201
-            )
+                handle_api_crud_operation(CRUDEndpoint.CREATE.value, service, entity_table_name, data=request.get_json()), 201
+            ),
         },
         "update": {
             "url": "/<int:entity_id>",
             "methods": ["PUT"],
             "handler": lambda entity_id: json_response(
-                handle_api_crud_operation(
-                    CRUDEndpoint.UPDATE.value,
-                    service,
-                    entity_table_name,
-                    entity_id,
-                    data=request.get_json()
-                )
-            )
+                handle_api_crud_operation(CRUDEndpoint.UPDATE.value, service, entity_table_name, entity_id, data=request.get_json())
+            ),
         },
         "delete": {
             "url": "/<int:entity_id>",
             "methods": ["DELETE"],
             "handler": lambda entity_id: json_response(
-                handle_api_crud_operation(
-                    CRUDEndpoint.DELETE.value,
-                    service,
-                    entity_table_name,
-                    entity_id
-                )
-            )
+                handle_api_crud_operation(CRUDEndpoint.DELETE.value, service, entity_table_name, entity_id)
+            ),
         },
     }
 
@@ -272,12 +194,7 @@ def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:
                     return handler_func(*args, **kwargs)
                 except Exception as e:
                     logger.error(f"Error in API handler: {e}", exc_info=True)
-                    return json_response(
-                        ErrorAPIContext(
-                            message=f"Internal server error: {str(e)}",
-                            status_code=500
-                        )
-                    )
+                    return json_response(ErrorAPIContext(message=f"Internal server error: {str(e)}", status_code=500))
 
             # Ensure the handler has the correct name for Flask
             wrapped_handler.__name__ = route_type

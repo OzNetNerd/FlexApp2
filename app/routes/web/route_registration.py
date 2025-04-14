@@ -46,13 +46,7 @@ class CrudTemplates:
 
     def to_dict(self) -> Dict[str, Optional[str]]:
         """Convert the dataclass to a dictionary."""
-        return {
-            'index': self.index,
-            'create': self.create,
-            'view': self.view,
-            'edit': self.edit,
-            'delete': self.delete
-        }
+        return {"index": self.index, "create": self.create, "view": self.view, "edit": self.edit, "delete": self.delete}
 
 
 @dataclass
@@ -78,10 +72,11 @@ def render_safely(config: RenderSafelyConfig):
         return f"<h1>{config.error_message}</h1><p>Error: {str(e)}</p>", 500
 
 
-def prepare_route_config(url: str, template_path: str, endpoint: Optional[str] = None,
-                         methods: Optional[List[str]] = None) -> Tuple[str, List[str]]:
+def prepare_route_config(
+    url: str, template_path: str, endpoint: Optional[str] = None, methods: Optional[List[str]] = None
+) -> Tuple[str, List[str]]:
     """Prepare route configuration with defaults."""
-    endpoint = endpoint or url.lstrip('/').replace('/', '_')
+    endpoint = endpoint or url.lstrip("/").replace("/", "_")
     methods = methods or ["GET", "POST"]
     return endpoint, methods
 
@@ -92,8 +87,7 @@ def find_service(context_provider: Callable) -> Optional[Any]:
         return None
 
     def is_service(obj: Any) -> bool:
-        return (hasattr(obj, "get_by_id") and hasattr(obj, "update") and
-                hasattr(obj, "create") and hasattr(obj, "delete"))
+        return hasattr(obj, "get_by_id") and hasattr(obj, "update") and hasattr(obj, "create") and hasattr(obj, "delete")
 
     # Check closure
     if hasattr(context_provider, "__closure__") and context_provider.__closure__:
@@ -113,8 +107,9 @@ def find_service(context_provider: Callable) -> Optional[Any]:
     return None
 
 
-def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str,
-                          entity_id: Optional[str], form_data: Dict[str, Any]) -> Optional[Any]:
+def handle_crud_operation(
+    endpoint: str, service: Any, blueprint_name: str, entity_id: Optional[str], form_data: Dict[str, Any]
+) -> Optional[Any]:
     """Handle CRUD operations based on endpoint type."""
     if not service:
         logger.error(f"No service available for {endpoint}")
@@ -130,7 +125,7 @@ def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str,
     elif endpoint == CRUDEndpoint.CREATE.value:
         new_entity = service.create(form_data)
         flash("Successfully created record", "success")
-        entity_id = getattr(new_entity, 'id', None)
+        entity_id = getattr(new_entity, "id", None)
 
         if entity_id:
             return redirect(url_for(f"{blueprint_name}.view", entity_id=entity_id))
@@ -144,8 +139,7 @@ def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str,
     return None
 
 
-def get_context(context_provider: Optional[Callable], title: str,
-                args: tuple, kwargs: dict) -> Any:
+def get_context(context_provider: Optional[Callable], title: str, args: tuple, kwargs: dict) -> Any:
     """Get context from provider or return a simple context."""
     if not context_provider:
         logger.info("No context provider, using default SimpleContext")
@@ -169,14 +163,14 @@ def get_context(context_provider: Optional[Callable], title: str,
 
 
 def register_route(
-        blueprint: Blueprint,
-        url: str,
-        template_path: str,
-        context_provider: Callable,
-        title: Optional[str] = None,
-        endpoint: Optional[str] = None,
-        methods: Optional[List[str]] = None,
-        error_message: str = "Failed to load the page",
+    blueprint: Blueprint,
+    url: str,
+    template_path: str,
+    context_provider: Callable,
+    title: Optional[str] = None,
+    endpoint: Optional[str] = None,
+    methods: Optional[List[str]] = None,
+    error_message: str = "Failed to load the page",
 ):
     """Register a route with the given blueprint."""
     logger.info(f"Starting route registration - URL: {url}, Template: {template_path}")
@@ -189,7 +183,7 @@ def register_route(
     title = title or endpoint
     logger.info(f"Using title '{title}' for the route")
 
-    logger.info(f'Registering route - title: {title} - endpoint: {endpoint}')
+    logger.info(f"Registering route - title: {title} - endpoint: {endpoint}")
 
     def route_handler(*args, **kwargs):
         """Handle HTTP requests for this route."""
@@ -199,14 +193,12 @@ def register_route(
             # Handle CRUD operations
             if request.method == "POST" and CRUDEndpoint.is_valid(endpoint):
                 logger.info(f"Handling POST request for endpoint '{endpoint}'")
-                entity_id = kwargs.get('entity_id')
+                entity_id = kwargs.get("entity_id")
                 form_data = request.form.to_dict()
                 service = find_service(context_provider)
 
                 logger.info(f"Found service '{service}' for the operation")
-                result = handle_crud_operation(
-                    endpoint, service, blueprint.name, entity_id, form_data
-                )
+                result = handle_crud_operation(endpoint, service, blueprint.name, entity_id, form_data)
 
                 if result:
                     logger.info(f"CRUD operation successful, returning result")
@@ -219,12 +211,14 @@ def register_route(
             logger.info(f"CRITICAL: About to render '{template_path}' for endpoint '{endpoint}'")
             logger.info(f"Blueprint name: {blueprint.name}, URL values: {kwargs}")
 
-            result = render_safely(RenderSafelyConfig(
-                template_path,
-                context,
-                error_message,
-                endpoint,
-            ))
+            result = render_safely(
+                RenderSafelyConfig(
+                    template_path,
+                    context,
+                    error_message,
+                    endpoint,
+                )
+            )
 
             if result is None:
                 logger.error("Template renderer returned None")
@@ -248,7 +242,6 @@ def register_route(
     return route_handler
 
 
-
 def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
     """Register CRUD routes based on configuration."""
     logger.info("Starting registration of CRUD routes.")
@@ -263,7 +256,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
 
     logger.info(f"Entity table name is valid: {entity_table_name}")
 
-    include_routes = crud_route_config.include_routes or ["index", "create", "view", "edit", "delete"]
+    include_routes = crud_route_config.include_routes or ["index", "create", "view", "edit", "update", "delete"]
     templates = crud_route_config.templates or CrudTemplates()
 
     logger.info(f"Routes to include: {include_routes}")
@@ -291,10 +284,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
             "template_default": f"pages/crud/create.html",
             "error_message": f"Failed to create {entity_table_name}",
             "context_provider": lambda service=service: EntityContext(
-                action="create",
-                entity_table_name=entity_table_name,
-                title=f"Create {entity_table_name}",
-                read_only=False
+                action="create", entity_table_name=entity_table_name, title=f"Create {entity_table_name}", read_only=False
             ),
             "methods": ["GET", "POST"],
         },
@@ -322,8 +312,23 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 title=f"Edit {entity_table_name}",
                 read_only=False,
                 blueprint_name=blueprint.name,
+                submit_url=url_for(f"{blueprint.name}.update", entity_id=entity_id),
             ),
             "methods": ["GET", "POST"],
+        },
+        "update": {
+            "url": "/<int:entity_id>/update",
+            "template_default": f"pages/crud/edit.html",
+            "error_message": f"Failed to update {entity_table_name}",
+            "context_provider": lambda entity_id, service=service: EntityContext(
+                action="update",
+                entity_table_name=entity_table_name,
+                entity_id=entity_id,
+                entity=service.get_by_id(entity_id),
+                title=f"Update {entity_table_name}",
+                read_only=False,
+            ),
+            "methods": ["POST"],
         },
         "delete": {
             "url": "/<int:entity_id>/delete",
@@ -370,9 +375,7 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
     return blueprint
 
 
-
-def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint: str,
-                        methods: Optional[List[str]] = None):
+def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint: str, methods: Optional[List[str]] = None):
     """Register an authentication route with a custom handler."""
     if methods is None:
         methods = ["GET"]

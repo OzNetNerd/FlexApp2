@@ -71,20 +71,20 @@ class Opportunity(BaseModel):
             contacts = set()
 
             # Handle both cases: notes as a collection or as a single Note object
-            if hasattr(self.notes, '__iter__') and not isinstance(self.notes, str):
+            if hasattr(self.notes, "__iter__") and not isinstance(self.notes, str):
                 # It's iterable (like a list)
                 for note in self.notes:
-                    if hasattr(note, 'author') and hasattr(note.author, 'relationships'):
+                    if hasattr(note, "author") and hasattr(note.author, "relationships"):
                         for rel in note.author.relationships:
-                            if hasattr(rel, 'contact'):
+                            if hasattr(rel, "contact"):
                                 contacts.add(rel.contact)
-            elif hasattr(self.notes, 'author') and hasattr(self.notes.author, 'relationships'):
+            elif hasattr(self.notes, "author") and hasattr(self.notes.author, "relationships"):
                 # It's a single Note object
                 for rel in self.notes.author.relationships:
-                    if hasattr(rel, 'contact'):
+                    if hasattr(rel, "contact"):
                         contacts.add(rel.contact)
 
-            scores = [c.crisp_summary for c in contacts if hasattr(c, 'crisp_summary') and c.crisp_summary is not None]
+            scores = [c.crisp_summary for c in contacts if hasattr(c, "crisp_summary") and c.crisp_summary is not None]
 
             if not scores:
                 return None

@@ -1,4 +1,4 @@
-# app/routes/contacts.py
+# routes/web/contacts.py
 import logging
 from flask import Blueprint
 from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig, CrudTemplates
@@ -27,9 +27,6 @@ logger.info(f"Custom templates: {custom_templates.to_dict()}")
 
 # Register all standard CRUD routes with custom templates
 contact_crud_config = CrudRouteConfig(
-    blueprint=contacts_bp,
-    entity_table_name="Contact",
-    service=contact_service,
-    templates=custom_templates
+    blueprint=contacts_bp, entity_table_name="Contact", service=contact_service, templates=custom_templates
 )
 register_crud_routes(contact_crud_config)

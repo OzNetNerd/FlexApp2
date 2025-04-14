@@ -15,11 +15,7 @@ contacts_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f
 contact_service = CRUDService(Contact)
 
 # Register all standard CRUD API routes
-contact_api_crud_config = ApiCrudRouteConfig(
-    blueprint=contacts_api_bp,
-    entity_table_name=ENTITY_NAME,
-    service=contact_service
-)
+contact_api_crud_config = ApiCrudRouteConfig(blueprint=contacts_api_bp, entity_table_name=ENTITY_NAME, service=contact_service)
 register_api_crud_routes(contact_api_crud_config)
 
 logger.info(f"{ENTITY_PLURAL_NAME} API routes registered successfully.")

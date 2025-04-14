@@ -7,6 +7,7 @@ from sqlalchemy import and_, or_
 from app.routes.api.route_registration import register_api_crud_routes, ApiCrudRouteConfig
 from app.routes.api.route_registration import json_response, ErrorAPIContext, ListAPIContext
 from app.models import Note
+
 # Import CRUDService directly and initialize it here to avoid circular imports
 from app.services.crud_service import CRUDService
 
@@ -21,11 +22,7 @@ notes_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/a
 note_service = CRUDService(Note)
 
 # Register all standard CRUD API routes
-note_api_crud_config = ApiCrudRouteConfig(
-    blueprint=notes_api_bp,
-    entity_table_name=ENTITY_NAME,
-    service=note_service
-)
+note_api_crud_config = ApiCrudRouteConfig(blueprint=notes_api_bp, entity_table_name=ENTITY_NAME, service=note_service)
 register_api_crud_routes(note_api_crud_config)
 
 
@@ -57,10 +54,7 @@ def query_notes():
         notable_type = request.args.get("notable_type")
         notable_id = request.args.get("notable_id")
         if notable_type and notable_id:
-            filters.append(and_(
-                Note.notable_type == notable_type,
-                Note.notable_id == int(notable_id)
-            ))
+            filters.append(and_(Note.notable_type == notable_type, Note.notable_id == int(notable_id)))
 
         # Filter by date range
         start_date = request.args.get("start_date")
@@ -71,17 +65,9 @@ def query_notes():
                 end = datetime.strptime(end_date, "%Y-%m-%d")
                 # Add a day to end_date to make it inclusive
                 end = end + timedelta(days=1)
-                filters.append(and_(
-                    Note.created_at >= start,
-                    Note.created_at < end
-                ))
+                filters.append(and_(Note.created_at >= start, Note.created_at < end))
             except ValueError as e:
-                return json_response(
-                    ErrorAPIContext(
-                        message=f"Invalid date format: {str(e)}",
-                        status_code=400
-                    )
-                )
+                return json_response(ErrorAPIContext(message=f"Invalid date format: {str(e)}", status_code=400))
 
         # Filter by days ago
         days = request.args.get("days")
@@ -89,21 +75,11 @@ def query_notes():
             try:
                 days_ago = int(days)
                 if days_ago <= 0:
-                    return json_response(
-                        ErrorAPIContext(
-                            message="Days parameter must be a positive integer",
-                            status_code=400
-                        )
-                    )
+                    return json_response(ErrorAPIContext(message="Days parameter must be a positive integer", status_code=400))
                 start_date = datetime.now() - timedelta(days=days_ago)
                 filters.append(Note.created_at >= start_date)
             except ValueError:
-                return json_response(
-                    ErrorAPIContext(
-                        message="Days parameter must be a valid integer",
-                        status_code=400
-                    )
-                )
+                return json_response(ErrorAPIContext(message="Days parameter must be a valid integer", status_code=400))
 
         # Filter by user ID
         user_id = request.args.get("user_id")
@@ -111,21 +87,13 @@ def query_notes():
             try:
                 filters.append(Note.user_id == int(user_id))
             except ValueError:
-                return json_response(
-                    ErrorAPIContext(
-                        message="User ID must be a valid integer",
-                        status_code=400
-                    )
-                )
+                return json_response(ErrorAPIContext(message="User ID must be a valid integer", status_code=400))
 
         # Search by content
         search_term = request.args.get("q")
         if search_term:
             search_pattern = f"%{search_term}%"
-            filters.append(or_(
-                Note.content.ilike(search_pattern),
-                Note.processed_content.ilike(search_pattern)
-            ))
+            filters.append(or_(Note.content.ilike(search_pattern), Note.processed_content.ilike(search_pattern)))
 
         # Apply all filters
         if filters:
@@ -143,32 +111,20 @@ def query_notes():
 
         return json_response(
             ListAPIContext(
-                entity_table_name=ENTITY_NAME,
-                items=paginated_notes.items,
-                total_count=paginated_notes.total,
-                page=page,
-                per_page=per_page
+                entity_table_name=ENTITY_NAME, items=paginated_notes.items, total_count=paginated_notes.total, page=page, per_page=per_page
             )
         )
 
     except Exception as e:
         logger.error(f"Error querying notes: {e}", exc_info=True)
-        return json_response(
-            ErrorAPIContext(
-                message=f"Error retrieving notes: {str(e)}",
-                status_code=500
-            )
-        )
+        return json_response(ErrorAPIContext(message=f"Error retrieving notes: {str(e)}", status_code=500))
 
 
 # Helper function for notes by notable type/id
 def get_notes_by_notable_entity(notable_type, notable_id):
     """Get notes by notable entity type and ID."""
     try:
-        return Note.query.filter_by(
-            notable_type=notable_type,
-            notable_id=notable_id
-        ).order_by(Note.created_at.desc()).all()
+        return Note.query.filter_by(notable_type=notable_type, notable_id=notable_id).order_by(Note.created_at.desc()).all()
     except Exception as e:
         logger.error(f"Error getting notes for {notable_type} {notable_id}: {e}")
         raise
@@ -179,12 +135,11 @@ def search_notes_by_content(search_term):
     """Search notes by content."""
     try:
         search_pattern = f"%{search_term}%"
-        return Note.query.filter(
-            or_(
-                Note.content.ilike(search_pattern),
-                Note.processed_content.ilike(search_pattern)
-            )
-        ).order_by(Note.created_at.desc()).all()
+        return (
+            Note.query.filter(or_(Note.content.ilike(search_pattern), Note.processed_content.ilike(search_pattern)))
+            .order_by(Note.created_at.desc())
+            .all()
+        )
     except Exception as e:
         logger.error(f"Error searching notes: {e}")
         raise
@@ -196,21 +151,10 @@ def get_notes_by_notable(notable_type, notable_id):
     try:
         notes = get_notes_by_notable_entity(notable_type, notable_id)
 
-        return json_response(
-            ListAPIContext(
-                entity_table_name=ENTITY_NAME,
-                items=notes,
-                total_count=len(notes)
-            )
-        )
+        return json_response(ListAPIContext(entity_table_name=ENTITY_NAME, items=notes, total_count=len(notes)))
     except Exception as e:
         logger.error(f"Error getting notes for {notable_type} {notable_id}: {e}", exc_info=True)
-        return json_response(
-            ErrorAPIContext(
-                message=f"Error retrieving notes: {str(e)}",
-                status_code=500
-            )
-        )
+        return json_response(ErrorAPIContext(message=f"Error retrieving notes: {str(e)}", status_code=500))
 
 
 @notes_api_bp.route("/search", methods=["GET"])
@@ -220,30 +164,14 @@ def search_notes():
         search_term = request.args.get("q")
 
         if not search_term:
-            return json_response(
-                ErrorAPIContext(
-                    message="Search query parameter 'q' is required",
-                    status_code=400
-                )
-            )
+            return json_response(ErrorAPIContext(message="Search query parameter 'q' is required", status_code=400))
 
         notes = search_notes_by_content(search_term)
 
-        return json_response(
-            ListAPIContext(
-                entity_table_name=ENTITY_NAME,
-                items=notes,
-                total_count=len(notes)
-            )
-        )
+        return json_response(ListAPIContext(entity_table_name=ENTITY_NAME, items=notes, total_count=len(notes)))
     except Exception as e:
         logger.error(f"Error searching notes: {e}", exc_info=True)
-        return json_response(
-            ErrorAPIContext(
-                message=f"Error searching notes: {str(e)}",
-                status_code=500
-            )
-        )
+        return json_response(ErrorAPIContext(message=f"Error searching notes: {str(e)}", status_code=500))
 
 
 logger.info(f"{ENTITY_PLURAL_NAME} API routes registered successfully.")

@@ -19,7 +19,7 @@ custom_templates = CrudTemplates(
     # create="pages/crud/create_view_edit_company.html",
     create="pages/crud/create_view_edit_company.html",
     view="pages/crud/create_view_edit_company.html",
-    edit = "pages/crud/create_view_edit_company.html"
+    edit="pages/crud/create_view_edit_company.html",
 )
 
 # Add debug logging to verify templates are set correctly
@@ -27,9 +27,6 @@ logger.info(f"Custom templates: {custom_templates.to_dict()}")
 
 # Register all standard CRUD routes with custom templates
 company_crud_config = CrudRouteConfig(
-    blueprint=companies_bp,
-    entity_table_name="Company",
-    service=company_service,
-    templates=custom_templates
+    blueprint=companies_bp, entity_table_name="Company", service=company_service, templates=custom_templates
 )
 register_crud_routes(company_crud_config)

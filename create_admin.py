@@ -265,10 +265,7 @@ def seed_notes():
         create_or_update(
             Note,
             {"notable_type": "Company", "notable_id": company.id, "user_id": user.id},
-            {
-                "content": f"Note for company {company.name}",
-                "processed_content": f"<p>Note for company {company.name}</p>"
-            },
+            {"content": f"Note for company {company.name}", "processed_content": f"<p>Note for company {company.name}</p>"},
         )
 
     # Seed notes for contacts
@@ -277,10 +274,7 @@ def seed_notes():
         create_or_update(
             Note,
             {"notable_type": "Contact", "notable_id": contact.id, "user_id": user.id},
-            {
-                "content": f"Note for contact {full_name}",
-                "processed_content": f"<p>Note for contact {full_name}</p>"
-            },
+            {"content": f"Note for contact {full_name}", "processed_content": f"<p>Note for contact {full_name}</p>"},
         )
 
     # Seed notes for opportunities
@@ -288,10 +282,7 @@ def seed_notes():
         create_or_update(
             Note,
             {"notable_type": "Opportunity", "notable_id": opportunity.id, "user_id": user.id},
-            {
-                "content": f"Note for opportunity {opportunity.name}",
-                "processed_content": f"<p>Note for opportunity {opportunity.name}</p>"
-            },
+            {"content": f"Note for opportunity {opportunity.name}", "processed_content": f"<p>Note for opportunity {opportunity.name}</p>"},
         )
     db.session.commit()
     print("✅ Notes seeded.")
@@ -314,16 +305,11 @@ def seed_relationships():
         user2 = users[i + 1]
         rel_type = relationship_types[i % len(relationship_types)]
 
-        existing = Relationship.query.filter_by(
-            entity1_type="user", entity1_id=user1.id,
-            entity2_type="user", entity2_id=user2.id
-        ).first()
+        existing = Relationship.query.filter_by(entity1_type="user", entity1_id=user1.id, entity2_type="user", entity2_id=user2.id).first()
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user1.id,
-                entity2_type="user", entity2_id=user2.id,
-                relationship_type=rel_type
+                entity1_type="user", entity1_id=user1.id, entity2_type="user", entity2_id=user2.id, relationship_type=rel_type
             )
             db.session.add(relationship)
             logger.info(f"Created relationship: User {user1.username} {rel_type} User {user2.username}")
@@ -335,15 +321,12 @@ def seed_relationships():
         rel_type = relationship_types[(i + 2) % len(relationship_types)]
 
         existing = Relationship.query.filter_by(
-            entity1_type="user", entity1_id=user.id,
-            entity2_type="contact", entity2_id=contact.id
+            entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id
         ).first()
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user.id,
-                entity2_type="contact", entity2_id=contact.id,
-                relationship_type=rel_type
+                entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id, relationship_type=rel_type
             )
             db.session.add(relationship)
             logger.info(f"Created relationship: User {user.username} {rel_type} Contact {contact.first_name} {contact.last_name}")
@@ -355,15 +338,12 @@ def seed_relationships():
         rel_type = relationship_types[(i + 4) % len(relationship_types)]
 
         existing = Relationship.query.filter_by(
-            entity1_type="user", entity1_id=user.id,
-            entity2_type="company", entity2_id=company.id
+            entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id
         ).first()
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user.id,
-                entity2_type="company", entity2_id=company.id,
-                relationship_type=rel_type
+                entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id, relationship_type=rel_type
             )
             db.session.add(relationship)
             logger.info(f"Created relationship: User {user.username} {rel_type} Company {company.name}")

@@ -1,23 +1,13 @@
 import logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
 logger = logging.getLogger(__name__)
 logger.info("Starting application initialization")
 
 
 from datetime import datetime
-from flask import (
-    Flask,
-    request,
-    redirect,
-    url_for,
-    make_response,
-    current_app
-)
+from flask import Flask, request, redirect, url_for, make_response, current_app
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
 from config import Config
@@ -69,8 +59,7 @@ def create_app(config_class=Config):
     @app.errorhandler(TypeError)
     def handle_type_error(e):
         logger.error(f"TypeError: {str(e)}")
-        return handle_template_error(e, request.endpoint, request.path,
-                                     "An error occurred while preparing the page context")
+        return handle_template_error(e, request.endpoint, request.path, "An error occurred while preparing the page context")
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -90,7 +79,7 @@ def create_app(config_class=Config):
     # ---------------------------------------------
     @app.before_request
     def log_request():
-        request_id = getattr(request, 'id', hex(id(request))[2:])
+        request_id = getattr(request, "id", hex(id(request))[2:])
         logger.info(f"[{request_id}] Web Request {request.method} {request.path} from {request.remote_addr}")
 
     # ---------------------------------------------
@@ -111,8 +100,7 @@ def create_app(config_class=Config):
             logger.info("No endpoint found; skipping login check.")
             return
         if not current_user.is_authenticated:
-            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith(
-                    "api_") or endpoint.endswith(".data"):
+            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
                 logger.info(f"Access allowed for endpoint: {endpoint}")
                 return
             logger.info(f"Access denied for endpoint: {endpoint}; redirecting to login with next={request.path}")
@@ -127,7 +115,7 @@ def create_app(config_class=Config):
             "now": datetime.utcnow(),
             "logger": logger,  # Pass standard logger to templates
             "current_app": current_app,
-            "is_debug_mode": app.debug
+            "is_debug_mode": app.debug,
         }
 
     with app.app_context():

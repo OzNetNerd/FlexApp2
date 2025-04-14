@@ -64,10 +64,7 @@ class NoteService(CRUDService):
             List[Note]: List of Notes
         """
         try:
-            return Note.query.filter_by(
-                notable_type=notable_type,
-                notable_id=notable_id
-            ).order_by(Note.created_at.desc()).all()
+            return Note.query.filter_by(notable_type=notable_type, notable_id=notable_id).order_by(Note.created_at.desc()).all()
         except Exception as e:
             logger.error(f"❌ Error getting notes for {notable_type} {notable_id}: {e}")
             raise
@@ -89,10 +86,7 @@ class NoteService(CRUDService):
             # Add a day to end_date to make it inclusive
             end = end + timedelta(days=1)
 
-            return Note.query.filter(
-                Note.created_at >= start,
-                Note.created_at < end
-            ).order_by(Note.created_at.desc()).all()
+            return Note.query.filter(Note.created_at >= start, Note.created_at < end).order_by(Note.created_at.desc()).all()
         except Exception as e:
             logger.error(f"❌ Error getting notes by date range: {e}")
             raise
@@ -110,9 +104,7 @@ class NoteService(CRUDService):
         try:
             start_date = datetime.now() - timedelta(days=int(days_ago))
 
-            return Note.query.filter(
-                Note.created_at >= start_date
-            ).order_by(Note.created_at.desc()).all()
+            return Note.query.filter(Note.created_at >= start_date).order_by(Note.created_at.desc()).all()
         except Exception as e:
             logger.error(f"❌ Error getting notes by days ago: {e}")
             raise
@@ -129,12 +121,11 @@ class NoteService(CRUDService):
         """
         try:
             search_pattern = f"%{search_term}%"
-            return Note.query.filter(
-                or_(
-                    Note.content.ilike(search_pattern),
-                    Note.processed_content.ilike(search_pattern)
-                )
-            ).order_by(Note.created_at.desc()).all()
+            return (
+                Note.query.filter(or_(Note.content.ilike(search_pattern), Note.processed_content.ilike(search_pattern)))
+                .order_by(Note.created_at.desc())
+                .all()
+            )
         except Exception as e:
             logger.error(f"❌ Error searching notes: {e}")
             raise
@@ -150,9 +141,7 @@ class NoteService(CRUDService):
             List[Note]: List of notes by the user
         """
         try:
-            return Note.query.filter_by(
-                user_id=user_id
-            ).order_by(Note.created_at.desc()).all()
+            return Note.query.filter_by(user_id=user_id).order_by(Note.created_at.desc()).all()
         except Exception as e:
             logger.error(f"❌ Error getting notes by user ID {user_id}: {e}")
             raise

@@ -1,4 +1,4 @@
-# crud_service.py
+# services/crud_service.py
 
 import logging
 import traceback
@@ -85,11 +85,11 @@ class CRUDService:
         Returns:
             Any: The found model instance or 404 error.
         """
-        logger.info(f'self: {self}')
-        logger.info(f'entity_id: {entity_id}')
+        logger.info(f"self: {self}")
+        logger.info(f"entity_id: {entity_id}")
         try:
             lookup_result = self.model_class.query.get_or_404(entity_id)
-            logger.info(f'lookup_result: {lookup_result.__dict__}')
+            logger.info(f"lookup_result: {lookup_result.__dict__}")
             return lookup_result
         except Exception as e:
             logger.error(f"❌  Error in get_by_id for {self.model_class.__name__} with id {entity_id}: {e}")
@@ -137,16 +137,15 @@ class CRUDService:
             data = self._convert_dates(data)
 
             # Check for unique constraints
-            if self.model_class.__name__ == 'Contact' and 'email' in data:
-                existing = self.model_class.query.filter_by(email=data['email']).first()
+            if self.model_class.__name__ == "Contact" and "email" in data:
+                existing = self.model_class.query.filter_by(email=data["email"]).first()
                 if existing:
                     raise ValueError(f"A contact with email '{data['email']}' already exists")
 
             # Extract properties that need special handling
             property_attrs = {}
             for key in list(data.keys()):
-                if (hasattr(self.model_class, key) and
-                        isinstance(getattr(self.model_class, key), property)):
+                if hasattr(self.model_class, key) and isinstance(getattr(self.model_class, key), property):
                     property_attrs[key] = data.pop(key)
 
             if issubclass(self.model_class, ValidatorMixin):

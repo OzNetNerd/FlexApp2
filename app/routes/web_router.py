@@ -33,7 +33,7 @@ BLUEPRINTS = [
     auth_bp,
     home_bp,
     relationships_bp,
-    crisp_scores_bp
+    crisp_scores_bp,
 ]
 
 

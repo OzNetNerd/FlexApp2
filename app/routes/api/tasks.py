@@ -15,11 +15,7 @@ tasks_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/a
 task_service = CRUDService(Task)
 
 # Register all standard CRUD API routes
-task_api_crud_config = ApiCrudRouteConfig(
-    blueprint=tasks_api_bp,
-    entity_table_name=ENTITY_NAME,
-    service=task_service
-)
+task_api_crud_config = ApiCrudRouteConfig(blueprint=tasks_api_bp, entity_table_name=ENTITY_NAME, service=task_service)
 register_api_crud_routes(task_api_crud_config)
 
 logger.info(f"{ENTITY_PLURAL_NAME} API routes registered successfully.")

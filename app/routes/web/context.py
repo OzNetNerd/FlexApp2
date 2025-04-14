@@ -67,8 +67,7 @@ class SimpleContext(BaseContext):
 class TableContext(SimpleContext):
     """Context class for rendering table views with table-specific attributes."""
 
-    def __init__(self, entity_table_name: str, title: str = "", read_only: bool = True,
-                action: Optional[str] = None, **kwargs):
+    def __init__(self, entity_table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = None, **kwargs):
 
         # Add table-specific attributes
         self.entity_table_name = entity_table_name
@@ -130,7 +129,7 @@ class EntityContext(BaseContext):
         self.name = "tba"
         self.current_user = current_user
         self.entity_table_name = entity_table_name  # Store table_name
-        self.entity_id = entity_id    # Store entity_id
+        self.entity_id = entity_id  # Store entity_id
 
         # Derived fields initialized in __init__
         self.tabs = []
@@ -161,8 +160,7 @@ class EntityContext(BaseContext):
         primary_str = ", ".join(f"{key}={repr(value)}" for key, value in primary_attrs.items())
 
         # Get all other attributes (excluding private ones)
-        other_attrs = {key: value for key, value in vars(self).items()
-                     if not key.startswith("_") and key not in primary_attrs}
+        other_attrs = {key: value for key, value in vars(self).items() if not key.startswith("_") and key not in primary_attrs}
 
         # Add summary of complex attributes
         if self.autocomplete_fields:
@@ -202,8 +200,7 @@ class EntityContext(BaseContext):
                 entity_dict = self.entity
             elif hasattr(self.entity, "__dict__"):
                 # For ORM models or objects with __dict__
-                entity_dict = {k: v for k, v in self.entity.__dict__.items()
-                           if not k.startswith('_')}
+                entity_dict = {k: v for k, v in self.entity.__dict__.items() if not k.startswith("_")}
             elif hasattr(self.entity, "to_dict"):
                 # For objects with to_dict method
                 entity_dict = self.entity.to_dict()

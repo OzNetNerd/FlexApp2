@@ -39,5 +39,7 @@ def get_autocomplete_field(title, relationships=None, field_id=None, placeholder
         logger.info(f"Extracted related IDs for entity_type '{entity_type}': {related_ids}")
 
     # Make sure to use related_ids to match template expectations
-    field = AutoCompleteField(title=title, id=field_id, placeholder=placeholder, name=name, data_api_url=data_api_url, related_ids=related_ids)
+    field = AutoCompleteField(
+        title=title, id=field_id, placeholder=placeholder, name=name, data_api_url=data_api_url, related_ids=related_ids
+    )
     return field

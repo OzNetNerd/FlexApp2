@@ -78,8 +78,7 @@ class TabBuilder(ABC):
 
     def create_tab(self) -> Tab:
         sections = [method() for method in self.section_method_order]
-        tab = Tab(tab_name=self.tab_name, sections=sections,
-                 visibility=self.visibility, template=self.template)
+        tab = Tab(tab_name=self.tab_name, sections=sections, visibility=self.visibility, template=self.template)
         logger.debug(f"{self.tab_name} tabbing: {tab}")
         return tab
 
@@ -176,16 +175,17 @@ class TabBuilder(ABC):
 #             TabEntry(entry_name="notes", label="Notes", type="custom", value=notes_html)
 #         ])
 
+
 def create_tabs(entity: Any, tabs: List[Callable], current_page=None, add_metadata_tab=True, add_notes_tab=True) -> List[Tab]:
     # Auto-detect current page from request if not provided
     if current_page is None:
         # Extract page type from endpoint name
-        endpoint = request.endpoint if hasattr(request, 'endpoint') else ""
-        if endpoint.endswith('.view'):
+        endpoint = request.endpoint if hasattr(request, "endpoint") else ""
+        if endpoint.endswith(".view"):
             current_page = PageType.VIEW
-        elif endpoint.endswith('.edit'):
+        elif endpoint.endswith(".edit"):
             current_page = PageType.EDIT
-        elif endpoint.endswith('.create'):
+        elif endpoint.endswith(".create"):
             current_page = PageType.CREATE
         else:
             # Default to showing all tabs if we can't determine the page type

@@ -135,23 +135,19 @@ class Contact(BaseModel):
             db.session.flush()
 
         # Clear existing manager relationships
-        Relationship.query.filter_by(
-            entity2_type="contact",
-            entity2_id=self.id,
-            relationship_type="manager"
-        ).delete()
+        Relationship.query.filter_by(entity2_type="contact", entity2_id=self.id, relationship_type="manager").delete()
 
         # Add new manager relationships
         if manager_list:
             for manager in manager_list:
                 if isinstance(manager, dict):
-                    manager_type = manager.get('type', 'user')
-                    manager_id = manager.get('id')
-                elif hasattr(manager, 'id'):
+                    manager_type = manager.get("type", "user")
+                    manager_id = manager.get("id")
+                elif hasattr(manager, "id"):
                     manager_type = manager.__class__.__name__.lower()
                     manager_id = manager.id
                 else:
-                    manager_type = 'user'
+                    manager_type = "user"
                     manager_id = int(manager)
 
                 relationship = Relationship(
@@ -159,6 +155,6 @@ class Contact(BaseModel):
                     entity1_id=manager_id,
                     entity2_type="contact",
                     entity2_id=self.id,
-                    relationship_type="manager"
+                    relationship_type="manager",
                 )
                 db.session.add(relationship)

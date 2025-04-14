@@ -23,10 +23,5 @@ custom_templates = CrudTemplates(
 logger.info(f"Custom templates: {custom_templates.to_dict()}")
 
 # Register all standard CRUD routes with custom templates
-task_crud_config = CrudRouteConfig(
-    blueprint=tasks_bp,
-    entity_table_name="Task",
-    service=task_service,
-    templates=custom_templates
-)
+task_crud_config = CrudRouteConfig(blueprint=tasks_bp, entity_table_name="Task", service=task_service, templates=custom_templates)
 register_crud_routes(task_crud_config)
