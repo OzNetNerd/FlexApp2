@@ -11,269 +11,215 @@
     {'tab_name': 'System Info'} if read_only else None
 ] | reject('none') | list %}
 {% import 'base/macros/render_form_fields.html' as field_macros with context %}
+{% import 'base/macros/tabs.html' as tab_macros with context %}
 
 {% block view_template_content %}
 <form method="post" action="{{ submit_url }}">
-  <!-- Container for all tab panes -->
   <div class="tab-content" id="formTabsContent">
 
     {% if read_only %}
     <!-- Tab Pane: Notes -->
-    <div class="tab-pane fade show active" id="tab-notes">
+    {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
       {% include 'components/_notes_section.html' %}
-    </div>
+    {% endcall %}
     {% endif %}
 
     <!-- Tab Pane: About -->
-    <div class="tab-pane fade {% if not read_only %}show active{% endif %}" id="tab-about">
-      <div class="section-card card shadow-sm border-0 mb-4">
-        <div class="section-header">
-          <h5 class="section-heading">Basic Info</h5>
-        </div>
-        <div class="section-body">
-          <div class="row g-3">
-            {{ field_macros.render_field({
-                "entry_name": "name",
-                "label": "Company Name",
-                "type": "text",
-                "value": entity.name,
-                "required": true,
-                "options": []
-             }, read_only=read_only) }}
-            {{ field_macros.render_field({
-                "entry_name": "description",
-                "label": "Description",
-                "type": "textarea",
-                "value": entity.description,
-                "required": false,
-                "options": []
-             }, read_only=read_only) }}
-          </div>
-        </div>
-      </div>
-    </div>
+    {% call tab_macros.render_tab_section('about', 'Basic Info', active=not read_only) %}
+      {{ field_macros.render_field({
+          "entry_name": "name",
+          "label": "Company Name",
+          "type": "text",
+          "value": entity.name,
+          "required": true,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "description",
+          "label": "Description",
+          "type": "textarea",
+          "value": entity.description,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+    {% endcall %}
 
     <!-- Tab Pane: Contacts -->
-    <div class="tab-pane fade" id="tab-contacts">
-      <div class="section-card card shadow-sm border-0 mb-4">
-        <div class="section-header">
-          <h5 class="section-heading">Related Contacts</h5>
+    {% call tab_macros.render_tab_section('contacts', 'Related Contacts') %}
+      {% if not read_only %}
+        {{ field_macros.render_field({
+            "entry_name": "contacts",
+            "label": "Contacts",
+            "type": "custom",
+            "value": entity.contacts,
+            "required": false,
+            "options": []
+        }, read_only=read_only) }}
+      {% else %}
+        <div class="col-12">
+          <label class="form-label fw-semibold">Contacts</label>
+          {% if entity.contacts %}
+            <div class="table-responsive form-control-plaintext bg-light border rounded px-3 py-2">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for contact in entity.contacts %}
+                  <tr>
+                    <td>{{ contact.name }}</td>
+                    <td>{{ contact.email|default('') }}</td>
+                    <td>{{ contact.phone|default('') }}</td>
+                    <td>
+                      <a href="/contacts/{{ contact.id }}" class="btn btn-sm btn-info">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="form-control-plaintext bg-light border rounded px-3 py-2">
+              No contacts associated with this company.
+            </div>
+          {% endif %}
         </div>
-        <div class="section-body">
-          <div class="row g-3">
-            {% if not read_only %}
-              {{ field_macros.render_field({
-                  "entry_name": "contacts",
-                  "label": "Contacts",
-                  "type": "custom",
-                  "value": entity.contacts,
-                  "required": false,
-                  "options": []
-              }, read_only=read_only) }}
-            {% else %}
-              <div class="col-12">
-                <label class="form-label fw-semibold">Contacts</label>
-                {% if entity.contacts %}
-                  <div class="table-responsive form-control-plaintext bg-light border rounded px-3 py-2">
-                    <table class="table table-hover mb-0">
-                      <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th>Email</th>
-                          <th>Phone</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {% for contact in entity.contacts %}
-                        <tr>
-                          <td>{{ contact.name }}</td>
-                          <td>{{ contact.email|default('') }}</td>
-                          <td>{{ contact.phone|default('') }}</td>
-                          <td>
-                            <a href="/contacts/{{ contact.id }}" class="btn btn-sm btn-info">
-                              <i class="fas fa-eye"></i>
-                            </a>
-                          </td>
-                        </tr>
-                        {% endfor %}
-                      </tbody>
-                    </table>
-                  </div>
-                {% else %}
-                  <div class="form-control-plaintext bg-light border rounded px-3 py-2">
-                    No contacts associated with this company.
-                  </div>
-                {% endif %}
-              </div>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
+      {% endif %}
+    {% endcall %}
 
     <!-- Tab Pane: Opportunities -->
-    <div class="tab-pane fade" id="tab-opportunities">
-      <div class="section-card card shadow-sm border-0 mb-4">
-        <div class="section-header">
-          <h5 class="section-heading">Opportunities</h5>
+    {% call tab_macros.render_tab_section('opportunities', 'Opportunities') %}
+      {% if not read_only %}
+        {{ field_macros.render_field({
+            "entry_name": "opportunities",
+            "label": "Opportunities",
+            "type": "custom",
+            "value": entity.opportunities,
+            "required": false,
+            "options": []
+        }, read_only=read_only) }}
+      {% else %}
+        <div class="col-12">
+          <label class="form-label fw-semibold">Opportunities</label>
+          {% if entity.opportunities %}
+            <div class="table-responsive form-control-plaintext bg-light border rounded px-3 py-2">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Stage</th>
+                    <th>Value</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for opportunity in entity.opportunities %}
+                  <tr>
+                    <td>{{ opportunity.name }}</td>
+                    <td>
+                      <span class="badge {% if opportunity.status == 'Open' %}bg-success{% elif opportunity.status == 'Closed' %}bg-danger{% else %}bg-secondary{% endif %}">
+                        {{ opportunity.status }}
+                      </span>
+                    </td>
+                    <td>{{ opportunity.stage }}</td>
+                    <td>${{ opportunity.value|default('0.00') }}</td>
+                    <td>
+                      <a href="/opportunities/{{ opportunity.id }}" class="btn btn-sm btn-info">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="form-control-plaintext bg-light border rounded px-3 py-2">
+              No opportunities associated with this company.
+            </div>
+          {% endif %}
         </div>
-        <div class="section-body">
-          <div class="row g-3">
-            {% if not read_only %}
-              {{ field_macros.render_field({
-                  "entry_name": "opportunities",
-                  "label": "Opportunities",
-                  "type": "custom",
-                  "value": entity.opportunities,
-                  "required": false,
-                  "options": []
-              }, read_only=read_only) }}
-            {% else %}
-              <div class="col-12">
-                <label class="form-label fw-semibold">Opportunities</label>
-                {% if entity.opportunities %}
-                  <div class="table-responsive form-control-plaintext bg-light border rounded px-3 py-2">
-                    <table class="table table-hover mb-0">
-                      <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th>Status</th>
-                          <th>Stage</th>
-                          <th>Value</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {% for opportunity in entity.opportunities %}
-                        <tr>
-                          <td>{{ opportunity.name }}</td>
-                          <td>
-                            <span class="badge {% if opportunity.status == 'Open' %}bg-success{% elif opportunity.status == 'Closed' %}bg-danger{% else %}bg-secondary{% endif %}">
-                              {{ opportunity.status }}
-                            </span>
-                          </td>
-                          <td>{{ opportunity.stage }}</td>
-                          <td>${{ opportunity.value|default('0.00') }}</td>
-                          <td>
-                            <a href="/opportunities/{{ opportunity.id }}" class="btn btn-sm btn-info">
-                              <i class="fas fa-eye"></i>
-                            </a>
-                          </td>
-                        </tr>
-                        {% endfor %}
-                      </tbody>
-                    </table>
-                  </div>
-                {% else %}
-                  <div class="form-control-plaintext bg-light border rounded px-3 py-2">
-                    No opportunities associated with this company.
-                  </div>
-                {% endif %}
-              </div>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
+      {% endif %}
+    {% endcall %}
 
     <!-- Tab Pane: Capabilities -->
-    <div class="tab-pane fade" id="tab-capabilities">
-      <div class="section-card card shadow-sm border-0 mb-4">
-        <div class="section-header">
-          <h5 class="section-heading">Capabilities</h5>
-        </div>
-        <div class="section-body">
-          <div class="row g-3">
-            {% if not read_only %}
-              {{ field_macros.render_field({
-                  "entry_name": "capabilities",
-                  "label": "Capabilities",
-                  "type": "custom",
-                  "value": entity.capabilities,
-                  "required": false,
-                  "options": []
-              }, read_only=read_only) }}
-            {% else %}
-              <div class="col-12">
-                <label class="form-label fw-semibold">Capabilities</label>
-                {% if entity.capabilities %}
-                  <div class="form-control-plaintext bg-light border rounded px-3 py-2">
-                    <div class="list-group list-group-flush">
-                      {% for capability in entity.capabilities %}
-                        <div class="list-group-item bg-transparent px-0 border-0 border-bottom">
-                          <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">{{ capability.name }}</h5>
-                          </div>
-                          {% if capability.description %}
-                            <p class="mb-1">{{ capability.description }}</p>
-                          {% endif %}
-                        </div>
-                      {% endfor %}
+    {% call tab_macros.render_tab_section('capabilities', 'Capabilities') %}
+      {% if not read_only %}
+        {{ field_macros.render_field({
+            "entry_name": "capabilities",
+            "label": "Capabilities",
+            "type": "custom",
+            "value": entity.capabilities,
+            "required": false,
+            "options": []
+        }, read_only=read_only) }}
+      {% else %}
+        <div class="col-12">
+          <label class="form-label fw-semibold">Capabilities</label>
+          {% if entity.capabilities %}
+            <div class="form-control-plaintext bg-light border rounded px-3 py-2">
+              <div class="list-group list-group-flush">
+                {% for capability in entity.capabilities %}
+                  <div class="list-group-item bg-transparent px-0 border-0 border-bottom">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h5 class="mb-1">{{ capability.name }}</h5>
                     </div>
+                    {% if capability.description %}
+                      <p class="mb-1">{{ capability.description }}</p>
+                    {% endif %}
                   </div>
-                {% else %}
-                  <div class="form-control-plaintext bg-light border rounded px-3 py-2">
-                    No capabilities defined for this company.
-                  </div>
-                {% endif %}
+                {% endfor %}
               </div>
-            {% endif %}
-          </div>
+            </div>
+          {% else %}
+            <div class="form-control-plaintext bg-light border rounded px-3 py-2">
+              No capabilities defined for this company.
+            </div>
+          {% endif %}
         </div>
-      </div>
-    </div>
+      {% endif %}
+    {% endcall %}
 
     {% if read_only %}
     <!-- Tab Pane: Insights -->
-    <div class="tab-pane fade" id="tab-insights">
-      <div class="section-card card shadow-sm border-0 mb-4">
-        <div class="section-header">
-          <h5 class="section-heading">Insights</h5>
-        </div>
-        <div class="section-body">
-          <div class="row g-3">
-            {{ field_macros.render_field({
-                "entry_name": "crisp_summary",
-                "label": "CRISP Summary",
-                "type": "text",
-                "value": entity.crisp_summary,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-          </div>
-        </div>
-      </div>
-    </div>
+    {% call tab_macros.render_tab_section('insights', 'Insights') %}
+      {{ field_macros.render_field({
+          "entry_name": "crisp_summary",
+          "label": "CRISP Summary",
+          "type": "text",
+          "value": entity.crisp_summary,
+          "required": false,
+          "options": []
+       }, read_only=true) }}
+    {% endcall %}
 
     <!-- Tab Pane: System Info -->
-    <div class="tab-pane fade" id="tab-system-info">
-      <div class="section-card card shadow-sm border-0 mb-4">
-        <div class="section-header">
-          <h5 class="section-heading">System Information</h5>
-        </div>
-        <div class="section-body">
-          <div class="row g-3">
-            {{ field_macros.render_field({
-                "entry_name": "created_at",
-                "label": "Created At",
-                "type": "datetime",
-                "value": entity.created_at,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-            {{ field_macros.render_field({
-                "entry_name": "updated_at",
-                "label": "Updated At",
-                "type": "datetime",
-                "value": entity.updated_at,
-                "required": false,
-                "options": []
-             }, read_only=true) }}
-          </div>
-        </div>
-      </div>
-    </div>
+    {% call tab_macros.render_tab_section('system-info', 'System Information') %}
+      {{ field_macros.render_field({
+          "entry_name": "created_at",
+          "label": "Created At",
+          "type": "datetime",
+          "value": entity.created_at,
+          "required": false,
+          "options": []
+       }, read_only=true) }}
+      {{ field_macros.render_field({
+          "entry_name": "updated_at",
+          "label": "Updated At",
+          "type": "datetime",
+          "value": entity.updated_at,
+          "required": false,
+          "options": []
+       }, read_only=true) }}
+    {% endcall %}
     {% endif %}
 
   </div>
