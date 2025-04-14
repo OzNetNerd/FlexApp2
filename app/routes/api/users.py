@@ -22,12 +22,4 @@ user_api_crud_config = ApiCrudRouteConfig(
 )
 register_api_crud_routes(user_api_crud_config)
 
-# If you need custom routes beyond CRUD, you can add them here
-# Example of a custom route:
-# @users_api_bp.route("/search", methods=["GET"])
-# def search_users():
-#     query = request.args.get("q", "")
-#     results = user_service.search(query)
-#     return jsonify([user.to_dict() for user in results])
-
 logger.info(f"{ENTITY_PLURAL_NAME} API routes registered successfully.")

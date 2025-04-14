@@ -34,6 +34,18 @@
           "required": true,
           "options": []
       }, read_only=read_only) }}
+
+      <!-- Company Selection Field -->
+      <div class="form-group">
+        <label for="company-input">Company</label>
+        <input type="text"
+               id="company-input"
+               class="form-control"
+               placeholder="Search for a company..."
+               data-initial="{{ [entity.company_id] if entity.company_id else '[]' }}"
+               {% if read_only %}disabled{% endif %}>
+      </div>
+
       {{ field_macros.render_field({
           "entry_name": "description",
           "label": "Description",
@@ -94,6 +106,32 @@
 
   </div>
 </form>
+
+<script type="module">
+  import { setupAutoComplete } from '/static/js/autoComplete.js';
+
+  // Wait for page to fully load
+  window.addEventListener('load', function() {
+    console.log("Page loaded - setting up autocomplete");
+
+    // Check if the element exists
+    const input = document.querySelector('#company-input');
+    if (input) {
+      console.log("Found company input field, initializing autocomplete");
+
+      // Call setup directly with explicit parameters
+      setupAutoComplete({
+        inputSelector: '#company-input',
+        dataUrl: '/api/companies',
+        inputName: 'company_id',
+        initialIds: JSON.parse(input.dataset.initial || '[]')
+      });
+    } else {
+      console.error("Company input field not found!");
+    }
+  });
+</script>
+
 {% endblock view_template_content %}
 
 <!-- END TEMPLATE: view_edit_opportunities.html -->

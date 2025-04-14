@@ -17,47 +17,6 @@ class AutoCompleteField:
     related_ids: List[str]
 
 
-# def get_autocomplete_fields(relationships):
-#     """
-#     Generate the autocomplete fields configuration based on the given relationships.
-#
-#     Args:
-#         relationships (list): A list of relationship data, each containing 'entity_type' and 'entity_id'.
-#
-#     Returns:
-#         list: A list of autocomplete field configurations.
-#     """
-#     # Extract related user and company IDs from relationships
-#     related_user_ids = []
-#     related_company_ids = []
-#
-#     for rel in relationships:
-#         if rel['entity_type'] == 'user':
-#             related_user_ids.append(rel['entity_id'])
-#         elif rel['entity_type'] == 'company':
-#             related_company_ids.append(rel['entity_id'])
-#
-#     # Return the autocomplete fields configuration
-#     return [
-#         AutoCompleteField(
-#             title="Users",
-#             id="users-input",
-#             placeholder="Search for users...",
-#             name="users",
-#             data_url="/api/users",
-#             related_ids=related_user_ids
-#         ),
-#         AutoCompleteField(
-#             title="Companies",
-#             id="companies-input",
-#             placeholder="Search for companies...",
-#             name="companies",
-#             data_url="/api/companies",
-#             related_ids=related_company_ids
-#         )
-#     ]
-
-
 def get_autocomplete_field(title, relationships=None, field_id=None, placeholder=None, name=None, data_api_url=None):
     """Get an AutoCompleteField instance with defaults derived from the title."""
     title_lower = title.lower()
