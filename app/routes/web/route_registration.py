@@ -125,7 +125,7 @@ def handle_crud_operation(
     elif endpoint == CRUDEndpoint.CREATE.value:
         new_entity = service.create(form_data)
         flash("Successfully created record", "success")
-        entity_id = getattr(new_entity, "id", None)
+        entity_id = getattr(new_entity, "entity_id", None)
 
         if entity_id:
             return redirect(url_for(f"{blueprint_name}.view", entity_id=entity_id))

@@ -38,8 +38,8 @@
      }, read_only=false) }}
 
     <!-- Hidden fields for notable entity type and ID -->
-    <input type="hidden" id="notable_type" name="notable_type" value="{{ entity.__class__.__name__ }}">
-    <input type="hidden" id="notable_id" name="notable_id" value="{{ entity.id }}">
+    <input type="hidden" id="notable_type" name="notable_type" value="{{ entity_class_name }}">
+    <input type="hidden" id="notable_id" name="notable_id" value="{{ id }}">
     <input type="hidden" id="user_id" name="user_id" value="{{ current_user.id }}">
 
     <!-- Add user information fields -->
@@ -72,8 +72,8 @@
 
 <!-- Add data attributes to store template variables for JavaScript -->
 <div id="notesData"
-     data-notable-type="{{ entity.__class__.__name__ }}"
-     data-notable-id="{{ entity.id }}"
+     data-notable-type="{{ entity_class_name }}"
+     data-notable-id="{{ id }}"
      data-user-id="{{ current_user.id }}"
      data-username="{{ current_user.username|default(current_user.name|default(current_user.email|default(''))) }}">
 </div>

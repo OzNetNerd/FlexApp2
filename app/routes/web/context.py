@@ -106,10 +106,10 @@ class EntityContext(BaseContext):
     def __init__(
         self,
         action: str,
+        entity: Any,
         autocomplete_fields: Optional[List[dict]] = None,
         error_message: str = "",
         title: str = "",
-        entity: Any = None,
         read_only: bool = True,
         entity_table_name: str = "",
         entity_id: Any = None,
@@ -189,6 +189,9 @@ class EntityContext(BaseContext):
         self.model_name = self.entity_table_name or self.__class__.__name__
         self.id = str(getattr(self, "entity_id", ""))
 
+        # Set entity_class_name for template use
+        self.entity_class_name = self.model_name
+
         # Get blueprint_name from kwargs if available
         blueprint_name = getattr(self, "blueprint_name", "")
 
@@ -208,7 +211,22 @@ class EntityContext(BaseContext):
         elif isinstance(self.entity, dict):
             entity_dict = self.entity
 
-        self.submit_url = url_for(f"{blueprint_name}.create") if not self.read_only else ""
+        # Make entity available to templates directly
+        # This is crucial for templates that reference entity directly
+        if not hasattr(self, 'entity'):
+            # If entity isn't already an attribute
+            setattr(self, 'entity', self.entity)
+
+        # Set the correct submit URL based on action and read-only status
+        if not self.read_only:
+            if self.action == "create":
+                self.submit_url = url_for(f"{blueprint_name}.create")
+            elif self.action == "edit" and self.entity_id:
+                self.submit_url = url_for(f"{blueprint_name}.update", id=self.entity_id)
+            else:
+                self.submit_url = ""
+        else:
+            self.submit_url = ""
 
         logger.info(f"📜 Building '{self.action}' page for '{blueprint_name}' blueprint (RO={self.read_only})")
         instance_details = "EntityContext (_initialize_derived_fields)"
