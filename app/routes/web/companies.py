@@ -17,6 +17,7 @@ company_service = CRUDService(Company)
 custom_templates = CrudTemplates(
     # The route_type here is "view", so the template file is named accordingly.
     # create="pages/crud/create_view_edit_company.html",
+    create="pages/crud/create_view_edit_company.html",
     view="pages/crud/create_view_edit_company.html",
     edit = "pages/crud/create_view_edit_company.html"
 )

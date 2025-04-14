@@ -14,6 +14,7 @@ task_service = CRUDService(Task)
 
 # Define custom templates for tasks
 custom_templates = CrudTemplates(
+    create="pages/crud/create_view_edit_task.html",
     view="pages/crud/create_view_edit_task.html",
     edit="pages/crud/create_view_edit_task.html",
 )

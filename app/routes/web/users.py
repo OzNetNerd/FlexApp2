@@ -16,6 +16,7 @@ user_service = CRUDService(User)
 
 # Define custom templates for users
 custom_templates = CrudTemplates(
+    create="pages/crud/create_view_edit_user.html",
     view="pages/crud/create_view_edit_user.html",
     edit="pages/crud/create_view_edit_user.html",
 )

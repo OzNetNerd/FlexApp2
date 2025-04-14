@@ -17,6 +17,7 @@ contact_service = CRUDService(Contact)
 custom_templates = CrudTemplates(
     # Your custom template needs to be correctly capitalized to match the route_type
     # In the code, "view" is used as the route_type, not "View"
+    create="pages/crud/create_view_edit_contact.html",
     view="pages/crud/create_view_edit_contact.html",
     edit="pages/crud/create_view_edit_contact.html",
 )
