@@ -1,0 +1,18 @@
+<!-- START TEMPLATE: base/macros/tabs.html -->
+
+{% macro render_tab_section(tab_id, title, active=false) %}
+<div class="tab-pane fade {% if active %}show active{% endif %}" id="tab-{{ tab_id }}">
+  <div class="section-card card shadow-sm border-0 mb-4">
+    <div class="section-header">
+      <h5 class="section-heading">{{ title }}</h5>
+    </div>
+    <div class="section-body">
+      <div class="row g-3">
+        {{ caller() }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+<!-- END TEMPLATE: base/macros/tabs.html -->
