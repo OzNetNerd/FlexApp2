@@ -1,3 +1,5 @@
+<!-- START TEMPLATE: create_view_edit_contact.html -->
+
 {% extends "page_templates/_create_view_edit.html" %}
 
 {% set tabs = [
@@ -214,38 +216,7 @@
   {% endcall %}
 
     {% call tab_macros.render_tab_section('relationships', 'Relationships') %}
-   <div class="form-group">
-    <label for="managers-input">Managers</label>
-    <input type="text"
-       id="managers-input"
-       class="form-control"
-       placeholder="Search for managers..."
-       data-initial="{{ entity.managers|map(attribute='id')|list|tojson if entity.managers else '[]' }}"
-       {% if read_only %}disabled{% endif %}>
-    <input type="hidden" name="managers" id="managers" value="{{ entity.managers|map(attribute='id')|list|tojson if entity.managers else '' }}">
-   </div>
-
-   <div class="form-group">
-    <label for="direct-reports-input">Direct Reports</label>
-    <input type="text"
-       id="direct-reports-input"
-       class="form-control"
-       placeholder="Search for direct reports..."
-       data-initial="{{ entity.subordinates|map(attribute='id')|list|tojson if entity.subordinates else '[]' }}"
-       {% if read_only %}disabled{% endif %}>
-    <input type="hidden" name="subordinates" id="subordinates" value="{{ entity.subordinates|map(attribute='id')|list|tojson if entity.subordinates else '' }}">
-   </div>
-
-   <div class="form-group">
-    <label for="opportunities-input">Opportunities</label>
-    <input type="text"
-       id="opportunities-input"
-       class="form-control"
-       placeholder="Search for opportunities..."
-       data-initial="{{ entity.opportunities|map(attribute='id')|list|tojson if entity.opportunities else '[]' }}"
-       {% if read_only %}disabled{% endif %}>
-    <input type="hidden" name="opportunities" id="opportunities" value="{{ entity.opportunities|map(attribute='id')|list|tojson if entity.opportunities else '' }}">
-   </div>
+   {% include 'pages/crud/sections/_relationship_section.html' %}
   {% endcall %}
 
   {% if read_only %}
@@ -278,3 +249,5 @@
 
 <script type="module" src="{{ url_for('static', filename='js/pages/create_view_edit_contact.js') }}"></script>
 {% endblock view_template_content %}
+
+<!-- END TEMPLATE: create_view_edit_contact.html -->
