@@ -1,0 +1,234 @@
+<!-- START TEMPLATE: view_edit_contacts.html -->
+
+{% extends "base/create_view_edit/_create_view_edit.html" %}
+
+{% set tabs = [
+    {'tab_name': 'Notes'} if read_only else None,
+    {'tab_name': 'About'},
+    {'tab_name': 'Professional Profile'},
+    {'tab_name': 'Technical Skills'},
+    {'tab_name': 'Job Details'},
+    {'tab_name': 'Relationships'},
+    {'tab_name': 'Insights'} if read_only else None,
+    {'tab_name': 'System Info'} if read_only else None
+] | reject('none') | list %}
+
+{% import 'base/macros/render_form_fields.html' as field_macros with context %}
+{% import 'base/macros/tabs.html' as tab_macros with context %}
+
+{% block view_template_content %}
+<form method="post" action="{{ submit_url }}">
+  {{ csrf_input }}
+  <div class="tab-content" id="formTabsContent">
+
+    {% if read_only %}
+    <!-- Tab Pane: Notes -->
+    {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
+      {% include 'components/_notes_section.html' %}
+    {% endcall %}
+    {% endif %}
+
+    <!-- Tab Pane: About -->
+    {% call tab_macros.render_tab_section('about', 'About', active=not read_only) %}
+      {{ field_macros.render_field({
+          "entry_name": "username",
+          "label": "Username",
+          "type": "text",
+          "value": entity.username,
+          "required": true,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "name",
+          "label": "Name",
+          "type": "text",
+          "value": entity.name,
+          "required": true,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "email",
+          "label": "Email",
+          "type": "email",
+          "value": entity.email,
+          "required": true,
+          "options": []
+       }, read_only=read_only) }}
+    {% endcall %}
+
+    <!-- Tab Pane: Professional Profile -->
+    {% call tab_macros.render_tab_section('professional-profile', 'Professional Profile') %}
+      {{ field_macros.render_field({
+          "entry_name": "role",
+          "label": "Role",
+          "type": "text",
+          "value": entity.role,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "role_level",
+          "label": "Role Level",
+          "type": "text",
+          "value": entity.role_level,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "skill_level",
+          "label": "Skill Level",
+          "type": "text",
+          "value": entity.skill_level,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "primary_skill_area",
+          "label": "Primary Skill Area",
+          "type": "text",
+          "value": entity.primary_skill_area,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "certifications",
+          "label": "Certifications",
+          "type": "text",
+          "value": entity.certifications,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "expertise_areas",
+          "label": "Expertise Areas",
+          "type": "text",
+          "value": entity.expertise_areas,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+    {% endcall %}
+
+    <!-- Tab Pane: Technical Skills -->
+    {% call tab_macros.render_tab_section('technical-skills', 'Technical Skills') %}
+      {{ field_macros.render_field({
+          "entry_name": "programming_languages",
+          "label": "Programming Languages",
+          "type": "text",
+          "value": entity.programming_languages,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "cloud_platforms",
+          "label": "Cloud Platforms",
+          "type": "text",
+          "value": entity.cloud_platforms,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "devops_tools",
+          "label": "DevOps Tools",
+          "type": "text",
+          "value": entity.devops_tools,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "ci_cd_tools",
+          "label": "CI/CD Tools",
+          "type": "text",
+          "value": entity.ci_cd_tools,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "version_control_systems",
+          "label": "Version Control Systems",
+          "type": "text",
+          "value": entity.version_control_systems,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "monitoring_logging",
+          "label": "Monitoring & Logging",
+          "type": "text",
+          "value": entity.monitoring_logging,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+    {% endcall %}
+
+    <!-- Tab Pane: Job Details -->
+    {% call tab_macros.render_tab_section('job-details', 'Job Details') %}
+      {{ field_macros.render_field({
+          "entry_name": "role_description",
+          "label": "Role Description",
+          "type": "textarea",
+          "value": entity.role_description,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "responsibilities",
+          "label": "Responsibilities",
+          "type": "textarea",
+          "value": entity.responsibilities,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+    {% endcall %}
+
+    <!-- Tab Pane: Relationships -->
+    {% call tab_macros.render_tab_section('relationships', 'Relationships') %}
+      {{ field_macros.render_field({
+          "entry_name": "users",
+          "label": "Users",
+          "type": "custom",
+          "value": entity.users,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "companies",
+          "label": "Companies",
+          "type": "custom",
+          "value": entity.companies,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+    {% endcall %}
+
+    {% if read_only %}
+    <!-- Tab Pane: Insights -->
+    {% call tab_macros.render_tab_section('insights', 'Insights') %}
+      {% include 'components/_crisp.html' %}
+    {% endcall %}
+
+    <!-- Tab Pane: System Info -->
+    {% call tab_macros.render_tab_section('system-info', 'System Info') %}
+      {{ field_macros.render_field({
+          "entry_name": "created_at",
+          "label": "Created At",
+          "type": "date",
+          "value": entity.created_at,
+          "required": false,
+          "options": []
+       }, read_only=true) }}
+      {{ field_macros.render_field({
+          "entry_name": "updated_at",
+          "label": "Updated At",
+          "type": "date",
+          "value": entity.updated_at,
+          "required": false,
+          "options": []
+       }, read_only=true) }}
+    {% endcall %}
+    {% endif %}
+
+  </div>
+</form>
+{% endblock view_template_content %}
+
+<!-- END TEMPLATE: view_edit_contacts.html -->
