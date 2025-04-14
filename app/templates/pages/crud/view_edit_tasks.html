@@ -1,0 +1,112 @@
+<!-- START TEMPLATE: view_edit_tasks.html -->
+
+{% extends "base/create_view_edit/_create_view_edit.html" %}
+
+{% set tabs = [
+    {'tab_name': 'Notes'} if read_only else None,
+    {'tab_name': 'About'},
+    {'tab_name': 'System Info'} if read_only else None
+] | reject('none') | list %}
+
+{% import 'base/macros/render_form_fields.html' as field_macros with context %}
+{% import 'base/macros/tabs.html' as tab_macros with context %}
+{% import 'base/macros/entity_macros.html' as entity_macros with context %}
+
+{% block view_template_content %}
+<form method="post" action="{{ submit_url }}">
+  <div class="tab-content" id="formTabsContent">
+
+    {% if read_only %}
+    <!-- Tab Pane: Notes -->
+    {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
+      {% include 'components/_notes_section.html' %}
+    {% endcall %}
+    {% endif %}
+
+    <!-- Tab Pane: About -->
+    {% call tab_macros.render_tab_section('about', 'Task Details', active=not read_only) %}
+      {{ field_macros.render_field({
+          "entry_name": "title",
+          "label": "Title",
+          "type": "text",
+          "value": entity.title,
+          "required": true,
+          "options": []
+      }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "description",
+          "label": "Description",
+          "type": "textarea",
+          "value": entity.description,
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "due_date",
+          "label": "Due Date",
+          "type": "date",
+          "value": entity.due_date or "",
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "status",
+          "label": "Status",
+          "type": "select",
+          "value": entity.status,
+          "required": true,
+          "options": ["Pending", "In Progress", "Completed"]
+      }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "priority",
+          "label": "Priority",
+          "type": "select",
+          "value": entity.priority,
+          "required": true,
+          "options": ["Low", "Medium", "High"]
+      }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "notable_type",
+          "label": "Linked Entity Type",
+          "type": "text",
+          "value": entity.notable_type,
+          "required": true,
+          "options": []
+      }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "notable_id",
+          "label": "Linked Entity ID",
+          "type": "number",
+          "value": entity.notable_id,
+          "required": true,
+          "options": []
+      }, read_only=read_only) }}
+    {% endcall %}
+
+    {% if read_only %}
+    <!-- Tab Pane: System Info -->
+    {% call tab_macros.render_tab_section('system-info', 'System Information') %}
+      {{ field_macros.render_field({
+          "entry_name": "created_at",
+          "label": "Created At",
+          "type": "datetime",
+          "value": entity.created_at,
+          "required": false,
+          "options": []
+      }, read_only=true) }}
+      {{ field_macros.render_field({
+          "entry_name": "updated_at",
+          "label": "Updated At",
+          "type": "datetime",
+          "value": entity.updated_at,
+          "required": false,
+          "options": []
+      }, read_only=true) }}
+    {% endcall %}
+    {% endif %}
+
+  </div>
+</form>
+{% endblock view_template_content %}
+
+<!-- END TEMPLATE: view_edit_tasks.html -->
