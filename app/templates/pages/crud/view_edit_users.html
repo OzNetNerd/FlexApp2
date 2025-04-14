@@ -10,6 +10,7 @@
 
 {% import 'base/macros/render_form_fields.html' as field_macros with context %}
 {% import 'base/macros/tabs.html' as tab_macros with context %}
+{% import 'base/macros/entity_macros.html' as entity_macros with context %}
 
 {% block content %}
 <div class="card border-0 shadow-sm">
@@ -34,58 +35,58 @@
       <div class="tab-content" id="formTabsContent">
 
         {% if 'Notes' in tabs %}
-        {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
+        {% call tab_macros.render_tab_section('notes', 'Notes', active=read_only) %}
           {% include 'components/_notes_section.html' %}
         {% endcall %}
         {% endif %}
 
         {% if 'About' in tabs %}
-        {% call tab_macros.render_tab_section('about', 'About', active=not read_only) %}
+        {% call tab_macros.render_tab_section('about', 'About', active=not read_only and 'Notes' not in tabs) %}
           {{ field_macros.render_field({
-              "entry_name": "username",
-              "label": "Username",
-              "type": "text",
-              "value": entity.username,
-              "required": true,
-              "options": []
+            "entry_name": "username",
+            "label": "Username",
+            "type": "text",
+            "value": entity.username,
+            "required": true,
+            "options": []
           }, read_only=read_only) }}
           {{ field_macros.render_field({
-              "entry_name": "name",
-              "label": "Full Name",
-              "type": "text",
-              "value": entity.name,
-              "required": true,
-              "options": []
+            "entry_name": "name",
+            "label": "Full Name",
+            "type": "text",
+            "value": entity.name,
+            "required": true,
+            "options": []
           }, read_only=read_only) }}
           {{ field_macros.render_field({
-              "entry_name": "email",
-              "label": "Email",
-              "type": "email",
-              "value": entity.email,
-              "required": true,
-              "options": []
+            "entry_name": "email",
+            "label": "Email",
+            "type": "email",
+            "value": entity.email,
+            "required": true,
+            "options": []
           }, read_only=read_only) }}
           {{ field_macros.render_field({
-              "entry_name": "is_admin",
-              "label": "Is Admin",
-              "type": "checkbox",
-              "value": entity.is_admin,
-              "required": false,
-              "options": []
+            "entry_name": "is_admin",
+            "label": "Is Admin",
+            "type": "checkbox",
+            "value": entity.is_admin,
+            "required": false,
+            "options": []
           }, read_only=read_only) }}
         {% endcall %}
         {% endif %}
 
         {% if 'Relationships' in tabs %}
-        {% call tab_macros.render_tab_section('relationships', 'Relationships') %}
+        {% call tab_macros.render_tab_section('relationships', 'Relationships', active=not read_only and 'Notes' not in tabs and 'About' not in tabs) %}
           {% if not read_only %}
             {{ field_macros.render_field({
-                "entry_name": "relationships",
-                "label": "Relationships",
-                "type": "custom",
-                "value": entity.relationships,
-                "required": false,
-                "options": []
+              "entry_name": "relationships",
+              "label": "Relationships",
+              "type": "custom",
+              "value": entity.relationships,
+              "required": false,
+              "options": []
             }, read_only=read_only) }}
           {% else %}
             {% set rel_columns = [
@@ -99,14 +100,14 @@
 
         {% if 'Insights' in tabs %}
         {% if read_only %}
-        {% call tab_macros.render_tab_section('insights', 'Insights') %}
+        {% call tab_macros.render_tab_section('insights', 'Insights', active=read_only and 'Notes' not in tabs and 'About' not in tabs and 'Relationships' not in tabs) %}
           {{ field_macros.render_field({
-              "entry_name": "crisp_summary",
-              "label": "CRISP Summary",
-              "type": "text",
-              "value": entity.crisp_summary,
-              "required": false,
-              "options": []
+            "entry_name": "crisp_summary",
+            "label": "CRISP Summary",
+            "type": "text",
+            "value": entity.crisp_summary,
+            "required": false,
+            "options": []
           }, read_only=true) }}
         {% endcall %}
         {% endif %}
@@ -114,27 +115,27 @@
 
         {% if 'System Info' in tabs %}
         {% if read_only %}
-        {% call tab_macros.render_tab_section('system-info', 'System Info') %}
+        {% call tab_macros.render_tab_section('system-info', 'System Info', active=read_only and 'Notes' not in tabs and 'About' not in tabs and 'Relationships' not in tabs and 'Insights' not in tabs) %}
           {{ field_macros.render_field({
-              "entry_name": "created_at",
-              "label": "Created At",
-              "type": "datetime",
-              "value": entity.created_at,
-              "required": false,
-              "options": []
+            "entry_name": "created_at",
+            "label": "Created At",
+            "type": "datetime",
+            "value": entity.created_at,
+            "required": false,
+            "options": []
           }, read_only=true) }}
           {{ field_macros.render_field({
-              "entry_name": "updated_at",
-              "label": "Updated At",
-              "type": "datetime",
-              "value": entity.updated_at,
-              "required": false,
-              "options": []
+            "entry_name": "updated_at",
+            "label": "Updated At",
+            "type": "datetime",
+            "value": entity.updated_at,
+            "required": false,
+            "options": []
           }, read_only=true) }}
         {% endcall %}
         {% endif %}
         {% endif %}
-        
+
       </div>
     </form>
     {% endblock %}
