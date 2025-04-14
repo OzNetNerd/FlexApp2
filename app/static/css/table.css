@@ -268,3 +268,12 @@
   background-color: #3182ce;
   border-radius: 2px;
 }
+
+.ag-theme-alpine .ag-cell {
+  display: flex;
+  align-items: center;            /* 🔥 vertically center */
+  white-space: normal !important; /* allows wrapping */
+  line-height: 1.3;               /* controls line spacing */
+  padding-top: 4px;
+  padding-bottom: 4px;
+}

@@ -186,7 +186,9 @@ export default function getGridOptions() {
         defaultColDef: {
             flex: 1,
             minWidth: 100,
-            resizable: true
+            resizable: true,
+            wrapText: true,           // ✅ enables cell wrapping
+            autoHeight: true          // ✅ adjusts row height to fit content
         },
         onRowClicked: event => {
             if (event.event.ctrlKey || event.event.metaKey || event.event.shiftKey || event.event.button !== 0) {
