@@ -18,11 +18,11 @@
       {% include 'base/create_view_edit/_header_tabs.html' %}
     </div>
   </div>
-  <div class="card-body pt-0  pb-0">
+  <div class="card-body pt-0 pb-0">
     {% block view_template_content %}
-      {# Main content will be inserted here from other templates #}
+      <!-- Main content will be inserted here from other templates -->
+      <!-- Add your content for this specific page here -->
     {% endblock %}
-
     {% if not read_only %}
       {% include 'base/common/_footer_buttons.html' %}
     {% endif %}
@@ -33,5 +33,3 @@
 {% block extra_js %}
 <script type="module" src="/js/pages/create_view_edit.js"></script>
 {% endblock %}
-
-<!-- END TEMPLATE: _create_view_edit.html -->
