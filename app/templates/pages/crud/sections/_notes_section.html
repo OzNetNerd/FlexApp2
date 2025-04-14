@@ -1,71 +1,74 @@
 <!-- START TEMPLATE: _notes_section.html -->
 {% import 'base/macros/render_form_fields.html' as field_macros with context %}
 
-    <div class="dropdown" style="margin-left: auto;">
-      <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="notesFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fas fa-filter me-1"></i> Filter
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notesFilterDropdown">
-        <li><a class="dropdown-item note-filter" href="#" data-days="7">Last 7 days</a></li>
-        <li><a class="dropdown-item note-filter" href="#" data-days="30">Last 30 days</a></li>
-        <li><a class="dropdown-item note-filter" href="#" data-days="90">Last 90 days</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li>
-          <form class="px-3 py-2" id="notesSearchForm">
-            <div class="input-group input-group-sm">
-              <input type="text" class="form-control" id="noteSearchInput" placeholder="Search...">
-              <button class="btn btn-outline-primary" type="submit">
-                <i class="fas fa-search"></i>
-              </button>
-            </div>
-          </form>
-        </li>
-      </ul>
-
-    <!-- Add Note form moved above the notes list -->
-    <form id="newNoteForm" class="mb-4">
-      <div class="row g-3">
-        {{ field_macros.render_field({
-            "entry_name": "content",
-            "label": "Add Note",
-            "type": "textarea",
-            "value": "",
-            "required": true,
-            "rows": 3,
-            "options": []
-         }, read_only=false) }}
-
-        <!-- Hidden fields for notable entity type and ID -->
-        <input type="hidden" id="notable_type" name="notable_type" value="{{ entity.__class__.__name__ }}">
-        <input type="hidden" id="notable_id" name="notable_id" value="{{ entity.id }}">
-        <input type="hidden" id="user_id" name="user_id" value="{{ current_user.id }}">
-
-        <!-- Add user information fields -->
-        <input type="hidden" id="username" name="username" value="{{ current_user.username|default(current_user.name|default(current_user.email|default(''))) }}">
-
-        <!-- Add CSRF token if your application uses it -->
-        {% if csrf_token is defined %}
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        {% endif %}
-      </div>
-
-      <div class="d-flex justify-content-end mt-3">
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-plus me-1"></i> Add Note
-        </button>
-      </div>
-    </form>
-
-    <div id="notesList" class="mb-3">
-      <!-- Notes will be loaded here via AJAX -->
-      <div class="text-center py-3 text-muted" id="notesLoading">
-        <div class="spinner-border spinner-border-sm me-2" role="status">
-          <span class="visually-hidden">Loading...</span>
+<div class="dropdown" style="margin-left: auto;">
+  <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="notesFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="fas fa-filter me-1"></i> Filter
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notesFilterDropdown">
+    <li><a class="dropdown-item note-filter" href="#" data-days="7">Last 7 days</a></li>
+    <li><a class="dropdown-item note-filter" href="#" data-days="30">Last 30 days</a></li>
+    <li><a class="dropdown-item note-filter" href="#" data-days="90">Last 90 days</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li>
+      <form class="px-3 py-2" id="notesSearchForm">
+        <div class="input-group input-group-sm">
+          <input type="text" class="form-control" id="noteSearchInput" placeholder="Search...">
+          <button class="btn btn-outline-primary" type="submit">
+            <i class="fas fa-search"></i>
+          </button>
         </div>
-        Loading notes...
-      </div>
-    </div>
+      </form>
+    </li>
+  </ul>
+</div>
+
+<!-- Create Note Section -->
+<div class="bg-light p-2 mb-3 border-start border-4 border-primary">Create Note</div>
+<form id="newNoteForm" class="mb-4">
+  <div class="row g-3">
+    {{ field_macros.render_field({
+        "entry_name": "content",
+        "label": "Add Note",
+        "type": "textarea",
+        "value": "",
+        "required": true,
+        "rows": 3,
+        "options": []
+     }, read_only=false) }}
+
+    <!-- Hidden fields for notable entity type and ID -->
+    <input type="hidden" id="notable_type" name="notable_type" value="{{ entity.__class__.__name__ }}">
+    <input type="hidden" id="notable_id" name="notable_id" value="{{ entity.id }}">
+    <input type="hidden" id="user_id" name="user_id" value="{{ current_user.id }}">
+
+    <!-- Add user information fields -->
+    <input type="hidden" id="username" name="username" value="{{ current_user.username|default(current_user.name|default(current_user.email|default(''))) }}">
+
+    <!-- Add CSRF token if your application uses it -->
+    {% if csrf_token is defined %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% endif %}
   </div>
+
+  <div class="d-flex justify-content-end mt-3">
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-plus me-1"></i> Add Note
+    </button>
+  </div>
+</form>
+
+<!-- Notes History Section -->
+<div class="bg-light p-2 mb-3 border-start border-4 border-primary">Notes History</div>
+<div id="notesList" class="mb-3">
+  <!-- Notes will be loaded here via AJAX -->
+  <div class="text-center py-3 text-muted" id="notesLoading">
+    <div class="spinner-border spinner-border-sm me-2" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    Loading notes...
+  </div>
+</div>
 
 <!-- Add data attributes to store template variables for JavaScript -->
 <div id="notesData"

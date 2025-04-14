@@ -3,9 +3,7 @@
 {% set tabs = [
   {'tab_name': 'Notes'} if read_only else None,
   {'tab_name': 'Contact Details'},
-  {'tab_name': 'Professional Profile'},
-  {'tab_name': 'Technical Skills'},
-  {'tab_name': 'Job Details'},
+  {'tab_name': 'Professional Details'},
   {'tab_name': 'Relationships'},
   {'tab_name': 'Insights'} if read_only else None,
   {'tab_name': 'System Info'} if read_only else None
@@ -68,7 +66,9 @@
    }, read_only=read_only) }}
   {% endcall %}
 
-    {% call tab_macros.render_tab_section('professional-profile', 'Professional Profile') %}
+    {% call tab_macros.render_tab_section('professional-details', 'Professional Details') %}
+   <!-- Professional Profile Section -->
+   <div class="bg-light p-2 mb-3 border-start border-4 border-primary">Professional Profile</div>
    {{ field_macros.render_field({
      "entry_name": "role",
      "label": "Role",
@@ -125,9 +125,9 @@
      "required": false,
      "options": []
    }, read_only=read_only) }}
-  {% endcall %}
 
-    {% call tab_macros.render_tab_section('technical-skills', 'Technical Skills') %}
+   <!-- Technical Skills Section -->
+   <div class="bg-light p-2 mb-3 border-start border-4 border-primary">Technical Skills</div>
    {{ field_macros.render_field({
      "entry_name": "programming_languages",
      "label": "Programming Languages",
@@ -184,9 +184,9 @@
      "required": false,
      "options": []
    }, read_only=read_only) }}
-  {% endcall %}
 
-    {% call tab_macros.render_tab_section('job-details', 'Job Details') %}
+   <!-- Job Details Section -->
+   <div class="bg-light p-2 mb-3 border-start border-4 border-primary">Job Details</div>
    {{ field_macros.render_field({
      "entry_name": "role_description",
      "label": "Role Description",
