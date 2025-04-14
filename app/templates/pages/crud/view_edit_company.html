@@ -12,115 +12,7 @@
 ] | reject('none') | list %}
 {% import 'base/macros/render_form_fields.html' as field_macros with context %}
 {% import 'base/macros/tabs.html' as tab_macros with context %}
-
-{# Local macros for entity-related rendering #}
-{% macro render_empty_state(message) %}
-  <div class="form-control-plaintext bg-light border rounded px-3 py-2">
-    {{ message }}
-  </div>
-{% endmacro %}
-
-{% macro render_contacts_table(contacts) %}
-  <div class="col-12">
-    <label class="form-label fw-semibold">Contacts</label>
-    {% if contacts %}
-      <div class="table-responsive form-control-plaintext bg-light border rounded px-3 py-2">
-        <table class="table table-hover mb-0">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for contact in contacts %}
-            <tr>
-              <td>{{ contact.name }}</td>
-              <td>{{ contact.email|default('') }}</td>
-              <td>{{ contact.phone|default('') }}</td>
-              <td>
-                <a href="/contacts/{{ contact.id }}" class="btn btn-sm btn-info">
-                  <i class="fas fa-eye"></i>
-                </a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      {{ render_empty_state('No contacts associated with this company.') }}
-    {% endif %}
-  </div>
-{% endmacro %}
-
-{% macro render_opportunities_table(opportunities) %}
-  <div class="col-12">
-    <label class="form-label fw-semibold">Opportunities</label>
-    {% if opportunities %}
-      <div class="table-responsive form-control-plaintext bg-light border rounded px-3 py-2">
-        <table class="table table-hover mb-0">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Status</th>
-              <th>Stage</th>
-              <th>Value</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for opportunity in opportunities %}
-            <tr>
-              <td>{{ opportunity.name }}</td>
-              <td>
-                <span class="badge {% if opportunity.status == 'Open' %}bg-success{% elif opportunity.status == 'Closed' %}bg-danger{% else %}bg-secondary{% endif %}">
-                  {{ opportunity.status }}
-                </span>
-              </td>
-              <td>{{ opportunity.stage }}</td>
-              <td>${{ opportunity.value|default('0.00') }}</td>
-              <td>
-                <a href="/opportunities/{{ opportunity.id }}" class="btn btn-sm btn-info">
-                  <i class="fas fa-eye"></i>
-                </a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      {{ render_empty_state('No opportunities associated with this company.') }}
-    {% endif %}
-  </div>
-{% endmacro %}
-
-{% macro render_capabilities_list(capabilities) %}
-  <div class="col-12">
-    <label class="form-label fw-semibold">Capabilities</label>
-    {% if capabilities %}
-      <div class="form-control-plaintext bg-light border rounded px-3 py-2">
-        <div class="list-group list-group-flush">
-          {% for capability in capabilities %}
-            <div class="list-group-item bg-transparent px-0 border-0 border-bottom">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">{{ capability.name }}</h5>
-              </div>
-              {% if capability.description %}
-                <p class="mb-1">{{ capability.description }}</p>
-              {% endif %}
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-    {% else %}
-      {{ render_empty_state('No capabilities defined for this company.') }}
-    {% endif %}
-  </div>
-{% endmacro %}
+{% import 'base/macros/entity_macros.html' as entity_macros with context %}
 
 {% block view_template_content %}
 <form method="post" action="{{ submit_url }}">
@@ -165,7 +57,12 @@
             "options": []
         }, read_only=read_only) }}
       {% else %}
-        {{ render_contacts_table(entity.contacts) }}
+        {% set contact_columns = [
+          {'key': 'name', 'label': 'Name', 'type': 'text'},
+          {'key': 'email', 'label': 'Email', 'type': 'text'},
+          {'key': 'phone', 'label': 'Phone', 'type': 'text'}
+        ] %}
+        {{ entity_macros.render_entity_table(entity.contacts, 'Contacts', contact_columns, '/contacts') }}
       {% endif %}
     {% endcall %}
 
@@ -181,7 +78,17 @@
             "options": []
         }, read_only=read_only) }}
       {% else %}
-        {{ render_opportunities_table(entity.opportunities) }}
+        {% set status_badge_mapping = {
+          'Open': 'bg-success',
+          'Closed': 'bg-danger'
+        } %}
+        {% set opportunity_columns = [
+          {'key': 'name', 'label': 'Name', 'type': 'text'},
+          {'key': 'status', 'label': 'Status', 'type': 'badge', 'badge_mapping': status_badge_mapping},
+          {'key': 'stage', 'label': 'Stage', 'type': 'text'},
+          {'key': 'value', 'label': 'Value', 'type': 'currency'}
+        ] %}
+        {{ entity_macros.render_entity_table(entity.opportunities, 'Opportunities', opportunity_columns, '/opportunities') }}
       {% endif %}
     {% endcall %}
 
@@ -197,7 +104,7 @@
             "options": []
         }, read_only=read_only) }}
       {% else %}
-        {{ render_capabilities_list(entity.capabilities) }}
+        {{ entity_macros.render_entity_list(entity.capabilities, 'Capabilities') }}
       {% endif %}
     {% endcall %}
 
@@ -238,3 +145,5 @@
   </div>
 </form>
 {% endblock view_template_content %}
+
+<!-- END TEMPLATE: view_edit_company.html -->
