@@ -7,6 +7,7 @@
   Blocks:
     - content: Main page content
     - footer: Optional footer region
+    - extra_scripts: Optional block for JS injection
   Includes:
     - _head.html, _navbar.html, _toasts.html
   JavaScript:
@@ -48,7 +49,7 @@
       log("info", "_entity_table.html", "DOMContentLoaded", "📡 Data URL loaded", dataUrl);
     </script>
 
-{% endblock %}
+    {% block extra_scripts %}{% endblock %}
   </body>
 </html>
 <!-- END TEMPLATE: _entity_table.html -->
