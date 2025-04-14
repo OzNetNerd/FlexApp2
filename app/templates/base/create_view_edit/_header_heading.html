@@ -11,6 +11,7 @@
    - read_only  : bool → Controls icon
    - id         : Optional[str] → Presence determines view/edit icon
    - ui         : Optional[List] → If present, includes _pills_nav.html
+   - action     : str  → "create", "edit", "view", etc.
 
  Features:
    - Context-aware icon selection based on page mode
@@ -34,6 +35,7 @@
     - read_only  : bool → Controls icon
     - id         : Optional[str] → Presence determines view/edit icon
     - ui         : Optional[List] → If present, includes _pills_nav.html
+    - action     : str  → "create", "edit", "view", etc.
   Notes:
     - Should be inside a Bootstrap card header
     - Uses icon to indicate mode and logs render context
@@ -47,35 +49,36 @@
   log("debug", "_header_heading.html", "config", "Read-only mode: {{ read_only|default('false') }}");
   log("debug", "_header_heading.html", "config", "Has ID: {{ id is defined and id is not none }}");
   log("debug", "_header_heading.html", "config", "Has UI config: {{ ui is defined and ui is not none }}");
+  log("debug", "_header_heading.html", "config", "Action: {{ action|default('undefined') }}");
 </script>
 
 <h3 class="h4 mb-0 text-primary me-3">
-  {% if read_only %}
-    <i class="fas fa-eye me-2"></i>
-    <script type="module">
-      import log from '/static/js/logger.js';
-      log("debug", "_header_heading.html", "icon", "Using read-only icon (eye)");
-    </script>
-  {% elif id is defined and id %}
-    <i class="fas fa-edit me-2"></i>
-    <script type="module">
-      import log from '/static/js/logger.js';
-      log("debug", "_header_heading.html", "icon", "Using edit icon (pencil)");
-    </script>
-  {% else %}
+  {% if action == 'create' %}
     <i class="fas fa-plus-circle me-2"></i>
     <script type="module">
       import log from '/static/js/logger.js';
       log("debug", "_header_heading.html", "icon", "Using create icon (plus)");
     </script>
+  {% elif read_only %}
+    <i class="fas fa-eye me-2"></i>
+    <script type="module">
+      import log from '/static/js/logger.js';
+      log("debug", "_header_heading.html", "icon", "Using read-only icon (eye)");
+    </script>
+  {% else %}
+    <i class="fas fa-edit me-2"></i>
+    <script type="module">
+      import log from '/static/js/logger.js';
+      log("debug", "_header_heading.html", "icon", "Using edit icon (pencil)");
+    </script>
   {% endif %}
 
-  {% if (read_only and id is defined and id) %}
-    View {{ model_name }}: <span class="text-info">{{ entity_name|default('') }}</span>
-  {% elif (id is defined and id) %}
-    Edit {{ model_name }}: <span class="text-info">{{ entity_name|default('') }}</span>
-  {% else %}
+  {% if action == 'create' %}
     Create {{ model_name }}
+  {% elif read_only %}
+    View {{ model_name }}: <span class="text-info">{{ entity_name|default('') }}</span>
+  {% else %}
+    Edit {{ model_name }}: <span class="text-info">{{ entity_name|default('') }}</span>
   {% endif %}
 </h3>
 
@@ -105,7 +108,8 @@
       entityName: "{{ entity_name|default('undefined') }}",
       readOnly: {{ read_only|default('false')|tojson }},
       hasId: {{ (id is defined and id is not none)|default('false')|tojson }},
-      hasUi: {{ (ui is defined and ui is not none)|default('false')|tojson }}
+      hasUi: {{ (ui is defined and ui is not none)|default('false')|tojson }},
+      action: "{{ action|default('undefined') }}"
     };
 
     log("info", "_header_heading.html", "render", "🧠 Header context", headerContext);

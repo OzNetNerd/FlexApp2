@@ -6,6 +6,11 @@
 {% import 'base/macros/tabs.html' as tab_macros with context %}
 {% import 'base/macros/entity_macros.html' as entity_macros with context %}
 
+{# Force the parent template to use our title #}
+{% block page_title %}{{ title }}{% endblock %}
+{% block heading %}{{ title }}{% endblock %}
+{% block title %}{{ title }}{% endblock %}
+
 {% block view_template_content %}
 <form method="post" action="{{ submit_url }}" id="main-form">
   {{ csrf_input }}
@@ -72,16 +77,26 @@
           "options": []
       }, read_only=read_only) }}
 
+      <!-- Customer Dropdown -->
       <div class="form-group">
-        <label for="linked-entity-input">Linked Entity</label>
-        <input type="text"
-               id="linked-entity-input"
-               class="form-control"
-               placeholder="Search for an entity..."
-               data-initial="{{ [entity.notable_id] if entity.notable_id else '[]' }}"
-               {% if read_only %}disabled{% endif %}>
-        <input type="hidden" name="notable_id" id="notable_id" value="{{ entity.notable_id if entity.notable_id else '' }}">
-        <input type="hidden" name="notable_type" id="notable_type" value="{{ entity.notable_type if entity.notable_type else '' }}">
+        <label for="customer-dropdown">Customer</label>
+        <select class="form-control" id="customer-dropdown" name="customer_id" {% if read_only %}disabled{% endif %}>
+          <option value="">Select Customer</option>
+          {% for customer in customers %}
+            <option value="{{ customer.id }}" {% if entity.customer_id == customer.id %}selected{% endif %}>{{ customer.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Owner Dropdown -->
+      <div class="form-group">
+        <label for="owner-dropdown">Owner</label>
+        <select class="form-control" id="owner-dropdown" name="owner_id" {% if read_only %}disabled{% endif %}>
+          <option value="">Select Owner</option>
+          {% for owner in owners %}
+            <option value="{{ owner.id }}" {% if entity.owner_id == owner.id %}selected{% endif %}>{{ owner.name }}</option>
+          {% endfor %}
+        </select>
       </div>
     {% endcall %}
 
@@ -114,24 +129,6 @@
   </div>
 </form>
 
-<script type="module">
-  import { setupAutoComplete } from '/static/js/autoComplete.js';
-
-  // Wait for page to fully load
-  window.addEventListener('load', function() {
-    // Setup autocomplete for linked entity
-    const linkedEntityInput = document.querySelector('#linked-entity-input');
-    if (linkedEntityInput) {
-      setupAutoComplete({
-        inputSelector: '#linked-entity-input',
-        dataUrl: '/api/entities',
-        inputName: 'notable_id',
-        entityTypeField: 'notable_type',
-        initialIds: JSON.parse(linkedEntityInput.dataset.initial || '[]')
-      });
-    }
-  });
-</script>
 {% endblock view_template_content %}
 
 <!-- END TEMPLATE: create_view_edit_task.html -->
