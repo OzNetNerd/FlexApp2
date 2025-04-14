@@ -21,7 +21,7 @@
 
     {% if read_only %}
     {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
-      {% include 'components/_notes_section.html' %}
+      {% include 'page_templates/crud_components/_notes_section.html' %}
     {% endcall %}
     {% endif %}
 

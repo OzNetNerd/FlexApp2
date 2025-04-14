@@ -24,7 +24,7 @@
     {% if read_only %}
     <!-- Tab Pane: Notes -->
     {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
-      {% include 'components/_notes_section.html' %}
+      {% include 'page_templates/crud_components/_notes_section.html' %}
     {% endcall %}
     {% endif %}
 
@@ -259,7 +259,7 @@
     {% if read_only %}
     <!-- Tab Pane: Insights -->
     {% call tab_macros.render_tab_section('insights', 'Insights') %}
-      {% include 'components/_crisp.html' %}
+      {% include 'page_templates/crud_components/_crisp.html' %}
     {% endcall %}
 
     <!-- Tab Pane: System Info -->
