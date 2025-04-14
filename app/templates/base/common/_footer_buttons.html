@@ -38,5 +38,12 @@
     {% endif %}
   </div>
 
+  {# Removed the extra Save Changes block #}
+  {# {% if not read_only %}
+  <div class="d-flex justify-content-end mt-4">
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+  </div>
+  {% endif %} #}
+
   <script type="module" src="{{ url_for('static', filename='js/pages/footer_buttons.js') }}"></script>
 {% endif %}
