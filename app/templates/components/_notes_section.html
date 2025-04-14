@@ -1,9 +1,6 @@
 <!-- START TEMPLATE: _notes_section.html -->
 {% import 'base/macros/render_form_fields.html' as field_macros with context %}
 
-<div class="section-card card shadow-sm border-0 mb-4 mt-4">
-  <div class="section-header">
-    <h5 class="section-heading">Notes</h5>
     <div class="dropdown" style="margin-left: auto;">
       <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="notesFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="fas fa-filter me-1"></i> Filter
@@ -24,10 +21,7 @@
           </form>
         </li>
       </ul>
-    </div>
-  </div>
 
-  <div class="section-body p-3">
     <!-- Add Note form moved above the notes list -->
     <form id="newNoteForm" class="mb-4">
       <div class="row g-3">
@@ -72,7 +66,6 @@
       </div>
     </div>
   </div>
-</div>
 
 <!-- Add data attributes to store template variables for JavaScript -->
 <div id="notesData"
