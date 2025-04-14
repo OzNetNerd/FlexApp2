@@ -2,27 +2,31 @@
 
 {% macro render_field(entry, read_only=True) %}
   <div class="col-md-6 mb-3">
-    <label for="{{ entry.entry_name }}" class="form-label fw-semibold">{{ entry.label }}</label>
-
     {% if read_only %}
-      <div class="form-control-plaintext bg-light border rounded px-3 py-2">
-        {% if entry.type == 'checkbox' %}
-          <i class="fas fa-{{ 'check' if entry.value else 'times' }}"></i> {{ 'Yes' if entry.value else 'No' }}
-        {% elif entry.type == 'select' and entry.options %}
-          {% for option in entry.options %}
-            {% if entry.value == option.value %}
-              {{ option.label }}
+      <div class="note-item mb-3 p-3 border rounded">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <strong>{{ entry.label }}</strong>
+        </div>
+        <div class="note-content">
+          {% if entry.type == 'checkbox' %}
+            <p><i class="fas fa-{{ 'check' if entry.value else 'times' }}"></i> {{ 'Yes' if entry.value else 'No' }}</p>
+          {% elif entry.type == 'select' and entry.options %}
+            {% for option in entry.options %}
+              {% if entry.value == option.value %}
+                <p>{{ option.label }}</p>
+              {% endif %}
+            {% endfor %}
+          {% elif entry.type == 'date' %}
+            <p>{{ entry.value.strftime('%Y-%m-%d') if entry.value else '' }}</p>
+          {% else %}
+            {% if entry.value is not none %}
+              <p>{{ entry.value }}</p>
             {% endif %}
-          {% endfor %}
-        {% elif entry.type == 'date' %}
-          {{ entry.value.strftime('%Y-%m-%d') if entry.value else '' }}
-        {% else %}
-          {% if entry.value is not none %}
-            {{ entry.value }}
           {% endif %}
-        {% endif %}
+        </div>
       </div>
     {% else %}
+      <label for="{{ entry.entry_name }}" class="form-label fw-semibold">{{ entry.label }}</label>
       {% if entry.type == 'textarea' %}
         <textarea class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
                   {% if entry.required %}required{% endif %}>{{ entry.value or '' }}</textarea>
