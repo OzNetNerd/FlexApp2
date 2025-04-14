@@ -1,0 +1,80 @@
+<!-- START TEMPLATE: create_view_edit_company.html -->
+
+{% extends "base/create_view_edit/_create_view_edit.html" %}
+
+{% set tabs = [
+    {'tab_name': 'About'},
+    {'tab_name': 'Contacts'},
+    {'tab_name': 'Opportunities'},
+    {'tab_name': 'Capabilities'}
+] %}
+
+{% import 'base/macros/render_form_fields.html' as field_macros with context %}
+{% import 'base/macros/tabs.html' as tab_macros with context %}
+{% import 'base/macros/entity_macros.html' as entity_macros with context %}
+
+{% block view_template_content %}
+<form method="post" action="{{ submit_url }}">
+  <div class="tab-content" id="formTabsContent">
+
+    <!-- Tab Pane: About -->
+    {% call tab_macros.render_tab_section('about', 'Basic Info', active=true) %}
+      {{ field_macros.render_field({
+          "entry_name": "name",
+          "label": "Company Name",
+          "type": "text",
+          "value": entity.name if entity else '',
+          "required": true,
+          "options": []
+      }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "description",
+          "label": "Description",
+          "type": "textarea",
+          "value": entity.description if entity else '',
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+    {% endcall %}
+
+    <!-- Tab Pane: Contacts -->
+    {% call tab_macros.render_tab_section('contacts', 'Related Contacts') %}
+      {{ field_macros.render_field({
+          "entry_name": "contacts",
+          "label": "Contacts",
+          "type": "custom",
+          "value": entity.contacts if entity else [],
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+    {% endcall %}
+
+    <!-- Tab Pane: Opportunities -->
+    {% call tab_macros.render_tab_section('opportunities', 'Opportunities') %}
+      {{ field_macros.render_field({
+          "entry_name": "opportunities",
+          "label": "Opportunities",
+          "type": "custom",
+          "value": entity.opportunities if entity else [],
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+    {% endcall %}
+
+    <!-- Tab Pane: Capabilities -->
+    {% call tab_macros.render_tab_section('capabilities', 'Capabilities') %}
+      {{ field_macros.render_field({
+          "entry_name": "capabilities",
+          "label": "Capabilities",
+          "type": "custom",
+          "value": entity.capabilities if entity else [],
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+    {% endcall %}
+
+  </div>
+</form>
+{% endblock view_template_content %}
+
+<!-- END TEMPLATE: create_view_edit_company.html -->
