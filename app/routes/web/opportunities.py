@@ -14,8 +14,8 @@ opportunity_service = CRUDService(Opportunity)
 
 # Define custom templates for opportunities
 custom_templates = CrudTemplates(
-    view="pages/crud/view_edit_opportunities.html",
-    edit="pages/crud/view_edit_opportunities.html",
+    view="pages/crud/create_view_edit_opportunity.html",
+    edit="pages/crud/create_view_edit_opportunity.html",
 
 )
 

@@ -1,80 +1,130 @@
-<!-- START TEMPLATE: create_view_edit_company.html -->
+{# create_view_edit_opportunity.html #}
 
 {% extends "base/create_view_edit/_create_view_edit.html" %}
 
 {% set tabs = [
+    {'tab_name': 'Notes'} if read_only else None,
     {'tab_name': 'About'},
-    {'tab_name': 'Contacts'},
-    {'tab_name': 'Opportunities'},
-    {'tab_name': 'Capabilities'}
-] %}
+    {'tab_name': 'Insights'} if read_only else None,
+    {'tab_name': 'System Info'} if read_only else None
+] | reject('none') | list %}
 
 {% import 'base/macros/render_form_fields.html' as field_macros with context %}
 {% import 'base/macros/tabs.html' as tab_macros with context %}
-{% import 'base/macros/entity_macros.html' as entity_macros with context %}
 
 {% block view_template_content %}
-<form method="post" action="{{ submit_url }}">
+<form method="post" action="{{ submit_url }}" id="main-form">
+  {{ csrf_input }}
   <div class="tab-content" id="formTabsContent">
 
-    <!-- Tab Pane: About -->
-    {% call tab_macros.render_tab_section('about', 'Basic Info', active=true) %}
+    {% if read_only %}
+    {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
+      {% include 'components/_notes_section.html' %}
+    {% endcall %}
+    {% endif %}
+
+    {% call tab_macros.render_tab_section('about', 'About', active=not read_only) %}
       {{ field_macros.render_field({
           "entry_name": "name",
-          "label": "Company Name",
+          "label": "Opportunity Name",
           "type": "text",
-          "value": entity.name if entity else '',
+          "value": entity.name,
           "required": true,
           "options": []
       }, read_only=read_only) }}
+
+      <div class="form-group">
+        <label for="company-input">Company</label>
+        <input type="text"
+               id="company-input"
+               class="form-control"
+               placeholder="Search for a company..."
+               data-initial="{{ [entity.company_id] if entity.company_id else '[]' }}"
+               {% if read_only %}disabled{% endif %}>
+        <input type="hidden" name="company_id" id="company_id" value="{{ entity.company_id if entity.company_id else '' }}">
+      </div>
+
       {{ field_macros.render_field({
           "entry_name": "description",
           "label": "Description",
           "type": "textarea",
-          "value": entity.description if entity else '',
+          "value": entity.description,
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "status",
+          "label": "Status",
+          "type": "text",
+          "value": entity.status,
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "stage",
+          "label": "Stage",
+          "type": "text",
+          "value": entity.stage,
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "value",
+          "label": "Estimated Value",
+          "type": "currency",
+          "value": entity.value,
           "required": false,
           "options": []
       }, read_only=read_only) }}
     {% endcall %}
 
-    <!-- Tab Pane: Contacts -->
-    {% call tab_macros.render_tab_section('contacts', 'Related Contacts') %}
+    {% if read_only %}
+    {% call tab_macros.render_tab_section('insights', 'Insights') %}
+      {% set crisp_score = "N/A" %}
+      {% if entity.crisp_summary is not none %}
+        {% set crisp_score = entity.crisp_summary %}
+      {% endif %}
+
       {{ field_macros.render_field({
-          "entry_name": "contacts",
-          "label": "Contacts",
-          "type": "custom",
-          "value": entity.contacts if entity else [],
+          "entry_name": "crisp_summary",
+          "label": "CRISP Summary",
+          "type": "text",
+          "value": crisp_score,
           "required": false,
           "options": []
-      }, read_only=read_only) }}
+      }, read_only=true) }}
     {% endcall %}
 
-    <!-- Tab Pane: Opportunities -->
-    {% call tab_macros.render_tab_section('opportunities', 'Opportunities') %}
-      {{ field_macros.render_field({
-          "entry_name": "opportunities",
-          "label": "Opportunities",
-          "type": "custom",
-          "value": entity.opportunities if entity else [],
-          "required": false,
-          "options": []
-      }, read_only=read_only) }}
-    {% endcall %}
-
-    <!-- Tab Pane: Capabilities -->
-    {% call tab_macros.render_tab_section('capabilities', 'Capabilities') %}
-      {{ field_macros.render_field({
-          "entry_name": "capabilities",
-          "label": "Capabilities",
-          "type": "custom",
-          "value": entity.capabilities if entity else [],
-          "required": false,
-          "options": []
-      }, read_only=read_only) }}
-    {% endcall %}
+    {% call tab_macros.render_tab_section('system_info', 'System Info') %}
+      {% endcall %}
+    {% endif %}
 
   </div>
 </form>
-{% endblock view_template_content %}
 
-<!-- END TEMPLATE: create_view_edit_company.html -->
+<script type="module">
+  import { setupAutoComplete } from '/static/js/autoComplete.js';
+
+  // Wait for page to fully load
+  window.addEventListener('load', function() {
+    console.log("Page loaded - setting up autocomplete");
+
+    // Check if the element exists
+    const input = document.querySelector('#company-input');
+    if (input) {
+      console.log("Found company input field, initializing autocomplete");
+
+      // Call setup directly with explicit parameters
+      setupAutoComplete({
+        inputSelector: '#company-input',
+        dataUrl: '/api/companies',
+        inputName: 'company_id',
+        initialIds: JSON.parse(input.dataset.initial || '[]')
+      });
+    } else {
+      console.error("Company input field not found!");
+    }
+  });
+</script>
+
+{% endblock view_template_content %}

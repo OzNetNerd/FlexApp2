@@ -1,4 +1,4 @@
-<!-- START TEMPLATE: view_edit_contacts.html -->
+<!-- START TEMPLATE: create_view_edit_contact.html -->
 
 {% extends "base/create_view_edit/_create_view_edit.html" %}
 
@@ -17,7 +17,7 @@
 {% import 'base/macros/tabs.html' as tab_macros with context %}
 
 {% block view_template_content %}
-<form method="post" action="{{ submit_url }}">
+<form method="post" action="{{ submit_url }}" id="main-form">
   {{ csrf_input }}
   <div class="tab-content" id="formTabsContent">
 
@@ -31,18 +31,18 @@
     <!-- Tab Pane: About -->
     {% call tab_macros.render_tab_section('about', 'About', active=not read_only) %}
       {{ field_macros.render_field({
-          "entry_name": "username",
-          "label": "Username",
+          "entry_name": "first_name",
+          "label": "First Name",
           "type": "text",
-          "value": entity.username,
+          "value": entity.first_name,
           "required": true,
           "options": []
        }, read_only=read_only) }}
       {{ field_macros.render_field({
-          "entry_name": "name",
-          "label": "Name",
+          "entry_name": "last_name",
+          "label": "Last Name",
           "type": "text",
-          "value": entity.name,
+          "value": entity.last_name,
           "required": true,
           "options": []
        }, read_only=read_only) }}
@@ -53,6 +53,22 @@
           "value": entity.email,
           "required": true,
           "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "phone_number",
+          "label": "Phone Number",
+          "type": "text",
+          "value": entity.phone_number,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "company_id",
+          "label": "Company",
+          "type": "select",
+          "value": entity.company_id,
+          "required": false,
+          "options": companies
        }, read_only=read_only) }}
     {% endcall %}
 
@@ -69,26 +85,26 @@
       {{ field_macros.render_field({
           "entry_name": "role_level",
           "label": "Role Level",
-          "type": "text",
+          "type": "select",
           "value": entity.role_level,
           "required": false,
-          "options": []
+          "options": role_levels
        }, read_only=read_only) }}
       {{ field_macros.render_field({
           "entry_name": "skill_level",
           "label": "Skill Level",
-          "type": "text",
+          "type": "select",
           "value": entity.skill_level,
           "required": false,
-          "options": []
+          "options": skill_levels
        }, read_only=read_only) }}
       {{ field_macros.render_field({
           "entry_name": "primary_skill_area",
           "label": "Primary Skill Area",
-          "type": "text",
+          "type": "select",
           "value": entity.primary_skill_area,
           "required": false,
-          "options": []
+          "options": skill_areas
        }, read_only=read_only) }}
       {{ field_macros.render_field({
           "entry_name": "certifications",
@@ -103,6 +119,14 @@
           "label": "Expertise Areas",
           "type": "text",
           "value": entity.expertise_areas,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "technologies_led",
+          "label": "Technologies Led",
+          "type": "textarea",
+          "value": entity.technologies_led,
           "required": false,
           "options": []
        }, read_only=read_only) }}
@@ -158,6 +182,14 @@
           "required": false,
           "options": []
        }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "other_technologies",
+          "label": "Other Technologies",
+          "type": "text",
+          "value": entity.other_technologies,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
     {% endcall %}
 
     <!-- Tab Pane: Job Details -->
@@ -178,26 +210,50 @@
           "required": false,
           "options": []
        }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "team_roles_responsibilities",
+          "label": "Team Roles & Responsibilities",
+          "type": "textarea",
+          "value": entity.team_roles_responsibilities,
+          "required": false,
+          "options": []
+       }, read_only=read_only) }}
     {% endcall %}
 
     <!-- Tab Pane: Relationships -->
     {% call tab_macros.render_tab_section('relationships', 'Relationships') %}
-      {{ field_macros.render_field({
-          "entry_name": "users",
-          "label": "Users",
-          "type": "custom",
-          "value": entity.users,
-          "required": false,
-          "options": []
-       }, read_only=read_only) }}
-      {{ field_macros.render_field({
-          "entry_name": "companies",
-          "label": "Companies",
-          "type": "custom",
-          "value": entity.companies,
-          "required": false,
-          "options": []
-       }, read_only=read_only) }}
+      <div class="form-group">
+        <label for="managers-input">Managers</label>
+        <input type="text"
+               id="managers-input"
+               class="form-control"
+               placeholder="Search for managers..."
+               data-initial="{{ entity.managers|map(attribute='id')|list|tojson if entity.managers else '[]' }}"
+               {% if read_only %}disabled{% endif %}>
+        <input type="hidden" name="managers" id="managers" value="{{ entity.managers|map(attribute='id')|list|tojson if entity.managers else '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="subordinates-input">Subordinates</label>
+        <input type="text"
+               id="subordinates-input"
+               class="form-control"
+               placeholder="Search for subordinates..."
+               data-initial="{{ entity.subordinates|map(attribute='id')|list|tojson if entity.subordinates else '[]' }}"
+               {% if read_only %}disabled{% endif %}>
+        <input type="hidden" name="subordinates" id="subordinates" value="{{ entity.subordinates|map(attribute='id')|list|tojson if entity.subordinates else '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="opportunities-input">Opportunities</label>
+        <input type="text"
+               id="opportunities-input"
+               class="form-control"
+               placeholder="Search for opportunities..."
+               data-initial="{{ entity.opportunities|map(attribute='id')|list|tojson if entity.opportunities else '[]' }}"
+               {% if read_only %}disabled{% endif %}>
+        <input type="hidden" name="opportunities" id="opportunities" value="{{ entity.opportunities|map(attribute='id')|list|tojson if entity.opportunities else '' }}">
+      </div>
     {% endcall %}
 
     {% if read_only %}
@@ -229,6 +285,46 @@
 
   </div>
 </form>
+
+<script type="module">
+  import { setupAutoComplete } from '/static/js/autoComplete.js';
+
+  // Wait for page to fully load
+  window.addEventListener('load', function() {
+    // Setup autocomplete for managers
+    const managersInput = document.querySelector('#managers-input');
+    if (managersInput) {
+      setupAutoComplete({
+        inputSelector: '#managers-input',
+        dataUrl: '/api/contacts',
+        inputName: 'managers',
+        initialIds: JSON.parse(managersInput.dataset.initial || '[]')
+      });
+    }
+
+    // Setup autocomplete for subordinates
+    const subordinatesInput = document.querySelector('#subordinates-input');
+    if (subordinatesInput) {
+      setupAutoComplete({
+        inputSelector: '#subordinates-input',
+        dataUrl: '/api/contacts',
+        inputName: 'subordinates',
+        initialIds: JSON.parse(subordinatesInput.dataset.initial || '[]')
+      });
+    }
+
+    // Setup autocomplete for opportunities
+    const opportunitiesInput = document.querySelector('#opportunities-input');
+    if (opportunitiesInput) {
+      setupAutoComplete({
+        inputSelector: '#opportunities-input',
+        dataUrl: '/api/opportunities',
+        inputName: 'opportunities',
+        initialIds: JSON.parse(opportunitiesInput.dataset.initial || '[]')
+      });
+    }
+  });
+</script>
 {% endblock view_template_content %}
 
-<!-- END TEMPLATE: view_edit_contacts.html -->
+<!-- END TEMPLATE: create_view_edit_contact.html -->
