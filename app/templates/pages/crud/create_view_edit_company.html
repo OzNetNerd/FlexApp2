@@ -1,11 +1,10 @@
-{# create_view_edit_opportunity.html #}
+{# create_view_edit_company.html #}
 
 {% extends "page_templates/_create_view_edit.html" %}
 
 {% set tabs = [
     {'tab_name': 'Notes'} if read_only else None,
     {'tab_name': 'About'},
-    {'tab_name': 'Insights'} if read_only else None,
     {'tab_name': 'System Info'} if read_only else None
 ] | reject('none') | list %}
 
@@ -19,30 +18,19 @@
 
     {% if read_only %}
     {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
-      {% include 'pages/crud/sections/_notes_sectA
+      {% include 'pages/crud/sections/_notes_section.html' %}
     {% endcall %}
     {% endif %}
 
     {% call tab_macros.render_tab_section('about', 'About', active=not read_only) %}
       {{ field_macros.render_field({
           "entry_name": "name",
-          "label": "Opportunity Name",
+          "label": "Company Name",
           "type": "text",
           "value": entity.name,
           "required": true,
           "options": []
       }, read_only=read_only) }}
-
-      <div class="form-group">
-        <label for="company-input">Company</label>
-        <input type="text"
-               id="company-input"
-               class="form-control"
-               placeholder="Search for a company..."
-               data-initial="{{ [entity.company_id] if entity.company_id else '[]' }}"
-               {% if read_only %}disabled{% endif %}>
-        <input type="hidden" name="company_id" id="company_id" value="{{ entity.company_id if entity.company_id else '' }}">
-      </div>
 
       {{ field_macros.render_field({
           "entry_name": "description",
@@ -52,79 +40,30 @@
           "required": false,
           "options": []
       }, read_only=read_only) }}
-      {{ field_macros.render_field({
-          "entry_name": "status",
-          "label": "Status",
-          "type": "text",
-          "value": entity.status,
-          "required": false,
-          "options": []
-      }, read_only=read_only) }}
-      {{ field_macros.render_field({
-          "entry_name": "stage",
-          "label": "Stage",
-          "type": "text",
-          "value": entity.stage,
-          "required": false,
-          "options": []
-      }, read_only=read_only) }}
-      {{ field_macros.render_field({
-          "entry_name": "value",
-          "label": "Estimated Value",
-          "type": "currency",
-          "value": entity.value,
-          "required": false,
-          "options": []
-      }, read_only=read_only) }}
     {% endcall %}
 
     {% if read_only %}
-    {% call tab_macros.render_tab_section('insights', 'Insights') %}
-      {% set crisp_score = "N/A" %}
-      {% if entity.crisp_summary is not none %}
-        {% set crisp_score = entity.crisp_summary %}
-      {% endif %}
+    {% call tab_macros.render_tab_section('system_info', 'System Info') %}
+      {{ field_macros.render_field({
+          "entry_name": "created_at",
+          "label": "Created",
+          "type": "text",
+          "value": entity.created_at,
+          "required": false,
+          "options": []
+      }, read_only=true) }}
 
       {{ field_macros.render_field({
-          "entry_name": "crisp_summary",
-          "label": "CRISP Summary",
+          "entry_name": "updated_at",
+          "label": "Last Updated",
           "type": "text",
-          "value": crisp_score,
+          "value": entity.updated_at,
           "required": false,
           "options": []
       }, read_only=true) }}
     {% endcall %}
-
-    {% call tab_macros.render_tab_section('system_info', 'System Info') %}
-      {% endcall %}
     {% endif %}
 
   </div>
 </form>
-
-<script type="module">
-  import { setupAutoComplete } from '/static/js/autoComplete.js';
-
-  // Wait for page to fully load
-  window.addEventListener('load', function() {
-    console.log("Page loaded - setting up autocomplete");
-
-    // Check if the element exists
-    const input = document.querySelector('#company-input');
-    if (input) {
-      console.log("Found company input field, initializing autocomplete");
-
-      // Call setup directly with explicit parameters
-      setupAutoComplete({
-        inputSelector: '#company-input',
-        dataUrl: '/api/companies',
-        inputName: 'company_id',
-        initialIds: JSON.parse(input.dataset.initial || '[]')
-      });
-    } else {
-      console.error("Company input field not found!");
-    }
-  });
-</script>
-
 {% endblock view_template_content %}
