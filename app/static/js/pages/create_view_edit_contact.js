@@ -22,14 +22,14 @@ window.addEventListener('load', function() {
     });
   }
 
-  // Setup autocomplete for direct reports (previously called subordinates)
+  // Setup autocomplete for direct reports
   const directReportsInput = document.querySelector('#direct-reports-input');
   if (directReportsInput) {
     log("info", "create_view_edit_contact", "setup", "Setting up autocomplete for direct reports");
     setupAutoComplete({
       inputSelector: '#direct-reports-input',
       dataUrl: '/api/contacts',
-      inputName: 'subordinates', // Keep original field name for backend compatibility
+      inputName: 'direct_reports',
       initialIds: JSON.parse(directReportsInput.dataset.initial || '[]')
     }).then(response => {
       log("info", "create_view_edit_contact", "autocomplete_success", "Autocomplete setup for direct reports succeeded", response);

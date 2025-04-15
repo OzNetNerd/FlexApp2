@@ -104,7 +104,7 @@ class Contact(BaseModel):
         return managers
 
     @property
-    def subordinates(self):
+    def direct_reports(self):
         """
         Retrieve contacts (or users) managed by this Contact.
         Looks for relationships where this contact is the source (entity1)
@@ -114,17 +114,50 @@ class Contact(BaseModel):
         subs = []
         for rel in rels:
             if rel.entity2_type == "contact":
-                subordinate = Contact.query.get(rel.entity2_id)
+                direct_report = Contact.query.get(rel.entity2_id)
             elif rel.entity2_type == "user":
                 from app.models.user import User
 
-                subordinate = User.query.get(rel.entity2_id)
-            if subordinate:
-                subs.append(subordinate)
+                direct_report = User.query.get(rel.entity2_id)
+            if direct_report:
+                subs.append(direct_report)
         return subs
 
     def __repr__(self) -> str:
         return f"<Contact {self.id} {self.full_name}>"
+
+    @direct_reports.setter
+    def direct_reports(self, direct_report_list):
+        """Set direct reports for this Contact by creating appropriate relationships."""
+        # Ensure contact has ID
+        if not self.id:
+            db.session.add(self)
+            db.session.flush()
+
+        # Clear existing direct report relationships
+        Relationship.query.filter_by(entity1_type="contact", entity1_id=self.id, relationship_type="manager").delete()
+
+        # Add new direct report relationships
+        if direct_report_list:
+            for direct_report in direct_report_list:
+                if isinstance(direct_report, dict):
+                    report_type = direct_report.get("type", "contact")
+                    report_id = direct_report.get("id")
+                elif hasattr(direct_report, "id"):
+                    report_type = direct_report.__class__.__name__.lower()
+                    report_id = direct_report.id
+                else:
+                    report_type = "contact"
+                    report_id = int(direct_report)
+
+                relationship = Relationship(
+                    entity1_type="contact",
+                    entity1_id=self.id,
+                    entity2_type=report_type,
+                    entity2_id=report_id,
+                    relationship_type="manager",
+                )
+                db.session.add(relationship)
 
     @managers.setter
     def managers(self, manager_list):
@@ -156,5 +189,38 @@ class Contact(BaseModel):
                     entity2_type="contact",
                     entity2_id=self.id,
                     relationship_type="manager",
+                )
+                db.session.add(relationship)
+
+    @opportunities.setter
+    def opportunities(self, opportunity_list):
+        """Set opportunities linked to this Contact by creating appropriate relationships."""
+        # Ensure contact has ID
+        if not self.id:
+            db.session.add(self)
+            db.session.flush()
+
+        # Clear existing opportunity relationships for this contact
+        Relationship.query.filter(
+            ((Relationship.entity1_type == "contact") & (Relationship.entity1_id == self.id) & (Relationship.entity2_type == "opportunity")) |
+            ((Relationship.entity2_type == "contact") & (Relationship.entity2_id == self.id) & (Relationship.entity1_type == "opportunity"))
+        ).delete()
+
+        # Add new opportunity relationships
+        if opportunity_list:
+            for opportunity in opportunity_list:
+                if isinstance(opportunity, dict):
+                    opp_id = opportunity.get("id")
+                elif hasattr(opportunity, "id"):
+                    opp_id = opportunity.id
+                else:
+                    opp_id = int(opportunity)
+
+                relationship = Relationship(
+                    entity1_type="contact",
+                    entity1_id=self.id,
+                    entity2_type="opportunity",
+                    entity2_id=opp_id,
+                    relationship_type="linked"
                 )
                 db.session.add(relationship)
