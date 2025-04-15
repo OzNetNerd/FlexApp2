@@ -17,6 +17,12 @@
 
     <!-- Load external JavaScript for base template logging and DOM verification -->
     <script type="module" src="{{ url_for('static', filename='js/pages/base_page.js') }}"></script>
+
+    <!-- Autocomplete functionality -->
+    <script type="module" src="{{ url_for('static', filename='js/autoComplete.js') }}"></script>
+
+    <!-- Task page JavaScript (will only load on task pages) -->
+    <script type="module" src="{{ url_for('static', filename='js/pages/create_view_edit_task.js') }}"></script>
   </body>
 </html>
 

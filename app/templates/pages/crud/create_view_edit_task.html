@@ -77,26 +77,36 @@
           "options": []
       }, read_only=read_only) }}
 
-      <!-- Customer Dropdown -->
-      <div class="form-group">
-        <label for="customer-dropdown">Customer</label>
-        <select class="form-control" id="customer-dropdown" name="customer_id" {% if read_only %}disabled{% endif %}>
-          <option value="">Select Customer</option>
-          {% for customer in customers %}
-            <option value="{{ customer.id }}" {% if entity.customer_id == customer.id %}selected{% endif %}>{{ customer.name }}</option>
-          {% endfor %}
-        </select>
+      <!-- Customer Autocomplete -->
+      <div class="form-group dropdown-container">
+        <label for="customer-input">Customer</label>
+        <input type="text"
+          id="customer-input"
+          class="form-control autocomplete-input"
+          placeholder="Search for customer..."
+          data-entity-type="company"
+          data-entity-id="{{ entity.customer_id if entity.customer_id else '' }}"
+          data-entity-name="{{ entity.customer.name if entity.customer else '' }}"
+          data-initial="{{ [entity.customer_id]|tojson if entity.customer_id else '[]' }}"
+          {% if read_only %}disabled{% endif %}>
+        <input type="hidden" name="customer_id" id="customer_id" value="{{ entity.customer_id if entity.customer_id else '' }}">
+        <div class="autocomplete-dropdown-menu" id="customer-results"></div>
       </div>
 
-      <!-- Owner Dropdown -->
-      <div class="form-group">
-        <label for="owner-dropdown">Owner</label>
-        <select class="form-control" id="owner-dropdown" name="owner_id" {% if read_only %}disabled{% endif %}>
-          <option value="">Select Owner</option>
-          {% for owner in owners %}
-            <option value="{{ owner.id }}" {% if entity.owner_id == owner.id %}selected{% endif %}>{{ owner.name }}</option>
-          {% endfor %}
-        </select>
+      <!-- Owner Autocomplete -->
+      <div class="form-group dropdown-container">
+        <label for="owner-input">Owner</label>
+        <input type="text"
+          id="owner-input"
+          class="form-control autocomplete-input"
+          placeholder="Search for owner..."
+          data-entity-type="user"
+          data-entity-id="{{ entity.owner_id if entity.owner_id else '' }}"
+          data-entity-name="{{ entity.owner.name if entity.owner else '' }}"
+          data-initial="{{ [entity.owner_id]|tojson if entity.owner_id else '[]' }}"
+          {% if read_only %}disabled{% endif %}>
+        <input type="hidden" name="owner_id" id="owner_id" value="{{ entity.owner_id if entity.owner_id else '' }}">
+        <div class="autocomplete-dropdown-menu" id="owner-results"></div>
       </div>
     {% endcall %}
 

@@ -1,7 +1,5 @@
 from flask import Blueprint, request, jsonify
 from app.models import User, Company, Opportunity
-
-# from app.services.mention import search_mentions
 import logging
 
 logger = logging.getLogger(__name__)
@@ -71,10 +69,19 @@ def mentions_search():
 
     logger.debug(f"Searching for mentions with query: {query} and type: {mention_type}")
     results = []
-    entities = search_mentions(query, mention_type)
+    # Commented out as it seems this function might not exist yet
+    # entities = search_mentions(query, mention_type)
 
-    for entity in entities:
-        if mention_type == "user":
+    # Temporary implementation
+    if mention_type == "user":
+        entities = User.query.filter(
+            User.username.ilike(f"%{query}%") |
+            User.name.ilike(f"%{query}%") |
+            User.first_name.ilike(f"%{query}%") |
+            User.last_name.ilike(f"%{query}%")
+        ).limit(10).all()
+
+        for entity in entities:
             results.append(
                 {
                     "id": entity.id,
@@ -83,7 +90,10 @@ def mentions_search():
                     "text": f"@{entity.username}",
                 }
             )
-        elif mention_type == "company":
+    elif mention_type == "company":
+        entities = Company.query.filter(Company.name.ilike(f"%{query}%")).limit(10).all()
+
+        for entity in entities:
             results.append(
                 {
                     "id": entity.id,
@@ -96,9 +106,22 @@ def mentions_search():
     return jsonify(results)
 
 
-@search_bp.route("/api/users")
+@search_bp.route("/users")
 def users_data():
-    users = User.query.order_by(User.name).all()
+    query = request.args.get("q", "").strip()
+
+    if query:
+        logger.debug(f"Searching for users with query: {query}")
+        users = User.query.filter(
+            User.username.ilike(f"%{query}%") |
+            User.name.ilike(f"%{query}%") |
+            User.first_name.ilike(f"%{query}%") |
+            User.last_name.ilike(f"%{query}%") |
+            User.email.ilike(f"%{query}%")
+        ).order_by(User.name).limit(10).all()
+    else:
+        users = User.query.order_by(User.name).limit(30).all()
+
     data = [
         {
             "id": user.id,
@@ -112,9 +135,18 @@ def users_data():
     return jsonify({"data": data})
 
 
-@search_bp.route("/api/companies")
+@search_bp.route("/companies")
 def companies_data():
-    companies = Company.query.order_by(Company.name).all()
+    query = request.args.get("q", "").strip()
+
+    if query:
+        logger.debug(f"Searching for companies with query: {query}")
+        companies = Company.query.filter(
+            Company.name.ilike(f"%{query}%")
+        ).order_by(Company.name).limit(10).all()
+    else:
+        companies = Company.query.order_by(Company.name).limit(30).all()
+
     data = [
         {
             "id": company.id,
