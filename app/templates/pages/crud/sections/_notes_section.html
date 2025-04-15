@@ -73,11 +73,12 @@
 <!-- Add data attributes to store template variables for JavaScript -->
 <div id="notesData"
      data-notable-type="{{ entity_class_name }}"
-     data-notable-id="{{ id }}"
+     data-notable-id="{{ entity.id }}"
      data-user-id="{{ current_user.id }}"
      data-username="{{ current_user.username|default(current_user.name|default(current_user.email|default(''))) }}">
 </div>
 
 <!-- Include the external JavaScript file -->
-<script src="{{ url_for('static', filename='js/pages/notes_section.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/pages/notes_section.js') }}"></script>
+
 <!-- END TEMPLATE: _notes_section.html -->
