@@ -20,6 +20,7 @@ custom_templates = CrudTemplates(
     create="pages/crud/create_view_edit_contact.html",
     view="pages/crud/create_view_edit_contact.html",
     edit="pages/crud/create_view_edit_contact.html",
+    update="pages/crud/create_view_edit_contact.html",
 )
 
 # Add debug logging to verify templates are set correctly

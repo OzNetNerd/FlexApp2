@@ -37,6 +37,7 @@ class CrudTemplates:
     create: Optional[str] = None
     view: Optional[str] = None
     edit: Optional[str] = None
+    update: Optional[str] = None  # Add this field
     delete: Optional[str] = None
 
     def get(self, route_type: str, default: str) -> str:
@@ -46,8 +47,8 @@ class CrudTemplates:
 
     def to_dict(self) -> Dict[str, Optional[str]]:
         """Convert the dataclass to a dictionary."""
-        return {"index": self.index, "create": self.create, "view": self.view, "edit": self.edit, "delete": self.delete}
-
+        return {"index": self.index, "create": self.create, "view": self.view,
+                "edit": self.edit, "update": self.update, "delete": self.delete}
 
 @dataclass
 class CrudRouteConfig:
