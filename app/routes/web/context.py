@@ -183,6 +183,8 @@ class EntityContext(BaseContext):
 
         return full_repr
 
+    # Fix for EntityContext._initialize_derived_fields in context.py
+
     def _initialize_derived_fields(self):
         """Initialize derived fields."""
         # Use entity_table_name for model_name if available, otherwise use class name
@@ -213,16 +215,15 @@ class EntityContext(BaseContext):
 
         # Make entity available to templates directly
         # This is crucial for templates that reference entity directly
-        if not hasattr(self, 'entity'):
-            # If entity isn't already an attribute
-            setattr(self, 'entity', self.entity)
+        setattr(self, 'entity', self.entity)
 
         # Set the correct submit URL based on action and read-only status
         if not self.read_only:
             if self.action == "create":
                 self.submit_url = url_for(f"{blueprint_name}.create")
             elif self.action == "edit" and self.entity_id:
-                self.submit_url = url_for(f"{blueprint_name}.update", id=self.entity_id)
+                # FIX: Use entity_id parameter name instead of id
+                self.submit_url = url_for(f"{blueprint_name}.update", entity_id=self.entity_id)
             else:
                 self.submit_url = ""
         else:

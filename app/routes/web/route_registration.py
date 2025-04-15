@@ -308,10 +308,11 @@ def register_crud_routes(crud_route_config: CrudRouteConfig) -> Any:
                 action="edit",
                 entity_table_name=entity_table_name,
                 entity_id=entity_id,
-                entity=service.get_by_id(entity_id),
+                entity=service.get_by_id(entity_id),  # Make sure entity is fetched correctly
                 title=f"Edit {entity_table_name}",
                 read_only=False,
                 blueprint_name=blueprint.name,
+                # This will be fixed by our update to _initialize_derived_fields
                 submit_url=url_for(f"{blueprint.name}.update", entity_id=entity_id),
             ),
             "methods": ["GET", "POST"],
