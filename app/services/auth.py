@@ -1,7 +1,7 @@
 # app/services/auth.py
 
 import logging
-from flask import request, redirect, url_for, flash, session
+from flask import request, redirect, url_for, flash, session, render_template
 from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash
 from app.routes.web.components.template_renderer import render_safely, RenderSafelyConfig
@@ -30,10 +30,11 @@ class AuthService:
                 next_page = request.args.get("next")
                 if not next_page or not next_page.startswith("/"):
                     try:
-                        next_page = url_for("home_bp.index")
+                        next_page = url_for("home.index")  # Changed from home_bp.index
                         logger.info(f"Redirecting to home page at '{next_page}'")
                     except Exception as e:
                         logger.error(f"Failed to build URL for 'home.index': {e}")
+                        next_page = "/"  # Fallback to root
 
                 flash("Logged in successfully.", "success")
                 logger.info(f"User {user.email} logged in.")
@@ -42,18 +43,16 @@ class AuthService:
             flash("Invalid email or password.", "danger")
             logger.warning(f"Failed login attempt for email: {email}")
 
-        context = BaseContext(title="Login")
-        config = RenderSafelyConfig(
-            template_path="pages/misc/login.html",
-            context=context,
-            error_message="An error occurred while rendering the login page.",
-            endpoint_name="auth_bp.login"
-        )
-        return render_safely(config)
+        # Use direct Flask render_template for simplicity
+        try:
+            return render_template("pages/misc/login.html", title="Login")
+        except Exception as e:
+            logger.exception(f"Template error: {e}")
+            return f"<h1>Login</h1><p>Error rendering login page: {str(e)}</p>"
 
     @staticmethod
     def handle_logout():
         logout_user()
         flash("Logged out.", "info")
         logger.info("User logged out.")
-        return redirect(url_for("auth.login"))  # Remove _bp suffix
+        return redirect(url_for("auth.login"))  # Changed from auth_bp.login
