@@ -12,9 +12,9 @@ srs_service = SRSService()
 
 templates = CrudTemplates(
     index="pages/tables/srs_items.html",
-    # create="pages/crud/create_view_edit_srs_item.html",
-    # view="pages/crud/view_srs_item.html",
-    # edit="pages/crud/create_view_edit_srs_item.html",
+    create="pages/crud/create_view_edit_srs_item.html",
+    view="pages/crud/view_srs_item.html",
+    edit="pages/crud/create_view_edit_srs_item.html",
     # update/delete use defaults if you don't override
 )
 
