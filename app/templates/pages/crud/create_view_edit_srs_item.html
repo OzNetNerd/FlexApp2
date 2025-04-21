@@ -5,26 +5,203 @@
 {% block heading %}{{ title }}{% endblock %}
 
 {% block view_template_content %}
-  <form method="post" action="{{ submit_url }}">
-    {{ csrf_input }}
+<div class="card shadow-sm mb-4">
+  <div class="card-header bg-light d-flex justify-content-between align-items-center">
+    <h4 class="mb-0">Question</h4>
+    {% if entity.category %}
+    <span class="badge bg-primary">{{ entity.category }}</span>
+    {% endif %}
+  </div>
+  <div class="card-body">
+    <p class="card-text fs-5">{{ entity.question }}</p>
+  </div>
+</div>
 
-    <div class="row">
-      <div class="col-md-6">
-        {{ field_macros.render_field({
-            "entry_name": "question",
-            "label": "Question",
-            "type": "textarea",
-            "value": entity.question or "",
-        }, read_only=read_only) }}
+<div class="card shadow-sm">
+  <div class="card-header bg-light">
+    <h4 class="mb-0">Your Answer</h4>
+  </div>
+  <div class="card-body">
+    <form id="review-form" data-entity-id="{{ entity.id }}">
+      {{ csrf_input }}
+
+      <div class="mb-4">
+        <textarea
+          name="answer_given"
+          class="form-control"
+          rows="4"
+          placeholder="Type your answer here..."
+          autofocus
+          required></textarea>
       </div>
-      <div class="col-md-6">
-        {{ field_macros.render_field({
-            "entry_name": "answer",
-            "label": "Answer",
-            "type": "textarea",
-            "value": entity.answer or "",
-        }, read_only=read_only) }}
+
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label class="form-label fw-bold">How well did you know this?</label>
+          <div class="rating-container d-flex align-items-center">
+            <input type="range" class="form-range me-3" id="rating-slider" min="0" max="5" value="0" oninput="updateRating(this.value)">
+            <select name="rating" id="rating-select" class="form-select" style="width: 80px" onchange="updateSlider(this.value)">
+              <option value="0">0 - No recall</option>
+              <option value="1">1 - Failed</option>
+              <option value="2">2 - Difficult</option>
+              <option value="3">3 - Hesitant</option>
+              <option value="4">4 - Easy</option>
+              <option value="5">5 - Perfect</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-6 d-flex align-items-end justify-content-end">
+          <div class="text-muted small me-3">
+            {% if entity.last_reviewed %}
+            <div>Last reviewed: {{ entity.last_reviewed.strftime('%Y-%m-%d') }}</div>
+            {% endif %}
+            {% if entity.due_date %}
+            <div>Next review: {{ entity.due_date.strftime('%Y-%m-%d') }}</div>
+            {% endif %}
+          </div>
+
+          <button type="button" id="show-answer-btn" class="btn btn-outline-secondary me-2" onclick="toggleAnswer()">
+            Show Answer
+          </button>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle me-1"></i> Submit
+          </button>
+        </div>
+      </div>
+
+      <div id="answer-container" class="border rounded p-3 mb-3 bg-light d-none">
+        <h5 class="text-muted">Correct Answer</h5>
+        <div>{{ entity.answer }}</div>
+      </div>
+
+      <div class="progress" style="height: 6px;">
+        <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%;"
+             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+    </form>
+  </div>
+
+  <div class="card-footer bg-white">
+    <div class="row text-center small text-muted">
+      <div class="col-4">
+        <div class="fw-bold">{{ stats.total_cards if stats else 0 }}</div>
+        <div>Total Cards</div>
+      </div>
+      <div class="col-4">
+        <div class="fw-bold">{{ stats.cards_due if stats else 0 }}</div>
+        <div>Due Today</div>
+      </div>
+      <div class="col-4">
+        <div class="fw-bold">{{ stats.cards_reviewed_today if stats else 0 }}</div>
+        <div>Reviewed Today</div>
       </div>
     </div>
-  </form>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between mt-3">
+  <button id="prev-btn" class="btn btn-sm btn-outline-secondary" title="Previous Card (Shift+Left)">
+    <i class="bi bi-arrow-left"></i> Previous
+  </button>
+  <div class="text-muted small">
+    Card {{ current_index if current_index else 1 }} of {{ total_cards if total_cards else 1 }}
+  </div>
+  <button id="next-btn" class="btn btn-sm btn-outline-secondary" title="Next Card (Shift+Right)">
+    Next <i class="bi bi-arrow-right"></i>
+  </button>
+</div>
+
+<script>
+  function updateRating(value) {
+    document.getElementById('rating-select').value = value;
+    updateProgressBar(value);
+  }
+
+  function updateSlider(value) {
+    document.getElementById('rating-slider').value = value;
+    updateProgressBar(value);
+  }
+
+  function updateProgressBar(value) {
+    const percentage = (value / 5) * 100;
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.style.width = percentage + '%';
+    progressBar.className = 'progress-bar';
+    if (value <= 1) {
+      progressBar.classList.add('bg-danger');
+    } else if (value <= 3) {
+      progressBar.classList.add('bg-warning');
+    } else {
+      progressBar.classList.add('bg-success');
+    }
+  }
+
+  function toggleAnswer() {
+    const answerContainer = document.getElementById('answer-container');
+    const showBtn = document.getElementById('show-answer-btn');
+    if (answerContainer.classList.contains('d-none')) {
+      answerContainer.classList.remove('d-none');
+      showBtn.textContent = 'Hide Answer';
+    } else {
+      answerContainer.classList.add('d-none');
+      showBtn.textContent = 'Show Answer';
+    }
+  }
+
+  document.addEventListener('keydown', function(event) {
+    if (event.shiftKey && event.key === 'ArrowRight') {
+      document.getElementById('next-btn').click();
+    }
+    if (event.shiftKey && event.key === 'ArrowLeft') {
+      document.getElementById('prev-btn').click();
+    }
+    if (event.key === ' ' && document.activeElement.tagName !== 'TEXTAREA') {
+      event.preventDefault();
+      toggleAnswer();
+    }
+    if (
+      document.activeElement.tagName !== 'TEXTAREA' &&
+      document.activeElement.tagName !== 'SELECT' &&
+      !isNaN(parseInt(event.key)) &&
+      parseInt(event.key) >= 0 &&
+      parseInt(event.key) <= 5
+    ) {
+      updateRating(event.key);
+    }
+  });
+
+  document.getElementById('review-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const entityId = form.dataset.entityId;
+    const rating = parseInt(document.getElementById('rating-select').value);
+    const csrfToken = form.querySelector('input[name="csrf_token"]').value;
+
+    try {
+      const response = await fetch(`/api/srs/${entityId}/review`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ rating })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit review');
+      }
+
+      // Option 1: redirect to next card (provided from the backend)
+      window.location.href = "{{ url_for('srs_bp.show_card', item_id=next_item_id) }}";
+
+    } catch (err) {
+      alert('An error occurred submitting your review. Please try again.');
+      console.error(err);
+    }
+  });
+
+  updateProgressBar(0);
+</script>
 {% endblock %}
