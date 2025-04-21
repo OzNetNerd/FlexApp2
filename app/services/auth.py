@@ -4,7 +4,7 @@ import logging
 from flask import request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash
-from app.routes.web.components.template_renderer import render_safely
+from app.routes.web.components.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.web.context import BaseContext
 
 logger = logging.getLogger(__name__)
@@ -43,7 +43,13 @@ class AuthService:
             logger.warning(f"Failed login attempt for email: {email}")
 
         context = BaseContext(title="Login")
-        return render_safely("pages/misc/login.html", context)
+        config = RenderSafelyConfig(
+            template_path="pages/misc/login.html",
+            context=context,
+            error_message="An error occurred while rendering the login page.",
+            endpoint_name="auth_bp.login"
+        )
+        return render_safely(config)
 
     @staticmethod
     def handle_logout():
