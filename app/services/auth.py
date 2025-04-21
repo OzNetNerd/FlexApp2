@@ -56,4 +56,4 @@ class AuthService:
         logout_user()
         flash("Logged out.", "info")
         logger.info("User logged out.")
-        return redirect(url_for("auth_bp.login"))
+        return redirect(url_for("auth.login"))  # Remove _bp suffix
