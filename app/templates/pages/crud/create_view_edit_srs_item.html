@@ -194,7 +194,7 @@
       }
 
       // Option 1: redirect to next card (provided from the backend)
-      window.location.href = "{{ url_for('srs_bp.show_card', item_id=next_item_id) }}";
+      window.location.href = "/srs/review/{{ next_item_id }}";
 
     } catch (err) {
       alert('An error occurred submitting your review. Please try again.');
