@@ -3,7 +3,7 @@
 import logging
 from flask import url_for
 from flask_login import current_user
-from app.utils.table_helpers import get_page_tabs, get_table_plural_name, get_table_id_by_name
+from app.utils.table_helpers import get_table_plural_name, get_table_id_by_name
 from app.routes.web.components.tab_builder import create_tabs
 from app.utils.app_logging import log_instance_vars
 from typing import Any, Optional, List
