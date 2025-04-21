@@ -1,0 +1,25 @@
+{% extends 'page_templates/_entity_table.html' %}
+
+{% block content %}
+  <h1>{{ title }}</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Q</th><th>Next Review</th><th>Interval (d)</th><th>EF</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for item in entities %}
+      <tr>
+        <td>{{ item.question|truncate(50) }}</td>
+        <td>{{ item.next_review_at }}</td>
+        <td>{{ "%.1f"|format(item.interval) }}</td>
+        <td>{{ "%.2f"|format(item.ease_factor) }}</td>
+        <td>
+          <a href="{{ url_for('srs_bp.view', entity_id=item.id) }}" class="btn btn-sm btn-outline-primary">Review</a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

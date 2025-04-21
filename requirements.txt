@@ -16,3 +16,4 @@ coverage
 mypy
 typecov
 requests
+fsrs

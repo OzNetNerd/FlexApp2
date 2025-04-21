@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+# create_db.py
+
 import os
 import logging
 from flask import current_app
@@ -46,6 +47,7 @@ def _create_sample_data(db):
     from app.models.company import Company
     from app.models.contact import Contact
     from app.models.opportunity import Opportunity
+    from app.models.srs_item import SRSItem
 
     if User.query.count() > 0:
         logger.info("Database already contains data. Skipping sample data creation.")
@@ -108,7 +110,25 @@ def _create_sample_data(db):
     db.session.add_all(opportunities)
     db.session.commit()
 
-    logger.info("✅ Sample data created successfully.")
+    # --- Example SRS cards ---
+    logger.info("Creating example SRS cards...")
+    example_cards = [
+        SRSItem(
+            notable_type="Contact",
+            notable_id=1,
+            question="What is Test User's last name?",
+            answer="User"
+        ),
+        SRSItem(
+            notable_type="Company",
+            notable_id=1,
+            question="What industry is Acme Inc in?",
+            answer="Technology company"
+        ),
+    ]
+    db.session.add_all(example_cards)
+    db.session.commit()
+    logger.info("✅ Example SRS cards created successfully.")
 
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@ from app.routes.web.tasks import tasks_bp
 from app.routes.web.settings import settings_bp
 from app.routes.web.auth import auth_bp
 from app.routes.web.home import home_bp
+from app.routes.web.srs import srs_bp
 
 # Register the blueprint with your Flask app
 
@@ -34,6 +35,7 @@ BLUEPRINTS = [
     home_bp,
     relationships_bp,
     crisp_scores_bp,
+    srs_bp,
 ]
 
 

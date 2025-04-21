@@ -1,0 +1,30 @@
+{% extends "page_templates/_create_view_edit.html" %}
+{% import 'base/macros/render_form_fields.html' as field_macros %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block heading %}{{ title }}{% endblock %}
+
+{% block view_template_content %}
+  <form method="post" action="{{ submit_url }}">
+    {{ csrf_input }}
+
+    <div class="row">
+      <div class="col-md-6">
+        {{ field_macros.render_field({
+            "entry_name": "question",
+            "label": "Question",
+            "type": "textarea",
+            "value": entity.question or "",
+        }, read_only=read_only) }}
+      </div>
+      <div class="col-md-6">
+        {{ field_macros.render_field({
+            "entry_name": "answer",
+            "label": "Answer",
+            "type": "textarea",
+            "value": entity.answer or "",
+        }, read_only=read_only) }}
+      </div>
+    </div>
+  </form>
+{% endblock %}

@@ -1,4 +1,8 @@
 ```
+ export FLASK_APP=app.app:create_app
+```
+
+```
 clear && python3 -m app.app
 ```
 
