@@ -31,16 +31,22 @@
           class="form-control"
           rows="4"
           placeholder="Type your answer here..."
-          autofocus
-          required></textarea>
+          autofocus></textarea>
       </div>
 
       <div class="row mb-4">
         <div class="col-md-6">
           <label class="form-label fw-bold">How well did you know this?</label>
-          <div class="rating-container d-flex align-items-center">
-            <input type="range" class="form-range me-3" id="rating-slider" min="0" max="5" value="0" oninput="updateRating(this.value)">
-            <select name="rating" id="rating-select" class="form-select" style="width: 80px" onchange="updateSlider(this.value)">
+          <div class="rating-container d-flex align-items-start gap-3">
+            <div>
+              <input type="range" class="form-range" id="rating-slider" min="0" max="5" value="0"
+                     oninput="updateRating(this.value)" title="Drag to preview interval">
+              <div class="small text-muted mt-1">
+                Delay: <span id="delay-preview">(0 min)</span>
+              </div>
+            </div>
+            <select name="rating" id="rating-select" class="form-select" style="width: 180px"
+                    onchange="updateSlider(this.value)">
               <option value="0">0 - No recall</option>
               <option value="1">1 - Failed</option>
               <option value="2">2 - Difficult</option>
@@ -86,15 +92,15 @@
   <div class="card-footer bg-white">
     <div class="row text-center small text-muted">
       <div class="col-4">
-        <div class="fw-bold">{{ stats.total_cards if stats else 0 }}</div>
+        <div id="total-cards" class="fw-bold">{{ stats.total_cards if stats else 0 }}</div>
         <div>Total Cards</div>
       </div>
       <div class="col-4">
-        <div class="fw-bold">{{ stats.cards_due if stats else 0 }}</div>
+        <div id="cards-due" class="fw-bold">{{ stats.cards_due if stats else 0 }}</div>
         <div>Due Today</div>
       </div>
       <div class="col-4">
-        <div class="fw-bold">{{ stats.cards_reviewed_today if stats else 0 }}</div>
+        <div id="cards-reviewed" class="fw-bold">{{ stats.cards_reviewed_today if stats else 0 }}</div>
         <div>Reviewed Today</div>
       </div>
     </div>
@@ -114,14 +120,57 @@
 </div>
 
 <script>
+  let intervalPreviewMap = {};
+
+  function describeDelay(days) {
+    if (days < 1) {
+      const mins = Math.round(days * 24 * 60);
+      return mins < 60 ? `${mins} min` : `${Math.round(mins / 60)} hr`;
+    }
+    if (days < 30) return `${Math.round(days)} day${days >= 2 ? 's' : ''}`;
+    const months = Math.round(days / 30);
+    return `${months} month${months > 1 ? 's' : ''}`;
+  }
+
+  async function fetchPreviewIntervals() {
+    const entityId = document.getElementById('review-form').dataset.entityId;
+    const response = await fetch(`/api/srs/${entityId}/preview`);
+    if (!response.ok) return;
+
+    intervalPreviewMap = await response.json();
+    updateAllRatingLabels();
+    updateLivePreview(document.getElementById('rating-slider').value);
+  }
+
+  function updateAllRatingLabels() {
+    const select = document.getElementById('rating-select');
+    for (const option of select.options) {
+      const rating = option.value;
+      const base = option.textContent.split('-')[1]?.split('(')[0]?.trim() || '';
+      const delay = intervalPreviewMap[rating] !== undefined ? describeDelay(intervalPreviewMap[rating]) : "?";
+      option.textContent = `${rating} - ${base} (${delay})`;
+    }
+  }
+
+  function updateLivePreview(value) {
+    const preview = document.getElementById('delay-preview');
+    const tooltip = document.getElementById('rating-slider');
+    const days = intervalPreviewMap[value];
+    const delay = days !== undefined ? describeDelay(days) : "?";
+    preview.textContent = `(${delay})`;
+    tooltip.title = `Next review in ${delay}`;
+  }
+
   function updateRating(value) {
     document.getElementById('rating-select').value = value;
     updateProgressBar(value);
+    updateLivePreview(value);
   }
 
   function updateSlider(value) {
     document.getElementById('rating-slider').value = value;
     updateProgressBar(value);
+    updateLivePreview(value);
   }
 
   function updateProgressBar(value) {
@@ -129,6 +178,7 @@
     const progressBar = document.getElementById('progress-bar');
     progressBar.style.width = percentage + '%';
     progressBar.className = 'progress-bar';
+
     if (value <= 1) {
       progressBar.classList.add('bg-danger');
     } else if (value <= 3) {
@@ -141,22 +191,20 @@
   function toggleAnswer() {
     const answerContainer = document.getElementById('answer-container');
     const showBtn = document.getElementById('show-answer-btn');
-    if (answerContainer.classList.contains('d-none')) {
-      answerContainer.classList.remove('d-none');
-      showBtn.textContent = 'Hide Answer';
-    } else {
-      answerContainer.classList.add('d-none');
-      showBtn.textContent = 'Show Answer';
-    }
+    const visible = !answerContainer.classList.contains('d-none');
+    answerContainer.classList.toggle('d-none');
+    showBtn.textContent = visible ? 'Show Answer' : 'Hide Answer';
   }
 
-  document.addEventListener('keydown', function(event) {
-    if (event.shiftKey && event.key === 'ArrowRight') {
-      document.getElementById('next-btn').click();
-    }
-    if (event.shiftKey && event.key === 'ArrowLeft') {
-      document.getElementById('prev-btn').click();
-    }
+  function updateStats(stats) {
+    document.getElementById('total-cards').textContent = stats.total_cards || 0;
+    document.getElementById('cards-due').textContent = stats.cards_due || 0;
+    document.getElementById('cards-reviewed').textContent = stats.cards_reviewed_today || 0;
+  }
+
+  document.addEventListener('keydown', function (event) {
+    if (event.shiftKey && event.key === 'ArrowRight') document.getElementById('next-btn').click();
+    if (event.shiftKey && event.key === 'ArrowLeft') document.getElementById('prev-btn').click();
     if (event.key === ' ' && document.activeElement.tagName !== 'TEXTAREA') {
       event.preventDefault();
       toggleAnswer();
@@ -177,6 +225,7 @@
     const form = e.target;
     const entityId = form.dataset.entityId;
     const rating = parseInt(document.getElementById('rating-select').value);
+    const answer_given = form.querySelector('textarea[name="answer_given"]').value || "";
     const csrfToken = form.querySelector('input[name="csrf_token"]').value;
 
     try {
@@ -186,22 +235,40 @@
           'Content-Type': 'application/json',
           'X-CSRFToken': csrfToken
         },
-        body: JSON.stringify({ rating })
+        body: JSON.stringify({
+          rating,
+          answer_given
+        })
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to submit review');
+      if (!response.ok) throw new Error('Failed to submit review');
+
+      // Refresh stats before redirecting
+      const statsResponse = await fetch('/api/srs/stats');
+      if (statsResponse.ok) {
+        const stats = await statsResponse.json();
+        updateStats(stats);
       }
 
-      // Option 1: redirect to next card (provided from the backend)
       window.location.href = "/srs/review/{{ next_item_id }}";
-
     } catch (err) {
       alert('An error occurred submitting your review. Please try again.');
       console.error(err);
     }
   });
 
-  updateProgressBar(0);
+  document.addEventListener("DOMContentLoaded", () => {
+    fetchPreviewIntervals();
+    updateProgressBar(0);
+
+    // Add navigation handlers
+    document.getElementById('prev-btn').addEventListener('click', function() {
+      window.location.href = "/srs/review/{{ prev_item_id }}";
+    });
+
+    document.getElementById('next-btn').addEventListener('click', function() {
+      window.location.href = "/srs/review/{{ next_item_id }}";
+    });
+  });
 </script>
 {% endblock %}

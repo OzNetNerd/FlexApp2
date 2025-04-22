@@ -22,7 +22,7 @@
     <h4 class="mb-0">Your Answer</h4>
   </div>
   <div class="card-body">
-    <form id="review-form" method="post" action="{{ url_for('srs_bp.update', entity_id=entity.id) }}">
+    <form id="review-form" data-entity-id="{{ entity.id }}">
       {{ csrf_input }}
 
       <div class="mb-4">
@@ -38,9 +38,16 @@
       <div class="row mb-4">
         <div class="col-md-6">
           <label class="form-label fw-bold">How well did you know this?</label>
-          <div class="rating-container d-flex align-items-center">
-            <input type="range" class="form-range me-3" id="rating-slider" min="0" max="5" value="0" oninput="updateRating(this.value)">
-            <select name="rating" id="rating-select" class="form-select" style="width: 80px" onchange="updateSlider(this.value)">
+          <div class="rating-container d-flex align-items-start gap-3">
+            <div>
+              <input type="range" class="form-range" id="rating-slider" min="0" max="5" value="0"
+                     oninput="updateRating(this.value)" title="Drag to preview interval">
+              <div class="small text-muted mt-1">
+                Delay: <span id="delay-preview">(0 min)</span>
+              </div>
+            </div>
+            <select name="rating" id="rating-select" class="form-select" style="width: 180px"
+                    onchange="updateSlider(this.value)">
               <option value="0">0 - No recall</option>
               <option value="1">1 - Failed</option>
               <option value="2">2 - Difficult</option>
@@ -114,24 +121,65 @@
 </div>
 
 <script>
-  // Update rating slider and select in sync
+  let intervalPreviewMap = {};
+
+  function describeDelay(days) {
+    if (days < 1) {
+      const mins = Math.round(days * 24 * 60);
+      return mins < 60 ? `${mins} min` : `${Math.round(mins / 60)} hr`;
+    }
+    if (days < 30) return `${Math.round(days)} day${days >= 2 ? 's' : ''}`;
+    const months = Math.round(days / 30);
+    return `${months} month${months > 1 ? 's' : ''}`;
+  }
+
+  async function fetchPreviewIntervals() {
+    const entityId = document.getElementById('review-form').dataset.entityId;
+    const response = await fetch(`/api/srs/${entityId}/preview`);
+    if (!response.ok) return;
+
+    intervalPreviewMap = await response.json();
+    updateAllRatingLabels();
+    updateLivePreview(document.getElementById('rating-slider').value);
+  }
+
+  function updateAllRatingLabels() {
+    const select = document.getElementById('rating-select');
+    for (const option of select.options) {
+      const rating = option.value;
+      const base = option.textContent.split('-')[1]?.split('(')[0]?.trim() || '';
+      const delay = intervalPreviewMap[rating] !== undefined ? describeDelay(intervalPreviewMap[rating]) : "?";
+      option.textContent = `${rating} - ${base} (${delay})`;
+    }
+  }
+
+  function updateLivePreview(value) {
+    const preview = document.getElementById('delay-preview');
+    const tooltip = document.getElementById('rating-slider');
+    const days = intervalPreviewMap[value];
+    const delay = days !== undefined ? describeDelay(days) : "?";
+    preview.textContent = `(${delay})`;
+    tooltip.title = `Next review in ${delay}`;
+  }
+
   function updateRating(value) {
     document.getElementById('rating-select').value = value;
     updateProgressBar(value);
+    updateLivePreview(value);
   }
 
   function updateSlider(value) {
     document.getElementById('rating-slider').value = value;
     updateProgressBar(value);
+    updateLivePreview(value);
   }
 
   function updateProgressBar(value) {
     const percentage = (value / 5) * 100;
     const progressBar = document.getElementById('progress-bar');
     progressBar.style.width = percentage + '%';
-
-    // Update color based on rating
     progressBar.className = 'progress-bar';
+
     if (value <= 1) {
       progressBar.classList.add('bg-danger');
     } else if (value <= 3) {
@@ -144,50 +192,58 @@
   function toggleAnswer() {
     const answerContainer = document.getElementById('answer-container');
     const showBtn = document.getElementById('show-answer-btn');
-
-    if (answerContainer.classList.contains('d-none')) {
-      answerContainer.classList.remove('d-none');
-      showBtn.textContent = 'Hide Answer';
-    } else {
-      answerContainer.classList.add('d-none');
-      showBtn.textContent = 'Show Answer';
-    }
+    const visible = !answerContainer.classList.contains('d-none');
+    answerContainer.classList.toggle('d-none');
+    showBtn.textContent = visible ? 'Show Answer' : 'Hide Answer';
   }
 
-  // Keyboard shortcuts
-  document.addEventListener('keydown', function(event) {
-    // Shift+Right Arrow for next card
-    if (event.shiftKey && event.key === 'ArrowRight') {
-      document.getElementById('next-btn').click();
-    }
-
-    // Shift+Left Arrow for previous card
-    if (event.shiftKey && event.key === 'ArrowLeft') {
-      document.getElementById('prev-btn').click();
-    }
-
-    // Shift+Enter to submit form
-    if (event.shiftKey && event.key === 'Enter') {
-      document.getElementById('review-form').submit();
-    }
-
-    // Space to toggle answer visibility
+  document.addEventListener('keydown', function (event) {
+    if (event.shiftKey && event.key === 'ArrowRight') document.getElementById('next-btn').click();
+    if (event.shiftKey && event.key === 'ArrowLeft') document.getElementById('prev-btn').click();
     if (event.key === ' ' && document.activeElement.tagName !== 'TEXTAREA') {
       event.preventDefault();
       toggleAnswer();
     }
-
-    // Numbers 0-5 to set rating when not in textarea
-    if (document.activeElement.tagName !== 'TEXTAREA' &&
-        document.activeElement.tagName !== 'SELECT' &&
-        !isNaN(parseInt(event.key)) &&
-        parseInt(event.key) >= 0 &&
-        parseInt(event.key) <= 5) {
+    if (
+      document.activeElement.tagName !== 'TEXTAREA' &&
+      document.activeElement.tagName !== 'SELECT' &&
+      !isNaN(parseInt(event.key)) &&
+      parseInt(event.key) >= 0 &&
+      parseInt(event.key) <= 5
+    ) {
       updateRating(event.key);
     }
   });
 
-  // Initialize progress bar
-  updateProgressBar(0);
+  document.getElementById('review-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const entityId = form.dataset.entityId;
+    const rating = parseInt(document.getElementById('rating-select').value);
+    const csrfToken = form.querySelector('input[name="csrf_token"]').value;
+
+    try {
+      const response = await fetch(`/api/srs/${entityId}/review`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ rating })
+      });
+
+      if (!response.ok) throw new Error('Failed to submit review');
+
+      window.location.href = "/srs/review/{{ next_item_id }}";
+    } catch (err) {
+      alert('An error occurred submitting your review. Please try again.');
+      console.error(err);
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    fetchPreviewIntervals();
+    updateProgressBar(0);
+  });
 </script>
 {% endblock %}

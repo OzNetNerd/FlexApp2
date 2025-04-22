@@ -8,7 +8,7 @@ from enum import Enum
 from flask import Blueprint, request, flash, redirect, url_for, render_template
 
 from app.utils.table_helpers import get_table_plural_name
-from app.routes.web.context import SimpleContext, EntityContext, TableContext
+from app.routes.web.context import BaseContext, SimpleContext, EntityContext, TableContext
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class CRUDEndpoint(Enum):
 @dataclass
 class RenderSafelyConfig:
     template_path: str
-    context: Any
+    context: BaseContext
     error_message: str
     endpoint: str
 
