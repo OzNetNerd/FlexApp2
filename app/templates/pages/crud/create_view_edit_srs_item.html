@@ -246,7 +246,16 @@
     const entityId = form.dataset.entityId;
     const rating = parseInt(document.getElementById('rating-select').value);
     const answer_given = form.querySelector('textarea[name="answer_given"]').value || "";
-    const csrfToken = form.querySelector('input[name="csrf_token"]').value;
+
+    // Find CSRF token by checking various possible implementations
+    let csrfToken = "";
+    const csrfInputs = form.querySelectorAll('input[type="hidden"]');
+    for (const input of csrfInputs) {
+      if (input.name && (input.name.includes('csrf') || input.name.includes('token'))) {
+        csrfToken = input.value;
+        break;
+      }
+    }
 
     console.log("Submitting review:", { entityId, rating, answer_given: answer_given.substring(0, 20) + "..." });
 

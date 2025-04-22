@@ -4,6 +4,7 @@ import logging
 from datetime import datetime, timedelta
 
 import fsrs
+from fsrs import FSRS, Card
 
 from app.services.crud_service import CRUDService
 from app.models.srs_item import SRSItem
@@ -17,34 +18,48 @@ class SRSService(CRUDService):
 
     def __init__(self):
         super().__init__(SRSItem)
+        self.fsrs = FSRS()  # Create FSRS instance
 
     def schedule_review(self, item_id: int, rating: int) -> SRSItem:
         item = self.get_by_id(item_id)
 
-        # FSRS step: (new_ease, new_interval_days, new_repetition)
-        new_ease, new_interval, new_repetition = fsrs.srs1.step(
-            rating,
-            item.repetition,
-            item.interval,
-            item.ease_factor,
+        # Create an FSRS Card with the current state
+        card = Card(
+            due=datetime.utcnow(),
+            stability=item.interval,
+            difficulty=item.ease_factor,
+            reps=item.repetition
         )
 
-        item.ease_factor = new_ease
-        item.interval = new_interval
-        item.repetition = new_repetition
+        # Get the updated card using FSRS
+        new_card = self.fsrs.repeat(card, rating)
+
+        # Update item properties
+        item.ease_factor = new_card.difficulty
+        item.interval = new_card.stability
+        item.repetition = new_card.reps
         item.review_count += 1
-        item.next_review_at = datetime.utcnow() + timedelta(days=new_interval)
+        item.next_review_at = datetime.utcnow() + timedelta(days=new_card.stability)
+
+        # Create update data dictionary for CRUDService.update()
+        update_data = {
+            'ease_factor': new_card.difficulty,
+            'interval': new_card.stability,
+            'repetition': new_card.reps,
+            'review_count': item.review_count,
+            'next_review_at': item.next_review_at
+        }
 
         # persist updated SRSItem
-        logger.info(f"SRSService: updating item {item.id} → next in {new_interval}d, ef={new_ease:.2f}")
-        self.update(item)
+        logger.info(f"SRSService: updating item {item.id} → next in {new_card.stability:.2f}d, ef={new_card.difficulty:.2f}")
+        self.update(item, update_data)  # Pass both entity and data
 
         # record history
         history = ReviewHistory(
             srs_item_id=item.id,
             rating=rating,
-            interval=new_interval,
-            ease_factor=new_ease,
+            interval=new_card.stability,
+            ease_factor=new_card.difficulty,
         )
         history.save()
         logger.info(f"SRSService: logged review {history.id} for item {item.id}")
