@@ -108,15 +108,19 @@
 </div>
 
 <div class="d-flex justify-content-between mt-3">
-  <button id="prev-btn" class="btn btn-sm btn-outline-secondary" title="Previous Card (Shift+Left)">
+  <a href="{{ url_for('srs_bp.review_item', item_id=prev_item_id or entity.id) }}"
+     id="prev-btn" class="btn btn-sm btn-outline-secondary"
+     title="Previous Card (Shift+Left)">
     <i class="bi bi-arrow-left"></i> Previous
-  </button>
+  </a>
   <div class="text-muted small">
     Card {{ current_index if current_index else 1 }} of {{ total_cards if total_cards else 1 }}
   </div>
-  <button id="next-btn" class="btn btn-sm btn-outline-secondary" title="Next Card (Shift+Right)">
+  <a href="{{ url_for('srs_bp.review_item', item_id=next_item_id or entity.id) }}"
+     id="next-btn" class="btn btn-sm btn-outline-secondary"
+     title="Next Card (Shift+Right)">
     Next <i class="bi bi-arrow-right"></i>
-  </button>
+  </a>
 </div>
 
 <script>
@@ -134,12 +138,21 @@
 
   async function fetchPreviewIntervals() {
     const entityId = document.getElementById('review-form').dataset.entityId;
-    const response = await fetch(`/api/srs/${entityId}/preview`);
-    if (!response.ok) return;
+    console.log("Fetching preview intervals for entity ID:", entityId);
+    try {
+      const response = await fetch(`/api/srs/${entityId}/preview`);
+      if (!response.ok) {
+        console.error("Failed to fetch preview intervals:", response.status);
+        return;
+      }
 
-    intervalPreviewMap = await response.json();
-    updateAllRatingLabels();
-    updateLivePreview(document.getElementById('rating-slider').value);
+      intervalPreviewMap = await response.json();
+      console.log("Received interval previews:", intervalPreviewMap);
+      updateAllRatingLabels();
+      updateLivePreview(document.getElementById('rating-slider').value);
+    } catch (err) {
+      console.error("Error fetching preview intervals:", err);
+    }
   }
 
   function updateAllRatingLabels() {
@@ -197,14 +210,21 @@
   }
 
   function updateStats(stats) {
+    console.log("Updating stats:", stats);
     document.getElementById('total-cards').textContent = stats.total_cards || 0;
     document.getElementById('cards-due').textContent = stats.cards_due || 0;
     document.getElementById('cards-reviewed').textContent = stats.cards_reviewed_today || 0;
   }
 
   document.addEventListener('keydown', function (event) {
-    if (event.shiftKey && event.key === 'ArrowRight') document.getElementById('next-btn').click();
-    if (event.shiftKey && event.key === 'ArrowLeft') document.getElementById('prev-btn').click();
+    if (event.shiftKey && event.key === 'ArrowRight') {
+      event.preventDefault();
+      window.location.href = document.getElementById('next-btn').getAttribute('href');
+    }
+    if (event.shiftKey && event.key === 'ArrowLeft') {
+      event.preventDefault();
+      window.location.href = document.getElementById('prev-btn').getAttribute('href');
+    }
     if (event.key === ' ' && document.activeElement.tagName !== 'TEXTAREA') {
       event.preventDefault();
       toggleAnswer();
@@ -228,6 +248,8 @@
     const answer_given = form.querySelector('textarea[name="answer_given"]').value || "";
     const csrfToken = form.querySelector('input[name="csrf_token"]').value;
 
+    console.log("Submitting review:", { entityId, rating, answer_given: answer_given.substring(0, 20) + "..." });
+
     try {
       const response = await fetch(`/api/srs/${entityId}/review`, {
         method: 'POST',
@@ -241,34 +263,36 @@
         })
       });
 
-      if (!response.ok) throw new Error('Failed to submit review');
+      if (!response.ok) {
+        console.error("Failed to submit review:", response.status);
+        throw new Error('Failed to submit review');
+      }
+
+      console.log("Review submitted successfully");
 
       // Refresh stats before redirecting
       const statsResponse = await fetch('/api/srs/stats');
       if (statsResponse.ok) {
         const stats = await statsResponse.json();
+        console.log("Received updated stats:", stats);
         updateStats(stats);
+      } else {
+        console.error("Failed to fetch updated stats:", statsResponse.status);
       }
 
-      window.location.href = "/srs/review/{{ next_item_id }}";
+      const nextItemId = "{{ next_item_id }}";
+      console.log("Redirecting to next item:", nextItemId);
+      window.location.href = `/srs/review/${nextItemId}`;
     } catch (err) {
+      console.error("Error submitting review:", err);
       alert('An error occurred submitting your review. Please try again.');
-      console.error(err);
     }
   });
 
   document.addEventListener("DOMContentLoaded", () => {
+    console.log("Page loaded, initializing...");
     fetchPreviewIntervals();
     updateProgressBar(0);
-
-    // Add navigation handlers
-    document.getElementById('prev-btn').addEventListener('click', function() {
-      window.location.href = "/srs/review/{{ prev_item_id }}";
-    });
-
-    document.getElementById('next-btn').addEventListener('click', function() {
-      window.location.href = "/srs/review/{{ next_item_id }}";
-    });
   });
 </script>
 {% endblock %}
