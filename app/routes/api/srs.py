@@ -1,4 +1,4 @@
-# app/routes/api/srs.py
+# app/routes/api/srs.py (Updated)
 
 import logging
 from flask import Blueprint, jsonify, request
@@ -18,6 +18,7 @@ srs_service = SRSService()
 # Register all standard CRUD API routes
 srs_api_crud_config = ApiCrudRouteConfig(blueprint=srs_api_bp, entity_table_name=ENTITY_NAME, service=srs_service)
 register_api_crud_routes(srs_api_crud_config)
+
 
 # Add custom endpoints for SRS-specific functionality
 @srs_api_bp.route("/due", methods=["GET"])
@@ -57,8 +58,16 @@ def review_item(item_id):
         return jsonify({"success": False, "error": "Missing rating parameter"}), 400
 
     try:
+        # Get the rating from the request
         rating = int(data["rating"])
-        item = srs_service.schedule_review(item_id, rating)
+
+        # The FSRS library only accepts ratings 0-4, but our UI goes to 5
+        # Map rating 5 to 4 if needed
+        fsrs_rating = min(rating, 4)
+
+        # Pass the adjusted rating to the service
+        item = srs_service.schedule_review(item_id, fsrs_rating)
+
         return jsonify({
             "success": True,
             "item": item.to_dict(),

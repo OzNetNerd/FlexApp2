@@ -106,7 +106,7 @@ def review_item(item_id):
     )
 
     config = RenderSafelyConfig(
-        template_path='pages/crud/view_srs_item.html',
+        template_path='pages/crud/create_view_edit_srs_item.html',
         context=context,
         error_message="Error loading flashcard",
         endpoint="srs_bp.index"

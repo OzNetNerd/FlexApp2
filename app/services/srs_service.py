@@ -1,10 +1,10 @@
 # srs_service.py
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 # Updated imports based on py-fsrs documentation
-from fsrs import Scheduler, Card, Rating, ReviewLog
+from fsrs import Scheduler, Card, Rating, ReviewLog, State
 
 from app.services.crud_service import CRUDService
 from app.models.srs_item import SRSItem
@@ -21,75 +21,102 @@ class SRSService(CRUDService):
         self.scheduler = Scheduler()  # Create the FSRS scheduler
 
     def preview_ratings(self, item_id: int) -> dict:
-        """
-        Preview what would happen with each possible rating.
-        Returns a dict mapping ratings to the number of days until next review.
-        """
+        """Preview what would happen with each possible rating."""
         item = self.get_by_id(item_id)
 
-        # Create card from current item state
-        card = Card(
-            due=datetime.utcnow(),
-            stability=item.interval,
-            difficulty=item.ease_factor,
-            elapsed_days=0,  # Assuming review is happening now
-            scheduled_days=item.interval,
-            reps=item.repetition
-        )
-
-        # Calculate next state for each possible rating
+        # Map UI ratings 0-5 to FSRS ratings 1-4
+        ui_to_fsrs_mapping = {0: 1, 1: 1, 2: 2, 3: 3, 4: 4, 5: 4}
         results = {}
-        # Use all possible rating values (typically 0-4 in FSRS)
-        for rating_value in range(5):  # Ratings 0-4
-            rating = Rating(rating_value)
-            # Get scheduling card
-            next_card = self.scheduler.repeat(card, rating)
-            results[rating_value] = round(next_card.scheduled_days, 1)  # Days until next review
+
+        for ui_rating in range(6):  # UI Ratings 0-5
+            fsrs_rating = ui_to_fsrs_mapping[ui_rating]
+
+            # Calculate next interval based on the rating
+            # For a new card or when there's no stability yet
+            if item.repetition == 0 or item.interval <= 0:
+                # Use learning steps for first few ratings
+                if fsrs_rating <= 2:
+                    days = 1 / 24  # 1 hour
+                elif fsrs_rating == 3:
+                    days = 1  # 1 day
+                else:
+                    days = 4  # 4 days
+            else:
+                # Apply spacing effect for reviews
+                if fsrs_rating == 1:
+                    days = 1  # 1 day
+                elif fsrs_rating == 2:
+                    days = item.interval * 1.2
+                elif fsrs_rating == 3:
+                    days = item.interval * 1.5
+                else:
+                    days = item.interval * 2.5
+
+            results[ui_rating] = round(days, 1)
 
         return results
 
     def schedule_review(self, item_id: int, rating: int) -> SRSItem:
         item = self.get_by_id(item_id)
 
-        # Convert numeric rating to FSRS Rating enum
-        fsrs_rating = Rating(rating)
+        # Map UI rating to FSRS rating (FSRS uses 1-4)
+        ui_to_fsrs_mapping = {0: 1, 1: 1, 2: 2, 3: 3, 4: 4, 5: 4}
+        fsrs_rating_value = ui_to_fsrs_mapping.get(rating, 1)  # Default to 1 if invalid
 
-        # Create Card from current item state
-        card = Card(
-            due=datetime.utcnow() if not item.next_review_at else item.next_review_at,
-            stability=item.interval,
-            difficulty=item.ease_factor,
-            elapsed_days=0,  # Assuming review is happening now
-            scheduled_days=item.interval,
-            reps=item.repetition
-        )
+        # Calculate next interval based on the rating
+        # For a new card or when there's no stability yet
+        if item.repetition == 0 or item.interval <= 0:
+            # Use learning steps for first few ratings
+            if fsrs_rating_value <= 2:
+                next_interval = 1 / 24  # 1 hour
+                new_ease = max(1.3, item.ease_factor - 0.2)
+            elif fsrs_rating_value == 3:
+                next_interval = 1  # 1 day
+                new_ease = item.ease_factor
+            else:
+                next_interval = 4  # 4 days
+                new_ease = min(2.5, item.ease_factor + 0.1)
+        else:
+            # Apply spacing effect for reviews
+            if fsrs_rating_value == 1:
+                next_interval = 1  # 1 day
+                new_ease = max(1.3, item.ease_factor - 0.2)
+            elif fsrs_rating_value == 2:
+                next_interval = item.interval * 1.2
+                new_ease = max(1.3, item.ease_factor - 0.15)
+            elif fsrs_rating_value == 3:
+                next_interval = item.interval * 1.5
+                new_ease = item.ease_factor
+            else:
+                next_interval = item.interval * 2.5
+                new_ease = min(2.5, item.ease_factor + 0.1)
 
-        # Get the next state using FSRS
-        next_card = self.scheduler.repeat(card, fsrs_rating)
+        # Limit maximum interval
+        next_interval = min(next_interval, 365)  # Max 1 year
 
-        # Calculate the next review date
-        next_review_at = datetime.utcnow() + timedelta(days=next_card.scheduled_days)
+        # Calculate next review date
+        next_review_at = datetime.now(UTC) + timedelta(days=next_interval)
 
         # Update item properties
         update_data = {
-            'ease_factor': next_card.difficulty,
-            'interval': next_card.stability,
+            'ease_factor': new_ease,
+            'interval': next_interval,
             'repetition': item.repetition + 1,
             'review_count': item.review_count + 1,
             'next_review_at': next_review_at
         }
 
-        # persist updated SRSItem
+        # Persist updated SRSItem
         logger.info(
-            f"SRSService: updating item {item.id} → next in {next_card.scheduled_days:.2f}d, ef={next_card.difficulty:.2f}")
-        self.update(item, update_data)  # Pass both entity and data
+            f"SRSService: updating item {item.id} → next in {next_interval:.2f}d, ef={new_ease:.2f}")
+        self.update(item, update_data)
 
-        # record history
+        # Record history
         history = ReviewHistory(
             srs_item_id=item.id,
             rating=rating,
-            interval=next_card.stability,
-            ease_factor=next_card.difficulty,
+            interval=next_interval,
+            ease_factor=new_ease,
         )
         history.save()
         logger.info(f"SRSService: logged review {history.id} for item {item.id}")
@@ -98,4 +125,4 @@ class SRSService(CRUDService):
 
     def get_due_items(self):
         """Return all cards whose next_review_at ≤ now."""
-        return SRSItem.query.filter(SRSItem.next_review_at <= datetime.utcnow()).all()
+        return SRSItem.query.filter(SRSItem.next_review_at <= datetime.now(UTC)).all()
