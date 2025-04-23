@@ -116,8 +116,15 @@ class EntityContext(BaseContext):
         **kwargs,
     ):
         """Initialize the context with proper parent class handling."""
-        # Call parent class initializer with all required params
-        super().__init__(title=title, read_only=read_only, **kwargs)
+        # Pass both entity_table_name and table_name so BaseContext can set defaults correctly
+        super().__init__(
+            title=title,
+            show_navbar=True,
+            read_only=read_only,
+            entity_table_name=entity_table_name,
+            table_name=entity_table_name,
+            **kwargs
+        )
 
         # Set instance attributes
         self.autocomplete_fields = autocomplete_fields or []
@@ -128,8 +135,8 @@ class EntityContext(BaseContext):
         self.action = action
         self.name = "tba"
         self.current_user = current_user
-        self.entity_table_name = entity_table_name  # Store table_name
-        self.entity_id = entity_id  # Store entity_id
+        self.entity_table_name = entity_table_name
+        self.entity_id = entity_id
 
         # Derived fields initialized in __init__
         self.tabs = []
@@ -144,6 +151,7 @@ class EntityContext(BaseContext):
     def __str__(self):
         """Return a user-friendly string representation focusing on key entity attributes."""
         return f"EntityContext(model='{self.model_name}', action='{self.action}', entity='{self.entity_name}')"
+
 
     def __repr__(self):
         """Return a detailed string representation of the entity context."""

@@ -78,7 +78,7 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     @login_manager.user_loader
     def load_user(user_id: str):
         """Load a user by ID for session management."""
-        logger.info(f"Loading user with ID: {user_id}")
+        logger.debug(f"Loading user with ID: {user_id}")
         return db.session.get(User, int(user_id))
 
     # Register routes

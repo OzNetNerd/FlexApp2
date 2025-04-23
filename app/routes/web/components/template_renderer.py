@@ -11,6 +11,7 @@ from flask import (
     current_app,
     url_for,
     get_flashed_messages,
+    abort,
 )
 from jinja2 import Environment, DebugUndefined
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
@@ -150,7 +151,7 @@ def handle_template_error(
                   else fallback_error_message)
 
     return render_template(
-        'pages/base/error.html',
+        'base/errors/500.html',
         error_type="Rendering Error",
         details=details,
         error_body=error_body,

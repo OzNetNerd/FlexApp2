@@ -4,6 +4,14 @@ New:
 clear && flask --app app.app run
 ```
 
+# Change
+
+
+
+```
+This is my flask app. I want to focus on being DRY and consistent. Review the code and give me succinct info on what I need to do to achieve this
+```
+
 # Change Recommendations
 
 ```

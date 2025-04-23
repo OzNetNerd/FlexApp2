@@ -8,27 +8,9 @@ from enum import Enum
 from app.utils.app_logging import get_logger
 from app.utils.table_helpers import get_table_plural_name
 from app.routes.web.components.template_renderer import render_safely, RenderSafelyConfig
+from app.routes.web.context import TableContext, EntityContext, SimpleContext
 
 logger = get_logger()
-
-# -----------------------------------------------------------------
-# Default template factory
-# -----------------------------------------------------------------
-
-def default_crud_templates(entity_table_name: str) -> 'CrudTemplates':
-    """Generate default CRUD template paths for an entity."""
-    plural = get_table_plural_name(entity_table_name)
-    lower = entity_table_name.lower()
-    return CrudTemplates(
-        index=f"pages/tables/{plural}.html",
-        create=f"pages/crud/create_{lower}.html",
-        view=f"pages/crud/view_{lower}.html",
-        edit=f"pages/crud/edit_{lower}.html",
-    )
-
-# -----------------------------------------------------------------
-# CRUD route configuration classes
-# -----------------------------------------------------------------
 
 class CRUDEndpoint(Enum):
     index = "index"
@@ -58,12 +40,33 @@ class CrudRouteConfig:
     service: Any
     templates: CrudTemplates
 
-# -----------------------------------------------------------------
-# Module discovery and registration
-# -----------------------------------------------------------------
+
+def default_crud_templates(entity_table_name: str) -> CrudTemplates:
+    """
+    Return default CRUD templates.
+    Uses the unified `create_view_edit_<entity>.html` template for view and edit.
+    """
+    plural = get_table_plural_name(entity_table_name)
+    lower = entity_table_name.lower()
+
+    # Index listing
+    index_tpl = f"pages/tables/{plural}.html"
+    # New-item form
+    create_tpl = f"pages/crud/create_{lower}.html"
+    # Shared form for view & edit
+    form_tpl = f"pages/crud/create_view_edit_{lower}.html"
+
+    return CrudTemplates(
+        index=index_tpl,
+        create=create_tpl,
+        view=form_tpl,
+        edit=form_tpl,
+    )
+
+
+
 
 def discover_web_modules() -> Iterator[Any]:
-    """Import and yield all modules in app.routes.web (excluding components)."""
     package = importlib.import_module('app.routes.web')
     for _, module_name, _ in pkgutil.iter_modules(package.__path__):
         if module_name == 'components':
@@ -72,8 +75,6 @@ def discover_web_modules() -> Iterator[Any]:
 
 
 def register_web_blueprints(app: Flask) -> None:
-    """Auto-wire CRUD routes and register web blueprints."""
-    # Phase 1: wire CRUD routes
     for module in discover_web_modules():
         for attr in dir(module):
             if attr.endswith('_crud_config'):
@@ -81,8 +82,6 @@ def register_web_blueprints(app: Flask) -> None:
                 if isinstance(config, CrudRouteConfig):
                     logger.debug(f"Wiring CRUD for {config.entity_table_name}")
                     register_crud_routes(config)
-
-    # Phase 2: register blueprints
     for module in discover_web_modules():
         for attr in dir(module):
             if attr.endswith('_bp'):
@@ -91,36 +90,12 @@ def register_web_blueprints(app: Flask) -> None:
                     logger.debug(f"Registering blueprint: {bp.name} @ {bp.url_prefix}")
                     app.register_blueprint(bp)
 
-# -----------------------------------------------------------------
-# Core CRUD wiring and handler
-# -----------------------------------------------------------------
-
-def handle_crud_operation(
-    endpoint: str,
-    service: Any,
-    blueprint_name: str,
-    entity_id: Optional[int],
-    form_data: Dict[str, Any]
-) -> Any:
-    """Perform create, edit, or delete operations and redirect appropriately."""
-    if endpoint == 'create':
-        entity = service.create(form_data)
-        return redirect(url_for(f"{blueprint_name}.view", entity_id=entity.id))
-    if endpoint == 'edit':
-        entity = service.update(service.get_by_id(entity_id), form_data)
-        return redirect(url_for(f"{blueprint_name}.view", entity_id=entity.id))
-    if endpoint == 'delete':
-        service.delete(entity_id)
-        return redirect(url_for(f"{blueprint_name}.index"))
-    return None
-
 
 def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
-    """Return a Flask view function handling CRUD + safe rendering."""
     def handler(*args, **kwargs):
         logger.info(f"Handling {request.method} {endpoint} with args={args}, kwargs={kwargs}")
 
-        # POST: CRUD operation
+        # POST operations
         if request.method == 'POST' and CRUDEndpoint.is_valid(endpoint):
             result = handle_crud_operation(
                 endpoint,
@@ -132,68 +107,110 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
             if result:
                 return result
 
-        # GET/others: render template safely
+        # GET operations: build appropriate context
+        if endpoint == CRUDEndpoint.index.value:
+            context = TableContext(entity_table_name=config.entity_table_name)
+        elif endpoint == CRUDEndpoint.create.value:
+            context = EntityContext(entity=None, entity_table_name=config.entity_table_name, action='create')
+        elif endpoint in (CRUDEndpoint.view.value, CRUDEndpoint.edit.value):
+            entity_id = kwargs.get('entity_id')
+            entity = config.service.get_by_id(entity_id)
+            context = EntityContext(
+                entity=entity,
+                entity_table_name=config.entity_table_name,
+                action=endpoint,
+                entity_id=entity_id
+            )
+        else:
+            context = SimpleContext(title=config.entity_table_name)
+
+        # --- CSRF injection for all form-based views ---
+        try:
+            from flask_wtf.csrf import generate_csrf
+            from markupsafe import Markup
+            context.csrf_input = Markup(
+                f'<input type="hidden" name="csrf_token" value="{generate_csrf()}">'
+            )
+        except ImportError:
+            context.csrf_input = ''
+
+        # Select the template
         template_path = config.templates.get(
             endpoint,
             f"pages/crud/{endpoint}_{config.entity_table_name.lower()}.html"
         )
         endpoint_name = f"{config.blueprint.name}.{endpoint}"
+
         cfg = RenderSafelyConfig(
             template_path=template_path,
-            context=config.__dict__,
+            context=context,
             error_message=f"Error rendering {config.entity_table_name} {endpoint}",
             endpoint_name=endpoint_name
         )
         return render_safely(cfg)
 
+    handler.__name__ = endpoint
     return handler
 
 
-def register_crud_routes(config: CrudRouteConfig) -> None:
-    """Attach CRUD routes (index/create/view/edit/delete) to blueprint with unique endpoints."""
-    bp = config.blueprint
-    plural = get_table_plural_name(config.entity_table_name)
-    base = f"/{plural}"
 
+def handle_crud_operation(
+    endpoint: str,
+    service: Any,
+    blueprint_name: str,
+    entity_id: Optional[int],
+    form_data: Dict[str, Any]
+) -> Any:
+    if endpoint == CRUDEndpoint.create.value:
+        entity = service.create(form_data)
+        return redirect(url_for(f"{blueprint_name}.view", entity_id=entity.id))
+    if endpoint == CRUDEndpoint.edit.value:
+        entity = service.update(service.get_by_id(entity_id), form_data)
+        return redirect(url_for(f"{blueprint_name}.view", entity_id=entity.id))
+    if endpoint == CRUDEndpoint.delete.value:
+        service.delete(entity_id)
+        return redirect(url_for(f"{blueprint_name}.index"))
+    return None
+
+
+def register_crud_routes(config: CrudRouteConfig) -> None:
+    bp = config.blueprint
     # Index
     bp.add_url_rule(
-        rule=base,
+        rule='/',
         endpoint='index',
         view_func=route_handler('index', config),
         methods=['GET']
     )
-    # Create
+    # Create (new)
     bp.add_url_rule(
-        rule=f"{base}/new",
+        rule='/new',
         endpoint='create',
         view_func=route_handler('create', config),
         methods=['GET', 'POST']
     )
     # View
     bp.add_url_rule(
-        rule=f"{base}/<int:entity_id>",
+        rule='/<int:entity_id>',
         endpoint='view',
         view_func=route_handler('view', config),
         methods=['GET']
     )
     # Edit
     bp.add_url_rule(
-        rule=f"{base}/<int:entity_id>/edit",
+        rule='/<int:entity_id>/edit',
         endpoint='edit',
         view_func=route_handler('edit', config),
         methods=['GET', 'POST']
     )
     # Delete
     bp.add_url_rule(
-        rule=f"{base}/<int:entity_id>/delete",
+        rule='/<int:entity_id>/delete',
         endpoint='delete',
         view_func=route_handler('delete', config),
         methods=['POST']
     )
 
-# -----------------------------------------------------------------
-# Auth route registration
-# -----------------------------------------------------------------
 
 def register_auth_route(
     blueprint: Blueprint,
