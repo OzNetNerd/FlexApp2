@@ -1,0 +1,204 @@
+{# ------------------------------------------------------------------------------
+  File: form_components.html | Purpose: Reusable form components and macros
+  Description:
+    - Consolidates form-related templates into a single file
+    - Includes rendered fields, form footers, and autocomplete functionality
+    - Provides consistent form styling and behavior across the application
+
+  Macros:
+    - render_field: Renders form fields based on type
+    - render_footer_buttons: Creates standardized form footer actions
+    - render_autocomplete: Adds autocomplete to form inputs
+------------------------------------------------------------------------------ #}
+
+{% macro render_field(entry, read_only=False) %}
+  <div class="col-md-6 mb-3">
+    {% if read_only %}
+      <div class="note-item mb-3 p-3 border rounded">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <strong>{{ entry.label }}</strong>
+        </div>
+        <div class="note-content">
+          {% if entry.type == 'checkbox' %}
+            <p><i class="fas fa-{{ 'check' if entry.value else 'times' }}"></i> {{ 'Yes' if entry.value else 'No' }}</p>
+          {% elif entry.type == 'select' and entry.options %}
+            {% for option in entry.options %}
+              {% if option is string and option == entry.value %}
+                <p>{{ option }}</p>
+              {% elif option is mapping %}
+                {% if entry.value == option.value %}
+                  <p>{{ option.text or option.label }}</p>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% elif entry.type == 'date' %}
+            <p>{{ entry.value.strftime('%Y-%m-%d') if entry.value else '' }}</p>
+          {% else %}
+            {% if entry.value is not none %}
+              <p>{{ entry.value }}</p>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      <label for="{{ entry.entry_name }}" class="form-label fw-semibold">{{ entry.label }}</label>
+      {% if entry.type == 'textarea' %}
+        <textarea class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+                  {% if entry.required %}required{% endif %}>{{ entry.value or '' }}</textarea>
+      {% elif entry.type == 'select' and entry.options %}
+        <select class="form-select" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+                {% if entry.required %}required{% endif %}>
+          <option value="">-- Select {{ entry.label }} --</option>
+          {% for option in entry.options %}
+            {% if option is string %}
+              <option value="{{ option }}" {% if entry.value == option %}selected{% endif %}>
+                {{ option }}
+              </option>
+            {% elif option is mapping %}
+              <option value="{{ option.value }}" {% if entry.value == option.value %}selected{% endif %}>
+                {{ option.text or option.label }}
+              </option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      {% elif entry.type == 'checkbox' %}
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+                 {% if entry.value %}checked{% endif %}>
+          <label class="form-check-label" for="{{ entry.entry_name }}">{{ entry.label }}</label>
+        </div>
+      {% elif entry.type == 'date' %}
+        <input type="date" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+               value="{{ entry.value }}" {% if entry.required %}required{% endif %}>
+      {% elif entry.type == 'number' %}
+        <input type="number" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+               value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
+      {% elif entry.type == 'readonly' %}
+        <div class="form-control-plaintext">{{ entry.value }}</div>
+      {% elif entry.type == 'autocomplete' %}
+        <input type="text" class="form-control autocomplete-input" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+               value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}
+               data-options="{{ entry.options|tojson if entry.options else '[]' }}">
+      {% else %}
+        <input type="text" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+               value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
+      {% endif %}
+      
+      {% if entry.help_text %}
+        <div class="form-text text-muted">{{ entry.help_text }}</div>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro render_footer_buttons(entity=None, read_only=False) %}
+  {% if request.endpoint is not defined %}
+    <div class="alert alert-danger">
+      Error: No request.endpoint available for navigation.
+    </div>
+    <script type="module">
+      import log from '/static/js/logger.js';
+      log("error", "form_components.html", "context_check", "Missing required template context: request.endpoint");
+    </script>
+  {% else %}
+    <script>
+      window.footerButtonsConfig = {
+        hasId: {{ (entity and entity.id) | tojson }},
+        endpoint: "{{ request.endpoint }}",
+        baseRoute: "{{ request.endpoint.rsplit('.', 1)[0] }}",
+        viewUrl: {% if entity and entity.id %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}"{% else %}null{% endif %},
+        indexUrl: "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
+      };
+    </script>
+
+    <div class="footer-buttons-container mt-4 d-flex justify-content-end gap-2">
+      {% if not read_only %}
+        {% if entity and entity.id %}
+          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}" class="btn btn-secondary">
+            <i class="fas fa-times me-1"></i> Cancel
+          </a>
+          <button type="submit" class="btn btn-primary" form="main-form">
+            <i class="fas fa-save me-1"></i> Update
+          </button>
+        {% else %}
+          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
+            <i class="fas fa-times me-1"></i> Cancel
+          </a>
+          <button type="submit" class="btn btn-primary" form="main-form">
+            <i class="fas fa-save me-1"></i> Create
+          </button>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    <script type="module" src="{{ url_for('static', filename='js/pages/footer_buttons.js') }}"></script>
+  {% endif %}
+{% endmacro %}
+
+{% macro render_tabbed_form(ui, model_name="", error_message="", read_only=False) %}
+  <div class="tab-content">
+    {% for tab in ui %}
+      <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+           id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+           role="tabpanel"
+           aria-labelledby="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab">
+        {% for section in tab.sections %}
+          <h5 class="mt-3">{{ section.section_name }}</h5>
+          <div class="row">
+            {% for entry in section.entries %}
+              {{ render_field(entry, read_only=read_only) }}
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  {# Autocomplete behavior (Tagify, etc.) initialized in main.js #}
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  {% if error_message %}
+    <script type="module">
+      import { showToast } from "/static/js/toasts.js";
+      document.addEventListener('DOMContentLoaded', () => {
+        const message = {{ ("Error creating " ~ model_name ~ ": " ~ error_message) | tojson }};
+        showToast(message, "error");
+      });
+    </script>
+  {% endif %}
+{% endmacro %}
+
+{% macro render_pill_navigation(tabs) %}
+  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    {% for tab in tabs %}
+      <li class="nav-item" role="presentation">
+        <button class="nav-link {% if loop.first %}active{% endif %}" 
+                id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab" 
+                data-bs-toggle="pill" 
+                data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}" 
+                type="button" 
+                role="tab" 
+                aria-controls="tab-{{ tab.tab_name | lower | replace(' ', '-') }}" 
+                aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+          {% if tab.icon %}
+            <i class="fas fa-{{ tab.icon }} me-1"></i>
+          {% endif %}
+          {{ tab.tab_name }}
+        </button>
+      </li>
+    {% endfor %}
+  </ul>
+  
+  <script type="module">
+    import log from '/static/js/logger.js';
+    document.addEventListener('DOMContentLoaded', () => {
+      // Log tab navigation events
+      document.querySelectorAll('.nav-link[data-bs-toggle="pill"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', event => {
+          const tabId = event.target.getAttribute('id');
+          log("info", "form_components.html", "nav", `Tab changed: ${tabId}`);
+        });
+      });
+    });
+  </script>
+{% endmacro %}

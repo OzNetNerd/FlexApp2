@@ -133,7 +133,7 @@ def handle_template_error(
 
     return (
         render_template(
-            "base/errors/500.html",
+            "pages/errors/500.html",
             error_type="Rendering Error",
             details=details,
             error_body=error_body,

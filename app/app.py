@@ -1,5 +1,7 @@
 # app/app.py
 
+from datetime import datetime
+
 import logging
 from datetime import datetime
 from logging import INFO, Formatter, StreamHandler
@@ -69,6 +71,10 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     root_logger.addHandler(console_handler)
     logger.info("Configured console logging at INFO level")
     # ------------------------------------------------------------
+
+    @app.template_global()
+    def now():
+        return datetime.now()
 
     @app.errorhandler(TypeError)
     def handle_type_error(e: TypeError):

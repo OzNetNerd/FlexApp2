@@ -14,4 +14,4 @@ home_bp = Blueprint("home_bp", __name__, url_prefix="/")
 def index():
     """Render the dashboard home page for authenticated users."""
     logger.info(f"Rendering dashboard for user {current_user.id}")
-    return render_template("pages/misc/home.html")
+    return render_template("pages/home.html")

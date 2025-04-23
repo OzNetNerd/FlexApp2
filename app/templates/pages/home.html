@@ -1,0 +1,260 @@
+<!-- START TEMPLATE: home.html -->
+
+{% extends "layouts/layout.html" %}
+
+{% block title %}CRM Dashboard - Home{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <h1 class="h3 mb-2">Welcome to your CRM</h1>
+      <p class="text-muted">Manage your customer relationships efficiently</p>
+    </div>
+  </div>
+</div>
+
+<!-- Navigation Cards -->
+<div class="row mb-4">
+  <div class="col-md-4 mb-3">
+    <a href="/companies" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-building text-primary" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Companies</h2>
+        <p class="card-text text-muted">Manage all your client companies</p>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-4 mb-3">
+    <a href="/customers" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-people text-success" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Customers</h2>
+        <p class="card-text text-muted">Manage individual customer contacts</p>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-4 mb-3">
+    <a href="/opportunities" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-graph-up-arrow text-danger" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Opportunities</h2>
+        <p class="card-text text-muted">Track sales opportunities and deals</p>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Summary Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Summary</h2>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-primary mb-2">4</div>
+                <div class="text-uppercase fw-bold small text-muted">Companies</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-success mb-2">9</div>
+                <div class="text-uppercase fw-bold small text-muted">Contacts</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-danger mb-2">7</div>
+                <div class="text-uppercase fw-bold small text-muted">Deals</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-info mb-2">$925K</div>
+                <div class="text-uppercase fw-bold small text-muted">Pipeline</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
+          <div class="highlights-container">
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <span class="text-primary fw-bold">4</span> companies ·
+                <span class="text-success fw-bold">9</span> contacts ·
+                <span class="text-danger fw-bold">7</span> deals =
+                <span class="text-info fw-bold">$925K</span> pipeline
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-arrow-up text-success me-1"></i>
+                <span class="fw-bold">$125K</span> added to pipeline this week
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-chart-line text-primary me-1"></i>
+                <span class="fw-bold">3</span> deals progressed to next stage
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-percentage text-warning me-1"></i>
+                CRIP score increased by <span class="fw-bold">12%</span> this month
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-trophy text-danger me-1"></i>
+                <span class="fw-bold">2</span> net new logos added this quarter
+              </p>
+            </div>
+          </div>
+
+          <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
+            <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Activity Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Recent Activity</h2>
+        <button class="btn btn-sm btn-outline-primary">View All</button>
+      </div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
+            <div class="activity-icon bg-warning text-white d-flex align-items-center justify-content-center">
+              <i class="bi bi-graph-up"></i>
+            </div>
+            <div class="ms-3">
+              <p class="mb-0">Deal progressed: <strong>GlobalTech - Moved to Negotiation</strong></p>
+              <small class="text-muted">1 hour ago</small>
+            </div>
+          </li>
+          <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
+            <div class="activity-icon bg-primary text-white d-flex align-items-center justify-content-center">
+              <i class="bi bi-person-plus"></i>
+            </div>
+            <div class="ms-3">
+              <p class="mb-0">New contact added: <strong>Sarah Johnson</strong></p>
+              <small class="text-muted">3 hours ago</small>
+            </div>
+          </li>
+          <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
+            <div class="activity-icon bg-danger text-white d-flex align-items-center justify-content-center">
+              <i class="bi bi-building-add"></i>
+            </div>
+            <div class="ms-3">
+              <p class="mb-0">New company added: <strong>Quantum Solutions</strong></p>
+              <small class="text-muted">Yesterday</small>
+            </div>
+          </li>
+          <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
+            <div class="activity-icon bg-success text-white d-flex align-items-center justify-content-center">
+              <i class="bi bi-currency-dollar"></i>
+            </div>
+            <div class="ms-3">
+              <p class="mb-0">Deal closed: <strong>Fusion Industries - $185,000</strong></p>
+              <small class="text-muted">2 days ago</small>
+            </div>
+          </li>
+          <li class="list-group-item d-flex align-items-center border-0 py-3">
+            <div class="activity-icon bg-info text-white d-flex align-items-center justify-content-center">
+              <i class="bi bi-calendar-event"></i>
+            </div>
+            <div class="ms-3">
+              <p class="mb-0">Meeting scheduled with <strong>NexGen Systems</strong></p>
+              <small class="text-muted">March 27, 2025</small>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script type="module" src="{{ url_for('static', filename='js/pages/index.js') }}"></script>
+{% endblock %}
+
+{% block head_extra %}
+<style>
+/* Activity Icons */
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.activity-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Navigation cards hover effect */
+.nav-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Highlights container */
+.highlights-container {
+  display: flex;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.highlight-item {
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>
+{% endblock %}
+<!-- END TEMPLATE: home.html -->

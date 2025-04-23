@@ -1,0 +1,69 @@
+{# create_view_edit_company.html #}
+
+{% extends "page_templates/_create_view_edit.html" %}
+
+{% set tabs = [
+    {'tab_name': 'Notes'} if read_only else None,
+    {'tab_name': 'About'},
+    {'tab_name': 'System Info'} if read_only else None
+] | reject('none') | list %}
+
+{% import 'base/macros/render_form_fields.html' as field_macros with context %}
+{% import 'base/macros/tabs.html' as tab_macros with context %}
+
+{% block view_template_content %}
+<form method="post" action="{{ submit_url }}" id="main-form">
+  {{ csrf_input }}
+  <div class="tab-content" id="formTabsContent">
+
+    {% if read_only %}
+    {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
+      {% include 'pages/crud/sections/_notes_section.html' %}
+    {% endcall %}
+    {% endif %}
+
+    {% call tab_macros.render_tab_section('about', 'About', active=not read_only) %}
+      {{ field_macros.render_field({
+          "entry_name": "name",
+          "label": "Company Name",
+          "type": "text",
+          "value": entity.name,
+          "required": true,
+          "options": []
+      }, read_only=read_only) }}
+
+      {{ field_macros.render_field({
+          "entry_name": "description",
+          "label": "Description",
+          "type": "textarea",
+          "value": entity.description,
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+    {% endcall %}
+
+    {% if read_only %}
+    {% call tab_macros.render_tab_section('system_info', 'System Info') %}
+      {{ field_macros.render_field({
+          "entry_name": "created_at",
+          "label": "Created",
+          "type": "text",
+          "value": entity.created_at,
+          "required": false,
+          "options": []
+      }, read_only=true) }}
+
+      {{ field_macros.render_field({
+          "entry_name": "updated_at",
+          "label": "Last Updated",
+          "type": "text",
+          "value": entity.updated_at,
+          "required": false,
+          "options": []
+      }, read_only=true) }}
+    {% endcall %}
+    {% endif %}
+
+  </div>
+</form>
+{% endblock view_template_content %}

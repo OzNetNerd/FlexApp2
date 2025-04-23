@@ -1,0 +1,494 @@
+{# ------------------------------------------------------------------------------
+  File: developer_tools.html | Purpose: Development and debugging tools
+  Description:
+    - Consolidates developer tools into a single file
+    - Provides debugger panels, logging utilities, and development helpers
+    - Only active in development environments
+
+  Macros:
+    - render_debug_panel: Creates a collapsible debug panel
+    - add_script_debugger: Adds JavaScript debugging utilities
+    - add_template_inspector: Shows template variables and structure
+------------------------------------------------------------------------------ #}
+
+{% macro render_debug_panel(debug_title="Debug Panel", debug_data={}, debug_context={}, debug_severity="info", debug_show_toggle=true, debug_expanded=false, debug_id="main", debug_capture_console=false) %}
+{% if current_app.config.get('ENV') == 'development' or current_app.config.get('DEBUG') == True %}
+<div id="debug-panel-{{ debug_id }}" class="debug-panel">
+  <div class="debug-panel-header {% if debug_severity == 'error' %}debug-error{% elif debug_severity == 'warning' %}debug-warning{% else %}debug-info{% endif %}">
+    <span class="debug-panel-title">{{ debug_title | default(template_name | default('Debug Panel')) }}</span>
+    {% if debug_show_toggle %}
+    <span class="debug-panel-toggle" data-action="toggle">[{{ '-' if debug_expanded else '+' }}]</span>
+    {% endif %}
+  </div>
+  <div class="debug-panel-content" {% if not debug_expanded %}style="display: none;"{% endif %}>
+    <div class="debug-section">
+      <div class="debug-section-title">Template Context</div>
+      <table class="debug-table">
+        <tr>
+          <th>Template</th>
+          <td>{{ template_name | default(request.endpoint + ' [endpoint]') }}</td>
+        </tr>
+        <tr>
+          <th>Request Path</th>
+          <td>{{ request.path | default('N/A') }}</td>
+        </tr>
+        <tr>
+          <th>Endpoint</th>
+          <td>{{ request.endpoint | default('N/A') }}</td>
+        </tr>
+        <tr>
+          <th>Method</th>
+          <td>{{ request.method | default('N/A') }}</td>
+        </tr>
+        {% if debug_context %}
+          {% for key, value in debug_context.items() %}
+          <tr>
+            <th>{{ key }}</th>
+            <td>{{ value }}</td>
+          </tr>
+          {% endfor %}
+        {% endif %}
+      </table>
+    </div>
+
+    {% if debug_data %}
+    <div class="debug-section">
+      <div class="debug-section-title">Component Data</div>
+      <table class="debug-table">
+        {% for key, value in debug_data.items() %}
+        <tr>
+          <th>{{ key }}</th>
+          <td>
+            {% if value is mapping %}
+              <pre>{{ value | tojson(indent=2) }}</pre>
+            {% elif value is iterable and value is not string %}
+              <ul class="debug-list">
+                {% for item in value %}
+                <li>{{ item }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              {{ value }}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% endif %}
+
+    <div class="debug-section">
+      <div class="debug-section-title">Console Log</div>
+      <div id="debug-log-{{ debug_id }}" class="debug-log"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  // Initialize the debug panel
+  const debugPanelId = "{{ debug_id }}";
+  const debugPanel = document.getElementById(`debug-panel-${debugPanelId}`);
+  const debugLog = document.getElementById(`debug-log-${debugPanelId}`);
+
+  // Initialize debug panel functionality
+  if (debugPanel) {
+    // Toggle panel functionality
+    const headerElem = debugPanel.querySelector('.debug-panel-header');
+    const contentElem = debugPanel.querySelector('.debug-panel-content');
+    const toggleElem = debugPanel.querySelector('.debug-panel-toggle');
+
+    if (headerElem && contentElem && toggleElem) {
+      headerElem.addEventListener('click', function() {
+        const isVisible = contentElem.style.display !== 'none';
+        contentElem.style.display = isVisible ? 'none' : 'block';
+        toggleElem.textContent = isVisible ? '[+]' : '[-]';
+      });
+    }
+
+    // Export the logger function to the window context for components to use
+    if (!window.debugLogger) {
+      window.debugLogger = {};
+    }
+
+    window.debugLogger[debugPanelId] = function(level, message, data) {
+      if (!debugLog) return;
+
+      // Create log entry
+      const entry = document.createElement('div');
+      entry.className = `debug-log-entry debug-log-${level}`;
+
+      // Add timestamp
+      const time = new Date().toLocaleTimeString();
+      const timeSpan = document.createElement('span');
+      timeSpan.className = 'debug-log-time';
+      timeSpan.textContent = time;
+
+      // Add message
+      entry.appendChild(timeSpan);
+      entry.appendChild(document.createTextNode(` [${level.toUpperCase()}] ${message}`));
+
+      // Add data if present
+      if (data) {
+        const dataText = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
+        const dataElem = document.createElement('pre');
+        dataElem.className = 'debug-log-data';
+        dataElem.textContent = dataText;
+        entry.appendChild(dataElem);
+      }
+
+      // Add to log and scroll to bottom
+      debugLog.appendChild(entry);
+      debugLog.scrollTop = debugLog.scrollHeight;
+    };
+
+    // Shorthand methods
+    ['info', 'warn', 'error', 'debug'].forEach(level => {
+      window.debugLogger[debugPanelId][level] = function(message, data) {
+        window.debugLogger[debugPanelId](level, message, data);
+      };
+    });
+
+    // Log initialization
+    window.debugLogger[debugPanelId].info('Debug panel initialized');
+
+    // Intercept console methods to capture in debug panel
+    if ({{ debug_capture_console | tojson }}) {
+      const originalConsole = {
+        log: console.log,
+        warn: console.warn,
+        error: console.error,
+        debug: console.debug
+      };
+
+      console.log = function() {
+        window.debugLogger[debugPanelId].info(Array.from(arguments).join(' '));
+        originalConsole.log.apply(console, arguments);
+      };
+
+      console.warn = function() {
+        window.debugLogger[debugPanelId].warn(Array.from(arguments).join(' '));
+        originalConsole.warn.apply(console, arguments);
+      };
+
+      console.error = function() {
+        window.debugLogger[debugPanelId].error(Array.from(arguments).join(' '));
+        originalConsole.error.apply(console, arguments);
+      };
+
+      console.debug = function() {
+        window.debugLogger[debugPanelId].debug(Array.from(arguments).join(' '));
+        originalConsole.debug.apply(console, arguments);
+      };
+
+      window.debugLogger[debugPanelId].info('Console methods intercepted');
+    }
+  }
+</script>
+{% endif %}
+{% endmacro %}
+
+{% macro add_script_debugger(script_file) %}
+{% if current_app.config.get('ENV') == 'development' or current_app.config.get('DEBUG') == True %}
+<div class="script-debugger mt-4 border p-3 rounded bg-light">
+  <h5>Script Debugger: {{ script_file }}</h5>
+  <div class="d-flex gap-2 mb-3">
+    <button class="btn btn-sm btn-outline-primary debugger-toggle-btn">Show Script</button>
+    <button class="btn btn-sm btn-outline-danger debugger-reload-btn">Reload Script</button>
+  </div>
+  <div class="script-content" style="display: none;">
+    <pre class="bg-dark text-light p-3 rounded"><code class="script-code">Loading...</code></pre>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const scriptPath = "{{ url_for('static', filename=script_file) }}";
+    const scriptContent = document.querySelector('.script-code');
+    const toggleBtn = document.querySelector('.debugger-toggle-btn');
+    const reloadBtn = document.querySelector('.debugger-reload-btn');
+    const scriptContainer = document.querySelector('.script-content');
+
+    // Function to load script content
+    async function loadScriptContent() {
+      try {
+        const response = await fetch(scriptPath);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const text = await response.text();
+        scriptContent.textContent = text;
+      } catch (error) {
+        scriptContent.textContent = `Error loading script: ${error.message}`;
+      }
+    }
+
+    // Toggle script content visibility
+    toggleBtn.addEventListener('click', function() {
+      const isVisible = scriptContainer.style.display !== 'none';
+      scriptContainer.style.display = isVisible ? 'none' : 'block';
+      toggleBtn.textContent = isVisible ? 'Show Script' : 'Hide Script';
+
+      if (!isVisible && scriptContent.textContent === 'Loading...') {
+        loadScriptContent();
+      }
+    });
+
+    // Reload script content
+    reloadBtn.addEventListener('click', function() {
+      scriptContent.textContent = 'Loading...';
+      loadScriptContent();
+
+      // If script is hidden, show it
+      if (scriptContainer.style.display === 'none') {
+        scriptContainer.style.display = 'block';
+        toggleBtn.textContent = 'Hide Script';
+      }
+    });
+  });
+</script>
+{% endif %}
+{% endmacro %}
+
+{% macro add_template_inspector() %}
+{% if current_app.config.get('ENV') == 'development' or current_app.config.get('DEBUG') == True %}
+<div id="template-inspector" class="position-fixed bottom-0 start-0 m-3 bg-light border rounded shadow-sm" style="z-index: 9999; max-width: 350px; display: none;">
+  <div class="inspector-header d-flex justify-content-between align-items-center p-2 border-bottom bg-primary text-white">
+    <span>Template Inspector</span>
+    <div>
+      <button class="btn btn-sm btn-outline-light me-1" id="inspector-refresh">🔄</button>
+      <button class="btn btn-sm btn-outline-light" id="inspector-close">×</button>
+    </div>
+  </div>
+  <div class="inspector-body p-2" style="max-height: 400px; overflow-y: auto;">
+    <div class="accordion" id="template-sections">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#context-section">
+            Template Context
+          </button>
+        </h2>
+        <div id="context-section" class="accordion-collapse collapse show">
+          <div class="accordion-body">
+            <div id="context-data">Loading...</div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#request-section">
+            Request Data
+          </button>
+        </h2>
+        <div id="request-section" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <div id="request-data">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button id="show-inspector" class="position-fixed bottom-0 start-0 m-3 btn btn-sm btn-primary" style="z-index: 9998;">
+  <i class="fas fa-code"></i> Inspect
+</button>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get elements
+    const inspectorBtn = document.getElementById('show-inspector');
+    const inspector = document.getElementById('template-inspector');
+    const closeBtn = document.getElementById('inspector-close');
+    const refreshBtn = document.getElementById('inspector-refresh');
+    const contextData = document.getElementById('context-data');
+    const requestData = document.getElementById('request-data');
+
+    // Toggle inspector visibility
+    inspectorBtn.addEventListener('click', function() {
+      inspector.style.display = 'block';
+      inspectorBtn.style.display = 'none';
+      loadInspectorData();
+    });
+
+    // Close inspector
+    closeBtn.addEventListener('click', function() {
+      inspector.style.display = 'none';
+      inspectorBtn.style.display = 'block';
+    });
+
+    // Refresh data
+    refreshBtn.addEventListener('click', loadInspectorData);
+
+    // Load template data
+    function loadInspectorData() {
+      fetch('/debug/template-data')
+        .then(response => response.json())
+        .then(data => {
+          // Display context data
+          if (data.context) {
+            contextData.innerHTML = formatObject(data.context);
+          } else {
+            contextData.innerHTML = '<p class="text-muted">No context data available</p>';
+          }
+
+          // Display request data
+          if (data.request) {
+            requestData.innerHTML = formatObject(data.request);
+          } else {
+            requestData.innerHTML = '<p class="text-muted">No request data available</p>';
+          }
+        })
+        .catch(error => {
+          contextData.innerHTML = `<p class="text-danger">Error loading data: ${error.message}</p>`;
+          requestData.innerHTML = `<p class="text-danger">Error loading data: ${error.message}</p>`;
+        });
+    }
+
+    // Format object as HTML
+    function formatObject(obj) {
+      let html = '<ul class="list-group">';
+      for (const [key, value] of Object.entries(obj)) {
+        html += `<li class="list-group-item p-2">
+          <strong>${key}:</strong>
+          ${typeof value === 'object' && value !== null
+            ? `<button class="btn btn-sm btn-link toggle-nested">Toggle</button>
+               <div class="nested-content mt-2" style="display: none;">${formatObject(value)}</div>`
+            : `<span class="text-muted">${value}</span>`}
+        </li>`;
+      }
+      html += '</ul>';
+
+      // Add event listeners for nested toggles
+      setTimeout(() => {
+        document.querySelectorAll('.toggle-nested').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const content = this.nextElementSibling;
+            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+          });
+        });
+      }, 0);
+
+      return html;
+    }
+  });
+</script>
+
+<style>
+  .toggle-nested {
+    padding: 0.1rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .nested-content {
+    margin-left: 1rem;
+    border-left: 2px solid #dee2e6;
+    padding-left: 0.5rem;
+  }
+</style>
+{% endif %}
+{% endmacro %}
+
+<style>
+  /* Debug Panel Styles */
+  .debug-panel {
+    font-family: monospace;
+    font-size: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 10px 0;
+    background: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .debug-panel-header {
+    padding: 8px 12px;
+    background: #e9e9e9;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .debug-panel-toggle {
+    font-weight: bold;
+    color: #555;
+  }
+
+  .debug-panel-content {
+    padding: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .debug-section {
+    margin-bottom: 15px;
+  }
+
+  .debug-section-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 3px;
+  }
+
+  .debug-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .debug-table th, .debug-table td {
+    padding: 4px 8px;
+    border: 1px solid #eee;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .debug-table th {
+    width: 30%;
+    background: #f5f5f5;
+  }
+
+  .debug-log {
+    background: #222;
+    color: #eee;
+    padding: 8px;
+    border-radius: 3px;
+    height: 100px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+  }
+
+  .debug-log-entry {
+    margin-bottom: 3px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 3px;
+  }
+
+  .debug-log-time {
+    color: #999;
+    margin-right: 5px;
+  }
+
+  .debug-log-info { color: #8acdff; }
+  .debug-log-warn { color: #ffcc00; }
+  .debug-log-error { color: #ff5555; }
+  .debug-log-debug { color: #77dd77; }
+
+  .debug-error { background: #ffdddd; }
+  .debug-warning { background: #ffffdd; }
+  .debug-info { background: #e9e9e9; }
+
+  .debug-list {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+</style>

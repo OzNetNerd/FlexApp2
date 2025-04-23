@@ -1,0 +1,116 @@
+{# ------------------------------------------------------------------------------
+  File: error_pages.html | Purpose: Reusable error page templates
+  Description:
+    - Consolidates error page templates into a single file
+    - Provides consistent error messaging across the application
+    - Supports various error types with custom messages
+
+  Macros:
+    - render_error_page: Creates a styled error page with appropriate messaging
+------------------------------------------------------------------------------ #}
+
+{% macro render_error_page(status_code, title, message, home_url="/") %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ status_code }} - {{ title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+  <!-- Error Debug Logger -->
+  <script type="module">
+    import log from '/static/js/logger.js';
+    log("error", "error_pages.html", "routing", "❌ {{ status_code }} page triggered - {{ title }}");
+    log("info", "error_pages.html", "context", "🔙 Suggesting redirect to {{ home_url }}");
+  </script>
+
+  <style>
+    .error-page {
+      max-width: 500px;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .error-code {
+      font-size: 72px;
+      font-weight: bold;
+      color: #f8f9fa;
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+      margin-bottom: 0;
+    }
+
+    .error-title {
+      font-size: 28px;
+      margin-bottom: 1rem;
+    }
+
+    .error-message {
+      color: #6c757d;
+      margin-bottom: 2rem;
+    }
+
+    .home-button {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column justify-content-center align-items-center" style="min-height: 100vh;">
+  <div class="error-page">
+    <p class="error-code">{{ status_code }}</p>
+    <h1 class="error-title">{{ title }}</h1>
+    <p class="error-message">{{ message }}</p>
+    <a href="{{ home_url }}" class="btn btn-outline-primary home-button">Return to home page</a>
+  </div>
+</body>
+</html>
+{% endmacro %}
+
+{# 404 Page Not Found template #}
+{% macro render_404(home_url="/") %}
+  {{ render_error_page(
+    status_code = "404",
+    title = "Page Not Found",
+    message = "The page you are looking for doesn't exist or has been moved.",
+    home_url = home_url
+  ) }}
+{% endmacro %}
+
+{# 500 Server Error template #}
+{% macro render_500(home_url="/") %}
+  {{ render_error_page(
+    status_code = "500",
+    title = "Server Error",
+    message = "Something went wrong on our end. We're working to fix the issue.",
+    home_url = home_url
+  ) }}
+{% endmacro %}
+
+{# 403 Forbidden template #}
+{% macro render_403(home_url="/") %}
+  {{ render_error_page(
+    status_code = "403",
+    title = "Access Denied",
+    message = "You don't have permission to access this resource.",
+    home_url = home_url
+  ) }}
+{% endmacro %}
+
+{# 401 Unauthorized template #}
+{% macro render_401(home_url="/") %}
+  {{ render_error_page(
+    status_code = "401",
+    title = "Authentication Required",
+    message = "You need to log in to access this page.",
+    home_url = home_url
+  ) }}
+{% endmacro %}
+
+{# Custom Error template for other status codes #}
+{% macro render_custom_error(status_code, title, message, home_url="/") %}
+  {{ render_error_page(
+    status_code = status_code,
+    title = title,
+    message = message,
+    home_url = home_url
+  ) }}
+{% endmacro %}
