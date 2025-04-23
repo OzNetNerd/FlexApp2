@@ -1,7 +1,7 @@
-from flask import Blueprint, request, redirect, flash, url_for
+from flask import Blueprint, flash, redirect, request, url_for
 from flask_login import login_required
-from app.models import db, CRISPScore, Relationship
 
+from app.models import CRISPScore, Relationship, db
 from app.utils.app_logging import get_logger
 
 logger = get_logger()

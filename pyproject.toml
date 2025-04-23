@@ -1,2 +1,10 @@
 [tool.black]
 line-length = 140
+target-version = ["py312"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 140
+known_first_party = ["app", "tests"]
+default_section = "THIRDPARTY"

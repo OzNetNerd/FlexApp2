@@ -1,6 +1,7 @@
-import logging
 import inspect
+import logging
 import time
+
 from jinja2 import DebugUndefined
 
 logger = logging.getLogger(__name__)

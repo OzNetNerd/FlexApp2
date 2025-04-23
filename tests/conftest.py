@@ -1,12 +1,14 @@
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 # Add the project root directory to sys.path so that app.py can be imported correctly
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from app.models.user import User
 from app.models.base import db as _db
+from app.models.user import User
+
 from .fixtures.mock_data import TEST_USERS
 
 

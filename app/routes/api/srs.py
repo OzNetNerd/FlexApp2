@@ -1,9 +1,11 @@
+from typing import Any, Dict
+
 from flask import Blueprint, request
-from typing import Dict, Any
-from app.utils.app_logging import get_logger
-from app.services.srs_service import SRSService
+
 from app.models import SRSItem
 from app.routes.api.route_registration import ApiCrudRouteConfig
+from app.services.srs_service import SRSService
+from app.utils.app_logging import get_logger
 
 logger = get_logger()
 

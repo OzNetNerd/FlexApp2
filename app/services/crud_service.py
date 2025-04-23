@@ -1,14 +1,15 @@
 # app/services/crud_service.py
 
 import traceback
-from typing import Type, Any
 from datetime import datetime
+from typing import Any, Type
+
 from app.models.base import db
 from app.models.mixins import ValidatorMixin
-
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
+
 
 class CRUDService:
     """

@@ -25,10 +25,10 @@ app/templates/shared/components/_debug_panel.html
 Add the debug panel to any template by including it with the appropriate context:
 
 ```jinja2
-{% with 
-  template_name="my_current_template.html", 
+{% with
+  template_name="my_current_template.html",
   debug_id="unique_id",
-  debug_title="My Component Debug", 
+  debug_title="My Component Debug",
   debug_data={
     "key1": value1,
     "key2": value2
@@ -47,13 +47,13 @@ From your JavaScript code, you can log information to the debug panel:
 if (window.debugLogger && window.debugLogger.my_panel_id) {
   // Log information
   window.debugLogger.my_panel_id.info("Some information");
-  
+
   // Log warning
   window.debugLogger.my_panel_id.warn("Warning message");
-  
+
   // Log error
   window.debugLogger.my_panel_id.error("Error message");
-  
+
   // Log with data object
   window.debugLogger.my_panel_id.debug("Data objects", {
     key1: "value1",
@@ -83,10 +83,10 @@ When including the debug panel, you can provide these context variables:
 To display an error debug panel:
 
 ```jinja2
-{% with 
-  template_name="my_template.html", 
+{% with
+  template_name="my_template.html",
   debug_id="error_panel",
-  debug_title="Error Information", 
+  debug_title="Error Information",
   debug_severity="error",
   debug_expanded=true,
   debug_data={
@@ -105,7 +105,7 @@ To display an error debug panel:
 Display available template variables:
 
 ```jinja2
-{% with 
+{% with
   debug_data={
     "available_vars": {
       "item": item.__class__.__name__ if item else None,
@@ -123,9 +123,9 @@ Display available template variables:
 Track form validation issues:
 
 ```jinja2
-{% with 
+{% with
   debug_id="form_debug",
-  debug_title="Form Validation Debug", 
+  debug_title="Form Validation Debug",
   debug_data={
     "form_errors": form.errors if form else {},
     "validation_failed": validation_failed

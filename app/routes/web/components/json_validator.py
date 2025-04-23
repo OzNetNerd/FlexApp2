@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 from app.utils.app_logging import get_logger
 

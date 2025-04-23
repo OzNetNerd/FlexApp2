@@ -4,10 +4,11 @@ Additional simplified authentication tests that don't depend on the User model.
 These tests focus on verifying the functionality of authentication-related endpoints without depending on the actual implementation of the User model.
 """
 
-import pytest
-from unittest.mock import patch, MagicMock
-import sys
 import os
+import sys
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 # Add the parent directory to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))

@@ -62,7 +62,7 @@ Extract constants
 # Research
 Defensive programming?
 
-# SImplified code - register_page_route 
+# SImplified code - register_page_route
 
 ```
 from dataclasses import dataclass, field
@@ -78,7 +78,7 @@ class RouteConfig:
     methods: List[str] = field(default_factory=lambda: ["GET"])
     context_provider: Optional[Callable] = None
     error_message: str = "Failed to load the page"
-    
+
     def __post_init__(self):
         """Derive endpoint name from template path if not provided"""
         if not self.endpoint:
@@ -89,15 +89,15 @@ class RouteConfig:
             else:
                 # For top-level templates (e.g., "home.html")
                 self.endpoint = self.template_path.split('.')[0]
-            
+
             logger.info(f"No endpoint provided. Using derived endpoint: '{self.endpoint}'")
         else:
             logger.info(f"Using provided endpoint: '{self.endpoint}'")
-        
+
         logger.info(f"Route configuration prepared: URL='{self.url}', endpoint='{self.endpoint}', methods={self.methods}")
 ```
 
-register_page_route 
+register_page_route
 
 ```
 def register_page_route(blueprint: Blueprint, config: RouteConfig):
@@ -177,7 +177,7 @@ register_page_route(my_blueprint, config)
           |  (Defines lambdas for each CRUD action)    |
           +---------------------------------------------+
                           |
-    +---------------------+---------------------+ 
+    +---------------------+---------------------+
     |                                           |
     v                                           v
 +-------------------+                       +-------------------+
@@ -491,7 +491,7 @@ EoQ m, w, d - Target %
 EoY m, w, d - Target %
 
 
-add 'relationships' tab - it'll show diagrams 
+add 'relationships' tab - it'll show diagrams
 
 I want to be able to edit individual fields without having to edit whole form (pencil icon)
 create form compeltely broken
@@ -520,7 +520,7 @@ include stats and links to articles and facts that help emphasise the importance
 
 adapts to the person's personality type based on their responses and asks feedback from them in terms of how it can deliver the information more helpfully
 
-advise that manager can see the responses - manager can 
+advise that manager can see the responses - manager can
 
 users can thumbs up, love and thumbs down feedback from ai - thumbs up is good feedback for the system, love is something we need to spend time on improving furhter, thumbs down is something that we need to seriously investigate
 
@@ -529,16 +529,16 @@ users can thumbs up, love and thumbs down feedback from ai - thumbs up is good f
 analyse notes
 
 have a an 'analyse' or 'review' button that an SE can click - that then chats to the SE about:
-* confirmation on whether x, y, z technology are being used, and if they are, add them to the approrpriate secitons - add competitors, etc 
+* confirmation on whether x, y, z technology are being used, and if they are, add them to the approrpriate secitons - add competitors, etc
 * if their ntoes conlict late,r bring it ot their attention or give them insights that on x date you said y and then there's z
-* analyse ntoes for things like 'a few weeks' and ask if they want a reminder in a few weeks 
+* analyse ntoes for things like 'a few weeks' and ask if they want a reminder in a few weeks
 
 ----
 
 give suggested next meeting agenda, call to action, suggest who to reach out to internally, past customers, etcs
 
 automation off the back of notes put in:
-discovery questions 
+discovery questions
 open ended questions
 meddpicc progress - and advice on how to achieve further progress, what are teh gaps and why
 
@@ -560,7 +560,7 @@ which colleagues owned those accounts
 linkedin connections to target customer
 
 crisp score
-SE confidence level on the win/tech win 
+SE confidence level on the win/tech win
 SEs don't have to be the bad guy, and I don't have to waste my time - if the metrics aren't there, they're not there
 
 
@@ -569,4 +569,4 @@ timeline view that shows time between updates and the growth of the opportunity 
 
 -----
 
-none of this is about duplicating work. all of this is about accelerating your success 
+none of this is about duplicating work. all of this is about accelerating your success

@@ -6,15 +6,16 @@ Centralized imports for all SQLAlchemy models and the `db` instance.
 
 import logging
 
-from .base import db, BaseModel
+from .base import BaseModel, db
 
 logger = logging.getLogger(__name__)
 
+from .capability import Capability
+
 # Model classes
 from .capability_category import CapabilityCategory
-from .capability import Capability
-from .company_capability import CompanyCapability
 from .company import Company
+from .company_capability import CompanyCapability
 from .contact import Contact
 from .crisp_score import CRISPScore
 from .mixins import ValidatorMixin

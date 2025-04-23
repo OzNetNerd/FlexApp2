@@ -1,9 +1,10 @@
-from app.app import create_app
-from app.models import db, User, Company, Contact, CapabilityCategory, Capability, CompanyCapability, Opportunity, Task, Note
-from werkzeug.security import generate_password_hash
-from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 
+from sqlalchemy.exc import IntegrityError
+from werkzeug.security import generate_password_hash
+
+from app.app import create_app
+from app.models import Capability, CapabilityCategory, Company, CompanyCapability, Contact, Note, Opportunity, Task, User, db
 from app.utils.app_logging import get_logger
 
 logger = get_logger()

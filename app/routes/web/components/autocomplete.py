@@ -1,6 +1,6 @@
 # app/routes/base/components/autocomplete.py
-from typing import List
 from dataclasses import dataclass
+from typing import List
 
 from app.utils.app_logging import get_logger
 

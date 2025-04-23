@@ -1,11 +1,11 @@
-from typing import Any, List, Optional, Callable, Set
-from dataclasses import dataclass, field
 from abc import ABC
+from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Callable, List, Optional, Set
 
 from flask import request
 
-from app.utils.app_logging import log_instance_vars, get_logger
+from app.utils.app_logging import get_logger, log_instance_vars
 
 logger = get_logger()
 

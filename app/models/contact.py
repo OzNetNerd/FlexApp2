@@ -1,8 +1,7 @@
 # contact.py
 
-from app.models.base import db, BaseModel
+from app.models.base import BaseModel, db
 from app.models.relationship import Relationship  # reuse the generic Relationship model
-
 from app.utils.app_logging import get_logger
 
 logger = get_logger()

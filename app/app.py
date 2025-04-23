@@ -2,19 +2,20 @@
 
 import logging
 from datetime import datetime
-from logging import StreamHandler, Formatter, INFO
+from logging import INFO, Formatter, StreamHandler
 from typing import Type
 
-from flask import Flask, request, redirect, url_for, make_response, current_app
-from flask_migrate import Migrate
+from flask import Flask, current_app, make_response, redirect, request, url_for
 from flask_login import LoginManager, current_user
+from flask_migrate import Migrate
+
+from app.models import Setting, User
+from app.models.base import db
+from app.routes.api_router import register_api_blueprints
+from app.routes.web.components.template_renderer import handle_template_error
+from app.routes.web_router import register_web_blueprints
 from app.utils.app_logging import get_logger
 from config import Config
-from app.models.base import db
-from app.models import User, Setting
-from app.routes.api_router import register_api_blueprints
-from app.routes.web_router import register_web_blueprints
-from app.routes.web.components.template_renderer import handle_template_error
 
 logger = get_logger()
 

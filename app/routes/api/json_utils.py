@@ -1,11 +1,14 @@
 # app/routes/api/json_utils.py
 
 from functools import wraps
+
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
+
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
+
 
 def json_endpoint(f):
     """
@@ -14,6 +17,7 @@ def json_endpoint(f):
       - on HTTPException: { success: false, error: message }, status=code
       - on other Exception: { success: false, error: 'Internal server error' }, status=500
     """
+
     @wraps(f)
     def wrapped(*args, **kwargs):
         try:

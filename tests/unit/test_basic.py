@@ -5,9 +5,10 @@ This test verifies that the testing setup is working correctly by running a basi
 that always passes. It is used to confirm that the test environment is properly configured.
 """
 
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 # Add the parent directory to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))

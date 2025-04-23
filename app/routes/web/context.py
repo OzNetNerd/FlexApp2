@@ -1,12 +1,12 @@
 # web/context.py
 
+from typing import Any, List, Optional
+
 from flask import url_for
 from flask_login import current_user
-from app.utils.table_helpers import get_table_plural_name, get_table_id_by_name
-from app.utils.app_logging import log_instance_vars
-from typing import Any, Optional, List
 
-from app.utils.app_logging import get_logger
+from app.utils.app_logging import get_logger, log_instance_vars
+from app.utils.table_helpers import get_table_id_by_name, get_table_plural_name
 
 logger = get_logger()
 
@@ -118,12 +118,7 @@ class EntityContext(BaseContext):
         """Initialize the context with proper parent class handling."""
         # Pass both entity_table_name and table_name so BaseContext can set defaults correctly
         super().__init__(
-            title=title,
-            show_navbar=True,
-            read_only=read_only,
-            entity_table_name=entity_table_name,
-            table_name=entity_table_name,
-            **kwargs
+            title=title, show_navbar=True, read_only=read_only, entity_table_name=entity_table_name, table_name=entity_table_name, **kwargs
         )
 
         # Set instance attributes
@@ -151,7 +146,6 @@ class EntityContext(BaseContext):
     def __str__(self):
         """Return a user-friendly string representation focusing on key entity attributes."""
         return f"EntityContext(model='{self.model_name}', action='{self.action}', entity='{self.entity_name}')"
-
 
     def __repr__(self):
         """Return a detailed string representation of the entity context."""

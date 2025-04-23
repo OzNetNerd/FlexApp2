@@ -1,6 +1,6 @@
 # app/services/auth.py
 
-from flask import request, redirect, url_for, flash, session, render_template
+from flask import flash, redirect, render_template, request, session, url_for
 from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash
 

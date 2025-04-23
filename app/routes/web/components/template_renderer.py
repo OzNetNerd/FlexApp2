@@ -1,25 +1,17 @@
 # template_renderer.py
 
-from typing import Union, Tuple, Dict, Any
-import traceback
-import json
 import inspect
+import json
+import traceback
+from dataclasses import dataclass
+from typing import Any, Dict, Tuple, Union
 
-from flask import (
-    render_template,
-    request,
-    current_app,
-    url_for,
-    get_flashed_messages,
-    abort,
-)
-from jinja2 import Environment, DebugUndefined
+from flask import abort, current_app, get_flashed_messages, render_template, request, url_for
+from jinja2 import DebugUndefined, Environment
 from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
 from markupsafe import Markup, escape
-from dataclasses import dataclass
 
 from app.routes.web.context import BaseContext
-
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
@@ -120,12 +112,7 @@ def get_flask_globals() -> Dict[str, Any]:
     return globals_dict
 
 
-def handle_template_error(
-    e: Exception,
-    template_name: str,
-    endpoint_name: str,
-    fallback_error_message: str
-) -> tuple[str, int]:
+def handle_template_error(e: Exception, template_name: str, endpoint_name: str, fallback_error_message: str) -> tuple[str, int]:
     """Central handler for Jinja rendering errors.
 
     - Aborts with 404 if the template is not found.
@@ -136,7 +123,7 @@ def handle_template_error(
         abort(404)
 
     # Otherwise, determine the status code and message
-    if hasattr(e, 'lineno'):
+    if hasattr(e, "lineno"):
         # A syntax error in the template
         status_code = 500
         details = f"Syntax error in template '{template_name}': {e}"
@@ -146,18 +133,19 @@ def handle_template_error(
         details = str(e)
 
     # In debug mode show full traceback, else show fallback message
-    error_body = (traceback.format_exc()
-                  if current_app.debug
-                  else fallback_error_message)
+    error_body = traceback.format_exc() if current_app.debug else fallback_error_message
 
-    return render_template(
-        'base/errors/500.html',
-        error_type="Rendering Error",
-        details=details,
-        error_body=error_body,
-        endpoint=endpoint_name,
-        path=request.path
-    ), status_code
+    return (
+        render_template(
+            "base/errors/500.html",
+            error_type="Rendering Error",
+            details=details,
+            error_body=error_body,
+            endpoint=endpoint_name,
+            path=request.path,
+        ),
+        status_code,
+    )
 
 
 def render_debug_panel(

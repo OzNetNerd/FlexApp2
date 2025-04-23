@@ -1,13 +1,16 @@
 # app/routes/api_router.py
 
-import pkgutil
 import importlib
-from typing import Iterator, Any
-from flask import Flask, Blueprint
-from app.utils.app_logging import get_logger
+import pkgutil
+from typing import Any, Iterator
+
+from flask import Blueprint, Flask
+
 from app.routes.api.route_registration import register_api_crud_routes
+from app.utils.app_logging import get_logger
 
 logger = get_logger()
+
 
 def discover_api_modules() -> Iterator[Any]:
     """Yield all modules in the app.routes.api package."""

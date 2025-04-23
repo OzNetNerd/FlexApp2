@@ -1,6 +1,7 @@
 # base.py
 
 from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 
 from app.utils.app_logging import get_logger

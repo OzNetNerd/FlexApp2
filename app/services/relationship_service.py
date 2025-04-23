@@ -1,13 +1,14 @@
 # app/services/relationship_service.py
 
-from typing import List, Tuple, Dict, Any, Optional
-from sqlalchemy import or_, and_
+from typing import Any, Dict, List, Optional, Tuple
+
+from sqlalchemy import and_, or_
+
 from app.models.base import db
+from app.models.company import Company
+from app.models.contact import Contact
 from app.models.relationship import Relationship
 from app.models.user import User
-from app.models.contact import Contact
-from app.models.company import Company
-
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
@@ -162,35 +163,35 @@ class RelationshipService:
     @classmethod
     def get_user_companies(cls, user_id: int) -> List[Dict[str, Any]]:
         """Fetch companies related to a user."""
-        rels = cls.get_relationships_for_entity('user', user_id)
-        return [r for r in rels if r['entity_type'] == 'company']
+        rels = cls.get_relationships_for_entity("user", user_id)
+        return [r for r in rels if r["entity_type"] == "company"]
 
     @classmethod
     def get_user_opportunities(cls, user_id: int) -> List[Dict[str, Any]]:
         """Fetch opportunities related to a user."""
-        rels = cls.get_relationships_for_entity('user', user_id)
-        return [r for r in rels if r['entity_type'] == 'opportunity']
+        rels = cls.get_relationships_for_entity("user", user_id)
+        return [r for r in rels if r["entity_type"] == "opportunity"]
 
     @classmethod
     def get_user_contacts(cls, user_id: int) -> List[Dict[str, Any]]:
         """Fetch contacts related to a user."""
-        rels = cls.get_relationships_for_entity('user', user_id)
-        return [r for r in rels if r['entity_type'] == 'contact']
+        rels = cls.get_relationships_for_entity("user", user_id)
+        return [r for r in rels if r["entity_type"] == "contact"]
 
     @classmethod
     def get_contact_contacts(cls, contact_id: int) -> List[Dict[str, Any]]:
         """Fetch contacts related to a contact."""
-        rels = cls.get_relationships_for_entity('contact', contact_id)
-        return [r for r in rels if r['entity_type'] == 'contact']
+        rels = cls.get_relationships_for_entity("contact", contact_id)
+        return [r for r in rels if r["entity_type"] == "contact"]
 
     @classmethod
     def get_contact_opportunities(cls, contact_id: int) -> List[Dict[str, Any]]:
         """Fetch opportunities related to a contact."""
-        rels = cls.get_relationships_for_entity('contact', contact_id)
-        return [r for r in rels if r['entity_type'] == 'opportunity']
+        rels = cls.get_relationships_for_entity("contact", contact_id)
+        return [r for r in rels if r["entity_type"] == "opportunity"]
 
     @classmethod
     def get_opportunity_companies(cls, opportunity_id: int) -> List[Dict[str, Any]]:
         """Fetch companies related to an opportunity."""
-        rels = cls.get_relationships_for_entity('opportunity', opportunity_id)
-        return [r for r in rels if r['entity_type'] == 'company']
+        rels = cls.get_relationships_for_entity("opportunity", opportunity_id)
+        return [r for r in rels if r["entity_type"] == "company"]

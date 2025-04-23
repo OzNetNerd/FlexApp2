@@ -1,14 +1,13 @@
 # srs_service.py
 
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 
 # Updated imports based on py-fsrs documentation
-from fsrs import Scheduler, Card, Rating, ReviewLog, State
+from fsrs import Card, Rating, ReviewLog, Scheduler, State
 
-from app.services.crud_service import CRUDService
-from app.models.srs_item import SRSItem
 from app.models.review_history import ReviewHistory
-
+from app.models.srs_item import SRSItem
+from app.services.crud_service import CRUDService
 from app.utils.app_logging import get_logger
 
 logger = get_logger()

@@ -1,4 +1,4 @@
-from app.models.base import db, BaseModel
+from app.models.base import BaseModel, db
 from app.models.company_capability import CompanyCapability
 
 

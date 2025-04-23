@@ -1,18 +1,19 @@
 # app/routes/api/route_registration.py
 
-import pkgutil
 import importlib
-from typing import Callable, List, Optional, Any, Dict, Tuple, Union
+import pkgutil
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
 from flask import Blueprint, request
 from flask.typing import ResponseReturnValue
 from werkzeug.exceptions import HTTPException
 
+from app.routes.api.context import EntityAPIContext, ErrorAPIContext, ListAPIContext
 from app.routes.api.json_utils import json_endpoint
-from app.utils.table_helpers import get_table_plural_name
-from app.routes.api.context import ListAPIContext, EntityAPIContext, ErrorAPIContext
 from app.utils.app_logging import get_logger
+from app.utils.table_helpers import get_table_plural_name
 
 logger = get_logger()
 
@@ -28,6 +29,7 @@ class CRUDEndpoint(Enum):
 @dataclass
 class ApiCrudRouteConfig:
     """Configuration for API CRUD routes."""
+
     blueprint: Blueprint
     entity_table_name: str
     service: Any
@@ -47,12 +49,8 @@ def handle_api_crud_operation(
     try:
         if endpoint == CRUDEndpoint.GET_ALL.value:
             result = service.get_all()
-            if hasattr(result, 'items'):
-                return ListAPIContext(
-                    entity_table_name=entity_table_name,
-                    items=result.items,
-                    total_count=getattr(result, 'total', None)
-                )
+            if hasattr(result, "items"):
+                return ListAPIContext(entity_table_name=entity_table_name, items=result.items, total_count=getattr(result, "total", None))
             return ListAPIContext(entity_table_name=entity_table_name, items=result)
 
         if endpoint == CRUDEndpoint.GET_BY_ID.value and entity_id is not None:
@@ -94,14 +92,10 @@ def handle_api_crud_operation(
 
 
 def register_api_route(
-    blueprint: Blueprint,
-    url: str,
-    handler: Callable[..., ResponseReturnValue],
-    endpoint: str,
-    methods: Optional[List[str]] = None
+    blueprint: Blueprint, url: str, handler: Callable[..., ResponseReturnValue], endpoint: str, methods: Optional[List[str]] = None
 ) -> None:
     """Register a single route on an API blueprint."""
-    blueprint.add_url_rule(rule=url, endpoint=endpoint, view_func=handler, methods=methods or ['GET'])
+    blueprint.add_url_rule(rule=url, endpoint=endpoint, view_func=handler, methods=methods or ["GET"])
 
 
 def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:
@@ -120,23 +114,23 @@ def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:
         # Define URL and HTTP methods
         if action == CRUDEndpoint.GET_ALL.value:
             url = "/"
-            methods = ['GET']
+            methods = ["GET"]
             func = lambda: handle_api_crud_operation(action, svc, entity)
         elif action == CRUDEndpoint.GET_BY_ID.value:
             url = "/<int:entity_id>"
-            methods = ['GET']
+            methods = ["GET"]
             func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id)
         elif action == CRUDEndpoint.CREATE.value:
             url = "/"
-            methods = ['POST']
+            methods = ["POST"]
             func = lambda: handle_api_crud_operation(action, svc, entity, data=request.get_json())
         elif action == CRUDEndpoint.UPDATE.value:
             url = "/<int:entity_id>"
-            methods = ['PUT']
+            methods = ["PUT"]
             func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id, data=request.get_json())
         elif action == CRUDEndpoint.DELETE.value:
             url = "/<int:entity_id>"
-            methods = ['DELETE']
+            methods = ["DELETE"]
             func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id)
         else:
             continue

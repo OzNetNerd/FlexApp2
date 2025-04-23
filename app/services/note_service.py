@@ -1,14 +1,16 @@
 # app/services/note_service.py
 
-from typing import Dict, Any, List
 from datetime import datetime, timedelta
+from typing import Any, Dict, List
+
 from sqlalchemy import or_
+
 from app.models import Note
 from app.services.crud_service import CRUDService
-
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
+
 
 class NoteService(CRUDService):
     """Service for Note model with polymorphic relationship and search helpers."""
@@ -17,19 +19,12 @@ class NoteService(CRUDService):
         """
         Initialize with Note model, enforcing the core fields on create.
         """
-        super().__init__(Note, required_fields=[
-            "content", "notable_type", "notable_id", "user_id"
-        ])
+        super().__init__(Note, required_fields=["content", "notable_type", "notable_id", "user_id"])
 
     def get_by_notable(self, notable_type: str, notable_id: int) -> List[Note]:
         """Fetch notes for a given entity, newest first."""
         try:
-            return (
-                Note.query
-                .filter_by(notable_type=notable_type, notable_id=notable_id)
-                .order_by(Note.created_at.desc())
-                .all()
-            )
+            return Note.query.filter_by(notable_type=notable_type, notable_id=notable_id).order_by(Note.created_at.desc()).all()
         except Exception as e:
             logger.error(f"❌ Error getting notes for {notable_type} id={notable_id}: {e}")
             raise
@@ -52,12 +47,7 @@ class NoteService(CRUDService):
         """
         try:
             pattern = f"%{term}%"
-            return (
-                Note.query
-                .filter(or_(Note.content.ilike(pattern), Note.user_id == term))
-                .order_by(Note.created_at.desc())
-                .all()
-            )
+            return Note.query.filter(or_(Note.content.ilike(pattern), Note.user_id == term)).order_by(Note.created_at.desc()).all()
         except Exception as e:
             logger.error(f"❌ Error searching notes for '{term}': {e}")
             raise

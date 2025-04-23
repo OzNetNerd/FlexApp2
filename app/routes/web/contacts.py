@@ -1,11 +1,12 @@
-from app.models.contact import Contact
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required
-from app.utils.app_logging import get_logger
+
+from app.models.contact import Contact
+from app.routes.web.context import EntityContext, TableContext
 from app.routes.web.context_utils import use_context
-from app.routes.web.context import TableContext, EntityContext
-from app.services.crud_service import CRUDService
 from app.routes.web.route_registration import default_crud_templates
+from app.services.crud_service import CRUDService
+from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
@@ -13,11 +14,13 @@ contacts_bp = Blueprint("contacts_bp", __name__, url_prefix="/contacts")
 contact_service = CRUDService(Contact)
 templates = default_crud_templates("Contact")
 
+
 @contacts_bp.route("/", methods=["GET"])
 @use_context(TableContext, entity_table_name="Contact", action="index")
 @login_required
 def index(context):
     return render_template(templates.index, **context.to_dict())
+
 
 @contacts_bp.route("/create", methods=["GET", "POST"])
 @use_context(EntityContext, entity_table_name="Contact", action="create")
@@ -33,11 +36,13 @@ def create(context):
             flash(str(e), "danger")
     return render_template(templates.create, **context.to_dict())
 
+
 @contacts_bp.route("/<int:entity_id>", methods=["GET"])
 @use_context(EntityContext, entity_table_name="Contact", action="view")
 @login_required
 def view(context, entity_id):
     return render_template(templates.view, **context.to_dict())
+
 
 @contacts_bp.route("/<int:entity_id>/edit", methods=["GET", "POST"])
 @use_context(EntityContext, entity_table_name="Contact", action="edit")
@@ -52,6 +57,7 @@ def edit(context, entity_id):
         except Exception as e:
             flash(str(e), "danger")
     return render_template(templates.edit, **context.to_dict())
+
 
 @contacts_bp.route("/<int:entity_id>/delete", methods=["POST"])
 @login_required

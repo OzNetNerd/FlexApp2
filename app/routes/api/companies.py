@@ -1,10 +1,11 @@
 # app/routes/api/companies.py
 
 from flask import Blueprint
-from app.utils.app_logging import get_logger
-from app.services.crud_service import CRUDService
+
 from app.models import Company
 from app.routes.api.route_registration import ApiCrudRouteConfig
+from app.services.crud_service import CRUDService
+from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
