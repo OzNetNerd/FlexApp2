@@ -1,52 +1,46 @@
-# api_router.py
-from flask import Flask
+# app/routes/api_router.py
 
-from app.routes.api.companies import companies_api_bp
-from app.routes.api.contacts import contacts_api_bp
-from app.routes.api.opportunities import opportunities_api_bp
-from app.routes.api.search import search_bp
-from app.routes.api.tasks import tasks_api_bp
-from app.routes.api.users import users_api_bp
-from app.routes.api.notes import notes_api_bp
-from app.routes.api.srs import srs_api_bp
-
+import pkgutil
+import importlib
+from typing import Iterator, Any
+from flask import Flask, Blueprint
 from app.utils.app_logging import get_logger
+from app.routes.api.route_registration import register_api_crud_routes
+
 logger = get_logger()
 
-# List of blueprints to register
-BLUEPRINTS = [
-    companies_api_bp,
-    contacts_api_bp,
-    opportunities_api_bp,
-    search_bp,
-    tasks_api_bp,
-    users_api_bp,
-    notes_api_bp,
-    srs_api_bp,
-]
+
+def discover_api_modules() -> Iterator[Any]:
+    """Yield all modules in the app.routes.api package."""
+    package = importlib.import_module('app.routes.api')
+    for finder, module_name, _ in pkgutil.iter_modules(package.__path__):
+        yield importlib.import_module(f'{package.__name__}.{module_name}')
 
 
 def register_api_blueprints(app: Flask) -> None:
-    """
-    Central function for registering all blueprints in the application.
+    """Auto-register API blueprints with their CRUD routes.
 
-    This function serves as the single point of registration for all blueprints
-    in the application. Each blueprint represents a distinct functional area or
-    feature set within the application. Adding new blueprints to this function
-    will make them available throughout the application.
+    1. Discover all `*_api_crud_config` in app.routes.api and call
+       register_api_crud_routes(config) on each blueprint.
+    2. Then discover all `*_api_bp` and register each Blueprint on the app.
 
     Args:
-        app (Flask): The Flask application instance to which blueprints will be registered
-
-    Returns:
-        None: This function modifies the app in-place and does not return a value
-
-    Example:
-        register_web_blueprints(app)
+        app (Flask): The Flask application.
     """
-    logger.info("Registering all web blueprints...")
+    modules = list(discover_api_modules())
 
-    # Loop through blueprints and register each one
-    for bp in BLUEPRINTS:
-        app.register_blueprint(bp)
-        logger.info(f"Blueprint '{bp.name}' registered successfully")
+    # 1) Wire up CRUD routes on each blueprint before any registration
+    for module in modules:
+        for attr in dir(module):
+            if attr.endswith('_api_crud_config'):
+                config = getattr(module, attr)
+                logger.debug(f'Wiring CRUD routes for {config.entity_table_name}')
+                register_api_crud_routes(config)
+
+    # 2) Now register the blueprints on the app
+    for module in modules:
+        for attr in dir(module):
+            if attr.endswith('_api_bp'):
+                bp = getattr(module, attr)  # type: Blueprint
+                logger.debug(f'Registering API blueprint: {bp.name}')
+                app.register_blueprint(bp)

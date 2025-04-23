@@ -112,16 +112,42 @@ def handle_api_crud_operation(
     return ErrorAPIContext(message="Invalid operation or missing required parameters", status_code=400)
 
 
-def register_api_route(blueprint: Blueprint, url: str, handler: Callable, endpoint: str, methods: Optional[List[str]] = None) -> Blueprint:
-    """Register an API route with the given blueprint."""
-    if methods is None:
-        methods = ["GET"]
+from typing import Callable, Optional, List, Tuple, Any
+from flask import Blueprint
+from flask.typing import ResponseReturnValue
 
-    logger.info(f"Registering API route '{endpoint}' at '{url}' with methods {methods}")
-    blueprint.add_url_rule(url, endpoint=endpoint, view_func=handler, methods=methods)
-    logger.info(f"Registered API route '{endpoint}' at '{url}'")
+def register_api_route(
+    blueprint: Blueprint,
+    url: str,
+    handler: Callable[..., ResponseReturnValue],
+    endpoint: str,
+    methods: Optional[List[str]] = None
+) -> Blueprint:
+    """Register a single route on an API blueprint.
 
+    Flask will namespace it as `<blueprint.name>.<endpoint>` when the blueprint
+    is registered on the app.
+
+    Args:
+        blueprint (Blueprint): The Flask Blueprint to register the route on.
+        url (str): The URL rule.
+        handler (Callable): The view function.
+        endpoint (str): Base endpoint name (e.g. "get_all").
+        methods (Optional[List[str]]): HTTP methods; defaults to ["GET"].
+
+    Returns:
+        Blueprint: The blueprint, for chaining.
+    """
+    methods = methods or ["GET"]
+    blueprint.add_url_rule(
+        rule=url,
+        endpoint=endpoint,           # no dot, use raw endpoint
+        view_func=handler,
+        methods=methods
+    )
     return blueprint
+
+
 
 
 def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:

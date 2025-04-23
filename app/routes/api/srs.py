@@ -1,80 +1,49 @@
-# app/routes/api/srs.py (Updated)
-from flask import Blueprint, jsonify, request
-
-from app.services.srs_service import SRSService
-from app.models.srs_item import SRSItem
-from app.routes.api.route_registration import register_api_crud_routes, ApiCrudRouteConfig
-
+from flask import Blueprint, request
+from typing import Dict, Any
 from app.utils.app_logging import get_logger
+from app.services.srs_service import SRSService
+from app.models import SRSItem
+from app.routes.api.route_registration import ApiCrudRouteConfig
+
 logger = get_logger()
 
 ENTITY_NAME = "SRSItem"
 ENTITY_PLURAL_NAME = "SRS"
 
-srs_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
+srs_api_bp = Blueprint(
+    f"{ENTITY_NAME.lower()}_api",
+    __name__,
+    url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}"
+)
+
 srs_service = SRSService()
 
-# Register all standard CRUD API routes
-srs_api_crud_config = ApiCrudRouteConfig(blueprint=srs_api_bp, entity_table_name=ENTITY_NAME, service=srs_service)
-register_api_crud_routes(srs_api_crud_config)
+srs_api_crud_config = ApiCrudRouteConfig(
+    blueprint=srs_api_bp,
+    entity_table_name=ENTITY_NAME,
+    service=srs_service
+)
 
-
-# Add custom endpoints for SRS-specific functionality
 @srs_api_bp.route("/due", methods=["GET"])
 def get_due_items():
-    """Get all items due for review."""
+    """Return all SRS items due for review."""
     items = srs_service.get_due_items()
-    return jsonify([item.to_dict() for item in items])
-
+    return {"due": [i.to_dict() for i in items]}
 
 @srs_api_bp.route("/<int:item_id>/preview", methods=["GET"])
-def preview_item_ratings(item_id):
-    """Preview the next review intervals for each possible rating."""
-    try:
-        preview_data = srs_service.preview_ratings(item_id)
-        # Return the raw preview_data directly, not wrapped in another dictionary
-        return jsonify(preview_data)
-    except Exception as e:
-        logger.error(f"Error previewing ratings for item {item_id}: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 400
-
+def preview_item_ratings(item_id: int) -> Dict[str, Any]:
+    """Show how long this card would be buried for each rating (0–5)."""
+    return srs_service.preview_ratings(item_id)
 
 @srs_api_bp.route("/<int:item_id>/review", methods=["POST"])
-def review_item(item_id):
-    """Process a review for an SRS item."""
-    data = request.get_json()
-    if not data or "rating" not in data:
-        return jsonify({"success": False, "error": "Missing rating parameter"}), 400
-
-    try:
-        # Get the rating from the request
-        rating = int(data["rating"])
-
-        # The FSRS library only accepts ratings 0-4, but our UI goes to 5
-        # Map rating 5 to 4 if needed
-        fsrs_rating = min(rating, 4)
-
-        # Pass the adjusted rating to the service
-        item = srs_service.schedule_review(item_id, fsrs_rating)
-
-        return jsonify({
-            "success": True,
-            "item": item.to_dict(),
-            "next_review_at": item.next_review_at.isoformat()
-        })
-    except Exception as e:
-        logger.error(f"Error processing review for item {item_id}: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 400
-
+def review_item(item_id: int) -> Dict[str, Any]:
+    """Submit a rating (0–5) and update the SRS schedule for that item."""
+    data = request.get_json() or {}
+    rating = int(data.get("rating", 0))
+    item = srs_service.schedule_review(item_id, rating)
+    return item.to_dict()
 
 @srs_api_bp.route("/items", methods=["GET"])
 def get_all_items():
-    """Get all SRS items."""
-    items = SRSItem.query.all()
-    return jsonify([item.to_dict() for item in items])
+    """List all SRS items (for admin/debug)."""
+    return {"items": [i.to_dict() for i in SRSItem.query.all()]}
