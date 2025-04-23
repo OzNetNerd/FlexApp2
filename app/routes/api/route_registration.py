@@ -1,13 +1,17 @@
-# api/route_registration.py
+# app/routes/api/route_registration.py
 
+import pkgutil
+import importlib
 from typing import Callable, List, Optional, Any, Dict, Tuple, Union
 from dataclasses import dataclass
 from enum import Enum
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
+from flask.typing import ResponseReturnValue
+from werkzeug.exceptions import HTTPException
 
+from app.routes.api.json_utils import json_endpoint
 from app.utils.table_helpers import get_table_plural_name
 from app.routes.api.context import ListAPIContext, EntityAPIContext, ErrorAPIContext
-
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
@@ -20,212 +24,129 @@ class CRUDEndpoint(Enum):
     UPDATE = "update"
     DELETE = "delete"
 
-    @classmethod
-    def is_valid(cls, endpoint: str) -> bool:
-        return any(endpoint == item.value for item in cls)
-
 
 @dataclass
 class ApiCrudRouteConfig:
     """Configuration for API CRUD routes."""
-
     blueprint: Blueprint
     entity_table_name: str
     service: Any
     include_routes: Optional[List[str]] = None
 
 
-def json_response(context: Any, status_code: int = 200) -> Tuple[Any, int]:
-    """Convert a context object to a JSON response with proper status code."""
-    if hasattr(context, "to_dict"):
-        data = context.to_dict()
-    elif isinstance(context, dict):
-        data = context
-    else:
-        data = {"data": str(context)}
-
-    # If it's an error context, use its status code
-    if hasattr(context, "status_code"):
-        status_code = context.status_code
-
-    return jsonify(data), status_code
-
-
 def handle_api_crud_operation(
-    endpoint: str, service: Any, entity_table_name: str, entity_id: Optional[Union[str, int]] = None, data: Optional[Dict[str, Any]] = None
+    endpoint: str,
+    service: Any,
+    entity_table_name: str,
+    entity_id: Optional[Union[int, str]] = None,
+    data: Optional[Dict[str, Any]] = None,
 ) -> Any:
-    """Handle CRUD operations based on endpoint type."""
-    if not service:
-        logger.error(f"No service available for {endpoint}")
-        return ErrorAPIContext(message="Service not available for this operation", status_code=500)
-
+    """
+    Handle CRUD operations based on endpoint type and return a Context object.
+    """
     try:
         if endpoint == CRUDEndpoint.GET_ALL.value:
-            query_result = service.get_all()
+            result = service.get_all()
+            if hasattr(result, 'items'):
+                return ListAPIContext(
+                    entity_table_name=entity_table_name,
+                    items=result.items,
+                    total_count=getattr(result, 'total', None)
+                )
+            return ListAPIContext(entity_table_name=entity_table_name, items=result)
 
-            # Handle pagination objects by extracting items and total_count
-            if hasattr(query_result, "items"):
-                items = query_result.items
-                total_count = getattr(query_result, "total_count", None)
-            else:
-                items = query_result
-                total_count = None
-
-            # Create the context with extracted items
-            return ListAPIContext(entity_table_name=entity_table_name, items=items, total_count=total_count)
-
-        elif endpoint == CRUDEndpoint.GET_BY_ID.value and entity_id:
+        if endpoint == CRUDEndpoint.GET_BY_ID.value and entity_id is not None:
             entity = service.get_by_id(entity_id)
             if not entity:
                 return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
             return EntityAPIContext(entity_table_name=entity_table_name, entity=entity)
 
-        elif endpoint == CRUDEndpoint.CREATE.value and data:
-            result = service.create(data)
-            if isinstance(result, dict) and result.get("error"):
-                return ErrorAPIContext(message=result.get("error"), status_code=400)
-            return EntityAPIContext(entity_table_name=entity_table_name, entity=result, message=f"{entity_table_name} created successfully")
+        if endpoint == CRUDEndpoint.CREATE.value and data is not None:
+            entity = service.create(data)
+            return EntityAPIContext(
+                entity_table_name=entity_table_name,
+                entity=entity,
+                message=f"{entity_table_name} created successfully",
+            )
 
-        elif endpoint == CRUDEndpoint.UPDATE.value and entity_id and data:
-            entity = service.get_by_id(entity_id)
-            if not entity:
+        if endpoint == CRUDEndpoint.UPDATE.value and entity_id is not None and data is not None:
+            existing = service.get_by_id(entity_id)
+            if not existing:
                 return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
+            entity = service.update(existing, data)
+            return EntityAPIContext(
+                entity_table_name=entity_table_name,
+                entity=entity,
+                message=f"{entity_table_name} updated successfully",
+            )
 
-            result = service.update(entity, data)
-            if isinstance(result, dict) and result.get("error"):
-                return ErrorAPIContext(message=result.get("error"), status_code=400)
-            return EntityAPIContext(entity_table_name=entity_table_name, entity=result, message=f"{entity_table_name} updated successfully")
-
-        elif endpoint == CRUDEndpoint.DELETE.value and entity_id:
-            entity = service.get_by_id(entity_id)
-            if not entity:
+        if endpoint == CRUDEndpoint.DELETE.value and entity_id is not None:
+            existing = service.get_by_id(entity_id)
+            if not existing:
                 return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
-
-            result = service.delete(entity_id)
-            if isinstance(result, dict) and result.get("error"):
-                return ErrorAPIContext(message=result.get("error"), status_code=400)
+            service.delete(entity_id)
             return {"message": f"{entity_table_name} deleted successfully"}
 
+        return ErrorAPIContext(message="Invalid operation or parameters", status_code=400)
     except Exception as e:
-        logger.error(f"Error in API operation: {e}", exc_info=True)
-        return ErrorAPIContext(message=f"Error processing request: {str(e)}", status_code=500)
-
-    return ErrorAPIContext(message="Invalid operation or missing required parameters", status_code=400)
-
-
-from typing import Callable, Optional, List, Tuple, Any
-from flask import Blueprint
-from flask.typing import ResponseReturnValue
+        logger.error(f"Error in API CRUD operation '{endpoint}': {e}", exc_info=True)
+        return ErrorAPIContext(message="Internal server error", status_code=500)
 
 
 def register_api_route(
-    blueprint: Blueprint, url: str, handler: Callable[..., ResponseReturnValue], endpoint: str, methods: Optional[List[str]] = None
-) -> Blueprint:
-    """Register a single route on an API blueprint.
-
-    Flask will namespace it as `<blueprint.name>.<endpoint>` when the blueprint
-    is registered on the app.
-
-    Args:
-        blueprint (Blueprint): The Flask Blueprint to register the route on.
-        url (str): The URL rule.
-        handler (Callable): The view function.
-        endpoint (str): Base endpoint name (e.g. "get_all").
-        methods (Optional[List[str]]): HTTP methods; defaults to ["GET"].
-
-    Returns:
-        Blueprint: The blueprint, for chaining.
-    """
-    methods = methods or ["GET"]
-    blueprint.add_url_rule(rule=url, endpoint=endpoint, view_func=handler, methods=methods)  # no dot, use raw endpoint
-    return blueprint
+    blueprint: Blueprint,
+    url: str,
+    handler: Callable[..., ResponseReturnValue],
+    endpoint: str,
+    methods: Optional[List[str]] = None
+) -> None:
+    """Register a single route on an API blueprint."""
+    blueprint.add_url_rule(rule=url, endpoint=endpoint, view_func=handler, methods=methods or ['GET'])
 
 
 def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:
-    """Register CRUD API routes based on configuration."""
-    logger.info("Starting registration of API CRUD routes.")
+    """Register CRUD API routes based on configuration, all wrapped with @json_endpoint."""
+    logger.info(f"Registering CRUD routes for {config.entity_table_name}")
 
-    blueprint = config.blueprint
-    entity_table_name = config.entity_table_name
-    service = config.service
+    bp = config.blueprint
+    entity = config.entity_table_name
+    svc = config.service
+    include = config.include_routes or [e.value for e in CRUDEndpoint]
 
-    if not isinstance(entity_table_name, str):
-        logger.error("Invalid entity_table_name type; expected a string.")
-        raise ValueError("The 'entity_table_name' must be a string.")
+    for action in include:
+        if action not in [e.value for e in CRUDEndpoint]:
+            continue
 
-    logger.info(f"Entity table name is valid: {entity_table_name}")
+        # Define URL and HTTP methods
+        if action == CRUDEndpoint.GET_ALL.value:
+            url = "/"
+            methods = ['GET']
+            func = lambda: handle_api_crud_operation(action, svc, entity)
+        elif action == CRUDEndpoint.GET_BY_ID.value:
+            url = "/<int:entity_id>"
+            methods = ['GET']
+            func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id)
+        elif action == CRUDEndpoint.CREATE.value:
+            url = "/"
+            methods = ['POST']
+            func = lambda: handle_api_crud_operation(action, svc, entity, data=request.get_json())
+        elif action == CRUDEndpoint.UPDATE.value:
+            url = "/<int:entity_id>"
+            methods = ['PUT']
+            func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id, data=request.get_json())
+        elif action == CRUDEndpoint.DELETE.value:
+            url = "/<int:entity_id>"
+            methods = ['DELETE']
+            func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id)
+        else:
+            continue
 
-    include_routes = config.include_routes or ["get_all", "get_by_id", "create", "update", "delete"]
+        # Wrap the handler with json_endpoint
+        handler = json_endpoint(func)
+        handler.__name__ = action
 
-    logger.info(f"Routes to include: {include_routes}")
+        # Register the route
+        register_api_route(bp, url, handler, endpoint=action, methods=methods)
+        logger.info(f"Registered API route {action} @ {url}")
 
-    entity_table_plural_name = get_table_plural_name(entity_table_name)
-    logger.info(f"Plural name for the entity table '{entity_table_name}': {entity_table_plural_name}")
-
-    # Configure all route handlers
-    route_configs = {
-        "get_all": {
-            "url": "/",
-            "methods": ["GET"],
-            "handler": lambda: json_response(handle_api_crud_operation(CRUDEndpoint.GET_ALL.value, service, entity_table_name)),
-        },
-        "get_by_id": {
-            "url": "/<int:entity_id>",
-            "methods": ["GET"],
-            "handler": lambda entity_id: json_response(
-                handle_api_crud_operation(CRUDEndpoint.GET_BY_ID.value, service, entity_table_name, entity_id)
-            ),
-        },
-        "create": {
-            "url": "/",
-            "methods": ["POST"],
-            "handler": lambda: json_response(
-                handle_api_crud_operation(CRUDEndpoint.CREATE.value, service, entity_table_name, data=request.get_json()), 201
-            ),
-        },
-        "update": {
-            "url": "/<int:entity_id>",
-            "methods": ["PUT"],
-            "handler": lambda entity_id: json_response(
-                handle_api_crud_operation(CRUDEndpoint.UPDATE.value, service, entity_table_name, entity_id, data=request.get_json())
-            ),
-        },
-        "delete": {
-            "url": "/<int:entity_id>",
-            "methods": ["DELETE"],
-            "handler": lambda entity_id: json_response(
-                handle_api_crud_operation(CRUDEndpoint.DELETE.value, service, entity_table_name, entity_id)
-            ),
-        },
-    }
-
-    # Register routes based on configuration
-    for route_type in [r for r in include_routes if r in route_configs]:
-        config = route_configs[route_type]
-        logger.info(f"Processing registration for API route type: '{route_type}'")
-
-        # Create a route handler with proper closure
-        def create_handler(handler_func):
-            def wrapped_handler(*args, **kwargs):
-                try:
-                    return handler_func(*args, **kwargs)
-                except Exception as e:
-                    logger.error(f"Error in API handler: {e}", exc_info=True)
-                    return json_response(ErrorAPIContext(message=f"Internal server error: {str(e)}", status_code=500))
-
-            # Ensure the handler has the correct name for Flask
-            wrapped_handler.__name__ = route_type
-            return wrapped_handler
-
-        register_api_route(
-            blueprint=blueprint,
-            url=config["url"],
-            handler=create_handler(config["handler"]),
-            endpoint=route_type,
-            methods=config["methods"],
-        )
-
-        logger.info(f"Successfully registered API route '{route_type}'.")
-
-    logger.info("API CRUD route registration completed successfully.")
-    return blueprint
+    return bp
