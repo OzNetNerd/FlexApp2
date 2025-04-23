@@ -1,13 +1,13 @@
 # services/note_service.py
 
-import logging
 from typing import Dict, Any, List, Optional, Union
 from datetime import datetime, timedelta
 from sqlalchemy import or_
 from app.models import Note
 from app.services.crud_service import CRUDService
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class NoteService(CRUDService):

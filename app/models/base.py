@@ -2,9 +2,9 @@
 
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-import logging
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 # Initialize SQLAlchemy instance to be shared across models
 db = SQLAlchemy()

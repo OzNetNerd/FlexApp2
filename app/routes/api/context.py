@@ -1,9 +1,9 @@
 # api/context.py
 
-import logging
 from typing import Any, Optional, Dict, List
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class APIContext:

@@ -1,10 +1,10 @@
-import logging
 from flask_login import UserMixin
 from app.models.base import db, BaseModel
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.relationship import Relationship
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class User(BaseModel, UserMixin):

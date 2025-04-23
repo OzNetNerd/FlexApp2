@@ -1,9 +1,9 @@
 # app/routes/home.py
-import logging
 from flask import Blueprint
 from app.routes.web.route_registration import register_route, SimpleContext
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 # Define the blueprint
 home_bp = Blueprint("home_bp", __name__, url_prefix="/")

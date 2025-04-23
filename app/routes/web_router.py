@@ -1,6 +1,5 @@
 # web_router.py
 
-import logging
 from flask import Flask, Blueprint
 
 from app.routes.web.companies import companies_bp
@@ -14,9 +13,8 @@ from app.routes.web.home import home_bp
 from app.routes.web.srs import srs_bp
 
 # Register the blueprint with your Flask app
-
-
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 # Define blueprints with original names for template compatibility

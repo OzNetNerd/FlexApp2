@@ -1,13 +1,13 @@
 # web/context.py
 
-import logging
 from flask import url_for
 from flask_login import current_user
 from app.utils.table_helpers import get_table_plural_name, get_table_id_by_name
 from app.utils.app_logging import log_instance_vars
 from typing import Any, Optional, List
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class BaseContext:

@@ -1,12 +1,10 @@
 # contact.py
 
-import logging
 from app.models.base import db, BaseModel
 from app.models.relationship import Relationship  # reuse the generic Relationship model
-from sqlalchemy.orm import foreign
 
-logger = logging.getLogger(__name__)
-
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 class Contact(BaseModel):
     __tablename__ = "contacts"

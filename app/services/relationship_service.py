@@ -1,6 +1,5 @@
 # app/services/relationship_service.py
 
-import logging
 from typing import List, Tuple, Dict, Any, Optional
 from app.models.base import db
 from app.models.relationship import Relationship
@@ -8,7 +7,8 @@ from app.models.user import User
 from app.models.contact import Contact
 from app.models.company import Company
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class RelationshipService:

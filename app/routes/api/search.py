@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify
 from app.models import User, Company, Opportunity
-import logging
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 search_bp = Blueprint("search_bp", __name__, url_prefix="/api/search")
+
 
 
 @search_bp.route("/")

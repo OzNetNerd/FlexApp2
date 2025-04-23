@@ -1,12 +1,12 @@
 # app/routes/auth.py
 
-import logging
 from flask import Blueprint
 from app.routes.web.route_registration import register_auth_route
 from app.services.auth import AuthService
 from app.models.user import User
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 # Define the blueprint
 auth_bp = Blueprint("auth_bp", __name__, url_prefix="/auth")

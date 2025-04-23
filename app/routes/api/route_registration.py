@@ -1,6 +1,5 @@
 # api/route_registration.py
 
-import logging
 from typing import Callable, List, Optional, Any, Dict, Tuple, Union
 from dataclasses import dataclass
 from enum import Enum
@@ -9,7 +8,8 @@ from flask import Blueprint, request, jsonify
 from app.utils.table_helpers import get_table_plural_name
 from app.routes.api.context import ListAPIContext, EntityAPIContext, ErrorAPIContext
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class CRUDEndpoint(Enum):

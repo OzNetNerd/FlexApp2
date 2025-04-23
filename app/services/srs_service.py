@@ -1,6 +1,5 @@
 # srs_service.py
 
-import logging
 from datetime import datetime, timedelta, UTC
 
 # Updated imports based on py-fsrs documentation
@@ -10,7 +9,8 @@ from app.services.crud_service import CRUDService
 from app.models.srs_item import SRSItem
 from app.models.review_history import ReviewHistory
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class SRSService(CRUDService):

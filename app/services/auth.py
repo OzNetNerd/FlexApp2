@@ -1,14 +1,11 @@
 # app/services/auth.py
 
-import logging
 from flask import request, redirect, url_for, flash, session, render_template
 from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash
-from app.routes.web.components.template_renderer import render_safely, RenderSafelyConfig
-from app.routes.web.context import BaseContext
 
-logger = logging.getLogger(__name__)
-
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 class AuthService:
     def __init__(self, model):

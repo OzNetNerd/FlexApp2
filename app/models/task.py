@@ -1,8 +1,8 @@
-import logging
 from app.models.base import db, BaseModel
 from datetime import datetime
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class Task(BaseModel):

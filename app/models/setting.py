@@ -1,8 +1,8 @@
-import logging
 from sqlalchemy import inspect
 from app.models.base import db, BaseModel
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class Setting(BaseModel):

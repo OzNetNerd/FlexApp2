@@ -1,12 +1,12 @@
 # api/users.py
 
-import logging
 from flask import Blueprint
 from app.routes.api.route_registration import register_api_crud_routes, ApiCrudRouteConfig
 from app.models import User
 from app.services.user_service import UserService
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 ENTITY_NAME = "User"
 ENTITY_PLURAL_NAME = "Users"

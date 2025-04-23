@@ -1,11 +1,11 @@
 # routes/web/contacts.py
-import logging
 from flask import Blueprint
 from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig, CrudTemplates
 from app.services.crud_service import CRUDService
 from app.models.contact import Contact
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 # Define the blueprint
 contacts_bp = Blueprint("contacts_bp", __name__, url_prefix="/contacts")

@@ -2,10 +2,10 @@ from app.app import create_app
 from app.models import db, User, Company, Contact, CapabilityCategory, Capability, CompanyCapability, Opportunity, Task, Note
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
-import logging
 from datetime import datetime
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 def create_or_update(model, match_by: dict, data: dict):

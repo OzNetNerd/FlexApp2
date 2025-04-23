@@ -1,4 +1,3 @@
-import logging
 from typing import Any, List, Optional, Callable, Set
 from dataclasses import dataclass, field
 from abc import ABC
@@ -6,9 +5,8 @@ from enum import Enum
 
 from flask import request
 
-from app.utils.app_logging import log_instance_vars
-
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import log_instance_vars, get_logger
+logger = get_logger()
 
 
 class PageType(Enum):

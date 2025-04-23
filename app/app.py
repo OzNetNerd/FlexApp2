@@ -1,12 +1,6 @@
 # app.py
-
-import logging
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-
-logger = logging.getLogger(__name__)
-logger.info("Starting application initialization")
-
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 from datetime import datetime
 from flask import Flask, request, redirect, url_for, make_response, current_app

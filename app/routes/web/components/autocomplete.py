@@ -2,9 +2,8 @@
 from typing import List
 from dataclasses import dataclass
 
-import logging
-
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 @dataclass

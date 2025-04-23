@@ -1,7 +1,5 @@
-import logging
-
-# Use the same logger as the Flask app
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 # Import base first to initialize db
 from .base import db

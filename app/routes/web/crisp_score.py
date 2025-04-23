@@ -1,9 +1,9 @@
-import logging
 from flask import Blueprint, request, redirect, flash, url_for
 from flask_login import login_required
 from app.models import db, CRISPScore, Relationship
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 # Define blueprint with explicit prefix
 crisp_scores_bp = Blueprint("crisp_scores_bp", __name__, url_prefix="/crisp_scores")

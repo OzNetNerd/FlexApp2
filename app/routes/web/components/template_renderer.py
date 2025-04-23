@@ -2,7 +2,6 @@
 
 from typing import Union, Tuple, Dict, Any
 import traceback
-import logging
 import json
 import inspect
 
@@ -20,7 +19,8 @@ from dataclasses import dataclass
 
 from app.routes.web.context import BaseContext
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 @dataclass

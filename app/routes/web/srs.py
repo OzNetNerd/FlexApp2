@@ -1,6 +1,5 @@
 # web/srs.py
 
-import logging
 from datetime import datetime
 from flask import Blueprint, flash, redirect, url_for
 from flask_login import login_required
@@ -17,7 +16,8 @@ from app.services.srs_service import SRSService
 from app.models.srs_item import SRSItem
 from app.models.review_history import ReviewHistory
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 srs_bp = Blueprint("srs_bp", __name__, url_prefix="/srs")
 srs_service = SRSService()

@@ -1,13 +1,13 @@
 # services/crud_service.py
 
-import logging
 import traceback
 from typing import Type, Any
 from datetime import datetime
 from app.models.base import db
 from app.models.mixins import ValidatorMixin
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class CRUDService:

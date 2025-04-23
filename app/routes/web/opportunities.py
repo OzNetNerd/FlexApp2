@@ -1,10 +1,10 @@
-import logging
 from flask import Blueprint
 from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig, CrudTemplates
 from app.services.crud_service import CRUDService
 from app.models.opportunity import Opportunity
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 # Define the blueprint
 opportunities_bp = Blueprint("opportunities_bp", __name__, url_prefix="/opportunities")

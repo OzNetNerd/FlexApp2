@@ -1,7 +1,7 @@
-import logging
 from app.services.relationship_service import RelationshipService
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 def get_relationships(entity, entity_type="user"):

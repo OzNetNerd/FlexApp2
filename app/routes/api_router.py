@@ -1,6 +1,4 @@
 # api_router.py
-
-import logging
 from flask import Flask
 
 from app.routes.api.companies import companies_api_bp
@@ -12,7 +10,8 @@ from app.routes.api.users import users_api_bp
 from app.routes.api.notes import notes_api_bp
 from app.routes.api.srs import srs_api_bp
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 # List of blueprints to register
 BLUEPRINTS = [

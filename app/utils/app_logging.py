@@ -1,80 +1,26 @@
 import logging
 import inspect
 import time
-import uuid
-import re
-import sys
 from jinja2 import DebugUndefined
 
 logger = logging.getLogger(__name__)
 
 REQUEST_IDS = {}
 
+def get_logger() -> logging.Logger:
+    """Return a logger named for the calling module.
 
-# def configure_logging(level=logging.INFO) -> logging.Logger:
-#     """Sets up and returns a custom logger with filters and console output."""
-#     logger.setLevel(level)
-#
-#     if not logger.handlers:
-#         handler = logging.StreamHandler(sys.stdout)
-#         formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s.%(funcName)s: %(message)s")
-#         handler.setFormatter(formatter)
-#         logger.addHandler(handler)
-#
-#     # Add filters
-#     logger.addFilter(RequestIDFilter())
-#     logger.addFilter(EmojiLogFilter())
-#     logger.propagate = False
-#
-#     logger.info("✅ Logging is configured.")
-#     return logger
-#
-#
-# class RequestIDFilter(logging.Filter):
-#     """Filter that adds request ID and Flask request context to log records."""
-#
-#     def filter(self, record):
-#         try:
-#             from flask import request, has_request_context
-#
-#             if has_request_context():
-#                 if id(request) not in REQUEST_IDS:
-#                     REQUEST_IDS[id(request)] = str(uuid.uuid4())[:8]
-#                 record.request_id = REQUEST_IDS[id(request)]
-#                 record.request_method = request.method
-#                 record.request_path = request.path
-#                 record.msg = f"[{record.request_id}] {record.msg}"
-#             else:
-#                 record.request_id = "-"
-#         except Exception:
-#             record.request_id = "-"
-#         return True
-#
-#
-# class EmojiLogFilter(logging.Filter):
-#     """Adds emojis based on known message patterns."""
-#
-#     def filter(self, record):
-#         if record.msg and isinstance(record.msg, str):
-#             if re.match(r"^\s*[^\w\s]", record.msg):
-#                 return True
-#
-#             msg = record.msg.strip()
-#
-#             if msg.startswith("Registering"):
-#                 record.msg = f"🔧 {record.msg}"
-#             elif msg.startswith("Registered"):
-#                 record.msg = f"✅ {record.msg}"
-#             elif msg.startswith("Successfully"):
-#                 record.msg = f"✅ {record.msg}"
-#             elif msg.startswith("Set"):
-#                 record.msg = f"🔠 {record.msg}"
-#             elif msg.startswith("Initializing"):
-#                 record.msg = f"🔧 {record.msg}"
-#             elif msg.startswith("Web Request"):
-#                 record.msg = f"📥 {record.msg}"
-#
-#         return True
+    Inspects the call stack to determine the module name of the caller
+    and returns a logger instance with that name.
+
+    Returns:
+        Logger: A configured Python logger for the caller's module.
+    """
+    # Look one frame up to find who called us
+    frame = inspect.currentframe().f_back
+    module = inspect.getmodule(frame)
+    name = module.__name__ if module and hasattr(module, "__name__") else __name__
+    return logging.getLogger(name)
 
 
 def log_instance_vars(instance_details, instance, exclude: list[str] = None) -> None:

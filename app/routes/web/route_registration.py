@@ -1,7 +1,6 @@
 # web/route_registration.py
 
 import jinja2.exceptions
-import logging
 from typing import Callable, List, Optional, Any, Dict, Tuple
 from dataclasses import dataclass
 from enum import Enum
@@ -10,7 +9,8 @@ from flask import Blueprint, request, flash, redirect, url_for, render_template
 from app.utils.table_helpers import get_table_plural_name
 from app.routes.web.context import BaseContext, SimpleContext, EntityContext, TableContext
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class CRUDEndpoint(Enum):

@@ -1,14 +1,17 @@
 # create_db.py
 
 import os
-import logging
 from flask import current_app
 from app.app import create_app
 from werkzeug.security import generate_password_hash
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# # Configure logging
+# import logging
+# logging.basicConfig(level=logging.INFO)
+# logger = logging.getLogger(__name__)
+
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 def init_db(app):

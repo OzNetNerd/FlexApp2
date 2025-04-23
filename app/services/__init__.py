@@ -1,6 +1,5 @@
-import logging
-
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 # Log that the modules have been imported and initialized
 logger.info("Initializing services module.")

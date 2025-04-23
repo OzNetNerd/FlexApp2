@@ -1,7 +1,6 @@
 # api/notes.py
 
-import logging
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from datetime import datetime, timedelta
 from sqlalchemy import and_, or_
 from app.routes.api.route_registration import register_api_crud_routes, ApiCrudRouteConfig
@@ -11,7 +10,8 @@ from app.models import Note
 # Import CRUDService directly and initialize it here to avoid circular imports
 from app.services.crud_service import CRUDService
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 ENTITY_NAME = "Note"
 ENTITY_PLURAL_NAME = "Notes"

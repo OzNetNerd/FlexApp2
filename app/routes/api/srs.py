@@ -1,13 +1,12 @@
 # app/routes/api/srs.py (Updated)
-
-import logging
 from flask import Blueprint, jsonify, request
 
 from app.services.srs_service import SRSService
 from app.models.srs_item import SRSItem
 from app.routes.api.route_registration import register_api_crud_routes, ApiCrudRouteConfig
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 ENTITY_NAME = "SRSItem"
 ENTITY_PLURAL_NAME = "SRS"

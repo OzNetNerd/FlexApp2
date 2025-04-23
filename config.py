@@ -1,27 +1,31 @@
 import os
 import pathlib
-import logging
+
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 # Get the absolute path to the root directory
 BASE_DIR = pathlib.Path(__file__).parent.absolute()
 
 # Configure logger to ensure it outputs to console
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# import logging
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
+
 
 # Create a console handler and set level to debug
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
+# console_handler = logging.StreamHandler()
+# console_handler.setLevel(logging.DEBUG)
 
 # Create a formatter and add it to the handler
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-console_handler.setFormatter(formatter)
+# formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+# console_handler.setFormatter(formatter)
 
 # Add the handler to the logger
-logger.addHandler(console_handler)
+# logger.addHandler(console_handler)
 
 # Log the base directory
-logger.debug(f"Base directory set to: {BASE_DIR}")
+# logger.debug(f"Base directory set to: {BASE_DIR}")
 
 
 class Config:

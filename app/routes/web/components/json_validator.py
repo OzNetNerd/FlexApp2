@@ -1,8 +1,8 @@
 import json
-import logging
 from typing import Dict, Any, List
 
-logger = logging.getLogger(__name__)
+from app.utils.app_logging import get_logger
+logger = get_logger()
 
 
 class JSONValidator:
