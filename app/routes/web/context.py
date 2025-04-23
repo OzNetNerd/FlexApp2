@@ -1,5 +1,3 @@
-# web/context.py
-
 from typing import Any, List, Optional
 
 from flask import url_for
@@ -41,7 +39,7 @@ class BaseContext:
         # Set each keyword argument as an attribute on the instance.
         for key, value in kwargs.items():
             setattr(self, key, value)
-            logger.info(f"Set attribute '{key}' = {value}")
+            logger.info(f"Set attribute {key!r} = {value!r}")
 
     def __repr__(self):
         """Return a detailed string representation of the context."""
@@ -50,7 +48,7 @@ class BaseContext:
 
     def __str__(self):
         """Return a user-friendly string representation of the context."""
-        return f"{self.__class__.__name__}(title='{self.title}', attrs={len(vars(self))})"
+        return f"{self.__class__.__name__}(title={self.title!r}, attrs={len(vars(self))})"
 
     def to_dict(self):
         """Convert context to dictionary for template rendering."""
@@ -68,36 +66,32 @@ class TableContext(SimpleContext):
     """Context class for rendering table views with table-specific attributes."""
 
     def __init__(self, entity_table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = None, **kwargs):
-
-        # Add table-specific attributes
         self.entity_table_name = entity_table_name
         self.read_only = read_only
         self.action = action
 
         if title:
             self.title = title
-            logger.info(f"title was provided. Set self.title to: {self.title}")
+            logger.info(f"title was provided. Set self.title to: {self.title!r}")
         else:
             self.title = f"{self.action} {self.entity_table_name}" if self.action else self.entity_table_name
-            logger.info(f"title was not provided. Set self.title to table name: {self.title}")
+            logger.info(f"title was not provided. Set self.title to table name: {self.title!r}")
 
-        # Initialize the base SimpleContext
         super().__init__(title=self.title, **kwargs)
 
         lower_entity_table_name = self.entity_table_name.lower()
-        logger.info(f"Set lower table name: {lower_entity_table_name}")
+        logger.info(f"Set lower table name: {lower_entity_table_name!r}")
 
-        # Set the table_id using the provided entity_table_name
         self.table_id = get_table_id_by_name(self.entity_table_name)
-        logger.info(f"Set attribute table_id = {self.table_id} (from {self.entity_table_name})")
+        logger.info(f"Set attribute table_id = {self.table_id!r} (from {self.entity_table_name!r})")
 
         plural_entity_table_name = get_table_plural_name(self.entity_table_name)
         self.data_api_url = f"/api/{plural_entity_table_name}"
-        logger.info(f"Set attribute data_url = {self.data_api_url} (from table_name = {self.entity_table_name})")
+        logger.info(f"Set attribute data_url = {self.data_api_url!r} (from table_name = {self.entity_table_name!r})")
 
     def __str__(self):
         """Return a user-friendly string representation focusing on table attributes."""
-        return f"TableContext(entity_table_name='{self.entity_table_name}', table_id={self.table_id}, title='{self.title}')"
+        return f"TableContext(entity_table_name={self.entity_table_name!r}, table_id={self.table_id}, title={self.title!r})"
 
 
 class EntityContext(BaseContext):
@@ -115,13 +109,11 @@ class EntityContext(BaseContext):
         entity_id: Any = None,
         **kwargs,
     ):
-        """Initialize the context with proper parent class handling."""
-        # Pass both entity_table_name and table_name so BaseContext can set defaults correctly
         super().__init__(
-            title=title, show_navbar=True, read_only=read_only, entity_table_name=entity_table_name, table_name=entity_table_name, **kwargs
+            title=title, show_navbar=True, read_only=read_only,
+            entity_table_name=entity_table_name, table_name=entity_table_name, **kwargs
         )
 
-        # Set instance attributes
         self.autocomplete_fields = autocomplete_fields or []
         self.error_message = error_message
         self.title = title or action
@@ -133,23 +125,18 @@ class EntityContext(BaseContext):
         self.entity_table_name = entity_table_name
         self.entity_id = entity_id
 
-        # Derived fields initialized in __init__
         self.tabs = []
         self.entity_name = ""
         self.submit_url = ""
         self.id = ""
         self.model_name = ""
 
-        # Set derived fields
         self._initialize_derived_fields()
 
     def __str__(self):
-        """Return a user-friendly string representation focusing on key entity attributes."""
-        return f"EntityContext(model='{self.model_name}', action='{self.action}', entity='{self.entity_name}')"
+        return f"EntityContext(model={self.model_name!r}, action={self.action!r}, entity={self.entity_name!r})"
 
     def __repr__(self):
-        """Return a detailed string representation of the entity context."""
-        # Include important fields first, then all others
         primary_attrs = {
             "model_name": self.model_name,
             "action": self.action,
@@ -158,13 +145,10 @@ class EntityContext(BaseContext):
             "id": self.id,
         }
 
-        # Format primary attributes
         primary_str = ", ".join(f"{key}={repr(value)}" for key, value in primary_attrs.items())
 
-        # Get all other attributes (excluding private ones)
         other_attrs = {key: value for key, value in vars(self).items() if not key.startswith("_") and key not in primary_attrs}
 
-        # Add summary of complex attributes
         if self.autocomplete_fields:
             other_attrs["autocomplete_fields"] = f"[{len(self.autocomplete_fields)} fields]"
         if self.tabs:
@@ -174,10 +158,8 @@ class EntityContext(BaseContext):
         elif self.entity:
             other_attrs["entity"] = f"<{type(self.entity).__name__}>"
 
-        # Format other attributes
         other_str = ", ".join(f"{key}={repr(value)}" for key, value in other_attrs.items())
 
-        # Combine both parts
         full_repr = f"EntityContext({primary_str}"
         if other_str:
             full_repr += f", {other_str}"
@@ -185,63 +167,46 @@ class EntityContext(BaseContext):
 
         return full_repr
 
-    # Fix for EntityContext._initialize_derived_fields in context.py
-
     def _initialize_derived_fields(self):
-        """Initialize derived fields."""
-        # Use entity_table_name for model_name if available, otherwise use class name
         self.model_name = self.entity_table_name or self.__class__.__name__
         self.id = str(getattr(self, "entity_id", ""))
-
-        # Set entity_class_name for template use
         self.entity_class_name = self.model_name
 
-        # Get blueprint_name from kwargs if available
         blueprint_name = getattr(self, "blueprint_name", "")
 
-        # Create entity_dict from entity if available
         entity_dict = {}
         if self.entity:
-            # Convert entity to dictionary if it's not already
             if isinstance(self.entity, dict):
                 entity_dict = self.entity
             elif hasattr(self.entity, "__dict__"):
-                # For ORM models or objects with __dict__
                 entity_dict = {k: v for k, v in self.entity.__dict__.items() if not k.startswith("_")}
             elif hasattr(self.entity, "to_dict"):
-                # For objects with to_dict method
                 entity_dict = self.entity.to_dict()
-        # Fallback to self.entity if it's a dict
         elif isinstance(self.entity, dict):
             entity_dict = self.entity
 
-        # Make entity available to templates directly
-        # This is crucial for templates that reference entity directly
-        setattr(self, "entity", self.entity)
+        # Removed: setattr(self, "entity", self.entity) — B010
 
-        # Set the correct submit URL based on action and read-only status
         if not self.read_only:
             if self.action == "create":
                 self.submit_url = url_for(f"{blueprint_name}.create")
             elif self.action == "edit" and self.entity_id:
-                # FIX: Use entity_id parameter name instead of id
                 self.submit_url = url_for(f"{blueprint_name}.update", entity_id=self.entity_id)
             else:
                 self.submit_url = ""
         else:
             self.submit_url = ""
 
-        logger.info(f"📜 Building '{self.action}' page for '{blueprint_name}' blueprint (RO={self.read_only})")
+        logger.info(f"📜 Building {self.action!r} page for {blueprint_name!r} blueprint (RO={self.read_only})")
         instance_details = "EntityContext (_initialize_derived_fields)"
         log_instance_vars(instance_details, self)
 
-        # Set entity_name from the first available field
         self.entity_name = ""
         for key in ("name", "title", "email", "username"):
             if entity_dict.get(key):
                 self.entity_name = entity_dict[key]
-                logger.info(f"ℹ️ entity_name set using key '{key}': '{self.entity_name}'")
+                logger.info(f"ℹ️ entity_name set using key {key!r}: {self.entity_name!r}")
                 break
         else:
             self.entity_name = self.id
-            logger.info(f"entity_name defaulted to id: '{self.entity_name}'")
+            logger.info(f"entity_name defaulted to id: {self.entity_name!r}")
