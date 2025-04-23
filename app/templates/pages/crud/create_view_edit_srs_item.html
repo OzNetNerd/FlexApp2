@@ -39,14 +39,15 @@
           <label class="form-label fw-bold">How well did you know this?</label>
           <div class="rating-container d-flex align-items-start gap-3">
             <div>
-              <input type="range" class="form-range" id="rating-slider" min="0" max="5" value="0"
-                     oninput="updateRating(this.value)" title="Drag to preview interval">
+              <input type="range" class="form-range" id="rating-slider" min="0" max="5" value=""
+                     oninput="updateRating(this.value)" title="Drag to select rating">
               <div class="small text-muted mt-1">
-                Delay: <span id="delay-preview">(0 min)</span>
+                Delay: <span id="delay-preview">(select rating)</span>
               </div>
             </div>
             <select name="rating" id="rating-select" class="form-select" style="width: 180px"
-                    onchange="updateSlider(this.value)">
+                    onchange="updateSlider(this.value)" required>
+              <option value="" selected disabled>-- Select rating --</option>
               <option value="0">0 - No recall</option>
               <option value="1">1 - Failed</option>
               <option value="2">2 - Difficult</option>
@@ -71,7 +72,7 @@
             Show Answer
           </button>
 
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" id="submit-btn" class="btn btn-primary" disabled>
             <i class="bi bi-check-circle me-1"></i> Submit
           </button>
         </div>
@@ -124,7 +125,14 @@
 </div>
 
 <script>
-  let intervalPreviewMap = {};
+  let intervalPreviewMap = {
+    0: 0.04, // 1 hour
+    1: 0.08, // 2 hours
+    2: 1,    // 1 day
+    3: 3,    // 3 days
+    4: 7,    // 7 days
+    5: 15    // 15 days
+  };
 
   function describeDelay(days) {
     if (days < 1) {
@@ -139,35 +147,85 @@
   async function fetchPreviewIntervals() {
     const entityId = document.getElementById('review-form').dataset.entityId;
     console.log("Fetching preview intervals for entity ID:", entityId);
+
+    // Set loading state
+    document.getElementById('delay-preview').textContent = "(loading...)";
+
     try {
-      const response = await fetch(`/api/srs/${entityId}/preview`);
+      // Log the request URL for debugging
+      const url = `/api/srs/${entityId}/preview`;
+      console.log("Fetching from:", url);
+
+      const response = await fetch(url);
       if (!response.ok) {
         console.error("Failed to fetch preview intervals:", response.status);
+        document.getElementById('delay-preview').textContent = "(using defaults)";
+        updateAllRatingLabels();
         return;
       }
 
-      intervalPreviewMap = await response.json();
-      console.log("Received interval previews:", intervalPreviewMap);
-      updateAllRatingLabels();
-      updateLivePreview(document.getElementById('rating-slider').value);
+      // Log the raw response for debugging
+      const responseText = await response.text();
+      console.log("Raw response:", responseText);
+
+      try {
+        // Parse the JSON response
+        const data = JSON.parse(responseText);
+        console.log("Parsed interval previews:", data);
+
+        // Check if we got valid data
+        if (data && Object.keys(data).length > 0) {
+          intervalPreviewMap = data;
+        } else {
+          console.warn("Empty response data, using defaults");
+        }
+
+        updateAllRatingLabels();
+        updateLivePreview(document.getElementById('rating-slider').value || "0");
+      } catch (parseError) {
+        console.error("JSON parse error:", parseError);
+        document.getElementById('delay-preview').textContent = "(using defaults)";
+        updateAllRatingLabels();
+      }
     } catch (err) {
-      console.error("Error fetching preview intervals:", err);
+      console.error("Network error fetching preview intervals:", err);
+      document.getElementById('delay-preview').textContent = "(using defaults)";
+      updateAllRatingLabels();
     }
   }
 
   function updateAllRatingLabels() {
     const select = document.getElementById('rating-select');
-    for (const option of select.options) {
+
+    // Default rating descriptions
+    const ratingDescriptions = {
+      0: "No recall",
+      1: "Failed",
+      2: "Difficult",
+      3: "Hesitant",
+      4: "Easy",
+      5: "Perfect"
+    };
+
+    for (let i = 1; i < select.options.length; i++) {
+      const option = select.options[i];
       const rating = option.value;
-      const base = option.textContent.split('-')[1]?.split('(')[0]?.trim() || '';
+      const baseText = ratingDescriptions[rating] || "";
       const delay = intervalPreviewMap[rating] !== undefined ? describeDelay(intervalPreviewMap[rating]) : "?";
-      option.textContent = `${rating} - ${base} (${delay})`;
+      option.textContent = `${rating} - ${baseText} (${delay})`;
     }
   }
 
   function updateLivePreview(value) {
     const preview = document.getElementById('delay-preview');
     const tooltip = document.getElementById('rating-slider');
+
+    if (value === "") {
+      preview.textContent = "(select rating)";
+      tooltip.title = "Drag to select rating";
+      return;
+    }
+
     const days = intervalPreviewMap[value];
     const delay = days !== undefined ? describeDelay(days) : "?";
     preview.textContent = `(${delay})`;
@@ -175,6 +233,15 @@
   }
 
   function updateRating(value) {
+    if (value === "") {
+      document.getElementById('submit-btn').disabled = true;
+      document.getElementById('rating-select').value = "";
+      updateProgressBar(0);
+      updateLivePreview("");
+      return;
+    }
+
+    document.getElementById('submit-btn').disabled = false;
     document.getElementById('rating-select').value = value;
     updateProgressBar(value);
     updateLivePreview(value);
@@ -182,7 +249,8 @@
 
   function updateSlider(value) {
     document.getElementById('rating-slider').value = value;
-    updateProgressBar(value);
+    document.getElementById('submit-btn').disabled = value === "";
+    updateProgressBar(value === "" ? 0 : value);
     updateLivePreview(value);
   }
 
@@ -300,8 +368,21 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     console.log("Page loaded, initializing...");
+    document.getElementById('rating-slider').value = "";
+    document.getElementById('submit-btn').disabled = true;
     fetchPreviewIntervals();
+    updateAllRatingLabels(); // Show default values immediately
     updateProgressBar(0);
+
+    // Set a timeout to ensure we have values displayed even if API fails
+    setTimeout(() => {
+      const delayEl = document.getElementById('delay-preview');
+      if (delayEl.textContent === "(loading...)") {
+        console.log("API request timed out or failed, using default values");
+        delayEl.textContent = "(using defaults)";
+        updateAllRatingLabels();
+      }
+    }, 3000); // 3 second timeout
   });
 </script>
 {% endblock %}

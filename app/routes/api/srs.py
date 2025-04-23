@@ -33,15 +33,8 @@ def preview_item_ratings(item_id):
     """Preview the next review intervals for each possible rating."""
     try:
         preview_data = srs_service.preview_ratings(item_id)
-        # Format the data for display
-        formatted_data = {
-            rating: f"{days} days" if days != 1 else "1 day"
-            for rating, days in preview_data.items()
-        }
-        return jsonify({
-            "success": True,
-            "intervals": formatted_data
-        })
+        # Return the raw preview_data directly, not wrapped in another dictionary
+        return jsonify(preview_data)
     except Exception as e:
         logger.error(f"Error previewing ratings for item {item_id}: {str(e)}")
         return jsonify({
