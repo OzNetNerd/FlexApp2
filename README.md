@@ -1,6 +1,10 @@
 New:
 
 ```
+docker run -v "$(pwd)":/app -it --rm ghcr.io/yamadashy/repomix --style markdown
+```
+
+```
 clear && flask --app app.app run
 ```
 

@@ -38,19 +38,20 @@ repos:
       - id: bandit
         args: ["-ll", "-r", "app"]
 
-  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    rev: v1.4.0
-    hooks:
-      - id: python-safety-dependencies-check
-        name: safety
-        files: requirements-dev.txt
-        args: ["--full-report"]
-
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.4.0
     hooks:
       - id: detect-secrets
-        args: ["scan", "--baseline", ".secrets.baseline"]
+        args: ["--baseline", ".secrets.baseline"]
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: safety-check
+        name: safety
+        entry: safety check -r requirements-dev.txt --full-report
+        language: system
+        pass_filenames: false
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
