@@ -1,4 +1,4 @@
-# services/crud_service.py
+# app/services/crud_service.py
 
 import traceback
 from typing import Type, Any
@@ -10,7 +10,6 @@ from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
-
 class CRUDService:
     """
     Generic CRUD service for SQLAlchemy models.
@@ -20,14 +19,16 @@ class CRUDService:
     per-model for reuse and testability.
     """
 
-    def __init__(self, model_class: Type):
+    def __init__(self, model_class: Type, required_fields: list[str] = None):
         """
         Initialize the CRUDService.
 
         Args:
             model_class (Type): The SQLAlchemy model class to operate on.
+            required_fields (list[str], optional): Fields that must be present on create.
         """
         self.model_class = model_class
+        self.required_fields = required_fields or []
 
     def get_all(
         self,
@@ -57,13 +58,13 @@ class CRUDService:
                 for col_id, filter_config in filters.items():
                     if hasattr(self.model_class, col_id):
                         column = getattr(self.model_class, col_id)
-                        filter_type = filter_config.get("type")
-                        filter_value = filter_config.get("filter")
-                        logger.debug(f"Applying filter on {col_id}: {filter_type}={filter_value}")
-                        if filter_type == "contains":
-                            query = query.filter(column.ilike(f"%{filter_value}%"))
-                        elif filter_type == "equals":
-                            query = query.filter(column == filter_value)
+                        ftype = filter_config.get("type")
+                        fval = filter_config.get("filter")
+                        logger.debug(f"Applying filter on {col_id}: {ftype}={fval}")
+                        if ftype == "contains":
+                            query = query.filter(column.ilike(f"%{fval}%"))
+                        elif ftype == "equals":
+                            query = query.filter(column == fval)
 
             if hasattr(self.model_class, sort_column):
                 column = getattr(self.model_class, sort_column)
@@ -72,94 +73,43 @@ class CRUDService:
             return query.paginate(page=page, per_page=per_page, error_out=False)
 
         except Exception as e:
-            logger.error(f"❌  Error in get_all for {self.model_class.__name__}: {e}")
+            logger.error(f"❌ Error in get_all for {self.model_class.__name__}: {e}")
             logger.error(traceback.format_exc())
             raise
 
     def get_by_id(self, entity_id: int) -> Any:
-        """
-        Fetch a single record by its ID.
-
-        Args:
-            entity_id (int): Primary key.
-
-        Returns:
-            Any: The found model instance or 404 error.
-        """
-        logger.info(f"self: {self}")
-        logger.info(f"entity_id: {entity_id}")
+        """Fetch a single instance by its primary key."""
         try:
-            lookup_result = self.model_class.query.get_or_404(entity_id)
-            logger.info(f"lookup_result: {lookup_result.__dict__}")
-            return lookup_result
+            return db.session.get(self.model_class, entity_id)
         except Exception as e:
-            logger.error(f"❌  Error in get_by_id for {self.model_class.__name__} with id {entity_id}: {e}")
-            logger.error(traceback.format_exc())
+            logger.error(f"❌ Error fetching {self.model_class.__name__} id={entity_id}: {e}")
             raise
-
-    def _convert_dates(self, data: dict) -> dict:
-        """
-        Converts date strings into datetime objects.
-
-        Args:
-            data (dict): Input form data.
-
-        Returns:
-            dict: Transformed data.
-        """
-        # Handle due_date
-        if "due_date" in data and isinstance(data["due_date"], str):
-            try:
-                data["due_date"] = datetime.strptime(data["due_date"], "%Y-%m-%d")
-            except ValueError:
-                logger.warning("Invalid due_date format; setting to None")
-                data["due_date"] = None
-
-        # Handle created_at and updated_at
-        for field in ["created_at", "updated_at"]:
-            if field in data and isinstance(data[field], str):
-                try:
-                    data[field] = datetime.strptime(data[field], "%Y-%m-%d %H:%M:%S.%f")
-                except ValueError:
-                    try:
-                        # Try without microseconds
-                        data[field] = datetime.strptime(data[field], "%Y-%m-%d %H:%M:%S")
-                    except ValueError:
-                        logger.warning(f"Invalid {field} format; keeping original")
-
-        return data
 
     def create(self, data: dict) -> Any:
         """
-        Create and persist a new instance.
+        Create a new instance after validating required fields and handling extra attrs.
+
+        Raises:
+            ValueError: If any required fields are missing.
         """
         try:
-            data = {k: v for k, v in data.items() if v != ""}
-            data = self._convert_dates(data)
+            # 1) enforce required fields
+            missing = [f for f in self.required_fields if not data.get(f)]
+            if missing:
+                raise ValueError(f"Missing required fields: {missing}")
 
-            # Check for unique constraints
-            if self.model_class.__name__ == "Contact" and "email" in data:
-                existing = self.model_class.query.filter_by(email=data["email"]).first()
-                if existing:
-                    raise ValueError(f"A contact with email '{data['email']}' already exists")
-
-            # Extract properties that need special handling
+            # 2) pull off any non-column properties to set after flush
             property_attrs = {}
-            for key in list(data.keys()):
-                if hasattr(self.model_class, key) and isinstance(getattr(self.model_class, key), property):
+            for key in list(data):
+                if key not in self.model_class.__table__.columns:
                     property_attrs[key] = data.pop(key)
 
-            if issubclass(self.model_class, ValidatorMixin):
-                errors = self.model_class().validate_create(data)
-                if errors:
-                    raise ValueError(f"Validation failed: {errors}")
-
-            # Create entity without property attributes
+            # 3) instantiate and persist
             entity = self.model_class(**data)
             db.session.add(entity)
-            db.session.flush()  # Get ID without committing
+            db.session.flush()  # get PK without committing
 
-            # Handle properties after entity has ID
+            # 4) assign back any extra attributes
             for key, value in property_attrs.items():
                 try:
                     setattr(entity, key, value)
@@ -171,7 +121,7 @@ class CRUDService:
 
         except Exception as e:
             db.session.rollback()
-            logger.error(f"❌  Error creating {self.model_class.__name__}: {e}")
+            logger.error(f"❌ Error creating {self.model_class.__name__}: {e}")
             logger.error(traceback.format_exc())
             raise
 
@@ -187,9 +137,11 @@ class CRUDService:
             Any: The updated instance.
         """
         try:
+            # strip out empty strings and convert dates if needed
             data = {k: v for k, v in data.items() if v != ""}
             data = self._convert_dates(data)
 
+            # model-level validation
             if isinstance(entity, ValidatorMixin):
                 errors = entity.validate_update(data)
                 if errors:
@@ -198,15 +150,23 @@ class CRUDService:
             for key, value in data.items():
                 if hasattr(entity, key):
                     setattr(entity, key, value)
+
             db.session.commit()
             return entity
+
         except Exception as e:
             db.session.rollback()
-            logger.error(f"❌  Error updating {entity.__class__.__name__} with id {entity.id}: {e}")
+            logger.error(f"❌ Error updating {entity.__class__.__name__} id={getattr(entity, 'id', 'unknown')}: {e}")
             logger.error(traceback.format_exc())
             raise
 
-    def delete(self, entity_or_id):
+    def delete(self, entity_or_id: Any) -> bool:
+        """
+        Delete an instance by ID or instance.
+
+        Returns:
+            bool: True if deletion succeeded.
+        """
         if isinstance(entity_or_id, int):
             entity = self.get_by_id(entity_or_id)
         else:
@@ -215,35 +175,9 @@ class CRUDService:
         try:
             db.session.delete(entity)
             db.session.commit()
-            logger.info(f"✅ Successfully deleted {entity.__class__.__name__} with id {entity.id}")
+            logger.info(f"✅ Deleted {entity.__class__.__name__} id={entity.id}")
             return True
-
         except Exception as e:
             db.session.rollback()
-            logger.error(f"❌ Error deleting {entity.__class__.__name__} with id {entity.id}: {e}")
-            raise e
-
-    def validate_create(self, data: dict) -> list:
-        """
-        Validate input data for creation. Override in subclasses.
-
-        Args:
-            data (dict): Input data.
-
-        Returns:
-            list: List of validation errors (empty if valid).
-        """
-        return []
-
-    def validate_update(self, entity: Any, data: dict) -> list:
-        """
-        Validate input data for updating. Override in subclasses.
-
-        Args:
-            entity (Any): Existing instance.
-            data (dict): Updated data.
-
-        Returns:
-            list: List of validation errors (empty if valid).
-        """
-        return []
+            logger.error(f"❌ Error deleting {entity.__class__.__name__} id={getattr(entity, 'id', 'unknown')}: {e}")
+            raise

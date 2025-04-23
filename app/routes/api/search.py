@@ -1,165 +1,48 @@
-from flask import Blueprint, request, jsonify
-from app.models import User, Company, Opportunity
+# app/routes/api/search.py
 
+from flask import Blueprint, request, abort
 from app.utils.app_logging import get_logger
+from app.services.search_service import SearchService
+from app.models import Company, Contact, Note, Opportunity, Task, User, SRSItem
 
 logger = get_logger()
 
 search_bp = Blueprint("search_bp", __name__, url_prefix="/api/search")
 
+# Configure which fields to text-search for each entity
+_entity_search_map = {
+    "companies": (Company, ["name", "industry"]),
+    "contacts":  (Contact, ["first_name", "last_name", "email"]),
+    "notes":     (Note, ["content"]),
+    "opportunities": (Opportunity, ["title", "status"]),
+    "tasks":     (Task, ["title", "description"]),
+    "users":     (User, ["username", "email"]),
+    "srs":       (SRSItem, ["question", "answer"]),
+}
 
-@search_bp.route("/")
-def search():
-    query = request.args.get("q", "").strip()
-    if not query or len(query) < 2:
-        logger.warning("Search query is too short or empty.")
-        return jsonify([])
+# Instantiate one SearchService per entity
+_search_services = {
+    key: SearchService(model, fields)
+    for key, (model, fields) in _entity_search_map.items()
+}
 
-    results = []
+@search_bp.route("/<entity_name>", methods=["GET"])
+def search_entity(entity_name: str):
+    """
+    Generic search endpoint.
+    Query params:
+      - q: text term (optional)
+      - any other: exact-match filters
+    """
+    svc = _search_services.get(entity_name)
+    if not svc:
+        logger.warning(f"Search for unknown entity '{entity_name}'")
+        abort(404, f"No search available for '{entity_name}'")
 
-    logger.debug(f"Searching for users with query: {query}")
-    users = User.query.filter(User.username.ilike(f"%{query}%") | User.name.ilike(f"%{query}%")).limit(5).all()
-    results.extend(
-        [
-            {
-                "id": user.id,
-                "text": user.name,
-                "type": "user",
-                "url": f"/users/{user.id}",
-            }
-            for user in users
-        ]
-    )
+    # extract term and exact filters
+    params = request.args.to_dict(flat=True)
+    term = params.pop("q", "")
+    filters = {k: v for k, v in params.items() if v != ""}
 
-    logger.debug(f"Searching for companies with query: {query}")
-    companies = Company.query.filter(Company.name.ilike(f"%{query}%")).limit(5).all()
-    results.extend(
-        [
-            {
-                "id": company.id,
-                "text": company.name,
-                "type": "company",
-                "url": f"/companies/{company.id}",
-            }
-            for company in companies
-        ]
-    )
-
-    logger.debug(f"Searching for opportunities with query: {query}")
-    opportunities = Opportunity.query.filter(Opportunity.name.ilike(f"%{query}%")).limit(5).all()
-    results.extend(
-        [
-            {
-                "id": opportunity.id,
-                "text": opportunity.name,
-                "type": "opportunity",
-                "url": f"/opportunities/{opportunity.id}",
-            }
-            for opportunity in opportunities
-        ]
-    )
-
-    logger.info(f"Returning {len(results)} search results.")
-    return jsonify(results)
-
-
-@search_bp.route("/mentions")
-def mentions_search():
-    query = request.args.get("q", "").strip()
-    mention_type = request.args.get("type", "user")
-
-    logger.debug(f"Searching for mentions with query: {query} and type: {mention_type}")
-    results = []
-    # Commented out as it seems this function might not exist yet
-    # entities = search_mentions(query, mention_type)
-
-    # Temporary implementation
-    if mention_type == "user":
-        entities = (
-            User.query.filter(
-                User.username.ilike(f"%{query}%")
-                | User.name.ilike(f"%{query}%")
-                | User.first_name.ilike(f"%{query}%")
-                | User.last_name.ilike(f"%{query}%")
-            )
-            .limit(10)
-            .all()
-        )
-
-        for entity in entities:
-            results.append(
-                {
-                    "id": entity.id,
-                    "username": entity.username,
-                    "name": entity.name,
-                    "text": f"@{entity.username}",
-                }
-            )
-    elif mention_type == "company":
-        entities = Company.query.filter(Company.name.ilike(f"%{query}%")).limit(10).all()
-
-        for entity in entities:
-            results.append(
-                {
-                    "id": entity.id,
-                    "name": entity.name,
-                    "text": f"#{entity.name}",
-                }
-            )
-
-    logger.info(f"Returning {len(results)} mention results.")
-    return jsonify(results)
-
-
-@search_bp.route("/users")
-def users_data():
-    query = request.args.get("q", "").strip()
-
-    if query:
-        logger.debug(f"Searching for users with query: {query}")
-        users = (
-            User.query.filter(
-                User.username.ilike(f"%{query}%")
-                | User.name.ilike(f"%{query}%")
-                | User.first_name.ilike(f"%{query}%")
-                | User.last_name.ilike(f"%{query}%")
-                | User.email.ilike(f"%{query}%")
-            )
-            .order_by(User.name)
-            .limit(10)
-            .all()
-        )
-    else:
-        users = User.query.order_by(User.name).limit(30).all()
-
-    data = [
-        {
-            "id": user.id,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "email": user.email,
-            "name": user.name or f"{user.first_name} {user.last_name}".strip(),
-        }
-        for user in users
-    ]
-    return jsonify({"data": data})
-
-
-@search_bp.route("/companies")
-def companies_data():
-    query = request.args.get("q", "").strip()
-
-    if query:
-        logger.debug(f"Searching for companies with query: {query}")
-        companies = Company.query.filter(Company.name.ilike(f"%{query}%")).order_by(Company.name).limit(10).all()
-    else:
-        companies = Company.query.order_by(Company.name).limit(30).all()
-
-    data = [
-        {
-            "id": company.id,
-            "name": company.name,
-        }
-        for company in companies
-    ]
-    return jsonify({"data": data})
+    items = svc.search(term, filters)
+    return {"data": [item.to_dict() for item in items]}

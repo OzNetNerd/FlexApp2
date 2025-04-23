@@ -9,7 +9,14 @@ clear && flask --app app.app run
 
 
 ```
-This is my flask app. I want to focus on being DRY and consistent. Review the code and give me succinct info on what I need to do to achieve this
+This is my flask app. I want to focus on being DRY and consistent. Review the code and give me succinct info on what I need to do to achieve this.
+
+This was some of your suggestions previously. We've implemented some. Check the code and pick up where we left off.
+
+Take it one step at a time. do not overload me with steps/info. If changes are small, give me a fully updated func so I can paste over existing code. I fhtere's numerous changes in one file, givem e the entire file updated.
+
+Give me a summary of the changes we're going to do with a succinct explanation of each. Then, with each change, tell me what file(s) we'll need, what the change(s) are, and why they're being done
+
 ```
 
 # Change Recommendations
