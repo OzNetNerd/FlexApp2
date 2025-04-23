@@ -137,11 +137,12 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
             endpoint,
             f"pages/crud/{endpoint}_{config.entity_table_name.lower()}.html"
         )
+        endpoint_name = f"{config.blueprint.name}.{endpoint}"
         cfg = RenderSafelyConfig(
             template_path=template_path,
             context=config.__dict__,
             error_message=f"Error rendering {config.entity_table_name} {endpoint}",
-            endpoint_name=endpoint
+            endpoint_name=endpoint_name
         )
         return render_safely(cfg)
 
@@ -149,16 +150,46 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
 
 
 def register_crud_routes(config: CrudRouteConfig) -> None:
-    """Attach CRUD routes (index/create/view/edit/delete) to blueprint."""
+    """Attach CRUD routes (index/create/view/edit/delete) to blueprint with unique endpoints."""
     bp = config.blueprint
     plural = get_table_plural_name(config.entity_table_name)
     base = f"/{plural}"
 
-    bp.route(base, methods=['GET'])(route_handler('index', config))
-    bp.route(f"{base}/new", methods=['GET', 'POST'])(route_handler('create', config))
-    bp.route(f"{base}/<int:entity_id>", methods=['GET'])(route_handler('view', config))
-    bp.route(f"{base}/<int:entity_id>/edit", methods=['GET', 'POST'])(route_handler('edit', config))
-    bp.route(f"{base}/<int:entity_id>/delete", methods=['POST'])(route_handler('delete', config))
+    # Index
+    bp.add_url_rule(
+        rule=base,
+        endpoint='index',
+        view_func=route_handler('index', config),
+        methods=['GET']
+    )
+    # Create
+    bp.add_url_rule(
+        rule=f"{base}/new",
+        endpoint='create',
+        view_func=route_handler('create', config),
+        methods=['GET', 'POST']
+    )
+    # View
+    bp.add_url_rule(
+        rule=f"{base}/<int:entity_id>",
+        endpoint='view',
+        view_func=route_handler('view', config),
+        methods=['GET']
+    )
+    # Edit
+    bp.add_url_rule(
+        rule=f"{base}/<int:entity_id>/edit",
+        endpoint='edit',
+        view_func=route_handler('edit', config),
+        methods=['GET', 'POST']
+    )
+    # Delete
+    bp.add_url_rule(
+        rule=f"{base}/<int:entity_id>/delete",
+        endpoint='delete',
+        view_func=route_handler('delete', config),
+        methods=['POST']
+    )
 
 # -----------------------------------------------------------------
 # Auth route registration
