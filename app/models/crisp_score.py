@@ -5,22 +5,10 @@ logger = get_logger()
 
 
 class CRISPScore(BaseModel):
-    """Represents a CRISP trust metric for a contact-user relationship.
-
-    CRISP = Credibility, Reliability, Intimacy, Self-Orientation.
-    A higher score reflects stronger trust in the relationship.
-
-    Attributes:
-        relationship_id (int): Foreign key to the related relationship.
-        credibility (int): Score for credibility.
-        reliability (int): Score for reliability.
-        intimacy (int): Score for intimacy.
-        self_orientation (int): Score for self-orientation (lower is better).
-        notes (str): Optional notes.
-        total_score (float): Computed trust score.
-    """
-
     __tablename__ = "crisp_scores"
+
+    # Add primary key
+    id = db.Column(db.Integer, primary_key=True)
 
     relationship_id = db.Column(db.Integer, db.ForeignKey("relationships.id"), nullable=False)
     relationship = db.relationship("Relationship", back_populates="crisp_scores")

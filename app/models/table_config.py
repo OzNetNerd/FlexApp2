@@ -7,16 +7,10 @@ logger = get_logger()
 
 
 class TableConfig(BaseModel):
-    """Stores and manages dynamic table configuration for frontend tables.
-
-    Enables AG Grid-compatible column configuration for each table in the CRM.
-
-    Attributes:
-        table_name (str): Unique table identifier.
-        column_config (str): JSON string of configuration metadata.
-    """
-
     __tablename__ = "table_configs"
+
+    # Add primary key
+    id = db.Column(db.Integer, primary_key=True)
 
     table_name = db.Column(db.String(50), unique=True, nullable=False)
     column_config = db.Column(db.Text, nullable=False)

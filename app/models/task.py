@@ -7,21 +7,10 @@ logger = get_logger()
 
 
 class Task(BaseModel):
-    """Represents a task associated with an entity like a company, contact, or opportunity.
-
-    Tasks store details for tracking progress, due dates, and ownership.
-
-    Attributes:
-        title (str): Short summary of the task.
-        description (str): Detailed explanation of the task.
-        due_date (datetime): Deadline for task completion.
-        status (str): Current task status (Pending, In Progress, Completed).
-        priority (str): Priority level (Low, Medium, High).
-        notable_type (str): The type of object this task is linked to.
-        notable_id (int): The ID of the object this task is linked to.
-    """
-
     __tablename__ = "tasks"
+
+    # Add primary key
+    id = db.Column(db.Integer, primary_key=True)
 
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)

@@ -9,7 +9,9 @@ from app.models.base import BaseModel, db
 class SRSItem(BaseModel):
     __tablename__ = "srs_items"
 
-    # link back to whichever CRM object you’re memorizing:
+    # Add primary key
+    id = db.Column(db.Integer, primary_key=True)
+
     notable_type = db.Column(db.String(50), nullable=False)
     notable_id = db.Column(db.Integer, nullable=False)
 

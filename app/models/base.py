@@ -1,9 +1,8 @@
 # base.py
 
-from datetime import datetime
 
+from sqlalchemy.ext.declarative import declared_attr
 from flask_sqlalchemy import SQLAlchemy
-
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
@@ -11,24 +10,23 @@ logger = get_logger()
 # Initialize SQLAlchemy instance to be shared across models
 db = SQLAlchemy()
 
-
 class BaseModel(db.Model):
-    """Base model class for all CRM entities.
-
-    Provides common fields and helper methods for serialization,
-    persistence, and deletion of records.
-
-    Attributes:
-        id (int): Primary key of the model instance.
-        created_at (datetime): Timestamp when the record was created.
-        updated_at (datetime): Timestamp when the record was last updated.
-    """
-
     __abstract__ = True
 
-    id = db.Column(db.Integer, primary_key=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    @declared_attr
+    def __tablename__(cls) -> str:
+        # snake_case plural of class name, e.g. Contact → contacts
+        return cls.__name__.lower() + "s"
+
+    @declared_attr
+    def __entity_name__(cls) -> str:
+        # Title-case singular, e.g. "Contact"
+        return cls.__name__
+
+    @declared_attr
+    def __entity_plural__(cls) -> str:
+        # snake_case plural, same as __tablename__
+        return cls.__tablename__
 
     def __init__(self, **kwargs):
         """

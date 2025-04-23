@@ -6,9 +6,10 @@ logger = get_logger()
 
 
 class Relationship(BaseModel):
-    """Represents a relationship between two entities in the CRM system."""
-
     __tablename__ = "relationships"
+
+    # Add primary key
+    id = db.Column(db.Integer, primary_key=True)
 
     # Generic entity fields
     entity1_type = db.Column(db.String(50), nullable=False)

@@ -1,14 +1,12 @@
 # app/routes/api/json_utils.py
 
 from functools import wraps
-
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
 
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
-
 
 def json_endpoint(f):
     """
@@ -27,11 +25,16 @@ def json_endpoint(f):
                 payload, status = result
             else:
                 payload, status = result, 200
+
+            # Convert APIContext objects to dicts
+            if hasattr(payload, "to_dict"):
+                payload = payload.to_dict()
+
             return jsonify({"success": True, "data": payload}), status
+
         except HTTPException as he:
-            # abort(404, "msg") and similar
             return jsonify({"success": False, "error": he.description}), he.code
-        except Exception as e:
+        except Exception:
             logger.exception(f"Unhandled exception in {f.__name__}")
             return jsonify({"success": False, "error": "Internal server error"}), 500
 

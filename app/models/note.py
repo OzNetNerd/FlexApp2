@@ -5,26 +5,15 @@ logger = get_logger()
 
 
 class Note(BaseModel):
-    """A comment or annotation linked to a CRM entity.
-
-    Notes support polymorphic behavior by attaching to various models like
-    Company, Contact, or Opportunity via `notable_type` and `notable_id`.
-
-    Attributes:
-        content (str): Raw text of the note.
-        processed_content (str): Optional processed/HTML content.
-        notable_type (str): The type of object this note is linked to.
-        notable_id (int): The ID of the object this note is linked to.
-        user_id (int): The user who created the note.
-        __field_order__ (list[dict]): Field rendering metadata for UI.
-    """
-
     __tablename__ = "notes"
+
+    # Add this primary key column
+    id = db.Column(db.Integer, primary_key=True)
 
     content = db.Column(db.Text, nullable=False)
     processed_content = db.Column(db.Text)
 
-    notable_type = db.Column(db.String(50), nullable=False)  # e.g., 'Company', 'Contact', 'Opportunity'
+    notable_type = db.Column(db.String(50), nullable=False)
     notable_id = db.Column(db.Integer, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)

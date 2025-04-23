@@ -6,21 +6,10 @@ logger = get_logger()
 
 
 class Company(BaseModel):
-    """Represents a company in the CRM system.
-
-    Stores metadata about a company and links to its contacts, opportunities,
-    notes, capabilities, and scoring summaries.
-
-    Attributes:
-        name (str): Display name of the company.
-        description (str): Additional details about the company.
-        contacts (list[Contact]): Related contacts.
-        opportunities (list[Opportunity]): Related opportunities.
-        notes (list[Note]): Notes linked via polymorphic relationship.
-        company_capabilities (list[CompanyCapability]): Capabilities offered.
-    """
-
     __tablename__ = "companies"
+
+    # Add primary key
+    id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)

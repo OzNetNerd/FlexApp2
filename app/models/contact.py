@@ -10,6 +10,8 @@ logger = get_logger()
 class Contact(BaseModel):
     __tablename__ = "contacts"
 
+    id = db.Column(db.Integer, primary_key=True)
+
     # --- Contact Information ---
     first_name = db.Column(db.String(127), nullable=False)
     last_name = db.Column(db.String(127), nullable=False)

@@ -5,22 +5,10 @@ logger = get_logger()
 
 
 class Opportunity(BaseModel):
-    """Represents a sales opportunity linked to a company.
-
-    Opportunities track deal stages, potential value, and related notes.
-
-    Attributes:
-        name (str): Title of the opportunity.
-        description (str): Summary or notes about the opportunity.
-        status (str): Current status (e.g., New, Won, Lost).
-        stage (str): Sales pipeline stage (e.g., Prospecting).
-        value (float): Estimated deal value.
-        company_id (int): FK to the related company.
-        notes (list[Note]): Notes linked via polymorphic relationship.
-        __field_order__ (list[dict]): Field metadata for UI rendering.
-    """
-
     __tablename__ = "opportunities"
+
+    # Add primary key
+    id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
