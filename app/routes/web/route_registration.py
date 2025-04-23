@@ -1,7 +1,5 @@
-import pkgutil
-import importlib
-from typing import Iterator, Any, Callable, Optional, Dict, List
-from flask import Flask, Blueprint, request, redirect, url_for, abort
+from typing import Any, Callable, Optional, Dict, List
+from flask import Blueprint, request, redirect, url_for
 from dataclasses import dataclass
 from enum import Enum
 
@@ -9,6 +7,8 @@ from app.utils.app_logging import get_logger
 from app.utils.table_helpers import get_table_plural_name
 from app.routes.web.components.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.web.context import TableContext, EntityContext, SimpleContext
+
+
 
 logger = get_logger()
 
@@ -43,53 +43,21 @@ class CrudRouteConfig:
 
 def default_crud_templates(entity_table_name: str) -> CrudTemplates:
     """
-    Return default CRUD templates.
-    Uses the unified `create_view_edit_<entity>.html` template for view and edit.
+    Return default CRUD templates following a uniform structure:
+      - pages/<plural>/index.html
+      - pages/<plural>/create.html
+      - pages/<plural>/view.html
+      - pages/<plural>/edit.html
     """
-    plural = get_table_plural_name(entity_table_name)
-    lower = entity_table_name.lower()
-
-    # Index listing
-    index_tpl = f"pages/tables/{plural}.html"
-    # New-item form
-    create_tpl = f"pages/crud/create_{lower}.html"
-    # Shared form for view & edit
-    form_tpl = f"pages/crud/create_view_edit_{lower}.html"
+    # Derive the lowercase plural form (e.g. "contacts" for "Contact")
+    plural = get_table_plural_name(entity_table_name).lower()
 
     return CrudTemplates(
-        index=index_tpl,
-        create=create_tpl,
-        view=form_tpl,
-        edit=form_tpl,
+        index  = f"pages/{plural}/index.html",
+        create = f"pages/{plural}/create.html",
+        view   = f"pages/{plural}/view.html",
+        edit   = f"pages/{plural}/edit.html",
     )
-
-
-
-
-def discover_web_modules() -> Iterator[Any]:
-    package = importlib.import_module('app.routes.web')
-    for _, module_name, _ in pkgutil.iter_modules(package.__path__):
-        if module_name == 'components':
-            continue
-        yield importlib.import_module(f'{package.__name__}.{module_name}')
-
-
-def register_web_blueprints(app: Flask) -> None:
-    for module in discover_web_modules():
-        for attr in dir(module):
-            if attr.endswith('_crud_config'):
-                config = getattr(module, attr)
-                if isinstance(config, CrudRouteConfig):
-                    logger.debug(f"Wiring CRUD for {config.entity_table_name}")
-                    register_crud_routes(config)
-    for module in discover_web_modules():
-        for attr in dir(module):
-            if attr.endswith('_bp'):
-                bp = getattr(module, attr)
-                if isinstance(bp, Blueprint):
-                    logger.debug(f"Registering blueprint: {bp.name} @ {bp.url_prefix}")
-                    app.register_blueprint(bp)
-
 
 def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
     def handler(*args, **kwargs):
