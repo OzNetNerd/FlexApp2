@@ -1,5 +1,3 @@
-# app/routes/api/route_registration.py
-
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Union
@@ -25,7 +23,6 @@ class CRUDEndpoint(Enum):
 @dataclass
 class ApiCrudRouteConfig:
     """Configuration for API CRUD routes."""
-
     blueprint: Blueprint
     entity_table_name: str
     service: Any
@@ -39,9 +36,7 @@ def handle_api_crud_operation(
     entity_id: Optional[Union[int, str]] = None,
     data: Optional[Dict[str, Any]] = None,
 ) -> Any:
-    """
-    Handle CRUD operations based on endpoint type and return a Context object.
-    """
+    """Handle CRUD operations based on endpoint type and return a Context object."""
     try:
         if endpoint == CRUDEndpoint.GET_ALL.value:
             result = service.get_all()
@@ -57,22 +52,14 @@ def handle_api_crud_operation(
 
         if endpoint == CRUDEndpoint.CREATE.value and data is not None:
             entity = service.create(data)
-            return EntityAPIContext(
-                entity_table_name=entity_table_name,
-                entity=entity,
-                message=f"{entity_table_name} created successfully",
-            )
+            return EntityAPIContext(entity_table_name=entity_table_name, entity=entity, message=f"{entity_table_name} created successfully")
 
         if endpoint == CRUDEndpoint.UPDATE.value and entity_id is not None and data is not None:
             existing = service.get_by_id(entity_id)
             if not existing:
                 return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
             entity = service.update(existing, data)
-            return EntityAPIContext(
-                entity_table_name=entity_table_name,
-                entity=entity,
-                message=f"{entity_table_name} updated successfully",
-            )
+            return EntityAPIContext(entity_table_name=entity_table_name, entity=entity, message=f"{entity_table_name} updated successfully")
 
         if endpoint == CRUDEndpoint.DELETE.value and entity_id is not None:
             existing = service.get_by_id(entity_id)
@@ -83,12 +70,16 @@ def handle_api_crud_operation(
 
         return ErrorAPIContext(message="Invalid operation or parameters", status_code=400)
     except Exception as e:
-        logger.error(f"Error in API CRUD operation '{endpoint}': {e}", exc_info=True)
+        logger.error(f"Error in API CRUD operation {endpoint!r}: {e}", exc_info=True)
         return ErrorAPIContext(message="Internal server error", status_code=500)
 
 
 def register_api_route(
-    blueprint: Blueprint, url: str, handler: Callable[..., ResponseReturnValue], endpoint: str, methods: Optional[List[str]] = None
+    blueprint: Blueprint,
+    url: str,
+    handler: Callable[..., ResponseReturnValue],
+    endpoint: str,
+    methods: Optional[List[str]] = None
 ) -> None:
     """Register a single route on an API blueprint."""
     blueprint.add_url_rule(rule=url, endpoint=endpoint, view_func=handler, methods=methods or ["GET"])
@@ -103,40 +94,45 @@ def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:
     svc = config.service
     include = config.include_routes or [e.value for e in CRUDEndpoint]
 
+    def make_func(action: str):
+        if action == CRUDEndpoint.GET_ALL.value:
+            def func_get_all():
+                return handle_api_crud_operation(action, svc, entity)
+            return "/", ["GET"], func_get_all
+
+        if action == CRUDEndpoint.GET_BY_ID.value:
+            def func_get_by_id(entity_id):
+                return handle_api_crud_operation(action, svc, entity, entity_id)
+            return "/<int:entity_id>", ["GET"], func_get_by_id
+
+        if action == CRUDEndpoint.CREATE.value:
+            def func_create():
+                return handle_api_crud_operation(action, svc, entity, data=request.get_json())
+            return "/", ["POST"], func_create
+
+        if action == CRUDEndpoint.UPDATE.value:
+            def func_update(entity_id):
+                return handle_api_crud_operation(action, svc, entity, entity_id, data=request.get_json())
+            return "/<int:entity_id>", ["PUT"], func_update
+
+        if action == CRUDEndpoint.DELETE.value:
+            def func_delete(entity_id):
+                return handle_api_crud_operation(action, svc, entity, entity_id)
+            return "/<int:entity_id>", ["DELETE"], func_delete
+
+        return None, None, None
+
     for action in include:
         if action not in [e.value for e in CRUDEndpoint]:
             continue
 
-        # Define URL and HTTP methods
-        if action == CRUDEndpoint.GET_ALL.value:
-            url = "/"
-            methods = ["GET"]
-            func = lambda: handle_api_crud_operation(action, svc, entity)
-        elif action == CRUDEndpoint.GET_BY_ID.value:
-            url = "/<int:entity_id>"
-            methods = ["GET"]
-            func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id)
-        elif action == CRUDEndpoint.CREATE.value:
-            url = "/"
-            methods = ["POST"]
-            func = lambda: handle_api_crud_operation(action, svc, entity, data=request.get_json())
-        elif action == CRUDEndpoint.UPDATE.value:
-            url = "/<int:entity_id>"
-            methods = ["PUT"]
-            func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id, data=request.get_json())
-        elif action == CRUDEndpoint.DELETE.value:
-            url = "/<int:entity_id>"
-            methods = ["DELETE"]
-            func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id)
-        else:
+        url, methods, func = make_func(action)
+        if not func:
             continue
 
-        # Wrap the handler with json_endpoint
         handler = json_endpoint(func)
         handler.__name__ = action
-
-        # Register the route
         register_api_route(bp, url, handler, endpoint=action, methods=methods)
-        logger.info(f"Registered API route {action} @ {url}")
+        logger.info(f"Registered API route {action!r} @ {url!r}")
 
     return bp

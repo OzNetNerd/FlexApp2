@@ -22,38 +22,38 @@ class Setting(BaseModel):
     }
 
     def __repr__(self) -> str:
-        return f"<Setting {self.key}: {self.value}>"
+        return f"<Setting {self.key!r}: {self.value!r}>"
 
     def save(self) -> "Setting":
-        logger.info(f"Saving setting '{self.key}' with value '{self.value}'")
+        logger.info(f"Saving setting {self.key!r} with value {self.value!r}")
         super().save()
-        logger.info(f"Setting '{self.key}' saved successfully.")
+        logger.info(f"Setting {self.key!r} saved successfully.")
         return self
 
     def delete(self) -> None:
-        logger.info(f"Deleting setting '{self.key}'")
+        logger.info(f"Deleting setting {self.key!r}")
         super().delete()
-        logger.info(f"Setting '{self.key}' deleted successfully.")
+        logger.info(f"Setting {self.key!r} deleted successfully.")
 
     @classmethod
     def seed(cls) -> None:
         """Ensure all app settings exist in the DB with defaults if needed."""
         inspector = inspect(db.engine)
-        logger.info("🔧 Checking for existence of 'settings' table")
+        logger.info(f"🔧 Checking for existence of {cls.__tablename__!r} table")
 
         if cls.__tablename__ not in inspector.get_table_names():
-            logger.warning(f"⚠️ Table '{cls.__tablename__}' does not exist. Creating")
+            logger.warning(f"⚠️ Table {cls.__tablename__!r} does not exist. Creating")
             db.create_all()
-            logger.info(f"Table '{cls.__tablename__}' created successfully.")
+            logger.info(f"Table {cls.__tablename__!r} created successfully.")
 
         logger.info("🔍 Verifying required settings in the database")
 
         for key, default_value in cls.SETTINGS.items():
             existing = cls.query.filter_by(key=key).first()
             if existing:
-                logger.info(f"   ✔️ '{key}' already exists with value: '{existing.value}'")
+                logger.info(f"   ✔️ {key!r} already exists with value: {existing.value!r}")
             else:
-                logger.info(f"➕ Creating setting '{key}' with default value: '{default_value}'")
+                logger.info(f"➕ Creating setting {key!r} with default value: {default_value!r}")
                 db.session.add(cls(key=key, value=default_value))
 
         db.session.commit()
@@ -62,11 +62,11 @@ class Setting(BaseModel):
     @classmethod
     def get_value(cls, key: str, fallback: str = None) -> str:
         """Retrieve the current value for a setting, with fallback."""
-        logger.info(f"Getting value for setting '{key}'")
+        logger.info(f"Getting value for setting {key!r}")
         setting = cls.query.filter_by(key=key).first()
         if setting:
-            logger.info(f"🔎 Found '{key}' = '{setting.value}'")
+            logger.info(f"🔎 Found {key!r} = {setting.value!r}")
             return setting.value
         default = cls.SETTINGS.get(key, fallback)
-        logger.info(f"❓ Setting '{key}' not in DB. Returning default/fallback: '{default}'")
+        logger.info(f"❓ Setting {key!r} not in DB. Returning default/fallback: {default!r}")
         return default
