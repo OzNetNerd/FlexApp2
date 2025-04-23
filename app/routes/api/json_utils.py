@@ -1,6 +1,7 @@
 # app/routes/api/json_utils.py
 
 from functools import wraps
+
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
 

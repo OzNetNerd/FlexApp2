@@ -1,8 +1,9 @@
 # base.py
 
 
-from sqlalchemy.ext.declarative import declared_attr
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.declarative import declared_attr
+
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
