@@ -8,6 +8,7 @@ from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
+
 def json_endpoint(f):
     """
     Wrap a view to return a uniform JSON response:

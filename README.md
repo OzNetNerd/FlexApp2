@@ -8,9 +8,43 @@ docker run -v "$(pwd)":/app -it --rm ghcr.io/yamadashy/repomix --style markdown
 clear && flask --app app.app run
 ```
 
+
+Commands
+
+```
+# 1. Black (formatting)
+pre-commit run black --all-files
+
+# 2. isort (import sorting)
+pre-commit run isort --all-files
+
+# 3. Flake8 (+ bugbear, annotations, docstrings)
+pre-commit run flake8 --all-files
+
+# 4. mypy (static type checking)
+pre-commit run mypy --all-files
+
+# 5. pydocstyle (docstring conventions)
+pre-commit run pydocstyle --all-files
+
+# 6. bandit (security lint)
+pre-commit run bandit --all-files
+
+# 7. safety (dependency CVE scan)
+pre-commit run python-safety-dependencies-check --all-files
+
+# 8. detect-secrets (secret-scanning)
+pre-commit run detect-secrets --all-files
+
+# 9. pre-commit-hooks (whitespace, merge conflicts, large files, YAML)
+pre-commit run trailing-whitespace --all-files
+pre-commit run end-of-file-fixer --all-files
+pre-commit run check-merge-conflict --all-files
+pre-commit run check-added-large-files --all-files
+pre-commit run check-yaml --all-files
+```
+
 # Change
-
-
 
 ```
 This is my flask app. I want to focus on being DRY and consistent. Review the code and give me succinct info on what I need to do to achieve this.

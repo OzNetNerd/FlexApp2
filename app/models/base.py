@@ -10,6 +10,7 @@ logger = get_logger()
 # Initialize SQLAlchemy instance to be shared across models
 db = SQLAlchemy()
 
+
 class BaseModel(db.Model):
     __abstract__ = True
 
