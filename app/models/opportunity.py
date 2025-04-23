@@ -7,7 +7,6 @@ logger = get_logger()
 class Opportunity(BaseModel):
     __tablename__ = "opportunities"
 
-    # Add primary key
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(100), nullable=False)
@@ -29,7 +28,7 @@ class Opportunity(BaseModel):
         Returns:
             str: Identifier showing the opportunity name.
         """
-        return f"<Opportunity {self.name}>"
+        return f"<Opportunity {self.name!r}>"
 
     def save(self) -> "Opportunity":
         """Persist opportunity to the database with logging.
@@ -37,16 +36,16 @@ class Opportunity(BaseModel):
         Returns:
             Opportunity: The saved instance.
         """
-        logger.info(f"Saving opportunity with name {self.name} and status {self.status}")
+        logger.info(f"Saving opportunity with name {self.name!r} and status {self.status!r}")
         super().save()
-        logger.info(f"Opportunity '{self.name}' saved successfully.")
+        logger.info(f"Opportunity {self.name!r} saved successfully.")
         return self
 
     def delete(self) -> None:
         """Remove opportunity from the database with logging."""
-        logger.info(f"Deleting opportunity with name {self.name}")
+        logger.info(f"Deleting opportunity with name {self.name!r}")
         super().delete()
-        logger.info(f"Opportunity '{self.name}' deleted successfully.")
+        logger.info(f"Opportunity {self.name!r} deleted successfully.")
 
     @property
     def crisp_summary(self) -> float | None:
@@ -58,26 +57,26 @@ class Opportunity(BaseModel):
         try:
             contacts = set()
 
-            # Handle both cases: notes as a collection or as a single Note object
             if hasattr(self.notes, "__iter__") and not isinstance(self.notes, str):
-                # It's iterable (like a list)
                 for note in self.notes:
                     if hasattr(note, "author") and hasattr(note.author, "relationships"):
                         for rel in note.author.relationships:
                             if hasattr(rel, "contact"):
                                 contacts.add(rel.contact)
             elif hasattr(self.notes, "author") and hasattr(self.notes.author, "relationships"):
-                # It's a single Note object
                 for rel in self.notes.author.relationships:
                     if hasattr(rel, "contact"):
                         contacts.add(rel.contact)
 
-            scores = [c.crisp_summary for c in contacts if hasattr(c, "crisp_summary") and c.crisp_summary is not None]
+            scores = [
+                c.crisp_summary for c in contacts
+                if hasattr(c, "crisp_summary") and c.crisp_summary is not None
+            ]
 
             if not scores:
                 return None
 
             return round(sum(scores) / len(scores), 2)
         except Exception as e:
-            logger.error(f"Error calculating CRISP summary: {e}")
+            logger.error(f"Error calculating CRISP summary: {e!r}")
             return None

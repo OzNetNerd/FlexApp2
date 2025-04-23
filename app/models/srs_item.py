@@ -27,4 +27,4 @@ class SRSItem(BaseModel):
     next_review_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     def __repr__(self):
-        return f"<SRSItem {self.id} [{self.notable_type}:{self.notable_id}] next={self.next_review_at}>"
+        return f"<SRSItem {self.id} [{self.notable_type}: {self.notable_id}] next={self.next_review_at}>"

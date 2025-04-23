@@ -25,21 +25,24 @@ def get_autocomplete_field(title, relationships=None, field_id=None, placeholder
     name = name or title_lower
     data_api_url = data_api_url or f"/api//{title_lower}"
 
-    # Fix entity type derivation with special cases
     if title_lower == "companies":
         entity_type = "company"
     else:
         entity_type = title_lower.rstrip("s")
 
-    logger.info(f"Derived entity_type '{entity_type}' from title '{title}'.")
+    logger.info(f"Derived entity_type {entity_type!r} from title {title!r}.")
 
     related_ids = []
     if relationships is not None:
         related_ids = [rel["entity_id"] for rel in relationships if rel.get("entity_type") == entity_type]
-        logger.info(f"Extracted related IDs for entity_type '{entity_type}': {related_ids}")
+        logger.info(f"Extracted related IDs for entity_type {entity_type!r}: {related_ids!r}")
 
-    # Make sure to use related_ids to match template expectations
     field = AutoCompleteField(
-        title=title, id=field_id, placeholder=placeholder, name=name, data_api_url=data_api_url, related_ids=related_ids
+        title=title,
+        id=field_id,
+        placeholder=placeholder,
+        name=name,
+        data_api_url=data_api_url,
+        related_ids=related_ids,
     )
     return field

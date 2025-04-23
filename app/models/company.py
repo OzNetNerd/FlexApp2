@@ -7,7 +7,6 @@ logger = get_logger()
 class Company(BaseModel):
     __tablename__ = "companies"
 
-    # Add primary key
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(100), nullable=False)
@@ -55,7 +54,7 @@ class Company(BaseModel):
         Returns:
             str: A readable company identifier.
         """
-        return f"<Company {self.name}>"
+        return f"<Company {self.name!r}>"
 
     @staticmethod
     def search_by_name(query: str) -> list:
@@ -67,7 +66,7 @@ class Company(BaseModel):
         Returns:
             list: List of Company objects matching the query.
         """
-        logger.info(f"Searching for companies with name starting with '{query}'")
+        logger.info(f"Searching for companies with name starting with {query!r}")
         result = Company.query.filter(Company.name.ilike(f"{query}%")).all()
-        logger.info(f"Found {len(result)} companies matching the query '{query}'")
+        logger.info(f"Found {len(result)} companies matching the query {query!r}")
         return result
