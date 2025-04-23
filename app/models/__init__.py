@@ -7,12 +7,7 @@ Centralized imports for all SQLAlchemy models and the `db` instance.
 import logging
 
 from .base import BaseModel, db
-
-logger = logging.getLogger(__name__)
-
 from .capability import Capability
-
-# Model classes
 from .capability_category import CapabilityCategory
 from .company import Company
 from .company_capability import CompanyCapability
@@ -28,6 +23,8 @@ from .srs_item import SRSItem
 from .table_config import TableConfig
 from .task import Task
 from .user import User
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "db",

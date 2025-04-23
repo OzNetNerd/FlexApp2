@@ -1,19 +1,18 @@
 # app/routes/api/route_registration.py
 
 
+import json
 from dataclasses import dataclass
 from enum import Enum
-import json
-from typing import Any, Callable, Dict, List, Optional, Union, Type
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 from flask import Blueprint, request
 from flask.typing import ResponseReturnValue
 
+from app.models.base import db
 from app.routes.api.context import EntityAPIContext, ErrorAPIContext, ListAPIContext
 from app.routes.api.json_utils import json_endpoint
 from app.utils.app_logging import get_logger
-from app.models.base import db
-
 
 logger = get_logger()
 

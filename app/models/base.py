@@ -1,6 +1,3 @@
-# base.py
-
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -44,7 +41,7 @@ class BaseModel(db.Model):
         """
         for key, value in kwargs.items():
             if not hasattr(self, key):
-                raise AttributeError(f"{self.__class__.__name__} has no attribute '{key}'")
+                raise AttributeError(f"{self.__class__.__name__} has no attribute {key!r}")
             setattr(self, key, value)
 
     def to_dict(self) -> dict:
