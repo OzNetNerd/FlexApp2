@@ -3,38 +3,34 @@ import importlib
 from typing import Iterator, Any
 from flask import Flask, Blueprint
 from app.utils.app_logging import get_logger
+from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig
 
 logger = get_logger()
 
-
 def discover_web_modules() -> Iterator[Any]:
-    """Yield all modules in the app.routes.web package, excluding the components subpackage.
-
-    Scans the `app.routes.web` directory and imports each module except those
-    under `components`, yielding the imported module object.
-
-    Returns:
-        Iterator[Any]: Imported module objects.
-    """
-    package = importlib.import_module("app.routes.web")
+    """Yield all modules in the app.routes.web package, excluding the components subpackage."""
+    package = importlib.import_module('app.routes.web')
     for _, module_name, is_pkg in pkgutil.iter_modules(package.__path__):
-        if module_name == "components":
+        if module_name == 'components':
             continue
-        yield importlib.import_module(f"{package.__name__}.{module_name}")
+        yield importlib.import_module(f'{package.__name__}.{module_name}')
 
 
 def register_web_blueprints(app: Flask) -> None:
-    """Auto-register all web blueprints from app.routes.web.
-
-    Discovers Blueprint objects named `<something>_bp` in each module
-    returned by `discover_web_modules()` and registers them on the Flask app.
-
-    Args:
-        app (Flask): The Flask application instance.
-    """
+    """Auto-wire CRUD routes and register all web blueprints."""
+    # Phase 1: register CRUD routes for each CrudRouteConfig
     for module in discover_web_modules():
         for attr in dir(module):
-            if attr.endswith("_bp"):
+            if attr.endswith('_crud_config'):
+                config = getattr(module, attr)
+                if isinstance(config, CrudRouteConfig):
+                    logger.debug(f"Wiring web CRUD routes for {config.entity_table_name}")
+                    register_crud_routes(config)
+
+    # Phase 2: register blueprints on the Flask app
+    for module in discover_web_modules():
+        for attr in dir(module):
+            if attr.endswith('_bp'):
                 bp = getattr(module, attr)
                 if isinstance(bp, Blueprint):
                     logger.debug(f"Registering web blueprint: {bp.name} at {bp.url_prefix}")

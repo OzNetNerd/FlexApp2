@@ -1,30 +1,20 @@
-# web/users.py
+# app/routes/web/users.py
 
 from flask import Blueprint
-from app.routes.web.route_registration import register_crud_routes, CrudRouteConfig, CrudTemplates
-from app.services.crud_service import CRUDService
-from app.models.user import User
-
 from app.utils.app_logging import get_logger
+from app.services.user_service import UserService
+from app.models import User
+from app.routes.web.route_registration import CrudRouteConfig, default_crud_templates
 
 logger = get_logger()
 
-# Define the blueprint
 users_bp = Blueprint("users_bp", __name__, url_prefix="/users")
+user_service = UserService(User)
+templates = default_crud_templates("User")
 
-# Create a service instance
-user_service = CRUDService(User)
-
-# Define custom templates for users
-custom_templates = CrudTemplates(
-    create="pages/crud/create_view_edit_user.html",
-    view="pages/crud/create_view_edit_user.html",
-    edit="pages/crud/create_view_edit_user.html",
+user_crud_config = CrudRouteConfig(
+    blueprint=users_bp,
+    entity_table_name="User",
+    service=user_service,
+    templates=templates,
 )
-
-# Log the custom templates for debugging
-logger.info(f"Custom templates: {custom_templates.to_dict()}")
-
-# Register all standard CRUD routes with custom templates
-user_crud_config = CrudRouteConfig(blueprint=users_bp, entity_table_name="User", service=user_service, templates=custom_templates)
-register_crud_routes(user_crud_config)

@@ -1,9 +1,47 @@
-```
- export FLASK_APP=app.app:create_app
-```
+New:
 
 ```
-clear && python3 -m app.app
+clear && flask --app app.app run
+```
+
+# Change Recommendations
+
+```
+Here are the key areas to tighten up for DRYness and consistency across your Flask CRM:
+
+Unify CRUD registration
+– Replace all per-module ApiCrudRouteConfig/register_api_crud_routes calls with a loop in app/routes/api_router.py that auto-discovers (ENTITY_NAME, blueprint, service) tuples.
+– Do the same in app/routes/web_router.py for your web-side blueprints and CrudRouteConfig.
+
+Centralize template paths
+– Define a naming convention (e.g. pages/<entity_plural>/<action>.html) and supply only entity names to CrudTemplates; let a factory build full paths.
+– This removes repeated literals like "pages/crud/create_view_edit_srs_item.html" in each module.
+
+Consolidate service logic
+– Keep per-model validation in your ValidatorMixin, but collapse all simple NoteService, TaskService, etc. into one CRUDService subclass with an overridable required_fields list.
+– Move any custom query methods (get_due_items, date filters, etc.) into dedicated service mixins rather than littering controllers.
+
+Abstract search and filtering
+– Create a generic SearchService that accepts model classes and search-fields arrays, replacing the hand-coded routes in app/routes/api/search.py.
+– Or parameterize a single /api/search/<entity> endpoint.
+
+DRY up context builders
+– Rather than manually instantiating EntityContext, ListAPIContext, etc., in each handler, write a decorator (e.g. @use_context(EntityContext, "Company")) that wraps your view.
+
+Eliminate duplicate imports/loggers
+– Configure a module-level logger factory (e.g. in app_logging.py) so you can drop logger = logging.getLogger(__name__) from every file.
+
+Standardize error and JSON responses
+– Consolidate json_response and error handlers into a single extension (blueprint or flask extension), so individual routes never call json_response directly.
+
+Leverage introspection/factories
+– For all your simple models (Company, Contact, etc.), generate API and web routes via a factory function that takes just the model class and optional overrides, removing boilerplate in each *.py.
+
+Enforce code style and linting
+– Adopt Black/flake8 with consistent import ordering and line-length limits so every file looks uniform.
+
+Extract constants
+– Move repeated magic strings ("Company", "Contacts", URL prefixes) into a single constants.py or into model metadata.
 ```
 
 # Research
