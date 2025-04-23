@@ -8,6 +8,7 @@ from app.models.contact import Contact
 from app.models.company import Company
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 

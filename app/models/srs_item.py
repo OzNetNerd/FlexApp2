@@ -19,7 +19,7 @@ class SRSItem(BaseModel):
 
     # FSRS state
     repetition = db.Column(db.Integer, default=0, nullable=False)
-    interval = db.Column(db.Float, default=0.0, nullable=False)       # in days
+    interval = db.Column(db.Float, default=0.0, nullable=False)  # in days
     ease_factor = db.Column(db.Float, default=2.5, nullable=False)
     review_count = db.Column(db.Integer, default=0, nullable=False)
 

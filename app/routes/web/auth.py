@@ -6,6 +6,7 @@ from app.services.auth import AuthService
 from app.models.user import User
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 # Define the blueprint

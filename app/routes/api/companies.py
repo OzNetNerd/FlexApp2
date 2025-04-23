@@ -11,16 +11,8 @@ logger = get_logger()
 ENTITY_NAME = "Company"
 ENTITY_PLURAL_NAME = "Companies"
 
-companies_api_bp = Blueprint(
-    f"{ENTITY_PLURAL_NAME.lower()}_api",
-    __name__,
-    url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}"
-)
+companies_api_bp = Blueprint(f"{ENTITY_PLURAL_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 
 company_service = CRUDService(Company)
 
-company_api_crud_config = ApiCrudRouteConfig(
-    blueprint=companies_api_bp,
-    entity_table_name=ENTITY_NAME,
-    service=company_service
-)
+company_api_crud_config = ApiCrudRouteConfig(blueprint=companies_api_bp, entity_table_name=ENTITY_NAME, service=company_service)

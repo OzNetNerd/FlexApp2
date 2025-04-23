@@ -9,6 +9,7 @@ from app.utils.table_helpers import get_table_plural_name
 from app.routes.api.context import ListAPIContext, EntityAPIContext, ErrorAPIContext
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 
@@ -116,12 +117,9 @@ from typing import Callable, Optional, List, Tuple, Any
 from flask import Blueprint
 from flask.typing import ResponseReturnValue
 
+
 def register_api_route(
-    blueprint: Blueprint,
-    url: str,
-    handler: Callable[..., ResponseReturnValue],
-    endpoint: str,
-    methods: Optional[List[str]] = None
+    blueprint: Blueprint, url: str, handler: Callable[..., ResponseReturnValue], endpoint: str, methods: Optional[List[str]] = None
 ) -> Blueprint:
     """Register a single route on an API blueprint.
 
@@ -139,15 +137,8 @@ def register_api_route(
         Blueprint: The blueprint, for chaining.
     """
     methods = methods or ["GET"]
-    blueprint.add_url_rule(
-        rule=url,
-        endpoint=endpoint,           # no dot, use raw endpoint
-        view_func=handler,
-        methods=methods
-    )
+    blueprint.add_url_rule(rule=url, endpoint=endpoint, view_func=handler, methods=methods)  # no dot, use raw endpoint
     return blueprint
-
-
 
 
 def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:

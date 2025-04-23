@@ -2,6 +2,7 @@ import os
 import pathlib
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 # Get the absolute path to the root directory

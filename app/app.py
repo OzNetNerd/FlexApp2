@@ -23,7 +23,7 @@ migrate = Migrate()
 
 
 @login_manager.unauthorized_handler
-def unauthorized() -> 'flask.wrappers.Response':
+def unauthorized() -> "flask.wrappers.Response":
     """Handle unauthorized access attempts."""
     return make_response("🔒 Unauthorized - Please log in first", 401)
 
@@ -41,7 +41,7 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     app.config.from_object(config_class)
 
     app.config.update(
-        PERMANENT_SESSION_LIFETIME=60 * 60 * 24,     # 1 day
+        PERMANENT_SESSION_LIFETIME=60 * 60 * 24,  # 1 day
         SESSION_PERMANENT=True,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SECURE=True,
@@ -62,9 +62,7 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     # --- Configure console logging at INFO level -----------------
     console_handler = StreamHandler()
     console_handler.setLevel(INFO)
-    console_handler.setFormatter(
-        Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    )
+    console_handler.setFormatter(Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
     root_logger = logging.getLogger()
     root_logger.setLevel(INFO)
     root_logger.addHandler(console_handler)
@@ -75,12 +73,7 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     def handle_type_error(e: TypeError):
         """Render a friendly error page when a TypeError occurs."""
         logger.error(f"TypeError: {e}")
-        return handle_template_error(
-            e,
-            request.endpoint or "",
-            request.path,
-            "An error occurred while preparing the page context"
-        )
+        return handle_template_error(e, request.endpoint or "", request.path, "An error occurred while preparing the page context")
 
     @login_manager.user_loader
     def load_user(user_id: str):
@@ -103,16 +96,11 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     @app.before_request
     def require_login():
         """Enforce login for non-whitelisted endpoints."""
-        whitelisted = {
-            "auth_bp.login", "auth_bp.logout", "static", "debug_session"
-        }
+        whitelisted = {"auth_bp.login", "auth_bp.logout", "static", "debug_session"}
         endpoint = request.endpoint or ""
         logger.info(f"require_login: endpoint={endpoint}, authenticated={current_user.is_authenticated}")
         if not current_user.is_authenticated:
-            if (endpoint in whitelisted
-                    or endpoint.startswith("static")
-                    or endpoint.startswith("api_")
-                    or endpoint.endswith(".data")):
+            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
                 logger.info(f"Access allowed to {endpoint}")
                 return None
             logger.info(f"Access denied to {endpoint}; redirecting to login")

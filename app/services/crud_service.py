@@ -7,6 +7,7 @@ from app.models.base import db
 from app.models.mixins import ValidatorMixin
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 

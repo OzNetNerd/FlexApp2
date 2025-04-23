@@ -3,6 +3,7 @@ from flask_login import login_required
 from app.models import db, CRISPScore, Relationship
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 # Define blueprint with explicit prefix

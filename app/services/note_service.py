@@ -7,6 +7,7 @@ from app.models import Note
 from app.services.crud_service import CRUDService
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 

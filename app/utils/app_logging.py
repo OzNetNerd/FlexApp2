@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 REQUEST_IDS = {}
 
+
 def get_logger() -> logging.Logger:
     """Return a logger named for the calling module.
 

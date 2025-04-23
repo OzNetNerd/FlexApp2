@@ -6,6 +6,7 @@ from app.services.crud_service import CRUDService
 from app.models.task import Task
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 # Define the blueprint

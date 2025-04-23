@@ -17,6 +17,7 @@ from app.models.srs_item import SRSItem
 from app.models.review_history import ReviewHistory
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 srs_bp = Blueprint("srs_bp", __name__, url_prefix="/srs")
@@ -38,7 +39,7 @@ config = CrudRouteConfig(
 register_crud_routes(config)
 
 
-@srs_bp.route('/review/<int:item_id>', methods=['GET'])
+@srs_bp.route("/review/<int:item_id>", methods=["GET"])
 @login_required
 def review_item(item_id):
     logger.info(f"Loading review for SRSItem id={item_id}")
@@ -46,7 +47,7 @@ def review_item(item_id):
 
     if not current_item:
         flash("Card not found", "danger")
-        return redirect(url_for('srs_bp.index'))
+        return redirect(url_for("srs_bp.index"))
 
     # Get all due items
     due_items = srs_service.get_due_items()
@@ -77,15 +78,9 @@ def review_item(item_id):
     cards_due_count = SRSItem.query.filter(SRSItem.next_review_at <= datetime.utcnow()).count()
 
     today_start = datetime.today().replace(hour=0, minute=0, second=0)
-    cards_reviewed_today_count = ReviewHistory.query.filter(
-        ReviewHistory.created_at >= today_start
-    ).count()
+    cards_reviewed_today_count = ReviewHistory.query.filter(ReviewHistory.created_at >= today_start).count()
 
-    stats = {
-        'total_cards': total_cards_count,
-        'cards_due': cards_due_count,
-        'cards_reviewed_today': cards_reviewed_today_count
-    }
+    stats = {"total_cards": total_cards_count, "cards_due": cards_due_count, "cards_reviewed_today": cards_reviewed_today_count}
 
     logger.info(f"Stats: {stats}")
 
@@ -102,14 +97,14 @@ def review_item(item_id):
         total_cards=total_cards,
         next_item_id=next_item_id,
         prev_item_id=prev_item_id,
-        stats=stats
+        stats=stats,
     )
 
     config = RenderSafelyConfig(
-        template_path='pages/crud/create_view_edit_srs_item.html',
+        template_path="pages/crud/create_view_edit_srs_item.html",
         context=context,
         error_message="Error loading flashcard",
-        endpoint="srs_bp.index"
+        endpoint="srs_bp.index",
     )
 
     return render_safely(config)

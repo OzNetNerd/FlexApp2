@@ -2,10 +2,10 @@ from flask import Blueprint, request, jsonify
 from app.models import User, Company, Opportunity
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 search_bp = Blueprint("search_bp", __name__, url_prefix="/api/search")
-
 
 
 @search_bp.route("/")
@@ -75,12 +75,16 @@ def mentions_search():
 
     # Temporary implementation
     if mention_type == "user":
-        entities = User.query.filter(
-            User.username.ilike(f"%{query}%") |
-            User.name.ilike(f"%{query}%") |
-            User.first_name.ilike(f"%{query}%") |
-            User.last_name.ilike(f"%{query}%")
-        ).limit(10).all()
+        entities = (
+            User.query.filter(
+                User.username.ilike(f"%{query}%")
+                | User.name.ilike(f"%{query}%")
+                | User.first_name.ilike(f"%{query}%")
+                | User.last_name.ilike(f"%{query}%")
+            )
+            .limit(10)
+            .all()
+        )
 
         for entity in entities:
             results.append(
@@ -113,13 +117,18 @@ def users_data():
 
     if query:
         logger.debug(f"Searching for users with query: {query}")
-        users = User.query.filter(
-            User.username.ilike(f"%{query}%") |
-            User.name.ilike(f"%{query}%") |
-            User.first_name.ilike(f"%{query}%") |
-            User.last_name.ilike(f"%{query}%") |
-            User.email.ilike(f"%{query}%")
-        ).order_by(User.name).limit(10).all()
+        users = (
+            User.query.filter(
+                User.username.ilike(f"%{query}%")
+                | User.name.ilike(f"%{query}%")
+                | User.first_name.ilike(f"%{query}%")
+                | User.last_name.ilike(f"%{query}%")
+                | User.email.ilike(f"%{query}%")
+            )
+            .order_by(User.name)
+            .limit(10)
+            .all()
+        )
     else:
         users = User.query.order_by(User.name).limit(30).all()
 
@@ -142,9 +151,7 @@ def companies_data():
 
     if query:
         logger.debug(f"Searching for companies with query: {query}")
-        companies = Company.query.filter(
-            Company.name.ilike(f"%{query}%")
-        ).order_by(Company.name).limit(10).all()
+        companies = Company.query.filter(Company.name.ilike(f"%{query}%")).order_by(Company.name).limit(10).all()
     else:
         companies = Company.query.order_by(Company.name).limit(30).all()
 

@@ -1,4 +1,5 @@
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 # Log that the modules have been imported and initialized

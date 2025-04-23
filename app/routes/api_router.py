@@ -12,9 +12,9 @@ logger = get_logger()
 
 def discover_api_modules() -> Iterator[Any]:
     """Yield all modules in the app.routes.api package."""
-    package = importlib.import_module('app.routes.api')
+    package = importlib.import_module("app.routes.api")
     for finder, module_name, _ in pkgutil.iter_modules(package.__path__):
-        yield importlib.import_module(f'{package.__name__}.{module_name}')
+        yield importlib.import_module(f"{package.__name__}.{module_name}")
 
 
 def register_api_blueprints(app: Flask) -> None:
@@ -32,15 +32,15 @@ def register_api_blueprints(app: Flask) -> None:
     # 1) Wire up CRUD routes on each blueprint before any registration
     for module in modules:
         for attr in dir(module):
-            if attr.endswith('_api_crud_config'):
+            if attr.endswith("_api_crud_config"):
                 config = getattr(module, attr)
-                logger.debug(f'Wiring CRUD routes for {config.entity_table_name}')
+                logger.debug(f"Wiring CRUD routes for {config.entity_table_name}")
                 register_api_crud_routes(config)
 
     # 2) Now register the blueprints on the app
     for module in modules:
         for attr in dir(module):
-            if attr.endswith('_api_bp'):
+            if attr.endswith("_api_bp"):
                 bp = getattr(module, attr)  # type: Blueprint
-                logger.debug(f'Registering API blueprint: {bp.name}')
+                logger.debug(f"Registering API blueprint: {bp.name}")
                 app.register_blueprint(bp)

@@ -6,6 +6,7 @@ from enum import Enum
 from flask import request
 
 from app.utils.app_logging import log_instance_vars, get_logger
+
 logger = get_logger()
 
 

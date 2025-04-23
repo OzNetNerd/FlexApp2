@@ -3,6 +3,7 @@ from flask import Blueprint
 from app.routes.web.route_registration import register_route, SimpleContext
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 # Define the blueprint

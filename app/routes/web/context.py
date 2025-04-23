@@ -7,6 +7,7 @@ from app.utils.app_logging import log_instance_vars
 from typing import Any, Optional, List
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 
@@ -214,7 +215,7 @@ class EntityContext(BaseContext):
 
         # Make entity available to templates directly
         # This is crucial for templates that reference entity directly
-        setattr(self, 'entity', self.entity)
+        setattr(self, "entity", self.entity)
 
         # Set the correct submit URL based on action and read-only status
         if not self.read_only:

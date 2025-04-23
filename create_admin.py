@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 

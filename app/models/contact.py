@@ -4,7 +4,9 @@ from app.models.base import db, BaseModel
 from app.models.relationship import Relationship  # reuse the generic Relationship model
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
+
 
 class Contact(BaseModel):
     __tablename__ = "contacts"
@@ -200,8 +202,12 @@ class Contact(BaseModel):
 
         # Clear existing opportunity relationships for this contact
         Relationship.query.filter(
-            ((Relationship.entity1_type == "contact") & (Relationship.entity1_id == self.id) & (Relationship.entity2_type == "opportunity")) |
-            ((Relationship.entity2_type == "contact") & (Relationship.entity2_id == self.id) & (Relationship.entity1_type == "opportunity"))
+            ((Relationship.entity1_type == "contact") & (Relationship.entity1_id == self.id) & (Relationship.entity2_type == "opportunity"))
+            | (
+                (Relationship.entity2_type == "contact")
+                & (Relationship.entity2_id == self.id)
+                & (Relationship.entity1_type == "opportunity")
+            )
         ).delete()
 
         # Add new opportunity relationships
@@ -215,10 +221,6 @@ class Contact(BaseModel):
                     opp_id = int(opportunity)
 
                 relationship = Relationship(
-                    entity1_type="contact",
-                    entity1_id=self.id,
-                    entity2_type="opportunity",
-                    entity2_id=opp_id,
-                    relationship_type="linked"
+                    entity1_type="contact", entity1_id=self.id, entity2_type="opportunity", entity2_id=opp_id, relationship_type="linked"
                 )
                 db.session.add(relationship)

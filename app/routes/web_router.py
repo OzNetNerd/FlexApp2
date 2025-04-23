@@ -1,63 +1,41 @@
-# web_router.py
-
+import pkgutil
+import importlib
+from typing import Iterator, Any
 from flask import Flask, Blueprint
-
-from app.routes.web.companies import companies_bp
-from app.routes.web.contacts import contacts_bp
-from app.routes.web.opportunities import opportunities_bp
-from app.routes.web.users import users_bp
-from app.routes.web.tasks import tasks_bp
-from app.routes.web.settings import settings_bp
-from app.routes.web.auth import auth_bp
-from app.routes.web.home import home_bp
-from app.routes.web.srs import srs_bp
-
-# Register the blueprint with your Flask app
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 
-# Define blueprints with original names for template compatibility
-relationships_bp = Blueprint("relationships", __name__, url_prefix="/relationships")
-crisp_scores_bp = Blueprint("crisp_scores", __name__, url_prefix="/crisp_scores")
+def discover_web_modules() -> Iterator[Any]:
+    """Yield all modules in the app.routes.web package, excluding the components subpackage.
 
-# List of blueprints to register
-BLUEPRINTS = [
-    companies_bp,
-    contacts_bp,
-    opportunities_bp,
-    users_bp,
-    tasks_bp,
-    settings_bp,
-    auth_bp,
-    home_bp,
-    relationships_bp,
-    crisp_scores_bp,
-    srs_bp,
-]
+    Scans the `app.routes.web` directory and imports each module except those
+    under `components`, yielding the imported module object.
+
+    Returns:
+        Iterator[Any]: Imported module objects.
+    """
+    package = importlib.import_module("app.routes.web")
+    for _, module_name, is_pkg in pkgutil.iter_modules(package.__path__):
+        if module_name == "components":
+            continue
+        yield importlib.import_module(f"{package.__name__}.{module_name}")
 
 
 def register_web_blueprints(app: Flask) -> None:
-    """
-    Central function for registering all blueprints in the application.
+    """Auto-register all web blueprints from app.routes.web.
 
-    This function serves as the single point of registration for all blueprints
-    in the application. Each blueprint represents a distinct functional area or
-    feature set within the application. Adding new blueprints to this function
-    will make them available throughout the application.
+    Discovers Blueprint objects named `<something>_bp` in each module
+    returned by `discover_web_modules()` and registers them on the Flask app.
 
     Args:
-        app (Flask): The Flask application instance to which blueprints will be registered
-
-    Returns:
-        None: This function modifies the app in-place and does not return a value
-
-    Example:
-        register_web_blueprints(app)
+        app (Flask): The Flask application instance.
     """
-    logger.info("Registering all web blueprints...")
-
-    # Loop through blueprints and register each one
-    for bp in BLUEPRINTS:
-        app.register_blueprint(bp)
-        logger.info(f"Blueprint '{bp.name}' registered successfully")
+    for module in discover_web_modules():
+        for attr in dir(module):
+            if attr.endswith("_bp"):
+                bp = getattr(module, attr)
+                if isinstance(bp, Blueprint):
+                    logger.debug(f"Registering web blueprint: {bp.name} at {bp.url_prefix}")
+                    app.register_blueprint(bp)

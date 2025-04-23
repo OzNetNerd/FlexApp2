@@ -9,16 +9,8 @@ logger = get_logger()
 ENTITY_NAME = "User"
 ENTITY_PLURAL_NAME = "Users"
 
-users_api_bp = Blueprint(
-    f"{ENTITY_NAME.lower()}_api",
-    __name__,
-    url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}"
-)
+users_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 
 user_service = UserService(User)
 
-user_api_crud_config = ApiCrudRouteConfig(
-    blueprint=users_api_bp,
-    entity_table_name=ENTITY_NAME,
-    service=user_service
-)
+user_api_crud_config = ApiCrudRouteConfig(blueprint=users_api_bp, entity_table_name=ENTITY_NAME, service=user_service)

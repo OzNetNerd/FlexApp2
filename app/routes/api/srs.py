@@ -10,19 +10,12 @@ logger = get_logger()
 ENTITY_NAME = "SRSItem"
 ENTITY_PLURAL_NAME = "SRS"
 
-srs_api_bp = Blueprint(
-    f"{ENTITY_NAME.lower()}_api",
-    __name__,
-    url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}"
-)
+srs_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 
 srs_service = SRSService()
 
-srs_api_crud_config = ApiCrudRouteConfig(
-    blueprint=srs_api_bp,
-    entity_table_name=ENTITY_NAME,
-    service=srs_service
-)
+srs_api_crud_config = ApiCrudRouteConfig(blueprint=srs_api_bp, entity_table_name=ENTITY_NAME, service=srs_service)
+
 
 @srs_api_bp.route("/due", methods=["GET"])
 def get_due_items():
@@ -30,10 +23,12 @@ def get_due_items():
     items = srs_service.get_due_items()
     return {"due": [i.to_dict() for i in items]}
 
+
 @srs_api_bp.route("/<int:item_id>/preview", methods=["GET"])
 def preview_item_ratings(item_id: int) -> Dict[str, Any]:
     """Show how long this card would be buried for each rating (0–5)."""
     return srs_service.preview_ratings(item_id)
+
 
 @srs_api_bp.route("/<int:item_id>/review", methods=["POST"])
 def review_item(item_id: int) -> Dict[str, Any]:
@@ -42,6 +37,7 @@ def review_item(item_id: int) -> Dict[str, Any]:
     rating = int(data.get("rating", 0))
     item = srs_service.schedule_review(item_id, rating)
     return item.to_dict()
+
 
 @srs_api_bp.route("/items", methods=["GET"])
 def get_all_items():

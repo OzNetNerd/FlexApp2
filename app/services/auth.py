@@ -5,7 +5,9 @@ from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
+
 
 class AuthService:
     def __init__(self, model):

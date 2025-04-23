@@ -2,6 +2,7 @@ import json
 from app.models.base import db, BaseModel
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 

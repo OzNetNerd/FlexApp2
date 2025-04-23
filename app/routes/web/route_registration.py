@@ -9,7 +9,11 @@ from flask import Blueprint, request, flash, redirect, url_for, render_template
 from app.utils.table_helpers import get_table_plural_name
 from app.routes.web.context import BaseContext, SimpleContext, EntityContext, TableContext
 
+from app.utils.table_helpers import get_table_plural_name
+
+
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 
@@ -48,8 +52,15 @@ class CrudTemplates:
 
     def to_dict(self) -> Dict[str, Optional[str]]:
         """Convert the dataclass to a dictionary."""
-        return {"index": self.index, "create": self.create, "view": self.view,
-                "edit": self.edit, "update": self.update, "delete": self.delete}  # Update this line
+        return {
+            "index": self.index,
+            "create": self.create,
+            "view": self.view,
+            "edit": self.edit,
+            "update": self.update,
+            "delete": self.delete,
+        }  # Update this line
+
 
 @dataclass
 class CrudRouteConfig:
@@ -72,6 +83,25 @@ def render_safely(config: RenderSafelyConfig):
     except Exception as e:
         logger.error(f"Error rendering template '{config.template_path}': {e}", exc_info=True)
         return f"<h1>{config.error_message}</h1><p>Error: {str(e)}</p>", 500
+
+
+def default_crud_templates(entity_table_name: str) -> CrudTemplates:
+    """Generate default CRUD template paths for a given entity.
+
+    Args:
+        entity_table_name (str): Singular name of the entity (e.g. "Company").
+
+    Returns:
+        CrudTemplates: Paths based on a consistent convention.
+    """
+    plural = get_table_plural_name(entity_table_name)
+    lower = entity_table_name.lower()
+    return CrudTemplates(
+        index=f"pages/tables/{plural}.html",
+        create=f"pages/crud/create_{lower}.html",
+        view=f"pages/crud/view_{lower}.html",
+        edit=f"pages/crud/edit_{lower}.html",
+    )
 
 
 def prepare_route_config(

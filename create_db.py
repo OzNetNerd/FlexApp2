@@ -11,6 +11,7 @@ from werkzeug.security import generate_password_hash
 # logger = logging.getLogger(__name__)
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 
@@ -153,10 +154,7 @@ def _create_sample_opportunities(db):
 
     added = 0
     for opp_data in sample_opportunities:
-        existing_opp = Opportunity.query.filter_by(
-            name=opp_data["name"],
-            company_id=opp_data["company_id"]
-        ).first()
+        existing_opp = Opportunity.query.filter_by(name=opp_data["name"], company_id=opp_data["company_id"]).first()
         if not existing_opp:
             db.session.add(Opportunity(**opp_data))
             added += 1
@@ -171,66 +169,37 @@ def _create_sample_srs_items(db):
     logger.info("Processing example SRS cards...")
     sample_cards = [
         # Contact cards
-        {
-            "notable_type": "Contact",
-            "notable_id": 1,
-            "question": "What is Test User's last name?",
-            "answer": "User"
-        },
-        {
-            "notable_type": "Contact",
-            "notable_id": 2,
-            "question": "What is Test2 User2's first name?",
-            "answer": "Test2"
-        },
-        {
-            "notable_type": "Contact",
-            "notable_id": 1,
-            "question": "Which contact has ID #1?",
-            "answer": "Test User"
-        },
-
+        {"notable_type": "Contact", "notable_id": 1, "question": "What is Test User's last name?", "answer": "User"},
+        {"notable_type": "Contact", "notable_id": 2, "question": "What is Test2 User2's first name?", "answer": "Test2"},
+        {"notable_type": "Contact", "notable_id": 1, "question": "Which contact has ID #1?", "answer": "Test User"},
         # Company cards
-        {
-            "notable_type": "Company",
-            "notable_id": 1,
-            "question": "What industry is Acme Inc in?",
-            "answer": "Technology company"
-        },
-        {
-            "notable_type": "Company",
-            "notable_id": 2,
-            "question": "What is Beta Corp's main business?",
-            "answer": "Manufacturing company"
-        },
-
+        {"notable_type": "Company", "notable_id": 1, "question": "What industry is Acme Inc in?", "answer": "Technology company"},
+        {"notable_type": "Company", "notable_id": 2, "question": "What is Beta Corp's main business?", "answer": "Manufacturing company"},
         # Opportunity cards
         {
             "notable_type": "Opportunity",
             "notable_id": 1,
             "question": "What is the value of the New Website opportunity?",
-            "answer": "$10,000"
+            "answer": "$10,000",
         },
         {
             "notable_type": "Opportunity",
             "notable_id": 2,
             "question": "What stage is the Software Upgrade opportunity in?",
-            "answer": "Negotiation"
+            "answer": "Negotiation",
         },
         {
             "notable_type": "Opportunity",
             "notable_id": 2,
             "question": "Which company is associated with the Software Upgrade opportunity?",
-            "answer": "Beta Corp (ID: 2)"
-        }
+            "answer": "Beta Corp (ID: 2)",
+        },
     ]
 
     added = 0
     for card_data in sample_cards:
         existing_card = SRSItem.query.filter_by(
-            notable_type=card_data["notable_type"],
-            notable_id=card_data["notable_id"],
-            question=card_data["question"]
+            notable_type=card_data["notable_type"], notable_id=card_data["notable_id"], question=card_data["question"]
         ).first()
         if not existing_card:
             db.session.add(SRSItem(**card_data))

@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.relationship import Relationship
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 

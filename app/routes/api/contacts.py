@@ -9,16 +9,8 @@ logger = get_logger()
 ENTITY_NAME = "Contact"
 ENTITY_PLURAL_NAME = "Contacts"
 
-contacts_api_bp = Blueprint(
-    f"{ENTITY_NAME.lower()}_api",
-    __name__,
-    url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}"
-)
+contacts_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 
 contact_service = CRUDService(Contact)
 
-contact_api_crud_config = ApiCrudRouteConfig(
-    blueprint=contacts_api_bp,
-    entity_table_name=ENTITY_NAME,
-    service=contact_service
-)
+contact_api_crud_config = ApiCrudRouteConfig(blueprint=contacts_api_bp, entity_table_name=ENTITY_NAME, service=contact_service)

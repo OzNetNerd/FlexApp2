@@ -10,6 +10,7 @@ from app.models.srs_item import SRSItem
 from app.models.review_history import ReviewHistory
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 
@@ -99,16 +100,15 @@ class SRSService(CRUDService):
 
         # Update item properties
         update_data = {
-            'ease_factor': new_ease,
-            'interval': next_interval,
-            'repetition': item.repetition + 1,
-            'review_count': item.review_count + 1,
-            'next_review_at': next_review_at
+            "ease_factor": new_ease,
+            "interval": next_interval,
+            "repetition": item.repetition + 1,
+            "review_count": item.review_count + 1,
+            "next_review_at": next_review_at,
         }
 
         # Persist updated SRSItem
-        logger.info(
-            f"SRSService: updating item {item.id} → next in {next_interval:.2f}d, ef={new_ease:.2f}")
+        logger.info(f"SRSService: updating item {item.id} → next in {next_interval:.2f}d, ef={new_ease:.2f}")
         self.update(item, update_data)
 
         # Record history

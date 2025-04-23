@@ -3,6 +3,7 @@ from typing import List
 from dataclasses import dataclass
 
 from app.utils.app_logging import get_logger
+
 logger = get_logger()
 
 
