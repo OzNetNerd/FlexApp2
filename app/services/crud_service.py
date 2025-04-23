@@ -37,6 +37,32 @@ class CRUDService:
         self.model = model
         self.required_fields = required_fields or []
 
+    def get_all(
+        self,
+        page: int = 1,
+        per_page: int = 15,
+        sort_column: str = "id",
+        sort_direction: str = "asc",
+        filters: Optional[Dict[str, Any]] = None,
+    ):
+        """
+        Retrieve a paginated, sorted, and optionally filtered list of entities.
+        """
+        query = self.model.query
+
+        # Apply any exact‐match filters
+        if filters:
+            for attr, val in filters.items():
+                if hasattr(self.model, attr):
+                    query = query.filter(getattr(self.model, attr) == val)
+
+        # Apply sorting
+        if hasattr(self.model, sort_column):
+            col = getattr(self.model, sort_column)
+            query = query.order_by(col.desc() if sort_direction.lower() == "desc" else col.asc())
+
+        return query.paginate(page=page, per_page=per_page)
+
     def get_by_id(self, entity_id: int):
         return self.model.query.get(entity_id)
 
