@@ -1,6 +1,7 @@
 # app/services/relationship_service.py
 
 from typing import List, Tuple, Dict, Any, Optional
+from sqlalchemy import or_, and_
 from app.models.base import db
 from app.models.relationship import Relationship
 from app.models.user import User
@@ -13,7 +14,7 @@ logger = get_logger()
 
 
 class RelationshipService:
-    """Service class to manage entity relationships."""
+    """Service class to manage entity relationships and helper mappings."""
 
     ENTITY_MODELS = {"user": User, "contact": Contact, "company": Company}
 
@@ -123,15 +124,15 @@ class RelationshipService:
     def get_relationships_for_entity(cls, entity_type: str, entity_id: int) -> List[Dict[str, Any]]:
         """Get all relationships for an entity with related data."""
         relationships = Relationship.query.filter(
-            db.or_(
-                db.and_(Relationship.entity1_type == entity_type.lower(), Relationship.entity1_id == entity_id),
-                db.and_(Relationship.entity2_type == entity_type.lower(), Relationship.entity2_id == entity_id),
+            or_(
+                and_(Relationship.entity1_type == entity_type.lower(), Relationship.entity1_id == entity_id),
+                and_(Relationship.entity2_type == entity_type.lower(), Relationship.entity2_id == entity_id),
             )
         ).all()
 
         result = []
         for rel in relationships:
-            # Get related entity type and id
+            # Determine the related side
             if rel.entity1_type == entity_type.lower() and rel.entity1_id == entity_id:
                 related_type = rel.entity2_type
                 related_id = rel.entity2_id
@@ -139,7 +140,6 @@ class RelationshipService:
                 related_type = rel.entity1_type
                 related_id = rel.entity1_id
 
-            # Get related entity object
             related_entity = cls.get_entity(related_type, related_id)
             if not related_entity:
                 continue
@@ -157,3 +157,40 @@ class RelationshipService:
             )
 
         return result
+
+    # New helper mappings
+    @classmethod
+    def get_user_companies(cls, user_id: int) -> List[Dict[str, Any]]:
+        """Fetch companies related to a user."""
+        rels = cls.get_relationships_for_entity('user', user_id)
+        return [r for r in rels if r['entity_type'] == 'company']
+
+    @classmethod
+    def get_user_opportunities(cls, user_id: int) -> List[Dict[str, Any]]:
+        """Fetch opportunities related to a user."""
+        rels = cls.get_relationships_for_entity('user', user_id)
+        return [r for r in rels if r['entity_type'] == 'opportunity']
+
+    @classmethod
+    def get_user_contacts(cls, user_id: int) -> List[Dict[str, Any]]:
+        """Fetch contacts related to a user."""
+        rels = cls.get_relationships_for_entity('user', user_id)
+        return [r for r in rels if r['entity_type'] == 'contact']
+
+    @classmethod
+    def get_contact_contacts(cls, contact_id: int) -> List[Dict[str, Any]]:
+        """Fetch contacts related to a contact."""
+        rels = cls.get_relationships_for_entity('contact', contact_id)
+        return [r for r in rels if r['entity_type'] == 'contact']
+
+    @classmethod
+    def get_contact_opportunities(cls, contact_id: int) -> List[Dict[str, Any]]:
+        """Fetch opportunities related to a contact."""
+        rels = cls.get_relationships_for_entity('contact', contact_id)
+        return [r for r in rels if r['entity_type'] == 'opportunity']
+
+    @classmethod
+    def get_opportunity_companies(cls, opportunity_id: int) -> List[Dict[str, Any]]:
+        """Fetch companies related to an opportunity."""
+        rels = cls.get_relationships_for_entity('opportunity', opportunity_id)
+        return [r for r in rels if r['entity_type'] == 'company']
