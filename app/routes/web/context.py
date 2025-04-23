@@ -110,8 +110,7 @@ class EntityContext(BaseContext):
         **kwargs,
     ):
         super().__init__(
-            title=title, show_navbar=True, read_only=read_only,
-            entity_table_name=entity_table_name, table_name=entity_table_name, **kwargs
+            title=title, show_navbar=True, read_only=read_only, entity_table_name=entity_table_name, table_name=entity_table_name, **kwargs
         )
 
         self.autocomplete_fields = autocomplete_fields or []

@@ -1,7 +1,8 @@
 """
 Additional simplified authentication tests that don't depend on the User model.
 
-These tests focus on verifying the functionality of authentication-related endpoints without depending on the actual implementation of the User model.
+These tests focus on verifying the functionality of authentication-related endpoints
+ without depending on the actual implementation of the User model.
 """
 
 import os

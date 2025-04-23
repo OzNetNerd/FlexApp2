@@ -3,8 +3,6 @@ Execute this script to create a pytest.ini file that skips database-dependent te
 This makes it easier to focus on basic tests that don't need database access.
 """
 
-import os
-
 PYTEST_INI_CONTENT = """
 [pytest]
 markers =

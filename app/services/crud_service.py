@@ -128,39 +128,45 @@ def handle_api_crud_operation(
 
 
 def register_api_route(
-    blueprint: Blueprint,
-    url: str,
-    handler: Callable[..., ResponseReturnValue],
-    endpoint: str,
-    methods: Optional[List[str]] = None
+    blueprint: Blueprint, url: str, handler: Callable[..., ResponseReturnValue], endpoint: str, methods: Optional[List[str]] = None
 ) -> None:
     blueprint.add_url_rule(rule=url, endpoint=endpoint, view_func=handler, methods=methods or ["GET"])
 
 
 def make_func(action: str, svc: Any, entity: str) -> tuple[str, list[str], Callable]:
     if action == CRUDEndpoint.GET_ALL.value:
+
         def get_all():
             return handle_api_crud_operation(action, svc, entity)
+
         return "/", ["GET"], get_all
 
     if action == CRUDEndpoint.GET_BY_ID.value:
+
         def get_by_id(entity_id):
             return handle_api_crud_operation(action, svc, entity, entity_id)
+
         return "/<int:entity_id>", ["GET"], get_by_id
 
     if action == CRUDEndpoint.CREATE.value:
+
         def create():
             return handle_api_crud_operation(action, svc, entity, data=request.get_json())
+
         return "/", ["POST"], create
 
     if action == CRUDEndpoint.UPDATE.value:
+
         def update(entity_id):
             return handle_api_crud_operation(action, svc, entity, entity_id, data=request.get_json())
+
         return "/<int:entity_id>", ["PUT"], update
 
     if action == CRUDEndpoint.DELETE.value:
+
         def delete(entity_id):
             return handle_api_crud_operation(action, svc, entity, entity_id)
+
         return "/<int:entity_id>", ["DELETE"], delete
 
     return "", [], None

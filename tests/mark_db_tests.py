@@ -2,7 +2,6 @@
 Add database test markers to test files.
 """
 
-import os
 import re
 from pathlib import Path
 

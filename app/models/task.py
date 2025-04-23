@@ -9,16 +9,12 @@ logger = get_logger()
 class Task(BaseModel):
     __tablename__ = "tasks"
 
-    # Add primary key
     id = db.Column(db.Integer, primary_key=True)
-
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     due_date = db.Column(db.DateTime)
     status = db.Column(db.String(20), default="Pending")
     priority = db.Column(db.String(20), default="Medium")
-
-    # Setting default values for notable_type and notable_id
     notable_type = db.Column(db.String(50), nullable=False, default="User")
     notable_id = db.Column(db.Integer, nullable=False, default=1)
 
@@ -28,7 +24,7 @@ class Task(BaseModel):
         Returns:
             str: Summary with task title.
         """
-        return f"<Task {self.title}>"
+        return f"<Task {self.title!r}>"
 
     def save(self, notable_type: str = "User", notable_id: int = 1) -> "Task":
         """Persist task to the database with logging.
@@ -40,24 +36,21 @@ class Task(BaseModel):
         Returns:
             Task: The saved task instance.
         """
-        # Ensure notable_type and notable_id are set before saving
         if not self.notable_type:
             self.notable_type = notable_type
         if not self.notable_id:
             self.notable_id = notable_id
 
-        # Removed the validation check that was raising ValueError
-
-        logger.info(f"Saving task '{self.title}' with status {self.status}")
+        logger.info(f"Saving task {self.title!r} with status {self.status!r}")
         super().save()
-        logger.info(f"Task '{self.title}' saved successfully.")
+        logger.info(f"Task {self.title!r} saved successfully.")
         return self
 
     def delete(self) -> None:
         """Remove task from the database with logging."""
-        logger.info(f"Deleting task '{self.title}'")
+        logger.info(f"Deleting task {self.title!r}")
         super().delete()
-        logger.info(f"Task '{self.title}' deleted successfully.")
+        logger.info(f"Task {self.title!r} deleted successfully.")
 
     @classmethod
     def create_from_form(cls, form_data):
@@ -69,12 +62,10 @@ class Task(BaseModel):
         Returns:
             Task: The created task instance
         """
-        # Ensure notable_type and notable_id are present
         if "notable_type" not in form_data or not form_data["notable_type"]:
             form_data["notable_type"] = "User"
 
         if "notable_id" not in form_data or not form_data["notable_id"]:
-            # Try to get user ID from the session or set default
             try:
                 from flask_login import current_user
 
@@ -94,7 +85,6 @@ class Task(BaseModel):
             notable_id=int(form_data["notable_id"]),
         )
 
-        # Handle date if provided
         if form_data.get("due_date"):
             try:
                 if isinstance(form_data["due_date"], str):
@@ -102,7 +92,7 @@ class Task(BaseModel):
                 else:
                     task.due_date = form_data["due_date"]
             except ValueError:
-                logger.warning(f"Invalid date format for due_date: {form_data['due_date']}")
+                logger.warning(f"Invalid date format for due_date: {form_data['due_date']!r}")
 
         task.save()
         return task

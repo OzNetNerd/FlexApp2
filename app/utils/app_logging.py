@@ -18,7 +18,6 @@ def get_logger() -> logging.Logger:
     Returns:
         Logger: A configured Python logger for the caller's module.
     """
-    # Look one frame up to find who called us
     frame = inspect.currentframe().f_back
     module = inspect.getmodule(frame)
     name = module.__name__ if module and hasattr(module, "__name__") else __name__
@@ -27,7 +26,7 @@ def get_logger() -> logging.Logger:
 
 def log_instance_vars(instance_details, instance, exclude: list[str] = None) -> None:
     exclude = exclude or []
-    logger.info(f"📋 Attributes for {instance_details}:")
+    logger.info(f"📋 Attributes for {instance_details}: ")
     for attr, value in vars(instance).items():
         if attr in exclude:
             continue
@@ -39,10 +38,7 @@ def log_instance_vars(instance_details, instance, exclude: list[str] = None) -> 
 
 
 def log_message_and_vars(message: str, vars: dict) -> None:
-    # Log the provided message
     logger.info(message)
-
-    # Log each variable with indentation
     for key, value in vars.items():
         logger.info(f"  📝 {key}: {value}")
 
@@ -63,7 +59,7 @@ def start_timer():
 
 def log_elapsed(timer_start, message):
     elapsed = time.time() - timer_start
-    logger.debug(f"⏱️ {message}: {elapsed:.4f} seconds")
+    logger.debug(f"⏱️ {message}: {elapsed: .4f} seconds")
 
 
 class LoggingUndefined(DebugUndefined):
@@ -72,21 +68,21 @@ class LoggingUndefined(DebugUndefined):
     def _log(self, msg: str):
         var_name = self._undefined_name
         self.__class__._missing_variables.add(var_name)
-        logger.warning(f"⚠️  {msg}: '{var_name}'")
+        logger.warning(f"⚠️  {msg}: {var_name!r}")
 
     def __str__(self):
         self._log("Undefined variable rendered as string")
-        return f"<<undefined:{self._undefined_name}>>"
+        return f"<<undefined: {self._undefined_name}>>"
 
     __repr__ = __str__
     __html__ = __str__
 
     def __getitem__(self, key):
-        self._log(f"Attempted to access key '{key}' on undefined variable")
+        self._log(f"Attempted to access key {key!r} on undefined variable")
         return self.__class__(hint=self._undefined_hint, obj=self._undefined_obj, name=f"{self._undefined_name}[{key!r}]")
 
     def __getattr__(self, attr):
-        self._log(f"Attempted to access attribute '{attr}' on undefined variable")
+        self._log(f"Attempted to access attribute {attr!r} on undefined variable")
         return self.__class__(hint=self._undefined_hint, obj=self._undefined_obj, name=f"{self._undefined_name}.{attr}")
 
     @classmethod
@@ -97,4 +93,4 @@ class LoggingUndefined(DebugUndefined):
     def raise_if_missing(cls):
         if cls._missing_variables:
             missing_list = "\n".join(f"- {v}" for v in sorted(cls._missing_variables))
-            raise RuntimeError(f"❌ Missing template variables:\n{missing_list}")
+            raise RuntimeError(f"❌ Missing template variables: \n{missing_list}")

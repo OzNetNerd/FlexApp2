@@ -61,10 +61,7 @@ class TableConfig(BaseModel):
             config_dict = config.config
             if isinstance(config_dict, list):
                 logger.info(f"Converting legacy format for table {table_name!r}")
-                column_overrides = {
-                    col["field"]: {k: v for k, v in col.items() if k != "field"}
-                    for col in config_dict if "field" in col
-                }
+                column_overrides = {col["field"]: {k: v for k, v in col.items() if k != "field"} for col in config_dict if "field" in col}
                 return {
                     "autoGenerateColumns": True,
                     "columnOverrides": column_overrides,

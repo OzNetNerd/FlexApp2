@@ -13,18 +13,21 @@ class BaseModel(db.Model):
     __abstract__ = True
 
     @declared_attr
+    @classmethod
     def __tablename__(cls) -> str:
-        # snake_case plural of class name, e.g. Contact → contacts
+        """snake_case plural of class name, e.g. Contact → contacts"""
         return cls.__name__.lower() + "s"
 
     @declared_attr
+    @classmethod
     def __entity_name__(cls) -> str:
-        # Title-case singular, e.g. "Contact"
+        """Title-case singular, e.g. 'Contact'"""
         return cls.__name__
 
     @declared_attr
+    @classmethod
     def __entity_plural__(cls) -> str:
-        # snake_case plural, same as __tablename__
+        """snake_case plural, same as __tablename__"""
         return cls.__tablename__
 
     def __init__(self, **kwargs):
@@ -55,10 +58,8 @@ class BaseModel(db.Model):
         Returns:
             dict: A dictionary of column names, relationship keys, and their values.
         """
-        # Start with columns.
         data = {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-        # Include relationship fields.
         for rel in self.__mapper__.relationships:
             try:
                 value = getattr(self, rel.key)
@@ -69,10 +70,8 @@ class BaseModel(db.Model):
             if value is None:
                 data[rel.key] = None
             elif isinstance(value, list):
-                # For a list of related objects, return a list of their IDs.
                 data[rel.key] = [entity.id for entity in value if hasattr(entity, "id")]
             else:
-                # For a single related object, return its ID.
                 data[rel.key] = value.id if hasattr(value, "id") else None
 
         return data
