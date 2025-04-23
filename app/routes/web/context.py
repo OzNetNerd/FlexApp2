@@ -4,7 +4,7 @@ from flask import url_for
 from flask_login import current_user
 
 from app.utils.app_logging import get_logger, log_instance_vars
-from app.utils.table_helpers import get_table_id_by_name, get_table_plural_name
+from app.utils.table_helpers import get_table_id_by_name, get_table_plural_name, get_entity_base_route
 
 logger = get_logger()
 
@@ -88,6 +88,10 @@ class TableContext(SimpleContext):
         plural_entity_table_name = get_table_plural_name(self.entity_table_name)
         self.data_api_url = f"/api/{plural_entity_table_name}"
         logger.info(f"Set attribute data_url = {self.data_api_url!r} (from table_name = {self.entity_table_name!r})")
+
+        # Add this new line to define entity_base_route
+        self.entity_base_route = get_entity_base_route(self.entity_table_name)
+        logger.info(f"Set attribute entity_base_route = {self.entity_base_route!r} (from {lower_entity_table_name!r})")
 
     def __str__(self):
         """Return a user-friendly string representation focusing on table attributes."""

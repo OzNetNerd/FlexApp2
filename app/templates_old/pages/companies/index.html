@@ -1,13 +1,13 @@
 <!-- START TEMPLATE: companies.html -->
 
-{% extends 'layouts/layout.html' %}
+{% extends 'layouts/base.html' %}
 {% from 'macros/card.html' import card %}
 
 {% block title %}Companies{% endblock %}
 
 {% block content %}
   {% call card(title='Companies') %}
-    {% include 'components/table.html' with context %}
+    {% include 'layouts/_table_index.html' with context %}
   {% endcall %}
 {% endblock %}
 

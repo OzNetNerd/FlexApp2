@@ -1,6 +1,6 @@
-<!-- START TEMPLATE: layout.html -->
+<!-- START TEMPLATE: base.html -->
 {# ------------------------------------------------------------------------------
-  File: layout.html | Purpose: Main application layout template
+  File: base.html | Purpose: Main application layout template
   Description:
     - Core layout template that consolidates the base structure, head section, and scripts
     - Provides the main structural blocks that other templates can extend
@@ -44,8 +44,8 @@
     <!-- Head Debug Logger -->
     <script type="module">
       import log from '/static/js/logger.js';
-      log("info", "layout.html", "head", "🎯 Page title set", "{{ self.title() }}");
-      log("debug", "layout.html", "head", "📦 Head assets loaded");
+      log("info", "base.html", "head", "🎯 Page title set", "{{ self.title() }}");
+      log("debug", "base.html", "head", "📦 Head assets loaded");
     </script>
     
     <!-- Toast Module Loader: Always load toasts.js and expose showToast globally -->
@@ -136,4 +136,4 @@
     {% block scripts_extra %}{% endblock %}
   </body>
 </html>
-<!-- END TEMPLATE: layout.html -->
+<!-- END TEMPLATE: base.html -->
