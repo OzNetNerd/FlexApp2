@@ -1,7 +1,6 @@
 # app/services/crud_service.py
 
 import traceback
-from datetime import datetime
 from typing import Any, Type
 
 from app.models.base import db

@@ -3,7 +3,7 @@
 from datetime import UTC, datetime, timedelta
 
 # Updated imports based on py-fsrs documentation
-from fsrs import Card, Rating, ReviewLog, Scheduler, State
+from fsrs import Scheduler
 
 from app.models.review_history import ReviewHistory
 from app.models.srs_item import SRSItem

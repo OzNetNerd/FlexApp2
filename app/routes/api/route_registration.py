@@ -1,19 +1,15 @@
 # app/routes/api/route_registration.py
 
-import importlib
-import pkgutil
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from flask import Blueprint, request
 from flask.typing import ResponseReturnValue
-from werkzeug.exceptions import HTTPException
 
 from app.routes.api.context import EntityAPIContext, ErrorAPIContext, ListAPIContext
 from app.routes.api.json_utils import json_endpoint
 from app.utils.app_logging import get_logger
-from app.utils.table_helpers import get_table_plural_name
 
 logger = get_logger()
 

@@ -41,7 +41,6 @@ def init_db(app):
 
 
 def _create_default_table_configs(db):
-    from app.models.table_config import TableConfig
 
     logger.info("Creating default table configurations...")
     # Add any default table config creation logic here

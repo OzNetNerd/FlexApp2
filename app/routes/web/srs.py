@@ -1,8 +1,6 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 
-from app.models import SRSItem
-from app.models.srs_item import SRSItem
 from app.routes.web.context import EntityContext, TableContext
 from app.routes.web.context_utils import use_context
 from app.routes.web.route_registration import default_crud_templates

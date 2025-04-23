@@ -8,7 +8,7 @@ from typing import Any, Dict, Tuple, Union
 
 from flask import abort, current_app, get_flashed_messages, render_template, request, url_for
 from jinja2 import DebugUndefined, Environment
-from jinja2.exceptions import TemplateNotFound, TemplateSyntaxError
+from jinja2.exceptions import TemplateNotFound
 from markupsafe import Markup, escape
 
 from app.routes.web.context import BaseContext

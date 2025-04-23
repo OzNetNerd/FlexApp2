@@ -1,7 +1,7 @@
 # app/services/note_service.py
 
 from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from typing import List
 
 from sqlalchemy import or_
 

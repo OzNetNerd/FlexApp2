@@ -1,6 +1,4 @@
 from datetime import datetime, timedelta
-from typing import List
-
 from flask import Blueprint, request
 
 from app.models import Note

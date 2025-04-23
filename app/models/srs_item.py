@@ -1,6 +1,5 @@
 # srs_item.py
 
-import enum
 from datetime import datetime
 
 from app.models.base import BaseModel, db
