@@ -1,0 +1,144 @@
+<!-- START TEMPLATE: create_view_edit_task.html -->
+
+{% extends "page_templates/_create_view_edit.html" %}
+
+{% import 'base/macros/render_form_fields.html' as field_macros with context %}
+{% import 'base/macros/tabs.html' as tab_macros with context %}
+{% import 'base/macros/entity_macros.html' as entity_macros with context %}
+
+{# Force the parent template to use our title #}
+{% block page_title %}{{ title }}{% endblock %}
+{% block heading %}{{ title }}{% endblock %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block view_template_content %}
+<form method="post" action="{{ submit_url }}" id="main-form">
+  {{ csrf_input }}
+
+  <!-- Priority, Status, Due Date fields row -->
+  <div class="row mt-4">
+    <div class="col-md-4">
+      {{ field_macros.render_field({
+          "entry_name": "priority",
+          "label": "Priority",
+          "type": "select",
+          "value": entity.priority,
+          "required": true,
+          "options": [
+              {"value": "Low", "label": "Low"},
+              {"value": "Medium", "label": "Medium"},
+              {"value": "High", "label": "High"}
+          ]
+      }, read_only=read_only) }}
+    </div>
+    <div class="col-md-4">
+      {{ field_macros.render_field({
+          "entry_name": "status",
+          "label": "Status",
+          "type": "select",
+          "value": entity.status,
+          "required": true,
+          "options": [
+              {"value": "Pending", "label": "Pending"},
+              {"value": "In Progress", "label": "In Progress"},
+              {"value": "Completed", "label": "Completed"}
+          ]
+      }, read_only=read_only) }}
+    </div>
+    <div class="col-md-4">
+      {{ field_macros.render_field({
+          "entry_name": "due_date",
+          "label": "Due Date",
+          "type": "date",
+          "value": entity.due_date or "",
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+    </div>
+  </div>
+
+  <div class="tab-content" id="formTabsContent">
+    <!-- Tab Pane: About -->
+    {% call tab_macros.render_tab_section('about', 'Task Details', active=true) %}
+      {{ field_macros.render_field({
+          "entry_name": "title",
+          "label": "Title",
+          "type": "text",
+          "value": entity.title,
+          "required": true,
+          "options": []
+      }, read_only=read_only) }}
+      {{ field_macros.render_field({
+          "entry_name": "description",
+          "label": "Description",
+          "type": "textarea",
+          "value": entity.description,
+          "required": false,
+          "options": []
+      }, read_only=read_only) }}
+
+      <!-- Customer Autocomplete -->
+      <div class="form-group dropdown-container">
+        <label for="customer-input">Customer</label>
+        <input type="text"
+          id="customer-input"
+          class="form-control autocomplete-input"
+          placeholder="Search for customer..."
+          data-entity-type="company"
+          data-entity-id="{{ entity.customer_id if entity.customer_id else '' }}"
+          data-entity-name="{{ entity.customer.name if entity.customer else '' }}"
+          data-initial="{{ [entity.customer_id]|tojson if entity.customer_id else '[]' }}"
+          {% if read_only %}disabled{% endif %}>
+        <input type="hidden" name="customer_id" id="customer_id" value="{{ entity.customer_id if entity.customer_id else '' }}">
+        <div class="autocomplete-dropdown-menu" id="customer-results"></div>
+      </div>
+
+      <!-- Owner Autocomplete -->
+      <div class="form-group dropdown-container">
+        <label for="owner-input">Owner</label>
+        <input type="text"
+          id="owner-input"
+          class="form-control autocomplete-input"
+          placeholder="Search for owner..."
+          data-entity-type="user"
+          data-entity-id="{{ entity.owner_id if entity.owner_id else '' }}"
+          data-entity-name="{{ entity.owner.name if entity.owner else '' }}"
+          data-initial="{{ [entity.owner_id]|tojson if entity.owner_id else '[]' }}"
+          {% if read_only %}disabled{% endif %}>
+        <input type="hidden" name="owner_id" id="owner_id" value="{{ entity.owner_id if entity.owner_id else '' }}">
+        <div class="autocomplete-dropdown-menu" id="owner-results"></div>
+      </div>
+    {% endcall %}
+
+    {% if read_only %}
+    <!-- Tab Pane: System Info -->
+    {% call tab_macros.render_tab_section('system-info', 'System Information') %}
+      {{ field_macros.render_field({
+          "entry_name": "created_at",
+          "label": "Created At",
+          "type": "datetime",
+          "value": entity.created_at,
+          "required": false,
+          "options": []
+      }, read_only=true) }}
+      {{ field_macros.render_field({
+          "entry_name": "updated_at",
+          "label": "Updated At",
+          "type": "datetime",
+          "value": entity.updated_at,
+          "required": false,
+          "options": []
+      }, read_only=true) }}
+    {% endcall %}
+
+    <!-- Tab Pane: Notes -->
+    {% call tab_macros.render_tab_section('notes', 'Notes') %}
+      {% include 'pages/crud/sections/_notes_section.html' %}
+    {% endcall %}
+    {% endif %}
+  </div>
+</form>
+
+{% endblock view_template_content %}
+
+<!-- END TEMPLATE: create_view_edit_task.html -->
