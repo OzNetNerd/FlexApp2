@@ -119,41 +119,44 @@ def get_flask_globals() -> Dict[str, Any]:
     return globals_dict
 
 
-def handle_template_error(e: Exception, template_name: str, endpoint_name: str, fallback_error_message: str) -> Tuple[str, int]:
-    """
-    Handles template rendering errors and returns a debug panel response.
-    """
-    current_path = request.path
-    logger.error(f"❌ Template error for '{template_name}' at path '{current_path}'")
-    logger.error(f"❌ Exception: {type(e).__name__}: {str(e)}")
-    logger.error(f"❌ Traceback: {traceback.format_exc()}")
+def handle_template_error(
+    e: Exception,
+    template_name: str,
+    endpoint_name: str,
+    fallback_error_message: str
+) -> tuple[str, int]:
+    """Central handler for Jinja rendering errors.
 
+    - Aborts with 404 if the template is not found.
+    - Returns a friendly error page for other exceptions.
+    """
+    # If the template itself wasn't found, return a 404
     if isinstance(e, TemplateNotFound):
-        error_type = "Template Not Found"
-        details = f"The template '{e.name}' could not be found."
-        status_code = 404
-    elif isinstance(e, TemplateSyntaxError):
-        error_type = "Template Syntax Error"
-        details = f"Syntax error in template '{template_name}': {str(e)}"
+        abort(404)
+
+    # Otherwise, determine the status code and message
+    if hasattr(e, 'lineno'):
+        # A syntax error in the template
         status_code = 500
+        details = f"Syntax error in template '{template_name}': {e}"
     else:
-        error_type = "❌ Rendering Error"
-        details = str(e)
+        # Some other rendering error
         status_code = 500
+        details = str(e)
 
-    logger.debug(f"🔧 Error Context data: {endpoint_name}")
-    logger.debug(f"🔧 Error type: {error_type}")
-    logger.debug(f"🔧 Error details: {details}")
+    # In debug mode show full traceback, else show fallback message
+    error_body = (traceback.format_exc()
+                  if current_app.debug
+                  else fallback_error_message)
 
-    render_fallback_error = traceback.format_exc() if current_app.debug else fallback_error_message
-
-    return render_debug_panel(
-        template_name=template_name,
-        original_error=details,
-        render_fallback_error=render_fallback_error,
-        endpoint_name=endpoint_name,
-        status_code=status_code,
-    )
+    return render_template(
+        'pages/base/error.html',
+        error_type="Rendering Error",
+        details=details,
+        error_body=error_body,
+        endpoint=endpoint_name,
+        path=request.path
+    ), status_code
 
 
 def render_debug_panel(

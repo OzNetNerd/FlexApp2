@@ -1,20 +1,15 @@
 # app/routes/home.py
-from flask import Blueprint
-from app.routes.web.route_registration import register_route, SimpleContext
 
+from flask import Blueprint, render_template
+from flask_login import login_required, current_user
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
-
-# Define the blueprint
 home_bp = Blueprint("home_bp", __name__, url_prefix="/")
 
-
-# Register the home page route
-register_route(
-    blueprint=home_bp,
-    url="/",
-    template_path="pages/misc/home.html",
-    title="home",
-    context_provider=SimpleContext,
-)
+@home_bp.route("/", methods=["GET"])
+@login_required
+def index():
+    """Render the dashboard home page for authenticated users."""
+    logger.info(f"Rendering dashboard for user {current_user.id}")
+    return render_template("pages/home/dashboard.html")
