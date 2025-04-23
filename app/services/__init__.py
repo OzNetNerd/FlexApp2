@@ -1,4 +1,5 @@
 from app.utils.app_logging import get_logger
+from app.services.crud_service import CRUDService
 
 logger = get_logger()
 
@@ -20,4 +21,4 @@ def init_db(app):
 # from .mention import process_mentions
 
 # __all__ = ["init_db", "process_mentions"]
-__all__ = ["init_db"]
+__all__ = ["init_db", "CRUDService"]

@@ -1,183 +1,198 @@
-# app/services/crud_service.py
+# app/routes/api/route_registration.py
 
-import traceback
-from typing import Any, Type
 
-from app.models.base import db
-from app.models.mixins import ValidatorMixin
+from dataclasses import dataclass
+from enum import Enum
+import json
+from typing import Any, Callable, Dict, List, Optional, Union, Type
+
+from flask import Blueprint, request
+from flask.typing import ResponseReturnValue
+
+from app.routes.api.context import EntityAPIContext, ErrorAPIContext, ListAPIContext
+from app.routes.api.json_utils import json_endpoint
 from app.utils.app_logging import get_logger
+from app.models.base import db
+
 
 logger = get_logger()
 
 
+class CRUDEndpoint(Enum):
+    GET_ALL = "get_all"
+    GET_BY_ID = "get_by_id"
+    CREATE = "create"
+    UPDATE = "update"
+    DELETE = "delete"
+
+
+@dataclass
+class ApiCrudRouteConfig:
+    """Configuration for API CRUD routes."""
+
+    blueprint: Blueprint
+    entity_table_name: str
+    service: Any
+    include_routes: Optional[List[str]] = None
+
+
+
 class CRUDService:
-    """
-    Generic CRUD service for SQLAlchemy models.
+    """Generic service for basic CRUD operations on a SQLAlchemy model."""
 
-    This class abstracts away common patterns for creating, reading,
-    updating, and deleting models. Intended to be subclassed or instantiated
-    per-model for reuse and testability.
-    """
-
-    def __init__(self, model_class: Type, required_fields: list[str] = None):
-        """
-        Initialize the CRUDService.
-
-        Args:
-            model_class (Type): The SQLAlchemy model class to operate on.
-            required_fields (list[str], optional): Fields that must be present on create.
-        """
-        self.model_class = model_class
+    def __init__(self, model: Type[db.Model], required_fields: Optional[List[str]] = None):
+        self.model = model
         self.required_fields = required_fields or []
 
-    def get_all(
-        self,
-        page: int = 1,
-        per_page: int = 15,
-        sort_column: str = "id",
-        sort_direction: str = "asc",
-        filters: dict | None = None,
-    ) -> Any:
-        """
-        Retrieve paginated and optionally filtered results.
+    def get_by_id(self, entity_id: int):
+        return self.model.query.get(entity_id)
 
-        Args:
-            page (int): Page number.
-            per_page (int): Results per page.
-            sort_column (str): Field to sort by.
-            sort_direction (str): 'asc' or 'desc'.
-            filters (dict | None): Column filters.
+    def create(self, data: dict):
+        self._validate_required_fields(data)
+        entity = self.model(**data)
+        db.session.add(entity)
+        db.session.commit()
+        return entity
 
-        Returns:
-            Pagination: A pagination object with results.
-        """
-        try:
-            query = self.model_class.query
+    def update(self, entity, data: dict):
+        for key, value in data.items():
+            setattr(entity, key, value)
+        db.session.commit()
+        return entity
 
-            if filters:
-                for col_id, filter_config in filters.items():
-                    if hasattr(self.model_class, col_id):
-                        column = getattr(self.model_class, col_id)
-                        ftype = filter_config.get("type")
-                        fval = filter_config.get("filter")
-                        logger.debug(f"Applying filter on {col_id}: {ftype}={fval}")
-                        if ftype == "contains":
-                            query = query.filter(column.ilike(f"%{fval}%"))
-                        elif ftype == "equals":
-                            query = query.filter(column == fval)
-
-            if hasattr(self.model_class, sort_column):
-                column = getattr(self.model_class, sort_column)
-                query = query.order_by(column.desc() if sort_direction == "desc" else column)
-
-            return query.paginate(page=page, per_page=per_page, error_out=False)
-
-        except Exception as e:
-            logger.error(f"❌ Error in get_all for {self.model_class.__name__}: {e}")
-            logger.error(traceback.format_exc())
-            raise
-
-    def get_by_id(self, entity_id: int) -> Any:
-        """Fetch a single instance by its primary key."""
-        try:
-            return db.session.get(self.model_class, entity_id)
-        except Exception as e:
-            logger.error(f"❌ Error fetching {self.model_class.__name__} id={entity_id}: {e}")
-            raise
-
-    def create(self, data: dict) -> Any:
-        """
-        Create a new instance after validating required fields and handling extra attrs.
-
-        Raises:
-            ValueError: If any required fields are missing.
-        """
-        try:
-            # 1) enforce required fields
-            missing = [f for f in self.required_fields if not data.get(f)]
-            if missing:
-                raise ValueError(f"Missing required fields: {missing}")
-
-            # 2) pull off any non-column properties to set after flush
-            property_attrs = {}
-            for key in list(data):
-                if key not in self.model_class.__table__.columns:
-                    property_attrs[key] = data.pop(key)
-
-            # 3) instantiate and persist
-            entity = self.model_class(**data)
-            db.session.add(entity)
-            db.session.flush()  # get PK without committing
-
-            # 4) assign back any extra attributes
-            for key, value in property_attrs.items():
-                try:
-                    setattr(entity, key, value)
-                except Exception as e:
-                    logger.warning(f"Could not set property {key}: {e}")
-
-            db.session.commit()
-            return entity
-
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"❌ Error creating {self.model_class.__name__}: {e}")
-            logger.error(traceback.format_exc())
-            raise
-
-    def update(self, entity: Any, data: dict) -> Any:
-        """
-        Update an existing instance.
-
-        Args:
-            entity (Any): The existing instance.
-            data (dict): New values.
-
-        Returns:
-            Any: The updated instance.
-        """
-        try:
-            # strip out empty strings and convert dates if needed
-            data = {k: v for k, v in data.items() if v != ""}
-            data = self._convert_dates(data)
-
-            # model-level validation
-            if isinstance(entity, ValidatorMixin):
-                errors = entity.validate_update(data)
-                if errors:
-                    raise ValueError(f"Validation failed: {errors}")
-
-            for key, value in data.items():
-                if hasattr(entity, key):
-                    setattr(entity, key, value)
-
-            db.session.commit()
-            return entity
-
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"❌ Error updating {entity.__class__.__name__} id={getattr(entity, 'id', 'unknown')}: {e}")
-            logger.error(traceback.format_exc())
-            raise
-
-    def delete(self, entity_or_id: Any) -> bool:
-        """
-        Delete an instance by ID or instance.
-
-        Returns:
-            bool: True if deletion succeeded.
-        """
-        if isinstance(entity_or_id, int):
-            entity = self.get_by_id(entity_or_id)
-        else:
-            entity = entity_or_id
-
-        try:
+    def delete(self, entity_id: int):
+        entity = self.get_by_id(entity_id)
+        if entity:
             db.session.delete(entity)
             db.session.commit()
-            logger.info(f"✅ Deleted {entity.__class__.__name__} id={entity.id}")
-            return True
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"❌ Error deleting {entity.__class__.__name__} id={getattr(entity, 'id', 'unknown')}: {e}")
-            raise
+
+    def _validate_required_fields(self, data: dict):
+        missing = [field for field in self.required_fields if field not in data]
+        if missing:
+            raise ValueError(f"Missing required fields: {', '.join(missing)}")
+
+
+def handle_api_crud_operation(
+        endpoint: str,
+        service: Any,
+        entity_table_name: str,
+        entity_id: Optional[Union[int, str]] = None,
+        data: Optional[Dict[str, Any]] = None,
+) -> Any:
+    """
+    Handle CRUD operations based on endpoint type and return a Context object.
+    """
+    try:
+        if endpoint == CRUDEndpoint.GET_ALL.value:
+            # Extract pagination params from request
+            page = request.args.get('page', 1, type=int)
+            per_page = request.args.get('per_page', 15, type=int)
+            sort_column = request.args.get('sort_column', 'id', type=str)
+            sort_direction = request.args.get('sort_direction', 'asc', type=str)
+
+            # Extract filters if present
+            filters = None
+            if request.args.get('filters'):
+                try:
+                    filters = json.loads(request.args.get('filters'))
+                except Exception as e:
+                    logger.warning(f"Failed to parse filters parameter: {e}")
+
+            result = service.get_all(page, per_page, sort_column, sort_direction, filters)
+            if hasattr(result, "items"):
+                return ListAPIContext(entity_table_name=entity_table_name, items=result.items,
+                                      total_count=getattr(result, "total", None))
+            return ListAPIContext(entity_table_name=entity_table_name, items=result)
+
+        if endpoint == CRUDEndpoint.GET_BY_ID.value and entity_id is not None:
+            entity = service.get_by_id(entity_id)
+            if not entity:
+                return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
+            return EntityAPIContext(entity_table_name=entity_table_name, entity=entity)
+
+        if endpoint == CRUDEndpoint.CREATE.value and data is not None:
+            entity = service.create(data)
+            return EntityAPIContext(
+                entity_table_name=entity_table_name,
+                entity=entity,
+                message=f"{entity_table_name} created successfully",
+            )
+
+        if endpoint == CRUDEndpoint.UPDATE.value and entity_id is not None and data is not None:
+            existing = service.get_by_id(entity_id)
+            if not existing:
+                return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
+            entity = service.update(existing, data)
+            return EntityAPIContext(
+                entity_table_name=entity_table_name,
+                entity=entity,
+                message=f"{entity_table_name} updated successfully",
+            )
+
+        if endpoint == CRUDEndpoint.DELETE.value and entity_id is not None:
+            existing = service.get_by_id(entity_id)
+            if not existing:
+                return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
+            service.delete(entity_id)
+            return {"message": f"{entity_table_name} deleted successfully"}
+
+        return ErrorAPIContext(message="Invalid operation or parameters", status_code=400)
+    except Exception as e:
+        logger.error(f"Error in API CRUD operation '{endpoint}': {e}", exc_info=True)
+        return ErrorAPIContext(message="Internal server error", status_code=500)
+
+
+def register_api_route(
+        blueprint: Blueprint, url: str, handler: Callable[..., ResponseReturnValue], endpoint: str,
+        methods: Optional[List[str]] = None
+) -> None:
+    """Register a single route on an API blueprint."""
+    blueprint.add_url_rule(rule=url, endpoint=endpoint, view_func=handler, methods=methods or ["GET"])
+
+
+def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:
+    """Register CRUD API routes based on configuration, all wrapped with @json_endpoint."""
+    logger.info(f"Registering CRUD routes for {config.entity_table_name}")
+
+    bp = config.blueprint
+    entity = config.entity_table_name
+    svc = config.service
+    include = config.include_routes or [e.value for e in CRUDEndpoint]
+
+    for action in include:
+        if action not in [e.value for e in CRUDEndpoint]:
+            continue
+
+        # Define URL and HTTP methods
+        if action == CRUDEndpoint.GET_ALL.value:
+            url = "/"
+            methods = ["GET"]
+            func = lambda: handle_api_crud_operation(action, svc, entity)
+        elif action == CRUDEndpoint.GET_BY_ID.value:
+            url = "/<int:entity_id>"
+            methods = ["GET"]
+            func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id)
+        elif action == CRUDEndpoint.CREATE.value:
+            url = "/"
+            methods = ["POST"]
+            func = lambda: handle_api_crud_operation(action, svc, entity, data=request.get_json())
+        elif action == CRUDEndpoint.UPDATE.value:
+            url = "/<int:entity_id>"
+            methods = ["PUT"]
+            func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id, data=request.get_json())
+        elif action == CRUDEndpoint.DELETE.value:
+            url = "/<int:entity_id>"
+            methods = ["DELETE"]
+            func = lambda entity_id: handle_api_crud_operation(action, svc, entity, entity_id)
+        else:
+            continue
+
+        # Wrap the handler with json_endpoint
+        handler = json_endpoint(func)
+        handler.__name__ = action
+
+        # Register the route
+        register_api_route(bp, url, handler, endpoint=action, methods=methods)
+        logger.info(f"Registered API route {action} @ {url}")
+
+    return bp

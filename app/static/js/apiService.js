@@ -19,10 +19,18 @@ export async function fetchApiDataFromContainer(containerId) {
 
     try {
         // Get data from API
-        const data = await fetchApiData(scriptName, functionName, apiUrl);
+        const response = await fetchApiData(scriptName, functionName, apiUrl);
+
+        // Check for error in response even if success flag is true
+        if (response && response.data && response.data.error) {
+            const error = response.data.error;
+            log("error", scriptName, functionName, `❌ API returned an error: ${error.message}`, { statusCode: error.status_code });
+            throw new Error(error.message || "Unknown API error");
+        }
+
         // Log the actual data for debugging
-        log("info", scriptName, functionName, "📊 Data structure:", data);
-        return data;
+        log("info", scriptName, functionName, "📊 Data structure:", response);
+        return response;
     } catch (error) {
         log("error", scriptName, functionName, "❌ Failed to fetch data from API", { error: error.message || String(error) });
         throw error; // Re-throw to let the caller handle it
@@ -35,8 +43,26 @@ export async function fetchApiDataFromContainer(containerId) {
  * @returns {Array} - Normalized data array
  */
 export function normalizeData(data) {
+    // Handle potential error responses
+    if (data && data.data && data.data.error) {
+        throw new Error(data.data.error.message || "Unknown API error");
+    }
+
     // Handle both data structures: data = [{...}] or data = {data: [{...}]}
-    return Array.isArray(data) ? data : (data.data || []);
+    if (Array.isArray(data)) {
+        return data;
+    } else if (data && typeof data === 'object') {
+        if (data.data && Array.isArray(data.data)) {
+            return data.data;
+        } else if (data.data && typeof data.data === 'object' && !data.data.error) {
+            return [data.data];
+        } else if (Object.keys(data).length > 0 && !('data' in data)) {
+            return [data];
+        }
+    }
+
+    // Fallback to empty array
+    return [];
 }
 
 /**
