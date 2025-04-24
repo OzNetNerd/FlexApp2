@@ -1,8 +1,12 @@
 /**
  * js/logger.js
- * Logger Module – Updated to support file and function grouping.
+ * Logger Module – supports optional nested (file & function) grouping.
  */
 
+// Toggle this to enable/disable nested grouping
+export let nestedLoggingEnabled = false;
+
+// Color map for levels
 const levelColors = {
   debug: '#808080',
   info: '#4682B4',
@@ -10,11 +14,12 @@ const levelColors = {
   error: '#FF0000'
 };
 
-// Map to track open file groups. Each entry holds the function count and current function name.
+// Track open file groups: { functionCount, currentFunction }
 const fileGroups = new Map();
 
-// Helper to close all open groups (both file and nested function groups)
+// Close all open groups (file + nested function)
 function closeAllFileGroups() {
+  if (!nestedLoggingEnabled) return;
   fileGroups.forEach((group) => {
     if (group.currentFunction) {
       console.groupEnd(); // close the function group
@@ -24,6 +29,15 @@ function closeAllFileGroups() {
   fileGroups.clear();
 }
 
+/**
+ * Main log function.
+ *
+ * @param {string} level         One of 'debug'|'info'|'warn'|'error'
+ * @param {string} scriptName    Name of the JS file/module
+ * @param {string} functionName  Name of the function or context
+ * @param {string} message       The message to log
+ * @param {any}    [data]        Optional extra data object
+ */
 export default function log(level, scriptName, functionName, message, data) {
   const timestamp = new Date().toISOString();
   const coloredLevel = `%c${level.toUpperCase()}%c`;
@@ -31,11 +45,20 @@ export default function log(level, scriptName, functionName, message, data) {
   const resetStyle = 'color: inherit; font-weight: normal;';
   const baseMessage = `${timestamp} ${coloredLevel} [${scriptName}:${functionName}]: ${message}`;
 
-  // If we haven't opened a file group for this script, close any existing groups and open a new file group.
+  // If nested grouping is off, just output a flat log
+  if (!nestedLoggingEnabled) {
+    if (data === undefined) {
+      console[level](baseMessage, levelStyle, resetStyle);
+    } else {
+      console[level](baseMessage, levelStyle, resetStyle, data);
+    }
+    return;
+  }
+
+  // --- nested grouping logic ---
+  // Ensure only one file group is open at a time
   if (!fileGroups.has(scriptName)) {
     closeAllFileGroups();
-    // We open the file group with an initial count (here shown as 0).
-    // (Due to console API limits, updating this count later isn’t directly possible.)
     console.groupCollapsed(`${scriptName} (0)`);
     fileGroups.set(scriptName, {
       functionCount: 0,
@@ -45,20 +68,17 @@ export default function log(level, scriptName, functionName, message, data) {
 
   const fileGroup = fileGroups.get(scriptName);
 
-  // If the current function group isn’t the one for this log, close the old function group (if any)
-  // and start a new one.
+  // Switch function groups if needed
   if (fileGroup.currentFunction !== functionName) {
     if (fileGroup.currentFunction !== null) {
       console.groupEnd(); // close previous function group
     }
     fileGroup.functionCount++;
-    // Ideally we would update the file group header to reflect the new function count,
-    // but the console API does not allow updating an already-opened group header.
     console.groupCollapsed(functionName);
     fileGroup.currentFunction = functionName;
   }
 
-  // Log the message inside the current function group.
+  // Finally log inside the innermost group
   if (data === undefined) {
     console[level](baseMessage, levelStyle, resetStyle);
   } else {
@@ -66,6 +86,22 @@ export default function log(level, scriptName, functionName, message, data) {
   }
 }
 
+/**
+ * Force-close all groups immediately.
+ */
 export function resetGroups() {
   closeAllFileGroups();
+}
+
+/**
+ * Helper to change nested-logging behavior at runtime.
+ * Passing false will also close any currently open groups.
+ *
+ * @param {boolean} enabled
+ */
+export function setNestedLogging(enabled) {
+  nestedLoggingEnabled = enabled;
+  if (!enabled) {
+    closeAllFileGroups();
+  }
 }

@@ -1,0 +1,23 @@
+{% extends 'layouts/base.html' %}
+{% from 'components/form_header.html' import form_header %}
+{% from 'components/form_footer.html' import form_footer %}
+{% from 'macros/fields.html'      import render_field %}
+
+{% block title %}{{ action|capitalize }} Company{% endblock %}
+
+{% block content %}
+  <form method="post">
+    {{ csrf_input|safe }}
+
+    {{ form_header(action, 'Company') }}
+
+    {% for field in [
+         {'name':'name','label':'Name','type':'text','value':entity.name,'required':true},
+         {'name':'description','label':'Description','type':'textarea','value':entity.description,'required':false}
+       ] %}
+      {{ render_field(field) }}
+    {% endfor %}
+
+    {{ form_footer(url_for('companies_bp.index')) }}
+  </form>
+{% endblock %}

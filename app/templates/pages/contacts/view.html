@@ -1,0 +1,23 @@
+{% extends 'layouts/base.html' %}
+{% from 'macros/card.html' import card %}
+
+{% block title %}{{ entity.name }}{% endblock %}
+
+{% block content %}
+  {% call card(title=entity.name) %}
+    <dl class="row">
+      <dt class="col-sm-3">Description</dt>
+      <dd class="col-sm-9">{{ entity.description }}</dd>
+    </dl>
+    <a href="{{ url_for('companies_bp.edit', entity_id=entity.id) }}"
+       class="btn btn-primary">Edit</a>
+    <form
+      method="post"
+      action="{{ url_for('companies_bp.delete', entity_id=entity.id) }}"
+      class="d-inline"
+    >
+      {{ csrf_input|safe }}
+      <button class="btn btn-danger">Delete</button>
+    </form>
+  {% endcall %}
+{% endblock %}
