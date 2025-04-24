@@ -128,7 +128,7 @@
   // ** Import paths updated for the new structure **
   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
   // ** Assuming init.js is the table logic, placed in components/table/ **
-  import initTable from '{{ url_for('static', filename='js/components/table/init.js') }}';
+  import initializeTable from '{{ url_for('static', filename='js/components/table.js') }}';
 
   // Ensure the DOM is fully loaded before initializing the grid
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
