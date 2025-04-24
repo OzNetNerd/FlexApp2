@@ -1,6 +1,6 @@
 // static/js/pages/create_view_edit_contact.js
 import log from '/static/js/core/logger.js';
-import { setupAutoComplete } from '/static/js/autoComplete.js';
+import { setupAutoComplete } from '/static/js/components/autoComplete.js';
 
 // Wait for page to fully load
 window.addEventListener('load', function() {

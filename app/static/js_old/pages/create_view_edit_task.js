@@ -1,4 +1,4 @@
-import { setupAutoComplete } from '/static/js/autoComplete.js';
+import { setupAutoComplete } from '/static/js/components/autoComplete.js';
 import log from '/static/js/core/logger.js';
 
 const scriptName = 'create_view_edit_task.js';

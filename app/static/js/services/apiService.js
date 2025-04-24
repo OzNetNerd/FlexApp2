@@ -1,7 +1,7 @@
 // apiService.js
 
 import log from '/static/js/core/logger.js';
-import { getDatasetVariables, getDatasetValue, fetchApiData } from '/static/js/utils.js';
+import { getDatasetVariables, getDatasetValue, fetchApiData } from '/static/js/core/utils.js';
 
 const scriptName = "apiService.js";
 
