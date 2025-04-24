@@ -34,7 +34,7 @@
 
   <!-- Head Debug Logger -->
   <script type="module">
-    import log from '/static/js/logger.js';
+    import log from '{{ url_for('static', filename='js/core/logger.js') }}';
     log("info", "_head.html", "head", "🎯 Page title set", "{{ (title or "CRM") }}");
     log("debug", "_head.html", "head", "📦 Head assets loaded");
   </script>

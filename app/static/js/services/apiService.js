@@ -1,6 +1,6 @@
 // /static/js/services/apiService.js
 
-import log from '../core/logger.js'; // Adjusted path
+import log from '/static/js/core/logger.js';
 import { getDatasetVariables, getDatasetValue, fetchApiData } from '../core/utils.js'; // Adjusted path
 
 const scriptName = "apiService.js";

@@ -1,6 +1,6 @@
 // /static/js/components/toasts.js
 
-import log from '../core/logger.js'; // Adjusted path
+import log from '/static/js/core/logger.js';
 
 const scriptName = "toasts.js";
 

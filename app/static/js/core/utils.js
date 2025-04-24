@@ -1,6 +1,6 @@
 // /static/js/core/utils.js
 
-import log from './logger.js'; // Adjusted path
+import log from '/static/js/core/logger.js';
 
 const scriptName = "utils.js";
 

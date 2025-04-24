@@ -4,7 +4,7 @@
     Error: No request.endpoint available for navigation.
   </div>
   <script type="module">
-    import log from '/static/js/logger.js';
+    import log from '{{ url_for('static', filename='js/core/logger.js') }}';
     log("error", "_footer_buttons.html", "context_check", "Missing required template context: request.endpoint");
   </script>
 {% else %}

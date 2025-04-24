@@ -1,5 +1,5 @@
 // header_buttons.js
-import log from '/static/js/logger.js';
+import log from '/static/js/core/logger.js';
 
 const data = window.headerButtonsData || {};
 const SOURCE = "_header_buttons.html"; // Define source once

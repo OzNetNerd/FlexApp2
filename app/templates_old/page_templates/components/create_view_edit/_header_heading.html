@@ -44,7 +44,7 @@
 {% import "base/macros/render_form_fields.html" as macros %}
 
 <script type="module">
-  import log from '/static/js/logger.js';
+  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
   log("info", "_header_heading.html", "init", "🚀 Header template loaded");
   log("debug", "_header_heading.html", "config", "Read-only mode: {{ read_only|default('false') }}");
   log("debug", "_header_heading.html", "config", "Has ID: {{ id is defined and id is not none }}");
@@ -56,19 +56,19 @@
   {% if action == 'create' %}
     <i class="fas fa-plus-circle me-2"></i>
     <script type="module">
-      import log from '/static/js/logger.js';
+      import log from '{{ url_for('static', filename='js/core/logger.js') }}';
       log("debug", "_header_heading.html", "icon", "Using create icon (plus)");
     </script>
   {% elif read_only %}
     <i class="fas fa-eye me-2"></i>
     <script type="module">
-      import log from '/static/js/logger.js';
+      import log from '{{ url_for('static', filename='js/core/logger.js') }}';
       log("debug", "_header_heading.html", "icon", "Using read-only icon (eye)");
     </script>
   {% else %}
     <i class="fas fa-edit me-2"></i>
     <script type="module">
-      import log from '/static/js/logger.js';
+      import log from '{{ url_for('static', filename='js/core/logger.js') }}';
       log("debug", "_header_heading.html", "icon", "Using edit icon (pencil)");
     </script>
   {% endif %}
@@ -84,20 +84,20 @@
 
 {% if ui is defined and ui %}
   <script type="module">
-    import log from '/static/js/logger.js';
+    import log from '{{ url_for('static', filename='js/core/logger.js') }}';
     log("debug", "_header_heading.html", "ui", "Including pills navigation component");
   </script>
   {% include 'pages/crud/sections/_pills_nav.html' %}
 {% else %}
   <script type="module">
-    import log from '/static/js/logger.js';
+    import log from '{{ url_for('static', filename='js/core/logger.js') }}';
     log("debug", "_header_heading.html", "ui", "No UI configuration - skipping pills navigation");
   </script>
 {% endif %}
 
 <!-- 🔍 Header Render Context Logging -->
 <script type="module">
-  import log from '/static/js/logger.js';
+  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
 
   try {
     log("debug", "_header_heading.html", "context", "Collecting header context data");
@@ -129,7 +129,7 @@
 </script>
 
 <script type="module">
-  import log from '/static/js/logger.js';
+  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
   log("info", "_header_heading.html", "final", "Header template finished rendering");
 </script>
 <!-- END TEMPLATE: _header_heading.html -->

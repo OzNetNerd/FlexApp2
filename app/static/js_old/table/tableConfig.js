@@ -1,5 +1,5 @@
 const scriptName = "tableConfig.js";
-import log from '/static/js/logger.js';
+import log from '/static/js/core/logger.js';
 
 // Create variables to store the grid API outside the gridOptions
 let gridApiReference = null;

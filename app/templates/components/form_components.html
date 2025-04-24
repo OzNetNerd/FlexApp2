@@ -83,7 +83,7 @@
         <input type="text" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
                value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
       {% endif %}
-      
+
       {% if entry.help_text %}
         <div class="form-text text-muted">{{ entry.help_text }}</div>
       {% endif %}
@@ -97,7 +97,7 @@
       Error: No request.endpoint available for navigation.
     </div>
     <script type="module">
-      import log from '/static/js/logger.js';
+      import log from '{{ url_for('static', filename='js/core/logger.js') }}';
       log("error", "form_components.html", "context_check", "Missing required template context: request.endpoint");
     </script>
   {% else %}
@@ -172,13 +172,13 @@
   <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     {% for tab in tabs %}
       <li class="nav-item" role="presentation">
-        <button class="nav-link {% if loop.first %}active{% endif %}" 
-                id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab" 
-                data-bs-toggle="pill" 
-                data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}" 
-                type="button" 
-                role="tab" 
-                aria-controls="tab-{{ tab.tab_name | lower | replace(' ', '-') }}" 
+        <button class="nav-link {% if loop.first %}active{% endif %}"
+                id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
+                data-bs-toggle="pill"
+                data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+                type="button"
+                role="tab"
+                aria-controls="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
                 aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
           {% if tab.icon %}
             <i class="fas fa-{{ tab.icon }} me-1"></i>
@@ -188,9 +188,9 @@
       </li>
     {% endfor %}
   </ul>
-  
+
   <script type="module">
-    import log from '/static/js/logger.js';
+    import log from '{{ url_for('static', filename='js/core/logger.js') }}';
     document.addEventListener('DOMContentLoaded', () => {
       // Log tab navigation events
       document.querySelectorAll('.nav-link[data-bs-toggle="pill"]').forEach(tab => {

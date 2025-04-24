@@ -3,7 +3,7 @@
  * Logger Module – Updated to support file and function grouping.
  */
 
-import log from '/static/js/logger.js';
+import log from '/static/js/core/logger.js';
 import initializeTable from './table/tableInit.js';
 const scriptName = "table.js";
 

@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 
   <script type="module">
-    import log from '/static/js/logger.js';
+    import log from '{{ url_for('static', filename='js/core/logger.js') }}';
     log("error", "500.html", "routing", "❌ 500 page triggered - Server Error");
     log("info", "500.html", "context", "🔙 Suggesting redirect to /");
   </script>

@@ -1,6 +1,6 @@
 const scriptName = "tableInit.js";
 
-import log from '/static/js/logger.js';
+import log from '/static/js/core/logger.js';
 import { getDatasetVariables } from '/static/js/utils.js';
 import { fetchApiDataFromContainer, normalizeData, formatDisplayText } from '/static/js/apiService.js';
 import getGridOptions, { setGridApi } from '/static/js/table/tableConfig.js';

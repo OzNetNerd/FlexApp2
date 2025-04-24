@@ -1,4 +1,4 @@
-import log from '/static/js/logger.js';
+import log from '/static/js/core/logger.js';
 
 export function validateTabsTemplate() {
   const templateData = document.getElementById('template-data');

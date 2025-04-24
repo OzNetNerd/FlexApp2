@@ -1,5 +1,5 @@
 // footer_buttons.js
-import log from '/static/js/logger.js';
+import log from '/static/js/core/logger.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Log initial messages

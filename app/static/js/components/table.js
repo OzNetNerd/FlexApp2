@@ -3,7 +3,7 @@
  * Entry point for table initialization. Imports the actual table logic.
  */
 
-import log from '../core/logger.js'; // Adjusted path
+import log from '/static/js/core/logger.js';
 // Assuming tableInit.js is in the same directory or a subdirectory
 // If tableInit.js is also moved, adjust this path accordingly.
 // If it's complex, it might live in its own subdirectory: e.g., './table/tableInit.js'

@@ -43,7 +43,7 @@
 
 <!-- 🧾 Logging Read-Only Values -->
 <script type="module">
-  import log from '/static/js/logger.js';
+  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
 
   const userEmails = {{ item.users | map(attribute='email') | list | tojson | safe }};
   const companyName = {{ item.company.name | tojson | safe if item.company else '"—"' }};

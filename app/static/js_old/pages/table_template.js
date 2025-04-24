@@ -1,6 +1,6 @@
 // File: static/js/table_custom.js
 
-import log from '/static/js/logger.js';
+import log from '/static/js/core/logger.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Attach event listener to the <li> element to prevent event propagation

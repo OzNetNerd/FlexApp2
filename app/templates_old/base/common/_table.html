@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script type="module">
-  import log from '/static/js/logger.js';
+  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
 
   const title = {{ title | tojson | safe }};
   const entityName = {{ entity_table_name | tojson | safe }};

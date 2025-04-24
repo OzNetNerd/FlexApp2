@@ -2,7 +2,7 @@
 
 // Import custom modules; paths adjusted for new structure
 import { initAutoCompleteFields } from './components/autoComplete.js'; // Adjusted path
-import log from './core/logger.js'; // Adjusted path
+import log from '/static/js/core/logger.js';
 
 // DOMContentLoaded event to ensure the DOM is ready before running scripts.
 document.addEventListener('DOMContentLoaded', () => {
