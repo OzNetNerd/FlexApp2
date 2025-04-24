@@ -8,8 +8,7 @@ from app.routes.web.context import EntityContext, TableContext
 from app.routes.web.context_utils import use_context
 from app.routes.web.route_registration import default_crud_templates
 
-# from app.services.crud_service import CRUDService
-from app.services.crud_service import *
+from app.services.crud_service import CRUDService
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
