@@ -122,12 +122,10 @@
   </div>
 </div>
 
-{# Inline module loader for AG Grid Initialization #}
-{# Consider moving this to a dedicated JS file if it gets complex #}
 <script type="module">
-  // ** Import paths updated for the new structure **
+  // Import paths updated for the new structure
   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-  // ** Assuming init.js is the table logic, placed in components/table/ **
+  // Import the correct function name
   import initializeTable from '{{ url_for('static', filename='js/components/table.js') }}';
 
   // Ensure the DOM is fully loaded before initializing the grid
@@ -138,13 +136,23 @@
   }
 
   function initializeGrid() {
-    const scriptName = '_table_index.html (inline)'; // More specific script name
+    const scriptName = '_table_index.html (inline)';
     const functionName = 'initializeGrid';
     try {
       log('info', scriptName, functionName, '🚀 DOM ready. Initializing AG Grid table...');
-      // Assuming initTable accepts the container ID or finds it internally
-      initTable('#table-container'); // Pass the container selector
-      log('info', scriptName, functionName, '✅ AG Grid initialization requested.');
+      // Call the correct function name without arguments
+      initializeTable()
+        .then(() => {
+          log('info', scriptName, functionName, '✅ AG Grid initialization completed successfully.');
+        })
+        .catch(error => {
+          log('error', scriptName, functionName, '❌ Table initialization failed:', error);
+          // Display an error message in the table container
+          const container = document.querySelector('#table-container');
+          if(container) {
+              container.innerHTML = '<div class="alert alert-danger m-3">Could not load table data. Please try again later.</div>';
+          }
+        });
     } catch (error) {
       log('error', scriptName, functionName, '❌ Failed to initialize AG Grid table.', error);
       // Optionally display an error message to the user in the table container

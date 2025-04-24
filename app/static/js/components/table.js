@@ -237,18 +237,24 @@ export function waitForAgGrid() {
 export function loadTableData(data) {
   const functionName = 'loadTableData';
   if (!data || data.length === 0) {
-    throw new Error("❌ No data available for the table.");
+    const error = new Error("❌ No data available for the table.");
+    log("error", scriptName, functionName, error.message);
+    throw error;
   }
   log("info", scriptName, functionName, `📊 Initializing table with data:`, data);
   try {
     if (gridApiReference) {
       gridApiReference.setRowData(data);
       log("info", scriptName, functionName, "📊 Table initialized with data", data);
+      return true;
     } else {
-      throw new Error("❌ AG Grid API not available.");
+      const error = new Error("❌ AG Grid API not available.");
+      log("error", scriptName, functionName, error.message);
+      throw error;
     }
   } catch (error) {
     log("error", scriptName, functionName, `❌ Error displaying AG Grid table: ${error.message}`);
+    throw error;  // Re-throw to propagate to caller
   }
 }
 
@@ -259,9 +265,16 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
 log("info", scriptName, "module", "AG Grid modules registered successfully");
 
 const tableContainerId = "table-container";
-const gridDiv = document.querySelector(`#${tableContainerId}`);
-log("info", scriptName, "module", `Container '#${tableContainerId}' found? ${!!gridDiv}`);
 window.gridApi = null;
+
+// Style element for column selector (created once)
+const columnSelectorStyle = document.createElement('style');
+columnSelectorStyle.textContent = `
+  .column-selector-item { display:flex; align-items:center; margin:8px 0; padding:4px; background:white; border-radius:4px; }
+  .column-selector-checkbox { margin-right:10px; }
+  .column-selector-label { cursor:pointer; user-select:none; }
+`;
+document.head.appendChild(columnSelectorStyle);
 
 /**
  * Global search setup
@@ -312,27 +325,68 @@ function setupColumnSelector(api) {
   }
   container.innerHTML = '';
   container.style.maxHeight='300px'; container.style.overflowY='auto'; container.style.padding='0 10px';
-  const styleEl = document.createElement('style');
-  styleEl.textContent = `
-    .column-selector-item { display:flex; align-items:center; margin:8px 0; padding:4px; background:white; border-radius:4px; }
-    .column-selector-checkbox { margin-right:10px; }
-    .column-selector-label { cursor:pointer; user-select:none; }
-  `;
-  document.head.appendChild(styleEl);
-  const cols = api.getColumns() || [];
+
+  const cols = api.getColumns ? api.getColumns() : [];
+  if (!Array.isArray(cols)) {
+    log("warn", scriptName, fn, "No columns available from API");
+    return;
+  }
+
   cols.forEach(col => {
-    const colId = col.getColId ? col.getColId() : col.getId();
-    const def = col.getColDef();
-    const name = (def.headerName||colId).replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase()+txt.substr(1).toLowerCase());
-    const visible = !(api.getColumnState().find(c=>c.colId===colId)?.hide);
+    if (!col) return;
+
+    const colId = typeof col.getColId === 'function' ? col.getColId() :
+                 typeof col.getId === 'function' ? col.getId() : null;
+
+    if (!colId) {
+      log("warn", scriptName, fn, "Column without ID found, skipping");
+      return;
+    }
+
+    const def = typeof col.getColDef === 'function' ? col.getColDef() : {};
+    const name = (def.headerName || colId).replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase()+txt.substr(1).toLowerCase());
+
+    const columnState = typeof api.getColumnState === 'function' ? api.getColumnState() : [];
+    const visible = !(Array.isArray(columnState) && columnState.find(c => c.colId === colId)?.hide);
+
     const div = document.createElement('div'); div.className='column-selector-item';
     const chk = document.createElement('input'); chk.type='checkbox'; chk.className='column-selector-checkbox'; chk.id=`chk-${colId}`; chk.checked=visible;
     const lbl = document.createElement('label'); lbl.className='column-selector-label'; lbl.htmlFor=`chk-${colId}`; lbl.textContent=name;
-    chk.addEventListener('change', e=> api.setColumnVisible(colId,e.target.checked));
-    div.append(chk,lbl); container.appendChild(div);
+
+    chk.addEventListener('change', e => {
+      if (typeof api.setColumnVisible === 'function') {
+        api.setColumnVisible(colId, e.target.checked);
+      }
+    });
+
+    div.append(chk, lbl); container.appendChild(div);
   });
-  if (selectAll) selectAll.addEventListener('click',()=>cols.forEach(c=>{api.setColumnVisible(c.getColId(),true);document.getElementById(`chk-${c.getColId()}`).checked=true;}));
-  if (clearAll) clearAll.addEventListener('click',()=>cols.forEach(c=>{api.setColumnVisible(c.getColId(),false);document.getElementById(`chk-${c.getColId()}`).checked=false;}));
+
+  if (selectAll) {
+    selectAll.addEventListener('click', () => {
+      cols.forEach(c => {
+        const colId = typeof c.getColId === 'function' ? c.getColId() : null;
+        if (colId && typeof api.setColumnVisible === 'function') {
+          api.setColumnVisible(colId, true);
+          const checkbox = document.getElementById(`chk-${colId}`);
+          if (checkbox) checkbox.checked = true;
+        }
+      });
+    });
+  }
+
+  if (clearAll) {
+    clearAll.addEventListener('click', () => {
+      cols.forEach(c => {
+        const colId = typeof c.getColId === 'function' ? c.getColId() : null;
+        if (colId && typeof api.setColumnVisible === 'function') {
+          api.setColumnVisible(colId, false);
+          const checkbox = document.getElementById(`chk-${colId}`);
+          if (checkbox) checkbox.checked = false;
+        }
+      });
+    });
+  }
 }
 
 /**
@@ -341,12 +395,17 @@ function setupColumnSelector(api) {
 function generateColumnDefs(data) {
   const fn = "generateColumnDefs";
   log("info", scriptName, fn, "Generating columns");
-  if (!data.length) { log("warn", scriptName, fn, "No data to generate columns"); return []; }
+  if (!data || !data.length) {
+    log("warn", scriptName, fn, "No data to generate columns");
+    return [];
+  }
   const keys = Object.keys(data[0]);
   log("debug", scriptName, fn, `Columns found: ${keys}`);
   return keys.map(key => {
-    const def = { field:key, headerName: formatDisplayText(key), sortable:true, filter:true };
-    if (data[0][key]!=null && typeof data[0][key]==='object') def.valueFormatter=objectValueFormatter;
+    const def = { field: key, headerName: formatDisplayText(key), sortable: true, filter: true };
+    if (data[0][key] != null && typeof data[0][key] === 'object') {
+      def.valueFormatter = objectValueFormatter;
+    }
     return def;
   });
 }
@@ -357,51 +416,69 @@ function generateColumnDefs(data) {
 async function initializeTable() {
   const fn = "initTable";
   log("info", scriptName, fn, "🚀 Starting table init");
-  if (!gridDiv) { log("error", scriptName, fn, `⚠️ Container not found`); return; }
+
+  // Get container element
+  const gridDiv = document.querySelector(`#${tableContainerId}`);
+  if (!gridDiv) {
+    const error = new Error(`⚠️ Container #${tableContainerId} not found`);
+    log("error", scriptName, fn, error.message);
+    return Promise.reject(error);
+  }
+
   if (!gridDiv.style.height && !gridDiv.classList.contains('ag-theme-alpine')) {
     log("info", scriptName, fn, "Applying default height/theme");
-    gridDiv.style.height='500px'; gridDiv.classList.add('ag-theme-alpine');
+    gridDiv.style.height = '500px';
+    gridDiv.classList.add('ag-theme-alpine');
   }
+
   let actualData;
   try {
     const raw = await fetchApiDataFromContainer(tableContainerId);
     log("debug", scriptName, fn, `Raw: ${JSON.stringify(raw).slice(0,100)}…`);
-    const arr = Array.isArray(raw?.data?.data)?raw.data.data:Array.isArray(raw?.data)?raw.data:[];
+    const arr = Array.isArray(raw?.data?.data) ? raw.data.data :
+               Array.isArray(raw?.data) ? raw.data : [];
     log("debug", scriptName, fn, `Rows extracted: ${arr.length}`);
     actualData = normalizeData(arr);
     log("info", scriptName, fn, `Normalized rows: ${actualData.length}`);
   } catch (err) {
     log("error", scriptName, fn, "❌ Fetch/process failed", err);
-    return;
+    return Promise.reject(err);
   }
+
   const gridOptions = getGridOptions();
-  if (actualData.length) {
+
+  if (actualData && actualData.length) {
     gridOptions.columnDefs = generateColumnDefs(actualData);
     window.columnDefs = gridOptions.columnDefs;
   } else {
     log("warn", scriptName, fn, "No data for columns");
   }
+
   const orig = gridOptions.onGridReady;
   gridOptions.onGridReady = params => {
-    if (orig) orig(params);
+    if (typeof orig === 'function') {
+      orig(params);
+    }
     setGridApi(params.api, params.columnApi);
     window.gridApi = params.api;
     params.api.setRowData(actualData);
     setupGlobalSearch(params.api);
     setupColumnSelector(params.api);
-    params.api.addEventListener('gridColumnsChanged', ()=>setupColumnSelector(params.api));
+    params.api.addEventListener('gridColumnsChanged', () => setupColumnSelector(params.api));
     params.api.refreshHeader();
     log("info", scriptName, fn, "Table data ready");
   };
+
   try {
-    new createGrid(gridDiv, gridOptions);
+    const grid = new createGrid(gridDiv, gridOptions);
     log("info", scriptName, fn, "AG Grid created");
   } catch (err) {
     log("error", scriptName, fn, "Grid creation failed", err);
-    throw err;
+    return Promise.reject(err);
   }
+
   log("info", scriptName, fn, "Table init completed");
-  return gridOptions;
+  return Promise.resolve(gridOptions);
 }
 
 // --- Bootstrap (from original table.js) ---
@@ -410,7 +487,13 @@ if (!window.__tableInitialized) {
   document.addEventListener('DOMContentLoaded', () => {
     const fn = "DOMContentLoaded";
     log("info", scriptName, fn, "Initializing table and column selector...");
-    initializeTable();
+    initializeTable()
+      .then(gridOptions => {
+        log("info", scriptName, fn, "Table initialization completed successfully");
+      })
+      .catch(error => {
+        log("error", scriptName, fn, "Table initialization failed:", error);
+      });
   });
 }
 
