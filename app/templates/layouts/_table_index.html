@@ -98,8 +98,8 @@
 
 {# Inline module loader for AG Grid #}
 <script type="module">
-  import log from '/static/js/logger.js';
-  import initTable from '/static/js/table/tableInit.js';
+  import log from '{{ url_for('static', filename='js/logger.js') }}';
+  import initTable from '{{ url_for('static', filename='js/table/tableInit.js') }}';
 
   document.addEventListener('DOMContentLoaded', () => {
     const scriptName = '_table_index.html';
