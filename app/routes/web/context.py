@@ -65,42 +65,52 @@ class SimpleContext(BaseContext):
 
 
 class TableContext(SimpleContext):
-    def __init__(self, entity_table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = None,
-                 **kwargs):
+    """Context class for rendering table views with table-specific attributes."""
+
+    def __init__(self, entity_table_name=None, title="", read_only=True, action=None, **kwargs):
+        # Allow either entity_table_name or model_class as input
+        self.model_class = kwargs.pop('model_class', None)
+
+        # If model_class is provided but not entity_table_name, derive it
+        if self.model_class and not entity_table_name:
+            entity_table_name = self.model_class.__entity_name__
+
+        if not entity_table_name:
+            raise ValueError("Either 'entity_table_name' or 'model_class' must be provided")
+
         self.entity_table_name = entity_table_name
         self.read_only = read_only
         self.action = action
 
-        # Get model class if not provided directly
-        self.model_class = kwargs.pop('model_class', None)
+        # Load model class if not already provided
         if not self.model_class:
-            # Import here to avoid circular imports
             from app.utils.model_registry import get_model_by_name
             self.model_class = get_model_by_name(entity_table_name)
 
-        # Set title using model info
+        # Set title from model metadata if not provided
         if title:
             self.title = title
         else:
-            entity_plural = getattr(self.model_class, '__entity_plural__', self.entity_table_name + 's')
-            self.title = f"{action} {entity_table_name}" if action else entity_plural.capitalize()
+            entity_plural = getattr(self.model_class, '__entity_plural__', self.entity_table_name.lower() + 's')
+            self.title = f"{action.capitalize()} {entity_table_name}" if action else entity_plural.capitalize()
 
         super().__init__(title=self.title, **kwargs)
 
-        # Use model metadata for consistency
-        self.entity_name = getattr(self.model_class, '__entity_name__', self.entity_table_name)
-        self.entity_title = getattr(self.model_class, '__entity_plural__', self.entity_table_name + 's').capitalize()
+        # Variables needed by _table_index.html
+        self.entity_name = self.model_class.__entity_name__
+        self.entity_title = getattr(self.model_class, '__entity_plural__', '').capitalize() or f"{self.entity_name}s"
         self.entity_base_route = f"{self.model_class.__tablename__}_bp"
         self.api_url = f"/api/{self.model_class.__tablename__}"
-
-        # Additional template variables
+        self.table_id = get_table_id_by_name(self.entity_table_name)
         self.default_sort = "name"
-        self.show_heading = True
-        self.show_card_title = False
+        self.show_heading = kwargs.get('show_heading', True)
+        self.show_card_title = kwargs.get('show_card_title', False)
+
+        logger.info(f"TableContext initialized for {self.entity_name} ({self.entity_base_route})")
 
     def __str__(self):
         """Return a user-friendly string representation focusing on table attributes."""
-        return f"TableContext(entity_table_name={self.entity_table_name!r}, table_id={self.table_id}, title={self.title!r})"
+        return f"TableContext(entity_table_name={self.entity_table_name!r}, entity_title={self.entity_title!r})"
 
 
 class EntityContext(BaseContext):
