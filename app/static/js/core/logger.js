@@ -1,6 +1,6 @@
 /**
- * core/utils/logger.js
- * Logger Module – Supports file and function grouping for better debugging
+ * js/logger.js
+ * Logger Module – Updated to support file and function grouping.
  */
 
 const levelColors = {
@@ -35,7 +35,7 @@ export default function log(level, scriptName, functionName, message, data) {
   if (!fileGroups.has(scriptName)) {
     closeAllFileGroups();
     // We open the file group with an initial count (here shown as 0).
-    // (Due to console API limits, updating this count later isn't directly possible.)
+    // (Due to console API limits, updating this count later isn’t directly possible.)
     console.groupCollapsed(`${scriptName} (0)`);
     fileGroups.set(scriptName, {
       functionCount: 0,
@@ -45,7 +45,7 @@ export default function log(level, scriptName, functionName, message, data) {
 
   const fileGroup = fileGroups.get(scriptName);
 
-  // If the current function group isn't the one for this log, close the old function group (if any)
+  // If the current function group isn’t the one for this log, close the old function group (if any)
   // and start a new one.
   if (fileGroup.currentFunction !== functionName) {
     if (fileGroup.currentFunction !== null) {
