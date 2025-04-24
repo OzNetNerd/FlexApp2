@@ -87,14 +87,19 @@ class TableContext(SimpleContext):
             from app.utils.model_registry import get_model_by_name
             self.model_class = get_model_by_name(entity_table_name)
 
-        # Set title from model metadata if not provided
+        # Determine plural name (with fallback)
+        entity_plural = getattr(self.model_class, '__entity_plural__', self.entity_table_name.lower() + 's')
+
+        # Set page title and display title
         if title:
             self.title = title
         else:
-            entity_plural = getattr(self.model_class, '__entity_plural__', self.entity_table_name.lower() + 's')
             self.title = f"{action.capitalize()} {entity_table_name}" if action else entity_plural.capitalize()
 
+        self.page_title = self.title  # ✅ Explicitly set page_title for templates
+
         super().__init__(title=self.title, **kwargs)
+
 
         # Variables needed by _table_index.html
         self.entity_name = self.model_class.__entity_name__

@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
 
 from flask import Blueprint, redirect, request, url_for
+from flask_login import login_required  # ✅ Now used in route_handler
 
 from app.routes.web.components.template_renderer import RenderSafelyConfig, render_safely
 from app.routes.web.context import EntityContext, SimpleContext, TableContext
@@ -51,7 +52,6 @@ def default_crud_templates(entity_table_name: str) -> CrudTemplates:
       - pages/<plural>/view.html
       - pages/<plural>/edit.html
     """
-    # Derive the lowercase plural form (e.g. "contacts" for "Contact")
     plural = get_table_plural_name(entity_table_name).lower()
 
     return CrudTemplates(
@@ -66,13 +66,11 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
     def handler(*args, **kwargs):
         logger.info(f"Handling {request.method} {endpoint} with args={args}, kwargs={kwargs}")
 
-        # POST operations
         if request.method == "POST" and CRUDEndpoint.is_valid(endpoint):
             result = handle_crud_operation(endpoint, config.service, config.blueprint.name, kwargs.get("entity_id"), request.form.to_dict())
             if result:
                 return result
 
-        # GET operations: build appropriate context
         if endpoint == CRUDEndpoint.index.value:
             context = TableContext(entity_table_name=config.entity_table_name)
         elif endpoint == CRUDEndpoint.create.value:
@@ -84,16 +82,13 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         else:
             context = SimpleContext(title=config.entity_table_name)
 
-        # --- CSRF injection for all form-based views ---
         try:
             from flask_wtf.csrf import generate_csrf
             from markupsafe import Markup
-
             context.csrf_input = Markup(f'<input type="hidden" name="csrf_token" value="{generate_csrf()}">')
         except ImportError:
             context.csrf_input = ""
 
-        # Select the template
         template_path = config.templates.get(endpoint, f"pages/crud/{endpoint}_{config.entity_table_name.lower()}.html")
         endpoint_name = f"{config.blueprint.name}.{endpoint}"
 
@@ -106,7 +101,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         return render_safely(cfg)
 
     handler.__name__ = endpoint
-    return handler
+    return login_required(handler)  # ✅ Wrap handler in login_required
 
 
 def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, entity_id: Optional[int], form_data: Dict[str, Any]) -> Any:
@@ -124,15 +119,10 @@ def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, enti
 
 def register_crud_routes(config: CrudRouteConfig) -> None:
     bp = config.blueprint
-    # Index
     bp.add_url_rule(rule="/", endpoint="index", view_func=route_handler("index", config), methods=["GET"])
-    # Create (new)
     bp.add_url_rule(rule="/new", endpoint="create", view_func=route_handler("create", config), methods=["GET", "POST"])
-    # View
     bp.add_url_rule(rule="/<int:entity_id>", endpoint="view", view_func=route_handler("view", config), methods=["GET"])
-    # Edit
     bp.add_url_rule(rule="/<int:entity_id>/edit", endpoint="edit", view_func=route_handler("edit", config), methods=["GET", "POST"])
-    # Delete
     bp.add_url_rule(rule="/<int:entity_id>/delete", endpoint="delete", view_func=route_handler("delete", config), methods=["POST"])
 
 
