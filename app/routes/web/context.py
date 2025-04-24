@@ -1,3 +1,5 @@
+# routes/web/context.py
+
 from typing import Any, List, Optional
 
 from flask import url_for
@@ -63,35 +65,38 @@ class SimpleContext(BaseContext):
 
 
 class TableContext(SimpleContext):
-    """Context class for rendering table views with table-specific attributes."""
-
-    def __init__(self, entity_table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = None, **kwargs):
+    def __init__(self, entity_table_name: str, title: str = "", read_only: bool = True, action: Optional[str] = None,
+                 **kwargs):
         self.entity_table_name = entity_table_name
         self.read_only = read_only
         self.action = action
 
+        # Get model class if not provided directly
+        self.model_class = kwargs.pop('model_class', None)
+        if not self.model_class:
+            # Import here to avoid circular imports
+            from app.utils.model_registry import get_model_by_name
+            self.model_class = get_model_by_name(entity_table_name)
+
+        # Set title using model info
         if title:
             self.title = title
-            logger.info(f"title was provided. Set self.title to: {self.title!r}")
         else:
-            self.title = f"{self.action} {self.entity_table_name}" if self.action else self.entity_table_name
-            logger.info(f"title was not provided. Set self.title to table name: {self.title!r}")
+            entity_plural = getattr(self.model_class, '__entity_plural__', self.entity_table_name + 's')
+            self.title = f"{action} {entity_table_name}" if action else entity_plural.capitalize()
 
         super().__init__(title=self.title, **kwargs)
 
-        lower_entity_table_name = self.entity_table_name.lower()
-        logger.info(f"Set lower table name: {lower_entity_table_name!r}")
+        # Use model metadata for consistency
+        self.entity_name = getattr(self.model_class, '__entity_name__', self.entity_table_name)
+        self.entity_title = getattr(self.model_class, '__entity_plural__', self.entity_table_name + 's').capitalize()
+        self.entity_base_route = f"{self.model_class.__tablename__}_bp"
+        self.api_url = f"/api/{self.model_class.__tablename__}"
 
-        self.table_id = get_table_id_by_name(self.entity_table_name)
-        logger.info(f"Set attribute table_id = {self.table_id!r} (from {self.entity_table_name!r})")
-
-        plural_entity_table_name = get_table_plural_name(self.entity_table_name)
-        self.data_api_url = f"/api/{plural_entity_table_name}"
-        logger.info(f"Set attribute data_url = {self.data_api_url!r} (from table_name = {self.entity_table_name!r})")
-
-        # Add this new line to define entity_base_route
-        self.entity_base_route = get_entity_base_route(self.entity_table_name)
-        logger.info(f"Set attribute entity_base_route = {self.entity_base_route!r} (from {lower_entity_table_name!r})")
+        # Additional template variables
+        self.default_sort = "name"
+        self.show_heading = True
+        self.show_card_title = False
 
     def __str__(self):
         """Return a user-friendly string representation focusing on table attributes."""
