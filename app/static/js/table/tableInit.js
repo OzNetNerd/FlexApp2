@@ -248,29 +248,29 @@ export default async function initTable() {
         return;
     }
 
-    // Ensure the grid container has a defined height
-    log("debug", scriptName, functionName, `Grid container style check - height: ${gridDiv.style.height}, has theme class: ${gridDiv.classList.contains('ag-theme-alpine')}`);
-
+    // ensure container has height + theme…
     if (!gridDiv.style.height && !gridDiv.classList.contains('ag-theme-alpine')) {
         log("info", scriptName, functionName, "Applying default height and theme to grid container");
         gridDiv.style.height = '500px';
         gridDiv.classList.add('ag-theme-alpine');
     }
 
-    // Directly read the API URL from the data attribute of the container
-    const data_api_url = gridDiv.dataset.apiUrl || null;
-    log("info", scriptName, functionName, `Fetching data from API: ${data_api_url}`);
-
+    // fetch
     let actualData;
     try {
         const rawData = await fetchApiDataFromContainer(tableContainerId);
-        log("debug", scriptName, functionName, `Raw data retrieved, size: ${JSON.stringify(rawData).length} bytes`);
-        log("info", scriptName, functionName, "Normalizing data");
-        actualData = normalizeData(rawData);
-        log("info", scriptName, functionName, `Setting grid data with ${actualData.length} rows`);
-        if (actualData.length > 0) {
-            log("debug", scriptName, functionName, `Data sample (first row): ${JSON.stringify(actualData[0])}`);
-        }
+        log("debug", scriptName, functionName, `Raw payload: ${JSON.stringify(rawData).substring(0,200)}…`);
+
+        // ── NEW: pull out the real array at rawData.data.data ──
+        const extracted = Array.isArray(rawData?.data?.data)
+          ? rawData.data.data
+          : Array.isArray(rawData?.data)
+            ? rawData.data
+            : [];
+        log("debug", scriptName, functionName, `Extracted ${extracted.length} rows for normalization`);
+
+        actualData = normalizeData(extracted);
+        log("info", scriptName, functionName, `Normalization complete; ${actualData.length} rows ready`);
     } catch (error) {
         log("error", scriptName, functionName, "❌ Failed to fetch or process data", {
             error: error.message || String(error),
@@ -279,59 +279,33 @@ export default async function initTable() {
         return;
     }
 
+    // … the rest of your code stays exactly the same …
     log("info", scriptName, functionName, "Getting grid options");
     const gridOptions = getGridOptions();
-    log("debug", scriptName, functionName, "Grid options retrieved successfully", { options: gridOptions });
 
     if (actualData.length > 0) {
         log("info", scriptName, functionName, "Generating column definitions");
         gridOptions.columnDefs = generateColumnDefs(actualData);
-        log("debug", scriptName, functionName, `Column definitions generated: ${gridOptions.columnDefs.length} columns`);
-
-        // Make columnDefs globally available
         window.columnDefs = gridOptions.columnDefs;
     } else {
         log("warn", scriptName, functionName, "No data available to generate columns");
     }
 
     const originalOnGridReady = gridOptions.onGridReady;
-    log("debug", scriptName, functionName, `Original onGridReady handler exists: ${!!originalOnGridReady}`);
-
-    gridOptions.onGridReady = (params) => {
-        log("info", scriptName, functionName, "AG Grid onGridReady event triggered");
-        if (originalOnGridReady) {
-            log("debug", scriptName, functionName, "Calling original onGridReady handler");
-            originalOnGridReady(params);
-        }
-
-        log("debug", scriptName, functionName, "Setting grid API references");
+    gridOptions.onGridReady = params => {
+        if (originalOnGridReady) originalOnGridReady(params);
         setGridApi(params.api, params.columnApi);
-
-        // Store grid API globally
         window.gridApi = params.api;
-
-        log("info", scriptName, functionName, `Setting grid data with ${actualData.length} rows`);
         params.api.setGridOption('rowData', actualData);
-
-        log("info", scriptName, functionName, "Setting up global search functionality");
         setupGlobalSearch(params.api, scriptName, functionName);
-
-        // Initial setup of column selector
-        log("info", scriptName, functionName, "Setting up column selector");
         setupColumnSelector(params.api, scriptName, functionName);
-
-        // Add the grid columns changed listener for future updates
-        params.api.addEventListener('gridColumnsChanged', () => {
-            log("debug", scriptName, functionName, "Grid columns changed event triggered");
-            setupColumnSelector(params.api, scriptName, functionName);
-        });
-
-        log("debug", scriptName, functionName, "Refreshing grid header");
+        params.api.addEventListener('gridColumnsChanged', () =>
+          setupColumnSelector(params.api, scriptName, functionName)
+        );
         params.api.refreshHeader();
         log("info", scriptName, functionName, "Table data initialized successfully");
     };
 
-    log("info", scriptName, functionName, "Creating AG Grid instance");
     try {
         new createGrid(gridDiv, gridOptions);
         log("info", scriptName, functionName, "AG Grid instance created successfully");
