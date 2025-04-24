@@ -1,12 +1,12 @@
-{# pages/companies/index.html #}
+{# pages/companies/index.html - Simplified template that relies on context variables from the route #}
 
 {% extends 'layouts/base.html' %}
-{% import 'macros/utils.html'  as utils %}
-{% block title %}Companies{% endblock %}
 {% from 'macros/card.html' import card %}
 
+{% block title %}{{ page_title }}{% endblock %}
+
 {% block content %}
-  {% call card(title='Companies') %}
-    {% include 'layouts/_table_index.html' with context %}
+  {% call card(title=None) %}
+    {% include 'layouts/_table_index.html' %}
   {% endcall %}
 {% endblock %}

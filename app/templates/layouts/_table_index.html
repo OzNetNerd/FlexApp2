@@ -1,82 +1,23 @@
 {# ------------------------------------------------------------------------------
-  File: _table_index.html | Purpose: Base template for all entity table index pages
+  File: _table_index.html | Purpose: Partial template for entity table index
   Description:
     - Defines a consistent structure for displaying table-based entity listings
-    - Incorporates table rendering functionality directly in the template
+    - Incorporates table rendering functionality as a reusable component
     - Provides blocks for entity-specific customization
     - Supports sorting, filtering, and pagination
 
-  Blocks:
-    - title: Page title (entity name + "List")
+  Context Variables:
     - entity_title: The display name of the entity type (e.g., "Companies")
     - entity_name: Singular entity name for button labels (e.g., "Company")
-    - page_heading: Main heading for the page (defaults to entity_title)
-    - action_buttons: Buttons for entity actions (defaults to Add button)
-    - before_table: Content to display before the table
-    - after_table: Content to display after the table
-
-  Context Variables:
     - entity_base_route: Base route name for the entity (e.g., "companies_bp")
     - api_url: API endpoint for loading the table data
-    - columns: Column configuration for the table
     - default_sort: Default sort field (defaults to "name")
     - additional_filters: Optional additional filters to apply
+    - show_heading: Whether to show the main h1 heading (defaults to true)
+    - show_card_title: Whether to show the card title h3 heading (defaults to false)
 ------------------------------------------------------------------------------ #}
 
-{% extends "layouts/base.html" %}
-
-{# Define table rendering macros directly in this template #}
-{% macro render_table(title, entity_type, api_url, columns, default_sort="name", additional_filters={}) %}
-<div class="card border-0 shadow-sm">
-  <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-    <h3 class="h4 mb-0 text-primary">{{ title }}</h3>
-    {% if caller %}
-      {{ caller() }}
-    {% endif %}
-  </div>
-
-  <div class="card-body">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div class="dropdown">
-        <button class="btn dropdown-toggle" type="button" id="columnSelectorDropdownToggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-          <i class="fas fa-table me-2"></i> Columns
-        </button>
-        <ul class="dropdown-menu" style="min-width: 180px; width: auto;" aria-labelledby="columnSelectorDropdownToggle">
-          <li class="px-3 py-2">
-            <div class="d-flex align-items-center">
-              <button class="btn btn-sm btn-outline-primary me-2" id="selectAllColumns">All</button>
-              <button class="btn btn-sm btn-outline-danger" id="clearAllColumns">Clear</button>
-            </div>
-          </li>
-          <li><hr class="dropdown-divider" /></li>
-          <li class="px-2" onclick="event.stopPropagation();">
-            <div class="column-list py-1" id="columnSelectorItems" data-column-name="__all_columns__">
-              <!-- JS will populate this -->
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <div class="input-group w-25">
-        <span class="input-group-text">
-          <i class="fas fa-search"></i>
-        </span>
-        <input type="text" class="form-control" id="globalSearch" placeholder="Search..." aria-label="Search">
-      </div>
-    </div>
-
-    <div id="table-container"
-         class="ag-theme-alpine w-100"
-         data-api-url="{{ api_url }}"
-         data-default-sort="{{ default_sort }}"
-         data-entity-type="{{ entity_type }}"
-         data-additional-filters="{{ additional_filters|tojson|replace('"', '&quot;') }}"
-         style="min-height: 420px;">
-    </div>
-  </div>
-</div>
-{% endmacro %}
-
+{# Define macros #}
 {% macro render_filter_panel(filters) %}
 <div class="filter-panel card border-0 shadow-sm mb-4">
   <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -144,19 +85,21 @@
 </div>
 {% endmacro %}
 
-{% block title %}{% block entity_title %}Entity{% endblock %} List{% endblock %}
-
-{% block content %}
+{# Main content for the partial #}
 <div class="container-fluid">
   <div class="row mb-4">
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center">
-        <h1 class="h3">{% block page_heading %}{{ self.entity_title() }}{% endblock %}</h1>
+        {% if show_heading|default(true) %}
+        <h1 class="h3">{{ entity_title|default('Items') }}</h1>
+        {% else %}
+        <div></div> {# Empty div to maintain flex layout #}
+        {% endif %}
 
         <div class="action-buttons">
           {% block action_buttons %}
           <a href="{{ url_for(entity_base_route + '.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i> Add {% block entity_name %}Item{% endblock %}
+            <i class="fas fa-plus me-1"></i> Add {{ entity_name|default('Item') }}
           </a>
           {% endblock %}
         </div>
@@ -164,30 +107,66 @@
     </div>
   </div>
 
-  {% block before_table %}
-    {% if filters is defined %}
-      {{ render_filter_panel(filters) }}
-    {% endif %}
-  {% endblock %}
+  {% if filters is defined %}
+    {{ render_filter_panel(filters) }}
+  {% endif %}
 
   <div class="row">
     <div class="col-12">
-      {% call render_table(
-        title=self.entity_title(),
-        entity_type=self.entity_name(),
-        api_url=api_url,
-        columns=columns,
-        default_sort=default_sort|default('name'),
-        additional_filters=additional_filters|default({})
-      ) %}
-        {% block table_actions %}{% endblock %}
-      {% endcall %}
+      <div class="card border-0 shadow-sm">
+          {% if show_card_title|default(false) %}
+          <h3 class="h4 mb-0 text-primary">{{ entity_title|default('Items') }}</h3>
+          {% else %}
+          <div></div> {# Empty div to maintain flex layout #}
+          {% endif %}
+          {% block table_actions %}{% endblock %}
+        </div>
+
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="dropdown">
+              <button class="btn dropdown-toggle" type="button" id="columnSelectorDropdownToggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                <i class="fas fa-table me-2"></i> Columns
+              </button>
+              <ul class="dropdown-menu" style="min-width: 180px; width: auto;" aria-labelledby="columnSelectorDropdownToggle">
+                <li class="px-3 py-2">
+                  <div class="d-flex align-items-center">
+                    <button class="btn btn-sm btn-outline-primary me-2" id="selectAllColumns">All</button>
+                    <button class="btn btn-sm btn-outline-danger" id="clearAllColumns">Clear</button>
+                  </div>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li class="px-2" onclick="event.stopPropagation();">
+                  <div class="column-list py-1" id="columnSelectorItems" data-column-name="__all_columns__">
+                    <!-- JS will populate this -->
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="input-group w-25">
+              <span class="input-group-text">
+                <i class="fas fa-search"></i>
+              </span>
+              <input type="text" class="form-control" id="globalSearch" placeholder="Search..." aria-label="Search">
+            </div>
+          </div>
+
+          <div id="table-container"
+               class="ag-theme-alpine w-100"
+               data-api-url="{{ api_url|default('') }}"
+               data-default-sort="{{ default_sort|default('name') }}"
+               data-entity-type="{{ entity_name|default('Item') }}"
+               data-additional-filters="{{ additional_filters|default({})|tojson|replace('"', '&quot;') }}"
+               style="min-height: 420px;">
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-
-  {% block after_table %}{% endblock %}
 </div>
 
+{# JavaScript for table functionality #}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // Make column selectors stop propagation to prevent dropdown closure
@@ -240,19 +219,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-});
-</script>
-{% endblock %}
-
-{% block scripts_extra %}
-<script type="module">
-  import log from '/static/js/logger.js';
 
   // Table initialization
-  document.addEventListener('DOMContentLoaded', function() {
-    const tableContainer = document.getElementById('table-container');
-    if (!tableContainer) return;
-
+  const tableContainer = document.getElementById('table-container');
+  if (tableContainer) {
     const apiUrl = tableContainer.dataset.apiUrl;
     const entityType = tableContainer.dataset.entityType;
     const defaultSort = tableContainer.dataset.defaultSort || 'name';
@@ -260,15 +230,14 @@ document.addEventListener('DOMContentLoaded', function() {
       ? JSON.parse(tableContainer.dataset.additionalFilters)
       : {};
 
-    log("info", "_table_index.html", "init", "Initializing table", {
+    console.log("Initializing table", {
       apiUrl,
       entityType,
       defaultSort,
       additionalFilters
     });
 
-    // Initialize the table (AG Grid setup would go here)
-    // This would typically call a function from your main.js or a dedicated table.js file
+    // Initialize the table (AG Grid setup)
     if (typeof initAgGrid === 'function') {
       initAgGrid(tableContainer, apiUrl, {
         defaultSort,
@@ -276,8 +245,8 @@ document.addEventListener('DOMContentLoaded', function() {
         entityType
       });
     } else {
-      log("error", "_table_index.html", "init", "AG Grid initialization function not found");
+      console.error("AG Grid initialization function not found");
     }
-  });
+  }
+});
 </script>
-{% endblock %}
