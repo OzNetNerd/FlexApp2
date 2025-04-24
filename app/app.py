@@ -1,7 +1,5 @@
 # app/app.py
 
-from datetime import datetime
-
 import logging
 from datetime import datetime
 from logging import INFO, Formatter, StreamHandler
