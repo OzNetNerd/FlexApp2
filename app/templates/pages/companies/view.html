@@ -104,12 +104,12 @@
       {{ csrf_input }}
       <div class="tab-content" id="formTabsContent">
         {% if read_only %}
-          {% call tab_macros.render_tab_section('notes', 'Notes', active=true) %}
+          {% call tab_macros.render_tab_section('notes', 'Notes', active=true, has_fade=false) %}
             {% include 'macros/_notes_section.html' %}
           {% endcall %}
         {% endif %}
 
-        {% call tab_macros.render_tab_section('about', 'About', active=not read_only) %}
+        {% call tab_macros.render_tab_section('about', 'About', active=not read_only, has_fade=false) %}
           {{ field_macros.render_field({
               "entry_name": "name",
               "label": "Company Name",
@@ -168,4 +168,26 @@
 </script>
 <script type="module" src="/js/pages/create_view_edit.js"></script>
 <script type="module" src="/js/pages/header_buttons.js"></script>
+
+<!-- Add tab initialization script -->
+<!-- Add this to your base template or include with your existing JS -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Force immediate display of active tab content
+    setTimeout(function() {
+      const activeTab = document.querySelector('.tab-pane.active');
+      if (activeTab) {
+        activeTab.classList.add('show');
+      }
+
+      // Initialize Bootstrap tabs
+      if (typeof bootstrap !== 'undefined') {
+        const tabElements = document.querySelectorAll('[data-bs-toggle="tab"]');
+        tabElements.forEach(function(tabEl) {
+          new bootstrap.Tab(tabEl);
+        });
+      }
+    }, 50);
+  });
+</script>
 {% endblock %}
