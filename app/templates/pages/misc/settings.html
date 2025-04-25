@@ -1,0 +1,247 @@
+{% extends "base/core/_base.html" %}
+
+{% block content %}
+<!-- Settings Page -->
+<div class="container py-4">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="mb-4 fw-bold">Application Settings</h1>
+      <p class="text-muted mb-4">Configure your application preferences and options.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Settings Navigation Sidebar -->
+    <div class="col-md-3 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush" id="settings-tabs" role="tablist">
+            <a class="list-group-item list-group-item-action active" id="general-tab" data-bs-toggle="list" href="#general" role="tab" aria-controls="general">
+              <i class="fas fa-cog me-2"></i> General
+            </a>
+            <a class="list-group-item list-group-item-action" id="notifications-tab" data-bs-toggle="list" href="#notifications" role="tab" aria-controls="notifications">
+              <i class="fas fa-bell me-2"></i> Notifications
+            </a>
+            <a class="list-group-item list-group-item-action" id="display-tab" data-bs-toggle="list" href="#display" role="tab" aria-controls="display">
+              <i class="fas fa-desktop me-2"></i> Display
+            </a>
+            <a class="list-group-item list-group-item-action" id="privacy-tab" data-bs-toggle="list" href="#privacy" role="tab" aria-controls="privacy">
+              <i class="fas fa-user-shield me-2"></i> Privacy
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Content -->
+    <div class="col-md-9">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <div class="tab-content">
+            <!-- General Settings -->
+            <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+              <h3 class="card-title mb-4">General Settings</h3>
+
+              <form>
+                <div class="mb-4">
+                  <label for="itemsPerPage" class="form-label fw-bold">Items per page</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="itemsPerPage" min="5" max="100" step="5" value="25">
+                    <span class="input-group-text"><i class="fas fa-list"></i></span>
+                  </div>
+                  <div class="form-text">Choose how many items to display per page in lists.</div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="sessionTimeout" class="form-label fw-bold">Session timeout (minutes)</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="sessionTimeout" min="5" max="120" step="5" value="30">
+                    <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                  </div>
+                  <div class="form-text">Set how long until your session expires due to inactivity.</div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label fw-bold">Default view</label>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="defaultView" id="cardView" value="card" checked>
+                    <label class="form-check-label" for="cardView">
+                      <i class="fas fa-th me-2"></i> Card view
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="defaultView" id="listView" value="list">
+                    <label class="form-check-label" for="listView">
+                      <i class="fas fa-list me-2"></i> List view
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="defaultView" id="tableView" value="table">
+                    <label class="form-check-label" for="tableView">
+                      <i class="fas fa-table me-2"></i> Table view
+                    </label>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
+              <h3 class="card-title mb-4">Notification Settings</h3>
+
+              <form>
+                <div class="mb-4">
+                  <label class="form-label fw-bold">Email notifications</label>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="emailNewContact" checked>
+                    <label class="form-check-label" for="emailNewContact">New contact added</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="emailNewOpportunity" checked>
+                    <label class="form-check-label" for="emailNewOpportunity">New opportunity created</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="emailTaskAssigned" checked>
+                    <label class="form-check-label" for="emailTaskAssigned">Task assigned to you</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="emailTaskDue">
+                    <label class="form-check-label" for="emailTaskDue">Task due date reminder</label>
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label fw-bold">In-app notifications</label>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="inappMessages" checked>
+                    <label class="form-check-label" for="inappMessages">New messages</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="inappUpdates" checked>
+                    <label class="form-check-label" for="inappUpdates">System updates</label>
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="notificationFrequency" class="form-label fw-bold">Digest email frequency</label>
+                  <select class="form-select" id="notificationFrequency">
+                    <option value="daily">Daily</option>
+                    <option value="weekly" selected>Weekly</option>
+                    <option value="never">Never</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+
+            <!-- Display Settings -->
+            <div class="tab-pane fade" id="display" role="tabpanel" aria-labelledby="display-tab">
+              <h3 class="card-title mb-4">Display Settings</h3>
+
+              <form>
+                <div class="mb-4">
+                  <label for="fontSize" class="form-label fw-bold">Base font size</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="fontSize" min="12" max="20" value="14">
+                    <span class="input-group-text">px</span>
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label fw-bold">Color theme</label>
+                  <div class="d-flex gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="colorTheme" id="lightTheme" value="light" checked>
+                      <label class="form-check-label" for="lightTheme">
+                        <i class="fas fa-sun me-2"></i> Light
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="colorTheme" id="darkTheme" value="dark">
+                      <label class="form-check-label" for="darkTheme">
+                        <i class="fas fa-moon me-2"></i> Dark
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="colorTheme" id="systemTheme" value="system">
+                      <label class="form-check-label" for="systemTheme">
+                        <i class="fas fa-laptop me-2"></i> System default
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="animationSpeed" class="form-label fw-bold">Animation speed</label>
+                  <input type="range" class="form-range" min="0" max="2" step="0.5" value="1" id="animationSpeed">
+                  <div class="d-flex justify-content-between">
+                    <span class="text-muted">Slow</span>
+                    <span class="text-muted">Fast</span>
+                  </div>
+                </div>
+
+                <div class="form-check form-switch mb-4">
+                  <input class="form-check-input" type="checkbox" id="enableAnimations" checked>
+                  <label class="form-check-label" for="enableAnimations">Enable animations</label>
+                </div>
+              </form>
+            </div>
+
+            <!-- Privacy Settings -->
+            <div class="tab-pane fade" id="privacy" role="tabpanel" aria-labelledby="privacy-tab">
+              <h3 class="card-title mb-4">Privacy Settings</h3>
+
+              <form>
+                <div class="mb-4">
+                  <label class="form-label fw-bold">Privacy options</label>
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="showOnlineStatus" checked>
+                    <label class="form-check-label" for="showOnlineStatus">Show when I'm online</label>
+                  </div>
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="shareActivityStatus" checked>
+                    <label class="form-check-label" for="shareActivityStatus">Share activity status</label>
+                  </div>
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="allowDataAnalytics">
+                    <label class="form-check-label" for="allowDataAnalytics">Allow data analytics</label>
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label fw-bold">Data retention</label>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="dataRetention" id="retain30" value="30" checked>
+                    <label class="form-check-label" for="retain30">
+                      Keep data for 30 days
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="dataRetention" id="retain90" value="90">
+                    <label class="form-check-label" for="retain90">
+                      Keep data for 90 days
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="dataRetention" id="retainForever" value="forever">
+                    <label class="form-check-label" for="retainForever">
+                      Keep data indefinitely
+                    </label>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Save Button -->
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+            <button type="button" class="btn btn-outline-secondary me-md-2">Reset to defaults</button>
+            <button type="button" class="btn btn-primary">
+              <i class="fas fa-save me-2"></i> Save settings
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
