@@ -1,4 +1,5 @@
 import log from '/static/js/core/logger.js';
+import { getDatasetVariables, getDatasetValue } from '/static/js/core/utils.js';
 
 /**
  * API service for making HTTP requests
@@ -42,25 +43,25 @@ class ApiService {
    */
   request(method, url, data = null, headers = {}, options = {}) {
     const functionName = 'request';
-    
+
     // Prepend base URL if the URL doesn't start with http or /
     const fullUrl = (url.startsWith('http') || url.startsWith('/'))
       ? url
       : `${this.baseUrl}/${url}`;
-    
+
     // Merge default headers with provided headers
     const mergedHeaders = {
       ...this.defaultHeaders,
       ...headers
     };
-    
+
     // Create fetch options
     const fetchOptions = {
       method,
       headers: mergedHeaders,
       ...options
     };
-    
+
     // Add body if data is provided
     if (data !== null) {
       if (mergedHeaders['Content-Type'] === 'application/json') {
@@ -73,19 +74,19 @@ class ApiService {
         fetchOptions.body = data;
       }
     }
-    
+
     log('debug', 'apiService.js', functionName, `Making ${method} request to ${fullUrl}`, {
       headers: mergedHeaders,
       data: data
     });
-    
+
     return fetch(fullUrl, fetchOptions)
       .then(response => {
         log('debug', 'apiService.js', functionName, `Received response from ${fullUrl}`, {
           status: response.status,
           statusText: response.statusText
         });
-        
+
         // Check if the response is OK
         if (!response.ok) {
           return response.text().then(text => {
@@ -93,7 +94,7 @@ class ApiService {
               status: response.status,
               text: text
             });
-            
+
             try {
               const errorData = JSON.parse(text);
               throw new Error(`API responded with status: ${response.status}: ${JSON.stringify(errorData)}`);
@@ -102,20 +103,20 @@ class ApiService {
             }
           });
         }
-        
+
         // Check if the response is empty
         const contentType = response.headers.get('content-type');
         if (!contentType || (!contentType.includes('application/json') && response.status !== 204)) {
           return response.text();
         }
-        
+
         return response.json();
       })
       .then(data => {
         log('debug', 'apiService.js', functionName, `Processed response from ${fullUrl}`, {
           data: data
         });
-        
+
         return data;
       })
       .catch(error => {
@@ -194,22 +195,22 @@ class ApiService {
    */
   uploadFile(url, file, fieldName = 'file', additionalData = {}, headers = {}, options = {}) {
     const functionName = 'uploadFile';
-    
+
     const formData = new FormData();
     formData.append(fieldName, file);
-    
+
     // Add additional data
     for (const [key, value] of Object.entries(additionalData)) {
       formData.append(key, value);
     }
-    
+
     log('debug', 'apiService.js', functionName, `Uploading file to ${url}`, {
       fileName: file.name,
       fileSize: file.size,
       fileType: file.type,
       fieldName: fieldName
     });
-    
+
     return this.request('POST', url, formData, headers, options);
   }
 }
@@ -217,3 +218,65 @@ class ApiService {
 // Create singleton instance
 const apiService = new ApiService();
 export default apiService;
+
+/**
+ * Fetches data from an API endpoint using the dataset variables on a container element
+ * @param {string} containerId - The ID of the container element with dataset attributes
+ * @returns {Promise<Array|Object>} - The data fetched from the API
+ */
+export async function fetchApiDataFromContainer(containerId) {
+  const functionName = "fetchApiDataFromContainer";
+
+  const datasetVariables = getDatasetVariables(containerId);
+  const apiUrl = getDatasetValue("apiService.js", datasetVariables, "apiUrl");
+  log("info", "apiService.js", functionName, `API URL Retrieved: ${apiUrl}`);
+
+  try {
+    // Use the singleton instance to fetch data
+    return await apiService.get(apiUrl);
+  } catch (error) {
+    log("error", "apiService.js", functionName, "Failed to fetch data from API", error);
+    throw error;
+  }
+}
+
+/**
+ * Normalizes data structure from various API response formats
+ * @param {Array|Object} data - The raw data from the API
+ * @returns {Array} - Normalized data array
+ */
+export function normalizeData(data) {
+  // Handle potential error responses
+  if (data && data.data && data.data.error) {
+    throw new Error(data.data.error.message || "Unknown API error");
+  }
+
+  // Handle both data structures: data = [{...}] or data = {data: [{...}]}
+  if (Array.isArray(data)) {
+    return data;
+  } else if (data && typeof data === 'object') {
+    if (data.data && Array.isArray(data.data)) {
+      return data.data;
+    } else if (data.data && typeof data.data === 'object' && !data.data.error) {
+      return [data.data];
+    } else if (Object.keys(data).length > 0 && !('data' in data)) {
+      return [data];
+    }
+  }
+
+  // Fallback to empty array
+  return [];
+}
+
+/**
+ * Formats a string for use as a column header or display text
+ * @param {string} text - Raw text to format
+ * @returns {string} - Formatted text
+ */
+export function formatDisplayText(text) {
+  return text
+    .replace(/_/g, ' ') // Replace underscores with spaces
+    .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()) // Capitalize first letter
+    .replace(/\bId\b/g, 'ID') // Make "Id" into "ID"
+    .replace(/\bAt\b/g, 'at'); // Make "At" into "at"
+}

@@ -1,12 +1,17 @@
 import log from '/static/js/core/logger.js';
 
 /**
- * Notes Section JavaScript
+ * Notes Section JavaScript - Fixed Version
  * Handles loading, displaying, filtering, and adding notes
  */
 document.addEventListener('DOMContentLoaded', function() {
   // Get data attributes from the notesData div
   const notesData = document.getElementById('notesData');
+  if (!notesData) {
+    console.error('Notes data element not found');
+    return;
+  }
+
   const notableType = notesData.dataset.notableType;
   const notableId = notesData.dataset.notableId;
   const currentUserId = notesData.dataset.userId;
@@ -23,10 +28,33 @@ document.addEventListener('DOMContentLoaded', function() {
   statusMessage.className = 'alert mt-3 d-none';
 
   // Add status message container after the form
-  document.getElementById('newNoteForm').insertAdjacentElement('afterend', statusMessage);
+  const newNoteForm = document.getElementById('newNoteForm');
+  if (newNoteForm) {
+    newNoteForm.insertAdjacentElement('afterend', statusMessage);
+  }
 
-  // Initial notes load
-  loadNotes();
+  // FIX: Load notes when visible - handle both initial load and tab switching
+  function checkAndLoadNotes() {
+    const notesTab = document.getElementById('tab-notes');
+    if (notesTab && window.getComputedStyle(notesTab).display !== 'none') {
+      loadNotes();
+      log("info", scriptName, "checkAndLoadNotes", "Notes tab is visible, loading notes");
+    }
+  }
+
+  // FIX: Initial load check
+  checkAndLoadNotes();
+
+  // FIX: Handle tab switching
+  const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+  tabButtons.forEach(button => {
+    button.addEventListener('shown.bs.tab', function(event) {
+      if (event.target.id === 'tab-notes-tab') {
+        loadNotes();
+        log("info", scriptName, "tabShown", "Notes tab was activated, loading notes");
+      }
+    });
+  });
 
   /**
    * Load notes with optional filters.
@@ -34,7 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
   function loadNotes(filters = {}) {
     const functionName = "loadNotes";
     log("info", scriptName, functionName, "Loading notes with filters", filters);
-    notesLoading.style.display = 'block';
+
+    if (notesLoading) {
+      notesLoading.style.display = 'block';
+    }
 
     // Build query string
     let queryParams = new URLSearchParams();
@@ -73,7 +104,9 @@ document.addEventListener('DOMContentLoaded', function() {
         return response.json();
       })
       .then(data => {
-        notesLoading.style.display = 'none';
+        if (notesLoading) {
+          notesLoading.style.display = 'none';
+        }
         log("debug", scriptName, functionName, "Response payload received", {
           url: endpoint,
           payload: data
@@ -81,8 +114,12 @@ document.addEventListener('DOMContentLoaded', function() {
         renderNotes(data.data);
       })
       .catch(error => {
-        notesLoading.style.display = 'none';
-        notesList.innerHTML = `<div class="alert alert-danger">Error loading notes: ${error.message}</div>`;
+        if (notesLoading) {
+          notesLoading.style.display = 'none';
+        }
+        if (notesList) {
+          notesList.innerHTML = `<div class="alert alert-danger">Error loading notes: ${error.message}</div>`;
+        }
         log("error", scriptName, functionName, "Error loading notes", {
           url: endpoint,
           error: error
@@ -95,6 +132,8 @@ document.addEventListener('DOMContentLoaded', function() {
    * Render notes in the UI.
    */
   function renderNotes(notes) {
+    if (!notesList) return;
+
     const functionName = "renderNotes";
     log("debug", scriptName, functionName, `Rendering ${notes ? notes.length : 0} notes`);
     if (!notes || notes.length === 0) {
@@ -185,7 +224,6 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * Add new note.
    */
-  const newNoteForm = document.getElementById('newNoteForm');
   if (newNoteForm) {
     newNoteForm.addEventListener('submit', function(e) {
       e.preventDefault();
