@@ -111,7 +111,18 @@
                <h5 class="section-heading">Notes</h5>
              </div>
              <div class="section-body">
+               <!-- Direct search form implementation before including notes section -->
                <div class="row g-3">
+                 <div class="col-12 mb-3">
+                   <form id="notesSearchForm" class="mb-3">
+                     <div class="input-group">
+                       <input type="text" id="noteSearchInput" class="form-control" placeholder="Search notes...">
+                       <button class="btn btn-outline-secondary" type="submit">
+                         <i class="fas fa-search"></i> Search
+                       </button>
+                     </div>
+                   </form>
+                 </div>
                  {% include 'macros/_notes_section.html' %}
                </div>
              </div>
