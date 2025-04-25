@@ -4,7 +4,7 @@ from flask import Blueprint, request
 
 from app.models import Note
 from app.routes.api.route_registration import ApiCrudRouteConfig
-from app.services.crud_service import CRUDService
+from app.services.note_service import NoteService
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
@@ -14,7 +14,7 @@ ENTITY_PLURAL_NAME = "Notes"
 
 notes_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 
-note_service = CRUDService(Note)
+note_service = NoteService()
 
 note_api_crud_config = ApiCrudRouteConfig(blueprint=notes_api_bp, entity_table_name=ENTITY_NAME, service=note_service)
 
@@ -61,7 +61,7 @@ def query_notes():
     # Fix: use keyword arguments instead of positional arguments
     paginated = query.order_by(Note.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
 
-    return {"items": [n.to_dict() for n in paginated.items], "total": paginated.total}
+    return {"data": [n.to_dict() for n in paginated.items], "total": paginated.total}
 
 # You can add other manual routes (e.g. /filter/notable, /search) below as needed...
 
