@@ -57,8 +57,13 @@ def query_notes():
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 15, type=int)
-    paginated = query.order_by(Note.created_at.desc()).paginate(page, per_page, False)
+
+    # Fix: use keyword arguments instead of positional arguments
+    paginated = query.order_by(Note.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+
     return {"items": [n.to_dict() for n in paginated.items], "total": paginated.total}
 
-
 # You can add other manual routes (e.g. /filter/notable, /search) below as needed...
+
+# Make sure to export the blueprint so it can be imported by the router
+# This is critical for the application to register the routes

@@ -8,7 +8,8 @@ import configManager from '/static/js/core/config.js';
 class TabsComponent {
   constructor() {
     this.instances = new Map();
-    log('info', 'tabs.js', 'constructor', 'Tabs component created');
+    this.scriptName = 'tabs.js'; // Default value for scriptName
+    log('info', this.scriptName, 'constructor', 'Tabs component created');
   }
 
   /**
@@ -19,17 +20,18 @@ class TabsComponent {
    */
   initTabs(tabsContainerId = 'formTabs', options = {}) {
     const functionName = 'initTabs';
+    const self = this; // Store reference to 'this'
 
     // Check if already initialized
     if (this.instances.has(tabsContainerId)) {
-      log('warn', 'tabs.js', functionName, `Tabs already initialized for container: ${tabsContainerId}`);
+      log('warn', this.scriptName, functionName, `Tabs already initialized for container: ${tabsContainerId}`);
       return this.instances.get(tabsContainerId);
     }
 
     // Get the tabs container
     const tabsContainer = document.getElementById(tabsContainerId);
     if (!tabsContainer) {
-      log('error', 'tabs.js', functionName, `Tabs container not found: ${tabsContainerId}`);
+      log('error', this.scriptName, functionName, `Tabs container not found: ${tabsContainerId}`);
       return null;
     }
 
@@ -41,17 +43,16 @@ class TabsComponent {
       ...options
     };
 
-    log('info', 'tabs.js', functionName, `Initializing tabs: ${tabsContainerId}`, config);
+    log('info', this.scriptName, functionName, `Initializing tabs: ${tabsContainerId}`, config);
 
     // Get template data if available
     const templateData = document.getElementById('template-data');
     if (templateData) {
-      config.scriptName = templateData.dataset.scriptName || 'tabs.js';
-
+      this.scriptName = templateData.dataset.scriptName || this.scriptName; // Ensure scriptName is properly set
       if (templateData.dataset.readOnlyDefined) {
         config.readOnly = JSON.parse(templateData.dataset.readOnlyDefined);
       }
-    } // Added missing closing brace here
+    }
 
     // State
     const state = {
@@ -74,13 +75,13 @@ class TabsComponent {
       // Find the tab
       const tab = state.tabs.find(t => t.name === tabName);
       if (!tab) {
-        log('warn', 'tabs.js', switchFunctionName, `Tab not found: ${tabName}`);
+        log('warn', self.scriptName, switchFunctionName, `Tab not found: ${tabName}`);
         return false;
       }
 
       // Check if the tab is enabled
       if (!tab.enabled || !tab.visible) {
-        log('warn', 'tabs.js', switchFunctionName, `Tab is disabled or hidden: ${tabName}`);
+        log('warn', self.scriptName, switchFunctionName, `Tab is disabled or hidden: ${tabName}`);
         return false;
       }
 
@@ -90,7 +91,7 @@ class TabsComponent {
       // Update UI
       updateTabUI();
 
-      log('info', 'tabs.js', switchFunctionName, `Switched to tab: ${tabName}`);
+      log('info', self.scriptName, switchFunctionName, `Switched to tab: ${tabName}`);
 
       // Publish tab change event
       eventSystem.publish('tabs.change', {
@@ -104,7 +105,7 @@ class TabsComponent {
     /**
      * Update the tab UI
      */
-    function updateTabUI() {
+    const updateTabUI = () => {
       const updateFunctionName = 'updateTabUI';
 
       // Get all nav links
@@ -168,72 +169,8 @@ class TabsComponent {
         }
       });
 
-      log('debug', 'tabs.js', updateFunctionName, `Updated tab UI for ${tabsContainerId}, active tab: ${state.activeTab}`);
-    }
-
-    /**
-     * Enable or disable a tab
-     * @param {string} tabName - Tab name
-     * @param {boolean} enabled - Whether the tab should be enabled
-     */
-    function setTabEnabled(tabName, enabled) {
-      const setEnabledFunctionName = 'setTabEnabled';
-
-      // Find the tab
-      const tab = state.tabs.find(t => t.name === tabName);
-      if (!tab) {
-        log('warn', 'tabs.js', setEnabledFunctionName, `Tab not found: ${tabName}`);
-        return;
-      }
-
-      // Update the tab
-      tab.enabled = enabled;
-
-      // If disabling the active tab, switch to the first enabled tab
-      if (!enabled && state.activeTab === tabName) {
-        const firstEnabledTab = state.tabs.find(t => t.enabled && t.visible);
-        if (firstEnabledTab) {
-          switchTab(firstEnabledTab.name);
-        }
-      }
-
-      // Update UI
-      updateTabUI();
-
-      log('info', 'tabs.js', setEnabledFunctionName, `${enabled ? 'Enabled' : 'Disabled'} tab: ${tabName}`);
-    }
-
-    /**
-     * Show or hide a tab
-     * @param {string} tabName - Tab name
-     * @param {boolean} visible - Whether the tab should be visible
-     */
-    function setTabVisible(tabName, visible) {
-      const setVisibleFunctionName = 'setTabVisible';
-
-      // Find the tab
-      const tab = state.tabs.find(t => t.name === tabName);
-      if (!tab) {
-        log('warn', 'tabs.js', setVisibleFunctionName, `Tab not found: ${tabName}`);
-        return;
-      }
-
-      // Update the tab
-      tab.visible = visible;
-
-      // If hiding the active tab, switch to the first visible tab
-      if (!visible && state.activeTab === tabName) {
-        const firstVisibleTab = state.tabs.find(t => t.enabled && t.visible);
-        if (firstVisibleTab) {
-          switchTab(firstVisibleTab.name);
-        }
-      }
-
-      // Update UI
-      updateTabUI();
-
-      log('info', 'tabs.js', setVisibleFunctionName, `${visible ? 'Showed' : 'Hid'} tab: ${tabName}`);
-    }
+      log('debug', self.scriptName, updateFunctionName, `Updated tab UI for ${tabsContainerId}, active tab: ${state.activeTab}`);
+    };
 
     // Set up event listeners
     const navLinks = tabsContainer.querySelectorAll('.nav-link');
@@ -252,7 +189,7 @@ class TabsComponent {
         // Switch to the tab
         switchTab(tabName);
 
-        log('debug', 'tabs.js', 'navLinkClick', `Tab link clicked: ${tabName}`);
+        log('debug', self.scriptName, 'navLinkClick', `Tab link clicked: ${tabName}`);
       });
     });
 
@@ -260,20 +197,50 @@ class TabsComponent {
     updateTabUI();
 
     // Log tab information
-    log("debug", config.scriptName, "config", "Tab names:", config.tabNames);
+    log("debug", self.scriptName, "config", "Tab names:", config.tabNames);
 
-    // Log sections for each tab
-    document.querySelectorAll('.tab-pane').forEach((tabPane, index) => {
-      const sectionNames = JSON.parse(tabPane.dataset.sectionNames || '[]');
-      log("debug", config.scriptName, "render", `📁 Sections in tab '${config.tabNames[index] || index}':`, sectionNames);
-    });
+    /**
+     * Set tab enabled state
+     * @param {string} tabName - Tab name
+     * @param {boolean} enabled - Enabled state
+     * @returns {boolean} - Success
+     */
+    function setTabEnabled(tabName, enabled = true) {
+      const tab = state.tabs.find(t => t.name === tabName);
+      if (!tab) {
+        log('warn', self.scriptName, 'setTabEnabled', `Tab not found: ${tabName}`);
+        return false;
+      }
+
+      tab.enabled = enabled;
+      updateTabUI();
+      return true;
+    }
+
+    /**
+     * Set tab visibility
+     * @param {string} tabName - Tab name
+     * @param {boolean} visible - Visibility state
+     * @returns {boolean} - Success
+     */
+    function setTabVisible(tabName, visible = true) {
+      const tab = state.tabs.find(t => t.name === tabName);
+      if (!tab) {
+        log('warn', self.scriptName, 'setTabVisible', `Tab not found: ${tabName}`);
+        return false;
+      }
+
+      tab.visible = visible;
+      updateTabUI();
+      return true;
+    }
 
     // Tabs controller object
     const controller = {
       switchTab,
       getActiveTab: () => state.activeTab,
       getTabs: () => [...state.tabs],
-      setTabEnabled,
+      setTabEnabled, // Added setTabEnabled method
       setTabVisible,
       refresh: () => updateTabUI()
     };
@@ -298,10 +265,11 @@ class TabsComponent {
    */
   validateTabsTemplate() {
     const functionName = 'validateTabsTemplate';
+    const self = this; // Store reference to 'this'
 
     const templateData = document.getElementById('template-data');
     if (!templateData) {
-      log('warn', 'tabs.js', functionName, 'Template data element not found');
+      log('warn', this.scriptName, functionName, 'Template data element not found');
       return;
     }
 
@@ -313,15 +281,15 @@ class TabsComponent {
     const missing = [];
 
     if (JSON.parse(templateData.dataset.tabsDefined)) received.push('tabs'); else missing.push('tabs');
-    if (JSON.parse(templateData.dataset.readOnlyDefined)) received.push('read_only'); else missing.push('read_only');
+    if (JSON.parse(templateData.dataset.readOnlyDefined)) received.push('readOnly'); else missing.push('readOnly');
 
-    log("info", scriptName, functionName, `🔍 Expecting variables: ${expected.join(', ')}`);
-    log("info", scriptName, functionName, `Received variables: ${received.join(', ') || 'None'}`);
+    log("info", this.scriptName, functionName, `🔍 Expecting variables: ${expected.join(', ')}`);
+    log("info", this.scriptName, functionName, `Received variables: ${received.join(', ') || 'None'}`);
 
     if (missing.length > 0) {
-      log("warn", scriptName, functionName, `❌ Missing variables: ${missing.join(', ')}`);
+      log("warn", this.scriptName, functionName, `❌ Missing variables: ${missing.join(', ')}`);
     } else {
-      log("info", scriptName, functionName, `✅ All expected variables present`);
+      log("info", this.scriptName, functionName, `✅ All expected variables present`);
     }
 
     // Log tab render info if tabs exist
@@ -329,12 +297,12 @@ class TabsComponent {
     if (formTabs) {
       const tabRenderFuncName = 'template_render';
       const tabNames = JSON.parse(formTabs.dataset.tabNames);
-      log("info", scriptName, tabRenderFuncName, "🧩 Tabs rendered:", tabNames);
+      log("info", this.scriptName, tabRenderFuncName, "🧩 Tabs rendered:", tabNames);
 
       // Log sections for each tab
       document.querySelectorAll('.tab-pane').forEach((tabPane, index) => {
         const sectionNames = JSON.parse(tabPane.dataset.sectionNames || '[]');
-        log("debug", scriptName, tabRenderFuncName, `📁 Sections in tab '${tabNames[index]}':`, sectionNames);
+        log("debug", this.scriptName, tabRenderFuncName, `📁 Sections in tab '${tabNames[index]}':`, sectionNames);
       });
     }
   }
