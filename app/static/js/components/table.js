@@ -402,7 +402,7 @@ function generateColumnDefs(data) {
     return [];
   }
   const keys = Object.keys(data[0]);
-  log("debug", scriptName, fn, `Columns found: ${keys}`);
+  log("debug", scriptName, fn, "Columns found:", keys);
   return keys.map(key => {
     const def = { field: key, headerName: formatDisplayText(key), sortable: true, filter: true };
     if (data[0][key] != null && typeof data[0][key] === 'object') {
@@ -436,7 +436,7 @@ async function initializeTable() {
   let actualData;
   try {
     const raw = await fetchApiDataFromContainer(tableContainerId);
-    log("debug", scriptName, fn, `Raw: ${JSON.stringify(raw).slice(0,100)}…`);
+    log("debug", scriptName, fn, "Raw data:", raw);
     const arr = Array.isArray(raw?.data?.data) ? raw.data.data :
                Array.isArray(raw?.data) ? raw.data : [];
     log("debug", scriptName, fn, `Rows extracted: ${arr.length}`);
