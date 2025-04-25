@@ -75,16 +75,25 @@
      </div>
    </div>
 
+   <!-- Store template information in data attributes -->
+   <div id="template-data"
+        data-script-name="create_view_edit.js"
+        data-tabs-defined="{{ tabs is defined|tojson }}"
+        data-read-only-defined="{{ read_only is defined|tojson }}">
+   </div>
+
    <!-- Tabs Navigation -->
    <div class="mt-3">
      {% if tabs %}
-       <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
+       <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist"
+           data-tab-names="{{ tabs|map(attribute='tab_name')|list|tojson }}">
          {%- for tab in tabs %}
            <li class="nav-item" role="presentation">
              <button class="nav-link {% if loop.first %}active{% endif %}"
                      id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
                      data-bs-toggle="tab"
                      data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
+                     data-tab-name="{{ tab.tab_name }}"
                      type="button"
                      role="tab"
                      aria-controls="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
@@ -105,7 +114,7 @@
      <div class="tab-content" id="formTabsContent">
        {% if read_only %}
          <!-- Modified tab pane with extra classes -->
-         <div class="tab-pane fade show active" id="tab-notes" role="tabpanel" aria-labelledby="tab-notes-tab">
+         <div class="tab-pane fade show active" id="tab-notes" role="tabpanel" aria-labelledby="tab-notes-tab" data-tab-name="Notes">
            <div class="section-card card shadow-sm border-0 mb-4">
              <div class="section-header">
                <h5 class="section-heading">Notes</h5>
@@ -192,50 +201,12 @@
 </script>
 <script type="module" src="/js/pages/create_view_edit.js"></script>
 <script type="module" src="/js/pages/header_buttons.js"></script>
+<script type="module">
+ import tabsComponent from '/static/js/core/tabs.js';
 
-<!-- Tab initialization -->
-<script>
  document.addEventListener('DOMContentLoaded', function() {
-   // Get all tab elements
-   const tabElements = document.querySelectorAll('[data-bs-toggle="tab"]');
-   const tabContents = document.querySelectorAll('.tab-pane');
-
-   // Make sure all tab panes have proper classes
-   tabContents.forEach(pane => {
-     // Ensure proper base classes are present
-     pane.classList.add('fade');
-
-     // If this is the active tab, make sure it's properly visible
-     if (pane.classList.contains('active') ||
-         document.querySelector(`[data-bs-target="#${pane.id}"]`)?.classList.contains('active')) {
-       pane.classList.add('show');
-     }
-   });
-
-   // Initialize Bootstrap tabs properly
-   tabElements.forEach(tab => {
-     tab.addEventListener('shown.bs.tab', function(event) {
-       // When a tab is shown, ensure its content is visible
-       const targetId = event.target.getAttribute('data-bs-target');
-       const targetPane = document.querySelector(targetId);
-
-       if (targetPane) {
-         // Add show class to make content visible
-         targetPane.classList.add('show');
-       }
-     });
-   });
-
-   // Ensure the initially active tab's content is visible
-   const activeTab = document.querySelector('.nav-link.active');
-   if (activeTab) {
-     const targetId = activeTab.getAttribute('data-bs-target');
-     const targetPane = document.querySelector(targetId);
-
-     if (targetPane) {
-       targetPane.classList.add('show', 'active');
-     }
-   }
+   // Initialize tabs component
+   tabsComponent.initTabs('formTabs');
  });
 </script>
 {% endblock %}
