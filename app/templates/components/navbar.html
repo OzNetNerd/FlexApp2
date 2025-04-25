@@ -14,6 +14,7 @@
     - Logger for template state and debugging
 ------------------------------------------------------------------------------ #}
 
+{%- set scriptName = 'navbar.html' -%}
 {%- set nav_items = [
   {'name': 'companies', 'display_name': 'Companies', 'icon': 'fa-building'},
   {'name': 'contacts', 'display_name': 'Contacts', 'icon': 'fa-address-card'},
@@ -26,23 +27,26 @@
 {# Log Initial Template Load #}
 <script type="module">
   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-  log("info", "navbar.html", "init", "🚀 Template navbar.html loaded");
-  log("debug", "navbar.html", "vars", "Nav items: " + JSON.stringify({{ nav_items }}));
-  log("debug", "navbar.html", "context", "Current endpoint: {{ request.endpoint }}");
-  log("debug", "navbar.html", "auth", "User authenticated: {{ current_user.is_authenticated }}");
+  log("info", "{{ scriptName }}", "init", "🚀 Template {{ scriptName }} loaded");
+  log("debug", "{{ scriptName }}", "vars", {{ nav_items | tojson | safe }});
+
+
+
+  log("debug", "{{ scriptName }}", "context", "Current endpoint: {{ request.endpoint }}");
+  log("debug", "{{ scriptName }}", "auth", "User authenticated: {{ current_user.is_authenticated }}");
 </script>
 
 {# Set Context Variables (precompute values to avoid inline logic in HTML) #}
 {% set show_navbar = show_navbar %}
 <script type="module">
   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-  log("debug", "navbar.html", "context", "show_navbar value: {{ show_navbar }}");
+  log("debug", "{{ scriptName }}", "context", "show_navbar value: {{ show_navbar }}");
 </script>
 
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top bg-white">
   <script type="module">
     import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-    log("debug", "navbar.html", "render", "Rendering navbar container");
+    log("debug", "{{ scriptName }}", "render", "Rendering navbar container");
   </script>
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="/">
@@ -51,7 +55,7 @@
     </a>
     <script type="module">
       import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-      log("debug", "navbar.html", "render", "Brand logo rendered");
+      log("debug", "{{ scriptName }}", "render", "Brand logo rendered");
     </script>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
@@ -62,7 +66,7 @@
     <div class="collapse navbar-collapse" id="navbarContent">
       <script type="module">
         import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-        log("debug", "navbar.html", "render", "Starting nav items rendering");
+        log("debug", "{{ scriptName }}", "render", "Starting nav items rendering");
       </script>
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         {%- for item in nav_items %}
@@ -108,7 +112,7 @@
           </li>
           <script type="module">
             import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-            log("debug", "navbar.html", "nav_item", "Rendered nav item: {{ item.name }}");
+            log("debug", "{{ scriptName }}", "nav_item", "Rendered nav item: {{ item.name }}");
           </script>
         {%- endfor %}
 
@@ -116,7 +120,7 @@
           <!-- Custom nav items injected here -->
           <script type="module">
             import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-            log("debug", "navbar.html", "blocks", "additional_nav_items block position");
+            log("debug", "{{ scriptName }}", "blocks", "additional_nav_items block position");
           </script>
         {% endblock %}
       </ul>
@@ -128,7 +132,7 @@
         </div>
         <script type="module">
           import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-          log("debug", "navbar.html", "render", "Search box rendered");
+          log("debug", "{{ scriptName }}", "render", "Search box rendered");
         </script>
       </div>
 
@@ -151,7 +155,7 @@
       <div class="user-menu">
         <script type="module">
           import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-          log("debug", "navbar.html", "render", "Starting user menu rendering");
+          log("debug", "{{ scriptName }}", "render", "Starting user menu rendering");
         </script>
         <div class="dropdown">
           <a class="user-dropdown-toggle d-flex align-items-center text-decoration-none" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -160,13 +164,13 @@
                 <img src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=random" alt="User avatar" class="user-avatar">
                 <script type="module">
                   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-                  log("debug", "navbar.html", "user", "Authenticated user avatar rendered for: {{ current_user.name }}");
+                  log("debug", "{{ scriptName }}", "user", "Authenticated user avatar rendered for: {{ current_user.name }}");
                 </script>
               {% else %}
                 <i class="fas fa-user-circle fs-4"></i>
                 <script type="module">
                   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-                  log("debug", "navbar.html", "user", "Anonymous user icon rendered");
+                  log("debug", "{{ scriptName }}", "user", "Anonymous user icon rendered");
                 </script>
               {% endif %}
             </div>
@@ -180,7 +184,7 @@
           <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="userDropdown">
             <script type="module">
               import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-              log("debug", "navbar.html", "render", "Dropdown menu items start");
+              log("debug", "{{ scriptName }}", "render", "Dropdown menu items start");
             </script>
             {% if current_user.is_authenticated %}
               <li class="dropdown-user-details d-md-none">
@@ -202,14 +206,14 @@
               <li><a class="dropdown-item logout-item" href="{{ url_for('auth_bp.logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
               <script type="module">
                 import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-                log("debug", "navbar.html", "auth", "Authenticated user menu items rendered");
+                log("debug", "{{ scriptName }}", "auth", "Authenticated user menu items rendered");
               </script>
             {% else %}
               <li><a class="dropdown-item" href="{{ url_for('auth_bp.login') }}"><i class="fas fa-sign-in-alt me-2"></i> Login</a></li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus me-2"></i> Register</a></li>
               <script type="module">
                 import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-                log("debug", "navbar.html", "auth", "Anonymous user menu items rendered");
+                log("debug", "{{ scriptName }}", "auth", "Anonymous user menu items rendered");
               </script>
             {% endif %}
           </ul>
@@ -223,16 +227,16 @@
 <script type="module">
   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
   document.addEventListener('DOMContentLoaded', () => {
-    log("info", "navbar.html", "dom", "DOM fully loaded and navbar visible");
+    log("info", "{{ scriptName }}", "dom", "DOM fully loaded and navbar visible");
     // Check if navbar is actually visible
     const navbar = document.querySelector('nav.navbar');
     if (navbar) {
-      log("info", "navbar.html", "verify", "📏 Navbar dimensions: " + navbar.offsetWidth + "x" + navbar.offsetHeight);
+      log("info", "{{ scriptName }}", "verify", "📏 Navbar dimensions: " + navbar.offsetWidth + "x" + navbar.offsetHeight);
       // Log CSS computed styles to check visibility
       const styles = window.getComputedStyle(navbar);
-      log("debug", "navbar.html", "styles", "Navbar display: " + styles.display + ", visibility: " + styles.visibility);
+      log("debug", "{{ scriptName }}", "styles", "Navbar display: " + styles.display + ", visibility: " + styles.visibility);
     } else {
-      log("error", "navbar.html", "verify", "❌ Navbar element not found in DOM");
+      log("error", "{{ scriptName }}", "verify", "❌ Navbar element not found in DOM");
     }
   });
 </script>
@@ -242,18 +246,18 @@
   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
   setTimeout(() => {
     if (typeof bootstrap !== 'undefined') {
-      log("info", "navbar.html", "deps", "Bootstrap JS is loaded");
+      log("info", "{{ scriptName }}", "deps", "Bootstrap JS is loaded");
     } else {
-      log("error", "navbar.html", "deps", "❌ Bootstrap JS not found - navigation may not work");
+      log("error", "{{ scriptName }}", "deps", "❌ Bootstrap JS not found - navigation may not work");
     }
     // Check if FontAwesome is loaded by testing an icon
     const iconElement = document.querySelector('.fas');
     if (iconElement) {
       const iconStyle = window.getComputedStyle(iconElement, ':before');
       if (iconStyle.content && iconStyle.content !== 'none' && iconStyle.content !== 'normal') {
-        log("info", "navbar.html", "deps", "FontAwesome icons loaded correctly");
+        log("info", "{{ scriptName }}", "deps", "FontAwesome icons loaded correctly");
       } else {
-        log("error", "navbar.html", "deps", "❌ FontAwesome icons not rendering properly");
+        log("error", "{{ scriptName }}", "deps", "❌ FontAwesome icons not rendering properly");
       }
     }
   }, 500);
@@ -262,7 +266,7 @@
 <!-- Log Final Template Render -->
 <script type="module">
   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-  log("info", "navbar.html", "final", "Navbar rendered successfully");
+  log("info", "{{ scriptName }}", "final", "Navbar rendered successfully");
 </script>
 
 <!-- JavaScript for Theme Toggle - Make the function globally available -->

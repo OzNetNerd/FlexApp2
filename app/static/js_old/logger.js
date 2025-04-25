@@ -25,6 +25,11 @@ function closeAllFileGroups() {
 }
 
 export default function log(level, scriptName, functionName, message, data) {
+  // if user passed e.g. 4 args and message is an array/object, shift it into data
+  if (data === undefined && typeof message !== 'string') {
+    data    = message;
+    message = '';
+  }
   const timestamp = new Date().toISOString();
   const coloredLevel = `%c${level.toUpperCase()}%c`;
   const levelStyle = `color: ${levelColors[level]}; font-weight: bold;`;

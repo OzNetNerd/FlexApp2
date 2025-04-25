@@ -39,6 +39,12 @@ function closeAllFileGroups() {
  * @param {any}    [data]        Optional extra data object
  */
 export default function log(level, scriptName, functionName, message, data) {
+  // if user passed e.g. 4 args and message is an array/object, shift it into data
+  if (data === undefined && typeof message !== 'string') {
+    data    = message;
+    message = '';
+  }
+
   const timestamp = new Date().toISOString();
   const coloredLevel = `%c${level.toUpperCase()}%c`;
   const levelStyle = `color: ${levelColors[level]}; font-weight: bold;`;
@@ -50,7 +56,10 @@ export default function log(level, scriptName, functionName, message, data) {
     if (data === undefined) {
       console[level](baseMessage, levelStyle, resetStyle);
     } else {
-      console[level](baseMessage, levelStyle, resetStyle, data);
+      // Use console.log with label first, then object separately
+      console[level](baseMessage, levelStyle, resetStyle);
+      // Use separate console call for object to make it inspectable
+      console[level](data);
     }
     return;
   }
@@ -82,7 +91,9 @@ export default function log(level, scriptName, functionName, message, data) {
   if (data === undefined) {
     console[level](baseMessage, levelStyle, resetStyle);
   } else {
-    console[level](baseMessage, levelStyle, resetStyle, data);
+    // Separate calls for message and data
+    console[level](baseMessage, levelStyle, resetStyle);
+    console[level](data);
   }
 }
 

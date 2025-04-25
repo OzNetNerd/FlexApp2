@@ -27,7 +27,8 @@
 <script type="module">
   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
   log("info", "_navbar.html", "init", "🚀 Template _navbar.html loaded");
-  log("debug", "_navbar.html", "vars", "Nav items: " + JSON.stringify({{ nav_items }}));
+  // log("debug", "_navbar.html", "vars", { nav_items: {{ nav_items | tojson }} });
+  log("debug", "_navbar.html", "vars", "hello");
   log("debug", "_navbar.html", "context", "Current endpoint: {{ request.endpoint }}");
   log("debug", "_navbar.html", "auth", "User authenticated: {{ current_user.is_authenticated }}");
 </script>
