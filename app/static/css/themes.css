@@ -1,0 +1,179 @@
+/*
+Theme styles - dark mode support
+Contains dark theme variables and style overrides
+*/
+
+/* ===== Dark Mode Variables ===== */
+[data-theme="dark"] {
+  /* Background colors */
+  --color-bg-primary: #121212;
+  --color-bg-secondary: #1e1e1e;
+  --color-bg-light: #252525;
+  --color-bg-lighter: #1e1e1e;
+  --bg-card: #2d2d2d;
+  --bg-section-heading: #252525;
+
+  /* Text colors */
+  --color-text-primary: #e1e1e1;
+  --color-text-secondary: #b0b0b0;
+  --color-text-muted: #909090;
+  --text-section-heading: #e1e1e1;
+
+  /* Border colors */
+  --color-border: #444444;
+  --color-border-light: #444444;
+  --color-border-lighter: #333333;
+  --border-section-heading: #565656;
+
+  /* Apply base styles */
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* ===== Dark Theme Element Overrides ===== */
+
+/* Basic elements */
+[data-theme="dark"] .navbar,
+[data-theme="dark"] .card,
+[data-theme="dark"] .card-header,
+[data-theme="dark"] .card-body {
+  background-color: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Navigation elements */
+[data-theme="dark"] .nav-link,
+[data-theme="dark"] .navbar-brand,
+[data-theme="dark"] .form-label {
+  color: var(--color-text-primary) !important;
+}
+
+/* Form elements */
+[data-theme="dark"] .form-control-plaintext,
+[data-theme="dark"] .form-control {
+  background-color: var(--bg-card) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Borders */
+[data-theme="dark"] .border {
+  border-color: var(--color-border) !important;
+}
+
+/* Buttons */
+[data-theme="dark"] .btn-light {
+  background-color: #2d2d2d;
+  color: #e1e1e1;
+  border-color: #444444;
+}
+
+/* Text colors */
+[data-theme="dark"] .text-muted {
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== Section Component Dark Mode Overrides ===== */
+[data-theme="dark"] .section-card {
+  background-color: var(--color-bg-secondary) !important;
+}
+
+[data-theme="dark"] .section-header {
+  background-color: var(--color-bg-secondary) !important;
+  border-bottom-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .section-heading {
+  background-color: var(--bg-section-heading);
+  color: var(--text-section-heading);
+  border-left-color: var(--border-section-heading);
+}
+
+/* ===== Nav Tabs in Dark Mode ===== */
+[data-theme="dark"] .nav-tabs .nav-link.active {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+  border-bottom-color: var(--color-bg-secondary);
+}
+
+[data-theme="dark"] .nav-tabs {
+  border-bottom-color: var(--color-border);
+}
+
+/* ===== Table Component Dark Mode Overrides ===== */
+[data-theme="dark"] .ag-theme-alpine {
+  --ag-header-background-color: #252525;
+  --ag-background-color: #1e1e1e;
+  --ag-odd-row-background-color: #252525;
+  --ag-header-foreground-color: #e1e1e1;
+  --ag-foreground-color: #e1e1e1;
+  --ag-border-color: #444444;
+  --ag-secondary-border-color: #333333;
+  --ag-row-border-color: #333333;
+  --ag-row-hover-color: rgba(79, 70, 229, 0.1);
+  --ag-selected-row-background-color: rgba(79, 70, 229, 0.2);
+  --ag-checkbox-unchecked-color: #909090;
+  --ag-checkbox-indeterminate-color: #909090;
+}
+
+[data-theme="dark"] .ag-theme-alpine .ag-header-cell-sorted-asc .ag-header-cell-label,
+[data-theme="dark"] .ag-theme-alpine .ag-header-cell-sorted-desc .ag-header-cell-label {
+  color: #7e5bef;
+}
+
+/* ===== Form Elements Dark Mode Overrides ===== */
+[data-theme="dark"] .input-container {
+  background-color: var(--bg-card);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .entity-input {
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .autocomplete-items {
+  background-color: var(--bg-card);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .autocomplete-item:hover,
+[data-theme="dark"] .highlight {
+  background-color: #333333;
+}
+
+/* ===== Dropdown Dark Mode Overrides ===== */
+[data-theme="dark"] .dropdown-menu {
+  background-color: var(--bg-card);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .dropdown-item {
+  color: var(--color-text-secondary);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background-color: rgba(79, 70, 229, 0.08);
+  color: #a5a0ff;
+}
+
+/* ===== Avatar Dark Mode Overrides ===== */
+[data-theme="dark"] .avatar-container,
+[data-theme="dark"] .avatar-circle {
+  background-color: #333333;
+  color: #b0b0b0;
+}
+
+/* ===== Badge Dark Mode Overrides ===== */
+[data-theme="dark"] .badge {
+  background-color: #333333;
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .badge-remove {
+  color: #909090;
+}
+
+[data-theme="dark"] .badge-remove:hover {
+  color: var(--color-danger);
+}

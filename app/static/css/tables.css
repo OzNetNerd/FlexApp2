@@ -1,0 +1,177 @@
+/*
+Table styles - AG Grid theme and custom table styling
+*/
+
+/* ===== AG Grid Theme Overrides ===== */
+.ag-theme-alpine {
+  --ag-font-family: var(--font-family);
+  --ag-font-size: 0.88rem;
+  --ag-header-foreground-color: #1a202c;
+  --ag-foreground-color: var(--color-text-primary);
+  --ag-header-background-color: var(--color-bg-light);
+  --ag-odd-row-background-color: var(--color-bg-lighter);
+  --ag-row-hover-color: rgba(66, 153, 225, 0.08);
+  --ag-selected-row-background-color: rgba(66, 153, 225, 0.16);
+  --ag-border-color: var(--color-border-light);
+  --ag-secondary-border-color: var(--color-border-lighter);
+  --ag-header-column-separator-display: block;
+  --ag-header-column-separator-color: var(--color-border-light);
+  --ag-header-column-resize-handle-color: #a0aec0;
+  --ag-row-border-color: var(--color-border-lighter);
+  --ag-checkbox-checked-color: #4299e1;
+  --ag-checkbox-unchecked-color: #a0aec0;
+  --ag-checkbox-indeterminate-color: #4299e1;
+  --ag-cell-horizontal-padding: 1rem;
+  --ag-header-height: 48px;
+  --ag-row-height: 44px;
+  --ag-header-column-separator-height: 50%;
+  --ag-header-column-separator-width: 1px;
+  --ag-range-selection-border-color: #4299e1;
+  --ag-input-focus-border-color: #4299e1;
+  --ag-alpine-active-color: #4299e1;
+  --ag-border-radius: 6px;
+}
+
+/* Card-like styling for the grid container */
+.ag-theme-alpine .ag-root-wrapper {
+  border: none !important;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Header styles */
+.ag-theme-alpine .ag-header {
+  font-weight: var(--font-weight-medium);
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid var(--ag-border-color);
+}
+
+/* Row hover animation */
+.ag-theme-alpine .ag-row {
+  transition: background-color var(--transition-fast);
+}
+
+/* Cell styling */
+.ag-theme-alpine .ag-cell {
+  display: flex;
+  align-items: center;            /* Vertically center */
+  white-space: normal !important; /* Allows wrapping */
+  line-height: 1.3;               /* Controls line spacing */
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+/* Pagination styling */
+.ag-theme-alpine .ag-paging-panel {
+  padding: var(--spacing-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  border-top: 1px solid var(--ag-border-color);
+}
+
+.ag-theme-alpine .ag-paging-button {
+  border-radius: var(--border-radius-sm);
+  color: #3182ce;
+}
+
+.ag-theme-alpine .ag-paging-button-wrapper {
+  height: 32px;
+}
+
+.ag-theme-alpine .ag-paging-button:hover {
+  background-color: #ebf8ff;
+}
+
+.ag-theme-alpine .ag-paging-page-summary-panel {
+  font-size: var(--font-size-sm);
+}
+
+/* Column headers */
+.ag-theme-alpine .ag-header-cell-label {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Sort icons */
+.ag-theme-alpine .ag-header-cell-sorted-asc .ag-header-cell-label,
+.ag-theme-alpine .ag-header-cell-sorted-desc .ag-header-cell-label {
+  color: #3182ce;
+}
+
+/* Cell Renderers */
+.ag-theme-alpine .ag-cell-value {
+  display: flex;
+  align-items: center;
+}
+
+/* Status badge styles */
+.ag-theme-alpine .status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  display: inline-block;
+}
+
+.ag-theme-alpine .status-badge-success {
+  background-color: #C6F6D5;
+  color: #2F855A;
+}
+
+.ag-theme-alpine .status-badge-warning {
+  background-color: #FEEBC8;
+  color: #C05621;
+}
+
+.ag-theme-alpine .status-badge-danger {
+  background-color: #FED7D7;
+  color: #C53030;
+}
+
+.ag-theme-alpine .status-badge-info {
+  background-color: #BEE3F8;
+  color: #2B6CB0;
+}
+
+/* Action buttons in cells */
+.ag-theme-alpine .cell-action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ag-theme-alpine .cell-action-btn {
+  background: transparent;
+  border: none;
+  color: #718096;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-fast);
+}
+
+.ag-theme-alpine .cell-action-btn:hover {
+  background-color: #edf2f7;
+  color: #4299e1;
+}
+
+/* Empty state styling */
+.ag-theme-alpine .ag-overlay-no-rows-center {
+  padding: 2rem;
+  color: var(--color-text-light);
+}
+
+/* Table container height */
+#table-container {
+  height: calc(100vh - 280px);
+  min-height: 420px;
+}
+
+/* Responsive table wrapper */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}

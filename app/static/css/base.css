@@ -1,0 +1,187 @@
+/*
+Base styles - typography, layout, and global elements
+These styles apply to the entire application
+*/
+
+html {
+  overflow-y: scroll;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  background-color: var(--color-bg-primary);
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+/* Container with consistent percentage margin */
+.container {
+  max-width: 95% !important;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+}
+
+/* Heading styles */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.01em;
+}
+
+/* Basic typography */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* Transitions for common elements */
+body,
+.card,
+.navbar,
+.form-control,
+.btn,
+.section-heading {
+  transition: background-color var(--transition-base),
+              color var(--transition-base),
+              border-color var(--transition-base);
+}
+
+/* Section layouts */
+.section-card {
+  box-shadow: var(--shadow-sm);
+}
+
+.section-header {
+  border-bottom: none;
+  padding: 0;
+}
+
+.section-heading {
+  background-color: var(--bg-section-heading);
+  color: var(--text-section-heading);
+  padding: var(--padding-section);
+  border-left: 4px solid var(--border-section-heading);
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+  font-size: var(--font-size-lg);
+  margin: 0;
+}
+
+.section-body {
+  padding: var(--spacing-base);
+  overflow-x: visible; /* Ensure dropdowns are visible */
+}
+
+.section-content {
+  padding: 0 var(--spacing-base);
+}
+
+/* Layout */
+.header {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+/* Navigation elements */
+.navigation {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.nav-card {
+  background-color: #4a6fdc;
+  color: white;
+  text-align: center;
+  padding: 30px;
+  border-radius: var(--border-radius-lg);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Dashboard statistics styling */
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background-color: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 15px;
+  text-align: center;
+  transition: transform var(--transition-base);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 10px 0;
+  color: #4a6fdc;
+}
+
+.stat-label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+/* Animations */
+.highlights-container {
+  position: relative;
+  height: 24px;
+  overflow: hidden;
+}
+
+.highlight-item {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.highlight-item.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Error page styling */
+.error-page h1 {
+  font-size: 3rem;
+  color: var(--color-danger);
+  margin-bottom: 1rem;
+}
+
+.error-page p {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 2rem;
+}

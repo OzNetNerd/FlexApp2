@@ -1,0 +1,308 @@
+/*
+Components styles - reusable UI elements
+Includes cards, buttons, badges, avatars, and other UI components
+*/
+
+/* ===== Card Component ===== */
+.card {
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.card-header h3 {
+  font-weight: var(--font-weight-semibold);
+  color: #1a202c;
+  letter-spacing: -0.01em;
+  font-size: var(--font-size-xl);
+  margin: 0;
+}
+
+.card-body {
+  padding: var(--spacing-xl);
+  overflow-x: visible; /* Ensure dropdowns are visible */
+}
+
+/* ===== Button Styles ===== */
+.btn {
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-xs) var(--spacing-base);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  letter-spacing: 0.01em;
+  font-size: var(--font-size-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-hover) 100%);
+  border: none;
+  color: white;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, var(--color-success-hover) 0%, #2c7a7b 100%);
+}
+
+.btn-outline-secondary {
+  border-color: #cbd5e0;
+  color: var(--color-text-secondary);
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f7fafc;
+  color: var(--color-text-primary);
+  border-color: #a0aec0;
+}
+
+.btn-outline-primary {
+  border-color: #4299e1;
+  color: #3182ce;
+}
+
+.btn-outline-primary:hover {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+}
+
+.btn-outline-danger {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.btn-outline-danger:hover {
+  background-color: #fff5f5;
+  color: var(--color-danger-hover);
+}
+
+.btn-sm {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+/* ===== Badge Component ===== */
+.badge {
+  background-color: #e1f0fe;
+  border-radius: var(--border-radius-full);
+  padding: 4px 8px;
+  margin: 3px;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--font-size-xs);
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.badge-remove {
+  margin-left: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #666;
+}
+
+.badge-remove:hover {
+  color: var(--color-danger);
+}
+
+/* ===== Avatar Component ===== */
+.avatar-container {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  color: #6b7280;
+  font-size: 1.5rem;
+}
+
+.avatar-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  font-size: 0.8rem;
+}
+
+.user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* User menu dropdown */
+.user-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-lg);
+  transition: all var(--transition-fast);
+}
+
+.user-dropdown-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.user-info {
+  margin-left: 0.6rem;
+  display: flex;
+  align-items: center;
+}
+
+.user-name {
+  font-weight: var(--font-weight-medium);
+  font-size: 0.95rem;
+}
+
+/* ===== Dropdown Component ===== */
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--color-secondary);
+  color: white;
+  border: none;
+}
+
+.dropdown-toggle:hover,
+.dropdown-toggle:focus {
+  background-color: var(--color-secondary-hover);
+  color: white;
+}
+
+.dropdown-toggle::after {
+  transition: transform var(--transition-fast);
+}
+
+.dropdown-toggle[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+.dropdown-container {
+  position: relative;
+  overflow-x: visible !important; /* Force visible overflow for dropdowns */
+}
+
+.dropdown-menu,
+.autocomplete-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  overflow: visible !important; /* Force visible overflow */
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: none;
+  padding: 0.75rem 0;
+  margin-top: 0;
+  transform-origin: top;
+}
+
+.dropdown-menu h6 {
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-semibold);
+  color: #3d4852;
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+  opacity: 0.1;
+}
+
+.custom-dropdown {
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius-xl);
+  padding: 0.5rem 0;
+  min-width: 220px;
+}
+
+.dropdown-item {
+  padding: 0.6rem 1.2rem;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-primary-lighter);
+  color: var(--color-primary);
+}
+
+.dropdown-item i {
+  width: 20px;
+  color: var(--color-text-muted);
+}
+
+.dropdown-item:hover i {
+  color: var(--color-primary);
+}
+
+.logout-item {
+  color: var(--color-danger);
+}
+
+.logout-item:hover {
+  background-color: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.logout-item i {
+  color: var(--color-danger);
+}
+
+/* ===== Background color utilities ===== */
+.bg-primary-soft {
+  background-color: rgba(13, 110, 253, 0.15);
+}
+
+.bg-success-soft {
+  background-color: var(--color-success-light);
+}
+
+.bg-purple-soft {
+  background-color: rgba(111, 66, 193, 0.15);
+}
+
+.bg-secondary-soft {
+  background-color: rgba(108, 117, 125, 0.15);
+}
+
+/* ===== List group styling ===== */
+.list-group-item {
+  transition: background-color var(--transition-fast);
+}
+
+.list-group-item:hover {
+  background-color: rgba(0, 0, 0, 0.01);
+}
