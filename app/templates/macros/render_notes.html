@@ -1,0 +1,31 @@
+<!-- START TEMPLATE: base/macros/render_notes.html -->
+{# base/macros/render_notes.html #}
+
+{% macro render_notes(notes) %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h2 class="h5 mb-0">Recent Activity</h2>
+          <button class="btn btn-sm btn-outline-primary">View All</button>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            {% for note in notes %}
+              <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
+                <div class="activity-icon {{ note.icon_bg_class }} text-white d-flex align-items-center justify-content-center">
+                  <i class="{{ note.icon_class }}"></i>
+                </div>
+                <div class="ms-3">
+                  <p class="mb-0">{{ note.description|safe }}</p>
+                  <small class="text-muted">{{ note.timestamp }}</small>
+                 </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+<!-- END TEMPLATE: base/macros/render_notes.html -->

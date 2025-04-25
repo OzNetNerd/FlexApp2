@@ -1,0 +1,79 @@
+{% macro render_empty_state(message) %}
+  <div class="form-control-plaintext bg-light border rounded px-3 py-2">
+    {{ message }}
+  </div>
+{% endmacro %}
+
+{% macro render_entity_table(entities, entity_type, columns, link_prefix) %}
+  <div class="col-12">
+    <label class="form-label fw-semibold">{{ entity_type }}</label>
+    {% if entities %}
+      <div class="table-responsive form-control-plaintext bg-light border rounded px-3 py-2">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              {% for column in columns %}
+                <th>{{ column.label }}</th>
+              {% endfor %}
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entity in entities %}
+            <tr>
+              {% for column in columns %}
+                <td>
+                  {% if column.type == 'badge' %}
+                    {% set badge_class = 'bg-secondary' %}
+                    {% if column.badge_mapping and entity[column.key] in column.badge_mapping %}
+                      {% set badge_class = column.badge_mapping[entity[column.key]] %}
+                    {% endif %}
+                    <span class="badge {{ badge_class }}">
+                      {{ entity[column.key]|default('') }}
+                    </span>
+                  {% elif column.type == 'currency' %}
+                    ${{ entity[column.key]|default('0.00') }}
+                  {% else %}
+                    {{ entity[column.key]|default('') }}
+                  {% endif %}
+                </td>
+              {% endfor %}
+              <td>
+                <a href="{{ link_prefix }}/{{ entity.id }}" class="btn btn-sm btn-info">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      {{ render_empty_state('No ' + entity_type|lower + ' associated with this entity.') }}
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro render_entity_list(entities, entity_type) %}
+  <div class="col-12">
+    <label class="form-label fw-semibold">{{ entity_type }}</label>
+    {% if entities %}
+      <div class="form-control-plaintext bg-light border rounded px-3 py-2">
+        <div class="list-group list-group-flush">
+          {% for entity in entities %}
+            <div class="list-group-item bg-transparent px-0 border-0 border-bottom">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ entity.name }}</h5>
+              </div>
+              {% if entity.description %}
+                <p class="mb-1">{{ entity.description }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      {{ render_empty_state('No ' + entity_type|lower + ' defined for this entity.') }}
+    {% endif %}
+  </div>
+{% endmacro %}

@@ -223,18 +223,10 @@
 
   {% call tab_macros.render_tab_section('system-info', 'System Info') %}
   {{ field_macros.render_field({
-   "entry_name": "created_at",
-   "label": "Created At",
-   "type": "date",
-   "value": entity.created_at,
    "required": false,
    "options": []
   }, read_only=true) }}
   {{ field_macros.render_field({
-   "entry_name": "updated_at",
-   "label": "Updated At",
-   "type": "date",
-   "value": entity.updated_at,
    "required": false,
    "options": []
   }, read_only=true) }}
