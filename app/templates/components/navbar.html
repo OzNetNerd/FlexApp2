@@ -1,4 +1,3 @@
-<!-- START TEMPLATE: navbar.html -->
 {# ------------------------------------------------------------------------------
   File: navbar.html | Purpose: Top nav bar with search, nav items, user menu
   Inputs:
@@ -28,14 +27,14 @@
 <script type="module">
   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
   log("info", "{{ scriptName }}", "init", "🚀 Template {{ scriptName }} loaded");
-  log("debug", "{{ scriptName }}", "vars", "Available variables:", {{ nav_items | tojson | safe }});
 
-
-
+  // Use JSON.parse to handle the HTML-encoded data
+  log("debug", "{{ scriptName }}", "vars", "Available variables:", {{ nav_items }});
 
   log("debug", "{{ scriptName }}", "context", "Current endpoint: {{ request.endpoint }}");
   log("debug", "{{ scriptName }}", "auth", "User authenticated: {{ current_user.is_authenticated }}");
 </script>
+
 
 {# Set Context Variables (precompute values to avoid inline logic in HTML) #}
 {% set show_navbar = show_navbar %}
@@ -339,4 +338,3 @@
     border-radius: 0.5rem;
   }
 </style>
-<!-- END TEMPLATE: navbar.html -->

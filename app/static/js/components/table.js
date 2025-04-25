@@ -246,7 +246,8 @@ export function loadTableData(data) {
   log("info", scriptName, functionName, `📊 Initializing table with data:`, data);
   try {
     if (gridApiReference) {
-      gridApiReference.setRowData(data);
+      // Updated: Replace deprecated setRowData with updateGridOptions
+      gridApiReference.updateGridOptions({ rowData: data });
       log("info", scriptName, functionName, "📊 Table initialized with data", data);
       return true;
     } else {
@@ -463,7 +464,10 @@ async function initializeTable() {
     }
     setGridApi(params.api, params.columnApi);
     window.gridApi = params.api;
-    params.api.setRowData(actualData);
+
+    // Updated: Replace deprecated setRowData with updateGridOptions
+    params.api.updateGridOptions({ rowData: actualData });
+
     setupGlobalSearch(params.api);
     setupColumnSelector(params.api);
     params.api.addEventListener('gridColumnsChanged', () => setupColumnSelector(params.api));
