@@ -74,6 +74,21 @@
           </a>
         {% endblock %}
         {% block extra_action_buttons %}{% endblock %}
+        <!-- Column selector button -->
+        <div class="dropdown ms-2">
+          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="columnSelectorBtn" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-columns me-1"></i> Columns
+          </button>
+          <div class="dropdown-menu p-3" style="width: 250px;" aria-labelledby="columnSelectorBtn">
+            <div class="d-flex justify-content-between mb-2">
+              <button id="selectAllColumns" class="btn btn-sm btn-outline-primary">Select All</button>
+              <button id="clearAllColumns" class="btn btn-sm btn-outline-secondary">Clear All</button>
+            </div>
+            <div id="columnSelectorItems" class="mt-2">
+              <!-- Column checkboxes will be added here dynamically -->
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
