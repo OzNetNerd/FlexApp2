@@ -113,11 +113,11 @@
              }, 500); // Delay a bit longer for errors
            });
          }
-      </script>
+      </script>v
     {%- endif %}
 
     {# Include Navbar (ensure path is correct relative to your templates dir) #}
-    {% include 'components/navbar.html' ignore missing with context %}
+    {% include 'partials/navbar.html' with context %}
 
     <main class="py-3 py-md-4"> {# Responsive padding #}
       {# Use container-fluid for full width, or container for centered fixed-width #}
