@@ -1,0 +1,143 @@
+{# partials/form_field.html #}
+<div class="form-group mb-3">
+  <label for="{{ field.field_name }}" class="form-label">
+    {{ field.label }}
+    {% if field.required and not field.readonly %}
+      <span class="text-danger">*</span>
+    {% endif %}
+  </label>
+
+  {% if field.field_type == 'text' %}
+    {% if field.readonly %}
+      <p class="form-control-static">{{ entity|attr(field.field_name) }}</p>
+    {% else %}
+      <input type="text"
+             class="form-control"
+             id="{{ field.field_name }}"
+             name="{{ field.field_name }}"
+             value="{{ entity|attr(field.field_name) or '' }}"
+             {% if field.required %}required{% endif %}>
+    {% endif %}
+
+  {% elif field.field_type == 'number' %}
+    {% if field.readonly %}
+      <p class="form-control-static">{{ entity|attr(field.field_name) }}</p>
+    {% else %}
+      <input type="number"
+             class="form-control"
+             id="{{ field.field_name }}"
+             name="{{ field.field_name }}"
+             value="{{ entity|attr(field.field_name) or '' }}"
+             {% if field.required %}required{% endif %}>
+    {% endif %}
+
+  {% elif field.field_type == 'textarea' %}
+    {% if field.readonly %}
+      <div class="form-control-static pre-wrap">{{ entity|attr(field.field_name) }}</div>
+    {% else %}
+      <textarea class="form-control"
+                id="{{ field.field_name }}"
+                name="{{ field.field_name }}"
+                rows="4"
+                {% if field.required %}required{% endif %}>{{ entity|attr(field.field_name) or '' }}</textarea>
+    {% endif %}
+
+  {% elif field.field_type == 'select' %}
+    {% if field.readonly %}
+      {% set selected_value = entity|attr(field.field_name) %}
+      {% set selected_label = '' %}
+      {% for option in field.options %}
+        {% if option.value == selected_value %}
+          {% set selected_label = option.label %}
+        {% endif %}
+      {% endfor %}
+      <p class="form-control-static">{{ selected_label }}</p>
+    {% else %}
+      <select class="form-select"
+              id="{{ field.field_name }}"
+              name="{{ field.field_name }}"
+              {% if field.required %}required{% endif %}>
+        <option value="">-- Select --</option>
+        {% for option in field.options %}
+          <option value="{{ option.value }}"
+                  {% if entity|attr(field.field_name) == option.value %}selected{% endif %}>
+            {{ option.label }}
+          </option>
+        {% endfor %}
+      </select>
+    {% endif %}
+
+  {% elif field.field_type == 'checkbox' %}
+    {% if field.readonly %}
+      <p class="form-control-static">
+        {% if entity|attr(field.field_name) %}Yes{% else %}No{% endif %}
+      </p>
+    {% else %}
+      <div class="form-check">
+        <input type="checkbox"
+               class="form-check-input"
+               id="{{ field.field_name }}"
+               name="{{ field.field_name }}"
+               value="true"
+               {% if entity|attr(field.field_name) %}checked{% endif %}>
+      </div>
+    {% endif %}
+
+  {% elif field.field_type == 'date' %}
+    {% if field.readonly %}
+      <p class="form-control-static">{{ entity|attr(field.field_name) }}</p>
+    {% else %}
+      <input type="date"
+             class="form-control"
+             id="{{ field.field_name }}"
+             name="{{ field.field_name }}"
+             value="{{ entity|attr(field.field_name) or '' }}"
+             {% if field.required %}required{% endif %}>
+    {% endif %}
+
+  {% elif field.field_type == 'datetime' %}
+    {% if field.readonly %}
+      <p class="form-control-static">{{ entity|attr(field.field_name) }}</p>
+    {% else %}
+      <input type="datetime-local"
+             class="form-control"
+             id="{{ field.field_name }}"
+             name="{{ field.field_name }}"
+             value="{{ entity|attr(field.field_name) or '' }}"
+             {% if field.required %}required{% endif %}>
+    {% endif %}
+
+  {% elif field.field_type == 'radio' %}
+    {% if field.readonly %}
+      {% set selected_value = entity|attr(field.field_name) %}
+      {% set selected_label = '' %}
+      {% for option in field.options %}
+        {% if option.value == selected_value %}
+          {% set selected_label = option.label %}
+        {% endif %}
+      {% endfor %}
+      <p class="form-control-static">{{ selected_label }}</p>
+    {% else %}
+      <div class="radio-options">
+        {% for option in field.options %}
+          <div class="form-check">
+            <input type="radio"
+                   class="form-check-input"
+                   id="{{ field.field_name }}_{{ loop.index }}"
+                   name="{{ field.field_name }}"
+                   value="{{ option.value }}"
+                   {% if entity|attr(field.field_name) == option.value %}checked{% endif %}
+                   {% if field.required %}required{% endif %}>
+            <label class="form-check-label" for="{{ field.field_name }}_{{ loop.index }}">
+              {{ option.label }}
+            </label>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endif %}
+
+  {% if field.help_text and not field.readonly %}
+    <div class="form-text text-muted">{{ field.help_text }}</div>
+  {% endif %}
+</div>

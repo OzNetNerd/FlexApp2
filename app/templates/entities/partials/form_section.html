@@ -1,0 +1,12 @@
+{# partials/form_section.html #}
+<div class="form-section mb-4">
+  {% if section.name %}
+    <h4 class="section-title">{{ section.name }}</h4>
+  {% endif %}
+
+  <div class="section-fields">
+    {% for field in section.fields %}
+      {% include "partials/form_field.html" %}
+    {% endfor %}
+  </div>
+</div>
