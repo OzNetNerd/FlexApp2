@@ -16,53 +16,11 @@ class Note(BaseModel):
     notable_type = db.Column(db.String(50), nullable=False)
     notable_id = db.Column(db.Integer, nullable=False)
 
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(),
+                           onupdate=db.func.current_timestamp())
 
-    __field_order__ = {
-        "Body": [
-            {
-                "name": "content",
-                "label": "Content",
-                "type": "textarea",
-                "tab": "Post",
-                "section": "Body",
-            },
-            {
-                "name": "processed_content",
-                "label": "Processed",
-                "type": "textarea",
-                "readonly": True,
-                "tab": "Post",
-                "section": "Body",
-            },
-        ],
-        "Metadata": [
-            {
-                "name": "author.username",
-                "label": "Author",
-                "type": "text",
-                "readonly": True,
-                "tab": "Post",
-                "section": "Metadata",
-            },
-            {
-                "name": "created_at",
-                "label": "Created At",
-                "type": "datetime",
-                "readonly": True,
-                "tab": "Post",
-                "section": "Metadata",
-            },
-            {
-                "name": "updated_at",
-                "label": "Updated At",
-                "type": "datetime",
-                "readonly": True,
-                "tab": "Post",
-                "section": "Metadata",
-            },
-        ],
-    }
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     def __repr__(self) -> str:
         """Readable string representation.
