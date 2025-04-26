@@ -100,7 +100,11 @@
       {{ csrf_input }}
       <div class="tab-content" id="formTabsContent">
         {% for tab in tabs %}
-          {% include 'pages/companies/tabs/_tab_' + tab.tab_name|lower|replace(' ','_') + '.html' %}
+          {% if tab.tab_name == 'Notes' %}
+            {% include 'pages/companies/tabs/_tab_notes.html' %}
+          {% else %}
+            {% include 'pages/companies/tabs/_tab_' + tab.tab_name|lower|replace(' ','_') + '.html' %}
+          {% endif %}
         {% endfor %}
       </div>
     </form>
@@ -165,9 +169,26 @@
 <script type="module" src="{{ url_for('static', filename='js/pages/header_buttons.js') }}"></script>
 
 <script type="module">
-  import tabsComponent from '{{ url_for('static', filename='js/core/tabs.js') }}';
+  import tabsComponent from '{{ url_for('static', filename='js/components/tabs.js') }}';
   document.addEventListener('DOMContentLoaded', () => {
     tabsComponent.initTabs('formTabs');
+
+    // Force show Notes tab if it exists and is active
+    setTimeout(() => {
+      console.log("Checking for Notes tab...");
+      const notesTabButton = document.getElementById('tab-notes-tab');
+      if (notesTabButton) {
+        console.log("Found Notes tab, activating...");
+        notesTabButton.click();
+      }
+
+      // Force initialize notes if script is loaded
+      if (window.notesComponent) {
+        console.log("Manually initializing notes");
+        const controller = window.notesComponent.initNotes();
+        if (controller) controller.showTab();
+      }
+    }, 1500);
   });
 </script>
 {% endblock %}
