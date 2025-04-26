@@ -5,23 +5,45 @@ import apiService from '/static/js/services/apiService.js';
 /**
  * Unified Notes Component
  * Handles all notes functionality including tabbed interfaces
- * Combines functionality from previous notes.js and notesSection.js
  */
 class NotesComponent {
   constructor() {
     this.instances = new Map();
-    log('info', 'notesSection.js', 'constructor', 'Unified Notes component created');
+    this.initialized = false;
+    log('info', 'notesSection.js', 'constructor', '🔄 Unified Notes component created');
 
     // Initialize on DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => {
-      log("info", "notesSection.js", "DOMContentLoaded", "DOM content loaded. Initializing Notes");
+      // Prevent duplicate initialization
+      if (this.initialized) {
+        log('warn', 'notesSection.js', 'DOMContentLoaded', '⚠️ Notes component already initialized, skipping');
+        return;
+      }
+
+      log("info", "notesSection.js", "DOMContentLoaded", "🚀 DOM content loaded. Initializing Notes");
+      this.initialized = true;
+
+      // Set global flag to indicate script is loaded (for view.html check)
+      window.notesScriptLoaded = true;
+      log("info", "notesSection.js", "DOMContentLoaded", "✅ Set window.notesScriptLoaded = true");
 
       // Auto-initialize any notes containers found in the DOM
       const notesDataContainers = document.querySelectorAll('[id^="notesData"]');
+      log("info", "notesSection.js", "DOMContentLoaded", `🔍 Found ${notesDataContainers.length} notes data containers`);
+
       notesDataContainers.forEach(container => {
         this.initNotes(container.id);
       });
     });
+  }
+
+  /**
+   * Normalize tab name for case-insensitive comparison
+   * @param {string} name - Tab name to normalize
+   * @returns {string} - Normalized tab name
+   */
+  normalizeTabName(name) {
+    return (name || '').toLowerCase().trim();
   }
 
   /**
@@ -35,13 +57,13 @@ class NotesComponent {
     // Get data attributes from the notesData div
     const notesData = document.getElementById(containerId);
     if (!notesData) {
-      log('error', 'notesSection.js', functionName, `Notes data container not found: ${containerId}`);
+      log('error', 'notesSection.js', functionName, `❌ Notes data container not found: ${containerId}`);
       return null;
     }
 
     // Check if already initialized
     if (this.instances.has(containerId)) {
-      log('warn', 'notesSection.js', functionName, `Notes already initialized for container: ${containerId}`);
+      log('warn', 'notesSection.js', functionName, `⚠️ Notes already initialized for container: ${containerId}`);
       return this.instances.get(containerId);
     }
 
@@ -52,10 +74,11 @@ class NotesComponent {
     const currentUsername = notesData.dataset.username;
     const scriptName = 'notesSection'; // Unified script name
 
-    log('info', scriptName, functionName, 'Initializing Notes Section', {
+    log('info', scriptName, functionName, '🔄 Initializing Notes Section', {
       notableType,
       notableId,
-      currentUserId
+      currentUserId,
+      containerId
     });
 
     // Get references to essential UI elements
@@ -65,6 +88,15 @@ class NotesComponent {
     const notesLoading = document.getElementById('notesLoading');
     const newNoteForm = document.getElementById('newNoteForm');
     const noteContentField = document.getElementById('content');
+
+    log('debug', scriptName, functionName, '📌 UI elements status', {
+      notesTabPane: notesTabPane ? '✅ Found' : '❌ Missing',
+      notesTabButton: notesTabButton ? '✅ Found' : '❌ Missing',
+      notesList: notesList ? '✅ Found' : '❌ Missing',
+      notesLoading: notesLoading ? '✅ Found' : '❌ Missing',
+      newNoteForm: newNoteForm ? '✅ Found' : '❌ Missing',
+      noteContentField: noteContentField ? '✅ Found' : '❌ Missing'
+    });
 
     // Date filter elements
     const noteFilterSelect = document.getElementById('noteFilterSelect');
@@ -76,7 +108,16 @@ class NotesComponent {
 
     // Optional UI check warning
     if (!notesList || !notesLoading || !newNoteForm || !noteContentField) {
-      log("warn", scriptName, functionName, "One or more UI elements are missing. Limited functionality available.");
+      log("warn", scriptName, functionName, "⚠️ One or more UI elements are missing. Limited functionality available.");
+    }
+
+    // Check tab state
+    if (notesTabPane) {
+      log('info', scriptName, functionName, `📌 Initial tab state:`, {
+        hasActiveClass: notesTabPane.classList.contains('active'),
+        hasShowClass: notesTabPane.classList.contains('show'),
+        classes: notesTabPane.className
+      });
     }
 
     // Create and insert status message area dynamically
@@ -151,11 +192,11 @@ class NotesComponent {
 
       // Check if notes are already loaded for current view
       if (state.notesLoadedForCurrentView && !forceReload) {
-        log("debug", scriptName, loadFunctionName, "Skipping load: Notes already loaded for current view");
+        log("debug", scriptName, loadFunctionName, "⏩ Skipping load: Notes already loaded for current view");
         return;
       }
 
-      log("info", scriptName, loadFunctionName, "Loading notes with filters", {
+      log("info", scriptName, loadFunctionName, "🔄 Loading notes with filters", {
         filters,
         searchTerm: state.searchTerm
       });
@@ -196,7 +237,7 @@ class NotesComponent {
             notesLoading.style.display = 'none';
           }
 
-          log("debug", scriptName, loadFunctionName, "Response payload received", {
+          log("debug", scriptName, loadFunctionName, "✅ Response payload received", {
             url: endpoint,
             payload: data
           });
@@ -240,7 +281,7 @@ class NotesComponent {
               </div>`;
           }
 
-          log("error", scriptName, loadFunctionName, "Error loading notes", {
+          log("error", scriptName, loadFunctionName, "❌ Error loading notes", {
             url: endpoint,
             error: error
           });
@@ -265,11 +306,11 @@ class NotesComponent {
       const renderFunctionName = "renderNotes";
 
       if (!notesList) {
-        log("warn", scriptName, renderFunctionName, "Notes list element not found");
+        log("warn", scriptName, renderFunctionName, "❌ Notes list element not found");
         return;
       }
 
-      log("debug", scriptName, renderFunctionName, `Rendering ${notes ? notes.length : 0} notes`);
+      log("debug", scriptName, renderFunctionName, `📝 Rendering ${notes ? notes.length : 0} notes`);
 
       if (!notes || notes.length === 0) {
         notesList.innerHTML = '<div class="text-center py-3 text-muted">No notes found matching the criteria.</div>';
@@ -310,7 +351,7 @@ class NotesComponent {
       });
 
       notesList.innerHTML = html;
-      log("info", scriptName, renderFunctionName, "Notes rendered successfully");
+      log("info", scriptName, renderFunctionName, "✅ Notes rendered successfully");
     }
 
     /**
@@ -322,13 +363,13 @@ class NotesComponent {
       const addFunctionName = "addNote";
 
       if (!content || content.trim() === '') {
-        log("warn", scriptName, addFunctionName, "Note content is empty. Aborting submission.");
+        log("warn", scriptName, addFunctionName, "⚠️ Note content is empty. Aborting submission.");
         showStatus('Please enter a note.', 'warning');
         if (noteContentField) noteContentField.focus();
         return Promise.reject(new Error('Note content is empty'));
       }
 
-      log("info", scriptName, addFunctionName, "Adding new note");
+      log("info", scriptName, addFunctionName, "➕ Adding new note");
 
       // Disable submit button during submission
       const submitBtn = newNoteForm?.querySelector('button[type="submit"]');
@@ -354,7 +395,7 @@ class NotesComponent {
 
       return apiService.post(postEndpoint, noteData)
         .then(data => {
-          log("debug", scriptName, addFunctionName, "Response payload received for POST", {
+          log("debug", scriptName, addFunctionName, "✅ Response payload received for POST", {
             url: postEndpoint,
             payload: data
           });
@@ -368,7 +409,7 @@ class NotesComponent {
           loadNotes(state.currentFilters, true); // Force reload with current filters
           showStatus('Note added successfully!');
 
-          log("info", scriptName, addFunctionName, "Note added successfully");
+          log("info", scriptName, addFunctionName, "✅ Note added successfully");
 
           // Publish note added event
           eventSystem.publish('notes.added', {
@@ -383,7 +424,7 @@ class NotesComponent {
         .catch(error => {
           showStatus(`Error adding note: ${error.message}`, 'danger');
 
-          log("error", scriptName, addFunctionName, "Error adding note", {
+          log("error", scriptName, addFunctionName, "❌ Error adding note", {
             url: postEndpoint,
             error: error
           });
@@ -409,10 +450,31 @@ class NotesComponent {
 
     // Set up event listeners for tabbed interface
     if (notesTabButton) {
-      notesTabButton.addEventListener('shown.bs.tab', function(event) {
-        log("info", scriptName, "tabShown", "Notes tab 'shown.bs.tab' event triggered");
-        loadNotes(state.currentFilters, !state.notesLoadedForCurrentView);
-      });
+      // IMPORTANT: Check if listener already attached to avoid duplicates
+      if (!notesTabButton._notesTabListenerAttached) {
+        log("info", scriptName, "tabEvents", "🔄 Setting up notes tab event listener");
+
+        notesTabButton.addEventListener('shown.bs.tab', function(event) {
+          log("info", scriptName, "tabShown", "🚀 Notes tab 'shown.bs.tab' event triggered");
+
+          // Force tab to stay visible - prevents hiding
+          if (notesTabPane) {
+            notesTabPane.classList.add('active', 'show');
+            log("info", scriptName, "tabShown", "📌 Enforced notes tab visibility");
+          }
+
+          loadNotes(state.currentFilters, !state.notesLoadedForCurrentView);
+        });
+
+        // Also listen for 'hide' events to debug tab hiding
+        notesTabButton.addEventListener('hide.bs.tab', function(event) {
+          log("warn", scriptName, "tabHide", "⚠️ Notes tab 'hide.bs.tab' event triggered - this may indicate a conflict");
+        });
+
+        notesTabButton._notesTabListenerAttached = true;
+      } else {
+        log("warn", scriptName, "tabEvents", "⚠️ Tab listener already attached, skipping");
+      }
     }
 
     // Filter by days dropdown
@@ -421,7 +483,7 @@ class NotesComponent {
         const functionName = "noteFilterSelect_change";
         const value = this.value;
 
-        log("info", scriptName, functionName, `Filter changed: ${value}`);
+        log("info", scriptName, functionName, `📅 Filter changed: ${value}`);
 
         // Toggle date range selectors visibility
         if (value === 'custom' && dateRangeSelectors) {
@@ -447,7 +509,7 @@ class NotesComponent {
         const functionName = "applyDateRange_click";
 
         if (!dateFrom || !dateTo) {
-          log("error", scriptName, functionName, "Date range inputs not found");
+          log("error", scriptName, functionName, "❌ Date range inputs not found");
           showStatus('Date range inputs are missing.', 'danger');
           return;
         }
@@ -469,7 +531,7 @@ class NotesComponent {
           return;
         }
 
-        log("info", scriptName, functionName, "Custom date range applied", {
+        log("info", scriptName, functionName, "📅 Custom date range applied", {
           fromDate: fromValue,
           toDate: toValue
         });
@@ -489,7 +551,7 @@ class NotesComponent {
       noteSearchInput.addEventListener('input', function(e) {
         const functionName = "noteSearchInput_input";
         const searchTerm = this.value.trim();
-        log("debug", scriptName, functionName, "Search input changed", { searchTerm });
+        log("debug", scriptName, functionName, "🔍 Search input changed", { searchTerm });
 
         state.searchTerm = searchTerm;
         state.notesLoadedForCurrentView = false;
@@ -499,18 +561,33 @@ class NotesComponent {
 
     // Handle adding a new note form submission
     if (newNoteForm) {
-      newNoteForm.addEventListener('submit', function(e) {
+      // Remove any existing listeners first
+      if (newNoteForm._hasSubmitListener) {
+        log("warn", scriptName, "formEvents", "⚠️ Form already has submit listener, removing");
+        const oldListener = newNoteForm._submitListener;
+        if (oldListener) {
+          newNoteForm.removeEventListener('submit', oldListener);
+        }
+      }
+
+      // Add new listener
+      const submitListener = function(e) {
         e.preventDefault();
         const functionName = "newNoteForm_submit";
+        log("info", scriptName, functionName, "📝 Note form submitted");
 
         addNote(noteContentField ? noteContentField.value : '')
           .then(() => {
             // Success handled within addNote
           })
           .catch(error => {
-            log("error", scriptName, functionName, "Add note promise rejected", error);
+            log("error", scriptName, functionName, "❌ Add note promise rejected", error);
           });
-      });
+      };
+
+      newNoteForm.addEventListener('submit', submitListener);
+      newNoteForm._submitListener = submitListener;
+      newNoteForm._hasSubmitListener = true;
     }
 
     // Notes controller object
@@ -530,7 +607,16 @@ class NotesComponent {
         state.notesLoadedForCurrentView = false;
         loadNotes(filters, true);
       },
-      showStatus
+      showStatus,
+      // Add method to force tab visibility
+      showTab: () => {
+        if (notesTabPane) {
+          notesTabPane.classList.add('active', 'show');
+          log("info", scriptName, "showTab", "📌 Manually forced tab visibility");
+          return true;
+        }
+        return false;
+      }
     };
 
     // Store the controller instance
@@ -538,22 +624,28 @@ class NotesComponent {
 
     // Expose controller globally for external access
     window.notesController = controller;
-    log("debug", scriptName, functionName, "Notes controller exposed globally");
+    log("debug", scriptName, functionName, "🌎 Notes controller exposed globally as window.notesController");
 
     // Ensure loading indicator is hidden if tab isn't active initially
     if (notesLoading) {
       notesLoading.style.display = 'none';
     }
 
+    // Check if tab is ready - this is crucial
+    const isTabActive = notesTabPane && (notesTabPane.classList.contains('active') || notesTabPane.classList.contains('show'));
+    log("info", scriptName, functionName, `📌 Tab active status: ${isTabActive ? 'Active' : 'Inactive'}`);
+
     // Only show the "Select tab" message if the notes tab is NOT initially active
-    if (notesList && notesTabPane && !(notesTabPane.classList.contains('active') || notesTabPane.classList.contains('show'))) {
+    if (notesList && notesTabPane && !isTabActive) {
       notesList.innerHTML = '<div class="text-center py-3 text-muted">Select the "Notes" tab to load notes.</div>';
+      log("info", scriptName, functionName, "💬 Displayed 'Select tab' message");
     } else {
       // If no tab interface or tab is active, load notes immediately
+      log("info", scriptName, functionName, "🔄 Tab is active or no tab interface, loading notes immediately");
       loadNotes();
     }
 
-    log('info', scriptName, functionName, 'Notes initialization complete for', containerId);
+    log('info', scriptName, functionName, '✅ Notes initialization complete for', containerId);
     return controller;
   }
 
@@ -569,4 +661,9 @@ class NotesComponent {
 
 // Create singleton instance
 const notesComponent = new NotesComponent();
+
+// Set global flag immediately for view.html timeout check
+window.notesScriptLoaded = true;
+log("info", "notesSection.js", "global", "✅ Set window.notesScriptLoaded = true on script load");
+
 export default notesComponent;
