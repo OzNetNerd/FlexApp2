@@ -3,196 +3,170 @@
 {% import 'macros/render_form_fields.html' as field_macros with context %}
 {% import 'macros/tabs.html' as tab_macros with context %}
 {% import 'macros/entity_macros.html' as entity_macros with context %}
-{% import 'macros/render_notes.html' as notes_macros with context %}
-
-{% set tabs = [
-   {'tab_name': 'Notes'} if read_only else None,
-   {'tab_name': 'About'},
-   {'tab_name': 'System Info'} if read_only else None
-] | reject('none') | list %}
 
 {% block content %}
 <div class="card border-0 shadow-sm" style="overflow: visible !important;">
- <!-- Card Header -->
- <div class="card-header bg-white py-3 pb-0" style="border: none;">
-   <div class="d-flex justify-content-between align-items-center">
-     <!-- Header Left - Heading -->
-     <div class="d-flex align-items-center">
-       <h3 class="h4 mb-0 text-primary me-3">
-         {% if read_only %}
-           <i class="fas fa-eye me-2"></i>
-           View {{ model_name }}: <span class="text-info">{{ entity_name|default('') }}</span>
-         {% else %}
-           <i class="fas fa-edit me-2"></i>
-           Edit {{ model_name }}: <span class="text-info">{{ entity_name|default('') }}</span>
-         {% endif %}
-       </h3>
-     </div>
+  <!-- Card Header -->
+  <div class="card-header bg-white py-3 pb-0" style="border: none;">
+    <div class="d-flex justify-content-between align-items-center">
+      <!-- Header Left -->
+      <div class="d-flex align-items-center">
+        <h3 class="h4 mb-0 text-primary me-3">
+          {% if read_only %}
+            <i class="fas fa-eye me-2"></i>
+            View {{ model_name }}: <span class="text-info">{{ entity_name|default('') }}</span>
+          {% else %}
+            <i class="fas fa-edit me-2"></i>
+            Edit {{ model_name }}: <span class="text-info">{{ entity_name|default('') }}</span>
+          {% endif %}
+        </h3>
+      </div>
 
-     <!-- Header Right - Action Buttons -->
-     <div class="d-flex gap-2">
-       <div class="d-flex justify-content-end align-items-center gap-2">
-         {% if read_only %}
-           <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.create') }}"
-               class="btn btn-primary fw-bold">
-             <i class="fas fa-plus me-1"></i> Add
-           </a>
+      <!-- Header Right -->
+      <div class="d-flex gap-2">
+        <div class="d-flex justify-content-end align-items-center gap-2">
+          {% if read_only %}
+            <a href="{{ url_for(request.endpoint.rsplit('.',1)[0] + '.create') }}" class="btn btn-primary fw-bold">
+              <i class="fas fa-plus me-1"></i> Add
+            </a>
+            {% if entity is defined and entity.id %}
+              <a href="{{ url_for(request.endpoint.rsplit('.',1)[0] + '.edit', entity_id=entity.id) }}" class="btn btn-warning text-dark fw-bold">
+                <i class="fas fa-edit me-1"></i> Edit
+              </a>
+              <button type="button" id="delete-button" class="btn btn-danger">
+                <i class="fas fa-trash me-1"></i> Delete
+              </button>
+            {% endif %}
+            <a href="{{ url_for(request.endpoint.rsplit('.',1)[0] + '.index') }}" class="btn btn-secondary">
+              <i class="fas fa-arrow-left me-1"></i> Back
+            </a>
+          {% else %}
+            {% if entity is defined and entity.id %}
+              <a href="{{ url_for(request.endpoint.rsplit('.',1)[0] + '.view', entity_id=entity.id) }}" class="btn btn-secondary">
+                <i class="fas fa-times me-1"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-primary" form="main-form">
+                <i class="fas fa-save me-1"></i> Update
+              </button>
+            {% else %}
+              <a href="{{ url_for(request.endpoint.rsplit('.',1)[0] + '.index') }}" class="btn btn-secondary">
+                <i class="fas fa-times me-1"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-primary" form="main-form">
+                <i class="fas fa-save me-1"></i> Save
+              </button>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
 
-           {% if entity is defined and entity.id %}
-             <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.edit', entity_id=entity.id) }}"
-                 class="btn btn-warning text-dark fw-bold">
-               <i class="fas fa-edit me-1"></i> Edit
-             </a>
-             <button type="button" id="delete-button" class="btn btn-danger">
-               <i class="fas fa-trash me-1"></i> Delete
-             </button>
-           {% endif %}
+    <!-- Template Data -->
+    <div id="template-data"
+         data-script-name="notesSection.js"
+         data-tabs-defined="{{ tabs is defined|tojson }}"
+         data-read-only-defined="{{ read_only is defined|tojson }}">
+    </div>
 
-           <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
-               class="btn btn-secondary">
-             <i class="fas fa-arrow-left me-1"></i> Back
-           </a>
-         {% else %}
-           {% if entity is defined and entity.id %}
-             <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}"
-                class="btn btn-secondary">
-               <i class="fas fa-times me-1"></i> Cancel
-             </a>
-             <button type="submit" class="btn btn-primary" form="main-form">
-               <i class="fas fa-save me-1"></i> Update
-             </button>
-           {% else %}
-             <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
-                class="btn btn-secondary">
-               <i class="fas fa-times me-1"></i> Cancel
-             </a>
-             <button type="submit" class="btn btn-primary" form="main-form">
-               <i class="fas fa-save me-1"></i> Save
-             </button>
-           {% endif %}
-         {% endif %}
-       </div>
-     </div>
-   </div>
+    <!-- Tabs Navigation -->
+    <div class="mt-3">
+      {% if tabs %}
+        <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist"
+            data-tab-names="{{ tabs|map(attribute='tab_name')|list|tojson }}">
+          {% for tab in tabs %}
+            <li class="nav-item" role="presentation">
+              <button class="nav-link {% if tab.active %}active{% endif %}"
+                      id="tab-{{ tab.tab_name|lower|replace(' ','-') }}-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#tab-{{ tab.tab_name|lower|replace(' ','-') }}"
+                      data-tab-name="{{ tab.tab_name }}"
+                      type="button"
+                      role="tab"
+                      aria-controls="tab-{{ tab.tab_name|lower|replace(' ','-') }}"
+                      aria-selected="{% if tab.active %}true{% else %}false{% endif %}">
+                {{ tab.tab_name }}
+              </button>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
 
-   <!-- Store template information in data attributes -->
-   <div id="template-data"
-        data-script-name="create_view_edit.js"
-        data-tabs-defined="{{ tabs is defined|tojson }}"
-        data-read-only-defined="{{ read_only is defined|tojson }}">
-   </div>
+  <!-- Card Body -->
+  <div class="card-body pt-0 pb-0" style="overflow: visible !important;">
+    <form method="post" action="{{ submit_url }}" id="main-form">
+      {{ csrf_input }}
+      <div class="tab-content" id="formTabsContent">
+        {% for tab in tabs %}
+          {% include 'pages/companies/tabs/_tab_' + tab.tab_name|lower|replace(' ','_') + '.html' %}
+        {% endfor %}
+      </div>
+    </form>
 
-   <!-- Tabs Navigation -->
-   <div class="mt-3">
-     {% if tabs %}
-       <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist"
-           data-tab-names="{{ tabs|map(attribute='tab_name')|list|tojson }}">
-         {%- for tab in tabs %}
-           <li class="nav-item" role="presentation">
-             <button class="nav-link {% if loop.first %}active{% endif %}"
-                     id="tab-{{ tab.tab_name | lower | replace(' ', '-') }}-tab"
-                     data-bs-toggle="tab"
-                     data-bs-target="#tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
-                     data-tab-name="{{ tab.tab_name }}"
-                     type="button"
-                     role="tab"
-                     aria-controls="tab-{{ tab.tab_name | lower | replace(' ', '-') }}"
-                     aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
-               {{ tab.tab_name }}
-             </button>
-           </li>
-         {%- endfor %}
-       </ul>
-     {% endif %}
-   </div>
- </div>
-
- <!-- Card Body - Main Content -->
- <div class="card-body pt-0 pb-0" style="overflow: visible !important;">
-   <form method="post" action="{{ submit_url }}" id="main-form">
-     {{ csrf_input }}
-     <div class="tab-content" id="formTabsContent">
-       {% if read_only %}
-         <!-- Notes Tab -->
-         <div class="tab-pane fade show active" id="tab-notes" role="tabpanel" aria-labelledby="tab-notes-tab" data-tab-name="Notes">
-           <div class="section-card card shadow-sm border-0 mb-4">
-             <div class="section-header">
-               <h5 class="section-heading">Notes</h5>
-             </div>
-             <div class="section-body">
-               <div class="row g-3">
-                 {% include 'partials/notes.html' %}
-               </div>
-             </div>
-           </div>
-         </div>
-       {% endif %}
-
-       {% call tab_macros.render_tab_section('about', 'About', active=not read_only, has_fade=false) %}
-         {{ field_macros.render_field({
-             "entry_name": "name",
-             "label": "Company Name",
-             "type": "text",
-             "value": entity.name,
-             "required": true,
-             "options": []
-         }, read_only=read_only) }}
-
-         {{ field_macros.render_field({
-             "entry_name": "description",
-             "label": "Description",
-             "type": "textarea",
-             "value": entity.description,
-             "required": false,
-             "options": []
-         }, read_only=read_only) }}
-       {% endcall %}
-     </div>
-   </form>
-
-   {% if not read_only %}
-     {% include 'base/common/_footer_buttons.html' %}
-   {% endif %}
- </div>
+    {% if not read_only %}
+      {% include 'base/common/_footer_buttons.html' %}
+    {% endif %}
+  </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+<!-- Delete Modal -->
 <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true" data-bs-scroll="false">
- <div class="modal-dialog" role="document">
-   <div class="modal-content">
-     <div class="modal-header">
-       <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-     </div>
-     <div class="modal-body">
-       Are you sure you want to delete this item? This action cannot be undone.
-     </div>
-     <div class="modal-footer">
-       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-       <button type="button" id="modalConfirmBtn" class="btn btn-danger">Confirm</button>
-     </div>
-   </div>
- </div>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this item? This action cannot be undone.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="modalConfirmBtn" class="btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
- window.headerButtonsData = {
-   hasId: {{ 'true' if entity is defined and entity.id else 'false' }},
-   readOnly: {{ 'true' if read_only else 'false' }},
-   endpoint: "{{ request.endpoint }}",
-   deleteUrl: "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.delete', entity_id=entity.id) if entity is defined and entity.id else '#' }}"
- };
+  window.headerButtonsData = {
+    hasId: {{ 'true' if entity is defined and entity.id else 'false' }},
+    readOnly: {{ 'true' if read_only else 'false' }},
+    endpoint: "{{ request.endpoint }}",
+    deleteUrl: "{{ url_for(request.endpoint.rsplit('.',1)[0] + '.delete', entity_id=entity.id) if entity is defined and entity.id else '#' }}"
+  };
+  window.notesScriptLoaded = false;
 </script>
-<script type="module" src="/js/pages/create_view_edit.js"></script>
-<script type="module" src="/js/pages/header_buttons.js"></script>
-<script type="module">
- import tabsComponent from '/static/js/core/tabs.js';
 
- document.addEventListener('DOMContentLoaded', function() {
-   // Initialize tabs component
-   tabsComponent.initTabs('formTabs');
- });
+<script type="module">
+  import log from '/static/js/core/logger.js';
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+      if (window.notesScriptLoaded) {
+        log("info", "view.html", "script_check", "✅ notesSection.js loaded successfully");
+      } else {
+        log("error", "view.html", "script_check", "❌ notesSection.js failed to load");
+        const notesList = document.getElementById('notesList');
+        if (notesList) {
+          notesList.innerHTML = `<div class="alert alert-danger"><strong>Script Loading Error</strong><p>The notes component script failed to load. Please check your browser console.</p><p>Expected path: /static/js/pages/notesSection.js</p></div>`;
+        }
+        const notesLoading = document.getElementById('notesLoading');
+        if (notesLoading) notesLoading.style.display = 'none';
+      }
+    }, 1000);
+  });
+</script>
+
+<script type="module" src="{{ url_for('static', filename='js/pages/notesSection.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/pages/header_buttons.js') }}"></script>
+
+<script type="module">
+  import tabsComponent from '{{ url_for('static', filename='js/core/tabs.js') }}';
+  document.addEventListener('DOMContentLoaded', () => {
+    tabsComponent.initTabs('formTabs');
+  });
 </script>
 {% endblock %}

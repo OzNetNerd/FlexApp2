@@ -1,7 +1,6 @@
 import log from '/static/js/core/logger.js';
 import moduleSystem from '/static/js/core/module.js';
 import eventSystem from '/static/js/core/events.js';
-import notesComponent from '/static/js/components/notes.js';
 import buttonsComponent from '/static/js/components/buttons.js';
 
 /**
@@ -23,6 +22,8 @@ class EntityViewPage {
     this.initButtons();
 
     // Initialize notes section if it exists
+    // Modified: Removed explicit initialization of notesComponent here
+    // The notesSection.js script should handle its own initialization based on DOM and tab visibility.
     this.initNotes();
 
     log('info', 'entityView.js', functionName, 'Entity view page initialization complete');
@@ -49,6 +50,8 @@ class EntityViewPage {
 
   /**
    * Initialize notes section if it exists
+   * This method now only checks for the notes section element.
+   * The actual initialization and tab handling for notes should be done by notesSection.js.
    */
   initNotes() {
     const functionName = 'initNotes';
@@ -60,24 +63,25 @@ class EntityViewPage {
       return;
     }
 
-    log('debug', 'entityView.js', functionName, 'Initializing notes section');
+    log('debug', 'entityView.js', functionName, 'Notes section element found. Assuming notesSection.js will handle initialization.');
 
-    // Initialize notes with the notes component
-    const notesController = notesComponent.initNotes('notesData');
+    // Removed: notesComponent.initNotes('notesData');
+    // Removed: Event listeners that were likely intended for notesComponent
 
-    // Listen for notes added event
+    // Listen for notes added event (assuming eventSystem is used by notesSection.js or related)
     eventSystem.subscribe('notes.added', (data) => {
-      log('info', 'entityView.js', 'notesAdded', 'Note added successfully');
+      log('info', 'entityView.js', 'notesAdded', 'Note added successfully (event received)');
     });
 
-    // Listen for notes error event
+    // Listen for notes error event (assuming eventSystem is used by notesSection.js or related)
     eventSystem.subscribe('notes.error', (data) => {
-      log('error', 'entityView.js', 'notesError', 'Error with notes:', data.error);
+      log('error', 'entityView.js', 'notesError', 'Error with notes (event received):', data.error);
     });
   }
 }
 
 // Create instance and register with the module system
+// The module system should ensure entityView.js is initialized once.
 const entityViewPage = new EntityViewPage();
 moduleSystem.register('entityView', () => entityViewPage.init(), ['common'], true);
 

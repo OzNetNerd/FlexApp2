@@ -9,6 +9,7 @@ from app.routes.web.components.template_renderer import RenderSafelyConfig, rend
 from app.routes.web.context import EntityContext, SimpleContext, TableContext
 from app.utils.app_logging import get_logger
 from app.utils.table_helpers import get_table_plural_name
+from app.config.ui_config import get_tabs_for_entity  # Import the new function
 
 logger = get_logger()
 
@@ -67,18 +68,54 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         logger.info(f"Handling {request.method} {endpoint} with args={args}, kwargs={kwargs}")
 
         if request.method == "POST" and CRUDEndpoint.is_valid(endpoint):
-            result = handle_crud_operation(endpoint, config.service, config.blueprint.name, kwargs.get("entity_id"), request.form.to_dict())
+            result = handle_crud_operation(endpoint, config.service, config.blueprint.name, kwargs.get("entity_id"),
+                                           request.form.to_dict())
             if result:
                 return result
+
+        entity = None
+        read_only = True
+
+        # Determine if we're in read-only mode based on endpoint
+        if endpoint == CRUDEndpoint.create.value:
+            read_only = False
+        elif endpoint == CRUDEndpoint.edit.value:
+            read_only = False
+
+        # Get entity if needed
+        if endpoint in (CRUDEndpoint.view.value, CRUDEndpoint.edit.value):
+            entity_id = kwargs.get("entity_id")
+            entity = config.service.get_by_id(entity_id)
+
+        # Get tabs configuration for this entity and endpoint
+        tabs = get_tabs_for_entity(
+            entity_table_name=config.entity_table_name,
+            endpoint=endpoint,
+            entity=entity,
+            read_only=read_only
+        )
 
         if endpoint == CRUDEndpoint.index.value:
             context = TableContext(entity_table_name=config.entity_table_name)
         elif endpoint == CRUDEndpoint.create.value:
-            context = EntityContext(entity=None, entity_table_name=config.entity_table_name, action="create")
+            context = EntityContext(
+                entity=None,
+                entity_table_name=config.entity_table_name,
+                action="create",
+                read_only=False,
+                tabs=tabs
+            )
         elif endpoint in (CRUDEndpoint.view.value, CRUDEndpoint.edit.value):
             entity_id = kwargs.get("entity_id")
             entity = config.service.get_by_id(entity_id)
-            context = EntityContext(entity=entity, entity_table_name=config.entity_table_name, action=endpoint, entity_id=entity_id)
+            context = EntityContext(
+                entity=entity,
+                entity_table_name=config.entity_table_name,
+                action=endpoint,
+                entity_id=entity_id,
+                read_only=read_only,
+                tabs=tabs
+            )
         else:
             context = SimpleContext(title=config.entity_table_name)
 
@@ -104,7 +141,8 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
     return login_required(handler)  # ✅ Wrap handler in login_required
 
 
-def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, entity_id: Optional[int], form_data: Dict[str, Any]) -> Any:
+def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, entity_id: Optional[int],
+                          form_data: Dict[str, Any]) -> Any:
     if endpoint == CRUDEndpoint.create.value:
         entity = service.create(form_data)
         return redirect(url_for(f"{blueprint_name}.view", entity_id=entity.id))
@@ -122,11 +160,14 @@ def register_crud_routes(config: CrudRouteConfig) -> None:
     bp.add_url_rule(rule="/", endpoint="index", view_func=route_handler("index", config), methods=["GET"])
     bp.add_url_rule(rule="/new", endpoint="create", view_func=route_handler("create", config), methods=["GET", "POST"])
     bp.add_url_rule(rule="/<int:entity_id>", endpoint="view", view_func=route_handler("view", config), methods=["GET"])
-    bp.add_url_rule(rule="/<int:entity_id>/edit", endpoint="edit", view_func=route_handler("edit", config), methods=["GET", "POST"])
-    bp.add_url_rule(rule="/<int:entity_id>/delete", endpoint="delete", view_func=route_handler("delete", config), methods=["POST"])
+    bp.add_url_rule(rule="/<int:entity_id>/edit", endpoint="edit", view_func=route_handler("edit", config),
+                    methods=["GET", "POST"])
+    bp.add_url_rule(rule="/<int:entity_id>/delete", endpoint="delete", view_func=route_handler("delete", config),
+                    methods=["POST"])
 
 
-def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint_name: str, methods: Optional[List[str]] = None) -> None:
+def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint_name: str,
+                        methods: Optional[List[str]] = None) -> None:
     """Register an authentication route on the given blueprint."""
     methods = methods or ["GET"]
     blueprint.add_url_rule(rule=url, endpoint=endpoint_name, view_func=handler, methods=methods)

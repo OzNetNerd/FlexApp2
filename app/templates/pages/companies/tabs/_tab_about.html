@@ -1,0 +1,20 @@
+{% import 'macros/render_form_fields.html' as field_macros with context %}
+{% call tab_macros.render_tab_section('about', 'About', active=tab.active) %}
+  {{ field_macros.render_field({
+      "entry_name": "name",
+      "label": "Company Name",
+      "type": "text",
+      "value": entity.name if entity else "",
+      "required": true,
+      "options": []
+  }, read_only=read_only) }}
+
+  {{ field_macros.render_field({
+      "entry_name": "description",
+      "label": "Description",
+      "type": "textarea",
+      "value": entity.description if entity else "",
+      "required": false,
+      "options": []
+  }, read_only=read_only) }}
+{% endcall %}

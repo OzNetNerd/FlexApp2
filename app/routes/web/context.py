@@ -131,6 +131,7 @@ class EntityContext(BaseContext):
         read_only: bool = True,
         entity_table_name: str = "",
         entity_id: Any = None,
+        tabs: Optional[List[dict]] = None,  # Added tabs parameter
         **kwargs,
     ):
         super().__init__(
@@ -148,7 +149,7 @@ class EntityContext(BaseContext):
         self.entity_table_name = entity_table_name
         self.entity_id = entity_id
 
-        self.tabs = []
+        self.tabs = tabs or []  # Use provided tabs or default to empty list
         self.entity_name = ""
         self.submit_url = ""
         self.id = ""
