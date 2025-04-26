@@ -9,7 +9,7 @@ from app.routes.web.components.template_renderer import RenderSafelyConfig, rend
 from app.routes.web.context import EntityContext, SimpleContext, TableContext
 from app.utils.app_logging import get_logger
 from app.utils.table_helpers import get_table_plural_name
-from app.config.ui_config import get_tabs_for_entity  # Import the new function
+# from app.config.ui_config import get_tabs_for_entity  # Import the new function
 
 logger = get_logger()
 
@@ -95,12 +95,12 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
             entity = config.service.get_by_id(entity_id)
 
         # Get tabs configuration for this entity and endpoint
-        tabs = get_tabs_for_entity(
-            entity_table_name=config.entity_table_name,
-            endpoint=endpoint,
-            entity=entity,
-            read_only=read_only
-        )
+        # tabs = get_tabs_for_entity(
+        #     entity_table_name=config.entity_table_name,
+        #     endpoint=endpoint,
+        #     entity=entity,
+        #     read_only=read_only
+        # )
 
         if endpoint == CRUDEndpoint.index.value:
             context = TableContext(entity_table_name=config.entity_table_name)
@@ -110,7 +110,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
                 entity_table_name=config.entity_table_name,
                 action="create",
                 read_only=False,
-                tabs=tabs
+                # tabs=tabs
             )
         elif endpoint in (CRUDEndpoint.view.value, CRUDEndpoint.edit.value):
             entity_id = kwargs.get("entity_id")
@@ -121,7 +121,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
                 action=endpoint,
                 entity_id=entity_id,
                 read_only=read_only,
-                tabs=tabs
+                # tabs=tabs
             )
         else:
             context = SimpleContext(title=config.entity_table_name)
