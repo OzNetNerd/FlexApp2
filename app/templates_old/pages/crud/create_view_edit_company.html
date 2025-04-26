@@ -9,7 +9,7 @@
 ] | reject('none') | list %}
 
 {% import 'macros/render_form_fields.html' as field_macros with context %}
-{% import 'base/macros/tabs.html' as tab_macros with context %}
+{% import 'macros/tabs.html' as tab_macros with context %}
 
 {% block view_template_content %}
 <form method="post" action="{{ submit_url }}" id="main-form">

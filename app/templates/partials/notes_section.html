@@ -1,0 +1,13 @@
+{# components/notes_section.html #}
+{# Implementation of the notes section that uses macros/notes.html #}
+
+{% import 'macros/notes.html' as notes %}
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0">Notes & Activity</h5>
+  </div>
+  <div class="card-body">
+    {{ notes.render_notes_section(entity) }}
+  </div>
+</div>

@@ -1,11 +1,12 @@
+{% import 'macros/tabs.html' as tab_macros with context %}
 {% call tab_macros.render_tab_section('notes', 'Notes', active=tab.active) %}
   <div class="row g-3">
     <!-- Hidden config for JS -->
     <div id="notesData"
-         data-notable-type="{{ entity.__class__.__name__ }}"
-         data-notable-id="{{ entity.id }}"
-         data-user-id="{{ current_user.id }}"
-         data-username="{{ current_user.username }}"
+         data-notable-type="{{ entity.__class__.__name__ if entity is defined and entity else 'Company' }}"
+         data-notable-id="{{ entity.id if entity is defined and entity and entity.id is defined else '' }}"
+         data-user-id="{{ current_user.id if current_user is defined and current_user else '' }}"
+         data-username="{{ current_user.username if current_user is defined and current_user else '' }}"
          data-script-name="notesSection.js">
     </div>
 
