@@ -55,6 +55,13 @@ def default_crud_templates(entity_table_name: str) -> CrudTemplates:
     """
     plural = get_table_plural_name(entity_table_name).lower()
 
+    # return CrudTemplates(
+    #     index=f"pages/{plural}/index.html",
+    #     create=f"pages/{plural}/create.html",
+    #     view=f"pages/{plural}/view.html",
+    #     edit=f"pages/{plural}/edit.html",
+    # )
+
     return CrudTemplates(
         index=f"pages/{plural}/index.html",
         create=f"pages/{plural}/create.html",
