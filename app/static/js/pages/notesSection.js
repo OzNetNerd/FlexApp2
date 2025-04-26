@@ -29,9 +29,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const notesList = document.getElementById('notesList');
   const notesLoading = document.getElementById('notesLoading');
   const newNoteForm = document.getElementById('newNoteForm');
-  const notesFilterLinks = document.querySelectorAll('.note-filter');
-  const notesSearchForm = document.getElementById('notesSearchForm');
   const noteContentField = document.getElementById('content'); // Specific field for validation/reset
+
+  // Get references to date range elements
+  const noteFilterSelect = document.getElementById('noteFilterSelect');
+  const dateRangeSelectors = document.getElementById('dateRangeSelectors');
+  const dateFrom = document.getElementById('dateFrom');
+  const dateTo = document.getElementById('dateTo');
+  const applyDateRange = document.getElementById('applyDateRange');
 
   // Check if essential elements exist
   if (!notesTabPane || !notesList || !notesLoading || !newNoteForm || !noteContentField) {
@@ -44,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       // Depending on severity, you might want to return here or display a user message.
   }
-
 
   // Create and insert status message area dynamically
   const statusMessage = document.createElement('div');
@@ -62,6 +66,26 @@ document.addEventListener('DOMContentLoaded', function() {
   let notesLoaded = false;
   // Store current filters to potentially avoid reload if filters haven't changed (optional optimization)
   let currentFilters = {};
+
+  // Set default dates (today and 7 days ago) for date pickers
+  function setDefaultDates() {
+    if (dateFrom && dateTo) {
+      const today = new Date();
+      const weekAgo = new Date();
+      weekAgo.setDate(today.getDate() - 7);
+
+      dateFrom.value = formatDateForInput(weekAgo);
+      dateTo.value = formatDateForInput(today);
+    }
+  }
+
+  // Format date for date input field (YYYY-MM-DD)
+  function formatDateForInput(date) {
+    return date.toISOString().split('T')[0];
+  }
+
+  // Initialize date pickers with default values
+  setDefaultDates();
 
   // --- Core Functions ---
 
@@ -231,32 +255,86 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // --- Event Listeners ---
 
-  // Handle clicking filter links (e.g., Last 7 days)
-  notesFilterLinks.forEach(filter => {
-    filter.addEventListener('click', function(e) {
-      e.preventDefault(); // Prevent default link behavior
-      const days = this.dataset.days;
-      log("info", scriptName, "filterClick", `Filter applied: ${days} days`);
-      notesLoaded = false; // Force reload when filter changes
-      loadNotes({ days: days }, true); // Pass filter and force reload
-    });
-  });
+  // Add search input handler
+  const noteSearchInput = document.getElementById('noteSearchInput');
+  if (noteSearchInput) {
+    noteSearchInput.addEventListener('input', function(e) {
+      const functionName = "noteSearchInput_input";
+      const searchTerm = this.value.trim();
 
-  // Handle search form submission
-  if (notesSearchForm) {
-    notesSearchForm.addEventListener('submit', function(e) {
-      e.preventDefault(); // Prevent form submission
-      const functionName = "notesSearchForm_submit";
-      const searchInput = document.getElementById('noteSearchInput');
-      const searchTerm = searchInput ? searchInput.value.trim() : '';
-
-      log("info", scriptName, functionName, "Search submitted", { searchTerm });
-      notesLoaded = false; // Force reload on search
+      log("info", scriptName, functionName, "Search input changed", { searchTerm });
+      notesLoaded = false; // Force reload on search change
       // Load notes with the search query 'q', pass empty filter if term is empty to show all
       loadNotes(searchTerm ? { q: searchTerm } : {}, true);
     });
   } else {
-       log("warn", scriptName, "init", "Notes search form not found.");
+    log("warn", scriptName, "init", "Note search input (#noteSearchInput) not found.");
+  }
+
+  // Add filter dropdown handler
+  if (noteFilterSelect) {
+    noteFilterSelect.addEventListener('change', function(e) {
+      const functionName = "noteFilterSelect_change";
+      const value = this.value;
+
+      log("info", scriptName, functionName, `Filter changed: ${value}`);
+
+      // Toggle date range selectors visibility
+      if (value === 'custom' && dateRangeSelectors) {
+        dateRangeSelectors.classList.remove('d-none');
+        return; // Don't trigger a reload yet, wait for Apply button
+      } else if (dateRangeSelectors) {
+        dateRangeSelectors.classList.add('d-none');
+      }
+
+      notesLoaded = false; // Force reload when filter changes
+      loadNotes({ days: value }, true); // Pass filter and force reload
+    });
+  } else {
+    log("warn", scriptName, "init", "Note filter select (#noteFilterSelect) not found.");
+  }
+
+  // Add date range apply button handler
+  if (applyDateRange) {
+    applyDateRange.addEventListener('click', function(e) {
+      const functionName = "applyDateRange_click";
+
+      if (!dateFrom || !dateTo) {
+        log("error", scriptName, functionName, "Date range inputs not found");
+        return;
+      }
+
+      const fromValue = dateFrom.value;
+      const toValue = dateTo.value;
+
+      if (!fromValue || !toValue) {
+        showStatus('Please select both From and To dates', 'warning');
+        return;
+      }
+
+      const fromDate = new Date(fromValue);
+      const toDate = new Date(toValue);
+      toDate.setHours(23, 59, 59); // Set to end of day
+
+      if (fromDate > toDate) {
+        showStatus('From date must be before To date', 'warning');
+        return;
+      }
+
+      log("info", scriptName, functionName, "Custom date range applied", {
+        fromDate: fromValue,
+        toDate: toValue
+      });
+
+      notesLoaded = false;
+      loadNotes({
+        from_date: fromValue,
+        to_date: toValue,
+        custom: true
+      }, true);
+    });
+  } else {
+    log("warn", scriptName, "init", "Apply date range button (#applyDateRange) not found.");
   }
 
   // Handle adding a new note
@@ -419,5 +497,8 @@ document.addEventListener('DOMContentLoaded', function() {
     observer.observe(notesTabPane, { attributes: true });
     log("debug", scriptName, "init", "Set up mutation observer for tab visibility changes.");
   }
+
+  // Expose loadNotes to window for date range picker
+  window.loadNotes = loadNotes;
 
 }); // End DOMContentLoaded

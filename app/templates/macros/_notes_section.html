@@ -7,25 +7,36 @@
      data-script-name="notes_section">
 </div>
 
-<!-- Notes section with filter and search controls -->
+<!-- Notes section with filter, custom range and search controls -->
 <div class="col-12">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <!-- Filter links -->
-    <div class="filter-controls">
-      <a href="#" class="note-filter me-2" data-days="7">Last 7 days</a>
-      <a href="#" class="note-filter me-2" data-days="30">Last 30 days</a>
-      <a href="#" class="note-filter" data-days="0">All notes</a>
+    <!-- Left side: Filter dropdown -->
+    <div class="d-flex align-items-center" style="width: 65%;">
+      <select id="noteFilterSelect" class="form-select form-select-sm me-3" style="max-width: 150px;">
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+        <option value="0" selected>All notes</option>
+        <option value="custom">Custom range...</option>
+      </select>
+
+      <!-- Date range selectors (initially hidden) -->
+      <div id="dateRangeSelectors" class="d-none d-flex align-items-center flex-grow-1">
+        <input type="date" id="dateFrom" class="form-control form-control-sm me-2" aria-label="From date">
+        <span class="mx-1">to</span>
+        <input type="date" id="dateTo" class="form-control form-control-sm ms-2" aria-label="To date">
+      </div>
     </div>
 
-    <!-- Search form - this was missing -->
-    <form id="notesSearchForm" class="ms-auto">
-      <div class="input-group">
-        <input type="text" id="noteSearchInput" class="form-control" placeholder="Search notes...">
-        <button class="btn btn-outline-secondary" type="submit">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-    </form>
+    <!-- Right side: Search input with border -->
+    <div class="input-group" style="max-width: 35%;">
+      <span class="input-group-text">
+        <i class="fas fa-search"></i>
+      </span>
+      <input type="search"
+             id="noteSearchInput"
+             class="form-control"
+             placeholder="Search notes...">
+    </div>
   </div>
 </div>
 
@@ -35,7 +46,7 @@
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
-    <p class="mt-2">Loading notes...</p>
+    <p class="mt-2">Loading notes</p>
   </div>
 </div>
 
@@ -58,3 +69,5 @@
     </button>
   </form>
 </div>
+
+<script type="module" src="/static/js/pages/notesSection.js"></script>

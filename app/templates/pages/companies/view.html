@@ -113,25 +113,14 @@
      {{ csrf_input }}
      <div class="tab-content" id="formTabsContent">
        {% if read_only %}
-         <!-- Modified tab pane with extra classes -->
+         <!-- Notes Tab -->
          <div class="tab-pane fade show active" id="tab-notes" role="tabpanel" aria-labelledby="tab-notes-tab" data-tab-name="Notes">
            <div class="section-card card shadow-sm border-0 mb-4">
              <div class="section-header">
                <h5 class="section-heading">Notes</h5>
              </div>
              <div class="section-body">
-               <!-- Direct search form implementation before including notes section -->
                <div class="row g-3">
-                 <div class="col-12 mb-3">
-                   <form id="notesSearchForm" class="mb-3">
-                     <div class="input-group">
-                       <input type="text" id="noteSearchInput" class="form-control" placeholder="Search notes...">
-                       <button class="btn btn-outline-secondary" type="submit">
-                         <i class="fas fa-search"></i> Search
-                       </button>
-                     </div>
-                   </form>
-                 </div>
                  {% include 'macros/_notes_section.html' %}
                </div>
              </div>
@@ -166,9 +155,6 @@
    {% endif %}
  </div>
 </div>
-
-<!-- Move notesSection.js script outside tab container -->
-<script type="module" src="/static/js/pages/notesSection.js"></script>
 
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true" data-bs-scroll="false">
