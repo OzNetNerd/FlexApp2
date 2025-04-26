@@ -91,11 +91,11 @@
       {{ csrf_input }}
       <div class="tab-content" id="formTabsContent">
         {% for tab in tabs %}
-          {% if tab.tab_name == 'Notes' %}
-            {% include 'pages/companies/tabs/_tab_notes.html' %}
-          {% else %}
-            {% include 'pages/companies/tabs/_tab_' + tab.tab_name|lower|replace(' ','_') + '.html' %}
-          {% endif %}
+          {# first try a shared partial, then fall back to entity-specific #}
+          {% set shared_path   = 'shared_tabs/_' ~ tab.tab_name|lower|replace(' ','_') ~ '.html' %}
+          {% set specific_path = 'pages/companies/tabs/_' ~ tab.tab_name|lower|replace(' ','_') ~ '.html' %}
+          {% include shared_path   ignore missing %}
+          {% include specific_path ignore missing %}
         {% endfor %}
       </div>
     </form>
