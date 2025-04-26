@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const currentUserId = notesData.dataset.userId;
   const currentUsername = notesData.dataset.username;
   // Use provided scriptName or default for logging context
-  const scriptName = notesData.dataset.scriptName || 'notes_section';
+  const scriptName = notesData.dataset.scriptName || 'notesSection';
 
   log("info", scriptName, "init", "Initializing Notes Section module", { notableType, notableId });
 
