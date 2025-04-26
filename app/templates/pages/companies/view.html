@@ -136,59 +136,15 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-  window.headerButtonsData = {
-    hasId: {{ 'true' if entity is defined and entity.id else 'false' }},
-    readOnly: {{ 'true' if read_only else 'false' }},
-    endpoint: "{{ request.endpoint }}",
-    deleteUrl: "{{ url_for(request.endpoint.rsplit('.',1)[0] + '.delete', entity_id=entity.id) if entity is defined and entity.id else '#' }}"
-  };
-  window.notesScriptLoaded = false;
-</script>
-
-<script type="module">
-  import log from '/static/js/core/logger.js';
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-      if (window.notesScriptLoaded) {
-        log("info", "view.html", "script_check", "✅ notesSection.js loaded successfully");
-      } else {
-        log("error", "view.html", "script_check", "❌ notesSection.js failed to load");
-        const notesList = document.getElementById('notesList');
-        if (notesList) {
-          notesList.innerHTML = `<div class="alert alert-danger"><strong>Script Loading Error</strong><p>The notes component script failed to load. Please check your browser console.</p><p>Expected path: /static/js/pages/notesSection.js</p></div>`;
-        }
-        const notesLoading = document.getElementById('notesLoading');
-        if (notesLoading) notesLoading.style.display = 'none';
-      }
-    }, 1000);
-  });
-</script>
-
-<script type="module" src="{{ url_for('static', filename='js/pages/notesSection.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/pages/header_buttons.js') }}"></script>
-
-<script type="module">
-  import tabsComponent from '{{ url_for('static', filename='js/components/tabs.js') }}';
-  document.addEventListener('DOMContentLoaded', () => {
-    tabsComponent.initTabs('formTabs');
-
-    // Force show Notes tab if it exists and is active
-    setTimeout(() => {
-      console.log("Checking for Notes tab...");
-      const notesTabButton = document.getElementById('tab-notes-tab');
-      if (notesTabButton) {
-        console.log("Found Notes tab, activating...");
-        notesTabButton.click();
-      }
-
-      // Force initialize notes if script is loaded
-      if (window.notesComponent) {
-        console.log("Manually initializing notes");
-        const controller = window.notesComponent.initNotes();
-        if (controller) controller.showTab();
-      }
-    }, 1500);
-  });
-</script>
+  {{ super() }}
+  <!-- Load Notes component after Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="{{ url_for('static', filename='js/pages/notesSection.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/components/tabs.js') }}"></script>
+  <script type="module">
+    import tabsComponent from '{{ url_for('static', filename='js/components/tabs.js') }}';
+    document.addEventListener('DOMContentLoaded', () => {
+      tabsComponent.initTabs('formTabs');
+    });
+  </script>
 {% endblock %}

@@ -12,27 +12,23 @@ class NotesComponent {
     this.initialized = false;
     log('info', 'notesSection.js', 'constructor', '🔄 Unified Notes component created');
 
-    // Initialize on DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => {
-      // Prevent duplicate initialization
-      if (this.initialized) {
-        log('warn', 'notesSection.js', 'DOMContentLoaded', '⚠️ Notes component already initialized, skipping');
-        return;
-      }
-
-      log("info", "notesSection.js", "DOMContentLoaded", "🚀 DOM content loaded. Initializing Notes");
+      if (this.initialized) return;
       this.initialized = true;
-
-      // Set global flag to indicate script is loaded (for view.html check)
       window.notesScriptLoaded = true;
-      log("info", "notesSection.js", "DOMContentLoaded", "✅ Set window.notesScriptLoaded = true");
 
-      // Auto-initialize any notes containers found in the DOM
-      const notesDataContainers = document.querySelectorAll('[id^="notesData"]');
-      log("info", "notesSection.js", "DOMContentLoaded", `🔍 Found ${notesDataContainers.length} notes data containers`);
+      // Initialize each notesData container
+      document.querySelectorAll('[id^="notesData"]').forEach(container => {
+        const ctrl = this.initNotes(container.id);
+        window.notesController = ctrl;
+      });
 
-      notesDataContainers.forEach(container => {
-        this.initNotes(container.id);
+      // Listen for our custom tabs.change event
+      eventSystem.subscribe('tabs.change', ({containerId, activeTab}) => {
+        if (containerId === 'formTabs' && activeTab === 'Notes') {
+          const ctrl = window.notesController;
+          if (ctrl) ctrl.loadNotes(ctrl.getState().currentFilters, true);
+        }
       });
     });
   }
@@ -659,11 +655,7 @@ class NotesComponent {
   }
 }
 
-// Create singleton instance
 const notesComponent = new NotesComponent();
-
-// Set global flag immediately for view.html timeout check
 window.notesScriptLoaded = true;
-log("info", "notesSection.js", "global", "✅ Set window.notesScriptLoaded = true on script load");
-
+log('info', 'notesSection.js', 'global', '✅ notesSection loaded');
 export default notesComponent;
