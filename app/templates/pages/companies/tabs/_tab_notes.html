@@ -1,59 +1,7 @@
+{# pages/companies/tabs/_tab_notes.html #}
+{% import 'macros/notes.html' as notes with context %}
 {% import 'macros/tabs.html' as tab_macros with context %}
+
 {% call tab_macros.render_tab_section('notes', 'Notes', active=tab.active) %}
-  <div class="row g-3">
-    <!-- Hidden config for JS -->
-    <div id="notesData"
-         data-notable-type="{{ entity.__class__.__name__ if entity is defined and entity else 'Company' }}"
-         data-notable-id="{{ entity.id if entity is defined and entity and entity.id is defined else '' }}"
-         data-user-id="{{ current_user.id if current_user is defined and current_user else '' }}"
-         data-username="{{ current_user.username if current_user is defined and current_user else '' }}"
-         data-script-name="notesSection.js">
-    </div>
-
-    <!-- Controls: filter, date range, search -->
-    <div class="col-12 d-flex justify-content-between align-items-center mb-3">
-      <div class="d-flex align-items-center" style="width:65%;">
-        <select id="noteFilterSelect" class="form-select form-select-sm me-3" style="max-width:150px;">
-          <option value="7">Last 7 days</option>
-          <option value="30">Last 30 days</option>
-          <option value="0" selected>All notes</option>
-          <option value="custom">Custom range...</option>
-        </select>
-        <div id="dateRangeSelectors" class="d-none d-flex align-items-center flex-grow-1">
-          <input type="date" id="dateFrom" class="form-control form-control-sm me-2" aria-label="From date">
-          <span class="mx-1">to</span>
-          <input type="date" id="dateTo" class="form-control form-control-sm ms-2" aria-label="To date">
-          <button type="button" id="applyDateRange" class="btn btn-sm btn-outline-primary ms-3">Apply</button>
-        </div>
-      </div>
-      <div class="input-group" style="max-width:35%;">
-        <span class="input-group-text"><i class="fas fa-search"></i></span>
-        <input type="search" id="noteSearchInput" class="form-control" placeholder="Search notes..." aria-label="Search notes">
-      </div>
-    </div>
-
-    <!-- Loading indicator -->
-    <div class="col-12">
-      <div id="notesLoading" class="text-center py-4">
-        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
-        <p class="mt-2">Loading notes...</p>
-      </div>
-    </div>
-
-    <!-- Notes list -->
-    <div class="col-12">
-      <div id="notesList" class="notes-list mb-4"><!-- populated by JS --></div>
-    </div>
-
-    <!-- New note form -->
-    <div class="col-12">
-      <form id="newNoteForm" class="mt-4">
-        <div class="mb-3">
-          <label for="content" class="form-label">Add a note</label>
-          <textarea id="content" name="content" class="form-control" rows="3" placeholder="Enter your note here..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Add Note</button>
-      </form>
-    </div>
-  </div>
+  {{ notes.render_notes_section(entity) }}
 {% endcall %}

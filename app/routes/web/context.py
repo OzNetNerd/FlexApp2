@@ -6,7 +6,7 @@ from flask import url_for
 from flask_login import current_user
 
 from app.utils.app_logging import get_logger, log_instance_vars
-from app.utils.table_helpers import get_table_id_by_name, get_table_plural_name, get_entity_base_route
+from app.utils.table_helpers import get_table_id_by_name
 
 logger = get_logger()
 
@@ -152,7 +152,6 @@ class EntityContext(BaseContext):
         self.tabs = tabs or []  # Use provided tabs or default to empty list
         self.entity_name = ""
         self.submit_url = ""
-        self.id = ""
         self.model_name = ""
 
         self._initialize_derived_fields()
