@@ -325,37 +325,6 @@ class TabsComponent {
       }
     });
 
-    // Monitor document for external tab changes
-    const observer = new MutationObserver((mutations) => {
-      // Check if our active tab has been deactivated by something else
-      mutations.forEach(mutation => {
-        if (mutation.type === 'attributes' &&
-            mutation.attributeName === 'class' &&
-            mutation.target.classList &&
-            mutation.target.id &&
-            mutation.target.id.startsWith('tab-')) {
-
-          // Get the tab name
-          const tabName = mutation.target.id.replace('tab-', '');
-          const isActive = mutation.target.classList.contains('active');
-
-          // If this is our active tab and it's been deactivated, restore it
-          if (self.normalizeTabName(tabName) === self.normalizeTabName(state.activeTab) && !isActive) {
-            log("warn", self.scriptName, "mutationObserver", `⚠️ Tab '${tabName}' was deactivated externally, restoring`);
-            // Small delay to let other scripts finish
-            setTimeout(() => {
-              updateTabUI();
-            }, 10);
-          }
-        }
-      });
-    });
-
-    // Start observing tab panes for class changes
-    document.querySelectorAll('.tab-pane').forEach(pane => {
-      observer.observe(pane, { attributes: true });
-    });
-
     return controller;
   }
 
