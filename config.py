@@ -36,6 +36,8 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev_key_for_development")
     logger.debug(f"SECRET_KEY set to: {SECRET_KEY}")
 
+    LOG_HTTP_REQUESTS = False
+
     SESSION_TYPE = "filesystem"
     PERMANENT_SESSION_LIFETIME = 60 * 60 * 24  # 24 hours in seconds
     SESSION_PERMANENT = True

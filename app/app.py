@@ -41,6 +41,9 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     app = Flask(__name__, static_folder="static", static_url_path="/static")
     app.config.from_object(config_class)
 
+    if not app.config['LOG_HTTP_REQUESTS']:
+        logging.getLogger('werkzeug').setLevel(logging.WARNING)
+
     app.config.update(
         PERMANENT_SESSION_LIFETIME=60 * 60 * 24,  # 1 day
         SESSION_PERMANENT=True,
@@ -92,23 +95,26 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     logger.info("Registering application blueprints")
     register_web_blueprints(app)
 
-    @app.before_request
     def log_request():
-        """Log each incoming HTTP request."""
+        if not current_app.config['LOG_HTTP_REQUESTS']:
+            return
         request_id = getattr(request, "id", hex(id(request))[2:])
         logger.info(f"[{request_id}] {request.method} {request.path} from {request.remote_addr}")
 
     @app.before_request
     def require_login():
-        """Enforce login for non-whitelisted endpoints."""
-        whitelisted = {"auth_bp.login", "auth_bp.logout", "static", "debug_session"}
         endpoint = request.endpoint or ""
-        logger.info(f"require_login: endpoint={endpoint}, authenticated={current_user.is_authenticated}")
-        if not current_user.is_authenticated:
-            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
-                logger.info(f"Access allowed to {endpoint}")
+        authenticated = current_user.is_authenticated
+        # only log this if the flag is on
+        if current_app.config['LOG_HTTP_REQUESTS']:
+            logger.info(f"require_login: endpoint={endpoint}, authenticated={authenticated}")
+
+        # now do your normal whitelist + redirect logic…
+        whitelisted = {"auth_bp.login", "auth_bp.logout", "static", "debug_session"}
+        if not authenticated:
+            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith(
+                    "api_") or endpoint.endswith(".data"):
                 return None
-            logger.info(f"Access denied to {endpoint}; redirecting to login")
             return redirect(url_for("auth_bp.login", next=request.path))
 
     @app.context_processor

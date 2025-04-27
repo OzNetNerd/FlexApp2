@@ -132,31 +132,38 @@ class EntityContext(BaseContext):
         entity_table_name: str = "",
         entity_id: Any = None,
         **kwargs,
-    ):
+    ) -> None:
+        """Initialize the context and derive dynamic fields."""
         super().__init__(
-            title=title, show_navbar=True, read_only=read_only, entity_table_name=entity_table_name, table_name=entity_table_name, **kwargs
+            title=title,
+            show_navbar=True,
+            read_only=read_only,
+            entity_table_name=entity_table_name,
+            table_name=entity_table_name,
+            **kwargs,
         )
-
-        self.autocomplete_fields = autocomplete_fields or []
-        self.error_message = error_message
-        self.title = title or action
-        self.entity = entity
-        self.read_only = read_only
-        self.action = action
-        self.name = "tba"
+        self.autocomplete_fields: List[dict] = autocomplete_fields or []
+        self.error_message: str = error_message
+        self.title: str = title or action
+        self.entity: Any = entity
+        self.read_only: bool = read_only
+        self.action: str = action
         self.current_user = current_user
-        self.entity_table_name = entity_table_name
-        self.entity_id = entity_id
-        self.entity_name = ""
-        self.submit_url = ""
-        self.model_name = ""
+        self.entity_table_name: str = entity_table_name
+        self.entity_id: Any = entity_id
+        # placeholders, may be overwritten by entity_dict
+        self.name: str = "tba"
+        self.entity_name: str = ""
+        self.submit_url: str = ""
+        self.model_name: str = ""
+        self.id: str = ""
 
         self._initialize_derived_fields()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"EntityContext(model={self.model_name!r}, action={self.action!r}, entity={self.entity_name!r})"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         primary_attrs = {
             "model_name": self.model_name,
             "action": self.action,
@@ -164,69 +171,78 @@ class EntityContext(BaseContext):
             "read_only": self.read_only,
             "id": self.id,
         }
-
-        primary_str = ", ".join(f"{key}={repr(value)}" for key, value in primary_attrs.items())
-
-        other_attrs = {key: value for key, value in vars(self).items() if not key.startswith("_") and key not in primary_attrs}
-
+        primary_str = ", ".join(f"{key}={value!r}" for key, value in primary_attrs.items())
+        other_attrs: Dict[str, Any] = {
+            key: value
+            for key, value in vars(self).items()
+            if not key.startswith("_") and key not in primary_attrs
+        }
         if self.autocomplete_fields:
             other_attrs["autocomplete_fields"] = f"[{len(self.autocomplete_fields)} fields]"
-        if self.tabs:
-            other_attrs["tabs"] = f"[{len(self.tabs)} tabs]"
-        if isinstance(self.entity, dict) and self.entity:
-            other_attrs["entity"] = f"[{len(self.entity)} keys]"
-        elif self.entity:
-            other_attrs["entity"] = f"<{type(self.entity).__name__}>"
 
-        other_str = ", ".join(f"{key}={repr(value)}" for key, value in other_attrs.items())
-
+        other_str = ", ".join(f"{key}={value!r}" for key, value in other_attrs.items())
         full_repr = f"EntityContext({primary_str}"
         if other_str:
             full_repr += f", {other_str}"
         full_repr += ")"
-
         return full_repr
 
-    def _initialize_derived_fields(self):
+    def _initialize_derived_fields(self) -> None:
+        """Derive dynamic fields, assign entity attributes, and log state."""
         self.model_name = self.entity_table_name or self.__class__.__name__
         self.id = str(getattr(self, "entity_id", ""))
-        self.entity_class_name = self.model_name
-
         blueprint_name = getattr(self, "blueprint_name", "")
 
-        entity_dict = {}
+        # Build a dict of entity attributes
+        entity_dict: Dict[str, Any] = {}
         if self.entity:
             if isinstance(self.entity, dict):
                 entity_dict = self.entity
             elif hasattr(self.entity, "__dict__"):
-                entity_dict = {k: v for k, v in self.entity.__dict__.items() if not k.startswith("_")}
+                entity_dict = {
+                    k: v for k, v in self.entity.__dict__.items() if not k.startswith("_")
+                }
             elif hasattr(self.entity, "to_dict"):
                 entity_dict = self.entity.to_dict()
-        elif isinstance(self.entity, dict):
-            entity_dict = self.entity
 
-        # Removed: setattr(self, "entity", self.entity) — B010
+        # Assign all entity fields onto this context object
+        for key, value in entity_dict.items():
+            setattr(self, key, value)
 
+        # Configure submit URL based on action
         if not self.read_only:
             if self.action == "create":
                 self.submit_url = url_for(f"{blueprint_name}.create")
             elif self.action == "edit" and self.entity_id:
-                self.submit_url = url_for(f"{blueprint_name}.update", entity_id=self.entity_id)
+                self.submit_url = url_for(
+                    f"{blueprint_name}.update", entity_id=self.entity_id
+                )
             else:
                 self.submit_url = ""
         else:
             self.submit_url = ""
 
-        logger.info(f"📜 Building {self.action!r} page for {blueprint_name!r} blueprint (RO={self.read_only})")
-        instance_details = "EntityContext (_initialize_derived_fields)"
-        log_instance_vars(instance_details, self)
+        # Log context state
+        logger.info(
+            f"📜 Building {self.action!r} page for {blueprint_name!r} blueprint (RO={self.read_only})"
+        )
+        log_instance_vars("EntityContext (_initialize_derived_fields)", self)
 
-        self.entity_name = ""
+        # Log all model instance variables, excluding SQLAlchemy internals
+        log_instance_vars(
+            "Entity model variables", self.entity, exclude=["_sa_instance_state"]
+        )
+
+        # Determine a friendly name for the entity
         for key in ("name", "title", "email", "username"):
             if entity_dict.get(key):
                 self.entity_name = entity_dict[key]
-                logger.info(f"ℹ️ entity_name set using key {key!r}: {self.entity_name!r}")
+                logger.info(
+                    f"ℹ️ entity_name set using key {key!r}: {self.entity_name!r}"
+                )
                 break
         else:
             self.entity_name = self.id
-            logger.info(f"entity_name defaulted to id: {self.entity_name!r}")
+            logger.info(
+                f"ℹ️ entity_name defaulted to id: {self.entity_name!r}"
+            )
