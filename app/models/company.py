@@ -10,33 +10,15 @@ class Company(BaseModel):
     id = db.Column(
         db.Integer,
         primary_key=True,
-        info={
-            "label": "ID",
-            "section": "About",
-            "tab": "General",
-            "widget": "readonly"
-        },
     )
 
     name = db.Column(
         db.String(100),
         nullable=False,
-        info={
-            "label": "Company Name",
-            "section": "About",
-            "tab": "General",
-            "required": True
-        },
     )
 
     description = db.Column(
         db.Text,
-        info={
-            "label": "Description",
-            "section": "About",
-            "tab": "Test",
-            "widget": "textarea"
-        },
     )
 
     contacts = db.relationship("Contact", back_populates="company")

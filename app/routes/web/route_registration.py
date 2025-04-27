@@ -108,38 +108,6 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
             context = SimpleContext(title=config.entity_table_name)
 
         # ---------------------------------------------------------------------
-        # Attach the UI schema for Jinja form/tab rendering
-        # ---------------------------------------------------------------------
-        try:
-            model_cls = config.service.model
-            logger.info(f"Using model class: {model_cls.__name__}")
-
-            if hasattr(model_cls, 'ui_schema'):
-                # Pass the current entity instance (or None) to ui_schema
-                ui_config = model_cls.ui_schema(getattr(context, 'entity', None))
-                context.ui_config = ui_config
-
-                # Enhanced debugging
-                try:
-                    logger.info(f"Generated UI config structure: {type(ui_config)}")
-                    logger.info(
-                        f"UI config keys: {list(ui_config.keys()) if isinstance(ui_config, dict) else 'Not a dict'}")
-
-                    # Safely print sample of UI config
-                    if isinstance(ui_config, dict) and len(ui_config) > 0:
-                        first_section = next(iter(ui_config.values()))
-                        logger.info(
-                            f"First section sample: {first_section[:1] if isinstance(first_section, list) else first_section}")
-                except Exception as e:
-                    logger.warning(f"Could not log UI config details: {e}")
-            else:
-                logger.warning(f"Model {model_cls.__name__} has no ui_schema method")
-                context.ui_config = {}
-        except Exception as e:
-            logger.warning(f"Failed to build ui_schema: {e}")
-            context.ui_config = {}
-
-        # ---------------------------------------------------------------------
         # Generate CSRF token (if available)
         # ---------------------------------------------------------------------
         try:

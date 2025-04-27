@@ -1,4 +1,96 @@
-{% extends 'entities/view.html' %}
-{% block content %}
-  {{ super() }}
+{% extends 'layouts/base_view.html' %}
+{% import 'macros/layout.html' as layout %}
+{% import 'macros/forms.html' as forms %}
+{% import 'macros/entity.html' as entity %}
+
+{% block form_content %}
+  {# General Information Tab #}
+  {{ layout.tabs_navigation([
+    {'name': 'General', 'id': 'general', 'icon': 'info-circle'},
+    {'name': 'Contacts', 'id': 'contacts', 'icon': 'address-book'},
+    {'name': 'Opportunities', 'id': 'opportunities', 'icon': 'chart-line'},
+    {'name': 'Capabilities', 'id': 'capabilities', 'icon': 'tools'}
+  ]) }}
+
+  {% call layout.tabs_content() %}
+    {# General Tab #}
+    {% call layout.tab_pane('general', active=true) %}
+      {% call layout.section('About') %}
+        <div class="row">
+          {{ forms.render_field({
+            'label': 'ID',
+            'type': 'readonly',
+            'value': id
+          }, read_only=read_only) }}
+
+          {{ forms.render_field({
+            'label': 'Company Name',
+            'name': 'name',
+            'value': name,
+            'required': true
+          }, read_only=read_only) }}
+
+          {{ forms.render_field({
+            'label': 'Description',
+            'name': 'description',
+            'type': 'textarea',
+            'value': description
+          }, read_only=read_only, column_class="col-md-12") }}
+        </div>
+      {% endcall %}
+    {% endcall %}
+
+    {# Contacts Tab #}
+    {% call layout.tab_pane('contacts') %}
+      {% if contacts %}
+        {{ entity.render_entity_table(
+          contacts,
+          'Contacts',
+          [
+            {'key': 'name', 'label': 'Name'},
+            {'key': 'title', 'label': 'Title'},
+            {'key': 'email', 'label': 'Email'},
+            {'key': 'phone', 'label': 'Phone'}
+          ],
+          '/contacts'
+        ) }}
+      {% else %}
+        {{ entity.render_empty_state('No contacts associated with this company.') }}
+      {% endif %}
+    {% endcall %}
+
+    {# Opportunities Tab #}
+    {% call layout.tab_pane('opportunities') %}
+      {% if opportunities and opportunities|length > 0 %}
+        {{ entity.render_entity_table(
+          opportunities,
+          'Opportunities',
+          [
+            {'key': 'name', 'label': 'Name'},
+            {'key': 'status', 'label': 'Status', 'type': 'badge', 'badge_mapping': {
+              'New': 'bg-info',
+              'Qualified': 'bg-primary',
+              'Proposal': 'bg-warning',
+              'Won': 'bg-success',
+              'Lost': 'bg-danger'
+            }},
+            {'key': 'value', 'label': 'Value', 'type': 'currency'},
+            {'key': 'close_date', 'label': 'Close Date'}
+          ],
+          '/opportunities'
+        ) }}
+      {% else %}
+        {{ entity.render_empty_state('No opportunities linked to this company.') }}
+      {% endif %}
+    {% endcall %}
+
+    {# Capabilities Tab #}
+    {% call layout.tab_pane('capabilities') %}
+      {% if company_capabilities and company_capabilities|length > 0 %}
+        {{ entity.render_entity_list(company_capabilities, 'Capabilities') }}
+      {% else %}
+        {{ entity.render_empty_state('No capabilities defined for this company.') }}
+      {% endif %}
+    {% endcall %}
+  {% endcall %}
 {% endblock %}
