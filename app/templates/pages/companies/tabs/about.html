@@ -1,0 +1,28 @@
+{% import 'macros/layout.html' as layout %}
+{% import 'macros/forms.html' as forms %}
+
+{% call layout.tab_pane('general', active=true) %}
+  {% call layout.section('About') %}
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'ID',
+        'type': 'readonly',
+        'value': id
+      }, read_only=read_only) }}
+
+      {{ forms.render_field({
+        'label': 'Company Name',
+        'name': 'name',
+        'value': name,
+        'required': true
+      }, read_only=read_only) }}
+
+      {{ forms.render_field({
+        'label': 'Description',
+        'name': 'description',
+        'type': 'textarea',
+        'value': description
+      }, read_only=read_only, column_class="col-md-12") }}
+    </div>
+  {% endcall %}
+{% endcall %}

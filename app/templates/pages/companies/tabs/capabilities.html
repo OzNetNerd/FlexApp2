@@ -1,0 +1,10 @@
+{% import 'macros/layout.html' as layout %}
+{% import 'macros/entity.html' as entity %}
+
+{% call layout.tab_pane('capabilities') %}
+  {% if company_capabilities and company_capabilities|length > 0 %}
+    {{ entity.render_entity_list(company_capabilities, 'Capabilities') }}
+  {% else %}
+    {{ entity.render_empty_state('No capabilities defined for this company.') }}
+  {% endif %}
+{% endcall %}

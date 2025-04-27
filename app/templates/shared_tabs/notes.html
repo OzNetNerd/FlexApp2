@@ -1,7 +1,11 @@
-{# templates/shared_tabs/_notes.html #}
+{# templates/shared_tabs/notes.html #}
 {% import 'macros/notes.html' as notes with context %}
-{% import 'macros/tabs.html' as tab_macros with context %}
+{% import 'macros/layout.html' as layout %}
 
-{% call tab_macros.render_tab_section('notes', 'Notes', active=tab.active) %}
-  {{ notes.render_notes_section(entity) }}
+{% call layout.tab_pane('notes') %}
+  {% call layout.section('Notes') %}
+    <div class="row">
+      {{ notes.render_notes_section(entity) }}
+    </div>
+  {% endcall %}
 {% endcall %}
