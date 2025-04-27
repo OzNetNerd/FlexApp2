@@ -86,17 +86,23 @@ class BaseModel(db.Model):
             return "textarea"
         return "text"
 
+
     @classmethod
-    def ui_schema(cls, instance=None) -> list[dict]:
+    def ui_schema(cls, instance=None) -> dict:
+        """
+        Generate a UI schema with sections containing form fields.
+        Returns a dictionary with section names as keys and lists of fields as values.
+        """
         sections = OrderedDict()
         for col in cls.__table__.columns:
             info = col.info or {}
             section_name = info.get("section", "Main")
             if section_name not in sections:
-                sections[section_name] = {"section_name": section_name, "entries": []}
+                sections[section_name] = []
 
-            entry = {
-                "entry_name": col.name,
+            field = {
+                "name": col.name,  # Using "name" as expected by the form.html macros
+                "entry_name": col.name,  # Keeping entry_name for backward compatibility
                 "label": info.get("label", col.name.replace("_", " ").title()),
                 "type": info.get("widget", cls._infer_widget(col.type)),
                 "value": getattr(instance, col.name) if instance is not None else None,
@@ -104,6 +110,6 @@ class BaseModel(db.Model):
                 "options": info.get("options", []),
                 "help_text": info.get("help_text", ""),
             }
-            sections[section_name]["entries"].append(entry)
+            sections[section_name].append(field)
 
-        return list(sections.values())
+        return sections  # Return dictionary with section names as keys

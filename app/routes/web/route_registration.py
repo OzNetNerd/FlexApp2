@@ -1,8 +1,9 @@
-# app/routes/web/route_registration.py
+# app/routes/web/route_registration.py - Improved debugging
 
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
+import json
 
 from flask import Blueprint, redirect, request, url_for
 from flask_login import login_required
@@ -83,6 +84,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         if endpoint in (CRUDEndpoint.view.value, CRUDEndpoint.edit.value):
             entity_id = kwargs.get("entity_id")
             entity = config.service.get_by_id(entity_id)
+            logger.info(f"Loaded entity for {endpoint}: ID={entity_id}, entity={entity}")
 
         # Build appropriate context object
         if endpoint == CRUDEndpoint.index.value:
@@ -110,10 +112,32 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         # ---------------------------------------------------------------------
         try:
             model_cls = config.service.model
+            logger.info(f"Using model class: {model_cls.__name__}")
+
             if hasattr(model_cls, 'ui_schema'):
-                context.ui_config = model_cls.ui_schema(getattr(context, 'entity', None))
+                # Pass the current entity instance (or None) to ui_schema
+                ui_config = model_cls.ui_schema(getattr(context, 'entity', None))
+                context.ui_config = ui_config
+
+                # Enhanced debugging
+                try:
+                    logger.info(f"Generated UI config structure: {type(ui_config)}")
+                    logger.info(
+                        f"UI config keys: {list(ui_config.keys()) if isinstance(ui_config, dict) else 'Not a dict'}")
+
+                    # Safely print sample of UI config
+                    if isinstance(ui_config, dict) and len(ui_config) > 0:
+                        first_section = next(iter(ui_config.values()))
+                        logger.info(
+                            f"First section sample: {first_section[:1] if isinstance(first_section, list) else first_section}")
+                except Exception as e:
+                    logger.warning(f"Could not log UI config details: {e}")
+            else:
+                logger.warning(f"Model {model_cls.__name__} has no ui_schema method")
+                context.ui_config = {}
         except Exception as e:
             logger.warning(f"Failed to build ui_schema: {e}")
+            context.ui_config = {}
 
         # ---------------------------------------------------------------------
         # Generate CSRF token (if available)
@@ -134,6 +158,8 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         )
         endpoint_name = f"{config.blueprint.name}.{endpoint}"
 
+        logger.info(f"Rendering template: {template_path} with context: {type(context).__name__}")
+
         cfg = RenderSafelyConfig(
             template_path=template_path,
             context=context,
@@ -147,11 +173,11 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
 
 
 def handle_crud_operation(
-    endpoint: str,
-    service: Any,
-    blueprint_name: str,
-    entity_id: Optional[int],
-    form_data: Dict[str, Any]
+        endpoint: str,
+        service: Any,
+        blueprint_name: str,
+        entity_id: Optional[int],
+        form_data: Dict[str, Any]
 ) -> Any:
     if endpoint == CRUDEndpoint.create.value:
         entity = service.create(form_data)
@@ -185,11 +211,11 @@ def register_crud_routes(config: CrudRouteConfig) -> None:
 
 
 def register_auth_route(
-    blueprint: Blueprint,
-    url: str,
-    handler: Callable,
-    endpoint_name: str,
-    methods: Optional[List[str]] = None
+        blueprint: Blueprint,
+        url: str,
+        handler: Callable,
+        endpoint_name: str,
+        methods: Optional[List[str]] = None
 ) -> None:
     methods = methods or ["GET"]
     blueprint.add_url_rule(rule=url, endpoint=endpoint_name, view_func=handler, methods=methods)

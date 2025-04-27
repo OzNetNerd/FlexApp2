@@ -1,15 +1,6 @@
-{# macros/form.html - Consolidated form components #}
+{# macros/form.html #}
 
-{# ------------------------------------------------------------------------------
-  Purpose: Reusable form components and field rendering
-
-  Macros:
-    - render_field: Renders form fields based on type with read-only option
-    - render_footer_buttons: Creates standardized form footer actions
-    - render_tabbed_form: Creates a complete form with tabs
-    - render_pill_navigation: Renders pill navigation
------------------------------------------------------------------------------- #}
-
+{# Keep all existing macros #}
 {% macro render_field(entry, read_only=False) %}
   <div class="col-md-6 mb-3">
     {% if read_only %}
@@ -40,12 +31,12 @@
         </div>
       </div>
     {% else %}
-      <label for="{{ entry.entry_name }}" class="form-label fw-semibold">{{ entry.label }}</label>
+      <label for="{{ entry.name }}" class="form-label fw-semibold">{{ entry.label }}</label>
       {% if entry.type == 'textarea' %}
-        <textarea class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+        <textarea class="form-control" id="{{ entry.name }}" name="{{ entry.name }}"
                   {% if entry.required %}required{% endif %}>{{ entry.value or '' }}</textarea>
       {% elif entry.type == 'select' and entry.options %}
-        <select class="form-select" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+        <select class="form-select" id="{{ entry.name }}" name="{{ entry.name }}"
                 {% if entry.required %}required{% endif %}>
           <option value="">-- Select {{ entry.label }} --</option>
           {% for option in entry.options %}
@@ -62,24 +53,20 @@
         </select>
       {% elif entry.type == 'checkbox' %}
         <div class="form-check">
-          <input type="checkbox" class="form-check-input" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+          <input type="checkbox" class="form-check-input" id="{{ entry.name }}" name="{{ entry.name }}"
                  {% if entry.value %}checked{% endif %}>
-          <label class="form-check-label" for="{{ entry.entry_name }}">{{ entry.label }}</label>
+          <label class="form-check-label" for="{{ entry.name }}">{{ entry.label }}</label>
         </div>
       {% elif entry.type == 'date' %}
-        <input type="date" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+        <input type="date" class="form-control" id="{{ entry.name }}" name="{{ entry.name }}"
                value="{{ entry.value }}" {% if entry.required %}required{% endif %}>
       {% elif entry.type == 'number' %}
-        <input type="number" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+        <input type="number" class="form-control" id="{{ entry.name }}" name="{{ entry.name }}"
                value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
       {% elif entry.type == 'readonly' %}
         <div class="form-control-plaintext">{{ entry.value }}</div>
-      {% elif entry.type == 'autocomplete' %}
-        <input type="text" class="form-control autocomplete-input" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
-               value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}
-               data-options="{{ entry.options|tojson if entry.options else '[]' }}">
       {% else %}
-        <input type="text" class="form-control" id="{{ entry.entry_name }}" name="{{ entry.entry_name }}"
+        <input type="text" class="form-control" id="{{ entry.name }}" name="{{ entry.name }}"
                value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
       {% endif %}
 
@@ -90,50 +77,37 @@
   </div>
 {% endmacro %}
 
-{% macro render_footer_buttons(entity=None, read_only=False) %}
-  {% if request.endpoint is not defined %}
-    <div class="alert alert-danger">
-      Error: No request.endpoint available for navigation.
-    </div>
-    <script type="module">
-      import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-      log("error", "form_components.html", "context_check", "Missing required template context: request.endpoint");
-    </script>
+{# Add a debug version of render_simple_form that displays its context #}
+{% macro render_simple_form(ui_config, model_name="", error_message="", read_only=False) %}
+  {% if ui_config %}
+    {% for section_name, fields in ui_config.items() %}
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">{{ section_name }}</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for field in fields %}
+              {{ render_field(field, read_only=read_only) }}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
   {% else %}
-    <script>
-      window.footerButtonsConfig = {
-        hasId: {{ (entity and entity.id) | tojson }},
-        endpoint: "{{ request.endpoint }}",
-        baseRoute: "{{ request.endpoint.rsplit('.', 1)[0] }}",
-        viewUrl: {% if entity and entity.id %}"{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}"{% else %}null{% endif %},
-        indexUrl: "{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}"
-      };
-    </script>
-
-    <div class="footer-buttons-container mt-4 d-flex justify-content-end gap-2">
-      {% if not read_only %}
-        {% if entity and entity.id %}
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}" class="btn btn-secondary">
-            <i class="fas fa-times me-1"></i> Cancel
-          </a>
-          <button type="submit" class="btn btn-primary" form="main-form">
-            <i class="fas fa-save me-1"></i> Update
-          </button>
-        {% else %}
-          <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
-            <i class="fas fa-times me-1"></i> Cancel
-          </a>
-          <button type="submit" class="btn btn-primary" form="main-form">
-            <i class="fas fa-save me-1"></i> Create
-          </button>
-        {% endif %}
-      {% endif %}
+    <div class="alert alert-danger">
+      <p>UI Config is missing or undefined. Cannot render form.</p>
     </div>
+  {% endif %}
 
-    <script type="module" src="{{ url_for('static', filename='js/pages/footer_buttons.js') }}"></script>
+  {% if error_message %}
+    <div class="alert alert-danger">
+      <p>Error: {{ error_message }}</p>
+    </div>
   {% endif %}
 {% endmacro %}
 
+{# Keep existing macros #}
 {% macro render_tabbed_form(ui, model_name="", error_message="", read_only=False) %}
   <div class="tab-content">
     {% for tab in ui %}
@@ -186,16 +160,4 @@
       </li>
     {% endfor %}
   </ul>
-
-  <script type="module">
-    import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.nav-link[data-bs-toggle="pill"]').forEach(tab => {
-        tab.addEventListener('shown.bs.tab', event => {
-          const tabId = event.target.getAttribute('id');
-          log("info", "form_components.html", "nav", `Tab changed: ${tabId}`);
-        });
-      });
-    });
-  </script>
 {% endmacro %}

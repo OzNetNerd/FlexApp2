@@ -4,6 +4,9 @@
 {% import 'macros/entity.html' as entity with context %}
 
 {% block content %}
+
+<h1>{{entity_name }} aa</h1>
+
 <div class="card border-0 shadow-sm" style="overflow: visible !important;">
   <!-- Card Header -->
   <div class="card-header bg-white py-3 pb-0" style="border: none;">
@@ -62,18 +65,20 @@
         {% endif %}
       </div>
     </div>
-
-    <!-- Tab Navigation -->
-    <div class="mt-3">
-      {{ forms.render_pill_navigation(ui_config) }}
-    </div>
   </div>
 
   <!-- Card Body -->
-  <div class="card-body pt-0 pb-0" style="overflow: visible !important;">
+  <div class="card-body pt-4 pb-0" style="overflow: visible !important;">
     <form method="post" action="{{ submit_url }}" id="main-form">
       {{ csrf_input }}
-      {{ forms.render_tabbed_form(
+
+      {% if ui_config %}
+        <div class="alert alert-info">UI config available</div>
+      {% else %}
+        <div class="alert alert-danger">UI config missing</div>
+      {% endif %}
+
+      {{ forms.render_simple_form(
            ui_config,
            model_name=model_name,
            error_message=error_message,
@@ -81,14 +86,10 @@
          )
       }}
     </form>
-
-    {% if not read_only %}
-      {% include 'base/common/_footer_buttons.html' %}
-    {% endif %}
   </div>
 </div>
 
-<!-- Delete Confirmation Modal (unchanged) -->
+<!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog"
      aria-labelledby="deleteModalLabel" aria-hidden="true" data-bs-scroll="false">
   <div class="modal-dialog" role="document">
