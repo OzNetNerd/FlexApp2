@@ -1,11 +1,11 @@
 {% extends "layouts/base.html" %}
-{% import 'macros/form.html' as forms with context %}
+{% import 'macros/form_components.html' as forms with context %}
 {% import 'macros/ui.html' as ui with context %}
 {% import 'macros/entity.html' as entity with context %}
 
 {% block content %}
 
-<h1>{{entity_name }} aa</h1>
+<h1>{{entity_name }}</h1>
 
 <div class="card border-0 shadow-sm" style="overflow: visible !important;">
   <!-- Card Header -->
@@ -73,18 +73,50 @@
       {{ csrf_input }}
 
       {% if ui_config %}
-        <div class="alert alert-info">UI config available</div>
+        {# Organize fields by tabs #}
+        {% set tabbed_ui = {} %}
+
+        {# First pass - group fields by tab #}
+        {% for section_name, fields in ui_config.items() %}
+          {% for field in fields %}
+            {% set tab_name = field.tab|default('General') %}
+
+            {% if tab_name not in tabbed_ui %}
+              {% set _ = tabbed_ui.update({tab_name: {'tab_name': tab_name, 'icon': 'info-circle', 'sections': {}}}) %}
+            {% endif %}
+
+            {% if section_name not in tabbed_ui[tab_name]['sections'] %}
+              {% set _ = tabbed_ui[tab_name]['sections'].update({section_name: []}) %}
+            {% endif %}
+
+            {% set _ = tabbed_ui[tab_name]['sections'][section_name].append(field) %}
+          {% endfor %}
+        {% endfor %}
+
+        {# Convert to list structure expected by the pill navigation and tabbed form macros #}
+        {% set tabs_list = [] %}
+        {% for tab_name, tab_data in tabbed_ui.items() %}
+          {% set tab = {'tab_name': tab_data.tab_name, 'icon': tab_data.icon, 'sections': []} %}
+
+          {% for section_name, fields in tab_data.sections.items() %}
+            {% set _ = tab.sections.append({'section_name': section_name, 'entries': fields}) %}
+          {% endfor %}
+
+          {% set _ = tabs_list.append(tab) %}
+        {% endfor %}
+
+        {# Render tabs #}
+        {{ forms.render_pill_navigation(tabs_list) }}
+        {{ forms.render_tabbed_form(
+             tabs_list,
+             model_name=model_name,
+             error_message=error_message,
+             read_only=read_only
+           )
+        }}
       {% else %}
         <div class="alert alert-danger">UI config missing</div>
       {% endif %}
-
-      {{ forms.render_simple_form(
-           ui_config,
-           model_name=model_name,
-           error_message=error_message,
-           read_only=read_only
-         )
-      }}
     </form>
   </div>
 </div>

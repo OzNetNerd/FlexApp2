@@ -13,6 +13,7 @@ class Company(BaseModel):
         info={
             "label": "ID",
             "section": "About",
+            "tab": "General",
             "widget": "readonly"
         },
     )
@@ -23,6 +24,7 @@ class Company(BaseModel):
         info={
             "label": "Company Name",
             "section": "About",
+            "tab": "General",
             "required": True
         },
     )
@@ -32,6 +34,7 @@ class Company(BaseModel):
         info={
             "label": "Description",
             "section": "About",
+            "tab": "General",
             "widget": "textarea"
         },
     )
