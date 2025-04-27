@@ -28,7 +28,7 @@ class BaseContext:
             ValueError: If neither title nor table_name is provided
         """
         instance_details = "BaseContext (__init__)"
-        log_instance_vars(instance_details, self)
+        # log_instance_vars(instance_details, self)
 
         if not title and not kwargs.get("entity_table_name"):
             raise ValueError("Either 'title' or 'entity_table_name' must be provided.")
@@ -226,7 +226,7 @@ class EntityContext(BaseContext):
         logger.info(
             f"📜 Building {self.action!r} page for {blueprint_name!r} blueprint (RO={self.read_only})"
         )
-        log_instance_vars("EntityContext (_initialize_derived_fields)", self)
+        # log_instance_vars("EntityContext (_initialize_derived_fields)", self)
 
         # Log all model instance variables, excluding SQLAlchemy internals
         log_instance_vars(
