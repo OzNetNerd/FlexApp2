@@ -2,7 +2,7 @@
 
 from typing import Any, List, Optional
 
-from flask import url_for
+from flask import url_for, request
 from flask_login import current_user
 
 from app.utils.app_logging import get_logger, log_instance_vars
@@ -39,9 +39,10 @@ class BaseContext:
         self.read_only = read_only
 
         # Set each keyword argument as an attribute on the instance.
+        logger.info(f"Setting kwargs as instance variables:")
         for key, value in kwargs.items():
             setattr(self, key, value)
-            logger.info(f"Set attribute {key!r} = {value!r}")
+            logger.info(f"  📝 Set attribute {key!r} = {value!r}")
 
     def __repr__(self):
         """Return a detailed string representation of the context."""
@@ -191,7 +192,7 @@ class EntityContext(BaseContext):
         """Derive dynamic fields, assign entity attributes, and log state."""
         self.model_name = self.entity_table_name or self.__class__.__name__
         self.id = str(getattr(self, "entity_id", ""))
-        blueprint_name = getattr(self, "blueprint_name", "")
+        blueprint_name = request.blueprint or ""
 
         # Build a dict of entity attributes
         entity_dict: Dict[str, Any] = {}

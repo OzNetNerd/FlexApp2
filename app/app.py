@@ -127,6 +127,15 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
             "is_debug_mode": app.debug,
         }
 
+    @app.before_request
+    def log_url() -> None:
+        """Log only application endpoints (skip static assets)."""
+        # skip anything served by Flask's 'static' endpoint
+        if request.endpoint == "static":
+            return
+
+        logger.info(f"URL requested: {request.path}")
+
     with app.app_context():
         logger.info("Seeding settings and creating database tables.")
         Setting.seed()
