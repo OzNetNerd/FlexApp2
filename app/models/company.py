@@ -57,23 +57,5 @@ class Company(BaseModel):
         lazy="dynamic",
     )
 
-    @property
-    def capabilities(self) -> list:
-        return [cc.capability for cc in self.company_capabilities]
-
-    @property
-    def crisp_summary(self) -> float | None:
-        scores = [c.crisp_summary for c in self.contacts if c.crisp_summary is not None]
-        if not scores:
-            return None
-        return round(sum(scores) / len(scores), 2)
-
     def __repr__(self) -> str:
         return f"<Company {self.name!r}>"
-
-    @staticmethod
-    def search_by_name(query: str) -> list["Company"]:
-        logger.info(f"Searching companies starting with {query!r}")
-        result = Company.query.filter(Company.name.ilike(f"{query}%")).all()
-        logger.info(f"Found {len(result)} matching companies")
-        return result
