@@ -34,7 +34,7 @@ class Company(BaseModel):
         info={
             "label": "Description",
             "section": "About",
-            "tab": "General",
+            "tab": "Test",
             "widget": "textarea"
         },
     )
