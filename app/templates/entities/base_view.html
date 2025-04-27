@@ -5,6 +5,7 @@
 {% import 'macros/entity.html' as entity with context %}
 
 {% block content %}
+
 <div class="card border-0 shadow-sm" style="overflow: visible !important;">
   <!-- Card Header -->
   <div class="card-header bg-white py-3 pb-0" style="border: none;">
@@ -91,11 +92,20 @@
       {{ csrf_input }}
       <div class="tab-content" id="formTabsContent">
         {% for tab in tabs %}
-          {# first try a shared partial, then fall back to entity-specific #}
-          {% set shared_path   = 'shared_tabs/_' ~ tab.tab_name|lower|replace(' ','_') ~ '.html' %}
-          {% set specific_path = 'pages/companies/tabs/' ~ tab.tab_name|lower|replace(' ','_') ~ '.html' %}
-          {% include shared_path   ignore missing %}
-          {% include specific_path ignore missing %}
+          <div class="tab-pane fade {% if tab.active %}show active{% endif %}"
+               id="tab-{{ tab.tab_name|lower|replace(' ','-') }}"
+               role="tabpanel"
+               aria-labelledby="tab-{{ tab.tab_name|lower|replace(' ','-') }}-tab">
+            {% if tab.template_path %}
+              {% include tab.template_path ignore missing %}
+            {% else %}
+              {# Fallback to the old behavior for backward compatibility #}
+              {% set shared_path = 'shared_tabs/_' ~ tab.tab_name|lower|replace(' ','_') ~ '.html' %}
+              {% set specific_path = 'pages/companies/tabs/' ~ tab.tab_name|lower|replace(' ','_') ~ '.html' %}
+              {% include shared_path ignore missing %}
+              {% include specific_path ignore missing %}
+            {% endif %}
+          </div>
         {% endfor %}
       </div>
     </form>
