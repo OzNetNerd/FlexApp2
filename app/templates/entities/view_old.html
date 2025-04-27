@@ -22,6 +22,7 @@
             'name': tab_name,
             'id': tab_name|lower|replace(' ', '-'),
             'icon': tab_icon,
+            'active': tab_names|length == 1,  {# Set first tab as active #}
             'sections': {}
           }) %}
         {% endif %}
@@ -38,15 +39,13 @@
       {% endfor %}
     {% endfor %}
 
-    {# Rest of the code remains the same #}
-
     {# Render tabs navigation #}
     {{ layout.tabs_navigation(tabs_list) }}
 
     {# Render tab content #}
     {% call layout.tabs_content() %}
       {% for tab in tabs_list %}
-        {% call layout.tab_pane(tab.id, loop.first) %}
+        {% call layout.tab_pane(tab.id, tab.active|default(loop.first)) %}
           {% for section_name, fields in tab.sections.items() %}
             {% call layout.section(section_name) %}
               {{ forms.render_fields_row(fields, read_only=read_only) }}

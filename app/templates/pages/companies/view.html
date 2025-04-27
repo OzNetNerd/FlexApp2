@@ -4,9 +4,9 @@
 {% import 'macros/entity.html' as entity %}
 
 {% block form_content %}
-  {# General Information Tab with Notes tab added #}
+  {# General Information Tab #}
   {{ layout.tabs_navigation([
-    {'name': 'Notes', 'id': 'notes', 'icon': 'sticky-note'},
+    {'name': 'Notes', 'id': 'notes', 'icon': 'info-circle', 'active': true},
     {'name': 'General', 'id': 'general', 'icon': 'info-circle'},
     {'name': 'Contacts', 'id': 'contacts', 'icon': 'address-book'},
     {'name': 'Opportunities', 'id': 'opportunities', 'icon': 'chart-line'},
