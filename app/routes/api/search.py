@@ -2,13 +2,13 @@
 
 from flask import Blueprint, abort, request
 
-from app.models.company import Company
-from app.models.contact import Contact
-from app.models.note import Note
-from app.models.opportunity import Opportunity
-from app.models.srs_item import SRSItem
-from app.models.task import Task
-from app.models.user import User
+from app.models.pages.company import Company
+from models.pages.contact import Contact
+from app.models.pages.note import Note
+from models.pages.opportunity import Opportunity
+from app.models.pages.srs import SRSItem
+from models.pages.task import Task
+from models.pages.user import User
 from app.services.search_service import SearchService
 from app.utils.app_logging import get_logger
 

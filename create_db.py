@@ -60,7 +60,7 @@ def _create_or_update_sample_data(db):
 
 
 def _create_sample_users(db):
-    from app.models.user import User
+    from models.pages.user import User
 
     logger.info("Processing sample users...")
     password = generate_password_hash("password123")
@@ -91,7 +91,7 @@ def _create_sample_users(db):
 
 
 def _create_sample_companies(db):
-    from app.models.company import Company
+    from models.pages.company import Company
 
     logger.info("Processing sample companies...")
     sample_companies = [
@@ -111,7 +111,7 @@ def _create_sample_companies(db):
 
 
 def _create_sample_contacts(db):
-    from app.models.contact import Contact
+    from models.pages.contact import Contact
 
     logger.info("Processing sample contacts...")
     sample_contacts = [
@@ -131,7 +131,7 @@ def _create_sample_contacts(db):
 
 
 def _create_sample_opportunities(db):
-    from app.models.opportunity import Opportunity
+    from models.pages.opportunity import Opportunity
 
     logger.info("Processing sample opportunities...")
     sample_opportunities = [

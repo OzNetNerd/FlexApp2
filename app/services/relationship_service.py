@@ -5,10 +5,10 @@ from typing import Any, Dict, List, Optional, Tuple
 from sqlalchemy import and_, or_
 
 from app.models.base import db
-from app.models.company import Company
-from app.models.contact import Contact
+from app.models.pages.company import Company
+from models.pages.contact import Contact
 from app.models.relationship import Relationship
-from app.models.user import User
+from models.pages.user import User
 from app.utils.app_logging import get_logger
 
 logger = get_logger()

@@ -7,7 +7,7 @@ import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app.models.base import db as _db
-from app.models.user import User
+from models.pages.user import User
 
 from .fixtures.mock_data import TEST_USERS
 

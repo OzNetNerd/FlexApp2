@@ -78,7 +78,7 @@ class Contact(BaseModel):
         Retrieve Opportunities linked to this Contact.
         Uses the Relationship model where this contact is linked to an opportunity.
         """
-        from app.models.opportunity import Opportunity
+        from app.models.pages.opportunity import Opportunity
 
         relationships = Relationship.get_relationships("contact", self.id, "opportunity")
         opp_ids = [rel.entity2_id if rel.entity1_type == "contact" else rel.entity1_id for rel in relationships]
@@ -95,7 +95,7 @@ class Contact(BaseModel):
         managers = []
         for rel in rels:
             if rel.entity1_type == "user":
-                from app.models.user import User
+                from app.models.pages.user import User
 
                 manager = User.query.get(rel.entity1_id)
             elif rel.entity1_type == "contact":
@@ -117,7 +117,7 @@ class Contact(BaseModel):
             if rel.entity2_type == "contact":
                 direct_report = Contact.query.get(rel.entity2_id)
             elif rel.entity2_type == "user":
-                from app.models.user import User
+                from app.models.pages.user import User
 
                 direct_report = User.query.get(rel.entity2_id)
             if direct_report:

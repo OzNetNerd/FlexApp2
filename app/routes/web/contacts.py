@@ -1,5 +1,5 @@
 # app/routes/web/contacts.py
-from app.models.contact import Contact
+from models.pages.contact import Contact
 from app.routes.web.blueprint_factory import create_crud_blueprint
 
 contacts_bp = create_crud_blueprint(Contact)

@@ -2,7 +2,7 @@
 
 from flask import Blueprint
 
-from app.models.user import User
+from models.pages.user import User
 from app.routes.web.route_registration import register_auth_route
 from app.services.auth import AuthService
 from app.utils.app_logging import get_logger

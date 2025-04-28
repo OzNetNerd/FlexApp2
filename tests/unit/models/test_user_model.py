@@ -6,7 +6,6 @@ These tests verify the basic existence and functionality of the User model witho
 
 import os
 import sys
-from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -22,7 +21,7 @@ def test_user_model_exists():
     Asserts:
         - The `User` class is not None.
     """
-    from app.models.user import User
+    from models.pages.user import User
 
     assert User is not None
 
@@ -37,7 +36,7 @@ def test_user_attributes():
         - The `User` instance has the attributes `id`, `email`, `username`, `password_hash`.
         - The `User` instance has authentication-related methods `is_authenticated` and `get_id`.
     """
-    from app.models.user import User
+    from models.pages.user import User
 
     # Create a user and test access to its attributes
     user = User()

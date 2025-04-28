@@ -6,23 +6,24 @@ Centralized imports for all SQLAlchemy models and the `db` instance.
 
 import logging
 
-from .base import BaseModel, db
-from .capability import Capability
-from .capability_category import CapabilityCategory
-from .company import Company
-from .company_capability import CompanyCapability
-from .contact import Contact
-from .crisp_score import CRISPScore
-from .mixins import ValidatorMixin
-from .note import Note
-from .opportunity import Opportunity
-from .relationship import Relationship
-from .review_history import ReviewHistory
-from .setting import Setting
-from .srs_item import SRSItem
-from .table_config import TableConfig
-from .task import Task
-from .user import User
+from app.models.base import BaseModel, db
+
+from app.models.capability import Capability
+from app.models.capability_category import CapabilityCategory
+from app.models.company_capability import CompanyCapability
+from app.models.crisp_score import CRISPScore
+from app.models.mixins import ValidatorMixin
+from app.models.relationship import Relationship
+from app.models.table_config import TableConfig
+
+from app.models.pages.company import Company
+from app.models.pages.contact import Contact
+from app.models.pages.note import Note
+from app.models.pages.opportunity import Opportunity
+from app.models.pages.srs import ReviewHistory, SRSItem
+from app.models.pages.setting import Setting
+from app.models.pages.task import Task
+from app.models.pages.user import User
 
 logger = logging.getLogger(__name__)
 
