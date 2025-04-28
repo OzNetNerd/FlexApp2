@@ -4,7 +4,7 @@
 {% call layout.tab_pane('general') %}
   {% call layout.section('About') %}
     <div class="row">
-      {% if action != 'create' %}
+      {% if action == 'view' %}
         {{ forms.render_field({
           'label': 'ID',
           'type': 'readonly',

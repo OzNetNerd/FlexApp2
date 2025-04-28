@@ -5,12 +5,17 @@
 
 {% block form_content %}
   {% set tabs = [
-    {'name': 'Notes', 'id': 'notes', 'icon': 'info-circle', 'active': true, 'template': 'shared_tabs/notes.html'},
-    {'name': 'General', 'id': 'general', 'icon': 'info-circle', 'template': 'pages/companies/tabs/about.html'},
+    {'name': 'General', 'id': 'general', 'icon': 'info-circle', 'active': true, 'template': 'pages/companies/tabs/about.html'},
     {'name': 'Contacts', 'id': 'contacts', 'icon': 'address-book', 'template': 'pages/companies/tabs/contacts.html'},
     {'name': 'Opportunities', 'id': 'opportunities', 'icon': 'chart-line', 'template': 'pages/companies/tabs/opportunities.html'},
     {'name': 'Capabilities', 'id': 'capabilities', 'icon': 'tools', 'template': 'pages/companies/tabs/capabilities.html'}
   ] %}
+
+  {% if action == 'view' %}
+    {% set tabs = [
+      {'name': 'Notes', 'id': 'notes', 'icon': 'info-circle', 'active': true, 'template': 'shared_tabs/notes.html'}
+    ] + tabs %}
+  {% endif %}
 
   {% if not read_only %}
     <form method="POST" action="{{ submit_url }}" class="needs-validation" novalidate>
