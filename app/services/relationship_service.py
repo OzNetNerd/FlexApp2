@@ -6,9 +6,9 @@ from sqlalchemy import and_, or_
 
 from app.models.base import db
 from app.models.pages.company import Company
-from models.pages.contact import Contact
+from app.models.pages.contact import Contact
 from app.models.relationship import Relationship
-from models.pages.user import User
+from app.models.pages.user import User
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
