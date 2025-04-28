@@ -26,88 +26,84 @@ Macros include:
   #}
 
   <div class="{{ column_class }} mb-3">
-    {% if read_only %}
-      <div class="note-item mb-3 p-3 border rounded">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <strong>{{ entry.label }}</strong>
-        </div>
-        <div class="note-content">
-          {% if entry.type == 'checkbox' %}
-            <p><i class="fas fa-{{ 'check' if entry.value else 'times' }}"></i> {{ 'Yes' if entry.value else 'No' }}</p>
-          {% elif entry.type == 'select' and entry.options %}
-            {% for option in entry.options %}
-              {% if option is string and option == entry.value %}
-                <p>{{ option }}</p>
-              {% elif option is mapping %}
-                {% if entry.value == option.value %}
-                  <p>{{ option.text or option.label }}</p>
-                {% endif %}
-              {% endif %}
-            {% endfor %}
-          {% elif entry.type == 'date' %}
-            <p>{{ entry.value.strftime('%Y-%m-%d') if entry.value else '' }}</p>
-          {% else %}
-            {% if entry.value is not none %}
-              <p>{{ entry.value }}</p>
-            {% endif %}
-          {% endif %}
-        </div>
-      </div>
-    {% else %}
-      {# Updated fallback: only entry.id or entry.name, no entry.entry_name #}
-      {% set field_id = entry.id | default(entry.name) %}
-      <label for="{{ field_id }}" class="form-label fw-semibold">
-        {{ entry.label }}
-        {% if entry.required %}
-          <span class="text-danger">*</span>
-        {% endif %}
-      </label>
+    {# Use the provided entry.id or entry.name as the field identifier #}
+    {% set field_id = entry.id if (entry.id is defined and entry.id) else (entry.name if (entry.name is defined and entry.name) else '') %}
 
-      {% if entry.type == 'textarea' %}
-        <textarea class="form-control" id="{{ field_id }}" name="{{ field_id }}"
-                  {% if entry.required %}required{% endif %}>{{ entry.value or '' }}</textarea>
-      {% elif entry.type == 'select' and entry.options %}
-        <select class="form-select" id="{{ field_id }}" name="{{ field_id }}"
-                {% if entry.required %}required{% endif %}>
-          <option value="">-- Select {{ entry.label }} --</option>
+    <label for="{{ field_id }}" class="form-label fw-semibold">
+      {{ entry.label }}
+      {% if entry.required and not read_only %}
+        <span class="text-danger">*</span>
+      {% endif %}
+    </label>
+
+    {% if read_only and entry.type != 'readonly' %}
+      {# Read-only display for view mode - always show as plain text #}
+      <div class="form-control-plaintext">
+        {% if entry.type == 'checkbox' %}
+          <i class="fas fa-{{ 'check' if entry.value else 'times' }}"></i> {{ 'Yes' if entry.value else 'No' }}
+        {% elif entry.type == 'select' and entry.options %}
           {% for option in entry.options %}
-            {% if option is string %}
-              <option value="{{ option }}" {% if entry.value == option %}selected{% endif %}>
-                {{ option }}
-              </option>
-            {% elif option is mapping %}
-              <option value="{{ option.value }}" {% if entry.value == option.value %}selected{% endif %}>
-                {{ option.text or option.label }}
-              </option>
+            {% if option is string and option == entry.value %}
+              {{ option }}
+            {% elif option is mapping and entry.value == option.value %}
+              {{ option.text or option.label }}
             {% endif %}
           {% endfor %}
-        </select>
-      {% elif entry.type == 'checkbox' %}
-        <div class="form-check">
-          <input type="checkbox" class="form-check-input" id="{{ field_id }}" name="{{ field_id }}"
-                 {% if entry.value %}checked{% endif %}>
-          <label class="form-check-label" for="{{ field_id }}">{{ entry.label }}</label>
-        </div>
-      {% elif entry.type == 'date' %}
-        <input type="date" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
-               value="{{ entry.value }}" {% if entry.required %}required{% endif %}>
-      {% elif entry.type == 'number' %}
-        <input type="number" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
-               value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
-      {% elif entry.type == 'readonly' %}
-        <div class="form-control-plaintext">{{ entry.value }}</div>
-      {% elif entry.type == 'autocomplete' %}
-        <input type="text" class="form-control autocomplete-input" id="{{ field_id }}" name="{{ field_id }}"
-               value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}
-               data-options="{{ entry.options|tojson if entry.options else '[]' }}">
-      {% else %}
-        <input type="text" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
-               value="{{ entry.value or '' }}" {% if entry.required %}required{% endif %}>
-      {% endif %}
+        {% elif entry.type == 'date' and entry.value %}
+          {{ entry.value.strftime('%Y-%m-%d') if entry.value is not string else entry.value }}
+        {% else %}
+          {{ entry.value or '' }}
+        {% endif %}
+      </div>
+    {% elif entry.type == 'readonly' or field_id == 'id' %}
+      {# Always read-only fields like ID #}
+      <div class="form-control-plaintext">{{ entry.value or '' }}</div>
+    {% elif entry.type == 'textarea' %}
+      <textarea class="form-control" id="{{ field_id }}" name="{{ field_id }}"
+                {% if entry.required %}required{% endif %}>{{ entry.value or '' }}</textarea>
+    {% elif entry.type == 'select' and entry.options %}
+      <select class="form-select" id="{{ field_id }}" name="{{ field_id }}"
+              {% if entry.required %}required{% endif %}>
+        <option value="">-- Select {{ entry.label }} --</option>
+        {% for option in entry.options %}
+          {% if option is string %}
+            <option value="{{ option }}" {% if entry.value == option %}selected{% endif %}>
+              {{ option }}
+            </option>
+          {% elif option is mapping %}
+            <option value="{{ option.value }}" {% if entry.value == option.value %}selected{% endif %}>
+              {{ option.text or option.label }}
+            </option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    {% elif entry.type == 'checkbox' %}
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="{{ field_id }}" name="{{ field_id }}"
+               {% if entry.value %}checked{% endif %}>
+        <label class="form-check-label" for="{{ field_id }}">{{ entry.label }}</label>
+      </div>
+    {% elif entry.type == 'date' %}
+      <input type="date" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
+             value="{{ entry.value }}"
+             {% if entry.required %}required{% endif %}>
+    {% elif entry.type == 'number' %}
+      <input type="number" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
+             value="{{ entry.value or '' }}"
+             {% if entry.required %}required{% endif %}>
+    {% elif entry.type == 'autocomplete' %}
+      <input type="text" class="form-control autocomplete-input" id="{{ field_id }}" name="{{ field_id }}"
+             value="{{ entry.value or '' }}"
+             {% if entry.required %}required{% endif %}
+             data-options="{{ entry.options|tojson if entry.options else '[]' }}">
+    {% else %}
+      <input type="text" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
+             value="{{ entry.value or '' }}"
+             {% if entry.required %}required{% endif %}>
+    {% endif %}
 
-      {% if entry.help_text %}
-        <div class="form-text text-muted">{{ entry.help_text }}</div>
-      {% endif %}
+    {% if entry.help_text and not read_only %}
+      <div class="form-text text-muted">{{ entry.help_text }}</div>
     {% endif %}
   </div>
 {% endmacro %}
