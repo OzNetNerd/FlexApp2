@@ -1,6 +1,6 @@
 # app/routes/api/relationships.py
 
-from flask import Blueprint
+from flask import Blueprint, request
 
 from app.services.relationship_service import RelationshipService
 from app.utils.app_logging import get_logger
@@ -46,3 +46,21 @@ def get_contact_opportunities(contact_id: int):
 @json_endpoint
 def get_opportunity_companies(opportunity_id: int):
     return RelationshipService.get_opportunity_companies(opportunity_id)
+
+
+@relationships_api_bp.route("/create", methods=["POST"])
+@json_endpoint
+def create_relationship():
+    """Create a relationship between entities"""
+    data = request.json
+    entity1_type = data.get("entity1_type")
+    entity1_id = data.get("entity1_id")
+    entity2_type = data.get("entity2_type")
+    entity2_id = data.get("entity2_id")
+    relationship_type = data.get("relationship_type", "Related")
+
+    success, relationship, message = RelationshipService.create_relationship(
+        entity1_type, entity1_id, entity2_type, entity2_id, relationship_type
+    )
+
+    return {"success": success, "message": message}
