@@ -2,19 +2,97 @@
 {% import 'macros/entity.html' as entity %}
 
 {% call layout.tab_pane('related') %}
-  {% if notable_id and notable_type %}
-    {% set entity_url = '/' + notable_type.lower() + 's' %}
+  <div class="related-entities-container">
+    <h3 class="section-title">Related Entities</h3>
 
-    {{ entity.render_entity_table(
-      [{'id': notable_id, 'type': notable_type}],
-      'Related ' + notable_type,
-      [
-        {'key': 'type', 'label': 'Entity Type'},
-        {'key': 'id', 'label': 'Entity ID'}
-      ],
-      entity_url
-    ) }}
-  {% else %}
-    {{ entity.render_empty_state('No related entity associated with this task.') }}
-  {% endif %}
+    <div class="row">
+      <!-- Companies Autocomplete Field -->
+      <div class="col-md-4 mb-3">
+        <label for="companies-input" class="form-label">Companies</label>
+        <input type="text"
+               id="companies-input"
+               class="form-control"
+               placeholder="Search for companies..."
+               data-initial="{{ related_companies|default('[]') }}">
+      </div>
+
+      <!-- Partners Autocomplete Field (Placeholder) -->
+      <div class="col-md-4 mb-3">
+        <label for="partners-input" class="form-label">Partners</label>
+        <input type="text"
+               id="partners-input"
+               class="form-control"
+               placeholder="Search for partners..."
+               data-initial="[]">
+        <!-- Comment: Partners entity type not implemented yet -->
+      </div>
+
+      <!-- Opportunities Autocomplete Field -->
+      <div class="col-md-4 mb-3">
+        <label for="opportunities-input" class="form-label">Opportunities</label>
+        <input type="text"
+               id="opportunities-input"
+               class="form-control"
+               placeholder="Search for opportunities..."
+               data-initial="{{ related_opportunities|default('[]') }}">
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { setupAutoComplete } from '/static/js/components/autoComplete.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Custom wrapper to handle the nested data structure
+      const setupAutoCompleteWithDataAdapter = (config) => {
+        // Modified fetching function that handles the nested data structure
+        const originalFetch = window.fetch;
+        window.fetch = async function(url, options) {
+          const response = await originalFetch(url, options);
+
+          // Only modify specific API endpoints
+          if (url.includes('/api/companies') || url.includes('/api/opportunities') || url.includes('/api/partners')) {
+            const originalJson = response.json;
+            response.json = async function() {
+              const json = await originalJson.call(this);
+              // Adapt the response format to what autoComplete.js expects
+              if (json && json.data && json.data.data) {
+                return { data: json.data.data };
+              }
+              return json;
+            };
+          }
+
+          return response;
+        };
+
+        // Call the original setupAutoComplete with our configuration
+        return setupAutoComplete(config);
+      };
+
+      // Set up each autocomplete field with the adapter
+      setupAutoCompleteWithDataAdapter({
+        inputSelector: '#companies-input',
+        dataUrl: '/api/companies',
+        inputName: 'related_company'
+      });
+
+      setupAutoCompleteWithDataAdapter({
+        inputSelector: '#partners-input',
+        dataUrl: '/api/partners', // This endpoint doesn't exist yet
+        inputName: 'related_partner'
+      });
+
+      setupAutoCompleteWithDataAdapter({
+        inputSelector: '#opportunities-input',
+        dataUrl: '/api/opportunities',
+        inputName: 'related_opportunity'
+      });
+
+      // Restore original fetch
+      setTimeout(() => {
+        window.fetch = originalFetch;
+      }, 2000);
+    });
+  </script>
 {% endcall %}
