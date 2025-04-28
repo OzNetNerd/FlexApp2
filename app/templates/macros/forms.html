@@ -1,6 +1,32 @@
-{# macros/forms.html - Form components and fields #}
+{#
+macros/forms.html - Form Components and Field Rendering
+
+This file contains reusable macros for rendering various types of form fields, form sections, and footer buttons in a web application built using Jinja2 templates and Bootstrap. The macros are designed to handle both editable and read-only form states, supporting various input types such as text, select, checkbox, date, number, and autocomplete fields.
+
+The macros are flexible and can be used to dynamically generate form components with consistent layout and styling. They also support optional help text, validation, and customization of column layouts. These macros are designed to be included in other templates to avoid redundancy and maintain a clean, DRY (Don't Repeat Yourself) codebase.
+
+Macros include:
+  - `render_field`: Renders a single form field with customizable types and validation.
+  - `render_fields_row`: Renders a row of form fields.
+  - `render_form_section`: Renders a complete section of a form, including a section title and fields.
+  - `render_footer_buttons`: Renders footer buttons for submitting or canceling a form.
+
+#}
+
 
 {% macro render_field(entry, read_only=false, column_class="col-md-6") %}
+  {#
+  Renders a single form field (e.g., text input, select, checkbox) based on the given entry data, with support for both editable and read-only states.
+
+  Args:
+    entry (dict): The field's data, including its name, label, value, type, and options (e.g., choices for a dropdown).
+    read_only (bool, optional): If True, the field is rendered in a read-only state, preventing user modification. Defaults to False.
+    column_class (str, optional): The Bootstrap column class to apply to the field container for layout purposes. Defaults to "col-md-6".
+
+  Returns:
+    str: The HTML markup for the rendered form field, either in editable or read-only state, including validation, help text, and specific input types.
+  #}
+
   <div class="{{ column_class }} mb-3">
     {% if read_only %}
       <div class="note-item mb-3 p-3 border rounded">
@@ -83,6 +109,16 @@
 {% endmacro %}
 
 {% macro render_fields_row(entries, read_only=false) %}
+  {#
+  Renders a row of form fields, where each field is defined in the provided list of entries, and each field is rendered using the `render_field` macro.
+
+  Args:
+    entries (list): A list of dictionaries, where each dictionary defines a form field's data (e.g., name, label, value, type, etc.).
+    read_only (bool, optional): If True, each field is rendered in a read-only state. Defaults to False.
+
+  Returns:
+    str: The HTML markup for a row of form fields, with each field rendered in its own column according to the layout specified.
+  #}
   <div class="row">
     {% for entry in entries %}
       {{ render_field(entry, read_only=read_only) }}
@@ -91,6 +127,17 @@
 {% endmacro %}
 
 {% macro render_form_section(title, entries, read_only=false) %}
+  {#
+  Renders a complete form section, including a title and a set of form fields, which are rendered by the `render_field` macro. Typically used to group fields under a heading.
+
+  Args:
+    title (str): The title of the form section, which will be displayed above the fields in the section.
+    entries (list): A list of dictionaries, where each dictionary contains the data for a form field (name, label, type, etc.).
+    read_only (bool, optional): If True, fields in the section will be rendered in a read-only state. Defaults to False.
+
+  Returns:
+    str: The HTML markup for the section, including the section title and the fields rendered in either editable or read-only mode.
+  #}
   <div class="form-section mb-4">
     <h5 class="mb-3">{{ title }}</h5>
     <div class="row">
@@ -102,6 +149,16 @@
 {% endmacro %}
 
 {% macro render_footer_buttons(entity=None, read_only=False) %}
+  {#
+  Renders the footer buttons (e.g., "Cancel" and "Save") for a form, conditionally rendering "Create" or "Update" based on the entity's state. The buttons are rendered only in non-read-only mode.
+
+  Args:
+    entity (optional): The entity associated with the form, which is used to check if the form is for creating a new entry or updating an existing one. If no entity is provided, the form is treated as a creation form.
+    read_only (bool, optional): If True, the footer buttons are disabled or not rendered at all, preventing form submission. Defaults to False.
+
+  Returns:
+    str: The HTML markup for the footer buttons (Cancel and Submit) based on the form's action (create or update).
+  #}
   <div class="footer-buttons-container mt-4 d-flex justify-content-end gap-2">
     {% if not read_only %}
       {% if entity and entity.id %}

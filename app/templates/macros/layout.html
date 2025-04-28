@@ -1,7 +1,21 @@
 {# macros/layout.html - Layout components for page structure #}
 
-{# Card component for encapsulating content #}
 {% macro card(title=None, footer=None, header_class="", body_class="", footer_class="", card_class="shadow-sm") %}
+{#
+Renders a reusable card component that encapsulates content, with optional title, body, and footer.
+
+Args:
+  title (str, optional): The title to display in the card header. Defaults to None.
+  footer (str, optional): The content to display in the card footer. Defaults to None.
+  header_class (str, optional): Additional CSS classes for the card header. Defaults to an empty string.
+  body_class (str, optional): Additional CSS classes for the card body. Defaults to an empty string.
+  footer_class (str, optional): Additional CSS classes for the card footer. Defaults to an empty string.
+  card_class (str, optional): Additional CSS classes for the card itself. Defaults to "shadow-sm".
+
+Returns:
+  str: HTML markup for the card component, with the optional title, body, and footer, all wrapped in a styled card container.
+#}
+
 <div class="card mb-4 {{ card_class }}">
   {% if title %}
     <div class="card-header {{ header_class }}">
@@ -19,8 +33,20 @@
 </div>
 {% endmacro %}
 
-{# Tab navigation tabs #}
 {% macro tabs_navigation(tabs) %}
+{#
+Renders the tab navigation for switching between different content tabs.
+
+Args:
+  tabs (list): A list of dictionaries defining the tabs. Each dictionary contains:
+    - name (str): The tab's name.
+    - id (str): The tab's ID.
+    - icon (str, optional): The icon to display next to the tab's name. Defaults to None.
+
+Returns:
+  str: HTML markup for the navigation tabs, with buttons to switch between the tabs.
+#}
+
   <ul class="nav nav-tabs mb-3" id="tabs-nav" role="tablist">
     {% for tab in tabs %}
       <li class="nav-item" role="presentation">
@@ -42,15 +68,33 @@
   </ul>
 {% endmacro %}
 
-{# Tab content container #}
 {% macro tabs_content() %}
+{#
+Renders the container for tab content. This is used to hold the content for each tab.
+
+Args:
+  None
+
+Returns:
+  str: HTML markup for the tab content container, which holds the actual content for the active tab.
+#}
   <div class="tab-content">
     {{ caller() }}
   </div>
 {% endmacro %}
 
-{# Individual tab pane #}
 {% macro tab_pane(id, active=false) %}
+{#
+Renders an individual tab pane, which contains the content for one tab in the tab content container.
+
+Args:
+  id (str): The unique ID for the tab pane, used to link the pane to its corresponding tab.
+  active (bool, optional): If True, this tab pane will be marked as active and visible. Defaults to False.
+
+Returns:
+  str: HTML markup for the tab pane, which is shown when the corresponding tab is selected.
+#}
+
   <div class="tab-pane fade {% if active %}show active{% endif %}"
        id="tab-{{ id }}"
        role="tabpanel"
@@ -59,8 +103,18 @@
   </div>
 {% endmacro %}
 
-{# Section within a tab #}
+
 {% macro section(title, section_class="") %}
+{#
+Renders a section within a tab, which can contain additional content with an optional title.
+
+Args:
+  title (str, optional): The title to display at the top of the section. Defaults to None.
+  section_class (str, optional): Additional CSS classes for the section container. Defaults to an empty string.
+
+Returns:
+  str: HTML markup for the section within a tab, including the title (if provided) and the content.
+#}
   <div class="section mb-4 {{ section_class }}">
     {% if title %}
       <h5 class="section-title mb-3">{{ title }}</h5>

@@ -1,12 +1,48 @@
-{# macros/entity.html - Entity display components #}
+{#
+macros/entity.html - Entity Display Components
+
+This file contains reusable macros for rendering entities in a web application. These macros are designed to display entities (e.g., records, items) in various formats such as tables or lists, and they provide a consistent layout for presenting entity-related data.
+
+The macros support rendering empty states when no entities are available, and they allow customization of how different fields are displayed, including badges for specific values, currency formatting, and standard text fields.
+
+Macros include:
+  - `render_empty_state`: Renders a simple message when no entities are available.
+  - `render_entity_table`: Renders a table of entities with columns defined by the user, including support for badges, currency, and actions.
+  - `render_entity_list`: Renders a list of entities with optional descriptions and a simple layout.
+
+These macros are designed to be reused across different pages where entity data needs to be displayed, promoting consistency and reducing redundant code.
+
+#}
 
 {% macro render_empty_state(message) %}
+{#
+Renders an empty state message when no data or entities are available.
+
+Args:
+  message (str): The message to display in the empty state. This typically explains that no entities or data are available for the current context.
+
+Returns:
+  str: HTML markup for the empty state message wrapped in a styled div.
+#}
+
   <div class="form-control-plaintext bg-light border rounded px-3 py-2">
     {{ message }}
   </div>
 {% endmacro %}
 
 {% macro render_entity_table(entities, entity_type, columns, link_prefix) %}
+{#
+Renders a table displaying a list of entities with customizable columns and actions.
+
+Args:
+  entities (list): A list of entities to be displayed in the table.
+  entity_type (str): The type of entity being displayed (e.g., "Companies", "Users").
+  columns (list): A list of dictionaries that define the columns of the table, including labels, types (e.g., 'badge', 'currency', 'text'), and mappings for specific column values.
+  link_prefix (str): A URL prefix for generating links to entity details (e.g., '/companies').
+
+Returns:
+  str: HTML markup for the entity table with rows corresponding to each entity, displaying the defined columns and actions for each entity.
+#}
   <div class="col-12">
     <label class="form-label fw-semibold">{{ entity_type }}</label>
     {% if entities %}
@@ -57,6 +93,17 @@
 {% endmacro %}
 
 {% macro render_entity_list(entities, entity_type) %}
+{#
+Renders a list of entities with optional descriptions, providing a simple and clean layout.
+
+Args:
+  entities (list): A list of entities to be displayed in the list.
+  entity_type (str): The type of entity being displayed (e.g., "Contacts", "Opportunities").
+
+Returns:
+  str: HTML markup for the entity list with items corresponding to each entity, including their names and descriptions (if available). If no entities exist, an empty state message is rendered instead.
+#}
+
   <div class="col-12">
     <label class="form-label fw-semibold">{{ entity_type }}</label>
     {% if entities %}
