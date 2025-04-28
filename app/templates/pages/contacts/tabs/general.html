@@ -1,0 +1,41 @@
+{% call layout.section('Personal Details') %}
+  <div class="row">
+    {{ forms.render_field({
+      'label': 'ID',
+      'type': 'readonly',
+      'value': id
+    }, read_only=read_only) }}
+
+    {{ forms.render_field({
+      'label': 'First Name',
+      'name': 'first_name',
+      'value': first_name,
+      'required': true
+    }, read_only=read_only) }}
+
+    {{ forms.render_field({
+      'label': 'Last Name',
+      'name': 'last_name',
+      'value': last_name,
+      'required': true
+    }, read_only=read_only) }}
+  </div>
+{% endcall %}
+
+{% call layout.section('Contact Information') %}
+  <div class="row">
+    {{ forms.render_field({
+      'label': 'Email',
+      'name': 'email',
+      'type': 'email',
+      'value': email,
+      'required': true
+    }, read_only=read_only) }}
+
+    {{ forms.render_field({
+      'label': 'Phone Number',
+      'name': 'phone_number',
+      'value': phone_number
+    }, read_only=read_only) }}
+  </div>
+{% endcall %}
