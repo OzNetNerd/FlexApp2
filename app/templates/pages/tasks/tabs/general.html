@@ -1,23 +1,28 @@
-{% call layout.section('Basic Information') %}
-  <div class="row">
-    {{ forms.render_field({
-      'label': 'ID',
-      'type': 'readonly',
-      'value': id
-    }, read_only=read_only) }}
+{% import 'macros/layout.html' as layout %}
+{% import 'macros/forms.html' as forms %}
 
-    {{ forms.render_field({
-      'label': 'Title',
-      'name': 'title',
-      'value': title,
-      'required': true
-    }, read_only=read_only) }}
+{% call layout.tab_pane('general') %}
+  {% call layout.section('Basic Information') %}
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'ID',
+        'type': 'readonly',
+        'value': id
+      }, read_only=read_only) }}
 
-    {{ forms.render_field({
-      'label': 'Description',
-      'name': 'description',
-      'type': 'textarea',
-      'value': description
-    }, read_only=read_only, column_class="col-md-12") }}
-  </div>
+      {{ forms.render_field({
+        'label': 'Title',
+        'name': 'title',
+        'value': title,
+        'required': true
+      }, read_only=read_only) }}
+
+      {{ forms.render_field({
+        'label': 'Description',
+        'name': 'description',
+        'type': 'textarea',
+        'value': description
+      }, read_only=read_only, column_class="col-md-12") }}
+    </div>
+  {% endcall %}
 {% endcall %}

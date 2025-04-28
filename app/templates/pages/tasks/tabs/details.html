@@ -1,39 +1,44 @@
-{% call layout.section('Task Details') %}
-  <div class="row">
-    {{ forms.render_field({
-      'label': 'Status',
-      'name': 'status',
-      'value': status,
-      'type': 'select',
-      'options': [
-        {'value': 'Not Started', 'label': 'Not Started'},
-        {'value': 'In Progress', 'label': 'In Progress'},
-        {'value': 'Completed', 'label': 'Completed'},
-        {'value': 'Deferred', 'label': 'Deferred'},
-        {'value': 'Cancelled', 'label': 'Cancelled'}
-      ]
-    }, read_only=read_only) }}
+{% import 'macros/layout.html' as layout %}
+{% import 'macros/forms.html' as forms %}
 
-    {{ forms.render_field({
-      'label': 'Priority',
-      'name': 'priority',
-      'value': priority,
-      'type': 'select',
-      'options': [
-        {'value': 'Low', 'label': 'Low'},
-        {'value': 'Medium', 'label': 'Medium'},
-        {'value': 'High', 'label': 'High'},
-        {'value': 'Urgent', 'label': 'Urgent'}
-      ]
-    }, read_only=read_only) }}
-  </div>
+{% call layout.tab_pane('details') %}
+  {% call layout.section('Task Details') %}
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'Status',
+        'name': 'status',
+        'value': status,
+        'type': 'select',
+        'options': [
+          {'value': 'Not Started', 'label': 'Not Started'},
+          {'value': 'In Progress', 'label': 'In Progress'},
+          {'value': 'Completed', 'label': 'Completed'},
+          {'value': 'Deferred', 'label': 'Deferred'},
+          {'value': 'Cancelled', 'label': 'Cancelled'}
+        ]
+      }, read_only=read_only) }}
 
-  <div class="row">
-    {{ forms.render_field({
-      'label': 'Due Date',
-      'name': 'due_date',
-      'value': due_date,
-      'type': 'date'
-    }, read_only=read_only) }}
-  </div>
+      {{ forms.render_field({
+        'label': 'Priority',
+        'name': 'priority',
+        'value': priority,
+        'type': 'select',
+        'options': [
+          {'value': 'Low', 'label': 'Low'},
+          {'value': 'Medium', 'label': 'Medium'},
+          {'value': 'High', 'label': 'High'},
+          {'value': 'Urgent', 'label': 'Urgent'}
+        ]
+      }, read_only=read_only) }}
+    </div>
+
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'Due Date',
+        'name': 'due_date',
+        'value': due_date,
+        'type': 'date'
+      }, read_only=read_only) }}
+    </div>
+  {% endcall %}
 {% endcall %}

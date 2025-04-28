@@ -1,15 +1,20 @@
-{% if notable_id and notable_type %}
-  {% set entity_url = '/' + notable_type.lower() + 's' %}
+{% import 'macros/layout.html' as layout %}
+{% import 'macros/entity.html' as entity %}
 
-  {{ entity.render_entity_table(
-    [{'id': notable_id, 'type': notable_type}],
-    'Related ' + notable_type,
-    [
-      {'key': 'type', 'label': 'Entity Type'},
-      {'key': 'id', 'label': 'Entity ID'}
-    ],
-    entity_url
-  ) }}
-{% else %}
-  {{ entity.render_empty_state('No related entity associated with this task.') }}
-{% endif %}
+{% call layout.tab_pane('related') %}
+  {% if notable_id and notable_type %}
+    {% set entity_url = '/' + notable_type.lower() + 's' %}
+
+    {{ entity.render_entity_table(
+      [{'id': notable_id, 'type': notable_type}],
+      'Related ' + notable_type,
+      [
+        {'key': 'type', 'label': 'Entity Type'},
+        {'key': 'id', 'label': 'Entity ID'}
+      ],
+      entity_url
+    ) }}
+  {% else %}
+    {{ entity.render_empty_state('No related entity associated with this task.') }}
+  {% endif %}
+{% endcall %}
