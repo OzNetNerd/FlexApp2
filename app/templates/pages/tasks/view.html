@@ -5,18 +5,17 @@
 
 {% block form_content %}
   {% set tabs = [
-    {'name': 'General', 'id': 'general', 'icon': 'check-circle', 'active': true},
-    {'name': 'Details', 'id': 'details', 'icon': 'list-ul'},
-    {'name': 'Related', 'id': 'related', 'icon': 'link'}
+    {'name': 'Notes', 'id': 'notes', 'icon': 'info-circle', 'active': true, 'template': 'shared_tabs/notes.html'},
+    {'name': 'General', 'id': 'general', 'icon': 'check-circle', 'template': 'pages/tasks/tabs/general.html'},
+    {'name': 'Details', 'id': 'details', 'icon': 'list-ul', 'template': 'pages/tasks/tabs/details.html'},
+    {'name': 'Related', 'id': 'related', 'icon': 'link', 'template': 'pages/tasks/tabs/related.html'}
   ] %}
 
   {{ layout.tabs_navigation(tabs) }}
 
   {% call layout.tabs_content() %}
     {% for tab in tabs %}
-      {% call layout.tab_pane(tab.id, active=tab.active|default(false)) %}
-        {% include 'pages/tasks/tabs/' + tab.id + '.html' %}
-      {% endcall %}
+      {% include tab.template %}
     {% endfor %}
   {% endcall %}
 {% endblock %}

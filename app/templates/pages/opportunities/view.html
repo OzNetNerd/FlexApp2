@@ -5,19 +5,18 @@
 
 {% block form_content %}
   {% set tabs = [
-    {'name': 'General', 'id': 'general', 'icon': 'info-circle', 'active': true},
-    {'name': 'Details', 'id': 'details', 'icon': 'list-ul'},
-    {'name': 'Companies', 'id': 'companies', 'icon': 'building'},
-    {'name': 'Contacts', 'id': 'contacts', 'icon': 'user-circle'}
+    {'name': 'Notes', 'id': 'notes', 'icon': 'info-circle', 'active': true, 'template': 'shared_tabs/notes.html'},
+    {'name': 'General', 'id': 'general', 'icon': 'info-circle', 'active': true, 'template': 'pages/opportunities/tabs/general.html'},
+    {'name': 'Details', 'id': 'details', 'icon': 'list-ul', 'template': 'pages/opportunities/tabs/details.html'},
+    {'name': 'Companies', 'id': 'companies', 'icon': 'building', 'template': 'pages/opportunities/tabs/companies.html'},
+    {'name': 'Contacts', 'id': 'contacts', 'icon': 'user-circle', 'template': 'pages/opportunities/tabs/contacts.html'}
   ] %}
 
   {{ layout.tabs_navigation(tabs) }}
 
   {% call layout.tabs_content() %}
     {% for tab in tabs %}
-      {% call layout.tab_pane(tab.id, active=tab.active|default(false)) %}
-        {% include 'pages/opportunities/tabs/' + tab.id + '.html' %}
-      {% endcall %}
+      {% include tab.template %}
     {% endfor %}
   {% endcall %}
 {% endblock %}

@@ -4,141 +4,19 @@
 {% import 'macros/entity.html' as entity %}
 
 {% block form_content %}
-  {# General Information Tab #}
-  {{ layout.tabs_navigation([
-    {'name': 'Profile', 'id': 'profile', 'icon': 'user'},
-    {'name': 'Account', 'id': 'account', 'icon': 'lock'},
-    {'name': 'Permissions', 'id': 'permissions', 'icon': 'shield-alt'},
-    {'name': 'Activity', 'id': 'activity', 'icon': 'history'}
-  ]) }}
+  {% set tabs = [
+    {'name': 'Notes', 'id': 'notes', 'icon': 'info-circle', 'active': true, 'template': 'shared_tabs/notes.html'},
+    {'name': 'Profile', 'id': 'profile', 'icon': 'user', 'active': true, 'template': 'pages/users/tabs/profile.html'},
+    {'name': 'Account', 'id': 'account', 'icon': 'lock', 'template': 'pages/users/tabs/account.html'},
+    {'name': 'Permissions', 'id': 'permissions', 'icon': 'shield-alt', 'template': 'pages/users/tabs/permissions.html'},
+    {'name': 'Activity', 'id': 'activity', 'icon': 'history', 'template': 'pages/users/tabs/activity.html'}
+  ] %}
+
+  {{ layout.tabs_navigation(tabs) }}
 
   {% call layout.tabs_content() %}
-    {# Profile Tab #}
-    {% call layout.tab_pane('profile', active=true) %}
-      {% call layout.section('User Information') %}
-        <div class="row">
-          {{ forms.render_field({
-            'label': 'ID',
-            'type': 'readonly',
-            'value': id
-          }, read_only=read_only) }}
-
-          {{ forms.render_field({
-            'label': 'Name',
-            'name': 'name',
-            'value': name,
-            'required': true
-          }, read_only=read_only) }}
-        </div>
-      {% endcall %}
-
-      {% call layout.section('Contact Information') %}
-        <div class="row">
-          {{ forms.render_field({
-            'label': 'Email',
-            'name': 'email',
-            'type': 'email',
-            'value': email,
-            'required': true
-          }, read_only=read_only) }}
-        </div>
-      {% endcall %}
-    {% endcall %}
-
-    {# Account Tab #}
-    {% call layout.tab_pane('account') %}
-      {% call layout.section('Account Settings') %}
-        <div class="row">
-          {{ forms.render_field({
-            'label': 'Username',
-            'name': 'username',
-            'value': username,
-            'required': true
-          }, read_only=read_only) }}
-        </div>
-
-        {% if not read_only %}
-          <div class="row">
-            {{ forms.render_field({
-              'label': 'Password',
-              'name': 'password',
-              'type': 'password',
-              'value': '',
-              'help_text': 'Leave blank to keep current password'
-            }, read_only=read_only) }}
-
-            {{ forms.render_field({
-              'label': 'Confirm Password',
-              'name': 'password_confirm',
-              'type': 'password',
-              'value': ''
-            }, read_only=read_only) }}
-          </div>
-        {% endif %}
-      {% endcall %}
-    {% endcall %}
-
-    {# Permissions Tab #}
-    {% call layout.tab_pane('permissions') %}
-      {% call layout.section('System Access') %}
-        <div class="row">
-          {{ forms.render_field({
-            'label': 'Administrator',
-            'name': 'is_admin',
-            'type': 'checkbox',
-            'value': is_admin,
-            'help_text': 'Grant full administrative privileges'
-          }, read_only=read_only) }}
-        </div>
-      {% endcall %}
-
-      {% if user_roles %}
-        {% call layout.section('Roles') %}
-          {{ entity.render_entity_table(
-            user_roles,
-            'Assigned Roles',
-            [
-              {'key': 'name', 'label': 'Role Name'},
-              {'key': 'description', 'label': 'Description'}
-            ],
-            '/roles'
-          ) }}
-        {% endcall %}
-      {% endif %}
-
-      {% if user_permissions %}
-        {% call layout.section('Permissions') %}
-          {{ entity.render_entity_table(
-            user_permissions,
-            'Specific Permissions',
-            [
-              {'key': 'name', 'label': 'Permission'},
-              {'key': 'resource', 'label': 'Resource'},
-              {'key': 'action', 'label': 'Action'}
-            ],
-            '/permissions'
-          ) }}
-        {% endcall %}
-      {% endif %}
-    {% endcall %}
-
-    {# Activity Tab #}
-    {% call layout.tab_pane('activity') %}
-      {% if user_activity and user_activity|length > 0 %}
-        {{ entity.render_entity_table(
-          user_activity,
-          'Recent Activity',
-          [
-            {'key': 'timestamp', 'label': 'Timestamp', 'type': 'datetime'},
-            {'key': 'action', 'label': 'Action'},
-            {'key': 'resource', 'label': 'Resource'},
-            {'key': 'details', 'label': 'Details'}
-          ],
-          '/activity'
-        ) }}
-      {% else %}
-        {{ entity.render_empty_state('No activity records available for this user.') }}
-      {% endif %}
-    {% endcall %}
+    {% for tab in tabs %}
+      {% include tab.template %}
+    {% endfor %}
   {% endcall %}
 {% endblock %}

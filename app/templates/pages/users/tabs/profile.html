@@ -1,0 +1,28 @@
+{% call layout.section('User Information') %}
+  <div class="row">
+    {{ forms.render_field({
+      'label': 'ID',
+      'type': 'readonly',
+      'value': id
+    }, read_only=read_only) }}
+
+    {{ forms.render_field({
+      'label': 'Name',
+      'name': 'name',
+      'value': name,
+      'required': true
+    }, read_only=read_only) }}
+  </div>
+{% endcall %}
+
+{% call layout.section('Contact Information') %}
+  <div class="row">
+    {{ forms.render_field({
+      'label': 'Email',
+      'name': 'email',
+      'type': 'email',
+      'value': email,
+      'required': true
+    }, read_only=read_only) }}
+  </div>
+{% endcall %}

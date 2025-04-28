@@ -1,0 +1,29 @@
+{% call layout.section('Account Settings') %}
+  <div class="row">
+    {{ forms.render_field({
+      'label': 'Username',
+      'name': 'username',
+      'value': username,
+      'required': true
+    }, read_only=read_only) }}
+  </div>
+
+  {% if not read_only %}
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'Password',
+        'name': 'password',
+        'type': 'password',
+        'value': '',
+        'help_text': 'Leave blank to keep current password'
+      }, read_only=read_only) }}
+
+      {{ forms.render_field({
+        'label': 'Confirm Password',
+        'name': 'password_confirm',
+        'type': 'password',
+        'value': ''
+      }, read_only=read_only) }}
+    </div>
+  {% endif %}
+{% endcall %}

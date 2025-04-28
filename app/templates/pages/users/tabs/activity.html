@@ -1,0 +1,15 @@
+{% if user_activity and user_activity|length > 0 %}
+  {{ entity.render_entity_table(
+    user_activity,
+    'Recent Activity',
+    [
+      {'key': 'timestamp', 'label': 'Timestamp', 'type': 'datetime'},
+      {'key': 'action', 'label': 'Action'},
+      {'key': 'resource', 'label': 'Resource'},
+      {'key': 'details', 'label': 'Details'}
+    ],
+    '/activity'
+  ) }}
+{% else %}
+  {{ entity.render_empty_state('No activity records available for this user.') }}
+{% endif %}

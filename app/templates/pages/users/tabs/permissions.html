@@ -1,0 +1,40 @@
+{% call layout.section('System Access') %}
+  <div class="row">
+    {{ forms.render_field({
+      'label': 'Administrator',
+      'name': 'is_admin',
+      'type': 'checkbox',
+      'value': is_admin,
+      'help_text': 'Grant full administrative privileges'
+    }, read_only=read_only) }}
+  </div>
+{% endcall %}
+
+{% if user_roles %}
+  {% call layout.section('Roles') %}
+    {{ entity.render_entity_table(
+      user_roles,
+      'Assigned Roles',
+      [
+        {'key': 'name', 'label': 'Role Name'},
+        {'key': 'description', 'label': 'Description'}
+      ],
+      '/roles'
+    ) }}
+  {% endcall %}
+{% endif %}
+
+{% if user_permissions %}
+  {% call layout.section('Permissions') %}
+    {{ entity.render_entity_table(
+      user_permissions,
+      'Specific Permissions',
+      [
+        {'key': 'name', 'label': 'Permission'},
+        {'key': 'resource', 'label': 'Resource'},
+        {'key': 'action', 'label': 'Action'}
+      ],
+      '/permissions'
+    ) }}
+  {% endcall %}
+{% endif %}
