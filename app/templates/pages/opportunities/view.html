@@ -4,132 +4,20 @@
 {% import 'macros/entity.html' as entity %}
 
 {% block form_content %}
-  {# General Information Tab #}
-  {{ layout.tabs_navigation([
-    {'name': 'General', 'id': 'general', 'icon': 'info-circle'},
+  {% set tabs = [
+    {'name': 'General', 'id': 'general', 'icon': 'info-circle', 'active': true},
     {'name': 'Details', 'id': 'details', 'icon': 'list-ul'},
     {'name': 'Companies', 'id': 'companies', 'icon': 'building'},
     {'name': 'Contacts', 'id': 'contacts', 'icon': 'user-circle'}
-  ]) }}
+  ] %}
+
+  {{ layout.tabs_navigation(tabs) }}
 
   {% call layout.tabs_content() %}
-    {# General Tab #}
-    {% call layout.tab_pane('general', active=true) %}
-      {% call layout.section('Basic Information') %}
-        <div class="row">
-          {{ forms.render_field({
-            'label': 'ID',
-            'type': 'readonly',
-            'value': id
-          }, read_only=read_only) }}
-
-          {{ forms.render_field({
-            'label': 'Opportunity Name',
-            'name': 'name',
-            'value': name,
-            'required': true
-          }, read_only=read_only) }}
-
-          {{ forms.render_field({
-            'label': 'Description',
-            'name': 'description',
-            'type': 'textarea',
-            'value': description
-          }, read_only=read_only, column_class="col-md-12") }}
-        </div>
+    {% for tab in tabs %}
+      {% call layout.tab_pane(tab.id, active=tab.active|default(false)) %}
+        {% include 'pages/opportunities/tabs/' + tab.id + '.html' %}
       {% endcall %}
-    {% endcall %}
-
-    {# Details Tab #}
-    {% call layout.tab_pane('details') %}
-      {% call layout.section('Status Information') %}
-        <div class="row">
-          {{ forms.render_field({
-            'label': 'Status',
-            'name': 'status',
-            'value': status,
-            'type': 'select',
-            'options': [
-              {'value': 'New', 'label': 'New'},
-              {'value': 'Qualified', 'label': 'Qualified'},
-              {'value': 'Proposal', 'label': 'Proposal'},
-              {'value': 'Won', 'label': 'Won'},
-              {'value': 'Lost', 'label': 'Lost'}
-            ]
-          }, read_only=read_only) }}
-
-          {{ forms.render_field({
-            'label': 'Stage',
-            'name': 'stage',
-            'value': stage,
-            'type': 'select',
-            'options': [
-              {'value': 'Prospecting', 'label': 'Prospecting'},
-              {'value': 'Qualification', 'label': 'Qualification'},
-              {'value': 'Needs Analysis', 'label': 'Needs Analysis'},
-              {'value': 'Value Proposition', 'label': 'Value Proposition'},
-              {'value': 'Decision Makers', 'label': 'Decision Makers'},
-              {'value': 'Proposal/Price Quote', 'label': 'Proposal/Price Quote'},
-              {'value': 'Negotiation/Review', 'label': 'Negotiation/Review'},
-              {'value': 'Closed Won', 'label': 'Closed Won'},
-              {'value': 'Closed Lost', 'label': 'Closed Lost'}
-            ]
-          }, read_only=read_only) }}
-        </div>
-      {% endcall %}
-
-      {% call layout.section('Financial Information') %}
-        <div class="row">
-          {{ forms.render_field({
-            'label': 'Value',
-            'name': 'value',
-            'value': value,
-            'type': 'currency'
-          }, read_only=read_only) }}
-
-          {{ forms.render_field({
-            'label': 'Close Date',
-            'name': 'close_date',
-            'value': close_date,
-            'type': 'date'
-          }, read_only=read_only) }}
-        </div>
-      {% endcall %}
-    {% endcall %}
-
-    {# Companies Tab #}
-    {% call layout.tab_pane('companies') %}
-      {% if company_id %}
-        {{ entity.render_entity_table(
-          [{'id': company_id, 'name': company_name}],
-          'Associated Company',
-          [
-            {'key': 'name', 'label': 'Company Name'}
-          ],
-          '/companies'
-        ) }}
-      {% else %}
-        {{ entity.render_empty_state('No company associated with this opportunity.') }}
-      {% endif %}
-    {% endcall %}
-
-    {# Contacts Tab #}
-    {% call layout.tab_pane('contacts') %}
-      {% if opportunity_contacts and opportunity_contacts|length > 0 %}
-        {{ entity.render_entity_table(
-          opportunity_contacts,
-          'Associated Contacts',
-          [
-            {'key': 'name', 'label': 'Name'},
-            {'key': 'title', 'label': 'Title'},
-            {'key': 'email', 'label': 'Email'},
-            {'key': 'phone', 'label': 'Phone'}
-          ],
-          '/contacts'
-        ) }}
-      {% else %}
-        {{ entity.render_empty_state('No contacts associated with this opportunity.') }}
-      {% endif %}
-    {% endcall %}
+    {% endfor %}
   {% endcall %}
 {% endblock %}

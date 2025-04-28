@@ -1,23 +1,22 @@
-{% extends 'layouts/base.html' %}
-{% from 'macros/card.html' import card %}
+{% extends 'layouts/crud_base_view.html' %}
+{% import 'macros/layout.html' as layout %}
+{% import 'macros/forms.html' as forms %}
+{% import 'macros/entity.html' as entity %}
 
-{% block title %}{{ entity.name }}{% endblock %}
+{% block form_content %}
+  {% set tabs = [
+    {'name': 'General', 'id': 'general', 'icon': 'check-circle', 'active': true},
+    {'name': 'Details', 'id': 'details', 'icon': 'list-ul'},
+    {'name': 'Related', 'id': 'related', 'icon': 'link'}
+  ] %}
 
-{% block content %}
-  {% call card(title=entity.name) %}
-    <dl class="row">
-      <dt class="col-sm-3">Description</dt>
-      <dd class="col-sm-9">{{ entity.description }}</dd>
-    </dl>
-    <a href="{{ url_for('companies_bp.edit', entity_id=entity.id) }}"
-       class="btn btn-primary">Edit</a>
-    <form
-      method="post"
-      action="{{ url_for('companies_bp.delete', entity_id=entity.id) }}"
-      class="d-inline"
-    >
-      {{ csrf_input|safe }}
-      <button class="btn btn-danger">Delete</button>
-    </form>
+  {{ layout.tabs_navigation(tabs) }}
+
+  {% call layout.tabs_content() %}
+    {% for tab in tabs %}
+      {% call layout.tab_pane(tab.id, active=tab.active|default(false)) %}
+        {% include 'pages/tasks/tabs/' + tab.id + '.html' %}
+      {% endcall %}
+    {% endfor %}
   {% endcall %}
 {% endblock %}

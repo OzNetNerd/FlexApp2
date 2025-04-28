@@ -1,0 +1,53 @@
+{% call layout.section('Status Information') %}
+  <div class="row">
+    {{ forms.render_field({
+      'label': 'Status',
+      'name': 'status',
+      'value': status,
+      'type': 'select',
+      'options': [
+        {'value': 'New', 'label': 'New'},
+        {'value': 'Qualified', 'label': 'Qualified'},
+        {'value': 'Proposal', 'label': 'Proposal'},
+        {'value': 'Won', 'label': 'Won'},
+        {'value': 'Lost', 'label': 'Lost'}
+      ]
+    }, read_only=read_only) }}
+
+    {{ forms.render_field({
+      'label': 'Stage',
+      'name': 'stage',
+      'value': stage,
+      'type': 'select',
+      'options': [
+        {'value': 'Prospecting', 'label': 'Prospecting'},
+        {'value': 'Qualification', 'label': 'Qualification'},
+        {'value': 'Needs Analysis', 'label': 'Needs Analysis'},
+        {'value': 'Value Proposition', 'label': 'Value Proposition'},
+        {'value': 'Decision Makers', 'label': 'Decision Makers'},
+        {'value': 'Proposal/Price Quote', 'label': 'Proposal/Price Quote'},
+        {'value': 'Negotiation/Review', 'label': 'Negotiation/Review'},
+        {'value': 'Closed Won', 'label': 'Closed Won'},
+        {'value': 'Closed Lost', 'label': 'Closed Lost'}
+      ]
+    }, read_only=read_only) }}
+  </div>
+{% endcall %}
+
+{% call layout.section('Financial Information') %}
+  <div class="row">
+    {{ forms.render_field({
+      'label': 'Value',
+      'name': 'value',
+      'value': value,
+      'type': 'currency'
+    }, read_only=read_only) }}
+
+    {{ forms.render_field({
+      'label': 'Close Date',
+      'name': 'close_date',
+      'value': close_date,
+      'type': 'date'
+    }, read_only=read_only) }}
+  </div>
+{% endcall %}
