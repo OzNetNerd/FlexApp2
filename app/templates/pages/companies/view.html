@@ -5,7 +5,7 @@
 
 {% block form_content %}
   {% set tabs = [
-    {'name': 'General', 'id': 'general', 'icon': 'info-circle', 'active': true, 'template': 'pages/companies/tabs/about.html'},
+    {'name': 'General', 'id': 'general', 'icon': 'info-circle', 'active': action != 'view', 'template': 'pages/companies/tabs/about.html'},
     {'name': 'Contacts', 'id': 'contacts', 'icon': 'address-book', 'template': 'pages/companies/tabs/contacts.html'},
     {'name': 'Opportunities', 'id': 'opportunities', 'icon': 'chart-line', 'template': 'pages/companies/tabs/opportunities.html'},
     {'name': 'Capabilities', 'id': 'capabilities', 'icon': 'tools', 'template': 'pages/companies/tabs/capabilities.html'}
@@ -41,4 +41,21 @@
     </div>
     </form>
   {% endif %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get the active tab button
+    const activeTab = document.querySelector('.nav-link.active[data-bs-toggle="tab"]');
+    if (activeTab) {
+      // Get the target tab pane ID
+      const targetId = activeTab.getAttribute('data-bs-target');
+      // Find the tab pane
+      const tabPane = document.querySelector(targetId);
+      if (tabPane) {
+        // Add the necessary classes to make it visible
+        tabPane.classList.add('show', 'active');
+      }
+    }
+  });
+</script>
 {% endblock %}

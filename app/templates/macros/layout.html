@@ -42,6 +42,7 @@ Args:
     - name (str): The tab's name.
     - id (str): The tab's ID.
     - icon (str, optional): The icon to display next to the tab's name. Defaults to None.
+    - active (bool, optional): Whether this tab should be active by default. Defaults to False.
 
 Returns:
   str: HTML markup for the navigation tabs, with buttons to switch between the tabs.
@@ -50,14 +51,14 @@ Returns:
   <ul class="nav nav-tabs mb-3" id="tabs-nav" role="tablist">
     {% for tab in tabs %}
       <li class="nav-item" role="presentation">
-        <button class="nav-link {% if loop.first %}active{% endif %}"
+        <button class="nav-link {% if tab.active|default(loop.first) %}active{% endif %}"
                 id="tab-{{ tab.id | default(tab.name | lower | replace(' ', '-')) }}-tab"
                 data-bs-toggle="tab"
                 data-bs-target="#tab-{{ tab.id | default(tab.name | lower | replace(' ', '-')) }}"
                 type="button"
                 role="tab"
                 aria-controls="tab-{{ tab.id | default(tab.name | lower | replace(' ', '-')) }}"
-                aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+                aria-selected="{% if tab.active|default(loop.first) %}true{% else %}false{% endif %}">
           {% if tab.icon %}
             <i class="fas fa-{{ tab.icon }} me-1"></i>
           {% endif %}
