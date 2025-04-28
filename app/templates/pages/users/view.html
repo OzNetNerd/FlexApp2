@@ -76,17 +76,6 @@
           </div>
         {% endif %}
       {% endcall %}
-
-      {% call layout.section('Account Status') %}
-        <div class="row">
-          {{ forms.render_field({
-            'label': 'Last Login',
-            'name': 'last_login',
-            'type': 'datetime',
-            'value': last_login
-          }, read_only=true) }}
-        </div>
-      {% endcall %}
     {% endcall %}
 
     {# Permissions Tab #}
