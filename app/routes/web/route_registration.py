@@ -3,7 +3,6 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
-import json
 
 from flask import Blueprint, redirect, request, url_for
 from flask_login import login_required
@@ -51,9 +50,10 @@ def default_crud_templates(entity_table_name: str) -> CrudTemplates:
     plural = get_table_plural_name(entity_table_name).lower()
     return CrudTemplates(
         index=f"pages/{plural}/index.html",
-        create=f"pages/{plural}/create.html",
+        # Use same view.html template for all operations
+        create=f"pages/{plural}/view.html",
         view=f"pages/{plural}/view.html",
-        edit=f"pages/{plural}/edit.html",
+        edit=f"pages/{plural}/view.html",
     )
 
 
@@ -91,18 +91,23 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
             context = TableContext(entity_table_name=config.entity_table_name)
         elif endpoint == CRUDEndpoint.create.value:
             context = EntityContext(
-                entity=None,
+                entity={},  # Empty dict for create
                 entity_table_name=config.entity_table_name,
                 action="create",
                 read_only=False,
+                title=f"Create {config.entity_table_name}",
             )
         elif endpoint in (CRUDEndpoint.view.value, CRUDEndpoint.edit.value):
+            entity_id = kwargs.get("entity_id")
+            title = f"{'View' if endpoint == CRUDEndpoint.view.value else 'Edit'} {config.entity_table_name}"
+
             context = EntityContext(
                 entity=entity,
                 entity_table_name=config.entity_table_name,
                 action=endpoint,
                 entity_id=entity_id,
                 read_only=read_only,
+                title=title,
             )
         else:
             context = SimpleContext(title=config.entity_table_name)
@@ -113,11 +118,20 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         try:
             from flask_wtf.csrf import generate_csrf
             from markupsafe import Markup
+            context.csrf_token = generate_csrf()
             context.csrf_input = Markup(
                 f"<input type=\"hidden\" name=\"csrf_token\" value=\"{generate_csrf()}\">"
             )
         except ImportError:
+            context.csrf_token = ""
             context.csrf_input = ""
+
+        # Set submit URL for form actions
+        if not read_only:
+            if endpoint == CRUDEndpoint.create.value:
+                context.submit_url = url_for(f"{config.blueprint.name}.create")
+            elif endpoint == CRUDEndpoint.edit.value:
+                context.submit_url = url_for(f"{config.blueprint.name}.update", entity_id=entity_id)
 
         # Render the template
         template_path = config.templates.get(

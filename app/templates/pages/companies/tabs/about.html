@@ -4,11 +4,13 @@
 {% call layout.tab_pane('general') %}
   {% call layout.section('About') %}
     <div class="row">
-      {{ forms.render_field({
-        'label': 'ID',
-        'type': 'readonly',
-        'value': id
-      }, read_only=read_only) }}
+      {% if action != 'create' %}
+        {{ forms.render_field({
+          'label': 'ID',
+          'type': 'readonly',
+          'value': id
+        }, read_only=true) }}
+      {% endif %}
 
       {{ forms.render_field({
         'label': 'Company Name',

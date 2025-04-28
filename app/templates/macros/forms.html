@@ -57,7 +57,12 @@ Macros include:
       </div>
     {% else %}
       {% set field_id = entry.id | default(entry.name | default(entry.entry_name)) %}
-      <label for="{{ field_id }}" class="form-label fw-semibold">{{ entry.label }}</label>
+      <label for="{{ field_id }}" class="form-label fw-semibold">
+        {{ entry.label }}
+        {% if entry.required %}
+          <span class="text-danger">*</span>
+        {% endif %}
+      </label>
 
       {% if entry.type == 'textarea' %}
         <textarea class="form-control" id="{{ field_id }}" name="{{ field_id }}"
@@ -148,24 +153,39 @@ Macros include:
   </div>
 {% endmacro %}
 
-{% macro render_footer_buttons(entity=None, read_only=False, current_endpoint=None) %}
+{% macro render_footer_buttons(action="view", entity_id=None, entity_table_name=None, submit_url=None) %}
+  {#
+  Renders appropriate footer buttons based on the current action (view, create, edit).
+
+  Args:
+    action (str): The current action ('view', 'create', or 'edit').
+    entity_id (str): The ID of the entity being viewed/edited.
+    entity_table_name (str): The name of the entity table/model (for URL construction).
+    submit_url (str): The URL to submit the form to (for create/edit actions).
+
+  Returns:
+    str: HTML markup for the appropriate footer buttons.
+  #}
   <div class="footer-buttons-container mt-4 d-flex justify-content-end gap-2">
-    {% if not read_only %}
-      {% if entity and entity.id %}
-        <a href="{{ url_for((current_endpoint or '').rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}" class="btn btn-secondary">
-          <i class="fas fa-times me-1"></i> Cancel
+    {% if action == 'view' %}
+      <a href="{{ url_for(request.blueprint + '.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Back
+      </a>
+      {% if entity_id %}
+        <a href="{{ url_for(request.blueprint + '.edit', entity_id=entity_id) }}" class="btn btn-primary">
+          <i class="fas fa-edit me-1"></i> Edit
         </a>
-        <button type="submit" class="btn btn-primary" form="main-form">
-          <i class="fas fa-save me-1"></i> Update
-        </button>
-      {% else %}
-        <a href="{{ url_for((current_endpoint or '').rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
-          <i class="fas fa-times me-1"></i> Cancel
-        </a>
-        <button type="submit" class="btn btn-primary" form="main-form">
-          <i class="fas fa-save me-1"></i> Create
-        </button>
       {% endif %}
+    {% elif action == 'create' or action == 'edit' %}
+      <a href="{{
+          url_for(request.blueprint + '.view', entity_id=entity_id) if entity_id else
+          url_for(request.blueprint + '.index')
+        }}" class="btn btn-secondary">
+        <i class="fas fa-times me-1"></i> Cancel
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> {{ 'Update' if action == 'edit' else 'Create' }}
+      </button>
     {% endif %}
   </div>
 {% endmacro %}
