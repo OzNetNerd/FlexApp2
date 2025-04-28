@@ -31,12 +31,29 @@ def query_notes():
     if nid:
         filters.append(Note.notable_id == nid)
 
+    # Handle from/to date parameters (ISO format)
+    from_date = request.args.get("from")
+    to_date = request.args.get("to")
+    if from_date and to_date:
+        try:
+            # Parse ISO format strings with timezone consideration
+            start = datetime.fromisoformat(from_date.replace('Z', '+00:00'))
+            end = datetime.fromisoformat(to_date.replace('Z', '+00:00'))
+            logger.info(f"Date filter applied: from={start}, to={end}")
+            filters.append(Note.created_at.between(start, end))
+        except Exception as e:
+            logger.error(f"Error parsing date range: {e}")
+
+    # Legacy date range support
     start = request.args.get("start_date")
     end = request.args.get("end_date")
-    if start and end:
-        s = datetime.strptime(start, "%Y-%m-%d")
-        e = datetime.strptime(end, "%Y-%m-%d") + timedelta(days=1)
-        filters.append(Note.created_at.between(s, e))
+    if start and end and not (from_date and to_date):  # Only use if new format not provided
+        try:
+            s = datetime.strptime(start, "%Y-%m-%d")
+            e = datetime.strptime(end, "%Y-%m-%d") + timedelta(days=1)
+            filters.append(Note.created_at.between(s, e))
+        except Exception as e:
+            logger.error(f"Error parsing legacy date range: {e}")
 
     days = request.args.get("days", type=int)
     if days is not None:
@@ -58,7 +75,6 @@ def query_notes():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 15, type=int)
 
-    # Fix: use keyword arguments instead of positional arguments
     paginated = query.order_by(Note.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
 
     return {"data": [n.to_dict() for n in paginated.items], "total": paginated.total}

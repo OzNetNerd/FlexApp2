@@ -7,6 +7,7 @@ class NotesComponent {
   constructor() {
     this.instances = new Map();
     this.initialized = false;
+    this.activeController = null;
     log('info', 'notesSection.js', 'constructor', '🔄 Unified Notes component created');
     document.addEventListener('DOMContentLoaded', () => this._onDOMContentLoaded());
   }
@@ -20,10 +21,15 @@ class NotesComponent {
     document.querySelectorAll('[id^="notesData"]').forEach(container => {
       const ctrl = this.initNotes(container.id);
       window.notesController = ctrl;
+      this.activeController = ctrl; // Store the active controller
     });
 
     // Listen for dropdown change to toggle custom date range visibility
     document.getElementById('noteFilterSelect').addEventListener('change', this.handleDateRangeVisibility);
+
+    // Listen for changes to date input fields to trigger filtering
+    document.getElementById('dateFrom').addEventListener('change', () => this.filterNotesByDateRange());
+    document.getElementById('dateTo').addEventListener('change', () => this.filterNotesByDateRange());
   }
 
   handleDateRangeVisibility = () => {
@@ -35,6 +41,32 @@ class NotesComponent {
       dateRangeSelectors.classList.add('d-none');
     }
   }
+
+filterNotesByDateRange = () => {
+  const dateFrom = document.getElementById('dateFrom').value;
+  const dateTo = document.getElementById('dateTo').value;
+
+  if (dateFrom && dateTo && this.activeController) {
+    // Create Date objects for start and end in local timezone
+    const startDate = new Date(dateFrom);
+    const endDate = new Date(dateTo);
+
+    // Set to beginning of day in local timezone, then convert to ISO
+    const startISO = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0).toISOString();
+
+    // Set to end of day in local timezone, then convert to ISO
+    const endISO = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59, 59, 999).toISOString();
+
+    // Create the filters object with timezone-aware ISO strings
+    const filtersObj = {
+      from: startISO,
+      to: endISO
+    };
+
+    console.log('Date filter applied:', filtersObj);
+    this.activeController.loadNotes(filtersObj, true);
+  }
+}
 
   initNotes(containerId = 'notesData') {
     const fn = 'initNotes';
