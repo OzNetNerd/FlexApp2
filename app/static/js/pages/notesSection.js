@@ -22,12 +22,18 @@ class NotesComponent {
       window.notesController = ctrl;
     });
 
-    eventSystem.subscribe('tabs.change', ({containerId, activeTab}) => {
-      if (containerId === 'formTabs' && activeTab.toLowerCase() === 'notes') {
-        window.notesController?.showTab();
-        window.notesController?.loadNotes(window.notesController.getState().currentFilters, true);
-      }
-    });
+    // Listen for dropdown change to toggle custom date range visibility
+    document.getElementById('noteFilterSelect').addEventListener('change', this.handleDateRangeVisibility);
+  }
+
+  handleDateRangeVisibility = () => {
+    const filterValue = document.getElementById('noteFilterSelect').value;
+    const dateRangeSelectors = document.getElementById('dateRangeSelectors');
+    if (filterValue === 'custom') {
+      dateRangeSelectors.classList.remove('d-none');
+    } else {
+      dateRangeSelectors.classList.add('d-none');
+    }
   }
 
   initNotes(containerId = 'notesData') {
@@ -47,16 +53,16 @@ class NotesComponent {
     log('info', scriptName, fn, '🔄 Initializing Notes Section', {notableType, notableId, currentUserId});
 
     // UI elements
-    const notesTabPane       = document.getElementById('tab-notes');
-    const notesList          = document.getElementById('notesList');
-    const notesLoading       = document.getElementById('notesLoading');
-    const noteContentField   = document.getElementById('content');
-    const noteFilterSelect   = document.getElementById('noteFilterSelect');
+    const notesTabPane = document.getElementById('tab-notes');
+    const notesList = document.getElementById('notesList');
+    const notesLoading = document.getElementById('notesLoading');
+    const noteContentField = document.getElementById('content');
+    const noteFilterSelect = document.getElementById('noteFilterSelect');
     const dateRangeSelectors = document.getElementById('dateRangeSelectors');
-    const dateFrom           = document.getElementById('dateFrom');
-    const dateTo             = document.getElementById('dateTo');
-    const noteSearchInput    = document.getElementById('noteSearchInput');
-    const submitBtn          = document.getElementById('newNoteSubmit');
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
+    const noteSearchInput = document.getElementById('noteSearchInput');
+    const submitBtn = document.getElementById('newNoteSubmit');
 
     // Status message element
     const statusMessage = document.createElement('div');
@@ -84,11 +90,11 @@ class NotesComponent {
     // Date setup
     const setDefaultDates = () => {
       if (!dateFrom || !dateTo) return;
-      const today   = new Date();
+      const today = new Date();
       const weekAgo = new Date();
       weekAgo.setDate(today.getDate() - 7);
       dateFrom.value = weekAgo.toISOString().split('T')[0];
-      dateTo.value   = today.toISOString().split('T')[0];
+      dateTo.value = today.toISOString().split('T')[0];
     };
     setDefaultDates();
 
@@ -109,7 +115,7 @@ class NotesComponent {
       notesList && (notesList.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm me-2" role="status"></div>Connecting to notes service...</div>');
 
       const qs = new URLSearchParams({ notable_type: notableType, notable_id: notableId });
-      Object.entries(filters).forEach(([k,v]) => v !== '' && qs.append(k, v));
+      Object.entries(filters).forEach(([k, v]) => v !== '' && qs.append(k, v));
       const url = `/api/notes/query?${qs}`;
 
       apiService.get(url)
@@ -164,20 +170,20 @@ class NotesComponent {
         notable_id: notableId,
         user_id: currentUserId
       })
-      .then(res => {
-        noteContentField.value = '';
-        state.notesLoadedForCurrentView = false;
-        loadNotes(state.currentFilters, true);
-        showStatus('Note added successfully!');
-      })
-      .catch(err => {
-        showStatus(`Error adding note: ${err.message}`, 'danger');
-        throw err;
-      })
-      .finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-plus me-1"></i> Add Note';
-      });
+        .then(res => {
+          noteContentField.value = '';
+          state.notesLoadedForCurrentView = false;
+          loadNotes(state.currentFilters, true);
+          showStatus('Note added successfully!');
+        })
+        .catch(err => {
+          showStatus(`Error adding note: ${err.message}`, 'danger');
+          throw err;
+        })
+        .finally(() => {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-plus me-1"></i> Add Note';
+        });
     };
 
     // Attach add-note handler

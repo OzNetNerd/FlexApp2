@@ -11,28 +11,29 @@
        data-script-name="notes_section">
   </div>
 
-  <!-- Notes section filters & search -->
-  <div class="col-12">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="d-flex align-items-center" style="width: 65%;">
-        <select id="noteFilterSelect" class="form-select form-select-sm me-3" style="max-width: 150px;">
-          <option value="7">Last 7 days</option>
-          <option value="30">Last 30 days</option>
-          <option value="0" selected>All notes</option>
-          <option value="custom">Custom range...</option>
-        </select>
-        <div id="dateRangeSelectors" class="d-none d-flex align-items-center flex-grow-1">
-          <input type="date" id="dateFrom" class="form-control form-control-sm me-2" aria-label="From date">
-          <span class="mx-1">to</span>
-          <input type="date" id="dateTo" class="form-control form-control-sm ms-2" aria-label="To date">
-        </div>
-      </div>
-      <div class="input-group" style="max-width: 35%;">
-        <span class="input-group-text"><i class="fas fa-search"></i></span>
-        <input type="search" id="noteSearchInput" class="form-control" placeholder="Search notes...">
+<!-- Notes section filters & search -->
+<div class="col-12">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center" style="width: 65%;">
+      <select id="noteFilterSelect" class="form-select form-select-sm me-3" style="max-width: 150px;">
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+        <option value="0" selected>All notes</option>
+        <option value="custom">Custom range</option>
+      </select>
+      <div id="dateRangeSelectors" class="d-none d-flex align-items-center flex-grow-1">
+        <input type="date" id="dateFrom" class="form-control form-control-sm me-2" aria-label="From date">
+        <span class="mx-1">to</span>
+        <input type="date" id="dateTo" class="form-control form-control-sm ms-2" aria-label="To date">
       </div>
     </div>
+    <div class="input-group" style="max-width: 35%;">
+      <span class="input-group-text"><i class="fas fa-search"></i></span>
+      <input type="search" id="noteSearchInput" class="form-control" placeholder="Search notes...">
+    </div>
   </div>
+</div>
+
 
   <!-- Loading indicator -->
   <div class="col-12">
