@@ -47,6 +47,21 @@
         'template': 'shared_tabs/notes.html'
       }
     ] + tabs %}
+
+    {# Set all other tabs to inactive if in read-only mode #}
+    {% for tab in tabs[1:] %}
+      {% set _ = tab.update({'active': false}) %}
+    {% endfor %}
+  {% endif %}
+
+  {#-- wrap in a form when editing or creating --#}
+  {% if not read_only %}
+    <form method="POST" action="{{ submit_url }}" class="needs-validation" novalidate>
+      {% if csrf_input %}
+        {{ csrf_input }}
+      {% else %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      {% endif %}
   {% endif %}
 
   {{ layout.tabs_navigation(tabs) }}
@@ -57,4 +72,33 @@
       {% include tab.template %}
     {% endfor %}
   {% endcall %}
+
+  {% if not read_only %}
+    <div class="form-actions mt-3">
+      <button type="submit" class="btn btn-primary">
+        {{ 'Save' if action == 'edit' else 'Create' }}
+      </button>
+      <a href="{{ url_for(request.blueprint + '.index') }}" class="btn btn-secondary ms-2">
+        Cancel
+      </a>
+    </div>
+    </form>
+  {% endif %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get the active tab button
+    const activeTab = document.querySelector('.nav-link.active[data-bs-toggle="tab"]');
+    if (activeTab) {
+      // Get the target tab pane ID
+      const targetId = activeTab.getAttribute('data-bs-target');
+      // Find the tab pane
+      const tabPane = document.querySelector(targetId);
+      if (tabPane) {
+        // Add the necessary classes to make it visible
+        tabPane.classList.add('show', 'active');
+      }
+    }
+  });
+</script>
 {% endblock %}
