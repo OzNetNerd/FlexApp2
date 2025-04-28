@@ -148,28 +148,18 @@ Macros include:
   </div>
 {% endmacro %}
 
-{% macro render_footer_buttons(entity=None, read_only=False) %}
-  {#
-  Renders the footer buttons (e.g., "Cancel" and "Save") for a form, conditionally rendering "Create" or "Update" based on the entity's state. The buttons are rendered only in non-read-only mode.
-
-  Args:
-    entity (optional): The entity associated with the form, which is used to check if the form is for creating a new entry or updating an existing one. If no entity is provided, the form is treated as a creation form.
-    read_only (bool, optional): If True, the footer buttons are disabled or not rendered at all, preventing form submission. Defaults to False.
-
-  Returns:
-    str: The HTML markup for the footer buttons (Cancel and Submit) based on the form's action (create or update).
-  #}
+{% macro render_footer_buttons(entity=None, read_only=False, current_endpoint=None) %}
   <div class="footer-buttons-container mt-4 d-flex justify-content-end gap-2">
     {% if not read_only %}
       {% if entity and entity.id %}
-        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}" class="btn btn-secondary">
+        <a href="{{ url_for((current_endpoint or '').rsplit('.', 1)[0] + '.view', entity_id=entity.id) }}" class="btn btn-secondary">
           <i class="fas fa-times me-1"></i> Cancel
         </a>
         <button type="submit" class="btn btn-primary" form="main-form">
           <i class="fas fa-save me-1"></i> Update
         </button>
       {% else %}
-        <a href="{{ url_for(request.endpoint.rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
+        <a href="{{ url_for((current_endpoint or '').rsplit('.', 1)[0] + '.index') }}" class="btn btn-secondary">
           <i class="fas fa-times me-1"></i> Cancel
         </a>
         <button type="submit" class="btn btn-primary" form="main-form">

@@ -171,6 +171,12 @@ def register_crud_routes(config: CrudRouteConfig) -> None:
         methods=["GET", "POST"],
     )
     bp.add_url_rule(
+        rule="/<int:entity_id>",
+        endpoint="update",
+        view_func=route_handler("edit", config),
+        methods=["POST"],
+    )
+    bp.add_url_rule(
         rule="/<int:entity_id>/delete",
         endpoint="delete",
         view_func=route_handler("delete", config),

@@ -227,12 +227,6 @@ class EntityContext(BaseContext):
         logger.info(
             f"📜 Building {self.action!r} page for {blueprint_name!r} blueprint (RO={self.read_only})"
         )
-        # log_instance_vars("EntityContext (_initialize_derived_fields)", self)
-
-        # Log all model instance variables, excluding SQLAlchemy internals
-        log_instance_vars(
-            "Entity model variables", self.entity, exclude=["_sa_instance_state"]
-        )
 
         # Determine a friendly name for the entity
         for key in ("name", "title", "email", "username"):
@@ -247,3 +241,8 @@ class EntityContext(BaseContext):
             logger.info(
                 f"ℹ️ entity_name defaulted to id: {self.entity_name!r}"
             )
+
+        # Log all model instance variables, excluding SQLAlchemy internals
+        log_instance_vars(
+            "Variables being assed to Jinja", self, exclude=["_sa_instance_state"]
+        )
