@@ -1,63 +1,69 @@
-{% call layout.section('Role Information') %}
-  <div class="row">
-    {{ forms.render_field({
-      'label': 'Role',
-      'name': 'role',
-      'value': role
-    }, read_only=read_only) }}
+{# templates/pages/contacts/tabs/professional.html #}
+{% import 'macros/layout.html' as layout %}
+{% import 'macros/forms.html'  as forms %}
 
-    {{ forms.render_field({
-      'label': 'Role Level',
-      'name': 'role_level',
-      'value': role_level
-    }, read_only=read_only) }}
+{% call layout.tab_pane('professional') %}
+  {% call layout.section('Role Information') %}
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'Role',
+        'name': 'role',
+        'value': role
+      }, read_only=read_only) }}
 
-    {{ forms.render_field({
-      'label': 'Role Description',
-      'name': 'role_description',
-      'type': 'textarea',
-      'value': role_description
-    }, read_only=read_only, column_class="col-md-12") }}
-  </div>
-{% endcall %}
+      {{ forms.render_field({
+        'label': 'Role Level',
+        'name': 'role_level',
+        'value': role_level
+      }, read_only=read_only) }}
 
-{% call layout.section('Skills & Expertise') %}
-  <div class="row">
-    {{ forms.render_field({
-      'label': 'Primary Skill Area',
-      'name': 'primary_skill_area',
-      'value': primary_skill_area
-    }, read_only=read_only) }}
+      {{ forms.render_field({
+        'label': 'Role Description',
+        'name': 'role_description',
+        'type': 'textarea',
+        'value': role_description
+      }, read_only=read_only, column_class="col-md-12") }}
+    </div>
+  {% endcall %}
 
-    {{ forms.render_field({
-      'label': 'Skill Level',
-      'name': 'skill_level',
-      'value': skill_level
-    }, read_only=read_only) }}
+  {% call layout.section('Skills & Expertise') %}
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'Primary Skill Area',
+        'name': 'primary_skill_area',
+        'value': primary_skill_area
+      }, read_only=read_only) }}
 
-    {{ forms.render_field({
-      'label': 'Expertise Areas',
-      'name': 'expertise_areas',
-      'type': 'textarea',
-      'value': expertise_areas
-    }, read_only=read_only, column_class="col-md-12") }}
-  </div>
-{% endcall %}
+      {{ forms.render_field({
+        'label': 'Skill Level',
+        'name': 'skill_level',
+        'value': skill_level
+      }, read_only=read_only) }}
 
-{% call layout.section('Responsibilities') %}
-  <div class="row">
-    {{ forms.render_field({
-      'label': 'Team Roles & Responsibilities',
-      'name': 'team_roles_responsibilities',
-      'type': 'textarea',
-      'value': team_roles_responsibilities
-    }, read_only=read_only, column_class="col-md-12") }}
+      {{ forms.render_field({
+        'label': 'Expertise Areas',
+        'name': 'expertise_areas',
+        'type': 'textarea',
+        'value': expertise_areas
+      }, read_only=read_only, column_class="col-md-12") }}
+    </div>
+  {% endcall %}
 
-    {{ forms.render_field({
-      'label': 'Responsibilities',
-      'name': 'responsibilities',
-      'type': 'textarea',
-      'value': responsibilities
-    }, read_only=read_only, column_class="col-md-12") }}
-  </div>
+  {% call layout.section('Responsibilities') %}
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'Team Roles & Responsibilities',
+        'name': 'team_roles_responsibilities',
+        'type': 'textarea',
+        'value': team_roles_responsibilities
+      }, read_only=read_only, column_class="col-md-12") }}
+
+      {{ forms.render_field({
+        'label': 'Responsibilities',
+        'name': 'responsibilities',
+        'type': 'textarea',
+        'value': responsibilities
+      }, read_only=read_only, column_class="col-md-12") }}
+    </div>
+  {% endcall %}
 {% endcall %}

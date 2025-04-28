@@ -1,76 +1,82 @@
-{% call layout.section('Technical Skills') %}
-  <div class="row">
-    {{ forms.render_field({
-      'label': 'Programming Languages',
-      'name': 'programming_languages',
-      'type': 'textarea',
-      'value': programming_languages
-    }, read_only=read_only, column_class="col-md-6") }}
+{# templates/pages/contacts/tabs/technologies.html #}
+{% import 'macros/layout.html' as layout %}
+{% import 'macros/forms.html'  as forms %}
 
-    {{ forms.render_field({
-      'label': 'Cloud Platforms',
-      'name': 'cloud_platforms',
-      'type': 'textarea',
-      'value': cloud_platforms
-    }, read_only=read_only, column_class="col-md-6") }}
-  </div>
+{% call layout.tab_pane('technologies') %}
+  {% call layout.section('Technical Skills') %}
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'Programming Languages',
+        'name': 'programming_languages',
+        'type': 'textarea',
+        'value': programming_languages
+      }, read_only=read_only, column_class="col-md-6") }}
 
-  <div class="row">
-    {{ forms.render_field({
-      'label': 'DevOps Tools',
-      'name': 'devops_tools',
-      'type': 'textarea',
-      'value': devops_tools
-    }, read_only=read_only, column_class="col-md-6") }}
+      {{ forms.render_field({
+        'label': 'Cloud Platforms',
+        'name': 'cloud_platforms',
+        'type': 'textarea',
+        'value': cloud_platforms
+      }, read_only=read_only, column_class="col-md-6") }}
+    </div>
 
-    {{ forms.render_field({
-      'label': 'CI/CD Tools',
-      'name': 'ci_cd_tools',
-      'type': 'textarea',
-      'value': ci_cd_tools
-    }, read_only=read_only, column_class="col-md-6") }}
-  </div>
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'DevOps Tools',
+        'name': 'devops_tools',
+        'type': 'textarea',
+        'value': devops_tools
+      }, read_only=read_only, column_class="col-md-6") }}
 
-  <div class="row">
-    {{ forms.render_field({
-      'label': 'Version Control Systems',
-      'name': 'version_control_systems',
-      'type': 'textarea',
-      'value': version_control_systems
-    }, read_only=read_only, column_class="col-md-6") }}
+      {{ forms.render_field({
+        'label': 'CI/CD Tools',
+        'name': 'ci_cd_tools',
+        'type': 'textarea',
+        'value': ci_cd_tools
+      }, read_only=read_only, column_class="col-md-6") }}
+    </div>
 
-    {{ forms.render_field({
-      'label': 'Monitoring & Logging',
-      'name': 'monitoring_logging',
-      'type': 'textarea',
-      'value': monitoring_logging
-    }, read_only=read_only, column_class="col-md-6") }}
-  </div>
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'Version Control Systems',
+        'name': 'version_control_systems',
+        'type': 'textarea',
+        'value': version_control_systems
+      }, read_only=read_only, column_class="col-md-6") }}
 
-  <div class="row">
-    {{ forms.render_field({
-      'label': 'Technologies Led',
-      'name': 'technologies_led',
-      'type': 'textarea',
-      'value': technologies_led
-    }, read_only=read_only, column_class="col-md-6") }}
+      {{ forms.render_field({
+        'label': 'Monitoring & Logging',
+        'name': 'monitoring_logging',
+        'type': 'textarea',
+        'value': monitoring_logging
+      }, read_only=read_only, column_class="col-md-6") }}
+    </div>
 
-    {{ forms.render_field({
-      'label': 'Other Technologies',
-      'name': 'other_technologies',
-      'type': 'textarea',
-      'value': other_technologies
-    }, read_only=read_only, column_class="col-md-6") }}
-  </div>
-{% endcall %}
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'Technologies Led',
+        'name': 'technologies_led',
+        'type': 'textarea',
+        'value': technologies_led
+      }, read_only=read_only, column_class="col-md-6") }}
 
-{% call layout.section('Certifications') %}
-  <div class="row">
-    {{ forms.render_field({
-      'label': 'Certifications',
-      'name': 'certifications',
-      'type': 'textarea',
-      'value': certifications
-    }, read_only=read_only, column_class="col-md-12") }}
-  </div>
+      {{ forms.render_field({
+        'label': 'Other Technologies',
+        'name': 'other_technologies',
+        'type': 'textarea',
+        'value': other_technologies
+      }, read_only=read_only, column_class="col-md-6") }}
+    </div>
+  {% endcall %}
+
+  {% call layout.section('Certifications') %}
+    <div class="row">
+      {{ forms.render_field({
+        'label': 'Certifications',
+        'name': 'certifications',
+        'type': 'textarea',
+        'value': certifications
+      }, read_only=read_only, column_class="col-md-12") }}
+    </div>
+  {% endcall %}
 {% endcall %}

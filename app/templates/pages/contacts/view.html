@@ -1,9 +1,10 @@
 {% extends 'layouts/crud_base_view.html' %}
-{% import 'macros/layout.html' as layout %}
-{% import 'macros/forms.html' as forms %}
-{% import 'macros/entity.html' as entity %}
+{% import 'macros/layout.html'   as layout %}
+{% import 'macros/forms.html'    as forms %}
+{% import 'macros/entity.html'   as entity %}
 
 {% block form_content %}
+  {#-- build tabs array --#}
   {% set tabs = [
     {'name': 'Notes',        'id': 'notes',        'icon': 'info-circle',   'active': true,  'template': 'shared_tabs/notes.html'},
     {'name': 'General',      'id': 'general',      'icon': 'user-circle',   'active': false, 'template': 'pages/contacts/tabs/general.html'},
@@ -12,14 +13,47 @@
     {'name': 'Technologies', 'id': 'technologies', 'icon': 'laptop-code',    'active': false, 'template': 'pages/contacts/tabs/technologies.html'}
   ] %}
 
+  {#-- only wrap in a form if we're editing/creating --#}
+  {% if not read_only %}
+    <form method="POST" action="{{ submit_url }}" class="needs-validation" novalidate>
+      {% if csrf_input %}
+        {{ csrf_input }}
+      {% else %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      {% endif %}
+  {% endif %}
+
   {{ layout.tabs_navigation(tabs) }}
 
   {% call layout.tabs_content() %}
     {% for tab in tabs %}
-      {% call layout.tab_pane(tab.id, active=tab.active) %}
-        {% include tab.template %}
-      {% endcall %}
+      {# each included template is responsible for its own layout.tab_pane(...) call #}
+      {% include tab.template %}
     {% endfor %}
   {% endcall %}
+
+  {% if not read_only %}
+    <div class="form-actions mt-3">
+      <button type="submit" class="btn btn-primary">
+        {{ 'Save' if action == 'edit' else 'Create' }}
+      </button>
+      <a href="{{ url_for(request.blueprint + '.index') }}" class="btn btn-secondary ms-2">
+        Cancel
+      </a>
+    </div>
+    </form>
+  {% endif %}
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const activeTab = document.querySelector('.nav-link.active[data-bs-toggle="tab"]');
+      if (activeTab) {
+        const targetId = activeTab.getAttribute('data-bs-target');
+        const tabPane = document.querySelector(targetId);
+        if (tabPane) {
+          tabPane.classList.add('show', 'active');
+        }
+      }
+    });
+  </script>
 {% endblock %}
-```
