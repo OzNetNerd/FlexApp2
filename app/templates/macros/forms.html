@@ -1,30 +1,4 @@
-{#
-macros/forms.html - Form Components and Field Rendering
-
-This file contains reusable macros for rendering various types of form fields, form sections, and footer buttons in a web application built using Jinja2 templates and Bootstrap. The macros are designed to handle both editable and read-only form states, supporting various input types such as text, select, checkbox, date, number, and autocomplete fields.
-
-The macros are flexible and can be used to dynamically generate form components with consistent layout and styling. They also support optional help text, validation, and customization of column layouts. These macros are designed to be included in other templates to avoid redundancy and maintain a clean, DRY (Don't Repeat Yourself) codebase.
-
-Macros include:
-  - `render_field`: Renders a single form field with customizable types and validation.
-  - `render_fields_row`: Renders a row of form fields.
-  - `render_form_section`: Renders a complete section of a form, including a section title and fields.
-  - `render_footer_buttons`: Renders footer buttons for submitting or canceling a form.
-#}
-
 {% macro render_field(entry, read_only=false, column_class="col-md-6") %}
-  {#
-  Renders a single form field (e.g., text input, select, checkbox) based on the given entry data, with support for both editable and read-only states.
-
-  Args:
-    entry (dict): The field's data, including its name, label, value, type, and options (e.g., choices for a dropdown).
-    read_only (bool, optional): If True, the field is rendered in a read-only state, preventing user modification. Defaults to False.
-    column_class (str, optional): The Bootstrap column class to apply to the field container for layout purposes. Defaults to "col-md-6".
-
-  Returns:
-    str: The HTML markup for the rendered form field, either in editable or read-only state, including validation, help text, and specific input types.
-  #}
-
   <div class="{{ column_class }} mb-3">
     {# Use the provided entry.id or entry.name as the field identifier #}
     {% set field_id = entry.id if (entry.id is defined and entry.id) else (entry.name if (entry.name is defined and entry.name) else '') %}
@@ -36,28 +10,40 @@ Macros include:
       {% endif %}
     </label>
 
-    {% if read_only and entry.type != 'readonly' %}
-      {# Read-only display for view mode - always show as plain text #}
-      <div class="form-control-plaintext">
-        {% if entry.type == 'checkbox' %}
-          <i class="fas fa-{{ 'check' if entry.value else 'times' }}"></i> {{ 'Yes' if entry.value else 'No' }}
-        {% elif entry.type == 'select' and entry.options %}
+    {% if read_only or entry.type == 'readonly' or field_id == 'id' %}
+      {# Read-only display - show as disabled input for all types except checkboxes, selects, and dates #}
+      {% if entry.type == 'checkbox' %}
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="{{ field_id }}" name="{{ field_id }}"
+                 {% if entry.value %}checked{% endif %} disabled>
+          <label class="form-check-label" for="{{ field_id }}">{{ entry.label }}</label>
+        </div>
+      {% elif entry.type == 'select' and entry.options %}
+        <select class="form-select" id="{{ field_id }}" name="{{ field_id }}" disabled>
           {% for option in entry.options %}
-            {% if option is string and option == entry.value %}
-              {{ option }}
-            {% elif option is mapping and entry.value == option.value %}
-              {{ option.text or option.label }}
+            {% if option is string %}
+              <option value="{{ option }}" {% if entry.value == option %}selected{% endif %}>
+                {{ option }}
+              </option>
+            {% elif option is mapping %}
+              <option value="{{ option.value }}" {% if entry.value == option.value %}selected{% endif %}>
+                {{ option.text or option.label }}
+              </option>
             {% endif %}
           {% endfor %}
-        {% elif entry.type == 'date' and entry.value %}
-          {{ entry.value.strftime('%Y-%m-%d') if entry.value is not string else entry.value }}
-        {% else %}
-          {{ entry.value or '' }}
-        {% endif %}
-      </div>
-    {% elif entry.type == 'readonly' or field_id == 'id' %}
-      {# Always read-only fields like ID #}
-      <div class="form-control-plaintext">{{ entry.value or '' }}</div>
+        </select>
+      {% elif entry.type == 'textarea' %}
+        <textarea class="form-control" id="{{ field_id }}" name="{{ field_id }}" disabled>{{ entry.value or '' }}</textarea>
+      {% elif entry.type == 'date' %}
+        <input type="date" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
+               value="{{ entry.value }}" disabled>
+      {% elif entry.type == 'number' %}
+        <input type="number" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
+               value="{{ entry.value or '' }}" disabled>
+      {% else %}
+        <input type="text" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
+               value="{{ entry.value or '' }}" disabled>
+      {% endif %}
     {% elif entry.type == 'textarea' %}
       <textarea class="form-control" id="{{ field_id }}" name="{{ field_id }}"
                 {% if entry.required %}required{% endif %}>{{ entry.value or '' }}</textarea>
@@ -104,50 +90,6 @@ Macros include:
 
     {% if entry.help_text and not read_only %}
       <div class="form-text text-muted">{{ entry.help_text }}</div>
-    {% endif %}
-  </div>
-{% endmacro %}
-
-{% macro render_fields_row(entries, read_only=false) %}
-  {# Renders a row of form fields using render_field #}
-  <div class="row">
-    {% for entry in entries %}
-      {{ render_field(entry, read_only=read_only) }}
-    {% endfor %}
-  </div>
-{% endmacro %}
-
-{% macro render_form_section(title, entries, read_only=false) %}
-  {# Renders a section heading plus fields #}
-  <div class="form-section mb-4">
-    <h5 class="mb-3">{{ title }}</h5>
-    <div class="row">
-      {% for entry in entries %}
-        {{ render_field(entry, read_only=read_only) }}
-      {% endfor %}
-    </div>
-  </div>
-{% endmacro %}
-
-{% macro render_footer_buttons(action="view", entity_id=None, entity_table_name=None, submit_url=None) %}
-  {# Renders action buttons based on view/create/edit #}
-  <div class="footer-buttons-container mt-4 d-flex justify-content-end gap-2">
-    {% if action == 'view' %}
-      <a href="{{ url_for(request.blueprint + '.index') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left me-1"></i> Back
-      </a>
-      {% if entity_id %}
-        <a href="{{ url_for(request.blueprint + '.edit', entity_id=entity_id) }}" class="btn btn-primary">
-          <i class="fas fa-edit me-1"></i> Edit
-        </a>
-      {% endif %}
-    {% elif action in ['create','edit'] %}
-      <a href="{{ url_for(request.blueprint + '.view', entity_id=entity_id) if entity_id else url_for(request.blueprint + '.index') }}" class="btn btn-secondary">
-        <i class="fas fa-times me-1"></i> Cancel
-      </a>
-      <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save me-1"></i> {{ 'Update' if action=='edit' else 'Create' }}
-      </button>
     {% endif %}
   </div>
 {% endmacro %}
