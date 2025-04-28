@@ -4,21 +4,19 @@
 {% import 'macros/entity.html' as entity %}
 
 {% block form_content %}
-  {# General Information Tab #}
-  {{ layout.tabs_navigation([
-    {'name': 'Notes', 'id': 'notes', 'icon': 'info-circle', 'active': true},
-    {'name': 'General', 'id': 'general', 'icon': 'info-circle'},
-    {'name': 'Contacts', 'id': 'contacts', 'icon': 'address-book'},
-    {'name': 'Opportunities', 'id': 'opportunities', 'icon': 'chart-line'},
-    {'name': 'Capabilities', 'id': 'capabilities', 'icon': 'tools'}
-  ]) }}
+  {% set tabs = [
+    {'name': 'Notes', 'id': 'notes', 'icon': 'info-circle', 'active': true, 'template': 'shared_tabs/notes.html'},
+    {'name': 'General', 'id': 'general', 'icon': 'info-circle', 'template': 'pages/companies/tabs/about.html'},
+    {'name': 'Contacts', 'id': 'contacts', 'icon': 'address-book', 'template': 'pages/companies/tabs/contacts.html'},
+    {'name': 'Opportunities', 'id': 'opportunities', 'icon': 'chart-line', 'template': 'pages/companies/tabs/opportunities.html'},
+    {'name': 'Capabilities', 'id': 'capabilities', 'icon': 'tools', 'template': 'pages/companies/tabs/capabilities.html'}
+  ] %}
+
+  {{ layout.tabs_navigation(tabs) }}
 
   {% call layout.tabs_content() %}
-    {% include 'shared_tabs/notes.html' %}
-    {% include 'pages/companies/tabs/about.html' %}
-    {% include 'pages/companies/tabs/contacts.html' %}
-    {% include 'pages/companies/tabs/opportunities.html' %}
-    {% include 'pages/companies/tabs/capabilities.html' %}
-
+    {% for tab in tabs %}
+      {% include tab.template %}
+    {% endfor %}
   {% endcall %}
 {% endblock %}
