@@ -4,16 +4,52 @@
 {% import 'macros/entity.html'   as entity %}
 
 {% block form_content %}
-  {#-- build tabs array --#}
+  {#-- build the base tabs array --#}
   {% set tabs = [
-    {'name': 'Notes',        'id': 'notes',        'icon': 'info-circle',   'active': true,  'template': 'shared_tabs/notes.html'},
-    {'name': 'General',      'id': 'general',      'icon': 'user-circle',   'active': false, 'template': 'pages/contacts/tabs/general.html'},
-    {'name': 'Professional', 'id': 'professional', 'icon': 'briefcase',     'active': false, 'template': 'pages/contacts/tabs/professional.html'},
-    {'name': 'Companies',    'id': 'companies',    'icon': 'building',      'active': false, 'template': 'pages/contacts/tabs/companies.html'},
-    {'name': 'Technologies', 'id': 'technologies', 'icon': 'laptop-code',    'active': false, 'template': 'pages/contacts/tabs/technologies.html'}
+    {
+      'name': 'General',
+      'id': 'general',
+      'icon': 'user-circle',
+      'active': not read_only,
+      'template': 'pages/contacts/tabs/general.html'
+    },
+    {
+      'name': 'Professional',
+      'id': 'professional',
+      'icon': 'briefcase',
+      'active': false,
+      'template': 'pages/contacts/tabs/professional.html'
+    },
+    {
+      'name': 'Companies',
+      'id': 'companies',
+      'icon': 'building',
+      'active': false,
+      'template': 'pages/contacts/tabs/companies.html'
+    },
+    {
+      'name': 'Technologies',
+      'id': 'technologies',
+      'icon': 'laptop-code',
+      'active': false,
+      'template': 'pages/contacts/tabs/technologies.html'
+    }
   ] %}
 
-  {#-- only wrap in a form if we're editing/creating --#}
+  {#-- prepend Notes tab only in read-only (view) mode --#}
+  {% if read_only %}
+    {% set tabs = [
+      {
+        'name': 'Notes',
+        'id': 'notes',
+        'icon': 'info-circle',
+        'active': true,
+        'template': 'shared_tabs/notes.html'
+      }
+    ] + tabs %}
+  {% endif %}
+
+  {#-- wrap in a form when editing or creating --#}
   {% if not read_only %}
     <form method="POST" action="{{ submit_url }}" class="needs-validation" novalidate>
       {% if csrf_input %}
@@ -27,7 +63,7 @@
 
   {% call layout.tabs_content() %}
     {% for tab in tabs %}
-      {# each included template is responsible for its own layout.tab_pane(...) call #}
+      {# each included template must call layout.tab_pane() itself #}
       {% include tab.template %}
     {% endfor %}
   {% endcall %}

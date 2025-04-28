@@ -1,22 +1,82 @@
 {% extends 'layouts/crud_base_view.html' %}
-{% import 'macros/layout.html' as layout %}
-{% import 'macros/forms.html' as forms %}
-{% import 'macros/entity.html' as entity %}
+{% import 'macros/layout.html'   as layout %}
+{% import 'macros/forms.html'    as forms %}
+{% import 'macros/entity.html'   as entity %}
 
 {% block form_content %}
+  {#-- build the base tabs array --#}
   {% set tabs = [
-    {'name': 'Notes', 'id': 'notes', 'icon': 'info-circle', 'active': true, 'template': 'shared_tabs/notes.html'},
-    {'name': 'Profile', 'id': 'profile', 'icon': 'user', 'active': true, 'template': 'pages/users/tabs/profile.html'},
-    {'name': 'Account', 'id': 'account', 'icon': 'lock', 'template': 'pages/users/tabs/account.html'},
-    {'name': 'Permissions', 'id': 'permissions', 'icon': 'shield-alt', 'template': 'pages/users/tabs/permissions.html'},
-    {'name': 'Activity', 'id': 'activity', 'icon': 'history', 'template': 'pages/users/tabs/activity.html'}
+    {
+      'name': 'Profile',
+      'id': 'profile',
+      'icon': 'user',
+      'active': not read_only,
+      'template': 'pages/users/tabs/profile.html'
+    },
+    {
+      'name': 'Account',
+      'id': 'account',
+      'icon': 'lock',
+      'active': false,
+      'template': 'pages/users/tabs/account.html'
+    },
+    {
+      'name': 'Permissions',
+      'id': 'permissions',
+      'icon': 'shield-alt',
+      'active': false,
+      'template': 'pages/users/tabs/permissions.html'
+    },
+    {
+      'name': 'Activity',
+      'id': 'activity',
+      'icon': 'history',
+      'active': false,
+      'template': 'pages/users/tabs/activity.html'
+    }
   ] %}
+
+  {#-- prepend Notes tab only in read-only (view) mode --#}
+  {% if read_only %}
+    {% set tabs = [
+      {
+        'name': 'Notes',
+        'id': 'notes',
+        'icon': 'info-circle',
+        'active': true,
+        'template': 'shared_tabs/notes.html'
+      }
+    ] + tabs %}
+  {% endif %}
+
+  {#-- wrap in a form when editing or creating --#}
+  {% if not read_only %}
+    <form method="POST" action="{{ submit_url }}" class="needs-validation" novalidate>
+      {% if csrf_input %}
+        {{ csrf_input }}
+      {% else %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      {% endif %}
+  {% endif %}
 
   {{ layout.tabs_navigation(tabs) }}
 
   {% call layout.tabs_content() %}
     {% for tab in tabs %}
+      {# each included template must call layout.tab_pane() itself #}
       {% include tab.template %}
     {% endfor %}
   {% endcall %}
+
+  {% if not read_only %}
+    <div class="form-actions mt-3">
+      <button type="submit" class="btn btn-primary">
+        {{ 'Save' if action == 'edit' else 'Create' }}
+      </button>
+      <a href="{{ url_for(request.blueprint + '.index') }}" class="btn btn-secondary ms-2">
+        Cancel
+      </a>
+    </div>
+    </form>
+  {% endif %}
 {% endblock %}

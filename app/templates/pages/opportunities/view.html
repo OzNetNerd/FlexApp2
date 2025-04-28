@@ -1,21 +1,59 @@
 {% extends 'layouts/crud_base_view.html' %}
-{% import 'macros/layout.html' as layout %}
-{% import 'macros/forms.html' as forms %}
-{% import 'macros/entity.html' as entity %}
+{% import 'macros/layout.html'   as layout %}
+{% import 'macros/forms.html'    as forms %}
+{% import 'macros/entity.html'   as entity %}
 
 {% block form_content %}
+  {#-- build the base tabs array --#}
   {% set tabs = [
-    {'name': 'Notes', 'id': 'notes', 'icon': 'info-circle', 'active': true, 'template': 'shared_tabs/notes.html'},
-    {'name': 'General', 'id': 'general', 'icon': 'info-circle', 'active': true, 'template': 'pages/opportunities/tabs/general.html'},
-    {'name': 'Details', 'id': 'details', 'icon': 'list-ul', 'template': 'pages/opportunities/tabs/details.html'},
-    {'name': 'Companies', 'id': 'companies', 'icon': 'building', 'template': 'pages/opportunities/tabs/companies.html'},
-    {'name': 'Contacts', 'id': 'contacts', 'icon': 'user-circle', 'template': 'pages/opportunities/tabs/contacts.html'}
+    {
+      'name': 'General',
+      'id': 'general',
+      'icon': 'info-circle',
+      'active': not read_only,
+      'template': 'pages/opportunities/tabs/general.html'
+    },
+    {
+      'name': 'Details',
+      'id': 'details',
+      'icon': 'list-ul',
+      'active': false,
+      'template': 'pages/opportunities/tabs/details.html'
+    },
+    {
+      'name': 'Companies',
+      'id': 'companies',
+      'icon': 'building',
+      'active': false,
+      'template': 'pages/opportunities/tabs/companies.html'
+    },
+    {
+      'name': 'Contacts',
+      'id': 'contacts',
+      'icon': 'user-circle',
+      'active': false,
+      'template': 'pages/opportunities/tabs/contacts.html'
+    }
   ] %}
+
+  {#-- prepend Notes tab only in read-only (view) mode --#}
+  {% if read_only %}
+    {% set tabs = [
+      {
+        'name': 'Notes',
+        'id': 'notes',
+        'icon': 'info-circle',
+        'active': true,
+        'template': 'shared_tabs/notes.html'
+      }
+    ] + tabs %}
+  {% endif %}
 
   {{ layout.tabs_navigation(tabs) }}
 
   {% call layout.tabs_content() %}
     {% for tab in tabs %}
+      {# each included template must call layout.tab_pane() itself #}
       {% include tab.template %}
     {% endfor %}
   {% endcall %}
