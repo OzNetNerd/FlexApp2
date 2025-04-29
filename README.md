@@ -9,6 +9,8 @@ clear && flask --app app.app run
 ```
 
 
+
+
 Commands
 
 ```
@@ -99,6 +101,10 @@ Extract constants
 
 # Research
 Defensive programming?
+
+# todo
+
+replace `render_template` with `render_safely`
 
 # SImplified code - register_page_route
 

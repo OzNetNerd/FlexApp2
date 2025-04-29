@@ -39,6 +39,12 @@ def review_item(item_id: int) -> Dict[str, Any]:
     item = srs_service.schedule_review(item_id, rating)
     return item.to_dict()
 
+@srs_api_bp.route("/stats", methods=["GET"])
+def get_srs_stats():
+    """Get current SRS system statistics."""
+    return srs_service.get_stats()
+
+
 
 # This route can be removed as it's redundant with the default index route from ApiCrudRouteConfig
 # @srs_api_bp.route("/items", methods=["GET"])
