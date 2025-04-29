@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from datetime import datetime, UTC
 from app.models.pages.srs import SRS, ReviewHistory
@@ -88,12 +88,12 @@ def due_cards():
     )
 
 
-# Review card route
 @srs_bp.route("/<int:item_id>/review", methods=["GET", "POST"])
 @login_required
 def review_item(item_id):
     """Web route for reviewing an SRS item."""
     item = srs_service.get_by_id(item_id)
+    is_batch = 'batch' in request.args
 
     if not item:
         flash("Card not found", "error")
@@ -103,18 +103,18 @@ def review_item(item_id):
         rating = int(request.form.get("rating", 0))
         item = srs_service.schedule_review(item_id, rating)
 
-        # Record review history
-        history = ReviewHistory(
-            srs_item_id=item_id,
-            rating=rating,
-            interval=item.interval,
-            ease_factor=item.ease_factor
-        )
-        history.save()
-
         flash("Card reviewed successfully", "success")
 
-        # If there are more due cards, go to the next one
+        # If this is part of a batch review, get next from session queue
+        if is_batch and session.get('review_queue'):
+            next_id = session['review_queue'][0]
+            session['review_queue'] = session['review_queue'][1:]
+            return redirect(url_for('srs_bp.review_item', item_id=next_id, batch=True))
+        elif is_batch and not session.get('review_queue'):
+            flash("You've completed the batch review!", "success")
+            return redirect(url_for('srs_bp.dashboard'))
+
+        # Otherwise handle as normal
         next_due = srs_service.get_next_due_item_id(item_id)
         if next_due:
             return redirect(url_for('srs_bp.review_item', item_id=next_due))
@@ -125,12 +125,17 @@ def review_item(item_id):
     next_item_id = srs_service.get_next_due_item_id(item_id)
     prev_item_id = srs_service.get_prev_item_id(item_id)
 
+    # Get remaining batch items count if this is a batch review
+    remaining_count = len(session.get('review_queue', [])) + 1 if is_batch else 0
+
     return render_template(
         "pages/srs/review.html",
         card=item,
         title="Review Card",
         next_item_id=next_item_id,
-        prev_item_id=prev_item_id
+        prev_item_id=prev_item_id,
+        is_batch=is_batch,
+        remaining_count=remaining_count
     )
 
 
@@ -312,3 +317,136 @@ def review_by_strategy(strategy):
 
     # Redirect to first card in queue
     return redirect(url_for('srs_bp.review_item', item_id=cards[0].id, batch=True))
+
+
+@srs_bp.route("/cards", methods=["GET"])
+@login_required
+def filtered_cards():
+    """View cards with filtering options."""
+    # Get filter parameters from request
+    filters = {
+        'due_only': 'due_only' in request.args,
+        'category': request.args.get('category'),
+        'search': request.args.get('search'),
+        'sort_by': request.args.get('sort_by', 'next_review_at'),
+        'sort_order': request.args.get('sort_order', 'asc')
+    }
+
+    # Advanced filters
+    if request.args.get('min_interval'):
+        filters['min_interval'] = float(request.args.get('min_interval'))
+    if request.args.get('max_interval'):
+        filters['max_interval'] = float(request.args.get('max_interval'))
+    if request.args.get('min_ease'):
+        filters['min_ease'] = float(request.args.get('min_ease'))
+    if request.args.get('max_ease'):
+        filters['max_ease'] = float(request.args.get('max_ease'))
+
+    # Get filtered cards
+    cards = srs_service.get_filtered_cards(filters)
+
+    # Get category counts for sidebar
+    category_counts = srs_service.count_by_type()
+    due_category_counts = srs_service.count_due_by_type()
+
+    # Count cards by learning stage
+    learning_stages = {
+        'new': len(srs_service.get_cards_by_learning_stage('new')),
+        'learning': len(srs_service.get_cards_by_learning_stage('learning')),
+        'reviewing': len(srs_service.get_cards_by_learning_stage('reviewing')),
+        'mastered': len(srs_service.get_cards_by_learning_stage('mastered'))
+    }
+
+    # Count cards by difficulty
+    difficulty_counts = {
+        'hard': len(srs_service.get_cards_by_difficulty('hard')),
+        'medium': len(srs_service.get_cards_by_difficulty('medium')),
+        'easy': len(srs_service.get_cards_by_difficulty('easy'))
+    }
+
+    # Count cards by performance
+    performance_counts = {
+        'struggling': len(srs_service.get_cards_by_performance('struggling')),
+        'average': len(srs_service.get_cards_by_performance('average')),
+        'strong': len(srs_service.get_cards_by_performance('strong'))
+    }
+
+    # Prepare template data
+    template_data = {
+        'cards': cards,
+        'title': 'Filtered Cards',
+        'filters': filters,
+        'category_counts': category_counts,
+        'due_category_counts': due_category_counts,
+        'due_today': srs_service.count_due_today(),
+        'total_cards': srs_service.count_total(),
+        'learning_stages': learning_stages,
+        'difficulty_counts': difficulty_counts,
+        'performance_counts': performance_counts,
+        'now': datetime.now(UTC)  # For comparing with due dates
+    }
+
+    return render_template("pages/srs/filtered_cards.html", **template_data)
+
+
+@srs_bp.route("/batch-action", methods=["POST"])
+@login_required
+def batch_action():
+    """Perform batch actions on selected cards."""
+    selected_ids = request.form.getlist('selected_cards')
+    action = request.form.get('batch_action')
+
+    if not selected_ids:
+        flash("No cards were selected", "warning")
+        return redirect(request.referrer or url_for('srs_bp.dashboard'))
+
+    if action == 'review':
+        # Start review session with selected cards
+        session['review_queue'] = selected_ids
+        return redirect(url_for('srs_bp.review_batch'))
+    elif action == 'reset':
+        # Reset progress for selected cards
+        for card_id in selected_ids:
+            card = srs_service.get_by_id(int(card_id))
+            if card:
+                update_data = {
+                    'interval': 0,
+                    'ease_factor': DEFAULT_EASE_FACTOR,
+                    'review_count': 0,
+                    'successful_reps': 0,
+                    'next_review_at': datetime.now(UTC),
+                    'last_reviewed_at': None,
+                    'last_rating': None
+                }
+                srs_service.update(card, update_data)
+        flash(f"Reset progress for {len(selected_ids)} cards", "success")
+    elif action == 'delete':
+        # Delete selected cards
+        count = 0
+        for card_id in selected_ids:
+            card = srs_service.get_by_id(int(card_id))
+            if card:
+                card.delete()
+                count += 1
+        flash(f"Deleted {count} cards", "success")
+
+    # Redirect back to previous page
+    return redirect(request.referrer or url_for('srs_bp.dashboard'))
+
+
+@srs_bp.route("/review-batch", methods=["GET"])
+@login_required
+def review_batch():
+    """Review a batch of selected cards."""
+    # Get queue from session
+    review_queue = session.get('review_queue', [])
+
+    if not review_queue:
+        flash("No cards in review queue", "warning")
+        return redirect(url_for('srs_bp.dashboard'))
+
+    # Get first card ID and remove from queue
+    card_id = review_queue[0]
+    session['review_queue'] = review_queue[1:]
+
+    return redirect(url_for('srs_bp.review_item', item_id=card_id, batch=True))

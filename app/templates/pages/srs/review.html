@@ -1,0 +1,99 @@
+# Add these sections to your existing view.html file
+
+# Add this just below the card-header in the question card:
+{% if is_batch %}
+<div class="batch-review-status bg-light p-2 rounded mb-3">
+  <div class="d-flex justify-content-between align-items-center">
+    <span class="text-muted">
+      <i class="bi bi-layers"></i> Batch review: Card {{ remaining_count }} of {{ remaining_count + session.review_queue|length }}
+    </span>
+    <div>
+      <a href="{{ url_for('srs_bp.filtered_cards') }}" class="btn btn-sm btn-outline-secondary">
+        Exit Review
+      </a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+# Add this after all existing script blocks:
+<script>
+  // Update the toggleAnswer function
+  function toggleAnswer() {
+    const answerContainer = document.getElementById('answer-container');
+    const showBtn = document.getElementById('show-answer-btn');
+    const visible = !answerContainer.classList.contains('d-none');
+    answerContainer.classList.toggle('d-none');
+    showBtn.textContent = visible ? 'Show Answer (Space)' : 'Hide Answer (Space)';
+  }
+
+  // Update the keyboard shortcuts section
+  document.addEventListener('keydown', function (event) {
+    // Add keys 0-5 for ratings
+    if (
+      document.activeElement.tagName !== 'TEXTAREA' &&
+      document.activeElement.tagName !== 'SELECT' &&
+      !isNaN(parseInt(event.key)) &&
+      parseInt(event.key) >= 0 &&
+      parseInt(event.key) <= 5
+    ) {
+      updateRating(event.key);
+      event.preventDefault();
+    }
+
+    // Add Enter key to submit when rating is selected
+    if (event.key === 'Enter' && !document.getElementById('submit-btn').disabled) {
+      document.getElementById('review-form').submit();
+      event.preventDefault();
+    }
+
+    // Update the show answer button to indicate space shortcut
+    document.getElementById('show-answer-btn').textContent =
+      document.getElementById('answer-container').classList.contains('d-none') ?
+      'Show Answer (Space)' : 'Hide Answer (Space)';
+  });
+</script>
+
+<!-- Add keyboard shortcuts help tooltip -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1030;">
+  <div class="toast align-items-center border-0 bg-dark text-white" role="alert" aria-live="assertive" aria-atomic="true" id="shortcuts-toast">
+    <div class="d-flex">
+      <div class="toast-body">
+        <strong>Keyboard Shortcuts</strong><br>
+        <div class="row mt-2">
+          <div class="col-6">
+            <small>Space: Show/Hide Answer<br>
+            0-5: Select Rating<br>
+            Enter: Submit Review</small>
+          </div>
+          <div class="col-6">
+            <small>Shift+→: Next Card<br>
+            Shift+←: Previous Card<br>
+            H: Show This Help</small>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Show keyboard shortcuts toast when H key is pressed
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'h' || event.key === 'H') {
+      const toast = new bootstrap.Toast(document.getElementById('shortcuts-toast'));
+      toast.show();
+    }
+  });
+
+  // Show toast briefly on page load to notify user of keyboard shortcuts
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+      const toast = new bootstrap.Toast(document.getElementById('shortcuts-toast'), {
+        delay: 3000
+      });
+      toast.show();
+    }, 1500);
+  });
+</script>

@@ -1,0 +1,592 @@
+{% extends "layouts/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-3">
+    <!-- Filter Panel -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Filter Cards</h5>
+      </div>
+      <div class="card-body">
+        <form id="filter-form" method="GET" action="{{ url_for('srs_bp.filtered_cards') }}">
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="due_only" name="due_only"
+                    {% if filters.due_only %}checked{% endif %}>
+              <label class="form-check-label" for="due_only">
+                Due cards only
+              </label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Category</label>
+            <select class="form-select" name="category">
+              <option value="">All Categories</option>
+              <option value="company" {% if filters.category == 'company' %}selected{% endif %}>Companies</option>
+              <option value="contact" {% if filters.category == 'contact' %}selected{% endif %}>Contacts</option>
+              <option value="opportunity" {% if filters.category == 'opportunity' %}selected{% endif %}>Opportunities</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Search</label>
+            <input type="text" class="form-control" name="search" value="{{ filters.search or '' }}"
+                   placeholder="Search question or answer...">
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-link btn-sm p-0" data-bs-toggle="collapse"
+                      data-bs-target="#advancedFilters">
+                Advanced Filters
+              </button>
+              <button type="button" class="btn btn-link btn-sm p-0" id="clear-filters">
+                Clear All
+              </button>
+            </div>
+          </div>
+
+          <div class="collapse" id="advancedFilters">
+            <div class="mb-3">
+              <label class="form-label">Interval Range (days)</label>
+              <div class="row g-2">
+                <div class="col-6">
+                  <input type="number" class="form-control" name="min_interval" min="0" step="0.1"
+                         value="{{ filters.min_interval or '' }}" placeholder="Min">
+                </div>
+                <div class="col-6">
+                  <input type="number" class="form-control" name="max_interval" min="0" step="0.1"
+                         value="{{ filters.max_interval or '' }}" placeholder="Max">
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Ease Factor Range</label>
+              <div class="row g-2">
+                <div class="col-6">
+                  <input type="number" class="form-control" name="min_ease" min="1.3" max="2.5" step="0.1"
+                         value="{{ filters.min_ease or '' }}" placeholder="Min">
+                </div>
+                <div class="col-6">
+                  <input type="number" class="form-control" name="max_ease" min="1.3" max="2.5" step="0.1"
+                         value="{{ filters.max_ease or '' }}" placeholder="Max">
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Sort By</label>
+              <select class="form-select" name="sort_by">
+                <option value="next_review_at" {% if filters.sort_by == 'next_review_at' %}selected{% endif %}>Next Review</option>
+                <option value="interval" {% if filters.sort_by == 'interval' %}selected{% endif %}>Interval</option>
+                <option value="ease_factor" {% if filters.sort_by == 'ease_factor' %}selected{% endif %}>Ease Factor</option>
+                <option value="review_count" {% if filters.sort_by == 'review_count' %}selected{% endif %}>Review Count</option>
+                <option value="created_at" {% if filters.sort_by == 'created_at' %}selected{% endif %}>Date Added</option>
+              </select>
+              <div class="mt-2">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="sort_order" id="sort_asc" value="asc"
+                         {% if filters.sort_order != 'desc' %}checked{% endif %}>
+                  <label class="form-check-label" for="sort_asc">Ascending</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="sort_order" id="sort_desc" value="desc"
+                         {% if filters.sort_order == 'desc' %}checked{% endif %}>
+                  <label class="form-check-label" for="sort_desc">Descending</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-funnel"></i> Apply Filters
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Category Stats Panel -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Categories</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          <a href="{{ url_for('srs_bp.filtered_cards') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            All Cards
+            <span class="badge bg-primary rounded-pill">{{ total_cards }}</span>
+          </a>
+          <a href="{{ url_for('srs_bp.filtered_cards', due_only=1) }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            Due Today
+            <span class="badge bg-danger rounded-pill">{{ due_today }}</span>
+          </a>
+          <a href="{{ url_for('srs_bp.filtered_cards', category='company') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            Companies
+            <div>
+              <span class="badge bg-secondary rounded-pill me-1">{{ category_counts.company }}</span>
+              <span class="badge bg-danger rounded-pill">{{ due_category_counts.company }}</span>
+            </div>
+          </a>
+          <a href="{{ url_for('srs_bp.filtered_cards', category='contact') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            Contacts
+            <div>
+              <span class="badge bg-secondary rounded-pill me-1">{{ category_counts.contact }}</span>
+              <span class="badge bg-danger rounded-pill">{{ due_category_counts.contact }}</span>
+            </div>
+          </a>
+          <a href="{{ url_for('srs_bp.filtered_cards', category='opportunity') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            Opportunities
+            <div>
+              <span class="badge bg-secondary rounded-pill me-1">{{ category_counts.opportunity }}</span>
+              <span class="badge bg-danger rounded-pill">{{ due_category_counts.opportunity }}</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Learning Stage Filters -->
+    <div class="card border-0 shadow-sm mt-4">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Learning Stages</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          <a href="{{ url_for('srs_bp.cards_by_learning_stage', stage='new') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
+                    {% if filters.get('learning_stage') == 'new' %}active bg-light fw-bold{% endif %}">
+            <div>
+              <i class="bi bi-star me-2"></i> New Cards
+            </div>
+            <span class="badge bg-info rounded-pill">{{ learning_stages.new|default(0) }}</span>
+          </a>
+          <a href="{{ url_for('srs_bp.cards_by_learning_stage', stage='learning') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
+                    {% if filters.get('learning_stage') == 'learning' %}active bg-light fw-bold{% endif %}">
+            <div>
+              <i class="bi bi-book me-2"></i> Learning
+            </div>
+            <span class="badge bg-primary rounded-pill">{{ learning_stages.learning|default(0) }}</span>
+          </a>
+          <a href="{{ url_for('srs_bp.cards_by_learning_stage', stage='reviewing') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
+                    {% if filters.get('learning_stage') == 'reviewing' %}active bg-light fw-bold{% endif %}">
+            <div>
+              <i class="bi bi-arrow-repeat me-2"></i> Reviewing
+            </div>
+            <span class="badge bg-warning rounded-pill">{{ learning_stages.reviewing|default(0) }}</span>
+          </a>
+          <a href="{{ url_for('srs_bp.cards_by_learning_stage', stage='mastered') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
+                    {% if filters.get('learning_stage') == 'mastered' %}active bg-light fw-bold{% endif %}">
+            <div>
+              <i class="bi bi-award me-2"></i> Mastered
+            </div>
+            <span class="badge bg-success rounded-pill">{{ learning_stages.mastered|default(0) }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Difficulty Filters -->
+    <div class="card border-0 shadow-sm mt-4">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">By Difficulty</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          <a href="{{ url_for('srs_bp.cards_by_difficulty', difficulty='hard') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
+                    {% if filters.get('difficulty') == 'hard' %}active bg-light fw-bold{% endif %}">
+            <div>
+              <i class="bi bi-emoji-frown me-2"></i> Hard Cards
+            </div>
+            <span class="badge bg-danger rounded-pill">{{ difficulty_counts.hard|default(0) }}</span>
+          </a>
+          <a href="{{ url_for('srs_bp.cards_by_difficulty', difficulty='medium') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
+                    {% if filters.get('difficulty') == 'medium' %}active bg-light fw-bold{% endif %}">
+            <div>
+              <i class="bi bi-emoji-neutral me-2"></i> Medium Difficulty
+            </div>
+            <span class="badge bg-warning rounded-pill">{{ difficulty_counts.medium|default(0) }}</span>
+          </a>
+          <a href="{{ url_for('srs_bp.cards_by_difficulty', difficulty='easy') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
+                    {% if filters.get('difficulty') == 'easy' %}active bg-light fw-bold{% endif %}">
+            <div>
+              <i class="bi bi-emoji-smile me-2"></i> Easy Cards
+            </div>
+            <span class="badge bg-success rounded-pill">{{ difficulty_counts.easy|default(0) }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Filters -->
+    <div class="card border-0 shadow-sm mt-4">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">By Performance</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          <a href="{{ url_for('srs_bp.cards_by_performance', performance='struggling') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
+                    {% if filters.get('performance') == 'struggling' %}active bg-light fw-bold{% endif %}">
+            <div>
+              <i class="bi bi-exclamation-triangle me-2"></i> Struggling
+            </div>
+            <span class="badge bg-danger rounded-pill">{{ performance_counts.struggling|default(0) }}</span>
+          </a>
+          <a href="{{ url_for('srs_bp.cards_by_performance', performance='average') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
+                    {% if filters.get('performance') == 'average' %}active bg-light fw-bold{% endif %}">
+            <div>
+              <i class="bi bi-bar-chart me-2"></i> Average
+            </div>
+            <span class="badge bg-warning rounded-pill">{{ performance_counts.average|default(0) }}</span>
+          </a>
+          <a href="{{ url_for('srs_bp.cards_by_performance', performance='strong') }}"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
+                    {% if filters.get('performance') == 'strong' %}active bg-light fw-bold{% endif %}">
+            <div>
+              <i class="bi bi-graph-up me-2"></i> Strong
+            </div>
+            <span class="badge bg-success rounded-pill">{{ performance_counts.strong|default(0) }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Review Strategies -->
+    <div class="card border-0 shadow-sm mt-4">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Review Strategies</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          <a href="{{ url_for('srs_bp.review_by_strategy', strategy='due_mix') }}"
+             class="list-group-item list-group-item-action">
+            <div>
+              <i class="bi bi-shuffle me-2"></i> Mixed Categories
+            </div>
+            <small class="text-muted">Balanced review across categories</small>
+          </a>
+          <a href="{{ url_for('srs_bp.review_by_strategy', strategy='priority_first') }}"
+             class="list-group-item list-group-item-action">
+            <div>
+              <i class="bi bi-alarm me-2"></i> Overdue First
+            </div>
+            <small class="text-muted">Start with most overdue cards</small>
+          </a>
+          <a href="{{ url_for('srs_bp.review_by_strategy', strategy='hard_cards_first') }}"
+             class="list-group-item list-group-item-action">
+            <div>
+              <i class="bi bi-patch-exclamation me-2"></i> Hard Cards Focus
+            </div>
+            <small class="text-muted">Prioritize difficult cards</small>
+          </a>
+          <a href="{{ url_for('srs_bp.review_by_strategy', strategy='mastery_boost') }}"
+             class="list-group-item list-group-item-action">
+            <div>
+              <i class="bi bi-trophy me-2"></i> Mastery Boost
+            </div>
+            <small class="text-muted">Cards close to mastery</small>
+          </a>
+          <a href="{{ url_for('srs_bp.review_by_strategy', strategy='struggling_focus') }}"
+             class="list-group-item list-group-item-action">
+            <div>
+              <i class="bi bi-bandaid me-2"></i> Struggling Focus
+            </div>
+            <small class="text-muted">Cards with low success rate</small>
+          </a>
+          <a href="{{ url_for('srs_bp.review_by_strategy', strategy='new_mix') }}"
+             class="list-group-item list-group-item-action">
+            <div>
+              <i class="bi bi-symmetry-vertical me-2"></i> New & Due Mix
+            </div>
+            <small class="text-muted">Balance new and due cards</small>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-9">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">{{ title }}</h4>
+        <span class="badge bg-primary">{{ cards|length }} cards</span>
+      </div>
+      <div class="card-body p-0">
+        <!-- Batch Actions Toolbar -->
+        <div class="p-3 bg-light border-bottom">
+          <form id="batch-action-form" action="{{ url_for('srs_bp.batch_action') }}" method="POST">
+            {{ csrf_input }}
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="select-all">
+                  <label class="form-check-label" for="select-all">Select All</label>
+                </div>
+              </div>
+              <div class="col-auto">
+                <select class="form-select" name="batch_action" id="batch-action">
+                  <option value="">Batch Actions</option>
+                  <option value="review">Review Selected</option>
+                  <option value="reset">Reset Progress</option>
+                  <option value="delete">Delete Selected</option>
+                </select>
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-secondary" id="apply-batch" disabled>
+                  Apply
+                </button>
+              </div>
+
+              <div class="col-auto ms-auto">
+                <a href="{{ url_for('srs_bp.create') }}" class="btn btn-success">
+                  <i class="bi bi-plus-circle"></i> New Card
+                </a>
+              </div>
+            </div>
+
+            <!-- Empty message for selected cards count -->
+            <div id="selected-count" class="mt-2 small d-none">
+              <span class="text-primary fw-bold">0</span> cards selected
+            </div>
+
+        </div>
+
+        <!-- Cards List -->
+        {% if cards %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th width="40" class="ps-3">#</th>
+                <th>Question</th>
+                <th>Category</th>
+                <th>Interval</th>
+                <th>Next Review</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for card in cards %}
+              <tr {% if card.next_review_at <= now %}class="table-warning"{% endif %}>
+                <td class="ps-3">
+                  <div class="form-check">
+                    <input class="form-check-input card-select" type="checkbox" name="selected_cards"
+                           value="{{ card.id }}" id="card-{{ card.id }}">
+                    <label class="form-check-label" for="card-{{ card.id }}"></label>
+                  </div>
+                </td>
+                <td>
+                  <div class="text-truncate" style="max-width: 300px;">{{ card.question }}</div>
+                </td>
+                <td>
+                  {% if card.notable_type == 'company' %}
+                  <span class="badge bg-primary">Company</span>
+                  {% elif card.notable_type == 'contact' %}
+                  <span class="badge bg-success">Contact</span>
+                  {% elif card.notable_type == 'opportunity' %}
+                  <span class="badge bg-danger">Opportunity</span>
+                  {% else %}
+                  <span class="badge bg-secondary">{{ card.notable_type }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if card.interval < 1 %}
+                  {{ (card.interval * 24)|int }} hours
+                  {% else %}
+                  {{ card.interval|int }} days
+                  {% endif %}
+                </td>
+                <td>
+                  {% if card.next_review_at %}
+                  <span {% if card.next_review_at <= now %}class="text-danger"{% endif %}>
+                    {{ card.next_review_at.strftime('%Y-%m-%d') }}
+                  </span>
+                  {% else %}
+                  -
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  <a href="{{ url_for('srs_bp.review_item', item_id=card.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                    Review
+                  </a>
+                  <a href="{{ url_for('srs_bp.edit', id=card.id) }}" class="btn btn-sm btn-outline-secondary me-1">
+                    Edit
+                  </a>
+                  <button type="button" class="btn btn-sm btn-outline-danger"
+                          onclick="confirmDelete('{{ card.id }}', '{{ card.question|truncate(30, true) }}')">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          </form>
+        </div>
+        {% else %}
+        <div class="p-5 text-center">
+          <div class="text-muted mb-3">
+            <i class="bi bi-search" style="font-size: 3rem;"></i>
+          </div>
+          <h5>No cards found</h5>
+          <p class="text-muted">Try adjusting your filters or create new cards</p>
+          <a href="{{ url_for('srs_bp.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New Card
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this card?</p>
+        <p class="text-danger fw-bold" id="delete-card-title"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form id="delete-form" method="POST">
+          {{ csrf_input }}
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Select all checkbox functionality
+    const selectAllCheckbox = document.getElementById('select-all');
+    const cardCheckboxes = document.querySelectorAll('.card-select');
+    const selectedCountEl = document.getElementById('selected-count');
+    const applyBatchBtn = document.getElementById('apply-batch');
+    const batchActionSelect = document.getElementById('batch-action');
+
+    // Clear filters button
+    document.getElementById('clear-filters').addEventListener('click', function() {
+      const form = document.getElementById('filter-form');
+      const inputs = form.querySelectorAll('input:not([type="radio"]), select');
+
+      inputs.forEach(input => {
+        if (input.type === 'checkbox') {
+          input.checked = false;
+        } else {
+          input.value = '';
+        }
+      });
+
+      // Set sort order to ascending
+      document.getElementById('sort_asc').checked = true;
+
+      // Submit the form to apply cleared filters
+      form.submit();
+    });
+
+    // Handle select all checkbox
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', function() {
+        cardCheckboxes.forEach(checkbox => {
+          checkbox.checked = selectAllCheckbox.checked;
+        });
+        updateSelectedCount();
+      });
+    }
+
+    // Handle individual card checkboxes
+    cardCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        updateSelectedCount();
+
+        // Update select all checkbox state
+        if (!this.checked) {
+          selectAllCheckbox.checked = false;
+        } else {
+          // Check if all checkboxes are checked
+          const allChecked = Array.from(cardCheckboxes).every(cb => cb.checked);
+          selectAllCheckbox.checked = allChecked;
+        }
+      });
+    });
+
+    // Batch action select change
+    batchActionSelect.addEventListener('change', function() {
+      applyBatchBtn.disabled = !this.value || getSelectedCount() === 0;
+    });
+
+    // Function to update selected count
+    function updateSelectedCount() {
+      const count = getSelectedCount();
+
+      if (count > 0) {
+        selectedCountEl.classList.remove('d-none');
+        selectedCountEl.querySelector('span').textContent = count;
+        applyBatchBtn.disabled = !batchActionSelect.value;
+      } else {
+        selectedCountEl.classList.add('d-none');
+        applyBatchBtn.disabled = true;
+      }
+    }
+
+    // Function to get count of selected cards
+    function getSelectedCount() {
+      return document.querySelectorAll('.card-select:checked').length;
+    }
+
+    // Batch form submission confirmation
+    document.getElementById('batch-action-form').addEventListener('submit', function(e) {
+      const action = batchActionSelect.value;
+      const count = getSelectedCount();
+
+      if (action === 'delete') {
+        if (!confirm(`Are you sure you want to delete ${count} selected cards? This cannot be undone.`)) {
+          e.preventDefault();
+          return false;
+        }
+      } else if (action === 'reset') {
+        if (!confirm(`Are you sure you want to reset progress for ${count} selected cards?`)) {
+          e.preventDefault();
+          return false;
+        }
+      }
+    });
+  });
+
+  // Delete confirmation modal
+  function confirmDelete(cardId, cardTitle) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    document.getElementById('delete-card-title').textContent = cardTitle;
+    document.getElementById('delete-form').action = `/flashcards/${cardId}/delete`;
+    modal.show();
+  }
+</script>
+{% endblock %}

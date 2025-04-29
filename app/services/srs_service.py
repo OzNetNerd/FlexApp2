@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from datetime import datetime, UTC, timedelta
 from app.models.pages.srs import SRS, ReviewHistory
@@ -116,6 +116,50 @@ class SRSService:
             pass
 
         return item
+
+    def get_filtered_cards(self, filters=None):
+        """Get SRS cards filtered by various criteria."""
+        # Start with base query
+        query = SRS.query
+
+        # Apply filters if provided
+        if filters:
+            # Due cards filter
+            if filters.get('due_only'):
+                query = query.filter(SRS.next_review_at <= datetime.now(UTC))
+
+            # Category filter
+            if filters.get('category'):
+                query = query.filter(SRS.notable_type == filters['category'])
+
+            # Text search in question or answer
+            if filters.get('search'):
+                search_term = f"%{filters['search']}%"
+                query = query.filter(
+                    (SRS.question.ilike(search_term)) |
+                    (SRS.answer.ilike(search_term))
+                )
+
+            # Interval range
+            if filters.get('min_interval') is not None:
+                query = query.filter(SRS.interval >= filters['min_interval'])
+            if filters.get('max_interval') is not None:
+                query = query.filter(SRS.interval <= filters['max_interval'])
+
+            # Ease factor range
+            if filters.get('min_ease') is not None:
+                query = query.filter(SRS.ease_factor >= filters['min_ease'])
+            if filters.get('max_ease') is not None:
+                query = query.filter(SRS.ease_factor <= filters['max_ease'])
+
+            # Sort order
+            sort_field = getattr(SRS, filters.get('sort_by', 'next_review_at'))
+            if filters.get('sort_order') == 'desc':
+                sort_field = sort_field.desc()
+            query = query.order_by(sort_field)
+
+        # Execute query
+        return query.all()
 
     def count_total(self):
         """Get the total count of SRS items."""
