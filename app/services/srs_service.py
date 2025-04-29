@@ -1,20 +1,6 @@
-# srs_service.py
-"""
-Service for managing Spaced Repetition System (SRS) items and scheduling reviews.
-
-This module implements an SRS service with optimized interval calculations
-based on cognitive science research about memory retention. Key design decisions:
-
-1. More graduated learning steps (10min→1h→6h→1d) to improve initial retention
-2. Moderate interval growth to prevent premature forgetting (max 2.0× for "easy" ratings)
-3. Reasonable ease factor bounds (1.3-2.5) with default starting value of 2.0
-4. One-year maximum interval suitable for educational contexts
-"""
-
+# srs_service.py - Fixed version
 from datetime import UTC, datetime, timedelta
 from typing import Dict, List, Optional
-
-# FSRS import removed - using optimized custom algorithm instead
 
 from app.models.pages.srs import ReviewHistory, SRS
 from app.services.crud_service import CRUDService
@@ -41,18 +27,7 @@ MAX_INTERVAL = 365  # Max 1 year
 
 
 class SRSService(CRUDService):
-    """
-    Service for managing SRS items and scheduling reviews based on spaced repetition principles.
-
-    This service extends the base CRUD service to add SRS-specific functionality.
-    It implements a custom algorithm that determines review intervals based on
-    user performance ratings and item history.
-
-    The algorithm uses:
-    - A graduated learning phase with four steps (10min → 1h → 6h → 1d)
-    - Optimized review multipliers based on cognitive science research
-    - Ease factor adjustments that prevent cards from becoming too easy/difficult
-    """
+    """Service for managing SRS items and scheduling reviews based on spaced repetition principles."""
 
     # Map UI ratings 0-5 to FSRS/SM2 ratings 1-4
     UI_TO_FSRS_RATING = {0: 1, 1: 1, 2: 2, 3: 3, 4: 4, 5: 4}
@@ -60,21 +35,9 @@ class SRSService(CRUDService):
     def __init__(self):
         """Initialize the SRS service."""
         super().__init__(SRS)
-        # The scheduler import is removed as we're using our own custom algorithm
 
     def preview_ratings(self, item_id: int) -> Dict[int, float]:
-        """
-        Preview the next intervals for each possible rating of an item.
-
-        Args:
-            item_id (int): ID of the SRS item to preview
-
-        Returns:
-            Dict[int, float]: Mapping of UI ratings (0-5) to resulting intervals in days
-
-        Raises:
-            ValueError: If the item doesn't exist
-        """
+        """Preview the next intervals for each possible rating of an item."""
         item = self.get_by_id(item_id)
         if not item:
             raise ValueError(f"SRS item with ID {item_id} not found")
@@ -87,21 +50,7 @@ class SRSService(CRUDService):
         return results
 
     def schedule_review(self, item_id: int, rating: int, answer_given='') -> SRS:
-        """
-        Schedule the next review for an item based on the user's rating.
-
-        Args:
-            item_id (int): ID of the SRS item being reviewed
-            rating (int): User's rating (0-5) of their recall performance
-
-        Returns:
-            SRS: Updated SRS item with new scheduling information
-        """
-
-        item = self.get_by_id(item_id)
-        if not item:
-            raise ValueError(f"SRS item with ID {item_id} not found")
-
+        """Schedule the next review for an item based on the user's rating."""
         item = self.get_by_id(item_id)
         if not item:
             raise ValueError(f"SRS item with ID {item_id} not found")
@@ -114,11 +63,11 @@ class SRSService(CRUDService):
         next_interval = self._calculate_next_interval(item, rating)
         new_ease = self._calculate_new_ease_factor(item, rating)
 
-        # Calculate next review date
-        next_review_at = datetime.now(timezone.utc) + timedelta(days=next_interval)
+        # Calculate next review date - Fixed timezone issue
+        next_review_at = datetime.now(UTC) + timedelta(days=next_interval)
 
         # Track successful repetitions (ratings ≥ 3)
-        successful_reps = item.successful_reps
+        successful_reps = item.successful_reps or 0
         if rating >= 3:
             successful_reps += 1
 
@@ -127,10 +76,10 @@ class SRSService(CRUDService):
             "ease_factor": new_ease,
             "interval": next_interval,
             "successful_reps": successful_reps,
-            "review_count": item.review_count + 1,
+            "review_count": (item.review_count or 0) + 1,
             "next_review_at": next_review_at,
             "last_rating": rating,
-            "last_reviewed_at": datetime.now(timezone.utc),
+            "last_reviewed_at": datetime.now(UTC),
         }
 
         # Persist updated SRS
@@ -154,29 +103,15 @@ class SRSService(CRUDService):
         return item
 
     def get_due_items(self) -> List[SRS]:
-        """
-        Get all SRS items that are due for review.
-
-        Returns:
-            List[SRS]: List of SRS objects due for review
-        """
+        """Get all SRS items that are due for review."""
         return SRS.query.filter(SRS.next_review_at <= datetime.now(UTC)).all()
 
     def _calculate_next_interval(self, item: SRS, ui_rating: int) -> float:
-        """
-        Calculate the next interval based on the rating and current item state.
-
-        Args:
-            item: The SRS item being reviewed
-            ui_rating: User interface rating (0-5)
-
-        Returns:
-            float: Next interval in days
-        """
+        """Calculate the next interval based on the rating and current item state."""
         fsrs_rating = self.UI_TO_FSRS_RATING.get(ui_rating, 1)  # Default to 1 if invalid
 
-        # For a new card or when there's no stability yet
-        if item.repetition == 0 or item.interval <= 0:
+        # Fix: use review_count instead of repetition
+        if item.review_count == 0 or item.interval <= 0:
             # Use graduated learning steps (10min → 1h → 6h → 1d)
             if fsrs_rating == 1:
                 return MIN_INTERVAL  # 10 minutes
@@ -198,16 +133,7 @@ class SRSService(CRUDService):
                 return min(item.interval * EASY_MULTIPLIER, MAX_INTERVAL)
 
     def _calculate_new_ease_factor(self, item: SRS, ui_rating: int) -> float:
-        """
-        Calculate the new ease factor based on the rating.
-
-        Args:
-            item: The SRS item being reviewed
-            ui_rating: User interface rating (0-5)
-
-        Returns:
-            float: New ease factor
-        """
+        """Calculate the new ease factor based on the rating."""
         fsrs_rating = self.UI_TO_FSRS_RATING.get(ui_rating, 1)  # Default to 1 if invalid
 
         if fsrs_rating == 1:
@@ -218,7 +144,6 @@ class SRSService(CRUDService):
             return item.ease_factor  # No change
         else:
             return min(MAX_EASE_FACTOR, item.ease_factor + EASY_EASE_BONUS)
-
 
     def get_next_due_item_id(self, current_item_id=None):
         """Get the next item due for review after current_item_id."""
@@ -234,12 +159,10 @@ class SRSService(CRUDService):
         first_item = query.order_by(SRS.next_review_at).first()
         return first_item.id if first_item else current_item_id
 
-
     def get_prev_item_id(self, current_item_id):
         """Get the previous item reviewed before current_item_id."""
         prev_items = SRS.query.filter(SRS.id < current_item_id).order_by(SRS.id.desc()).limit(1).all()
         return prev_items[0].id if prev_items else current_item_id
-
 
     def get_item_position(self, item_id):
         """Get the position of the item in the current review queue."""
@@ -254,7 +177,6 @@ class SRSService(CRUDService):
         ).count()
 
         return position
-
 
     def get_stats(self):
         """Get current SRS system statistics."""

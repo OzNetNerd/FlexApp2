@@ -1,90 +1,87 @@
-# srs.py
+from datetime import UTC, datetime
+from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey
+from sqlalchemy.orm import relationship
 
-from datetime import datetime, timezone
-from app.models.base import BaseModel, db
-from sqlalchemy import Index
+from app.models.base import db, BaseModel
 
 
 class SRS(BaseModel):
     """
-    Represents an SRS item for spaced repetition review.
+    SRS model for spaced repetition learning cards.
 
-    Attributes:
-        id: Primary key
-        notable_type/notable_id: Reference to the associated content item
-        question/answer: Content of the flashcard
-        successful_reps: Counter for successful reviews (ratings ≥ 3)
-        review_count: Total number of reviews regardless of rating
-        last_rating: Most recent rating (0-5) given to this item
-        interval: Current interval in days between reviews
-        ease_factor: Difficulty factor affecting interval growth
-        next_review_at: DateTime when the item is due for review
-        last_reviewed_at: DateTime when the item was last reviewed
+    This model stores question-answer pairs linked to entities in the CRM
+    (contacts, companies, opportunities) and tracks learning state including
+    review intervals, ease factors, and success rates.
     """
+    __tablename__ = 'srs'
 
-    __tablename__ = "srs"
-    __entity_name__ = "SRS"
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    # Reference to the associated item
-    notable_type = db.Column(db.String(50), nullable=False)
-    notable_id = db.Column(db.Integer, nullable=False)
+    id = Column(Integer, primary_key=True)
 
     # Card content
-    question = db.Column(db.Text, nullable=False)
-    answer = db.Column(db.Text, nullable=False)
+    question = Column(Text, nullable=False)
+    answer = Column(Text, nullable=False)
+
+    # Entity reference (polymorphic relationship)
+    notable_type = Column(String(50), nullable=False)
+    notable_id = Column(Integer, nullable=False)
 
     # SRS algorithm state
-    successful_reps = db.Column(db.Integer, default=0, nullable=False,
-                                comment="Count of successful repetitions (rating ≥ 3)")
-    review_count = db.Column(db.Integer, default=0, nullable=False,
-                             comment="Total review count regardless of rating")
-    last_rating = db.Column(db.Integer, nullable=True,
-                            comment="Most recent rating (0-5)")
+    interval = Column(Float, default=0)  # Current interval in days
+    ease_factor = Column(Float, default=2.0)  # Current ease factor (SM-2 algorithm)
+    review_count = Column(Integer, default=0)  # Number of times reviewed
+    successful_reps = Column(Integer, default=0)  # Number of successful reviews (rating >= 3)
 
-    interval = db.Column(db.Float, default=0.0, nullable=False,
-                         comment="Current interval in days")
-    ease_factor = db.Column(db.Float, default=2.0, nullable=False,
-                            comment="Difficulty factor (1.3-2.5)")
+    # Review timestamps
+    next_review_at = Column(DateTime(timezone=True), default=datetime.now(UTC))
+    last_reviewed_at = Column(DateTime(timezone=True), nullable=True)
 
-    # Timing
-    next_review_at = db.Column(db.DateTime(timezone=True), default=datetime.now(timezone.utc),
-                               nullable=False, index=True)
-    last_reviewed_at = db.Column(db.DateTime(timezone=True), nullable=True)
+    # Last review data
+    last_rating = Column(Integer, nullable=True)  # Last rating given (0-5)
 
-    # Create composite index for finding cards by notable reference
-    __table_args__ = (
-        Index('idx_srs_notable', 'notable_type', 'notable_id'),
-    )
+    # Relationship to review history
+    review_history = relationship("ReviewHistory", back_populates="srs_item", cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f"<SRS {self.id} [{self.notable_type}: {self.notable_id}] next={self.next_review_at}>"
+        return f"<SRS id={self.id} q='{self.question[:20]}...'>"
+
+    def to_dict(self):
+        """Convert SRS item to dictionary."""
+        return {
+            'id': self.id,
+            'question': self.question,
+            'answer': self.answer,
+            'notable_type': self.notable_type,
+            'notable_id': self.notable_id,
+            'interval': self.interval,
+            'ease_factor': self.ease_factor,
+            'review_count': self.review_count,
+            'successful_reps': self.successful_reps,
+            'next_review_at': self.next_review_at.isoformat() if self.next_review_at else None,
+            'last_reviewed_at': self.last_reviewed_at.isoformat() if self.last_reviewed_at else None,
+            'last_rating': self.last_rating
+        }
 
 
 class ReviewHistory(BaseModel):
     """
-    Records the review history for SRS items.
+    Stores the history of SRS card reviews.
 
-    Attributes:
-        id: Primary key
-        srs_item_id: Foreign key to the related SRS item
-        timestamp: When the review occurred
-        rating: Rating given during review (0-5)
-        interval: Interval that was set after this review
-        ease_factor: Ease factor after this review
+    Each review includes the rating given, resulting interval,
+    and timestamp for analysis and future algorithm improvements.
     """
+    __tablename__ = 'review_history'
 
-    __tablename__ = "review_history"
+    id = Column(Integer, primary_key=True)
+    srs_item_id = Column(Integer, ForeignKey('srs.id'), nullable=False)
+    rating = Column(Integer, nullable=False)  # Rating given (0-5)
+    interval = Column(Float, nullable=False)  # Resulting interval in days
+    ease_factor = Column(Float, nullable=False)  # Resulting ease factor
+    timestamp = Column(DateTime(timezone=True), default=datetime.now(UTC))
 
-    id = db.Column(db.Integer, primary_key=True)
-    srs_item_id = db.Column(db.Integer, db.ForeignKey("srs.id", ondelete="CASCADE"),
-                            nullable=False, index=True)
-    timestamp = db.Column(db.DateTime(timezone=True), default=datetime.now(timezone.utc),
-                          nullable=False)
-    rating = db.Column(db.Integer, nullable=False)
-    interval = db.Column(db.Float, nullable=False)
-    ease_factor = db.Column(db.Float, nullable=False)
+    # Relationship to SRS item
+    srs_item = relationship("SRS", back_populates="review_history")
 
-    def __repr__(self):
-        return f"<ReviewHistory item={self.srs_item_id} rating={self.rating} at={self.timestamp}>"
+    def save(self):
+        """Save the review history to the database."""
+        db.session.add(self)
+        db.session.commit()

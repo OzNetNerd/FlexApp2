@@ -1,8 +1,9 @@
 from typing import Any, Dict
 from flask import Blueprint, request
 
-from app.models import SRS
-from app.routes.api.route_registration import ApiCrudRouteConfig
+# Fix the import path for SRS
+from app.models.pages.srs import SRS
+from app.routes.api.route_registration import ApiCrudRouteConfig, register_api_crud_routes
 from app.services.srs_service import SRSService
 from app.utils.app_logging import get_logger
 
@@ -15,8 +16,8 @@ srs_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api
 
 srs_service = SRSService()
 
+# Create config
 srs_api_crud_config = ApiCrudRouteConfig(blueprint=srs_api_bp, entity_table_name=ENTITY_NAME, service=srs_service)
-
 
 @srs_api_bp.route("/due", methods=["GET"])
 def get_due_items():
@@ -43,11 +44,3 @@ def review_item(item_id: int) -> Dict[str, Any]:
 def get_srs_stats():
     """Get current SRS system statistics."""
     return srs_service.get_stats()
-
-
-
-# This route can be removed as it's redundant with the default index route from ApiCrudRouteConfig
-# @srs_api_bp.route("/items", methods=["GET"])
-# def get_all_items():
-#     """List all SRS items (for admin/debug)."""
-#     return {"items": [i.to_dict() for i in SRS.query.all()]}
