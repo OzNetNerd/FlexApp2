@@ -1,5 +1,4 @@
 from datetime import UTC, datetime
-from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.models.base import db, BaseModel
@@ -15,28 +14,22 @@ class SRS(BaseModel):
     """
     __tablename__ = 'srs'
 
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    question = db.Column(db.Text, nullable=False)
+    answer = db.Column(db.Text, nullable=False)
+    notable_id = db.Column(db.Integer)
+    notable_type = db.Column(db.String(50))
 
-    # Card content
-    question = Column(Text, nullable=False)
-    answer = Column(Text, nullable=False)
+    # Use timezone=True to store timezone information
+    next_review_at = db.Column(db.DateTime(timezone=True))
+    last_reviewed_at = db.Column(db.DateTime(timezone=True))
 
-    # Entity reference (polymorphic relationship)
-    notable_type = Column(String(50), nullable=False)
-    notable_id = Column(Integer, nullable=False)
-
-    # SRS algorithm state
-    interval = Column(Float, default=0)  # Current interval in days
-    ease_factor = Column(Float, default=2.0)  # Current ease factor (SM-2 algorithm)
-    review_count = Column(Integer, default=0)  # Number of times reviewed
-    successful_reps = Column(Integer, default=0)  # Number of successful reviews (rating >= 3)
-
-    # Review timestamps
-    next_review_at = Column(DateTime(timezone=True), default=datetime.now(UTC))
-    last_reviewed_at = Column(DateTime(timezone=True), nullable=True)
-
-    # Last review data
-    last_rating = Column(Integer, nullable=True)  # Last rating given (0-5)
+    # SRS algorithm fields
+    interval = db.Column(db.Float, default=0)
+    ease_factor = db.Column(db.Float, default=2.5)
+    review_count = db.Column(db.Integer, default=0)
+    successful_reps = db.Column(db.Integer, default=0)
+    last_rating = db.Column(db.Integer)
 
     # Relationship to review history
     review_history = relationship("ReviewHistory", back_populates="srs_item", cascade="all, delete-orphan")
@@ -71,12 +64,12 @@ class ReviewHistory(BaseModel):
     """
     __tablename__ = 'review_history'
 
-    id = Column(Integer, primary_key=True)
-    srs_item_id = Column(Integer, ForeignKey('srs.id'), nullable=False)
-    rating = Column(Integer, nullable=False)  # Rating given (0-5)
-    interval = Column(Float, nullable=False)  # Resulting interval in days
-    ease_factor = Column(Float, nullable=False)  # Resulting ease factor
-    timestamp = Column(DateTime(timezone=True), default=datetime.now(UTC))
+    id = db.Column(db.Integer, primary_key=True)
+    srs_item_id = db.Column(db.Integer, db.ForeignKey('srs.id'))
+    timestamp = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    rating = db.Column(db.Integer)
+    interval = db.Column(db.Float)
+    ease_factor = db.Column(db.Float)
 
     # Relationship to SRS item
     srs_item = relationship("SRS", back_populates="review_history")

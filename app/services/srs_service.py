@@ -1017,3 +1017,87 @@ def progress_data():
 def register_srs_blueprint(app):
     """Register the SRS blueprint with the app."""
     app.register_blueprint(srs_bp, url_prefix='/flashcards')
+
+
+def get_categories(self):
+    """Get all available categories (decks)."""
+    # First get all distinct notable_types from the database
+    query = db.session.query(SRS.notable_type).distinct()
+    db_categories = [row[0] for row in query.all() if row[0]]
+
+    # Get category counts
+    category_counts = self.count_by_type()
+
+    # Merge with predefined categories
+    predefined = {
+        'company': {'name': 'Companies', 'color': 'primary', 'icon': 'building'},
+        'contact': {'name': 'Contacts', 'color': 'success', 'icon': 'people'},
+        'opportunity': {'name': 'Opportunities', 'color': 'danger', 'icon': 'graph-up-arrow'}
+    }
+
+    result = []
+
+    # Add predefined categories first
+    for category_id, info in predefined.items():
+        count = category_counts.get(category_id, 0)
+        result.append({
+            'id': category_id,
+            'name': info['name'],
+            'color': info['color'],
+            'icon': info['icon'],
+            'count': count
+        })
+
+    # Add custom categories from database that aren't in predefined list
+    for category_id in db_categories:
+        if category_id not in predefined:
+            count = category_counts.get(category_id, 0)
+            result.append({
+                'id': category_id,
+                'name': category_id.capitalize(),  # Default name is capitalized ID
+                'color': 'secondary',  # Default color
+                'icon': 'folder',  # Default icon
+                'count': count
+            })
+
+    return result
+
+
+def create_category(self, name, color='secondary', icon='folder'):
+    """
+    Create a new category (deck).
+
+    This doesn't actually create a database record since categories
+    are stored as notable_type strings on SRS items. Instead, it
+    ensures the category ID is valid and returns a category object.
+    """
+    # Normalize the name to create a valid ID
+    category_id = name.lower().replace(' ', '_')
+
+    logger.info(f"SRSService: Creating category {category_id} with name '{name}'")
+
+    # Return a category object
+    return {
+        'id': category_id,
+        'name': name,
+        'color': color,
+        'icon': icon,
+        'count': 0
+    }
+
+
+def create(self, data):
+    """Create a new SRS item."""
+    item = SRS()
+    for key, value in data.items():
+        setattr(item, key, value)
+    item.save()
+    return item
+
+
+def count_reviews_today(self):
+    """Count the number of reviews completed today."""
+    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+    return ReviewHistory.query.filter(
+        ReviewHistory.timestamp >= today_start
+    ).count()

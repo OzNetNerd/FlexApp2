@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
+from datetime import datetime, UTC
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -303,7 +304,7 @@ def seed_tasks():
 
     for i in range(task_assignments):
         title, description, due_date, status, priority, notable_type, notable_id = tasks[i]
-        due_date = datetime.strptime(due_date, "%Y-%m-%d")
+        due_date = datetime.strptime(due_date, "%Y-%m-%d").replace(tzinfo=UTC)
         create_or_update(
             Task,
             {"title": title},

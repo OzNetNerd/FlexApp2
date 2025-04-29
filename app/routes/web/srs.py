@@ -450,3 +450,87 @@ def review_batch():
     session['review_queue'] = review_queue[1:]
 
     return redirect(url_for('srs_bp.review_item', item_id=card_id, batch=True))
+
+
+@srs_bp.route("/add", methods=["GET", "POST"])
+@login_required
+def add_card():
+    """Add a new flashcard."""
+    if request.method == "POST":
+        # Get form data
+        category = request.form.get("category")
+        question = request.form.get("question")
+        answer = request.form.get("answer")
+        tags = request.form.get("tags", "").strip()
+        review_immediately = "review_immediately" in request.form
+        action = request.form.get("action", "save")
+
+        # Validate required fields
+        if not all([category, question, answer]):
+            flash("Please fill out all required fields", "error")
+            return redirect(url_for("srs_bp.add_card"))
+
+        # Create new card
+        new_card = {
+            "notable_type": category,
+            "question": question,
+            "answer": answer,
+            "tags": [tag.strip() for tag in tags.split(",")] if tags else [],
+            "ease_factor": DEFAULT_EASE_FACTOR,
+            "interval": 0,
+            "review_count": 0,
+            "successful_reps": 0,
+            "created_at": datetime.now(UTC),
+            "updated_at": datetime.now(UTC)
+        }
+
+        # Set review date to today if immediate review requested
+        if review_immediately:
+            new_card["next_review_at"] = datetime.now(UTC)
+        else:
+            # Set review date to tomorrow by default
+            new_card["next_review_at"] = datetime.now(UTC).replace(
+                hour=0, minute=0, second=0, microsecond=0
+            ) + timedelta(days=1)
+
+        # Save the card
+        card = srs_service.create(new_card)
+
+        flash("Card added successfully", "success")
+
+        # Handle different save actions
+        if action == "save_add_another":
+            return redirect(url_for("srs_bp.add_card"))
+        else:
+            return redirect(url_for("srs_bp.dashboard"))
+
+    # GET request - show form
+    # Get categories (decks) for dropdown
+    categories = srs_service.get_categories()
+
+    # Get stats for footer
+    stats = srs_service.get_stats()
+
+    return render_template(
+        "pages/srs/add_card.html",
+        title="Add New Card",
+        categories=categories,
+        stats=stats
+    )
+
+
+@srs_bp.route("/categories/create", methods=["POST"])
+@login_required
+def create_category_web():
+    """Create a new category (deck) and return to the form."""
+    name = request.form.get("name")
+    color = request.form.get("color", "#0d6efd")
+
+    if not name:
+        flash("Category name is required", "error")
+        return redirect(url_for("srs_bp.add_card"))
+
+    category = srs_service.create_category(name, color)
+    flash(f"Category '{name}' created successfully", "success")
+
+    return redirect(url_for("srs_bp.add_card"))
