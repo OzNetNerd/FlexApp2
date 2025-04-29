@@ -107,7 +107,7 @@ class TableContext(SimpleContext):
         self.entity_title = getattr(self.model_class, "__entity_plural__", "").capitalize() or f"{self.entity_name}s"
         self.entity_base_route = f"{self.model_class.__tablename__}_bp"
         self.api_url = f"/api/{self.model_class.__tablename__}"
-        self.table_id = get_table_id_by_name(self.entity_table_name)
+        self.table_id = f"{self.entity_table_name}_table"
         self.default_sort = "name"
         self.show_heading = kwargs.get("show_heading", True)
         self.show_card_title = kwargs.get("show_card_title", False)
