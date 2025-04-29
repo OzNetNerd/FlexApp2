@@ -88,8 +88,18 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         if endpoint == CRUDEndpoint.index.value:
             context = TableWebContext(entity_table_name=config.entity_table_name)
         elif endpoint == CRUDEndpoint.create.value:
+            # Initialize with default empty values for required fields
+            default_entity = {
+                "id": "",
+                "question": "",
+                "answer": "",
+                "category": "",
+                "last_reviewed": None,
+                "due_date": None
+            }
+
             context = TableWebContext(
-                entity={},  # Empty dict for create
+                entity=default_entity,  # Use default entity instead of empty dict
                 entity_table_name=config.entity_table_name,
                 action="create",
                 read_only=False,
@@ -167,7 +177,7 @@ def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, enti
 def register_crud_routes(config: CrudRouteConfig) -> None:
     bp = config.blueprint
     bp.add_url_rule(rule="/", endpoint="index", view_func=route_handler("index", config), methods=["GET"])
-    bp.add_url_rule(rule="/new", endpoint="create", view_func=route_handler("create", config), methods=["GET", "POST"])
+    bp.add_url_rule(rule="/create", endpoint="create", view_func=route_handler("create", config), methods=["GET", "POST"])
     bp.add_url_rule(rule="/<int:entity_id>", endpoint="view", view_func=route_handler("view", config), methods=["GET"])
     bp.add_url_rule(
         rule="/<int:entity_id>/edit",
