@@ -333,26 +333,9 @@ def filtered_cards():
     due_category_counts = srs_service.count_due_by_type()
 
     # Count cards by learning stage
-    learning_stages = {
-        'new': len(srs_service.get_cards_by_learning_stage('new')),
-        'learning': len(srs_service.get_cards_by_learning_stage('learning')),
-        'reviewing': len(srs_service.get_cards_by_learning_stage('reviewing')),
-        'mastered': len(srs_service.get_cards_by_learning_stage('mastered'))
-    }
-
-    # Count cards by difficulty
-    difficulty_counts = {
-        'hard': len(srs_service.get_cards_by_difficulty('hard')),
-        'medium': len(srs_service.get_cards_by_difficulty('medium')),
-        'easy': len(srs_service.get_cards_by_difficulty('easy'))
-    }
-
-    # Count cards by performance
-    performance_counts = {
-        'struggling': len(srs_service.get_cards_by_performance('struggling')),
-        'average': len(srs_service.get_cards_by_performance('average')),
-        'strong': len(srs_service.get_cards_by_performance('strong'))
-    }
+    learning_stages = srs_service.get_learning_stages_counts()
+    difficulty_counts = srs_service.get_difficulty_counts()
+    performance_counts = srs_service.get_performance_counts()
 
     # Prepare template data
     template_data = {

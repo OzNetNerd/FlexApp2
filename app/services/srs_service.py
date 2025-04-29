@@ -862,3 +862,28 @@ class SRSService:
     def get_by_type(self, type_name):
         """Get all SRS items of a specific type."""
         return SRS.query.filter(SRS.notable_type == type_name).all()
+
+    def get_learning_stages_counts(self):
+        """Get counts of cards by learning stage."""
+        return {
+            'new': len(self.get_cards_by_learning_stage('new')),
+            'learning': len(self.get_cards_by_learning_stage('learning')),
+            'reviewing': len(self.get_cards_by_learning_stage('reviewing')),
+            'mastered': len(self.get_cards_by_learning_stage('mastered'))
+        }
+
+    def get_difficulty_counts(self):
+        """Get counts of cards by difficulty level."""
+        return {
+            'hard': len(self.get_cards_by_difficulty('hard')),
+            'medium': len(self.get_cards_by_difficulty('medium')),
+            'easy': len(self.get_cards_by_difficulty('easy'))
+        }
+
+    def get_performance_counts(self):
+        """Get counts of cards by performance level."""
+        return {
+            'struggling': len(self.get_cards_by_performance('struggling')),
+            'average': len(self.get_cards_by_performance('average')),
+            'strong': len(self.get_cards_by_performance('strong'))
+        }
