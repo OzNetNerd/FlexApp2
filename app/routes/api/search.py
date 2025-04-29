@@ -16,7 +16,8 @@ from .json_utils import json_endpoint
 
 logger = get_logger()
 
-search_bp = Blueprint("search_bp", __name__, url_prefix="/api/search")
+search_api_bp = Blueprint("search_api", __name__, url_prefix="/api/search")
+# search_bp = Blueprint("search_bp", __name__, url_prefix="/api/search")
 
 # Map each entity name to its model and searchable fields
 _entity_search_map = {
@@ -33,7 +34,7 @@ _entity_search_map = {
 _search_services = {key: SearchService(model, fields) for key, (model, fields) in _entity_search_map.items()}
 
 
-@search_bp.route("/<entity_name>", methods=["GET"])
+@search_api_bp.route("/<entity_name>", methods=["GET"])
 @json_endpoint
 def search_entity(entity_name: str):
     """

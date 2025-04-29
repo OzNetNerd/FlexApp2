@@ -1,5 +1,4 @@
 from typing import Any, Dict
-
 from flask import Blueprint, request
 
 from app.models import SRSItem
@@ -10,7 +9,7 @@ from app.utils.app_logging import get_logger
 logger = get_logger()
 
 ENTITY_NAME = "SRSItem"
-ENTITY_PLURAL_NAME = "SRS"
+ENTITY_PLURAL_NAME = "SRS_Items"  # Changed from "SRS" to "SRSItems"
 
 srs_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 
@@ -41,7 +40,8 @@ def review_item(item_id: int) -> Dict[str, Any]:
     return item.to_dict()
 
 
-@srs_api_bp.route("/items", methods=["GET"])
-def get_all_items():
-    """List all SRS items (for admin/debug)."""
-    return {"items": [i.to_dict() for i in SRSItem.query.all()]}
+# This route can be removed as it's redundant with the default index route from ApiCrudRouteConfig
+# @srs_api_bp.route("/items", methods=["GET"])
+# def get_all_items():
+#     """List all SRS items (for admin/debug)."""
+#     return {"items": [i.to_dict() for i in SRSItem.query.all()]}

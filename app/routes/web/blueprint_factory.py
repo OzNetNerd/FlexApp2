@@ -14,30 +14,21 @@ from app.utils.app_logging import get_logger
 logger = get_logger()
 
 
-def create_crud_blueprint(model_class: Any, service: Optional[Any] = None) -> Blueprint:
+def create_crud_blueprint(model_class: Any, service: Optional[Any] = None, url_prefix: Optional[str] = None) -> Blueprint:
     """Creates a Flask Blueprint with CRUD routes for a database model.
-
-    This function generates a complete set of CRUD endpoints for the given model class.
-    It allows customization of the service layer by accepting an optional service instance.
 
     Args:
         model_class: SQLAlchemy model class that defines __tablename__ and __entity_name__
-        service: Optional service instance to handle CRUD operations. If None, a new
-            CRUDService instance will be created. This pattern avoids the Python mutable
-            default argument problem.
+        service: Optional service instance to handle CRUD operations
+        url_prefix: Optional custom URL prefix (default uses model's tablename)
 
     Returns:
         Flask Blueprint with all CRUD routes registered
-
-    Example:
-        # Basic usage with default CRUDService
-        companies_bp = create_crud_blueprint(Company)
-
-        # With custom service
-        users_bp = create_crud_blueprint(User, service=UserService(User))
     """
     blueprint_name = f"{model_class.__tablename__}_bp"
-    blueprint = Blueprint(blueprint_name, __name__, url_prefix=f"/{model_class.__tablename__}")
+    # Use custom URL prefix if provided, otherwise use tablename
+    prefix = url_prefix if url_prefix is not None else f"/{model_class.__tablename__}"
+    blueprint = Blueprint(blueprint_name, __name__, url_prefix=prefix)
 
     # Create default service if none provided
     if service is None:

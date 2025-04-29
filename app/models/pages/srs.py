@@ -9,6 +9,7 @@ class SRSItem(BaseModel):
     Represents an SRS item for spaced repetition review.
     """
     __tablename__ = "srs_items"
+    __entity_name__ = "SRSItem"  # Add this line
 
     id = db.Column(db.Integer, primary_key=True)
 

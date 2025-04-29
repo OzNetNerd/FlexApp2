@@ -1,0 +1,20 @@
+{% import 'macros/layout.html' as layout %}
+{% import 'macros/entity.html' as entity %}
+
+{% call layout.tab_pane('contacts') %}
+  {% if contacts %}
+    {{ entity.render_entity_table(
+      contacts,
+      'Contacts',
+      [
+        {'key': 'name', 'label': 'Name'},
+        {'key': 'title', 'label': 'Title'},
+        {'key': 'email', 'label': 'Email'},
+        {'key': 'phone', 'label': 'Phone'}
+      ],
+      '/contacts'
+    ) }}
+  {% else %}
+    {{ entity.render_empty_state('No contacts associated with this company.') }}
+  {% endif %}
+{% endcall %}
