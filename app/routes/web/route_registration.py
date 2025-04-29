@@ -8,9 +8,8 @@ from flask import Blueprint, redirect, request, url_for
 from flask_login import login_required
 
 from app.routes.web.components.template_renderer import RenderSafelyConfig, render_safely
-from app.routes.web.context import EntityContext, SimpleContext, TableContext
+from app.routes.web.context import TableWebContext, WebContext
 from app.utils.app_logging import get_logger
-from app.utils.table_helpers import get_table_plural_name
 
 logger = get_logger()
 
@@ -46,11 +45,10 @@ class CrudRouteConfig:
     templates: CrudTemplates
 
 
-def default_crud_templates(entity_table_name: str) -> CrudTemplates:
-    plural = get_table_plural_name(entity_table_name).lower()
+def default_crud_templates(model_class) -> CrudTemplates:
+    plural = model_class.__entity_plural__.lower()
     return CrudTemplates(
         index=f"pages/{plural}/index.html",
-        # Use same view.html template for all operations
         create=f"pages/{plural}/view.html",
         view=f"pages/{plural}/view.html",
         edit=f"pages/{plural}/view.html",
@@ -88,9 +86,9 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
 
         # Build appropriate context object
         if endpoint == CRUDEndpoint.index.value:
-            context = TableContext(entity_table_name=config.entity_table_name)
+            context = TableWebContext(entity_table_name=config.entity_table_name)
         elif endpoint == CRUDEndpoint.create.value:
-            context = EntityContext(
+            context = TableWebContext(
                 entity={},  # Empty dict for create
                 entity_table_name=config.entity_table_name,
                 action="create",
@@ -101,7 +99,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
             entity_id = kwargs.get("entity_id")
             title = f"{'View' if endpoint == CRUDEndpoint.view.value else 'Edit'} {config.entity_table_name}"
 
-            context = EntityContext(
+            context = TableWebContext(
                 entity=entity,
                 entity_table_name=config.entity_table_name,
                 action=endpoint,
@@ -110,7 +108,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
                 title=title,
             )
         else:
-            context = SimpleContext(title=config.entity_table_name)
+            context = WebContext(title=config.entity_table_name)
 
         # ---------------------------------------------------------------------
         # Generate CSRF token (if available)

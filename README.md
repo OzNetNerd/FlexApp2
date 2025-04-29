@@ -81,7 +81,7 @@ Abstract search and filtering
 – Or parameterize a single /api/search/<entity> endpoint.
 
 DRY up context builders
-– Rather than manually instantiating EntityContext, ListAPIContext, etc., in each handler, write a decorator (e.g. @use_context(EntityContext, "Company")) that wraps your view.
+– Rather than manually instantiating TableWebContext, ListApiContext, etc., in each handler, write a decorator (e.g. @use_context(TableWebContext, "Company")) that wraps your view.
 
 Eliminate duplicate imports/loggers
 – Configure a module-level logger factory (e.g. in app_logging.py) so you can drop logger = logging.getLogger(__name__) from every file.
@@ -156,10 +156,10 @@ def register_page_route(blueprint: Blueprint, config: RouteConfig):
             context = config.context_provider(title=config.title, *args, **kwargs)
             if not context:
                 logger.warning(f"Context provider returned None for endpoint '{config.endpoint}'")
-                context = SimpleContext(title=config.endpoint)
+                context = WebContext(title=config.endpoint)
         else:
-            logger.info(f"No context provider for endpoint '{config.endpoint}', using default SimpleContext")
-            context = SimpleContext(title=config.title)  # Using title instead of endpoint name
+            logger.info(f"No context provider for endpoint '{config.endpoint}', using default WebContext")
+            context = WebContext(title=config.title)  # Using title instead of endpoint name
 
         # Render the template safely, handling exceptions
         return render_safely(
@@ -238,7 +238,7 @@ register_page_route(my_blueprint, config)
          |                                            |
          v                                            v
 +---------------------------------------------------------------+
-|  Returns context object (EntityContext or TableContext)        |
+|  Returns context object (TableWebContext or TableWebContext)        |
 |       Passes data to Jinja template for rendering               |
 +---------------------------------------------------------------+
          |
@@ -326,8 +326,6 @@ This separation maintains the DRY principle within each context while acknowledg
 ----
 
 replace - ctx.model.__tablename__ - with one of the lookup funcs
-
-finish this - from app.utils.table_helpers import get_table_id_by_name
 
 replace _table.html with _table_template.html
 

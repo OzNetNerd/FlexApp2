@@ -11,7 +11,7 @@ from jinja2 import DebugUndefined, Environment
 from jinja2.exceptions import TemplateNotFound
 from markupsafe import Markup, escape
 
-from app.routes.web.context import BaseContext
+from app.routes.web.context import WebContext
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
@@ -20,7 +20,7 @@ logger = get_logger()
 @dataclass
 class RenderSafelyConfig:
     template_path: str
-    context: BaseContext
+    context: WebContext
     error_message: str
     endpoint_name: str
 

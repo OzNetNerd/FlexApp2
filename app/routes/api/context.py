@@ -1,60 +1,47 @@
-# api/context.py
-
 from typing import Any, Dict, List, Optional
 
+from app.routes.base_context import AppContext
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
 
-class APIContext:
+class ApiContext(AppContext):
     """Base context class for API responses."""
 
     def __init__(self, **kwargs):
-        """Initialize the API context with provided attributes."""
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-            logger.debug(f"Set attribute '{key}' = {value}")
-
-    def __repr__(self):
-        """Return a detailed string representation of the context."""
-        attributes = ", ".join(f"{key}={repr(value)}" for key, value in vars(self).items() if not key.startswith("_"))
-        return f"{self.__class__.__name__}({attributes})"
-
-    def to_dict(self):
-        """Convert context to dictionary for response serialization."""
-        return {key: value for key, value in vars(self).items() if not key.startswith("_")}
+        """Initialize the API context."""
+        super().__init__(**kwargs)
 
 
-class ListAPIContext(APIContext):
+class ListApiContext(ApiContext):
     """Context class for list API responses."""
 
     def __init__(
-        self,
-        entity_table_name: str,
-        items: List[Any],
-        total_count: Optional[int] = None,
-        page: Optional[int] = None,
-        per_page: Optional[int] = None,
-        **kwargs,
+            self,
+            entity_table_name: str,
+            items: List[Any],
+            total_count: Optional[int] = None,
+            page: Optional[int] = None,
+            per_page: Optional[int] = None,
+            **kwargs,
     ):
         """Initialize a list API context."""
-        self.entity_table_name = entity_table_name
+        super().__init__(entity_table_name=entity_table_name, **kwargs)
+
         self.items = items
         self.total_count = total_count or len(items)
 
-        # Pagination info (if applicable)
+        # Pagination info
         if page is not None:
             self.page = page
             self.per_page = per_page or len(items)
 
-        super().__init__(**kwargs)
-
     def to_dict(self):
-        """Convert to response dictionary with pagination if applicable."""
+        """Format response with items and metadata."""
         base_dict = super().to_dict()
 
-        # Convert items to dictionaries if they have to_dict method
+        # Convert items to dictionaries
         items_data = []
         for item in self.items:
             if hasattr(item, "to_dict"):
@@ -72,7 +59,7 @@ class ListAPIContext(APIContext):
             },
         }
 
-        # Add pagination metadata if present
+        # Add pagination if present
         if hasattr(self, "page"):
             result["meta"]["pagination"] = {
                 "page": self.page,
@@ -80,7 +67,7 @@ class ListAPIContext(APIContext):
                 "total_pages": (self.total_count + self.per_page - 1) // self.per_page,
             }
 
-        # Add any additional attributes
+        # Add other attributes
         for key, value in base_dict.items():
             if key not in ["entity_table_name", "items", "total_count", "page", "per_page"]:
                 result[key] = value
@@ -88,22 +75,21 @@ class ListAPIContext(APIContext):
         return result
 
 
-class EntityAPIContext(APIContext):
+class EntityApiContext(ApiContext):
     """Context class for single entity API responses."""
 
     def __init__(self, entity_table_name: str, entity: Any = None, entity_id: Any = None, **kwargs):
         """Initialize an entity API context."""
-        self.entity_table_name = entity_table_name
+        super().__init__(entity_table_name=entity_table_name, **kwargs)
+
         self.entity = entity
         self.entity_id = entity_id or getattr(entity, "id", None)
 
-        super().__init__(**kwargs)
-
     def to_dict(self):
-        """Convert to response dictionary with entity data."""
+        """Format response with entity data."""
         base_dict = super().to_dict()
 
-        # Create the response structure
+        # Create response structure
         result = {"meta": {"entity_type": self.entity_table_name}}
 
         # Add entity data
@@ -117,7 +103,7 @@ class EntityAPIContext(APIContext):
         else:
             result["data"] = {"id": self.entity_id}
 
-        # Add any additional attributes
+        # Add other attributes
         for key, value in base_dict.items():
             if key not in ["entity_table_name", "entity", "entity_id"]:
                 result[key] = value
@@ -125,18 +111,20 @@ class EntityAPIContext(APIContext):
         return result
 
 
-class ErrorAPIContext(APIContext):
+class ErrorApiContext(ApiContext):
     """Context class for error API responses."""
 
     def __init__(
-        self,
-        message: str,
-        status_code: int = 400,
-        error_code: Optional[str] = None,
-        field_errors: Optional[Dict[str, str]] = None,
-        **kwargs,
+            self,
+            message: str,
+            status_code: int = 400,
+            error_code: Optional[str] = None,
+            field_errors: Optional[Dict[str, str]] = None,
+            **kwargs,
     ):
         """Initialize an error API context."""
+        super().__init__(**kwargs)
+
         self.message = message
         self.status_code = status_code
 
@@ -146,10 +134,8 @@ class ErrorAPIContext(APIContext):
         if field_errors:
             self.field_errors = field_errors
 
-        super().__init__(**kwargs)
-
     def to_dict(self):
-        """Convert to error response dictionary."""
+        """Format error response."""
         base_dict = super().to_dict()
 
         result = {"error": {"message": self.message, "status_code": self.status_code}}
@@ -162,7 +148,7 @@ class ErrorAPIContext(APIContext):
         if hasattr(self, "field_errors"):
             result["error"]["fields"] = self.field_errors
 
-        # Add any additional attributes
+        # Add other attributes
         for key, value in base_dict.items():
             if key not in ["message", "status_code", "error_code", "field_errors"]:
                 result[key] = value

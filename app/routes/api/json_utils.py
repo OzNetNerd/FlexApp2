@@ -28,7 +28,7 @@ def json_endpoint(f):
             else:
                 payload, status = result, 200
 
-            # Convert APIContext objects to dicts
+            # Convert ApiContext objects to dicts
             if hasattr(payload, "to_dict"):
                 payload = payload.to_dict()
 

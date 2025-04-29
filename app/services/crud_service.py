@@ -9,7 +9,7 @@ from flask import Blueprint, request
 from flask.typing import ResponseReturnValue
 
 from app.models.base import db
-from app.routes.api.context import EntityAPIContext, ErrorAPIContext, ListAPIContext
+from app.routes.api.context import EntityApiContext, ErrorApiContext, ListApiContext
 from app.routes.api.json_utils import json_endpoint
 from app.utils.app_logging import get_logger
 
@@ -112,18 +112,18 @@ def handle_api_crud_operation(
                     logger.warning(f"Failed to parse filters parameter: {e}")
             result = service.get_all(page, per_page, sort_column, sort_direction, filters)
             if hasattr(result, "items"):
-                return ListAPIContext(entity_table_name=entity_table_name, items=result.items, total_count=getattr(result, "total", None))
-            return ListAPIContext(entity_table_name=entity_table_name, items=result)
+                return ListApiContext(entity_table_name=entity_table_name, items=result.items, total_count=getattr(result, "total", None))
+            return ListApiContext(entity_table_name=entity_table_name, items=result)
 
         if endpoint == CRUDEndpoint.GET_BY_ID.value and entity_id is not None:
             entity = service.get_by_id(entity_id)
             if not entity:
-                return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
-            return EntityAPIContext(entity_table_name=entity_table_name, entity=entity)
+                return ErrorApiContext(message=f"{entity_table_name} not found", status_code=404)
+            return EntityApiContext(entity_table_name=entity_table_name, entity=entity)
 
         if endpoint == CRUDEndpoint.CREATE.value and data is not None:
             entity = service.create(data)
-            return EntityAPIContext(
+            return EntityApiContext(
                 entity_table_name=entity_table_name,
                 entity=entity,
                 message=f"{entity_table_name} created successfully",
@@ -132,9 +132,9 @@ def handle_api_crud_operation(
         if endpoint == CRUDEndpoint.UPDATE.value and entity_id is not None and data is not None:
             existing = service.get_by_id(entity_id)
             if not existing:
-                return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
+                return ErrorApiContext(message=f"{entity_table_name} not found", status_code=404)
             entity = service.update(existing, data)
-            return EntityAPIContext(
+            return EntityApiContext(
                 entity_table_name=entity_table_name,
                 entity=entity,
                 message=f"{entity_table_name} updated successfully",
@@ -143,14 +143,14 @@ def handle_api_crud_operation(
         if endpoint == CRUDEndpoint.DELETE.value and entity_id is not None:
             existing = service.get_by_id(entity_id)
             if not existing:
-                return ErrorAPIContext(message=f"{entity_table_name} not found", status_code=404)
+                return ErrorApiContext(message=f"{entity_table_name} not found", status_code=404)
             service.delete(entity_id)
             return {"message": f"{entity_table_name} deleted successfully"}
 
-        return ErrorAPIContext(message="Invalid operation or parameters", status_code=400)
+        return ErrorApiContext(message="Invalid operation or parameters", status_code=400)
     except Exception as e:
         logger.error(f"Error in API CRUD operation {endpoint!r}: {e}", exc_info=True)
-        return ErrorAPIContext(message="Internal server error", status_code=500)
+        return ErrorApiContext(message="Internal server error", status_code=500)
 
 
 def register_api_route(

@@ -11,15 +11,15 @@ def use_context(context_cls: Type[Any], *ctx_args, **ctx_kwargs):
     Decorator to build a context object and inject it into the view.
 
     Args:
-        context_cls: The Context class to instantiate (e.g. TableContext).
+        context_cls: The Context class to instantiate (e.g. TableWebContext).
         *ctx_args, **ctx_kwargs: Passed to the context_cls constructor.
     """
 
     def decorator(view_fn):
         @wraps(view_fn)
         def wrapped(*args, **kwargs):
-            # If this is an EntityContext, handle the entity parameter
-            if context_cls.__name__ == "EntityContext":
+            # If this is an TableWebContext, handle the entity parameter
+            if context_cls.__name__ == "TableWebContext":
                 entity_id = kwargs.get("entity_id")
                 entity_table_name = ctx_kwargs.get("entity_table_name")
 
