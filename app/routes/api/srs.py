@@ -1,5 +1,5 @@
 from typing import Any, Dict
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 
 from app.routes.api.route_registration import ApiCrudRouteConfig
 from app.utils.app_logging import get_logger
@@ -72,32 +72,4 @@ def progress_data():
     """Get progress data for charts."""
     months = request.args.get('months', 7, type=int)
     data = srs_service.get_learning_progress_data(months=months)
-    return jsonify(data)
-
-
-# API endpoint for chart data
-@srs_api_bp.route("/progress-data", methods=["GET"])
-def progress_data():
-    """Get progress data for charts."""
-    months = request.args.get('months', 7, type=int)
-
-    # Create sample data (in a real implementation, this would be calculated from ReviewHistory)
-    data = {
-        'labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'][:months],
-        'datasets': [
-            {
-                'label': 'Cards Mastered',
-                'data': [5, 9, 12, 18, 22, 28, 35][:months]
-            },
-            {
-                'label': 'Cards Added',
-                'data': [8, 12, 15, 20, 25, 30, 47][:months]
-            },
-            {
-                'label': 'Retention Score',
-                'data': [60, 65, 70, 72, 75, 80, 83][:months]
-            }
-        ]
-    }
-
     return jsonify(data)
