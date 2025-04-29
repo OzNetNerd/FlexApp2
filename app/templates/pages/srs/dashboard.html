@@ -1,5 +1,3 @@
-<!-- START TEMPLATE: dashboard.html -->
-
 {% extends "layouts/base.html" %}
 
 {% block title %}CRM Dashboard - Flashcards{% endblock %}
@@ -18,19 +16,19 @@
 <!-- Quick Actions Cards -->
 <div class="row mb-4">
   <div class="col-md-3 mb-3">
-    <a href="/flashcards/due" class="nav-card card h-100 border-0 shadow-sm">
+    <a href="{{ url_for('srs_bp.filtered_cards', due_only=1) }}" class="nav-card card h-100 border-0 shadow-sm">
       <div class="card-body text-center p-4">
         <div class="mb-3">
           <i class="bi bi-alarm text-primary" style="font-size: 2.5rem;"></i>
         </div>
         <h2 class="h5 card-title">Due Cards</h2>
         <p class="card-text text-muted">Review cards due today</p>
-        <div class="badge bg-danger">12</div>
+        <div class="badge bg-danger">{{ stats.due_today }}</div>
       </div>
     </a>
   </div>
   <div class="col-md-3 mb-3">
-    <a href="/flashcards/create" class="nav-card card h-100 border-0 shadow-sm">
+    <a href="{{ url_for('srs_bp.create') }}" class="nav-card card h-100 border-0 shadow-sm">
       <div class="card-body text-center p-4">
         <div class="mb-3">
           <i class="bi bi-plus-circle text-success" style="font-size: 2.5rem;"></i>
@@ -41,7 +39,7 @@
     </a>
   </div>
   <div class="col-md-3 mb-3">
-    <a href="/flashcards/all" class="nav-card card h-100 border-0 shadow-sm">
+    <a href="{{ url_for('srs_bp.filtered_cards') }}" class="nav-card card h-100 border-0 shadow-sm">
       <div class="card-body text-center p-4">
         <div class="mb-3">
           <i class="bi bi-collection text-info" style="font-size: 2.5rem;"></i>
@@ -52,7 +50,7 @@
     </a>
   </div>
   <div class="col-md-3 mb-3">
-    <a href="/flashcards/stats" class="nav-card card h-100 border-0 shadow-sm">
+    <a href="{{ url_for('srs_bp.statistics') }}" class="nav-card card h-100 border-0 shadow-sm">
       <div class="card-body text-center p-4">
         <div class="mb-3">
           <i class="bi bi-bar-chart text-warning" style="font-size: 2.5rem;"></i>
@@ -76,7 +74,7 @@
           <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
             <div class="stat-card card border-0 bg-light h-100">
               <div class="card-body text-center">
-                <div class="display-4 text-primary mb-2">47</div>
+                <div class="display-4 text-primary mb-2">{{ stats.total_cards }}</div>
                 <div class="text-uppercase fw-bold small text-muted">Total Cards</div>
               </div>
             </div>
@@ -84,7 +82,7 @@
           <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
             <div class="stat-card card border-0 bg-light h-100">
               <div class="card-body text-center">
-                <div class="display-4 text-danger mb-2">12</div>
+                <div class="display-4 text-danger mb-2">{{ stats.due_today }}</div>
                 <div class="text-uppercase fw-bold small text-muted">Due Today</div>
               </div>
             </div>
@@ -92,7 +90,7 @@
           <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
             <div class="stat-card card border-0 bg-light h-100">
               <div class="card-body text-center">
-                <div class="display-4 text-success mb-2">83%</div>
+                <div class="display-4 text-success mb-2">{{ stats.success_rate }}%</div>
                 <div class="text-uppercase fw-bold small text-muted">Success Rate</div>
               </div>
             </div>
@@ -100,7 +98,7 @@
           <div class="col-md-3 col-sm-6">
             <div class="stat-card card border-0 bg-light h-100">
               <div class="card-body text-center">
-                <div class="display-4 text-info mb-2">9</div>
+                <div class="display-4 text-info mb-2">{{ stats.days_streak }}</div>
                 <div class="text-uppercase fw-bold small text-muted">Days Streak</div>
               </div>
             </div>
@@ -112,28 +110,28 @@
             <div class="highlight-item">
               <p class="h6 mb-0 fw-normal">
                 <i class="fas fa-check-circle text-success me-1"></i>
-                <span class="fw-bold">32</span> cards reviewed this week
+                <span class="fw-bold">{{ stats.weekly_reviews }}</span> cards reviewed this week
               </p>
             </div>
 
             <div class="highlight-item">
               <p class="h6 mb-0 fw-normal">
                 <i class="fas fa-trophy text-warning me-1"></i>
-                <span class="fw-bold">5</span> new mastered cards this month
+                <span class="fw-bold">{{ stats.mastered_cards }}</span> new mastered cards this month
               </p>
             </div>
 
             <div class="highlight-item">
               <p class="h6 mb-0 fw-normal">
                 <i class="fas fa-chart-line text-primary me-1"></i>
-                Knowledge retention increased by <span class="fw-bold">18%</span>
+                Knowledge retention increased by <span class="fw-bold">{{ stats.retention_increase }}%</span>
               </p>
             </div>
 
             <div class="highlight-item">
               <p class="h6 mb-0 fw-normal">
                 <i class="fas fa-award text-danger me-1"></i>
-                <span class="fw-bold">3</span> consecutive perfect reviews
+                <span class="fw-bold">{{ stats.perfect_reviews }}</span> consecutive perfect reviews
               </p>
             </div>
           </div>
@@ -158,7 +156,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="h5 mb-0">Card Categories</h2>
-        <button class="btn btn-sm btn-outline-primary">Manage Categories</button>
+        <a href="{{ url_for('srs_bp.filtered_cards') }}" class="btn btn-sm btn-outline-primary">Browse All Cards</a>
       </div>
       <div class="card-body">
         <div class="row">
@@ -171,12 +169,12 @@
                   </div>
                   <h3 class="h6 mb-0">Companies</h3>
                 </div>
-                <p class="small text-muted mb-2">18 cards total · 5 due</p>
+                <p class="small text-muted mb-2">{{ categories[0].total }} cards total · {{ categories[0].due }} due</p>
                 <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-primary" role="progressbar" style="width: 68%;" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"></div>
+                  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ categories[0].progress }}%;" aria-valuenow="{{ categories[0].progress }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <a href="/flashcards/companies" class="btn btn-sm btn-outline-primary">View Cards</a>
+                  <a href="{{ url_for('srs_bp.filtered_cards', category='company') }}" class="btn btn-sm btn-outline-primary">View Cards</a>
                 </div>
               </div>
             </div>
@@ -190,12 +188,12 @@
                   </div>
                   <h3 class="h6 mb-0">Contacts</h3>
                 </div>
-                <p class="small text-muted mb-2">23 cards total · 4 due</p>
+                <p class="small text-muted mb-2">{{ categories[1].total }} cards total · {{ categories[1].due }} due</p>
                 <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-success" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                  <div class="progress-bar bg-success" role="progressbar" style="width: {{ categories[1].progress }}%;" aria-valuenow="{{ categories[1].progress }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <a href="/flashcards/contacts" class="btn btn-sm btn-outline-success">View Cards</a>
+                  <a href="{{ url_for('srs_bp.filtered_cards', category='contact') }}" class="btn btn-sm btn-outline-success">View Cards</a>
                 </div>
               </div>
             </div>
@@ -209,12 +207,12 @@
                   </div>
                   <h3 class="h6 mb-0">Opportunities</h3>
                 </div>
-                <p class="small text-muted mb-2">6 cards total · 3 due</p>
+                <p class="small text-muted mb-2">{{ categories[2].total }} cards total · {{ categories[2].due }} due</p>
                 <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-danger" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+                  <div class="progress-bar bg-danger" role="progressbar" style="width: {{ categories[2].progress }}%;" aria-valuenow="{{ categories[2].progress }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <a href="/flashcards/opportunities" class="btn btn-sm btn-outline-danger">View Cards</a>
+                  <a href="{{ url_for('srs_bp.filtered_cards', category='opportunity') }}" class="btn btn-sm btn-outline-danger">View Cards</a>
                 </div>
               </div>
             </div>
@@ -231,7 +229,12 @@
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="h5 mb-0">Cards Due Today</h2>
-        <a href="/flashcards/due" class="btn btn-sm btn-primary">Review All</a>
+        <div>
+          <a href="{{ url_for('srs_bp.filtered_cards', due_only=1) }}" class="btn btn-sm btn-outline-primary me-2">
+            <i class="bi bi-funnel"></i> Filter Cards
+          </a>
+          <a href="{{ url_for('srs_bp.due_cards') }}" class="btn btn-sm btn-primary">Review All</a>
+        </div>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
@@ -241,67 +244,51 @@
                 <th scope="col" class="ps-4">Question</th>
                 <th scope="col">Category</th>
                 <th scope="col">Entity</th>
-                <th scope="col">Last Review</th>
+                <th scope="col">Due Date</th>
                 <th scope="col" class="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
+              {% for card in due_cards %}
               <tr>
-                <td class="ps-4">Who is the CTO of TechNova?</td>
-                <td><span class="badge bg-primary">Company</span></td>
-                <td>TechNova</td>
-                <td>3 days ago</td>
+                <td class="ps-4">{{ card.question|truncate(60) }}</td>
+                <td>
+                  {% if card.notable_type == 'company' %}
+                    <span class="badge bg-primary">Company</span>
+                  {% elif card.notable_type == 'contact' %}
+                    <span class="badge bg-success">Contact</span>
+                  {% elif card.notable_type == 'opportunity' %}
+                    <span class="badge bg-danger">Opportunity</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ card.notable_type }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ card.notable_id }}</td>
+                <td>{{ card.next_review_at.strftime('%Y-%m-%d') }}</td>
                 <td class="text-center">
-                  <a href="/flashcards/review/12" class="btn btn-sm btn-outline-primary me-1">Review</a>
-                  <button class="btn btn-sm btn-outline-secondary">Details</button>
+                  <a href="{{ url_for('srs_bp.review_item', item_id=card.id) }}" class="btn btn-sm btn-outline-primary me-1">Review</a>
+                  <a href="{{ url_for('srs_bp.edit', id=card.id) }}" class="btn btn-sm btn-outline-secondary">Details</a>
                 </td>
               </tr>
+              {% endfor %}
+              {% if not due_cards %}
               <tr>
-                <td class="ps-4">What is Sarah Johnson's role at GlobalTech?</td>
-                <td><span class="badge bg-success">Contact</span></td>
-                <td>Sarah Johnson</td>
-                <td>5 days ago</td>
-                <td class="text-center">
-                  <a href="/flashcards/review/23" class="btn btn-sm btn-outline-primary me-1">Review</a>
-                  <button class="btn btn-sm btn-outline-secondary">Details</button>
+                <td colspan="5" class="text-center py-4">
+                  <div class="text-muted">
+                    <i class="bi bi-check-circle-fill fs-4 mb-2"></i>
+                    <p>No cards due today! Great job!</p>
+                  </div>
                 </td>
               </tr>
-              <tr>
-                <td class="ps-4">What is the budget for Quantum Solutions' new project?</td>
-                <td><span class="badge bg-danger">Opportunity</span></td>
-                <td>Quantum Solutions</td>
-                <td>2 days ago</td>
-                <td class="text-center">
-                  <a href="/flashcards/review/34" class="btn btn-sm btn-outline-primary me-1">Review</a>
-                  <button class="btn btn-sm btn-outline-secondary">Details</button>
-                </td>
-              </tr>
-              <tr>
-                <td class="ps-4">Which industry does NexGen Systems operate in?</td>
-                <td><span class="badge bg-primary">Company</span></td>
-                <td>NexGen Systems</td>
-                <td>4 days ago</td>
-                <td class="text-center">
-                  <a href="/flashcards/review/45" class="btn btn-sm btn-outline-primary me-1">Review</a>
-                  <button class="btn btn-sm btn-outline-secondary">Details</button>
-                </td>
-              </tr>
-              <tr>
-                <td class="ps-4">What was the outcome of the last meeting with Fusion Industries?</td>
-                <td><span class="badge bg-danger">Opportunity</span></td>
-                <td>Fusion Industries</td>
-                <td>6 days ago</td>
-                <td class="text-center">
-                  <a href="/flashcards/review/56" class="btn btn-sm btn-outline-primary me-1">Review</a>
-                  <button class="btn btn-sm btn-outline-secondary">Details</button>
-                </td>
-              </tr>
+              {% endif %}
             </tbody>
           </table>
         </div>
       </div>
       <div class="card-footer bg-white text-center">
-        <a href="/flashcards/due" class="text-decoration-none">View all 12 due cards</a>
+        <a href="{{ url_for('srs_bp.filtered_cards', due_only=1) }}" class="text-decoration-none">
+          View all {{ stats.due_today }} due cards
+        </a>
       </div>
     </div>
   </div>
@@ -359,34 +346,8 @@
     const chart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-        datasets: [
-          {
-            label: 'Cards Mastered',
-            data: [5, 9, 12, 18, 22, 28, 35],
-            borderColor: 'rgba(40, 167, 69, 0.8)',
-            backgroundColor: 'rgba(40, 167, 69, 0.1)',
-            tension: 0.4,
-            fill: true
-          },
-          {
-            label: 'Cards Added',
-            data: [8, 12, 15, 20, 25, 30, 47],
-            borderColor: 'rgba(0, 123, 255, 0.8)',
-            backgroundColor: 'rgba(0, 123, 255, 0.1)',
-            tension: 0.4,
-            fill: true
-          },
-          {
-            label: 'Retention Score',
-            data: [60, 65, 70, 72, 75, 80, 83],
-            borderColor: 'rgba(220, 53, 69, 0.8)',
-            backgroundColor: 'rgba(220, 53, 69, 0.1)',
-            tension: 0.4,
-            fill: true,
-            yAxisID: 'y1'
-          }
-        ]
+        labels: {{ progress_data.labels|tojson }},
+        datasets: {{ progress_data.datasets|tojson }}
       },
       options: {
         responsive: true,
@@ -484,4 +445,3 @@
 }
 </style>
 {% endblock %}
-<!-- END TEMPLATE: dashboard.html -->

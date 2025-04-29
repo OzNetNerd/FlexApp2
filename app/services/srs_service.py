@@ -395,6 +395,179 @@ class SRSService:
             'datasets': datasets
         }
 
+    def get_cards_by_learning_stage(self, stage='new'):
+        """
+        Get cards filtered by their learning stage based on interval.
+
+        Args:
+            stage (str): One of 'new', 'learning', 'reviewing', or 'mastered'
+
+        Returns:
+            list: Cards in the specified learning stage
+        """
+        if stage == 'new':
+            # Cards that have never been reviewed
+            return SRS.query.filter(SRS.review_count == 0).all()
+        elif stage == 'learning':
+            # Cards in initial learning phase (interval <= 1 day but reviewed at least once)
+            return SRS.query.filter(
+                SRS.review_count > 0,
+                SRS.interval <= 1.0
+            ).all()
+        elif stage == 'reviewing':
+            # Cards in review phase (interval between 1 and 21 days)
+            return SRS.query.filter(
+                SRS.interval > 1.0,
+                SRS.interval <= 21.0
+            ).all()
+        elif stage == 'mastered':
+            # Cards considered mastered (interval > 21 days)
+            return SRS.query.filter(SRS.interval > 21.0).all()
+        else:
+            raise ValueError(f"Unknown learning stage: {stage}")
+
+    def get_cards_by_difficulty(self, difficulty='easy'):
+        """
+        Get cards filtered by difficulty based on ease factor.
+
+        Args:
+            difficulty (str): One of 'hard', 'medium', or 'easy'
+
+        Returns:
+            list: Cards with the specified difficulty
+        """
+        if difficulty == 'hard':
+            # Hard cards (low ease factor)
+            return SRS.query.filter(
+                SRS.ease_factor <= 1.5,
+                SRS.review_count > 0  # Only include reviewed cards
+            ).all()
+        elif difficulty == 'medium':
+            # Medium difficulty cards
+            return SRS.query.filter(
+                SRS.ease_factor > 1.5,
+                SRS.ease_factor < 2.0,
+                SRS.review_count > 0
+            ).all()
+        elif difficulty == 'easy':
+            # Easy cards (high ease factor)
+            return SRS.query.filter(
+                SRS.ease_factor >= 2.0,
+                SRS.review_count > 0
+            ).all()
+        else:
+            raise ValueError(f"Unknown difficulty: {difficulty}")
+
+    def get_cards_by_performance(self, performance='struggling'):
+        """
+        Get cards filtered by user performance.
+
+        Args:
+            performance (str): One of 'struggling', 'average', or 'strong'
+
+        Returns:
+            list: Cards that match the specified performance criteria
+        """
+        # Join with review history to calculate statistics
+        if performance == 'struggling':
+            # Cards with low success rate (< 60% correct)
+            return SRS.query.filter(
+                SRS.review_count > 2,  # At least 3 reviews
+                (SRS.successful_reps * 100 / SRS.review_count) < 60
+            ).all()
+        elif performance == 'average':
+            # Cards with average success rate (60-85%)
+            return SRS.query.filter(
+                SRS.review_count > 2,
+                (SRS.successful_reps * 100 / SRS.review_count) >= 60,
+                (SRS.successful_reps * 100 / SRS.review_count) <= 85
+            ).all()
+        elif performance == 'strong':
+            # Cards with high success rate (> 85%)
+            return SRS.query.filter(
+                SRS.review_count > 2,
+                (SRS.successful_reps * 100 / SRS.review_count) > 85
+            ).all()
+        else:
+            raise ValueError(f"Unknown performance level: {performance}")
+
+    def get_review_strategy(self, strategy_name, limit=None):
+        """
+        Get cards based on various predefined review strategies.
+
+        Args:
+            strategy_name (str): Name of the review strategy
+            limit (int): Optional maximum number of cards to return
+
+        Returns:
+            list: Cards that match the strategy criteria
+        """
+        cards = []
+
+        if strategy_name == 'due_mix':
+            # A mix of cards from different categories that are due
+            due_cards = self.get_due_items()
+            categories = {}
+
+            # Group by category
+            for card in due_cards:
+                if card.notable_type not in categories:
+                    categories[card.notable_type] = []
+                categories[card.notable_type].append(card)
+
+            # Get a mix of cards from each category
+            for category_cards in categories.values():
+                # Take about 1/3 of cards from each category, but at least 1
+                category_limit = max(1, len(category_cards) // 3)
+                cards.extend(category_cards[:category_limit])
+
+        elif strategy_name == 'priority_first':
+            # Cards that are most overdue first
+            cards = SRS.query.filter(
+                SRS.next_review_at <= datetime.now(UTC)
+            ).order_by(SRS.next_review_at).all()
+
+        elif strategy_name == 'hard_cards_first':
+            # Focus on difficult cards first
+            cards = SRS.query.filter(
+                SRS.next_review_at <= datetime.now(UTC),
+                SRS.ease_factor <= 1.7
+            ).order_by(SRS.ease_factor).all()
+
+        elif strategy_name == 'mastery_boost':
+            # Cards that are close to mastery (interval between 15-21 days)
+            cards = SRS.query.filter(
+                SRS.next_review_at <= datetime.now(UTC),
+                SRS.interval >= 15,
+                SRS.interval <= 21
+            ).order_by(SRS.interval.desc()).all()
+
+        elif strategy_name == 'struggling_focus':
+            # Focus on cards with low success rate
+            cards = SRS.query.filter(
+                SRS.next_review_at <= datetime.now(UTC),
+                SRS.review_count > 2,
+                (SRS.successful_reps * 100 / SRS.review_count) < 70
+            ).order_by((SRS.successful_reps * 100 / SRS.review_count)).all()
+
+        elif strategy_name == 'new_mix':
+            # Mix of new and due cards
+            new_cards = SRS.query.filter(SRS.review_count == 0).limit(5).all()
+            due_cards = SRS.query.filter(
+                SRS.next_review_at <= datetime.now(UTC),
+                SRS.review_count > 0
+            ).limit(10).all()
+            cards = new_cards + due_cards
+
+        else:
+            raise ValueError(f"Unknown review strategy: {strategy_name}")
+
+        # Apply limit if specified
+        if limit:
+            cards = cards[:limit]
+
+        return cards
+
     def get_due_cards(self, limit=None):
         """
         Get SRS items that are due for review.

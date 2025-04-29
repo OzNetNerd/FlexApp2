@@ -1,9 +1,7 @@
 from typing import Any, Dict
 from flask import Blueprint, request
 
-# Fix the import path for SRS
-from app.models.pages.srs import SRS
-from app.routes.api.route_registration import ApiCrudRouteConfig, register_api_crud_routes
+from app.routes.api.route_registration import ApiCrudRouteConfig
 from app.services.srs_service import SRSService
 from app.utils.app_logging import get_logger
 

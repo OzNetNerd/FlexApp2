@@ -186,3 +186,129 @@ def progress_data():
 def register_srs_blueprint(app):
     """Register the SRS blueprint with the app."""
     app.register_blueprint(srs_bp, url_prefix='/flashcards')
+
+
+@srs_bp.route("/learning-stage/<stage>", methods=["GET"])
+@login_required
+def cards_by_learning_stage(stage):
+    """View cards by learning stage."""
+    valid_stages = ['new', 'learning', 'reviewing', 'mastered']
+    if stage not in valid_stages:
+        flash(f"Invalid learning stage: {stage}", "error")
+        return redirect(url_for('srs_bp.dashboard'))
+
+    cards = srs_service.get_cards_by_learning_stage(stage)
+
+    stage_names = {
+        'new': 'New Cards',
+        'learning': 'Learning Cards',
+        'reviewing': 'Review Cards',
+        'mastered': 'Mastered Cards'
+    }
+
+    return render_template(
+        "pages/srs/filtered_cards.html",
+        cards=cards,
+        title=stage_names[stage],
+        filters={'learning_stage': stage},
+        category_counts=srs_service.count_by_type(),
+        due_category_counts=srs_service.count_due_by_type(),
+        due_today=srs_service.count_due_today(),
+        total_cards=srs_service.count_total(),
+        active_tab=stage
+    )
+
+
+@srs_bp.route("/difficulty/<difficulty>", methods=["GET"])
+@login_required
+def cards_by_difficulty(difficulty):
+    """View cards by difficulty level."""
+    valid_difficulties = ['hard', 'medium', 'easy']
+    if difficulty not in valid_difficulties:
+        flash(f"Invalid difficulty level: {difficulty}", "error")
+        return redirect(url_for('srs_bp.dashboard'))
+
+    cards = srs_service.get_cards_by_difficulty(difficulty)
+
+    difficulty_names = {
+        'hard': 'Hard Cards',
+        'medium': 'Medium Difficulty Cards',
+        'easy': 'Easy Cards'
+    }
+
+    return render_template(
+        "pages/srs/filtered_cards.html",
+        cards=cards,
+        title=difficulty_names[difficulty],
+        filters={'difficulty': difficulty},
+        category_counts=srs_service.count_by_type(),
+        due_category_counts=srs_service.count_due_by_type(),
+        due_today=srs_service.count_due_today(),
+        total_cards=srs_service.count_total(),
+        active_tab=f'difficulty_{difficulty}'
+    )
+
+
+@srs_bp.route("/performance/<performance>", methods=["GET"])
+@login_required
+def cards_by_performance(performance):
+    """View cards by performance level."""
+    valid_performances = ['struggling', 'average', 'strong']
+    if performance not in valid_performances:
+        flash(f"Invalid performance level: {performance}", "error")
+        return redirect(url_for('srs_bp.dashboard'))
+
+    cards = srs_service.get_cards_by_performance(performance)
+
+    performance_names = {
+        'struggling': 'Struggling Cards',
+        'average': 'Average Performance Cards',
+        'strong': 'Strong Performance Cards'
+    }
+
+    return render_template(
+        "pages/srs/filtered_cards.html",
+        cards=cards,
+        title=performance_names[performance],
+        filters={'performance': performance},
+        category_counts=srs_service.count_by_type(),
+        due_category_counts=srs_service.count_due_by_type(),
+        due_today=srs_service.count_due_today(),
+        total_cards=srs_service.count_total(),
+        active_tab=f'performance_{performance}'
+    )
+
+
+@srs_bp.route("/strategy/<strategy>", methods=["GET"])
+@login_required
+def review_by_strategy(strategy):
+    """Start a review session using a specific review strategy."""
+    valid_strategies = ['due_mix', 'priority_first', 'hard_cards_first', 'mastery_boost', 'struggling_focus', 'new_mix']
+    if strategy not in valid_strategies:
+        flash(f"Invalid review strategy: {strategy}", "error")
+        return redirect(url_for('srs_bp.dashboard'))
+
+    # Get cards based on strategy
+    cards = srs_service.get_review_strategy(strategy, limit=20)
+
+    if not cards:
+        flash("No cards available for this review strategy", "warning")
+        return redirect(url_for('srs_bp.dashboard'))
+
+    # Store card IDs in session for review
+    session['review_queue'] = [card.id for card in cards]
+
+    strategy_names = {
+        'due_mix': 'Mixed Categories Review',
+        'priority_first': 'Overdue First Review',
+        'hard_cards_first': 'Difficult Cards Focus',
+        'mastery_boost': 'Mastery Boost Review',
+        'struggling_focus': 'Struggling Cards Focus',
+        'new_mix': 'New & Due Cards Mix'
+    }
+
+    # Set session variable for strategy name to display during review
+    session['review_strategy'] = strategy_names[strategy]
+
+    # Redirect to first card in queue
+    return redirect(url_for('srs_bp.review_item', item_id=cards[0].id, batch=True))
