@@ -110,14 +110,20 @@
     </div>
 
     <div class="d-flex justify-content-between mt-3">
-      <a href="{{ url_for('srs_bp.review_item', item_id=prev_item_id or entity.id) }}"
+      {% if prev_item_id %}
+      <a href="{{ url_for('srs_bp.review_item', item_id=prev_item_id) }}"
          id="prev-btn" class="btn btn-sm btn-outline-secondary"
          title="Previous Card (Shift+Left)">
          <i class="bi bi-arrow-left"></i> Previous
       </a>
+      {% else %}
+      <div></div>
+      {% endif %}
+
       <div class="text-muted small">
          Card {{ current_index|default(1) }} of {{ total_cards|default(1) }}
       </div>
+
       {% if next_item_id is defined and next_item_id %}
       <a href="{{ url_for('srs_bp.review_item', item_id=next_item_id) }}"
          id="next-btn" class="btn btn-sm btn-outline-secondary"
@@ -125,10 +131,29 @@
          Next <i class="bi bi-arrow-right"></i>
       </a>
       {% else %}
-      <button class="btn btn-sm btn-outline-secondary" disabled>
-        Next <i class="bi bi-arrow-right"></i>
-      </button>
+      <div></div>
       {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Finished review message modal -->
+<div class="modal fade" id="finishedModal" tabindex="-1" aria-labelledby="finishedModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="finishedModalLabel">Review Complete!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Congratulations! You've completed all your flashcards for this session.</p>
+        <div class="text-center mt-3 mb-2">
+          <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="/srs/dashboard" class="btn btn-primary">Go to Dashboard</a>
+      </div>
     </div>
   </div>
 </div>
@@ -295,17 +320,26 @@
     document.getElementById('cards-reviewed').textContent = stats.cards_reviewed_today || 0;
   }
 
+  function showFinishedModal() {
+    const modal = new bootstrap.Modal(document.getElementById('finishedModal'));
+    modal.show();
+  }
+
   document.addEventListener('keydown', function (event) {
+    // Only process next/prev keyboard shortcuts if the buttons exist
     if (event.shiftKey && event.key === 'ArrowRight') {
       const nextBtn = document.getElementById('next-btn');
-      if (nextBtn && !nextBtn.hasAttribute('disabled')) {
+      if (nextBtn) {
         event.preventDefault();
         window.location.href = nextBtn.getAttribute('href');
       }
     }
     if (event.shiftKey && event.key === 'ArrowLeft') {
-      event.preventDefault();
-      window.location.href = document.getElementById('prev-btn').getAttribute('href');
+      const prevBtn = document.getElementById('prev-btn');
+      if (prevBtn) {
+        event.preventDefault();
+        window.location.href = prevBtn.getAttribute('href');
+      }
     }
     if (event.key === ' ' && document.activeElement.tagName !== 'TEXTAREA') {
       event.preventDefault();
@@ -372,12 +406,13 @@
       }
 
       const nextItemId = "{{ next_item_id|default('') }}";
-      console.log("Redirecting to next item:", nextItemId);
+      console.log("Next item ID:", nextItemId);
+
       if (nextItemId) {
         window.location.href = `/srs/review/${nextItemId}`;
       } else {
-        // If no next item, redirect to the review index page
-        window.location.href = '/srs/review';
+        // Show the "finished" modal instead of redirecting
+        showFinishedModal();
       }
     } catch (err) {
       console.error("Error submitting review:", err);
