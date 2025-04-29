@@ -14,5 +14,5 @@ def register_web_blueprints(app: Flask) -> None:
         config_suffix="_crud_config",
         register_func=register_crud_routes,
         blueprint_suffix="_bp",
-        exclusions=["components"]
+        exclusions=["components"],
     )

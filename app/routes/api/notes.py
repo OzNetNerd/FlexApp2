@@ -37,8 +37,8 @@ def query_notes():
     if from_date and to_date:
         try:
             # Parse ISO format strings with timezone consideration
-            start = datetime.fromisoformat(from_date.replace('Z', '+00:00'))
-            end = datetime.fromisoformat(to_date.replace('Z', '+00:00'))
+            start = datetime.fromisoformat(from_date.replace("Z", "+00:00"))
+            end = datetime.fromisoformat(to_date.replace("Z", "+00:00"))
             logger.info(f"Date filter applied: from={start}, to={end}")
             filters.append(Note.created_at.between(start, end))
         except Exception as e:
@@ -78,6 +78,7 @@ def query_notes():
     paginated = query.order_by(Note.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
 
     return {"data": [n.to_dict() for n in paginated.items], "total": paginated.total}
+
 
 # You can add other manual routes (e.g. /filter/notable, /search) below as needed...
 

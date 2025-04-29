@@ -11,19 +11,13 @@ logger = get_logger()
 ENTITY_NAME = "Relationship"
 ENTITY_PLURAL_NAME = "Relationships"
 
-relationships_api_bp = Blueprint(
-    f"{ENTITY_NAME.lower()}_api",
-    __name__,
-    url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}"
-)
+relationships_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 
 relationship_service = CRUDService(Relationship)
 
 # Configure standard CRUD routes
 relationship_api_crud_config = ApiCrudRouteConfig(
-    blueprint=relationships_api_bp,
-    entity_table_name=ENTITY_NAME,
-    service=relationship_service
+    blueprint=relationships_api_bp, entity_table_name=ENTITY_NAME, service=relationship_service
 )
 
 
@@ -51,9 +45,7 @@ def search_relationships():
     try:
         entity_id = int(entity_id)
         relationships = Relationship.get_relationships(
-            entity_type=entity_type,
-            entity_id=entity_id,
-            related_entity_type=related_entity_type
+            entity_type=entity_type, entity_id=entity_id, related_entity_type=related_entity_type
         )
 
         # Filter by relationship_type if provided
@@ -64,14 +56,16 @@ def search_relationships():
         formatted_relationships = []
         for relationship in relationships:
             related_type, related_id = relationship.get_related_entity(entity_type, entity_id)
-            formatted_relationships.append({
-                "id": relationship.id,
-                "entity_type": entity_type,
-                "entity_id": entity_id,
-                "related_entity_type": related_type,
-                "related_entity_id": related_id,
-                "relationship_type": relationship.relationship_type
-            })
+            formatted_relationships.append(
+                {
+                    "id": relationship.id,
+                    "entity_type": entity_type,
+                    "entity_id": entity_id,
+                    "related_entity_type": related_type,
+                    "related_entity_id": related_id,
+                    "relationship_type": relationship.relationship_type,
+                }
+            )
 
         return {"success": True, "data": formatted_relationships}
 

@@ -22,12 +22,12 @@ def discover_modules(package_path: str, exclusions: Optional[List[str]] = None) 
 
 
 def register_blueprint_routes(
-        app: Flask,
-        package_path: str,
-        config_suffix: str,
-        register_func: Callable,
-        blueprint_suffix: str = "_bp",
-        exclusions: Optional[List[str]] = None
+    app: Flask,
+    package_path: str,
+    config_suffix: str,
+    register_func: Callable,
+    blueprint_suffix: str = "_bp",
+    exclusions: Optional[List[str]] = None,
 ) -> None:
     """Generic blueprint registration with customizable behavior."""
     modules = list(discover_modules(package_path, exclusions))

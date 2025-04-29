@@ -24,15 +24,14 @@ class NoteService(CRUDService):
     def get_by_notable(self, notable_type: str, notable_id: int) -> List[Note]:
         """Fetch notes for a given entity, newest first."""
         try:
-            return Note.query.filter_by(notable_type=notable_type, notable_id=notable_id).order_by(
-                Note.created_at.desc()).all()
+            return Note.query.filter_by(notable_type=notable_type, notable_id=notable_id).order_by(Note.created_at.desc()).all()
         except Exception as e:
             logger.error(f"❌ Error getting notes for {notable_type} id={notable_id}: {e}")
             raise
 
-    def get_by_notable_with_filters(self, notable_type: str, notable_id: int,
-                                    from_date: Optional[str] = None,
-                                    to_date: Optional[str] = None) -> List[Note]:
+    def get_by_notable_with_filters(
+        self, notable_type: str, notable_id: int, from_date: Optional[str] = None, to_date: Optional[str] = None
+    ) -> List[Note]:
         """
         Get notes for a specific notable entity with optional date range filtering.
         Date parameters should be ISO format strings.
@@ -43,8 +42,8 @@ class NoteService(CRUDService):
             if from_date and to_date:
                 logger.info(f"Applying date filter: from={from_date}, to={to_date}")
                 # Parse ISO format strings with timezone consideration
-                start = datetime.fromisoformat(from_date.replace('Z', '+00:00'))
-                end = datetime.fromisoformat(to_date.replace('Z', '+00:00'))
+                start = datetime.fromisoformat(from_date.replace("Z", "+00:00"))
+                end = datetime.fromisoformat(to_date.replace("Z", "+00:00"))
                 query = query.filter(Note.created_at.between(start, end))
 
             return query.order_by(Note.created_at.desc()).all()
@@ -59,8 +58,8 @@ class NoteService(CRUDService):
         """
         try:
             # Parse ISO format strings directly
-            start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
-            end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+            start = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
+            end = datetime.fromisoformat(end_date.replace("Z", "+00:00"))
 
             logger.info(f"Querying notes between {start} and {end}")
             return Note.query.filter(Note.created_at.between(start, end)).all()
@@ -74,8 +73,7 @@ class NoteService(CRUDService):
         """
         try:
             pattern = f"%{term}%"
-            return Note.query.filter(or_(Note.content.ilike(pattern), Note.user_id == term)).order_by(
-                Note.created_at.desc()).all()
+            return Note.query.filter(or_(Note.content.ilike(pattern), Note.user_id == term)).order_by(Note.created_at.desc()).all()
         except Exception as e:
             logger.error(f"❌ Error searching notes for '{term}': {e}")
             raise

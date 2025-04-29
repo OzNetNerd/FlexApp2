@@ -41,8 +41,8 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     app = Flask(__name__, static_folder="static", static_url_path="/static")
     app.config.from_object(config_class)
 
-    if not app.config['LOG_HTTP_REQUESTS']:
-        logging.getLogger('werkzeug').setLevel(logging.WARNING)
+    if not app.config["LOG_HTTP_REQUESTS"]:
+        logging.getLogger("werkzeug").setLevel(logging.WARNING)
 
     app.config.update(
         PERMANENT_SESSION_LIFETIME=60 * 60 * 24,  # 1 day
@@ -96,7 +96,7 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     register_web_blueprints(app)
 
     def log_request():
-        if not current_app.config['LOG_HTTP_REQUESTS']:
+        if not current_app.config["LOG_HTTP_REQUESTS"]:
             return
         request_id = getattr(request, "id", hex(id(request))[2:])
         logger.info(f"[{request_id}] {request.method} {request.path} from {request.remote_addr}")
@@ -106,14 +106,13 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
         endpoint = request.endpoint or ""
         authenticated = current_user.is_authenticated
         # only log this if the flag is on
-        if current_app.config['LOG_HTTP_REQUESTS']:
+        if current_app.config["LOG_HTTP_REQUESTS"]:
             logger.info(f"require_login: endpoint={endpoint}, authenticated={authenticated}")
 
         # now do your normal whitelist + redirect logic…
         whitelisted = {"auth_bp.login", "auth_bp.logout", "static", "debug_session"}
         if not authenticated:
-            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith(
-                    "api_") or endpoint.endswith(".data"):
+            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
                 return None
             return redirect(url_for("auth_bp.login", next=request.path))
 

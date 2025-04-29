@@ -70,7 +70,7 @@ class TableContext(SimpleContext):
 
     def __init__(self, entity_table_name=None, title="", read_only=True, action=None, **kwargs):
         # Allow either entity_table_name or model_class as input
-        self.model_class = kwargs.pop('model_class', None)
+        self.model_class = kwargs.pop("model_class", None)
 
         # If model_class is provided but not entity_table_name, derive it
         if self.model_class and not entity_table_name:
@@ -86,10 +86,11 @@ class TableContext(SimpleContext):
         # Load model class if not already provided
         if not self.model_class:
             from app.utils.model_registry import get_model_by_name
+
             self.model_class = get_model_by_name(entity_table_name)
 
         # Determine plural name (with fallback)
-        entity_plural = getattr(self.model_class, '__entity_plural__', self.entity_table_name.lower() + 's')
+        entity_plural = getattr(self.model_class, "__entity_plural__", self.entity_table_name.lower() + "s")
 
         # Set page title and display title
         if title:
@@ -101,16 +102,15 @@ class TableContext(SimpleContext):
 
         super().__init__(title=self.title, **kwargs)
 
-
         # Variables needed by _table_index.html
         self.entity_name = self.model_class.__entity_name__
-        self.entity_title = getattr(self.model_class, '__entity_plural__', '').capitalize() or f"{self.entity_name}s"
+        self.entity_title = getattr(self.model_class, "__entity_plural__", "").capitalize() or f"{self.entity_name}s"
         self.entity_base_route = f"{self.model_class.__tablename__}_bp"
         self.api_url = f"/api/{self.model_class.__tablename__}"
         self.table_id = get_table_id_by_name(self.entity_table_name)
         self.default_sort = "name"
-        self.show_heading = kwargs.get('show_heading', True)
-        self.show_card_title = kwargs.get('show_card_title', False)
+        self.show_heading = kwargs.get("show_heading", True)
+        self.show_card_title = kwargs.get("show_card_title", False)
 
         logger.info(f"TableContext initialized for {self.entity_name} ({self.entity_base_route})")
 
@@ -174,9 +174,7 @@ class EntityContext(BaseContext):
         }
         primary_str = ", ".join(f"{key}={value!r}" for key, value in primary_attrs.items())
         other_attrs: Dict[str, Any] = {
-            key: value
-            for key, value in vars(self).items()
-            if not key.startswith("_") and key not in primary_attrs
+            key: value for key, value in vars(self).items() if not key.startswith("_") and key not in primary_attrs
         }
         if self.autocomplete_fields:
             other_attrs["autocomplete_fields"] = f"[{len(self.autocomplete_fields)} fields]"
@@ -200,9 +198,7 @@ class EntityContext(BaseContext):
             if isinstance(self.entity, dict):
                 entity_dict = self.entity
             elif hasattr(self.entity, "__dict__"):
-                entity_dict = {
-                    k: v for k, v in self.entity.__dict__.items() if not k.startswith("_")
-                }
+                entity_dict = {k: v for k, v in self.entity.__dict__.items() if not k.startswith("_")}
             elif hasattr(self.entity, "to_dict"):
                 entity_dict = self.entity.to_dict()
 
@@ -215,34 +211,24 @@ class EntityContext(BaseContext):
             if self.action == "create":
                 self.submit_url = url_for(f"{blueprint_name}.create")
             elif self.action == "edit" and self.entity_id:
-                self.submit_url = url_for(
-                    f"{blueprint_name}.update", entity_id=self.entity_id
-                )
+                self.submit_url = url_for(f"{blueprint_name}.update", entity_id=self.entity_id)
             else:
                 self.submit_url = ""
         else:
             self.submit_url = ""
 
         # Log context state
-        logger.info(
-            f"📜 Building {self.action!r} page for {blueprint_name!r} blueprint (RO={self.read_only})"
-        )
+        logger.info(f"📜 Building {self.action!r} page for {blueprint_name!r} blueprint (RO={self.read_only})")
 
         # Determine a friendly name for the entity
         for key in ("name", "title", "email", "username"):
             if entity_dict.get(key):
                 self.entity_name = entity_dict[key]
-                logger.info(
-                    f"ℹ️ entity_name set using key {key!r}: {self.entity_name!r}"
-                )
+                logger.info(f"ℹ️ entity_name set using key {key!r}: {self.entity_name!r}")
                 break
         else:
             self.entity_name = self.id
-            logger.info(
-                f"ℹ️ entity_name defaulted to id: {self.entity_name!r}"
-            )
+            logger.info(f"ℹ️ entity_name defaulted to id: {self.entity_name!r}")
 
         # Log all model instance variables, excluding SQLAlchemy internals
-        log_instance_vars(
-            "Variables being assed to Jinja", self, exclude=["_sa_instance_state"]
-        )
+        log_instance_vars("Variables being assed to Jinja", self, exclude=["_sa_instance_state"])

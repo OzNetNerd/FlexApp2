@@ -19,13 +19,13 @@ def use_context(context_cls: Type[Any], *ctx_args, **ctx_kwargs):
         @wraps(view_fn)
         def wrapped(*args, **kwargs):
             # If this is an EntityContext, handle the entity parameter
-            if context_cls.__name__ == 'EntityContext':
-                entity_id = kwargs.get('entity_id')
-                entity_table_name = ctx_kwargs.get('entity_table_name')
+            if context_cls.__name__ == "EntityContext":
+                entity_id = kwargs.get("entity_id")
+                entity_table_name = ctx_kwargs.get("entity_table_name")
 
                 # For create action, use empty entity
-                if ctx_kwargs.get('action') == 'create':
-                    ctx_kwargs['entity'] = {}
+                if ctx_kwargs.get("action") == "create":
+                    ctx_kwargs["entity"] = {}
                 # For view/edit actions, fetch entity
                 elif entity_id and entity_table_name:
                     from app.utils.model_registry import get_model_by_name
@@ -36,16 +36,16 @@ def use_context(context_cls: Type[Any], *ctx_args, **ctx_kwargs):
 
                     try:
                         entity = service.get_by_id(entity_id)
-                        ctx_kwargs['entity'] = entity
+                        ctx_kwargs["entity"] = entity
                     except Exception as e:
                         current_app.logger.error(f"Error fetching entity: {str(e)}")
-                        ctx_kwargs['entity'] = {}
+                        ctx_kwargs["entity"] = {}
                 else:
-                    ctx_kwargs['entity'] = {}
+                    ctx_kwargs["entity"] = {}
 
                 # Pass entity_id to context
                 if entity_id:
-                    ctx_kwargs['entity_id'] = entity_id
+                    ctx_kwargs["entity_id"] = entity_id
 
             # Instantiate the context
             ctx = context_cls(*ctx_args, **ctx_kwargs)

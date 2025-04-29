@@ -8,6 +8,7 @@ class SRSItem(BaseModel):
     """
     Represents an SRS item for spaced repetition review.
     """
+
     __tablename__ = "srs_items"
     __entity_name__ = "SRSItem"  # Add this line
 
@@ -36,13 +37,12 @@ class ReviewHistory(BaseModel):
     """
     Records the review history entries for SRS items.
     """
+
     __tablename__ = "review_history"
 
     id = db.Column(db.Integer, primary_key=True)
 
-    srs_item_id = db.Column(
-        db.Integer, db.ForeignKey("srs_items.id"), nullable=False
-    )
+    srs_item_id = db.Column(db.Integer, db.ForeignKey("srs_items.id"), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     rating = db.Column(db.Integer, nullable=False)
     interval = db.Column(db.Float, nullable=False)

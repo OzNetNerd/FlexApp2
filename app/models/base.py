@@ -86,7 +86,6 @@ class BaseModel(db.Model):
             return "textarea"
         return "text"
 
-
     @classmethod
     def ui_schema(cls, instance=None) -> dict:
         """

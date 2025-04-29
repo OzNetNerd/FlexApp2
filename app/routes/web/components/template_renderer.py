@@ -33,9 +33,7 @@ class LoggingUndefined(DebugUndefined):
     def _log(self, msg: str):
         var_name = self._undefined_name
         frame = inspect.stack()[2]
-        logger.warning(
-            f"⚠️  {msg}: {var_name!r} (template file: {frame.filename}, line: {frame.lineno})"
-        )
+        logger.warning(f"⚠️  {msg}: {var_name!r} (template file: {frame.filename}, line: {frame.lineno})")
         self.__class__._missing_variables.add(var_name)
 
     def __str__(self):
@@ -47,19 +45,11 @@ class LoggingUndefined(DebugUndefined):
 
     def __getitem__(self, key):
         self._log(f"Attempted to access key {key!r} on undefined variable")
-        return self.__class__(
-            hint=self._undefined_hint,
-            obj=self._undefined_obj,
-            name=f"{self._undefined_name}[{key!r}]"
-        )
+        return self.__class__(hint=self._undefined_hint, obj=self._undefined_obj, name=f"{self._undefined_name}[{key!r}]")
 
     def __getattr__(self, attr):
         self._log(f"Attempted to access attribute {attr!r} on undefined variable")
-        return self.__class__(
-            hint=self._undefined_hint,
-            obj=self._undefined_obj,
-            name=f"{self._undefined_name}.{attr}"
-        )
+        return self.__class__(hint=self._undefined_hint, obj=self._undefined_obj, name=f"{self._undefined_name}.{attr}")
 
     @classmethod
     def clear_missing_variables(cls):
@@ -152,9 +142,7 @@ def render_debug_panel(
     status_code: int,
 ) -> Tuple[str, int]:
     current_path = request.path
-    logger.info(
-        f"🛠️ Rendering debug panel for template {template_name!r} at path {current_path!r}"
-    )
+    logger.info(f"🛠️ Rendering debug panel for template {template_name!r} at path {current_path!r}")
 
     try:
         html_response = render_template(
@@ -185,9 +173,7 @@ def render_debug_panel(
 
 
 def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, int], str]:
-    current_endpoint = (
-        render_safely_config.endpoint_name or request.endpoint or "unknown endpoint"
-    )
+    current_endpoint = render_safely_config.endpoint_name or request.endpoint or "unknown endpoint"
     logger.info(f"🔍 Routing to endpoint: {current_endpoint}")
     logger.info(f"🔍 Using template: {render_safely_config.template_path!r}")
     logger.debug(f"📝 Request ID: {id(request)}")
@@ -233,8 +219,7 @@ def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, 
 
     except Exception as e:
         logger.exception(
-            f"❌ Error rendering template {render_safely_config.template_path!r} "
-            f"at endpoint {render_safely_config.endpoint_name!r}"
+            f"❌ Error rendering template {render_safely_config.template_path!r} " f"at endpoint {render_safely_config.endpoint_name!r}"
         )
         logger.error(f"❌ Exception details: {type(e).__name__}: {str(e)}")
         return handle_template_error(

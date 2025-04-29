@@ -121,6 +121,7 @@ class SRSService(CRUDService):
 
         return item
 
-    def get_due_items(self):
+    @staticmethod
+    def get_due_items():
         """Return all cards whose next_review_at ≤ now."""
         return SRSItem.query.filter(SRSItem.next_review_at <= datetime.now(UTC)).all()

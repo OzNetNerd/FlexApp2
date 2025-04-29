@@ -68,10 +68,7 @@ class Opportunity(BaseModel):
                     if hasattr(rel, "contact"):
                         contacts.add(rel.contact)
 
-            scores = [
-                c.crisp_summary for c in contacts
-                if hasattr(c, "crisp_summary") and c.crisp_summary is not None
-            ]
+            scores = [c.crisp_summary for c in contacts if hasattr(c, "crisp_summary") and c.crisp_summary is not None]
 
             if not scores:
                 return None

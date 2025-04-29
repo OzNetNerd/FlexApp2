@@ -118,10 +118,9 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         try:
             from flask_wtf.csrf import generate_csrf
             from markupsafe import Markup
+
             context.csrf_token = generate_csrf()
-            context.csrf_input = Markup(
-                f"<input type=\"hidden\" name=\"csrf_token\" value=\"{generate_csrf()}\">"
-            )
+            context.csrf_input = Markup(f'<input type="hidden" name="csrf_token" value="{generate_csrf()}">')
         except ImportError:
             context.csrf_token = ""
             context.csrf_input = ""
@@ -154,13 +153,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
     return login_required(handler)
 
 
-def handle_crud_operation(
-        endpoint: str,
-        service: Any,
-        blueprint_name: str,
-        entity_id: Optional[int],
-        form_data: Dict[str, Any]
-) -> Any:
+def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, entity_id: Optional[int], form_data: Dict[str, Any]) -> Any:
     if endpoint == CRUDEndpoint.create.value:
         entity = service.create(form_data)
         return redirect(url_for(f"{blueprint_name}.view", entity_id=entity.id))
@@ -198,12 +191,6 @@ def register_crud_routes(config: CrudRouteConfig) -> None:
     )
 
 
-def register_auth_route(
-        blueprint: Blueprint,
-        url: str,
-        handler: Callable,
-        endpoint_name: str,
-        methods: Optional[List[str]] = None
-) -> None:
+def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint_name: str, methods: Optional[List[str]] = None) -> None:
     methods = methods or ["GET"]
     blueprint.add_url_rule(rule=url, endpoint=endpoint_name, view_func=handler, methods=methods)

@@ -6,7 +6,7 @@ IRREGULAR_PLURALS = {
     "opportunity": "opportunities",
     "category": "categories",
     "capability": "capabilities",
-    "srsitem": "srs"
+    "srsitem": "srs",
 }
 
 
