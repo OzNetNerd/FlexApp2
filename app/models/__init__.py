@@ -20,7 +20,7 @@ from app.models.pages.company import Company
 from app.models.pages.contact import Contact
 from app.models.pages.note import Note
 from app.models.pages.opportunity import Opportunity
-from app.models.pages.srs import ReviewHistory, SRSItem
+from app.models.pages.srs import ReviewHistory, SRS
 from app.models.pages.setting import Setting
 from app.models.pages.task import Task
 from app.models.pages.user import User
@@ -42,7 +42,7 @@ __all__ = [
     "Relationship",
     "ReviewHistory",
     "Setting",
-    "SRSItem",
+    "SRS",
     "TableConfig",
     "Task",
     "User",

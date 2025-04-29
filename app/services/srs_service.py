@@ -16,7 +16,7 @@ from typing import Dict, List, Optional
 
 # FSRS import removed - using optimized custom algorithm instead
 
-from app.models.pages.srs import ReviewHistory, SRSItem
+from app.models.pages.srs import ReviewHistory, SRS
 from app.services.crud_service import CRUDService
 from app.utils.app_logging import get_logger
 
@@ -59,7 +59,7 @@ class SRSService(CRUDService):
 
     def __init__(self):
         """Initialize the SRS service."""
-        super().__init__(SRSItem)
+        super().__init__(SRS)
         # The scheduler import is removed as we're using our own custom algorithm
 
     def preview_ratings(self, item_id: int) -> Dict[int, float]:
@@ -86,7 +86,7 @@ class SRSService(CRUDService):
 
         return results
 
-    def schedule_review(self, item_id: int, rating: int, answer_given='') -> SRSItem:
+    def schedule_review(self, item_id: int, rating: int, answer_given='') -> SRS:
         """
         Schedule the next review for an item based on the user's rating.
 
@@ -95,7 +95,7 @@ class SRSService(CRUDService):
             rating (int): User's rating (0-5) of their recall performance
 
         Returns:
-            SRSItem: Updated SRS item with new scheduling information
+            SRS: Updated SRS item with new scheduling information
         """
 
         item = self.get_by_id(item_id)
@@ -133,7 +133,7 @@ class SRSService(CRUDService):
             "last_reviewed_at": datetime.now(timezone.utc),
         }
 
-        # Persist updated SRSItem
+        # Persist updated SRS
         logger.info(f"SRSService: updating item {item.id} → next in {next_interval:.2f}d, ef={new_ease:.2f}")
         self.update(item, update_data)
 
@@ -153,16 +153,16 @@ class SRSService(CRUDService):
 
         return item
 
-    def get_due_items(self) -> List[SRSItem]:
+    def get_due_items(self) -> List[SRS]:
         """
         Get all SRS items that are due for review.
 
         Returns:
-            List[SRSItem]: List of SRSItem objects due for review
+            List[SRS]: List of SRS objects due for review
         """
-        return SRSItem.query.filter(SRSItem.next_review_at <= datetime.now(UTC)).all()
+        return SRS.query.filter(SRS.next_review_at <= datetime.now(UTC)).all()
 
-    def _calculate_next_interval(self, item: SRSItem, ui_rating: int) -> float:
+    def _calculate_next_interval(self, item: SRS, ui_rating: int) -> float:
         """
         Calculate the next interval based on the rating and current item state.
 
@@ -197,7 +197,7 @@ class SRSService(CRUDService):
             else:
                 return min(item.interval * EASY_MULTIPLIER, MAX_INTERVAL)
 
-    def _calculate_new_ease_factor(self, item: SRSItem, ui_rating: int) -> float:
+    def _calculate_new_ease_factor(self, item: SRS, ui_rating: int) -> float:
         """
         Calculate the new ease factor based on the rating.
 
@@ -222,22 +222,22 @@ class SRSService(CRUDService):
 
     def get_next_due_item_id(self, current_item_id=None):
         """Get the next item due for review after current_item_id."""
-        query = SRSItem.query.filter(SRSItem.next_review_at <= datetime.now(UTC))
+        query = SRS.query.filter(SRS.next_review_at <= datetime.now(UTC))
 
         if current_item_id:
             # Try to find the next item in sequence
-            next_items = query.filter(SRSItem.id > current_item_id).order_by(SRSItem.id).limit(1).all()
+            next_items = query.filter(SRS.id > current_item_id).order_by(SRS.id).limit(1).all()
             if next_items:
                 return next_items[0].id
 
         # Otherwise get the first due item
-        first_item = query.order_by(SRSItem.next_review_at).first()
+        first_item = query.order_by(SRS.next_review_at).first()
         return first_item.id if first_item else current_item_id
 
 
     def get_prev_item_id(self, current_item_id):
         """Get the previous item reviewed before current_item_id."""
-        prev_items = SRSItem.query.filter(SRSItem.id < current_item_id).order_by(SRSItem.id.desc()).limit(1).all()
+        prev_items = SRS.query.filter(SRS.id < current_item_id).order_by(SRS.id.desc()).limit(1).all()
         return prev_items[0].id if prev_items else current_item_id
 
 
@@ -248,9 +248,9 @@ class SRSService(CRUDService):
             return 1
 
         # Count items before this one
-        position = SRSItem.query.filter(
-            SRSItem.next_review_at <= item.next_review_at,
-            SRSItem.id <= item_id
+        position = SRS.query.filter(
+            SRS.next_review_at <= item.next_review_at,
+            SRS.id <= item_id
         ).count()
 
         return position
@@ -258,9 +258,9 @@ class SRSService(CRUDService):
 
     def get_stats(self):
         """Get current SRS system statistics."""
-        total = SRSItem.query.count()
-        due_today = SRSItem.query.filter(
-            SRSItem.next_review_at <= datetime.now(UTC)
+        total = SRS.query.count()
+        due_today = SRS.query.filter(
+            SRS.next_review_at <= datetime.now(UTC)
         ).count()
 
         today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)

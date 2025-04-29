@@ -5,7 +5,7 @@ from app.models.base import BaseModel, db
 from sqlalchemy import Index
 
 
-class SRSItem(BaseModel):
+class SRS(BaseModel):
     """
     Represents an SRS item for spaced repetition review.
 
@@ -22,8 +22,8 @@ class SRSItem(BaseModel):
         last_reviewed_at: DateTime when the item was last reviewed
     """
 
-    __tablename__ = "srs_items"
-    __entity_name__ = "SRSItem"
+    __tablename__ = "srs"
+    __entity_name__ = "SRS"
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -55,11 +55,11 @@ class SRSItem(BaseModel):
 
     # Create composite index for finding cards by notable reference
     __table_args__ = (
-        Index('idx_srs_items_notable', 'notable_type', 'notable_id'),
+        Index('idx_srs_notable', 'notable_type', 'notable_id'),
     )
 
     def __repr__(self):
-        return f"<SRSItem {self.id} [{self.notable_type}: {self.notable_id}] next={self.next_review_at}>"
+        return f"<SRS {self.id} [{self.notable_type}: {self.notable_id}] next={self.next_review_at}>"
 
 
 class ReviewHistory(BaseModel):
@@ -78,7 +78,7 @@ class ReviewHistory(BaseModel):
     __tablename__ = "review_history"
 
     id = db.Column(db.Integer, primary_key=True)
-    srs_item_id = db.Column(db.Integer, db.ForeignKey("srs_items.id", ondelete="CASCADE"),
+    srs_item_id = db.Column(db.Integer, db.ForeignKey("srs.id", ondelete="CASCADE"),
                             nullable=False, index=True)
     timestamp = db.Column(db.DateTime(timezone=True), default=datetime.now(timezone.utc),
                           nullable=False)

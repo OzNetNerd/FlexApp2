@@ -6,7 +6,7 @@ from app.models.pages.company import Company
 from app.models.pages.contact import Contact
 from app.models.pages.note import Note
 from app.models.pages.opportunity import Opportunity
-from app.models.pages.srs import SRSItem
+from app.models.pages.srs import SRS
 from app.models.pages.task import Task
 from app.models.pages.user import User
 from app.services.search_service import SearchService
@@ -27,7 +27,7 @@ _entity_search_map = {
     "opportunities": (Opportunity, ["title", "status"]),
     "tasks": (Task, ["title", "description"]),
     "users": (User, ["username", "email"]),
-    "srs": (SRSItem, ["question", "answer"]),
+    "srs": (SRS, ["question", "answer"]),
 }
 
 # Instantiate one SearchService per entity

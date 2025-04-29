@@ -110,7 +110,7 @@
     </div>
 
     <div class="d-flex justify-content-between mt-3">
-      <a href="{{ url_for('srs_items_bp.review_item', item_id=prev_item_id or entity.id) }}"
+      <a href="{{ url_for('srs_bp.review_item', item_id=prev_item_id or entity.id) }}"
          id="prev-btn" class="btn btn-sm btn-outline-secondary"
          title="Previous Card (Shift+Left)">
          <i class="bi bi-arrow-left"></i> Previous
@@ -119,7 +119,7 @@
          Card {{ current_index|default(1) }} of {{ total_cards|default(1) }}
       </div>
       {% if next_item_id is defined and next_item_id %}
-      <a href="{{ url_for('srs_items_bp.review_item', item_id=next_item_id) }}"
+      <a href="{{ url_for('srs_bp.review_item', item_id=next_item_id) }}"
          id="next-btn" class="btn btn-sm btn-outline-secondary"
          title="Next Card (Shift+Right)">
          Next <i class="bi bi-arrow-right"></i>

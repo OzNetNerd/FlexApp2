@@ -19,7 +19,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from app.models import Capability, CapabilityCategory, Company, CompanyCapability, Contact, Note, Opportunity, Task, \
     User, db
 from app.models.relationship import Relationship
-from app.models.pages.srs import SRSItem
+from app.models.pages.srs import SRS
 
 
 # Setup database connection
@@ -461,7 +461,7 @@ def seed_srs_items():
 
     for card_data in sample_cards:
         create_or_update(
-            SRSItem,
+            SRS,
             {
                 "notable_type": card_data["notable_type"],
                 "notable_id": card_data["notable_id"],

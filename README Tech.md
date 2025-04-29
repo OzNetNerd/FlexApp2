@@ -304,7 +304,7 @@ tests/                # Unit and functional tests
     * Provides common attributes (`__tablename__`, `__entity_name__`, `__entity_plural__`) derived from the class name.
     * Includes standard methods: `save()`, `delete()`, `to_dict()` for serialization.
     * Initializes instances from keyword arguments (`__init__`).
-* **Models:** Defines application entities (e.g., `User`, `Company`, `Contact`, `Opportunity`, `Task`, `Note`, `Capability`, `SRSItem`). Each model inherits from `BaseModel`.
+* **Models:** Defines application entities (e.g., `User`, `Company`, `Contact`, `Opportunity`, `Task`, `Note`, `Capability`, `SRS`). Each model inherits from `BaseModel`.
 * **Relationships:**
     * Standard relationships (one-to-many, many-to-one) are defined using `db.relationship` with `back_populates` or `backref`.
     * **Polymorphic Notes:** The `Note` model uses `notable_type` (e.g., 'Company', 'Contact') and `notable_id` to link to different parent entities.
@@ -347,7 +347,7 @@ tests/                # Unit and functional tests
     * `NoteService`: Extends `CRUDService` for notes, adding methods to fetch notes by related entity (`get_by_notable`) or date range.
     * `RelationshipService`: Manages the polymorphic `Relationship` model, providing methods to create, delete, and retrieve relationships between different entity types (e.g., `get_relationships_for_entity`, `get_user_companies`).
     * `SearchService`: Provides generic text search (`ilike`) across specified fields for a given model, also supporting exact filters.
-    * `SRSService`: Manages `SRSItem` entities, interacting with the `fsrs` library (likely for spaced repetition scheduling) via methods like `schedule_review` and `preview_ratings`. It also records review history.
+    * `SRSService`: Manages `SRS` entities, interacting with the `fsrs` library (likely for spaced repetition scheduling) via methods like `schedule_review` and `preview_ratings`. It also records review history.
 * **Validation (`app/services/validator_mixin.py`):** A mixin class providing `validate_create` and `validate_update` methods that can be implemented by specific services (like `UserService`) to enforce custom validation rules before creating or updating entities.
 
 ### 4.6. Templating (`app/templates/`)
@@ -411,7 +411,7 @@ tests/                # Unit and functional tests
 * **API Standardization:** (`@json_endpoint`, API Context classes) Ensures consistent JSON responses and error handling for APIs.
 * **Frontend Modularity:** (ES Modules, `ModuleSystem`, `EventSystem`, Components, Services) Organizes frontend code for better maintainability and reusability.
 * **Dynamic Form Generation:** (`FormDefinition`, `FormTab`, etc.) Allows UI form structure to be configured via the database.
-* **Spaced Repetition System (SRS):** (`SRSItem`, `SRSService`) Implements learning/review logic using the FSRS algorithm.
+* **Spaced Repetition System (SRS):** (`SRS`, `SRSService`) Implements learning/review logic using the FSRS algorithm.
 * **Comprehensive Testing & Linting:** (Pytest, Coverage, Black, Flake8, Mypy, pre-commit) Ensures code quality and reliability.
 
 ## 6. Setup & Running
