@@ -1,8 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
-from flask_login import login_required, current_user
 from datetime import datetime, UTC, timedelta
 from app.models.pages.srs import SRS, ReviewHistory
-from app.routes.web.blueprint_factory import create_crud_blueprint
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
@@ -740,364 +737,128 @@ class SRSService:
             'cards_reviewed_today': reviewed_today
         }
 
+    def get_categories(self):
+        """Get all available categories (decks)."""
+        # First get all distinct notable_types from the database
+        query = db.session.query(SRS.notable_type).distinct()
+        db_categories = [row[0] for row in query.all() if row[0]]
 
-# Create the service instance
-srs_service = SRSService()
+        # Get category counts
+        category_counts = self.count_by_type()
 
-# Create a blueprint with CRUD operations
-srs_bp = create_crud_blueprint(SRS, service=srs_service)
-
-
-# Dashboard route
-@srs_bp.route("/dashboard", methods=["GET"])
-@login_required
-def dashboard():
-    """Render the flashcard dashboard."""
-    # Get statistics from the service
-    service_stats = srs_service.get_stats()
-
-    # Count total cards in the database
-    total_cards = service_stats.get('total_cards', 0)
-
-    # Get cards due today
-    due_today = service_stats.get('cards_due', 0)
-
-    # Calculate basic success rate (if possible)
-    success_rate = 0
-    all_items = srs_service.get_all()
-    if all_items:
-        successful_items = sum(
-            1 for item in all_items if item.successful_reps and item.review_count and item.review_count > 0)
-        success_rate = int((successful_items / len(all_items)) * 100) if len(all_items) > 0 else 0
-
-    # Fill in other stats with placeholder data for now
-    stats = {
-        'total_cards': total_cards,
-        'due_today': due_today,
-        'success_rate': success_rate,
-        'days_streak': 9,  # Placeholder
-        'weekly_reviews': service_stats.get('cards_reviewed_today', 0) * 7,  # Rough estimate
-        'mastered_cards': 5,  # Placeholder
-        'retention_increase': 18,  # Placeholder
-        'perfect_reviews': 3  # Placeholder
-    }
-
-    # Get all cards to calculate category stats
-    all_items = srs_service.get_all()
-
-    # Count cards by type
-    company_cards = [item for item in all_items if item.notable_type == 'company']
-    contact_cards = [item for item in all_items if item.notable_type == 'contact']
-    opportunity_cards = [item for item in all_items if item.notable_type == 'opportunity']
-
-    # Simple progress calculation based on successful repetitions
-    def calculate_progress(cards):
-        if not cards:
-            return 0
-        total_progress = sum((item.successful_reps or 0) / max(item.review_count or 1, 1) * 100 for item in cards)
-        return int(total_progress / len(cards)) if cards else 0
-
-    # Get cards due today
-    due_cards = srs_service.get_due_items()
-
-    # Count due cards by type
-    company_due = len([item for item in due_cards if item.notable_type == 'company'])
-    contact_due = len([item for item in due_cards if item.notable_type == 'contact'])
-    opportunity_due = len([item for item in due_cards if item.notable_type == 'opportunity'])
-
-    # Create categories data
-    categories = [
-        {
-            'name': 'Companies',
-            'type': 'company',
-            'icon': 'building',
-            'color': 'primary',
-            'total': len(company_cards),
-            'due': company_due,
-            'progress': calculate_progress(company_cards)
-        },
-        {
-            'name': 'Contacts',
-            'type': 'contact',
-            'icon': 'people',
-            'color': 'success',
-            'total': len(contact_cards),
-            'due': contact_due,
-            'progress': calculate_progress(contact_cards)
-        },
-        {
-            'name': 'Opportunities',
-            'type': 'opportunity',
-            'icon': 'graph-up-arrow',
-            'color': 'danger',
-            'total': len(opportunity_cards),
-            'due': opportunity_due,
-            'progress': calculate_progress(opportunity_cards)
+        # Merge with predefined categories
+        predefined = {
+            'company': {'name': 'Companies', 'color': 'primary', 'icon': 'building'},
+            'contact': {'name': 'Contacts', 'color': 'success', 'icon': 'people'},
+            'opportunity': {'name': 'Opportunities', 'color': 'danger', 'icon': 'graph-up-arrow'}
         }
-    ]
 
-    # Get due cards for today (limited to 5 for display)
-    due_cards = srs_service.get_due_items()[:5]
+        result = []
 
-    # Create sample learning progress data for chart
-    # In a real implementation, this would be calculated from ReviewHistory
-    progress_data = {
-        'labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-        'datasets': [
-            {
-                'label': 'Cards Mastered',
-                'data': [5, 9, 12, 18, 22, 28, 35]
-            },
-            {
-                'label': 'Cards Added',
-                'data': [8, 12, 15, 20, 25, 30, 47]
-            },
-            {
-                'label': 'Retention Score',
-                'data': [60, 65, 70, 72, 75, 80, 83]
-            }
-        ]
-    }
-
-    return render_template(
-        "pages/srs/dashboard.html",
-        stats=stats,
-        categories=categories,
-        due_cards=due_cards,
-        progress_data=progress_data
-    )
-
-
-# Due cards route
-@srs_bp.route("/due", methods=["GET"])
-@login_required
-def due_cards():
-    """View all cards due for review today."""
-    cards = srs_service.get_due_items()
-    return render_template(
-        "pages/srs/due.html",
-        cards=cards,
-        title="Cards Due Today"
-    )
-
-
-# Review card route
-@srs_bp.route("/<int:item_id>/review", methods=["GET", "POST"])
-@login_required
-def review_item(item_id):
-    """Web route for reviewing an SRS item."""
-    item = srs_service.get_by_id(item_id)
-
-    if not item:
-        flash("Card not found", "error")
-        return redirect(url_for('srs_bp.dashboard'))
-
-    if request.method == "POST":
-        rating = int(request.form.get("rating", 0))
-        item = srs_service.schedule_review(item_id, rating)
-
-        # Record review history
-        history = ReviewHistory(
-            srs_item_id=item_id,
-            rating=rating,
-            interval=item.interval,
-            ease_factor=item.ease_factor
-        )
-        history.save()
-
-        flash("Card reviewed successfully", "success")
-
-        # If there are more due cards, go to the next one
-        next_due = srs_service.get_next_due_item_id(item_id)
-        if next_due:
-            return redirect(url_for('srs_bp.review_item', item_id=next_due))
-        else:
-            return redirect(url_for('srs_bp.dashboard'))
-
-    # Get navigation variables
-    next_item_id = srs_service.get_next_due_item_id(item_id)
-    prev_item_id = srs_service.get_prev_item_id(item_id)
-
-    return render_template(
-        "pages/srs/review.html",
-        card=item,
-        title="Review Card",
-        next_item_id=next_item_id,
-        prev_item_id=prev_item_id
-    )
-
-
-# Category view route
-@srs_bp.route("/category/<string:category_type>", methods=["GET"])
-@login_required
-def category_view(category_type):
-    """View cards by category."""
-    # Filter cards by notable_type
-    all_cards = srs_service.get_all()
-    cards = [card for card in all_cards if card.notable_type == category_type]
-
-    category_info = {
-        'company': {'name': 'Companies', 'color': 'primary'},
-        'contact': {'name': 'Contacts', 'color': 'success'},
-        'opportunity': {'name': 'Opportunities', 'color': 'danger'}
-    }
-
-    info = category_info.get(category_type, {'name': 'Unknown', 'color': 'secondary'})
-
-    return render_template(
-        "pages/srs/category.html",
-        cards=cards,
-        category_type=category_type,
-        category_name=info['name'],
-        category_color=info['color'],
-        title=f"{info['name']} Cards"
-    )
-
-
-# Statistics route
-@srs_bp.route("/stats", methods=["GET"])
-@login_required
-def statistics():
-    """View detailed learning statistics."""
-    # Get basic stats from service
-    basic_stats = srs_service.get_stats()
-
-    # Get all cards and history for additional calculations
-    all_cards = srs_service.get_all()
-
-    # Build more detailed stats
-    stats = {
-        **basic_stats,
-        'average_ease_factor': sum(card.ease_factor or DEFAULT_EASE_FACTOR for card in all_cards) / len(
-            all_cards) if all_cards else DEFAULT_EASE_FACTOR,
-        'average_interval': sum(card.interval or 0 for card in all_cards) / len(all_cards) if all_cards else 0,
-        'mastered_cards': len([card for card in all_cards if card.interval and card.interval > 30]),
-        'learning_cards': len(
-            [card for card in all_cards if card.interval and card.interval <= 30 and card.interval > 1]),
-        'new_cards': len([card for card in all_cards if card.review_count == 0])
-    }
-
-    return render_template(
-        "pages/srs/stats.html",
-        stats=stats,
-        title="Learning Statistics"
-    )
-
-
-# API endpoint for chart data
-@srs_bp.route("/api/progress-data", methods=["GET"])
-@login_required
-def progress_data():
-    """Get progress data for charts."""
-    months = request.args.get('months', 7, type=int)
-
-    # Create sample data (in a real implementation, this would be calculated from ReviewHistory)
-    data = {
-        'labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'][:months],
-        'datasets': [
-            {
-                'label': 'Cards Mastered',
-                'data': [5, 9, 12, 18, 22, 28, 35][:months]
-            },
-            {
-                'label': 'Cards Added',
-                'data': [8, 12, 15, 20, 25, 30, 47][:months]
-            },
-            {
-                'label': 'Retention Score',
-                'data': [60, 65, 70, 72, 75, 80, 83][:months]
-            }
-        ]
-    }
-
-    return jsonify(data)
-
-
-# Register the blueprint
-def register_srs_blueprint(app):
-    """Register the SRS blueprint with the app."""
-    app.register_blueprint(srs_bp, url_prefix='/flashcards')
-
-
-def get_categories(self):
-    """Get all available categories (decks)."""
-    # First get all distinct notable_types from the database
-    query = db.session.query(SRS.notable_type).distinct()
-    db_categories = [row[0] for row in query.all() if row[0]]
-
-    # Get category counts
-    category_counts = self.count_by_type()
-
-    # Merge with predefined categories
-    predefined = {
-        'company': {'name': 'Companies', 'color': 'primary', 'icon': 'building'},
-        'contact': {'name': 'Contacts', 'color': 'success', 'icon': 'people'},
-        'opportunity': {'name': 'Opportunities', 'color': 'danger', 'icon': 'graph-up-arrow'}
-    }
-
-    result = []
-
-    # Add predefined categories first
-    for category_id, info in predefined.items():
-        count = category_counts.get(category_id, 0)
-        result.append({
-            'id': category_id,
-            'name': info['name'],
-            'color': info['color'],
-            'icon': info['icon'],
-            'count': count
-        })
-
-    # Add custom categories from database that aren't in predefined list
-    for category_id in db_categories:
-        if category_id not in predefined:
+        # Add predefined categories first
+        for category_id, info in predefined.items():
             count = category_counts.get(category_id, 0)
             result.append({
                 'id': category_id,
-                'name': category_id.capitalize(),  # Default name is capitalized ID
-                'color': 'secondary',  # Default color
-                'icon': 'folder',  # Default icon
+                'name': info['name'],
+                'color': info['color'],
+                'icon': info['icon'],
                 'count': count
             })
 
-    return result
+        # Add custom categories from database that aren't in predefined list
+        for category_id in db_categories:
+            if category_id not in predefined:
+                count = category_counts.get(category_id, 0)
+                result.append({
+                    'id': category_id,
+                    'name': category_id.capitalize(),  # Default name is capitalized ID
+                    'color': 'secondary',  # Default color
+                    'icon': 'folder',  # Default icon
+                    'count': count
+                })
+
+        return result
 
 
-def create_category(self, name, color='secondary', icon='folder'):
-    """
-    Create a new category (deck).
+    def create_category(self, name, color='secondary', icon='folder'):
+        """
+        Create a new category (deck).
 
-    This doesn't actually create a database record since categories
-    are stored as notable_type strings on SRS items. Instead, it
-    ensures the category ID is valid and returns a category object.
-    """
-    # Normalize the name to create a valid ID
-    category_id = name.lower().replace(' ', '_')
+        This doesn't actually create a database record since categories
+        are stored as notable_type strings on SRS items. Instead, it
+        ensures the category ID is valid and returns a category object.
+        """
+        # Normalize the name to create a valid ID
+        category_id = name.lower().replace(' ', '_')
 
-    logger.info(f"SRSService: Creating category {category_id} with name '{name}'")
+        logger.info(f"SRSService: Creating category {category_id} with name '{name}'")
 
-    # Return a category object
-    return {
-        'id': category_id,
-        'name': name,
-        'color': color,
-        'icon': icon,
-        'count': 0
-    }
-
-
-def create(self, data):
-    """Create a new SRS item."""
-    item = SRS()
-    for key, value in data.items():
-        setattr(item, key, value)
-    item.save()
-    return item
+        # Return a category object
+        return {
+            'id': category_id,
+            'name': name,
+            'color': color,
+            'icon': icon,
+            'count': 0
+        }
 
 
-def count_reviews_today(self):
-    """Count the number of reviews completed today."""
-    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
-    return ReviewHistory.query.filter(
-        ReviewHistory.timestamp >= today_start
-    ).count()
+    def create(self, data):
+        """Create a new SRS item."""
+        item = SRS()
+        for key, value in data.items():
+            setattr(item, key, value)
+        item.save()
+        return item
+
+
+    def count_reviews_today(self):
+        """Count the number of reviews completed today."""
+        today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+        return ReviewHistory.query.filter(
+            ReviewHistory.timestamp >= today_start
+        ).count()
+
+    def get_detailed_stats(self):
+        """Get detailed learning statistics for analysis."""
+        basic_stats = self.get_stats()
+        all_cards = self.get_all()
+
+        learning_stages = {
+            'new': len(self.get_cards_by_learning_stage('new')),
+            'learning': len(self.get_cards_by_learning_stage('learning')),
+            'reviewing': len(self.get_cards_by_learning_stage('reviewing')),
+            'mastered': len(self.get_cards_by_learning_stage('mastered'))
+        }
+
+        difficulty_counts = {
+            'hard': len(self.get_cards_by_difficulty('hard')),
+            'medium': len(self.get_cards_by_difficulty('medium')),
+            'easy': len(self.get_cards_by_difficulty('easy'))
+        }
+
+        performance_counts = {
+            'struggling': len(self.get_cards_by_performance('struggling')),
+            'average': len(self.get_cards_by_performance('average')),
+            'strong': len(self.get_cards_by_performance('strong'))
+        }
+
+        stats = {
+            **basic_stats,
+            'average_ease_factor': sum(card.ease_factor or DEFAULT_EASE_FACTOR for card in all_cards) / len(
+                all_cards) if all_cards else DEFAULT_EASE_FACTOR,
+            'average_interval': sum(card.interval or 0 for card in all_cards) / len(all_cards) if all_cards else 0,
+            'learning_stages': learning_stages,
+            'difficulty_counts': difficulty_counts,
+            'performance_counts': performance_counts,
+            'streak_days': self.get_streak_days(),
+            'weekly_reviews': self.count_weekly_reviews(),
+            'mastered_this_month': self.count_mastered_cards_this_month()
+        }
+
+        return stats
+
+    def get_by_type(self, type_name):
+        """Get all SRS items of a specific type."""
+        return SRS.query.filter(SRS.notable_type == type_name).all()

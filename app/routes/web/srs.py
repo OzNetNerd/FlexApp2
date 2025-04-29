@@ -176,23 +176,6 @@ def statistics():
         title="Learning Statistics"
     )
 
-
-# API endpoint for chart data
-@srs_bp.route("/api/progress-data", methods=["GET"])
-@login_required
-def progress_data():
-    """Get progress data for charts."""
-    months = request.args.get('months', 7, type=int)
-    data = srs_service.get_learning_progress_data(months=months)
-    return jsonify(data)
-
-
-# Register the blueprint
-def register_srs_blueprint(app):
-    """Register the SRS blueprint with the app."""
-    app.register_blueprint(srs_bp, url_prefix='/flashcards')
-
-
 @srs_bp.route("/learning-stage/<stage>", methods=["GET"])
 @login_required
 def cards_by_learning_stage(stage):
