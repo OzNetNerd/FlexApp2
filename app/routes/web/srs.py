@@ -461,7 +461,7 @@ def add_card():
 
 @srs_bp.route("/categories/create", methods=["POST"])
 @login_required
-def create_category_web():
+def create_category():
     """Create a new category (deck) and return to the form."""
     name = request.form.get("name")
     color = request.form.get("color", "#0d6efd")

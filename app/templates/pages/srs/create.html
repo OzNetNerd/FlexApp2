@@ -1,50 +1,42 @@
 {% extends "pages/srs/base.html" %}
 {% set mode = 'create' %}
-{% block title %}Create New Flashcard{% endblock %}
+{% block title %}Create New Category{% endblock %}
 
 {% block header_buttons %}
   <button type="button" class="btn btn-outline-secondary me-2" onclick="location.href='/srs/dashboard'">
     <i class="bi bi-x-circle me-1"></i> Cancel
   </button>
   <button type="submit" form="entity-form" class="btn btn-primary">
-    <i class="bi bi-plus-circle me-1"></i> Create Card
+    <i class="bi bi-plus-circle me-1"></i> Create Category
   </button>
 {% endblock %}
 
 {% block srs_content %}
-  <form id="entity-form" method="POST" action="{{ url_for('srs_bp.create') }}">
+  <form id="entity-form" method="POST" action="{{ url_for('srs_bp.create_category') }}">
     {{ csrf_input }}
 
-    <!-- Question Card -->
+    <!-- Category Card -->
     <div class="card shadow-sm mb-4">
       <div class="card-header bg-primary-subtle d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 text-primary"><i class="bi bi-question-circle me-2"></i>Question</h5>
-        <div class="input-group" style="max-width: 200px;">
-          <select name="category" class="form-select form-select-sm" id="category">
-            <option value="" selected disabled>-- Select a category --</option>
-            {% for category in categories %}
-              <option value="{{ category }}">{{ category }}</option>
-            {% endfor %}
-          </select>
-        </div>
+        <h5 class="mb-0 text-primary"><i class="bi bi-folder me-2"></i>Category Name</h5>
       </div>
       <div class="card-body">
         <div class="mb-3">
-          <textarea name="question" class="form-control" rows="4" placeholder="Enter question here..." required></textarea>
+          <input type="text" name="category_name" class="form-control" placeholder="Enter category name..." required>
         </div>
       </div>
     </div>
 
-    <!-- Answer Card -->
+    <!-- Description Card -->
     <div class="card shadow-sm mb-4">
       <div class="card-header bg-success-subtle">
         <h5 class="mb-0 text-success">
-          <i class="bi bi-check-circle me-2"></i>Answer
+          <i class="bi bi-file-text me-2"></i>Description
         </h5>
       </div>
       <div class="card-body">
         <div class="mb-3">
-          <textarea name="answer" class="form-control" rows="4" placeholder="Enter answer here..." required></textarea>
+          <textarea name="description" class="form-control" rows="4" placeholder="Enter category description..." required></textarea>
         </div>
       </div>
     </div>
@@ -72,7 +64,7 @@
           <!-- Tags will be displayed here as badges -->
         </div>
         <input type="hidden" name="tags" id="tags-hidden" value="">
-        <small class="text-muted">Tags help you categorize and find cards more easily</small>
+        <small class="text-muted">Tags help you categorize and find categories more easily</small>
       </div>
     </div>
 
@@ -85,21 +77,6 @@
   let tags = [];
 
   document.addEventListener("DOMContentLoaded", function() {
-    // Handle custom category selection
-    const categorySelect = document.getElementById('category');
-    const customCategoryContainer = document.getElementById('custom-category-container');
-    const customCategoryInput = document.getElementById('custom-category');
-
-    categorySelect.addEventListener('change', function() {
-      if (this.value === 'Custom') {
-        customCategoryContainer.classList.remove('d-none');
-        customCategoryInput.setAttribute('required', 'required');
-      } else {
-        customCategoryContainer.classList.add('d-none');
-        customCategoryInput.removeAttribute('required');
-      }
-    });
-
     // Handle tag input
     const tagInput = document.getElementById('tag-input');
     const addTagBtn = document.getElementById('add-tag-btn');
@@ -147,20 +124,6 @@
       if (e.key === 'Enter' || e.key === ',') {
         e.preventDefault();
         addTag();
-      }
-    });
-
-    // Handle form submission
-    document.getElementById('entity-form').addEventListener('submit', function(e) {
-      // Handle custom category if selected
-      if (categorySelect.value === 'Custom') {
-        const customValue = customCategoryInput.value.trim();
-        if (customValue) {
-          categorySelect.value = customValue;
-        } else {
-          e.preventDefault();
-          alert('Please enter a custom category');
-        }
       }
     });
   });
