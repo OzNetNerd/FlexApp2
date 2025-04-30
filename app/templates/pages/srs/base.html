@@ -1,0 +1,32 @@
+{% extends "layouts/base.html" %}
+{% import 'macros/crud_buttons.html' as crud with context %}
+{% block title %}{{ title }}{% endblock %}
+
+<style>
+.text-dark-blue {
+  color: #005b96 !important;
+}
+</style>
+
+{% block content %}
+<div class="card shadow border-0 mb-4">
+  <!-- Header with title and card counter -->
+  <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center py-3">
+    <h1 class="fs-4 mb-0" style="color: #005b96;"><i class="bi bi-book-half me-2" style="color: #005b96;"></i>{{ title }}</h1>
+    <div class="d-flex align-items-center">
+      {% block header_buttons %}{% endblock %}
+    </div>
+  </div>
+
+  <div class="card-body p-4">
+    {% block srs_content %}{% endblock %}
+  </div>
+</div>
+
+<!-- Modal blocks that can be overridden by child templates -->
+{% block modals %}{% endblock %}
+{% endblock %}
+
+{% block scripts_extra %}
+  {% block srs_scripts %}{% endblock %}
+{% endblock %}
