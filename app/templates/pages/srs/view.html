@@ -2,33 +2,39 @@
 {% import 'macros/crud_buttons.html' as crud with context %}
 {% block title %}{{ title }}{% endblock %}
 
+<style>
+.text-dark-blue {
+  color: #005b96 !important;
+}
+</style>
+
 {% block content %}
 <div class="card shadow border-0 mb-4">
   <!-- Header with title and card counter -->
-  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
-    <h1 class="fs-4 mb-0">{{ title }}</h1>
+  <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center py-3">
+    <h1 class="fs-4 mb-0" style="color: #005b96;"><i class="bi bi-book-half me-2" style="color: #005b96;"></i>{{ title }}</h1>
     <div class="d-flex align-items-center">
-      <span class="badge bg-light text-primary me-2">Card {{ current_index|default(1) }} of {{ total_cards|default(1) }}</span>
       {{ crud.crud_buttons('srs_bp', entity.id) }}
+      <span class="badge bg-primary text-white ms-2 rounded-pill px-3">Card {{ current_index|default(1) }} of {{ total_cards|default(1) }}</span>
     </div>
   </div>
 
   <div class="card-body p-4">
     <div class="card shadow-sm mb-4">
-      <div class="card-header bg-light d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">Question</h4>
+      <div class="card-header bg-primary-subtle d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary"><i class="bi bi-question-circle me-2"></i>Question</h5>
         {% if entity.category %}
         <span class="badge bg-primary">{{ entity.category }}</span>
         {% endif %}
       </div>
       <div class="card-body">
-        <p class="card-text fs-5">{{ entity.question }}</p>
+        <p class="card-text fs-6">{{ entity.question }}</p>
       </div>
     </div>
 
     <div class="card shadow-sm">
-      <div class="card-header bg-light">
-        <h4 class="mb-0">Your Answer</h4>
+      <div class="card-header bg-success-subtle">
+        <h5 class="mb-0 text-success"><i class="bi bi-pencil-square me-2"></i>Your Answer</h5>
       </div>
       <div class="card-body">
         <form id="review-form" data-entity-id="{{ entity.id }}">
@@ -88,7 +94,7 @@
           </div>
 
           <div id="answer-container" class="border rounded p-3 mb-3 bg-light d-none">
-            <h5 class="text-muted">Correct Answer</h5>
+            <h5 class="text-muted"><i class="bi bi-check-circle me-2"></i>Correct Answer</h5>
             <div>{{ entity.answer }}</div>
           </div>
 
@@ -119,29 +125,7 @@
   </div>
 
   <!-- Footer with navigation buttons -->
-  <div class="card-footer bg-light d-flex justify-content-between align-items-center py-3">
-    {% if prev_item_id %}
-    <a href="{{ url_for('srs_bp.review_item', item_id=prev_item_id) }}"
-       id="prev-btn" class="btn btn-sm btn-outline-primary"
-       title="Previous Card (Shift+Left)">
-       <i class="bi bi-arrow-left"></i> Previous
-    </a>
-    {% else %}
-    <div></div>
-    {% endif %}
-
-    <!-- Stats are already shown above, no need to repeat pagination info here -->
-
-    {% if next_item_id is defined and next_item_id %}
-    <a href="{{ url_for('srs_bp.review_item', item_id=next_item_id) }}"
-       id="next-btn" class="btn btn-sm btn-outline-primary"
-       title="Next Card (Shift+Right)">
-       Next <i class="bi bi-arrow-right"></i>
-    </a>
-    {% else %}
-    <div></div>
-    {% endif %}
-  </div>
+  <!-- Removed footer with navigation buttons -->
 </div>
 
 <!-- Delete Confirmation Modal -->
