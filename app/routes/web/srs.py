@@ -1,16 +1,22 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
-from flask_login import login_required, current_user
+from flask import  render_template, request, redirect, url_for, flash, session
+from flask_login import login_required
 from datetime import datetime, UTC
-from app.models.pages.srs import SRS, ReviewHistory
+from app.models.pages.srs import SRS
 from app.services.srs_service import SRSService
-from app.routes.web.blueprint_factory import create_crud_blueprint
-from routes.api.srs import review_item
+from app.routes.web.blueprint_factory import create_crud_blueprint, BlueprintConfig
 
 # Create the service instance
 srs_service = SRSService()
 
-# Create a blueprint with CRUD operations and custom templates
-srs_bp = create_crud_blueprint(SRS, service=srs_service, create_template="pages/srs/create.html")  # Specify custom create template
+# Create the blueprint config
+srs_config = BlueprintConfig(
+    model_class=SRS,
+    service=srs_service,
+    create_template="pages/srs/create.html"
+)
+
+# Create the blueprint using the config
+srs_bp = create_crud_blueprint(srs_config)# Specify custom create template
 
 
 # Dashboard route
