@@ -12,7 +12,8 @@ class SRS(BaseModel):
     (contacts, companies, opportunities) and tracks learning state including
     review intervals, ease factors, and success rates.
     """
-    __tablename__ = 'srs'
+
+    __tablename__ = "srs"
 
     id = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.Text, nullable=False)
@@ -40,18 +41,18 @@ class SRS(BaseModel):
     def to_dict(self):
         """Convert SRS item to dictionary."""
         return {
-            'id': self.id,
-            'question': self.question,
-            'answer': self.answer,
-            'notable_type': self.notable_type,
-            'notable_id': self.notable_id,
-            'interval': self.interval,
-            'ease_factor': self.ease_factor,
-            'review_count': self.review_count,
-            'successful_reps': self.successful_reps,
-            'next_review_at': self.next_review_at.isoformat() if self.next_review_at else None,
-            'last_reviewed_at': self.last_reviewed_at.isoformat() if self.last_reviewed_at else None,
-            'last_rating': self.last_rating
+            "id": self.id,
+            "question": self.question,
+            "answer": self.answer,
+            "notable_type": self.notable_type,
+            "notable_id": self.notable_id,
+            "interval": self.interval,
+            "ease_factor": self.ease_factor,
+            "review_count": self.review_count,
+            "successful_reps": self.successful_reps,
+            "next_review_at": self.next_review_at.isoformat() if self.next_review_at else None,
+            "last_reviewed_at": self.last_reviewed_at.isoformat() if self.last_reviewed_at else None,
+            "last_rating": self.last_rating,
         }
 
 
@@ -62,10 +63,11 @@ class ReviewHistory(BaseModel):
     Each review includes the rating given, resulting interval,
     and timestamp for analysis and future algorithm improvements.
     """
-    __tablename__ = 'review_history'
+
+    __tablename__ = "review_history"
 
     id = db.Column(db.Integer, primary_key=True)
-    srs_item_id = db.Column(db.Integer, db.ForeignKey('srs.id'))
+    srs_item_id = db.Column(db.Integer, db.ForeignKey("srs.id"))
     timestamp = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(UTC))
     rating = db.Column(db.Integer)
     interval = db.Column(db.Float)

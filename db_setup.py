@@ -17,8 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Import the models directly
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from app.models import Capability, CapabilityCategory, Company, CompanyCapability, Contact, Note, Opportunity, Task, \
-    User, db
+from app.models import Capability, CapabilityCategory, Company, CompanyCapability, Contact, Note, Opportunity, Task, User, db
 from app.models.relationship import Relationship
 from app.models.pages.srs import SRS
 
@@ -198,8 +197,7 @@ def seed_opportunities():
         ("Security Partnership", "Partnership with a major security firm.", "New", "Prospecting", 100000.0, None),
         ("Data Analytics Project", "Project for a large data analytics firm.", "Won", "Negotiation", 150000.0, None),
         ("Software Licensing", "Renewal of software licenses for an enterprise.", "Lost", "Closed", 30000.0, None),
-        ("Cybersecurity Solutions", "Comprehensive cybersecurity solutions for a client.", "New", "Prospecting",
-         200000.0, None),
+        ("Cybersecurity Solutions", "Comprehensive cybersecurity solutions for a client.", "New", "Prospecting", 200000.0, None),
         # Fixed company assignment
         ("New Website", "Build a new website", "New", "Prospecting", 10000.0, 1),
         ("Software Upgrade", "Upgrade ERP system", "In Progress", "Negotiation", 25000.0, 2),
@@ -333,8 +331,7 @@ def seed_notes():
         create_or_update(
             Note,
             {"notable_type": "Company", "notable_id": company.id, "user_id": user.id},
-            {"content": f"Note for company {company.name}",
-             "processed_content": f"<p>Note for company {company.name}</p>"},
+            {"content": f"Note for company {company.name}", "processed_content": f"<p>Note for company {company.name}</p>"},
         )
 
     # Seed notes for contacts
@@ -351,8 +348,7 @@ def seed_notes():
         create_or_update(
             Note,
             {"notable_type": "Opportunity", "notable_id": opportunity.id, "user_id": user.id},
-            {"content": f"Note for opportunity {opportunity.name}",
-             "processed_content": f"<p>Note for opportunity {opportunity.name}</p>"},
+            {"content": f"Note for opportunity {opportunity.name}", "processed_content": f"<p>Note for opportunity {opportunity.name}</p>"},
         )
     db.session.commit()
     logger.info("✅ Notes seeded.")
@@ -373,13 +369,11 @@ def seed_relationships():
         user2 = users[i + 1]
         rel_type = relationship_types[i % len(relationship_types)]
 
-        existing = Relationship.query.filter_by(entity1_type="user", entity1_id=user1.id, entity2_type="user",
-                                                entity2_id=user2.id).first()
+        existing = Relationship.query.filter_by(entity1_type="user", entity1_id=user1.id, entity2_type="user", entity2_id=user2.id).first()
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user1.id, entity2_type="user", entity2_id=user2.id,
-                relationship_type=rel_type
+                entity1_type="user", entity1_id=user1.id, entity2_type="user", entity2_id=user2.id, relationship_type=rel_type
             )
             db.session.add(relationship)
             logger.info(f"Created relationship: User {user1.username} {rel_type} User {user2.username}")
@@ -396,12 +390,10 @@ def seed_relationships():
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id,
-                relationship_type=rel_type
+                entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id, relationship_type=rel_type
             )
             db.session.add(relationship)
-            logger.info(
-                f"Created relationship: User {user.username} {rel_type} Contact {contact.first_name} {contact.last_name}")
+            logger.info(f"Created relationship: User {user.username} {rel_type} Contact {contact.first_name} {contact.last_name}")
 
     # Create user-to-company relationships
     for i in range(min(len(users), len(companies))):
@@ -415,8 +407,7 @@ def seed_relationships():
 
         if not existing:
             relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id,
-                relationship_type=rel_type
+                entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id, relationship_type=rel_type
             )
             db.session.add(relationship)
             logger.info(f"Created relationship: User {user.username} {rel_type} Company {company.name}")
@@ -431,14 +422,11 @@ def seed_srs_items():
     sample_cards = [
         # Contact cards
         {"notable_type": "Contact", "notable_id": 1, "question": "What is Test User's last name?", "answer": "User"},
-        {"notable_type": "Contact", "notable_id": 2, "question": "What is Test2 User2's first name?",
-         "answer": "Test2"},
+        {"notable_type": "Contact", "notable_id": 2, "question": "What is Test2 User2's first name?", "answer": "Test2"},
         {"notable_type": "Contact", "notable_id": 1, "question": "Which contact has ID #1?", "answer": "Test User"},
         # Company cards
-        {"notable_type": "Company", "notable_id": 1, "question": "What industry is Acme Inc in?",
-         "answer": "Technology company"},
-        {"notable_type": "Company", "notable_id": 2, "question": "What is Beta Corp's main business?",
-         "answer": "Manufacturing company"},
+        {"notable_type": "Company", "notable_id": 1, "question": "What industry is Acme Inc in?", "answer": "Technology company"},
+        {"notable_type": "Company", "notable_id": 2, "question": "What is Beta Corp's main business?", "answer": "Manufacturing company"},
         # Opportunity cards
         {
             "notable_type": "Opportunity",
@@ -463,12 +451,8 @@ def seed_srs_items():
     for card_data in sample_cards:
         create_or_update(
             SRS,
-            {
-                "notable_type": card_data["notable_type"],
-                "notable_id": card_data["notable_id"],
-                "question": card_data["question"]
-            },
-            {"answer": card_data["answer"]}
+            {"notable_type": card_data["notable_type"], "notable_id": card_data["notable_id"], "question": card_data["question"]},
+            {"answer": card_data["answer"]},
         )
 
     db.session.commit()

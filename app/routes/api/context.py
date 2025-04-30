@@ -18,13 +18,13 @@ class ListApiContext(ApiContext):
     """Context class for list API responses."""
 
     def __init__(
-            self,
-            entity_table_name: str,
-            items: List[Any],
-            total_count: Optional[int] = None,
-            page: Optional[int] = None,
-            per_page: Optional[int] = None,
-            **kwargs,
+        self,
+        entity_table_name: str,
+        items: List[Any],
+        total_count: Optional[int] = None,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        **kwargs,
     ):
         """Initialize a list API context."""
         super().__init__(entity_table_name=entity_table_name, **kwargs)
@@ -115,12 +115,12 @@ class ErrorApiContext(ApiContext):
     """Context class for error API responses."""
 
     def __init__(
-            self,
-            message: str,
-            status_code: int = 400,
-            error_code: Optional[str] = None,
-            field_errors: Optional[Dict[str, str]] = None,
-            **kwargs,
+        self,
+        message: str,
+        status_code: int = 400,
+        error_code: Optional[str] = None,
+        field_errors: Optional[Dict[str, str]] = None,
+        **kwargs,
     ):
         """Initialize an error API context."""
         super().__init__(**kwargs)

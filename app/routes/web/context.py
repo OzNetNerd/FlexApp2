@@ -45,6 +45,7 @@ class TableWebContext(WebContext):
         # Load model class if not already provided
         if not self.model_class:
             from app.utils.model_registry import get_model_by_name
+
             self.model_class = get_model_by_name(entity_table_name)
 
         # Determine plural name
@@ -57,13 +58,7 @@ class TableWebContext(WebContext):
             page_title = f"{action.capitalize()} {entity_table_name}" if action else entity_plural.capitalize()
 
         # Call parent with processed values
-        super().__init__(
-            title=page_title,
-            show_navbar=True,
-            read_only=read_only,
-            entity_table_name=entity_table_name,
-            **kwargs
-        )
+        super().__init__(title=page_title, show_navbar=True, read_only=read_only, entity_table_name=entity_table_name, **kwargs)
 
         # Setup variables needed by templates
         self.page_title = page_title  # For templates
@@ -83,25 +78,19 @@ class EntityWebContext(WebContext):
     """Context class for entity-specific web views."""
 
     def __init__(
-            self,
-            action: str,
-            entity: Any,
-            autocomplete_fields: Optional[List[dict]] = None,
-            error_message: str = "",
-            title: str = "",
-            read_only: bool = True,
-            entity_table_name: str = "",
-            entity_id: Any = None,
-            **kwargs,
+        self,
+        action: str,
+        entity: Any,
+        autocomplete_fields: Optional[List[dict]] = None,
+        error_message: str = "",
+        title: str = "",
+        read_only: bool = True,
+        entity_table_name: str = "",
+        entity_id: Any = None,
+        **kwargs,
     ) -> None:
         """Initialize the context for entity views."""
-        super().__init__(
-            title=title,
-            show_navbar=True,
-            read_only=read_only,
-            entity_table_name=entity_table_name,
-            **kwargs
-        )
+        super().__init__(title=title, show_navbar=True, read_only=read_only, entity_table_name=entity_table_name, **kwargs)
 
         self.autocomplete_fields = autocomplete_fields or []
         self.error_message = error_message

@@ -61,7 +61,7 @@ class SRSService:
 
         return results
 
-    def schedule_review(self, item_id: int, rating: int, answer_given='') -> SRS:
+    def schedule_review(self, item_id: int, rating: int, answer_given="") -> SRS:
         """Schedule the next review for an item based on the user's rating."""
         item = self.get_by_id(item_id)
         if not item:
@@ -122,36 +122,33 @@ class SRSService:
         # Apply filters if provided
         if filters:
             # Due cards filter
-            if filters.get('due_only'):
+            if filters.get("due_only"):
                 query = query.filter(SRS.next_review_at <= datetime.now(UTC))
 
             # Category filter
-            if filters.get('category'):
-                query = query.filter(SRS.notable_type == filters['category'])
+            if filters.get("category"):
+                query = query.filter(SRS.notable_type == filters["category"])
 
             # Text search in question or answer
-            if filters.get('search'):
+            if filters.get("search"):
                 search_term = f"%{filters['search']}%"
-                query = query.filter(
-                    (SRS.question.ilike(search_term)) |
-                    (SRS.answer.ilike(search_term))
-                )
+                query = query.filter((SRS.question.ilike(search_term)) | (SRS.answer.ilike(search_term)))
 
             # Interval range
-            if filters.get('min_interval') is not None:
-                query = query.filter(SRS.interval >= filters['min_interval'])
-            if filters.get('max_interval') is not None:
-                query = query.filter(SRS.interval <= filters['max_interval'])
+            if filters.get("min_interval") is not None:
+                query = query.filter(SRS.interval >= filters["min_interval"])
+            if filters.get("max_interval") is not None:
+                query = query.filter(SRS.interval <= filters["max_interval"])
 
             # Ease factor range
-            if filters.get('min_ease') is not None:
-                query = query.filter(SRS.ease_factor >= filters['min_ease'])
-            if filters.get('max_ease') is not None:
-                query = query.filter(SRS.ease_factor <= filters['max_ease'])
+            if filters.get("min_ease") is not None:
+                query = query.filter(SRS.ease_factor >= filters["min_ease"])
+            if filters.get("max_ease") is not None:
+                query = query.filter(SRS.ease_factor <= filters["max_ease"])
 
             # Sort order
-            sort_field = getattr(SRS, filters.get('sort_by', 'next_review_at'))
-            if filters.get('sort_order') == 'desc':
+            sort_field = getattr(SRS, filters.get("sort_by", "next_review_at"))
+            if filters.get("sort_order") == "desc":
                 sort_field = sort_field.desc()
             query = query.order_by(sort_field)
 
@@ -164,9 +161,7 @@ class SRSService:
 
     def count_due_today(self):
         """Get the count of SRS items due for review today."""
-        return SRS.query.filter(
-            SRS.next_review_at <= datetime.now(UTC)
-        ).count()
+        return SRS.query.filter(SRS.next_review_at <= datetime.now(UTC)).count()
 
     def calculate_success_rate(self):
         """Calculate the success rate of SRS items as a percentage."""
@@ -174,10 +169,7 @@ class SRSService:
         if not all_items:
             return 0
 
-        successful_items = sum(
-            1 for item in all_items
-            if item.successful_reps and item.review_count and item.review_count > 0
-        )
+        successful_items = sum(1 for item in all_items if item.successful_reps and item.review_count and item.review_count > 0)
 
         return int((successful_items / len(all_items)) * 100) if len(all_items) > 0 else 0
 
@@ -250,10 +242,7 @@ class SRSService:
             return 1
 
         # Count items before this one
-        position = SRS.query.filter(
-            SRS.next_review_at <= item.next_review_at,
-            SRS.id <= item_id
-        ).count()
+        position = SRS.query.filter(SRS.next_review_at <= item.next_review_at, SRS.id <= item_id).count()
 
         return position
 
@@ -261,10 +250,7 @@ class SRSService:
         """Calculate the current streak of consecutive days with SRS reviews."""
         # Get dates with activity
         today = datetime.now(UTC).date()
-        history_dates = set(
-            h.timestamp.date()
-            for h in ReviewHistory.query.all()
-        )
+        history_dates = set(h.timestamp.date() for h in ReviewHistory.query.all())
 
         if not history_dates:
             return 0
@@ -308,19 +294,18 @@ class SRSService:
         mastered_cards = 0
 
         # Get unique cards with reviews this month
-        month_reviews = ReviewHistory.query.filter(
-            ReviewHistory.timestamp >= first_of_month
-        ).all()
+        month_reviews = ReviewHistory.query.filter(ReviewHistory.timestamp >= first_of_month).all()
 
         # Get unique card IDs with intervals crossing the threshold this month
         mastered_card_ids = set()
         for review in month_reviews:
             if review.interval >= mastery_threshold:
                 # Check if this is the first time the card crossed the threshold
-                prev_reviews = ReviewHistory.query.filter(
-                    ReviewHistory.srs_item_id == review.srs_item_id,
-                    ReviewHistory.timestamp < review.timestamp
-                ).order_by(ReviewHistory.timestamp.desc()).first()
+                prev_reviews = (
+                    ReviewHistory.query.filter(ReviewHistory.srs_item_id == review.srs_item_id, ReviewHistory.timestamp < review.timestamp)
+                    .order_by(ReviewHistory.timestamp.desc())
+                    .first()
+                )
 
                 # If no previous reviews or previous review had interval < threshold
                 if not prev_reviews or prev_reviews.interval < mastery_threshold:
@@ -333,10 +318,7 @@ class SRSService:
         now = datetime.now(UTC)
         week_ago = now - timedelta(days=7)
 
-        return ReviewHistory.query.filter(
-            ReviewHistory.timestamp >= week_ago,
-            ReviewHistory.timestamp <= now
-        ).count()
+        return ReviewHistory.query.filter(ReviewHistory.timestamp >= week_ago, ReviewHistory.timestamp <= now).count()
 
     def calculate_retention_increase(self):
         """Calculate the increase in retention rate over the past month compared to the previous month."""
@@ -353,13 +335,11 @@ class SRSService:
 
         # Get reviews for current and previous months
         current_month_reviews = ReviewHistory.query.filter(
-            ReviewHistory.timestamp >= current_month_start,
-            ReviewHistory.timestamp < now
+            ReviewHistory.timestamp >= current_month_start, ReviewHistory.timestamp < now
         ).all()
 
         prev_month_reviews = ReviewHistory.query.filter(
-            ReviewHistory.timestamp >= prev_month_start,
-            ReviewHistory.timestamp < current_month_start
+            ReviewHistory.timestamp >= prev_month_start, ReviewHistory.timestamp < current_month_start
         ).all()
 
         # Calculate success rates
@@ -381,9 +361,7 @@ class SRSService:
     def count_consecutive_perfect_reviews(self):
         """Count the number of consecutive perfect reviews (rating 4-5) in the most recent history."""
         # Get all review history ordered by time, most recent first
-        history = ReviewHistory.query.order_by(
-            ReviewHistory.timestamp.desc()
-        ).all()
+        history = ReviewHistory.query.order_by(ReviewHistory.timestamp.desc()).all()
 
         # Count consecutive perfect reviews
         consecutive_count = 0
@@ -413,7 +391,7 @@ class SRSService:
         for i in range(months):
             # Calculate month by going backward from current month
             month_date = now.replace(day=1) - timedelta(days=30 * i)
-            month_name = month_date.strftime('%b')
+            month_name = month_date.strftime("%b")
             labels.insert(0, month_name)  # Insert at beginning to get chronological order
 
         # For now, use sample data similar to what's in the dashboard route
@@ -426,17 +404,14 @@ class SRSService:
 
         # Create datasets
         datasets = [
-            {'label': 'Cards Mastered', 'data': mastered},
-            {'label': 'Cards Added', 'data': added},
-            {'label': 'Retention Score', 'data': retention}
+            {"label": "Cards Mastered", "data": mastered},
+            {"label": "Cards Added", "data": added},
+            {"label": "Retention Score", "data": retention},
         ]
 
-        return {
-            'labels': labels,
-            'datasets': datasets
-        }
+        return {"labels": labels, "datasets": datasets}
 
-    def get_cards_by_learning_stage(self, stage='new'):
+    def get_cards_by_learning_stage(self, stage="new"):
         """
         Get cards filtered by their learning stage based on interval.
 
@@ -446,28 +421,22 @@ class SRSService:
         Returns:
             list: Cards in the specified learning stage
         """
-        if stage == 'new':
+        if stage == "new":
             # Cards that have never been reviewed
             return SRS.query.filter(SRS.review_count == 0).all()
-        elif stage == 'learning':
+        elif stage == "learning":
             # Cards in initial learning phase (interval <= 1 day but reviewed at least once)
-            return SRS.query.filter(
-                SRS.review_count > 0,
-                SRS.interval <= 1.0
-            ).all()
-        elif stage == 'reviewing':
+            return SRS.query.filter(SRS.review_count > 0, SRS.interval <= 1.0).all()
+        elif stage == "reviewing":
             # Cards in review phase (interval between 1 and 21 days)
-            return SRS.query.filter(
-                SRS.interval > 1.0,
-                SRS.interval <= 21.0
-            ).all()
-        elif stage == 'mastered':
+            return SRS.query.filter(SRS.interval > 1.0, SRS.interval <= 21.0).all()
+        elif stage == "mastered":
             # Cards considered mastered (interval > 21 days)
             return SRS.query.filter(SRS.interval > 21.0).all()
         else:
             raise ValueError(f"Unknown learning stage: {stage}")
 
-    def get_cards_by_difficulty(self, difficulty='easy'):
+    def get_cards_by_difficulty(self, difficulty="easy"):
         """
         Get cards filtered by difficulty based on ease factor.
 
@@ -477,29 +446,19 @@ class SRSService:
         Returns:
             list: Cards with the specified difficulty
         """
-        if difficulty == 'hard':
+        if difficulty == "hard":
             # Hard cards (low ease factor)
-            return SRS.query.filter(
-                SRS.ease_factor <= 1.5,
-                SRS.review_count > 0  # Only include reviewed cards
-            ).all()
-        elif difficulty == 'medium':
+            return SRS.query.filter(SRS.ease_factor <= 1.5, SRS.review_count > 0).all()  # Only include reviewed cards
+        elif difficulty == "medium":
             # Medium difficulty cards
-            return SRS.query.filter(
-                SRS.ease_factor > 1.5,
-                SRS.ease_factor < 2.0,
-                SRS.review_count > 0
-            ).all()
-        elif difficulty == 'easy':
+            return SRS.query.filter(SRS.ease_factor > 1.5, SRS.ease_factor < 2.0, SRS.review_count > 0).all()
+        elif difficulty == "easy":
             # Easy cards (high ease factor)
-            return SRS.query.filter(
-                SRS.ease_factor >= 2.0,
-                SRS.review_count > 0
-            ).all()
+            return SRS.query.filter(SRS.ease_factor >= 2.0, SRS.review_count > 0).all()
         else:
             raise ValueError(f"Unknown difficulty: {difficulty}")
 
-    def get_cards_by_performance(self, performance='struggling'):
+    def get_cards_by_performance(self, performance="struggling"):
         """
         Get cards filtered by user performance.
 
@@ -510,25 +469,19 @@ class SRSService:
             list: Cards that match the specified performance criteria
         """
         # Join with review history to calculate statistics
-        if performance == 'struggling':
+        if performance == "struggling":
             # Cards with low success rate (< 60% correct)
-            return SRS.query.filter(
-                SRS.review_count > 2,  # At least 3 reviews
-                (SRS.successful_reps * 100 / SRS.review_count) < 60
-            ).all()
-        elif performance == 'average':
+            return SRS.query.filter(SRS.review_count > 2, (SRS.successful_reps * 100 / SRS.review_count) < 60).all()  # At least 3 reviews
+        elif performance == "average":
             # Cards with average success rate (60-85%)
             return SRS.query.filter(
                 SRS.review_count > 2,
                 (SRS.successful_reps * 100 / SRS.review_count) >= 60,
-                (SRS.successful_reps * 100 / SRS.review_count) <= 85
+                (SRS.successful_reps * 100 / SRS.review_count) <= 85,
             ).all()
-        elif performance == 'strong':
+        elif performance == "strong":
             # Cards with high success rate (> 85%)
-            return SRS.query.filter(
-                SRS.review_count > 2,
-                (SRS.successful_reps * 100 / SRS.review_count) > 85
-            ).all()
+            return SRS.query.filter(SRS.review_count > 2, (SRS.successful_reps * 100 / SRS.review_count) > 85).all()
         else:
             raise ValueError(f"Unknown performance level: {performance}")
 
@@ -545,7 +498,7 @@ class SRSService:
         """
         cards = []
 
-        if strategy_name == 'due_mix':
+        if strategy_name == "due_mix":
             # A mix of cards from different categories that are due
             due_cards = self.get_due_items()
             categories = {}
@@ -562,42 +515,36 @@ class SRSService:
                 category_limit = max(1, len(category_cards) // 3)
                 cards.extend(category_cards[:category_limit])
 
-        elif strategy_name == 'priority_first':
+        elif strategy_name == "priority_first":
             # Cards that are most overdue first
-            cards = SRS.query.filter(
-                SRS.next_review_at <= datetime.now(UTC)
-            ).order_by(SRS.next_review_at).all()
+            cards = SRS.query.filter(SRS.next_review_at <= datetime.now(UTC)).order_by(SRS.next_review_at).all()
 
-        elif strategy_name == 'hard_cards_first':
+        elif strategy_name == "hard_cards_first":
             # Focus on difficult cards first
-            cards = SRS.query.filter(
-                SRS.next_review_at <= datetime.now(UTC),
-                SRS.ease_factor <= 1.7
-            ).order_by(SRS.ease_factor).all()
+            cards = SRS.query.filter(SRS.next_review_at <= datetime.now(UTC), SRS.ease_factor <= 1.7).order_by(SRS.ease_factor).all()
 
-        elif strategy_name == 'mastery_boost':
+        elif strategy_name == "mastery_boost":
             # Cards that are close to mastery (interval between 15-21 days)
-            cards = SRS.query.filter(
-                SRS.next_review_at <= datetime.now(UTC),
-                SRS.interval >= 15,
-                SRS.interval <= 21
-            ).order_by(SRS.interval.desc()).all()
+            cards = (
+                SRS.query.filter(SRS.next_review_at <= datetime.now(UTC), SRS.interval >= 15, SRS.interval <= 21)
+                .order_by(SRS.interval.desc())
+                .all()
+            )
 
-        elif strategy_name == 'struggling_focus':
+        elif strategy_name == "struggling_focus":
             # Focus on cards with low success rate
-            cards = SRS.query.filter(
-                SRS.next_review_at <= datetime.now(UTC),
-                SRS.review_count > 2,
-                (SRS.successful_reps * 100 / SRS.review_count) < 70
-            ).order_by((SRS.successful_reps * 100 / SRS.review_count)).all()
+            cards = (
+                SRS.query.filter(
+                    SRS.next_review_at <= datetime.now(UTC), SRS.review_count > 2, (SRS.successful_reps * 100 / SRS.review_count) < 70
+                )
+                .order_by((SRS.successful_reps * 100 / SRS.review_count))
+                .all()
+            )
 
-        elif strategy_name == 'new_mix':
+        elif strategy_name == "new_mix":
             # Mix of new and due cards
             new_cards = SRS.query.filter(SRS.review_count == 0).limit(5).all()
-            due_cards = SRS.query.filter(
-                SRS.next_review_at <= datetime.now(UTC),
-                SRS.review_count > 0
-            ).limit(10).all()
+            due_cards = SRS.query.filter(SRS.next_review_at <= datetime.now(UTC), SRS.review_count > 0).limit(10).all()
             cards = new_cards + due_cards
 
         else:
@@ -635,7 +582,6 @@ class SRSService:
         """
         all_items = self.get_all()
 
-
         def calculate_progress(cards):
             if not cards:
                 return 0
@@ -649,10 +595,10 @@ class SRSService:
         else:
             # Calculate progress for each type
             progress = {
-                'company': calculate_progress([item for item in all_items if item.notable_type == 'company']),
-                'contact': calculate_progress([item for item in all_items if item.notable_type == 'contact']),
-                'opportunity': calculate_progress([item for item in all_items if item.notable_type == 'opportunity']),
-                'overall': calculate_progress(all_items)
+                "company": calculate_progress([item for item in all_items if item.notable_type == "company"]),
+                "contact": calculate_progress([item for item in all_items if item.notable_type == "contact"]),
+                "opportunity": calculate_progress([item for item in all_items if item.notable_type == "opportunity"]),
+                "overall": calculate_progress(all_items),
             }
             return progress
 
@@ -671,12 +617,7 @@ class SRSService:
             return sum(1 for item in due_items if item.notable_type == type_name)
         else:
             # Initialize counts dictionary
-            counts = {
-                'company': 0,
-                'contact': 0,
-                'opportunity': 0,
-                'other': 0  # For any items with unrecognized types
-            }
+            counts = {"company": 0, "contact": 0, "opportunity": 0, "other": 0}  # For any items with unrecognized types
 
             # Count due items by type
             for item in due_items:
@@ -684,7 +625,7 @@ class SRSService:
                 if item_type in counts:
                     counts[item_type] += 1
                 else:
-                    counts['other'] += 1
+                    counts["other"] += 1
 
             return counts
 
@@ -702,12 +643,7 @@ class SRSService:
             return sum(1 for item in all_items if item.notable_type == type_name)
         else:
             # Initialize counts dictionary
-            counts = {
-                'company': 0,
-                'contact': 0,
-                'opportunity': 0,
-                'other': 0  # For any items with unrecognized types
-            }
+            counts = {"company": 0, "contact": 0, "opportunity": 0, "other": 0}  # For any items with unrecognized types
 
             # Count items by type
             for item in all_items:
@@ -715,27 +651,19 @@ class SRSService:
                 if item_type in counts:
                     counts[item_type] += 1
                 else:
-                    counts['other'] += 1
+                    counts["other"] += 1
 
             return counts
 
     def get_stats(self):
         """Get current SRS system statistics."""
         total = SRS.query.count()
-        due_today = SRS.query.filter(
-            SRS.next_review_at <= datetime.now(UTC)
-        ).count()
+        due_today = SRS.query.filter(SRS.next_review_at <= datetime.now(UTC)).count()
 
         today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
-        reviewed_today = ReviewHistory.query.filter(
-            ReviewHistory.timestamp >= today_start
-        ).count()
+        reviewed_today = ReviewHistory.query.filter(ReviewHistory.timestamp >= today_start).count()
 
-        return {
-            'total_cards': total,
-            'cards_due': due_today,
-            'cards_reviewed_today': reviewed_today
-        }
+        return {"total_cards": total, "cards_due": due_today, "cards_reviewed_today": reviewed_today}
 
     def get_categories(self):
         """Get all available categories (decks)."""
@@ -748,9 +676,9 @@ class SRSService:
 
         # Merge with predefined categories
         predefined = {
-            'company': {'name': 'Companies', 'color': 'primary', 'icon': 'building'},
-            'contact': {'name': 'Contacts', 'color': 'success', 'icon': 'people'},
-            'opportunity': {'name': 'Opportunities', 'color': 'danger', 'icon': 'graph-up-arrow'}
+            "company": {"name": "Companies", "color": "primary", "icon": "building"},
+            "contact": {"name": "Contacts", "color": "success", "icon": "people"},
+            "opportunity": {"name": "Opportunities", "color": "danger", "icon": "graph-up-arrow"},
         }
 
         result = []
@@ -758,30 +686,25 @@ class SRSService:
         # Add predefined categories first
         for category_id, info in predefined.items():
             count = category_counts.get(category_id, 0)
-            result.append({
-                'id': category_id,
-                'name': info['name'],
-                'color': info['color'],
-                'icon': info['icon'],
-                'count': count
-            })
+            result.append({"id": category_id, "name": info["name"], "color": info["color"], "icon": info["icon"], "count": count})
 
         # Add custom categories from database that aren't in predefined list
         for category_id in db_categories:
             if category_id not in predefined:
                 count = category_counts.get(category_id, 0)
-                result.append({
-                    'id': category_id,
-                    'name': category_id.capitalize(),  # Default name is capitalized ID
-                    'color': 'secondary',  # Default color
-                    'icon': 'folder',  # Default icon
-                    'count': count
-                })
+                result.append(
+                    {
+                        "id": category_id,
+                        "name": category_id.capitalize(),  # Default name is capitalized ID
+                        "color": "secondary",  # Default color
+                        "icon": "folder",  # Default icon
+                        "count": count,
+                    }
+                )
 
         return result
 
-
-    def create_category(self, name, color='secondary', icon='folder'):
+    def create_category(self, name, color="secondary", icon="folder"):
         """
         Create a new category (deck).
 
@@ -790,19 +713,12 @@ class SRSService:
         ensures the category ID is valid and returns a category object.
         """
         # Normalize the name to create a valid ID
-        category_id = name.lower().replace(' ', '_')
+        category_id = name.lower().replace(" ", "_")
 
         logger.info(f"SRSService: Creating category {category_id} with name '{name}'")
 
         # Return a category object
-        return {
-            'id': category_id,
-            'name': name,
-            'color': color,
-            'icon': icon,
-            'count': 0
-        }
-
+        return {"id": category_id, "name": name, "color": color, "icon": icon, "count": 0}
 
     def create(self, data):
         """Create a new SRS item."""
@@ -812,13 +728,10 @@ class SRSService:
         item.save()
         return item
 
-
     def count_reviews_today(self):
         """Count the number of reviews completed today."""
         today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
-        return ReviewHistory.query.filter(
-            ReviewHistory.timestamp >= today_start
-        ).count()
+        return ReviewHistory.query.filter(ReviewHistory.timestamp >= today_start).count()
 
     def get_detailed_stats(self):
         """Get detailed learning statistics for analysis."""
@@ -826,35 +739,36 @@ class SRSService:
         all_cards = self.get_all()
 
         learning_stages = {
-            'new': len(self.get_cards_by_learning_stage('new')),
-            'learning': len(self.get_cards_by_learning_stage('learning')),
-            'reviewing': len(self.get_cards_by_learning_stage('reviewing')),
-            'mastered': len(self.get_cards_by_learning_stage('mastered'))
+            "new": len(self.get_cards_by_learning_stage("new")),
+            "learning": len(self.get_cards_by_learning_stage("learning")),
+            "reviewing": len(self.get_cards_by_learning_stage("reviewing")),
+            "mastered": len(self.get_cards_by_learning_stage("mastered")),
         }
 
         difficulty_counts = {
-            'hard': len(self.get_cards_by_difficulty('hard')),
-            'medium': len(self.get_cards_by_difficulty('medium')),
-            'easy': len(self.get_cards_by_difficulty('easy'))
+            "hard": len(self.get_cards_by_difficulty("hard")),
+            "medium": len(self.get_cards_by_difficulty("medium")),
+            "easy": len(self.get_cards_by_difficulty("easy")),
         }
 
         performance_counts = {
-            'struggling': len(self.get_cards_by_performance('struggling')),
-            'average': len(self.get_cards_by_performance('average')),
-            'strong': len(self.get_cards_by_performance('strong'))
+            "struggling": len(self.get_cards_by_performance("struggling")),
+            "average": len(self.get_cards_by_performance("average")),
+            "strong": len(self.get_cards_by_performance("strong")),
         }
 
         stats = {
             **basic_stats,
-            'average_ease_factor': sum(card.ease_factor or DEFAULT_EASE_FACTOR for card in all_cards) / len(
-                all_cards) if all_cards else DEFAULT_EASE_FACTOR,
-            'average_interval': sum(card.interval or 0 for card in all_cards) / len(all_cards) if all_cards else 0,
-            'learning_stages': learning_stages,
-            'difficulty_counts': difficulty_counts,
-            'performance_counts': performance_counts,
-            'streak_days': self.get_streak_days(),
-            'weekly_reviews': self.count_weekly_reviews(),
-            'mastered_this_month': self.count_mastered_cards_this_month()
+            "average_ease_factor": (
+                sum(card.ease_factor or DEFAULT_EASE_FACTOR for card in all_cards) / len(all_cards) if all_cards else DEFAULT_EASE_FACTOR
+            ),
+            "average_interval": sum(card.interval or 0 for card in all_cards) / len(all_cards) if all_cards else 0,
+            "learning_stages": learning_stages,
+            "difficulty_counts": difficulty_counts,
+            "performance_counts": performance_counts,
+            "streak_days": self.get_streak_days(),
+            "weekly_reviews": self.count_weekly_reviews(),
+            "mastered_this_month": self.count_mastered_cards_this_month(),
         }
 
         return stats
@@ -866,24 +780,24 @@ class SRSService:
     def get_learning_stages_counts(self):
         """Get counts of cards by learning stage."""
         return {
-            'new': len(self.get_cards_by_learning_stage('new')),
-            'learning': len(self.get_cards_by_learning_stage('learning')),
-            'reviewing': len(self.get_cards_by_learning_stage('reviewing')),
-            'mastered': len(self.get_cards_by_learning_stage('mastered'))
+            "new": len(self.get_cards_by_learning_stage("new")),
+            "learning": len(self.get_cards_by_learning_stage("learning")),
+            "reviewing": len(self.get_cards_by_learning_stage("reviewing")),
+            "mastered": len(self.get_cards_by_learning_stage("mastered")),
         }
 
     def get_difficulty_counts(self):
         """Get counts of cards by difficulty level."""
         return {
-            'hard': len(self.get_cards_by_difficulty('hard')),
-            'medium': len(self.get_cards_by_difficulty('medium')),
-            'easy': len(self.get_cards_by_difficulty('easy'))
+            "hard": len(self.get_cards_by_difficulty("hard")),
+            "medium": len(self.get_cards_by_difficulty("medium")),
+            "easy": len(self.get_cards_by_difficulty("easy")),
         }
 
     def get_performance_counts(self):
         """Get counts of cards by performance level."""
         return {
-            'struggling': len(self.get_cards_by_performance('struggling')),
-            'average': len(self.get_cards_by_performance('average')),
-            'strong': len(self.get_cards_by_performance('strong'))
+            "struggling": len(self.get_cards_by_performance("struggling")),
+            "average": len(self.get_cards_by_performance("average")),
+            "strong": len(self.get_cards_by_performance("strong")),
         }

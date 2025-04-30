@@ -15,6 +15,7 @@ logger = get_logger()
 @dataclass
 class BlueprintConfig:
     """Configuration class for creating CRUD blueprints."""
+
     model_class: Any
     service: Optional[Any] = None
     url_prefix: Optional[str] = None
@@ -27,10 +28,10 @@ class BlueprintConfig:
         plural = self.model_class.__entity_plural__.lower()
 
         for attr, value in self.__dict__.items():
-            if not attr.endswith('_template') or value is not None:
+            if not attr.endswith("_template") or value is not None:
                 continue
 
-            if attr == 'index_template':
+            if attr == "index_template":
                 setattr(self, attr, f"pages/{plural}/index.html")
             else:
                 setattr(self, attr, f"pages/{plural}/view.html")
@@ -57,10 +58,7 @@ def create_crud_blueprint(config: BlueprintConfig) -> Blueprint:
         service = CRUDService(model_class)
 
     route_config = CrudRouteConfig(
-        blueprint=blueprint,
-        entity_table_name=model_class.__entity_name__,
-        service=service,
-        model_class=model_class
+        blueprint=blueprint, entity_table_name=model_class.__entity_name__, service=service, model_class=model_class
     )
 
     # Set custom templates if provided

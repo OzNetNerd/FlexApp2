@@ -17,6 +17,7 @@ srs_service = SRSService()
 # Create config
 srs_api_crud_config = ApiCrudRouteConfig(blueprint=srs_api_bp, entity_table_name=ENTITY_NAME, service=srs_service)
 
+
 @srs_api_bp.route("/due", methods=["GET"])
 def get_due_items():
     """Return all SRS items due for review."""
@@ -37,6 +38,7 @@ def review_item(item_id: int) -> Dict[str, Any]:
     rating = int(data.get("rating", 0))
     item = srs_service.schedule_review(item_id, rating)
     return item.to_dict()
+
 
 @srs_api_bp.route("/stats", methods=["GET"])
 def get_srs_stats():
@@ -66,10 +68,11 @@ def get_categories_api():
     categories = srs_service.get_categories()
     return {"categories": categories}
 
+
 # API endpoint for chart data
 @srs_api_bp.route("/progress-data", methods=["GET"])
 def progress_data():
     """Get progress data for charts."""
-    months = request.args.get('months', 7, type=int)
+    months = request.args.get("months", 7, type=int)
     data = srs_service.get_learning_progress_data(months=months)
     return jsonify(data)

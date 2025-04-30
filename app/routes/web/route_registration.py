@@ -85,14 +85,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
             context = TableWebContext(entity_table_name=config.entity_table_name)
         elif endpoint == CRUDEndpoint.create.value:
             # Initialize with default empty values for required fields
-            default_entity = {
-                "id": "",
-                "question": "",
-                "answer": "",
-                "category": "",
-                "last_reviewed": None,
-                "due_date": None
-            }
+            default_entity = {"id": "", "question": "", "answer": "", "category": "", "last_reviewed": None, "due_date": None}
 
             context = TableWebContext(
                 entity=default_entity,  # Use default entity instead of empty dict
@@ -119,9 +112,9 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
             context.model_name = config.model_class.__name__  # Set model name from class
 
             # Get entity name for display
-            if hasattr(entity, 'name'):
+            if hasattr(entity, "name"):
                 context.entity_name = entity.name
-            elif hasattr(entity, 'title'):
+            elif hasattr(entity, "title"):
                 context.entity_name = entity.title
             else:
                 context.entity_name = f"{config.model_class.__name__} #{entity_id}"
@@ -173,8 +166,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
     return login_required(handler)
 
 
-def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, entity_id: Optional[int],
-                          form_data: Dict[str, Any]) -> Any:
+def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, entity_id: Optional[int], form_data: Dict[str, Any]) -> Any:
     if endpoint == CRUDEndpoint.create.value:
         entity = service.create(form_data)
         return redirect(url_for(f"{blueprint_name}.view", entity_id=entity.id))
@@ -190,8 +182,7 @@ def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, enti
 def register_crud_routes(config: CrudRouteConfig) -> None:
     bp = config.blueprint
     bp.add_url_rule(rule="/", endpoint="index", view_func=route_handler("index", config), methods=["GET"])
-    bp.add_url_rule(rule="/create", endpoint="create", view_func=route_handler("create", config),
-                    methods=["GET", "POST"])
+    bp.add_url_rule(rule="/create", endpoint="create", view_func=route_handler("create", config), methods=["GET", "POST"])
     bp.add_url_rule(rule="/<int:entity_id>", endpoint="view", view_func=route_handler("view", config), methods=["GET"])
     bp.add_url_rule(
         rule="/<int:entity_id>/edit",
@@ -213,7 +204,6 @@ def register_crud_routes(config: CrudRouteConfig) -> None:
     )
 
 
-def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint_name: str,
-                        methods: Optional[List[str]] = None) -> None:
+def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint_name: str, methods: Optional[List[str]] = None) -> None:
     methods = methods or ["GET"]
     blueprint.add_url_rule(rule=url, endpoint=endpoint_name, view_func=handler, methods=methods)
