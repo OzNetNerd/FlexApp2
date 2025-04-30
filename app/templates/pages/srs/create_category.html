@@ -1,0 +1,201 @@
+{% extends "pages/srs/base.html" %}
+{% set mode = 'create' %}
+{% block title %}Create New Flashcard{% endblock %}
+
+{% block header_buttons %}
+  <button type="button" class="btn btn-outline-secondary me-2" onclick="location.href='{{ url_for('srs_bp.list') }}'">
+    <i class="bi bi-x-circle me-1"></i> Cancel
+  </button>
+  <button type="submit" form="entity-form" class="btn btn-primary">
+    <i class="bi bi-save me-1"></i> Save
+  </button>
+{% endblock %}
+
+{% block srs_content %}
+  <form id="entity-form" method="POST" action="{{ url_for('srs_bp.create') }}">
+    {{ csrf_input }}
+
+    <!-- Question Card -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary-subtle d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary"><i class="bi bi-question-circle me-2"></i>Question</h5>
+        <div class="input-group" style="max-width: 200px;">
+          <select name="category" class="form-select form-select-sm" id="category">
+            <option value="" selected disabled>-- Select a category --</option>
+            {% for category in categories %}
+              <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+            <option value="Custom">Custom...</option>
+          </select>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <textarea name="question" class="form-control" rows="4" placeholder="Enter question here..." required></textarea>
+        </div>
+        <div id="custom-category-container" class="mt-2 d-none">
+          <input type="text" id="custom-category" class="form-control" placeholder="Enter custom category">
+        </div>
+      </div>
+    </div>
+
+    <!-- Answer Card -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-success-subtle">
+        <h5 class="mb-0 text-success">
+          <i class="bi bi-check-circle me-2"></i>Answer
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <textarea name="answer" class="form-control" rows="4" placeholder="Enter answer here..." required></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tags Section -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="bi bi-tags me-2"></i>Tags</h5>
+      </div>
+      <div class="card-body">
+        <div class="input-group mb-2">
+          <input
+            type="text"
+            id="tag-input"
+            class="form-control"
+            placeholder="Add a tag and press Enter">
+          <button
+            type="button"
+            id="add-tag-btn"
+            class="btn btn-outline-secondary">
+            <i class="bi bi-plus-lg"></i> Add
+          </button>
+        </div>
+        <div id="tags-container" class="d-flex flex-wrap gap-2 mt-2">
+          <!-- Tags will be displayed here as badges -->
+        </div>
+        <input type="hidden" name="tags" id="tags-hidden" value="">
+        <small class="text-muted">Tags help you categorize and find cards more easily</small>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-between mt-4">
+      <a href="/srs/dashboard" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save"></i> Create Card
+      </button>
+    </div>
+  </form>
+
+  <!-- Stats Footer -->
+  <div class="card mt-4">
+    <div class="card-footer bg-white">
+      <div class="row text-center small text-muted">
+        <div class="col-4">
+          <div id="total-cards" class="fw-bold">{{ stats.total_cards if stats else 0 }}</div>
+          <div>Total Cards</div>
+        </div>
+        <div class="col-4">
+          <div id="cards-due" class="fw-bold">{{ stats.cards_due if stats else 0 }}</div>
+          <div>Due Today</div>
+        </div>
+        <div class="col-4">
+          <div id="cards-reviewed" class="fw-bold">{{ stats.cards_reviewed_today if stats else 0 }}</div>
+          <div>Reviewed Today</div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block srs_scripts %}
+<script>
+  // Array to store tags
+  let tags = [];
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // Handle custom category selection
+    const categorySelect = document.getElementById('category');
+    const customCategoryContainer = document.getElementById('custom-category-container');
+    const customCategoryInput = document.getElementById('custom-category');
+
+    categorySelect.addEventListener('change', function() {
+      if (this.value === 'Custom') {
+        customCategoryContainer.classList.remove('d-none');
+        customCategoryInput.setAttribute('required', 'required');
+      } else {
+        customCategoryContainer.classList.add('d-none');
+        customCategoryInput.removeAttribute('required');
+      }
+    });
+
+    // Handle tag input
+    const tagInput = document.getElementById('tag-input');
+    const addTagBtn = document.getElementById('add-tag-btn');
+    const tagsContainer = document.getElementById('tags-container');
+    const tagsHidden = document.getElementById('tags-hidden');
+
+    function addTag() {
+      const tagText = tagInput.value.trim();
+      if (tagText && !tags.includes(tagText)) {
+        tags.push(tagText);
+        renderTags();
+        tagInput.value = '';
+        updateHiddenField();
+      }
+    }
+
+    function removeTag(tag) {
+      tags = tags.filter(t => t !== tag);
+      renderTags();
+      updateHiddenField();
+    }
+
+    function renderTags() {
+      tagsContainer.innerHTML = '';
+      tags.forEach(tag => {
+        const tagElement = document.createElement('span');
+        tagElement.className = 'badge bg-primary d-flex align-items-center';
+        tagElement.style.padding = '0.5em 0.7em';
+        tagElement.innerHTML = `
+          ${tag}
+          <button type="button" class="btn-close btn-close-white ms-2" style="font-size: 0.5rem;" aria-label="Remove tag"></button>
+        `;
+        tagElement.querySelector('.btn-close').addEventListener('click', () => removeTag(tag));
+        tagsContainer.appendChild(tagElement);
+      });
+    }
+
+    function updateHiddenField() {
+      tagsHidden.value = JSON.stringify(tags);
+    }
+
+    addTagBtn.addEventListener('click', addTag);
+
+    tagInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        addTag();
+      }
+    });
+
+    // Handle form submission
+    document.getElementById('entity-form').addEventListener('submit', function(e) {
+      // Handle custom category if selected
+      if (categorySelect.value === 'Custom') {
+        const customValue = customCategoryInput.value.trim();
+        if (customValue) {
+          categorySelect.value = customValue;
+        } else {
+          e.preventDefault();
+          alert('Please enter a custom category');
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -16,7 +16,7 @@ srs_config = BlueprintConfig(
 )
 
 # Create the blueprint using the config
-srs_bp = create_crud_blueprint(srs_config)# Specify custom create template
+srs_bp = create_crud_blueprint(srs_config) # Specify custom create template
 
 
 # Dashboard route
