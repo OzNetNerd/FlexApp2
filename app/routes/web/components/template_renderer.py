@@ -103,6 +103,9 @@ def get_jinja_variables(context_dict):
                 f"⚠️ CONFLICT: '{key}' from context ({context_value}) overridden by Flask global ({flask_value})")
         jinja_variables[key] = flask_value
 
+    # Log all variables being returned
+    logger.info(f"Jinja variables: {jinja_variables}")
+
     return jinja_variables
 
 
