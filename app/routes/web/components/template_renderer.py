@@ -82,10 +82,12 @@ def create_template_environment() -> Environment:
     return env
 
 
-def get_flask_globals() -> Dict[str, Any]:
-    logger.info("Fetching Flask global objects for template rendering")
+def get_jinja_variables(context_dict):
+    # Start with context dictionary
+    jinja_variables = context_dict.copy()
 
-    globals_dict = {
+    # Define Flask globals dictionary
+    flask_globals = {
         "url_for": url_for,
         "get_flashed_messages": get_flashed_messages,
         "request": request,
@@ -93,14 +95,15 @@ def get_flask_globals() -> Dict[str, Any]:
         "current_app": current_app,
     }
 
-    logger.info(f"Got them: {globals_dict}")
-    logger.debug(f"📝 Request method: {request.method}")
-    logger.debug(f"📝 Request path: {request.path}")
-    logger.debug(f"📝 Request args: {request.args}")
-    logger.debug(f"📝 Request headers: {dict(request.headers)}")
-    logger.debug(f"📝 Request cookies: {request.cookies}")
-    logger.debug(f"📝 Request form: {request.form}")
-    return globals_dict
+    # Add Flask globals, logging any overrides
+    for key, flask_value in flask_globals.items():
+        if key in jinja_variables:
+            context_value = jinja_variables[key]
+            logger.warning(
+                f"⚠️ CONFLICT: '{key}' from context ({context_value}) overridden by Flask global ({flask_value})")
+        jinja_variables[key] = flask_value
+
+    return jinja_variables
 
 
 def handle_template_error(
@@ -208,7 +211,7 @@ def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, 
 
         LoggingUndefined.clear_missing_variables()
         logger.debug("📝 Starting template rendering process")
-        rendered = template.render(**get_flask_globals(), **context_dict)
+        rendered = template.render(**get_jinja_variables(context_dict))
         logger.debug(f"Template rendered successfully with length {len(rendered)} chars")
 
         LoggingUndefined.raise_if_missing()
@@ -228,3 +231,5 @@ def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, 
             render_safely_config.endpoint_name,
             render_safely_config.error_message,
         )
+
+
