@@ -8,8 +8,12 @@ from app.routes.web.blueprint_factory import create_crud_blueprint
 # Create the service instance
 srs_service = SRSService()
 
-# Create a blueprint with CRUD operations
-srs_bp = create_crud_blueprint(SRS, service=srs_service)
+# Create a blueprint with CRUD operations and custom templates
+srs_bp = create_crud_blueprint(
+    SRS,
+    service=srs_service,
+    create_template="pages/srs/create.html"  # Specify custom create template
+)
 
 
 # Dashboard route

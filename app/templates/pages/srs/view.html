@@ -2,10 +2,14 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
-    <h1 class="mb-4">{{ title }}</h1>
+<div class="card shadow border-0 mb-4">
+  <!-- Header with title and card counter -->
+  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+    <h1 class="fs-4 mb-0">{{ title }}</h1>
+    <span class="badge bg-light text-primary">Card {{ current_index|default(1) }} of {{ total_cards|default(1) }}</span>
+  </div>
 
+  <div class="card-body p-4">
     <div class="card shadow-sm mb-4">
       <div class="card-header bg-light d-flex justify-content-between align-items-center">
         <h4 class="mb-0">Question</h4>
@@ -108,32 +112,31 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="d-flex justify-content-between mt-3">
-      {% if prev_item_id %}
-      <a href="{{ url_for('srs_bp.review_item', item_id=prev_item_id) }}"
-         id="prev-btn" class="btn btn-sm btn-outline-secondary"
-         title="Previous Card (Shift+Left)">
-         <i class="bi bi-arrow-left"></i> Previous
-      </a>
-      {% else %}
-      <div></div>
-      {% endif %}
+  <!-- Footer with navigation buttons -->
+  <div class="card-footer bg-light d-flex justify-content-between align-items-center py-3">
+    {% if prev_item_id %}
+    <a href="{{ url_for('srs_bp.review_item', item_id=prev_item_id) }}"
+       id="prev-btn" class="btn btn-sm btn-outline-primary"
+       title="Previous Card (Shift+Left)">
+       <i class="bi bi-arrow-left"></i> Previous
+    </a>
+    {% else %}
+    <div></div>
+    {% endif %}
 
-      <div class="text-muted small">
-         Card {{ current_index|default(1) }} of {{ total_cards|default(1) }}
-      </div>
+    <!-- Stats are already shown above, no need to repeat pagination info here -->
 
-      {% if next_item_id is defined and next_item_id %}
-      <a href="{{ url_for('srs_bp.review_item', item_id=next_item_id) }}"
-         id="next-btn" class="btn btn-sm btn-outline-secondary"
-         title="Next Card (Shift+Right)">
-         Next <i class="bi bi-arrow-right"></i>
-      </a>
-      {% else %}
-      <div></div>
-      {% endif %}
-    </div>
+    {% if next_item_id is defined and next_item_id %}
+    <a href="{{ url_for('srs_bp.review_item', item_id=next_item_id) }}"
+       id="next-btn" class="btn btn-sm btn-outline-primary"
+       title="Next Card (Shift+Right)">
+       Next <i class="bi bi-arrow-right"></i>
+    </a>
+    {% else %}
+    <div></div>
+    {% endif %}
   </div>
 </div>
 

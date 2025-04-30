@@ -1,6 +1,6 @@
 # app/routes/web/route_registration.py - Improved debugging
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
 
@@ -27,32 +27,35 @@ class CRUDEndpoint(Enum):
 
 
 @dataclass
-class CrudTemplates:
-    index: Optional[str] = None
-    create: Optional[str] = None
-    view: Optional[str] = None
-    edit: Optional[str] = None
-
-    def get(self, route_type: str, default: str) -> str:
-        return getattr(self, route_type) or default
-
-
-@dataclass
 class CrudRouteConfig:
     blueprint: Blueprint
     entity_table_name: str
     service: Any
-    templates: CrudTemplates
+    model_class: Any
 
+    # Template paths that won't be part of __init__ but will be required fields
+    index_template: str = field(init=False)
+    create_template: str = field(init=False)
+    view_template: str = field(init=False)
+    edit_template: str = field(init=False)
 
-def default_crud_templates(model_class) -> CrudTemplates:
-    plural = model_class.__entity_plural__.lower()
-    return CrudTemplates(
-        index=f"pages/{plural}/index.html",
-        create=f"pages/{plural}/view.html",
-        view=f"pages/{plural}/view.html",
-        edit=f"pages/{plural}/view.html",
-    )
+    def __post_init__(self):
+        plural = self.model_class.__entity_plural__.lower()
+        self.index_template = f"pages/{plural}/index.html"
+        self.create_template = f"pages/{plural}/view.html"
+        self.view_template = f"pages/{plural}/view.html"
+        self.edit_template = f"pages/{plural}/view.html"
+
+    def get_template(self, route_type: str, default: str) -> str:
+        if route_type == "index":
+            return self.index_template or default
+        elif route_type == "create":
+            return self.create_template or default
+        elif route_type == "view":
+            return self.view_template or default
+        elif route_type == "edit":
+            return self.edit_template or default
+        return default
 
 
 def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
@@ -117,6 +120,22 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
                 read_only=read_only,
                 title=title,
             )
+
+            # Add missing variables required by the template
+            context.id = entity_id  # Template uses "id" but context has "entity_id"
+            context.model_name = config.model_class.__name__  # Set model name from class
+
+            # Get entity name for display
+            if hasattr(entity, 'name'):
+                context.entity_name = entity.name
+            elif hasattr(entity, 'title'):
+                context.entity_name = entity.title
+            else:
+                context.entity_name = f"{config.model_class.__name__} #{entity_id}"
+
+            # Set submit_url even for read-only views (for proper form structure)
+            if endpoint == CRUDEndpoint.view.value:
+                context.submit_url = url_for(f"{config.blueprint.name}.update", entity_id=entity_id)
         else:
             context = WebContext(title=config.entity_table_name)
 
@@ -141,7 +160,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
                 context.submit_url = url_for(f"{config.blueprint.name}.update", entity_id=entity_id)
 
         # Render the template
-        template_path = config.templates.get(
+        template_path = config.get_template(
             endpoint,
             f"pages/crud/{endpoint}_{config.entity_table_name.lower()}.html",
         )
@@ -161,7 +180,8 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
     return login_required(handler)
 
 
-def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, entity_id: Optional[int], form_data: Dict[str, Any]) -> Any:
+def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, entity_id: Optional[int],
+                          form_data: Dict[str, Any]) -> Any:
     if endpoint == CRUDEndpoint.create.value:
         entity = service.create(form_data)
         return redirect(url_for(f"{blueprint_name}.view", entity_id=entity.id))
@@ -177,7 +197,8 @@ def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, enti
 def register_crud_routes(config: CrudRouteConfig) -> None:
     bp = config.blueprint
     bp.add_url_rule(rule="/", endpoint="index", view_func=route_handler("index", config), methods=["GET"])
-    bp.add_url_rule(rule="/create", endpoint="create", view_func=route_handler("create", config), methods=["GET", "POST"])
+    bp.add_url_rule(rule="/create", endpoint="create", view_func=route_handler("create", config),
+                    methods=["GET", "POST"])
     bp.add_url_rule(rule="/<int:entity_id>", endpoint="view", view_func=route_handler("view", config), methods=["GET"])
     bp.add_url_rule(
         rule="/<int:entity_id>/edit",
@@ -199,6 +220,7 @@ def register_crud_routes(config: CrudRouteConfig) -> None:
     )
 
 
-def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint_name: str, methods: Optional[List[str]] = None) -> None:
+def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint_name: str,
+                        methods: Optional[List[str]] = None) -> None:
     methods = methods or ["GET"]
     blueprint.add_url_rule(rule=url, endpoint=endpoint_name, view_func=handler, methods=methods)
