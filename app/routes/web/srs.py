@@ -4,6 +4,7 @@ from datetime import datetime, UTC
 from app.models.pages.srs import SRS, ReviewHistory
 from app.services.srs_service import SRSService
 from app.routes.web.blueprint_factory import create_crud_blueprint
+from routes.api.srs import review_item
 
 # Create the service instance
 srs_service = SRSService()
@@ -13,6 +14,7 @@ srs_bp = create_crud_blueprint(
     SRS,
     service=srs_service,
     create_template="pages/srs/create.html"  # Specify custom create template
+
 )
 
 

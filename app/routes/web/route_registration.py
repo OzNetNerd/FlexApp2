@@ -33,18 +33,11 @@ class CrudRouteConfig:
     service: Any
     model_class: Any
 
-    # Template paths that won't be part of __init__ but will be required fields
-    index_template: str = field(init=False)
-    create_template: str = field(init=False)
-    view_template: str = field(init=False)
-    edit_template: str = field(init=False)
-
-    def __post_init__(self):
-        plural = self.model_class.__entity_plural__.lower()
-        self.index_template = f"pages/{plural}/index.html"
-        self.create_template = f"pages/{plural}/view.html"
-        self.view_template = f"pages/{plural}/view.html"
-        self.edit_template = f"pages/{plural}/view.html"
+    # Template paths with explicit initialization
+    index_template: str = ""
+    create_template: str = ""
+    view_template: str = ""
+    edit_template: str = ""
 
     def get_template(self, route_type: str, default: str) -> str:
         if route_type == "index":
