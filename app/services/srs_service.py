@@ -1,6 +1,7 @@
 from datetime import datetime, UTC, timedelta
 from app.models.pages.srs import SRS, ReviewHistory
 from app.utils.app_logging import get_logger
+from app.models import db
 
 logger = get_logger()
 
