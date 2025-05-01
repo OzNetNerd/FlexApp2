@@ -399,7 +399,8 @@ def filtered_cards():
     }
 
     template_name = "pages/srs/filtered_cards.html"
-    log_message_and_vars(f"📄 Rendering template: {template_name}", template_data)
+    log_message_and_vars(f"📄 Vars being sent to template:", template_data)
+    logger.info(f"📄 Rendering template: {template_name}")
     return render_template(template_name, **template_data)
 
 

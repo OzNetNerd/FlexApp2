@@ -385,7 +385,7 @@
             </thead>
             <tbody>
               {% for card in cards %}
-              <tr {% if card.next_review_at <= now %}class="table-warning"{% endif %}>
+              <tr {% if card.next_review_at and card.next_review_at <= now %}class="table-warning"{% endif %}>
                 <td class="ps-3">
                   <div class="form-check">
                     <input class="form-check-input card-select" type="checkbox" name="selected_cards"
@@ -427,7 +427,7 @@
                   <a href="{{ url_for('srs_bp.review_item', item_id=card.id) }}" class="btn btn-sm btn-outline-primary me-1">
                     Review
                   </a>
-                  <a href="{{ url_for('srs_bp.edit', id=card.id) }}" class="btn btn-sm btn-outline-secondary me-1">
+                  <a href="{{ url_for('srs_bp.edit', entity_id=card.id) }}" class="btn btn-sm btn-outline-secondary me-1">
                     Edit
                   </a>
                   <button type="button" class="btn btn-sm btn-outline-danger"

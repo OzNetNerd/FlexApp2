@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from flask import Blueprint, request
 
@@ -57,7 +58,7 @@ def query_notes():
 
     days = request.args.get("days", type=int)
     if days is not None:
-        cutoff = datetime.utcnow() - timedelta(days=days)
+        cutoff = datetime.now(ZoneInfo("UTC")) - timedelta(days=days)
         filters.append(Note.created_at >= cutoff)
 
     uid = request.args.get("user_id", type=int)

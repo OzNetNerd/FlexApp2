@@ -1,7 +1,8 @@
 # app/app.py
 
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from logging import INFO, Formatter, StreamHandler
 from typing import Type
 
@@ -75,7 +76,7 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
 
     @app.template_global()
     def now():
-        return datetime.now()
+        return datetime.now(ZoneInfo("UTC"))
 
     @app.errorhandler(TypeError)
     def handle_type_error(e: TypeError):
@@ -120,7 +121,7 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     def inject_globals():
         """Inject common variables into every template context."""
         return {
-            "now": datetime.now(timezone.utc),
+            "now": datetime.now(ZoneInfo("UTC")),
             "logger": logger,
             "current_app": current_app,
             "is_debug_mode": app.debug,
