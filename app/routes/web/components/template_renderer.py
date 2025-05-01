@@ -4,14 +4,14 @@ import inspect
 import json
 import traceback
 from dataclasses import dataclass
-from typing import Optional, Tuple, Union
+from typing import Tuple, Union
 
 from flask import abort, current_app, get_flashed_messages, render_template, request, url_for
 from jinja2 import DebugUndefined, Environment
 from jinja2.exceptions import TemplateNotFound
 from markupsafe import Markup, escape
 
-from app.routes.web.context import WebContext
+from app.routes.web.context import BaseContext
 from app.utils.app_logging import get_logger, log_message_and_variables
 
 logger = get_logger()
@@ -20,7 +20,7 @@ logger = get_logger()
 @dataclass
 class RenderSafelyConfig:
     template_path: str
-    context: WebContext
+    context: BaseContext
     error_message: str
     endpoint_name: str
 
