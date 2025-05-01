@@ -1,6 +1,7 @@
 # app/services/category_service.py
-from datetime import datetime, UTC
-from app.models.pages.srs import Category, SRS
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+# from app.models.pages.srs import Category, SRS
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
@@ -29,7 +30,7 @@ class CategoryService:
         for category in categories:
             total_count = len(category.cards) if category.cards else 0
             due_count = sum(
-                1 for card in category.cards if card.next_review_at and card.next_review_at <= datetime.now(UTC))
+                1 for card in category.cards if card.next_review_at and card.next_review_at <= datetime.now(ZoneInfo("UTC")))
 
             result.append({
                 "id": category.id,

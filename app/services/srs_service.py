@@ -1,4 +1,6 @@
-from datetime import datetime, UTC, timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS, ReviewHistory
 from app.utils.app_logging import get_logger
 from app.models import db
@@ -97,7 +99,7 @@ class SRSService:
         logger.info(f"SRSService: Calculated next interval: {next_interval:.2f} days, new ease factor: {new_ease:.2f}")
 
         # Calculate next review date - Fixed timezone issue
-        next_review_at = datetime.now(UTC) + timedelta(days=next_interval)
+        next_review_at = datetime.now(ZoneInfo("UTC")) + timedelta(days=next_interval)
         logger.info(f"SRSService: Next review scheduled for {next_review_at.isoformat()}")
 
         # Track successful repetitions (ratings ≥ 3)
@@ -114,7 +116,7 @@ class SRSService:
             "review_count": (item.review_count or 0) + 1,
             "next_review_at": next_review_at,
             "last_rating": rating,
-            "last_reviewed_at": datetime.now(UTC),
+            "last_reviewed_at": datetime.now(ZoneInfo("UTC")),
         }
 
         # Persist updated SRS
@@ -151,7 +153,7 @@ class SRSService:
             if filters.get("due_only"):
                 logger.info("SRSService: Applying due_only filter")
                 # Add a condition to filter out NULL next_review_at values
-                query = query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(UTC))
+                query = query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")))
 
             # Category filter
             if filters.get("category"):
@@ -202,7 +204,7 @@ class SRSService:
     def count_due_today(self):
         """Get the count of SRS items due for review today."""
         logger.info("SRSService: Counting SRS items due today")
-        count = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(UTC)).count()
+        count = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))).count()
         logger.info(f"SRSService: SRS items due today: {count}")
         return count
 
@@ -225,7 +227,7 @@ class SRSService:
     def get_due_items(self) -> list:
         """Get all SRS items that are due for review."""
         logger.info("SRSService: Retrieving all due SRS items")
-        items = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(UTC)).all()
+        items = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))).all()
         logger.info(f"SRSService: Found {len(items)} due items")
         return items
 
@@ -304,7 +306,7 @@ class SRSService:
     def get_next_due_item_id(self, current_item_id=None):
         """Get the next item due for review after current_item_id."""
         logger.info(f"SRSService: Finding next due item after item ID {current_item_id}")
-        query = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(UTC))
+        query = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")))
 
         if current_item_id:
             # Try to find the next item in sequence
@@ -347,7 +349,7 @@ class SRSService:
         """Calculate the current streak of consecutive days with SRS reviews."""
         logger.info("SRSService: Calculating review streak days")
         # Get dates with activity
-        today = datetime.now(UTC).date()
+        today = datetime.now(ZoneInfo("UTC")).date()
         history_dates = set(h.timestamp.date() for h in ReviewHistory.query.all())
         logger.info(f"SRSService: Found activity on {len(history_dates)} different days")
 
@@ -394,7 +396,7 @@ class SRSService:
         logger.info(f"SRSService: Using mastery threshold of {mastery_threshold} days")
 
         # Get current month range
-        now = datetime.now(UTC)
+        now = datetime.now(ZoneInfo("UTC"))
         first_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         logger.info(f"SRSService: Calculating for current month starting {first_of_month.isoformat()}")
 
@@ -432,7 +434,7 @@ class SRSService:
     def count_weekly_reviews(self):
         """Count the number of reviews completed in the past 7 days."""
         logger.info("SRSService: Counting reviews in the past 7 days")
-        now = datetime.now(UTC)
+        now = datetime.now(ZoneInfo("UTC"))
         week_ago = now - timedelta(days=7)
         logger.info(f"SRSService: Counting reviews between {week_ago.isoformat()} and {now.isoformat()}")
 
@@ -443,7 +445,7 @@ class SRSService:
     def calculate_retention_increase(self):
         """Calculate the increase in retention rate over the past month compared to the previous month."""
         logger.info("SRSService: Calculating retention rate increase")
-        now = datetime.now(UTC)
+        now = datetime.now(ZoneInfo("UTC"))
 
         # Current month
         current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -523,7 +525,7 @@ class SRSService:
         """
         logger.info(f"SRSService: Getting learning progress data for past {months} months")
         # Create month labels based on current month
-        now = datetime.now(UTC)
+        now = datetime.now(ZoneInfo("UTC"))
         labels = []
 
         for i in range(months):
@@ -697,20 +699,20 @@ class SRSService:
         elif strategy_name == "priority_first":
             # Cards that are most overdue first
             logger.info("SRSService: Applying 'priority_first' strategy (most overdue first)")
-            cards = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(UTC)).order_by(
+            cards = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))).order_by(
                 SRS.next_review_at).all()
 
         elif strategy_name == "hard_cards_first":
             # Focus on difficult cards first
             logger.info("SRSService: Applying 'hard_cards_first' strategy (ease_factor <= 1.7)")
-            cards = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(UTC),
+            cards = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
                                      SRS.ease_factor <= 1.7).order_by(SRS.ease_factor).all()
 
         elif strategy_name == "mastery_boost":
             # Cards that are close to mastery (interval between 15-21 days)
             logger.info("SRSService: Applying 'mastery_boost' strategy (interval between 15-21 days)")
             cards = (
-                SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(UTC),
+                SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
                                  SRS.interval >= 15, SRS.interval <= 21)
                 .order_by(SRS.interval.desc())
                 .all()
@@ -722,7 +724,7 @@ class SRSService:
             cards = (
                 SRS.query.filter(
                     SRS.next_review_at.isnot(None),
-                    SRS.next_review_at <= datetime.now(UTC),
+                    SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
                     SRS.review_count > 2,
                     (SRS.successful_reps * 100 / SRS.review_count) < 70
                 )
@@ -736,7 +738,7 @@ class SRSService:
             new_cards = SRS.query.filter(SRS.review_count == 0).limit(5).all()
             logger.info(f"SRSService: Found {len(new_cards)} new cards")
 
-            due_cards = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(UTC),
+            due_cards = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
                                          SRS.review_count > 0).limit(10).all()
             logger.info(f"SRSService: Found {len(due_cards)} due cards")
 
@@ -891,10 +893,10 @@ class SRSService:
         total = SRS.query.count()
         logger.info(f"SRSService: Total cards: {total}")
 
-        due_today = SRS.query.filter(SRS.next_review_at <= datetime.now(UTC)).count()
+        due_today = SRS.query.filter(SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))).count()
         logger.info(f"SRSService: Cards due today: {due_today}")
 
-        today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+        today_start = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0, microsecond=0)
         reviewed_today = ReviewHistory.query.filter(ReviewHistory.timestamp >= today_start).count()
         logger.info(f"SRSService: Cards reviewed today: {reviewed_today}")
 
@@ -983,7 +985,7 @@ class SRSService:
     def count_reviews_today(self):
         """Count the number of reviews completed today."""
         logger.info("SRSService: Counting reviews completed today")
-        today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+        today_start = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0, microsecond=0)
         logger.info(f"SRSService: Today started at {today_start.isoformat()}")
 
         count = ReviewHistory.query.filter(ReviewHistory.timestamp >= today_start).count()
