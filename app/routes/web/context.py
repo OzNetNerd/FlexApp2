@@ -8,11 +8,16 @@ from app.utils.app_logging import get_logger, log_instance_vars
 
 logger = get_logger()
 
+NAVBAR_ENTRIES = [
+    {"name": "Home", "url": "/", "icon": "home"},
+    {"name": "Companies", "url": "/companies", "icon": "building"},
+    {"name": "Contacts", "url": "/contacts", "icon": "user"},
+]
 
 class WebContext(AppContext):
     """Base context class for web template rendering."""
 
-    def __init__(self, title="", show_navbar=True, read_only=True, **kwargs):
+    def __init__(self, title="", read_only=True, **kwargs):
         """Initialize the web context with common template variables."""
         super().__init__(**kwargs)
 
@@ -22,8 +27,8 @@ class WebContext(AppContext):
 
         self.title = title or kwargs.get("table_name", entity_table_name)
         self.current_user = current_user
-        self.show_navbar = show_navbar
         self.read_only = read_only
+        self.navbar_entries = NAVBAR_ENTRIES
 
 
 class TableWebContext(WebContext):

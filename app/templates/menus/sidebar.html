@@ -2,17 +2,13 @@
 {# ------------------------------------------------------------------------------
   File: sidebar.html
   Purpose: Left sidebar navigation with collapsible functionality
-  Imports:
-    - navigation.html: For shared navigation items
   Features:
     - Collapsible sidebar
-    - Same navigation items as navbar
+    - Navigation items from navbar_entries
     - Toggle button for expanding/collapsing
 ------------------------------------------------------------------------------ #}
 
 {% from 'macros/navigation.html' import get_endpoint, is_active, get_url %}
-{% from 'menus/nav_items.html' import get_nav_items %}
-{% set nav_items = get_nav_items() %}
 
 <div id="sidebar" class="sidebar">
   <div class="sidebar-header">
@@ -27,15 +23,15 @@
 
   <div class="sidebar-content">
     <ul class="sidebar-nav">
-      {% for item in nav_items %}
+      {% for item in navbar_entries %}
         {% set endpoint = get_endpoint(item) %}
         {% set is_active_item = is_active(item) %}
-        {% set item_url = get_url(item) %}
+        {% set item_url = item.url|default(get_url(item)) %}
 
         <li class="sidebar-item {% if is_active_item %}active{% endif %}">
           <a href="{{ item_url }}" class="sidebar-link" {% if is_active_item %}aria-current="page"{% endif %}>
-            <i class="fas {{ item.icon|default('fa-circle') }} sidebar-icon"></i>
-            <span class="sidebar-text">{{ item.display_name|default(item) }}</span>
+            <i class="fas fa-{{ item.icon|default('circle') }} sidebar-icon"></i>
+            <span class="sidebar-text">{{ item.name }}</span>
             {% if is_active_item %}<span class="active-indicator"></span>{% endif %}
           </a>
         </li>

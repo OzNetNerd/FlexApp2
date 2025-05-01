@@ -1,6 +1,6 @@
 # app/routes/web/route_registration.py - Improved debugging
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
 

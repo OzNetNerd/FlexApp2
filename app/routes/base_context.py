@@ -1,10 +1,3 @@
-from typing import Any
-
-from app.utils.app_logging import get_logger
-
-logger = get_logger()
-
-
 class AppContext:
     """Base context class for all contexts (API and web)."""
 

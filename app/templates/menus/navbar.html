@@ -1,18 +1,14 @@
 {# ------------------------------------------------------------------------------
   File: navbar.html | Purpose: Top nav bar with search, nav items, user menu
-  Imports:
-    - navigation.html: For shared navigation items
   Variables:
     - current_user: Flask-Login user object
+    - navbar_entries: From context NAVBAR_ENTRIES
   Features:
     - Bootstrap 5 responsive nav
     - Dynamic user avatar and links
-    - Logger for template state and debugging
 ------------------------------------------------------------------------------ #}
 
 {% from 'macros/navigation.html' import get_endpoint, is_active, get_url %}
-{% from 'menus/nav_items.html' import get_nav_items %}
-{% set nav_items = get_nav_items() %}
 
 <!-- Link to CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
@@ -33,17 +29,17 @@
     <div class="collapse navbar-collapse" id="navbarContent">
       <!-- Navigation Items (hidden on mobile as they'll be in sidebar) -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-none d-lg-flex">
-        {% for item in nav_items %}
+        {% for item in navbar_entries %}
           {% set endpoint = get_endpoint(item) %}
           {% set is_active_item = is_active(item) %}
-          {% set item_url = get_url(item) %}
+          {% set item_url = item.url|default(get_url(item)) %}
 
           <li class="nav-item">
             <a class="nav-link {% if is_active_item %}active{% endif %}"
                href="{{ item_url }}"
                {% if is_active_item %}aria-current="page"{% endif %}>
-              <i class="fas {{ item.icon }} nav-icon me-1"></i>
-              {{ item.display_name }}
+              <i class="fas fa-{{ item.icon }} nav-icon me-1"></i>
+              {{ item.name }}
               {% if is_active_item %}<span class="visually-hidden">(current)</span>{% endif %}
             </a>
           </li>

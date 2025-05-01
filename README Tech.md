@@ -51,7 +51,7 @@ These classes are primarily used by the web interface (`app/routes/web/`).
 * **Purpose:** To gather and structure all data required by a Jinja2 template for rendering a specific web page. They separate the data-gathering logic from the route handler logic.
 * **`WebContext`:**
     * The foundation class.
-    * Initializes common attributes like `title`, `current_user`, `show_navbar`, `read_only`.
+    * Initializes common attributes like `title`, `current_user`, `read_only`.
     * Provides a `to_dict()` method used by `render_safely` to pass data to templates.
 * **`WebContext`:**
     * Inherits from `WebContext`.

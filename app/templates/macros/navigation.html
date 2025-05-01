@@ -64,8 +64,13 @@
 #}
 
 {% macro get_url(item) %}
-  {% set item_name = (item.name if item is mapping and item.name is defined else item) | trim %}
-  {%- if item_name == 'settings' %}
+  {# Get item name and clean it of problematic characters #}
+  {% set raw_item_name = (item.name if item is mapping and item.name is defined else item) | trim %}
+  {% set item_name = raw_item_name | replace('[', '') | replace(']', '') | replace('\n', '') | replace('{', '') | replace('}', '') %}
+
+  {% if item_name == '' %}
+    {{- url_for('home_bp.index') -}}
+  {%- elif item_name == 'settings' %}
     {{- url_for('settings_bp.index') -}}
   {%- elif item_name == 'relationships' %}
     {{- url_for('relationships_bp.index') -}}
