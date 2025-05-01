@@ -14,25 +14,15 @@
 {% from 'macros/navigation.html' import get_endpoint, is_active, get_url %}
 {% include 'menus/nav_items.html' %}
 
-<script type="module">
-  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-  log("info", "{{ scriptName }}", "init", "🚀 Template {{ scriptName }} loaded");
-</script>
+<!-- Link to CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top bg-white">
-  <script type="module">
-    import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-    log("debug", "{{ scriptName }}", "render", "Rendering navbar container");
-  </script>
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="/">
       <div class="brand-icon-container me-2"><i class="fas fa-building"></i></div>
       <span class="fw-bold">CRM Dashboard</span>
     </a>
-    <script type="module">
-      import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-      log("debug", "{{ scriptName }}", "render", "Brand logo rendered");
-    </script>
 
     <!-- Mobile toggle for navbar -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
@@ -41,11 +31,6 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarContent">
-      <script type="module">
-        import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-        log("debug", "{{ scriptName }}", "render", "Starting nav items rendering");
-      </script>
-
       <!-- Navigation Items (hidden on mobile as they'll be in sidebar) -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-none d-lg-flex">
         {% for item in nav_items %}
@@ -62,18 +47,10 @@
               {% if is_active_item %}<span class="visually-hidden">(current)</span>{% endif %}
             </a>
           </li>
-          <script type="module">
-            import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-            log("debug", "{{ scriptName }}", "nav_item", "Rendered nav item: {{ item.name }}");
-          </script>
         {% endfor %}
 
         {% block additional_nav_items %}
           <!-- Custom nav items injected here -->
-          <script type="module">
-            import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-            log("debug", "{{ scriptName }}", "blocks", "additional_nav_items block position");
-          </script>
         {% endblock %}
       </ul>
 
@@ -83,10 +60,6 @@
           <span class="input-group-text border-0 bg-transparent"><i class="fas fa-search"></i></span>
           <input type="search" class="form-control border-0 shadow-none" placeholder="Search..." aria-label="Search">
         </div>
-        <script type="module">
-          import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-          log("debug", "{{ scriptName }}", "render", "Search box rendered");
-        </script>
       </div>
 
       <!-- Theme Toggle Button -->
@@ -108,25 +81,13 @@
 
       <!-- User Menu -->
       <div class="user-menu">
-        <script type="module">
-          import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-          log("debug", "{{ scriptName }}", "render", "Starting user menu rendering");
-        </script>
         <div class="dropdown">
           <a class="user-dropdown-toggle d-flex align-items-center text-decoration-none" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             <div class="avatar-container me-2">
               {% if current_user.is_authenticated %}
                 <img src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=random" alt="User avatar" class="user-avatar">
-                <script type="module">
-                  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-                  log("debug", "{{ scriptName }}", "user", "Authenticated user avatar rendered for: {{ current_user.name }}");
-                </script>
               {% else %}
                 <i class="fas fa-user-circle fs-4"></i>
-                <script type="module">
-                  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-                  log("debug", "{{ scriptName }}", "user", "Anonymous user icon rendered");
-                </script>
               {% endif %}
             </div>
             <div class="user-info d-none d-md-block">
@@ -137,10 +98,6 @@
             </div>
           </a>
           <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="userDropdown">
-            <script type="module">
-              import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-              log("debug", "{{ scriptName }}", "render", "Dropdown menu items start");
-            </script>
             {% if current_user.is_authenticated %}
               <li class="dropdown-user-details d-md-none">
                 <div class="d-flex align-items-center p-3">
@@ -159,17 +116,9 @@
               <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i> Help Center</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item logout-item" href="{{ url_for('auth_bp.logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
-              <script type="module">
-                import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-                log("debug", "{{ scriptName }}", "auth", "Authenticated user menu items rendered");
-              </script>
             {% else %}
               <li><a class="dropdown-item" href="{{ url_for('auth_bp.login') }}"><i class="fas fa-sign-in-alt me-2"></i> Login</a></li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus me-2"></i> Register</a></li>
-              <script type="module">
-                import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-                log("debug", "{{ scriptName }}", "auth", "Anonymous user menu items rendered");
-              </script>
             {% endif %}
           </ul>
         </div>
@@ -178,64 +127,5 @@
   </div>
 </nav>
 
-<style>
-  /* Theme Toggle Button Styles */
-  .btn-icon {
-    background: transparent;
-    border: none;
-    color: #495057;
-    padding: 0.375rem;
-    line-height: 1;
-    border-radius: 50%;
-  }
-
-  .btn-icon:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    color: #000;
-  }
-
-  /* Dark mode styles */
-  [data-theme="dark"] .btn-icon {
-    color: #e9ecef;
-  }
-
-  [data-theme="dark"] .btn-icon:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
-  }
-
-  [data-theme="dark"] .navbar {
-    background-color: #212529 !important;
-    border-bottom: 1px solid #343a40;
-  }
-
-  [data-theme="dark"] .navbar-brand,
-  [data-theme="dark"] .nav-link,
-  [data-theme="dark"] .user-name {
-    color: #e9ecef;
-  }
-
-  /* Notification Badge */
-  .notification-badge {
-    background-color: #ff4757;
-    width: 8px;
-    height: 8px;
-    right: -2px;
-    top: -2px;
-  }
-
-  /* User Avatar */
-  .user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-
-  /* Custom Dropdown */
-  .custom-dropdown {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    border: none;
-    border-radius: 0.5rem;
-  }
-</style>
+<!-- Include JavaScript at the end of the file -->
+<script type="module" src="{{ url_for('static', filename='js/navbar.js') }}"></script>
