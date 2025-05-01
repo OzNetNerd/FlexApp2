@@ -1,7 +1,24 @@
-{# templates/shared_tabs/notes.html #}
+<!-- START TEMPLATE: shared_tabs/notes.html -->
+
+{# templates/shared_tabs/notes.html
+   """
+   Renders the Notes tab pane for a notable entity, including:
+     - Configuration element with data attributes for entity type, ID, user, and script name
+     - Filters for date ranges (last 7 days, last 30 days, all notes, custom range)
+     - Search input for filtering notes by text
+     - Loading indicator while notes load
+     - Container for displaying a list of notes
+     - Form control to add a new note with content textarea and submit button
+     - Inclusion of notesSection.js for dynamic behavior
+     - Links to separate CSS file for styling
+   """
+#}
 {% import 'macros/layout.html' as layout with context %}
 
 {% call layout.tab_pane('notes', active=true) %}
+  <!-- Include notes CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/notes.css') }}">
+
   <!-- Hidden configuration element for notes -->
   <div id="notesData"
        data-notable-type="{{ entity.__class__.__name__ }}"
@@ -11,30 +28,29 @@
        data-script-name="notes_section">
   </div>
 
-<!-- Notes section filters & search -->
-<div class="col-12">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="d-flex align-items-center" style="width: 65%;">
-      <select id="noteFilterSelect" class="form-select form-select-sm me-3" style="max-width: 150px;">
-        <option value="7">Last 7 days</option>
-        <option value="30">Last 30 days</option>
-        <option value="0" selected>All notes</option>
-        <option value="custom">Custom range</option>
-      </select>
-      <div id="dateRangeSelectors" class="d-none d-flex align-items-center flex-grow-1">
-        <span class="me-2">From</span>
-        <input type="date" id="dateFrom" class="form-control form-control-sm me-2" style="width: 130px;" aria-label="From date">
-        <span class="mx-1">to</span>
-        <input type="date" id="dateTo" class="form-control form-control-sm ms-2" style="width: 130px;" aria-label="To date">
+  <!-- Notes section filters & search -->
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="d-flex align-items-center" style="width: 65%;">
+        <select id="noteFilterSelect" class="form-select form-select-sm me-3" style="max-width: 150px;">
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="0" selected>All notes</option>
+          <option value="custom">Custom range</option>
+        </select>
+        <div id="dateRangeSelectors" class="d-none d-flex align-items-center flex-grow-1">
+          <span class="me-2">From</span>
+          <input type="date" id="dateFrom" class="form-control form-control-sm me-2" style="width: 130px;" aria-label="From date">
+          <span class="mx-1">to</span>
+          <input type="date" id="dateTo" class="form-control form-control-sm ms-2" style="width: 130px;" aria-label="To date">
+        </div>
+      </div>
+      <div class="input-group" style="max-width: 35%;">
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
+        <input type="search" id="noteSearchInput" class="form-control" placeholder="Search notes...">
       </div>
     </div>
-    <div class="input-group" style="max-width: 35%;">
-      <span class="input-group-text"><i class="fas fa-search"></i></span>
-      <input type="search" id="noteSearchInput" class="form-control" placeholder="Search notes...">
-    </div>
   </div>
-</div>
-
 
   <!-- Loading indicator -->
   <div class="col-12">
@@ -64,15 +80,7 @@
 
   <!-- Script include -->
   <script type="module" src="{{ url_for('static', filename='js/pages/notesSection.js') }}"></script>
-
-  <style>
-    .activity-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  </style>
 {% endcall %}
+
+
+<!-- END TEMPLATE: shared_tabs/notes.html -->
