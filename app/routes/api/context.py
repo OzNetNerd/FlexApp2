@@ -1,12 +1,12 @@
 from typing import Any, Dict, List, Optional
 
-from app.routes.base_context import AppContext
+from app.routes.base_context import BaseContext
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
 
-class ApiContext(AppContext):
+class ApiContext(BaseContext):
     """Base context class for API responses."""
 
     def __init__(self, **kwargs):

@@ -2,13 +2,11 @@ from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
-class AppContext:
+class BaseContext:
     """Base context class for all contexts (API and web)."""
 
-    def __init__(self, entity_table_name: str = "", **kwargs):
+    def __init__(self, **kwargs):
         """Initialize with common attributes for all contexts."""
-        self.entity_table_name = entity_table_name
-
         # Set all kwargs as attributes
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -21,7 +19,7 @@ class AppContext:
 
     def __str__(self):
         """Return a user-friendly string representation of the context."""
-        return f"{self.__class__.__name__}(entity_table_name={self.entity_table_name!r})"
+        return f"{self.__class__.__name__}()"
 
     def to_dict(self):
         """Convert context to dictionary for template rendering or response serialization."""

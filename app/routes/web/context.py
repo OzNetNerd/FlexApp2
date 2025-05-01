@@ -3,7 +3,7 @@ from typing import Any, List, Optional
 from flask import url_for, request
 from flask_login import current_user
 
-from app.routes.base_context import AppContext
+from app.routes.base_context import BaseContext
 from app.utils.app_logging import get_logger, log_instance_vars
 
 logger = get_logger()
@@ -14,7 +14,7 @@ NAVBAR_ENTRIES = [
     {"name": "Contacts", "url": "/contacts", "icon": "user"},
 ]
 
-class WebContext(AppContext):
+class WebContext(BaseContext):
     """Base context class for web template rendering."""
 
     def __init__(self, title="", read_only=True, **kwargs):
@@ -31,7 +31,7 @@ class WebContext(AppContext):
         self.navbar_entries = NAVBAR_ENTRIES
 
 
-class TableWebContext(WebContext):
+class TableContext(WebContext):
     """Context class for rendering table views with table-specific attributes."""
 
     def __init__(self, entity_table_name=None, title="", read_only=True, action=None, **kwargs):
@@ -76,10 +76,10 @@ class TableWebContext(WebContext):
         self.show_heading = kwargs.get("show_heading", True)
         self.show_card_title = kwargs.get("show_card_title", False)
 
-        logger.info(f"TableWebContext initialized for {self.entity_name} ({self.entity_base_route})")
+        logger.info(f"TableContext initialized for {self.entity_name} ({self.entity_base_route})")
 
 
-class EntityWebContext(WebContext):
+class EntityContext(WebContext):
     """Context class for entity-specific web views."""
 
     def __init__(

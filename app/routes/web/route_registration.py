@@ -8,7 +8,7 @@ from flask import Blueprint, redirect, request, url_for
 from flask_login import login_required
 
 from app.routes.web.components.template_renderer import RenderSafelyConfig, render_safely
-from app.routes.web.context import TableWebContext, WebContext
+from app.routes.web.context import TableContext, WebContext
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
@@ -82,12 +82,12 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
 
         # Build appropriate context object
         if endpoint == CRUDEndpoint.index.value:
-            context = TableWebContext(entity_table_name=config.entity_table_name)
+            context = TableContext(entity_table_name=config.entity_table_name)
         elif endpoint == CRUDEndpoint.create.value:
             # Initialize with default empty values for required fields
             default_entity = {"id": "", "question": "", "answer": "", "category": "", "last_reviewed": None, "due_date": None}
 
-            context = TableWebContext(
+            context = TableContext(
                 entity=default_entity,  # Use default entity instead of empty dict
                 entity_table_name=config.entity_table_name,
                 action="create",
@@ -98,7 +98,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
             entity_id = kwargs.get("entity_id")
             title = f"{'View' if endpoint == CRUDEndpoint.view.value else 'Edit'} {config.entity_table_name}"
 
-            context = TableWebContext(
+            context = TableContext(
                 entity=entity,
                 entity_table_name=config.entity_table_name,
                 action=endpoint,
