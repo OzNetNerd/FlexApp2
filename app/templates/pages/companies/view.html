@@ -1,3 +1,4 @@
+<!-- START TEMPLATE: pages/companies/view.html -->
 {% extends 'layouts/crud_base_view.html' %}
 {% import 'macros/layout.html' as layout %}
 {% import 'macros/forms.html' as forms %}
@@ -42,20 +43,6 @@
     </form>
   {% endif %}
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Get the active tab button
-    const activeTab = document.querySelector('.nav-link.active[data-bs-toggle="tab"]');
-    if (activeTab) {
-      // Get the target tab pane ID
-      const targetId = activeTab.getAttribute('data-bs-target');
-      // Find the tab pane
-      const tabPane = document.querySelector(targetId);
-      if (tabPane) {
-        // Add the necessary classes to make it visible
-        tabPane.classList.add('show', 'active');
-      }
-    }
-  });
-</script>
+<script src="{{ url_for('static', filename='js/pags/tabs.js') }}"></script>
 {% endblock %}
+<!-- END TEMPLATE: pages/companies/view.html -->
