@@ -1,7 +1,22 @@
-{# ------------------------------------------------------------------------------
-  File: navigation.html | Purpose: Define shared navigation item utility macros
-  This file contains utility macros for navigation without the get_nav_items macro
------------------------------------------------------------------------------- #}
+<!-- START TEMPLATE: macros/navigation.html -->
+
+{#
+  Template: navigation.html
+
+  Provides utility macros for shared navigation items:
+#}
+
+{#
+  • get_endpoint(item)
+      Returns the Flask endpoint name for a given navigation item.
+      – item.name : string identifier of the nav item (e.g. "settings", "relationships", "crisp_scores", or other blueprint prefix)
+      Special-cases:
+        • "settings"       → "settings_bp.index"
+        • "relationships"  → "relationships_bp.index"
+        • "crisp_scores"   → "crisp_scores_bp.index"
+      Default:
+        → "{item.name}_bp.index"
+#}
 
 {% macro get_endpoint(item) %}
   {%- if item.name == 'settings' %}
@@ -15,6 +30,14 @@
   {%- endif %}
 {% endmacro %}
 
+{#
+
+  • is_active(item)
+      Returns a boolean indicating whether the current request endpoint matches the navigation item.
+      – Checks for exact match on index endpoints for special cases ("settings", "relationships", "crisp_scores")
+      – Otherwise, checks if request.endpoint starts with "{item.name}_bp."
+#}
+
 {% macro is_active(item) %}
   {%- if item.name == 'settings' %}
     {{- request.endpoint == 'settings_bp.index' -}}
@@ -27,6 +50,17 @@
   {%- endif %}
 {% endmacro %}
 
+{#
+  • get_url(item)
+      Returns the URL for a nav item's index using url_for().
+      – Mirrors the same special-casing as get_endpoint:
+        • "settings"       → url_for("settings_bp.index")
+        • "relationships"  → url_for("relationships_bp.index")
+        • "crisp_scores"   → url_for("crisp_scores_bp.index")
+      – Default:
+        → url_for("{item.name}_bp.index")
+#}
+
 {% macro get_url(item) %}
   {%- if item.name == 'settings' %}
     {{- url_for('settings_bp.index') -}}
@@ -38,3 +72,5 @@
     {{- url_for(item.name + '_bp.index') -}}
   {%- endif %}
 {% endmacro %}
+
+<!-- END TEMPLATE: macros/navigation.html -->
