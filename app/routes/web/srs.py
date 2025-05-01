@@ -1,9 +1,12 @@
-from flask import  render_template, request, redirect, url_for, flash, session
+from flask import render_template, request, redirect, url_for, flash, session
 from flask_login import login_required
-from datetime import datetime, UTC
+from datetime import datetime, UTC, timedelta  # Added timedelta import
 from app.models.pages.srs import SRS
 from app.services.srs_service import SRSService
 from app.routes.web.blueprint_factory import create_crud_blueprint, BlueprintConfig
+
+# Define missing constant
+DEFAULT_EASE_FACTOR = 2.5  # Add the default ease factor value
 
 # Create the service instance
 srs_service = SRSService()
@@ -16,7 +19,7 @@ srs_config = BlueprintConfig(
 )
 
 # Create the blueprint using the config
-srs_bp = create_crud_blueprint(srs_config) # Specify custom create template
+srs_bp = create_crud_blueprint(srs_config)
 
 
 # Dashboard route
@@ -73,7 +76,8 @@ def dashboard():
     # Get learning progress data for chart
     progress_data = srs_service.get_learning_progress_data(months=7)
 
-    return render_template("pages/srs/dashboard.html", stats=stats, categories=categories, due_cards=due_cards, progress_data=progress_data)
+    return render_template("pages/srs/dashboard.html", stats=stats, categories=categories, due_cards=due_cards,
+                           progress_data=progress_data)
 
 
 # Due cards route
@@ -181,7 +185,8 @@ def cards_by_learning_stage(stage):
 
     cards = srs_service.get_cards_by_learning_stage(stage)
 
-    stage_names = {"new": "New Cards", "learning": "Learning Cards", "reviewing": "Review Cards", "mastered": "Mastered Cards"}
+    stage_names = {"new": "New Cards", "learning": "Learning Cards", "reviewing": "Review Cards",
+                   "mastered": "Mastered Cards"}
 
     return render_template(
         "pages/srs/filtered_cards.html",
@@ -233,7 +238,8 @@ def cards_by_performance(performance):
 
     cards = srs_service.get_cards_by_performance(performance)
 
-    performance_names = {"struggling": "Struggling Cards", "average": "Average Performance Cards", "strong": "Strong Performance Cards"}
+    performance_names = {"struggling": "Struggling Cards", "average": "Average Performance Cards",
+                         "strong": "Strong Performance Cards"}
 
     return render_template(
         "pages/srs/filtered_cards.html",
@@ -306,7 +312,13 @@ def filtered_cards():
     if request.args.get("max_ease"):
         filters["max_ease"] = float(request.args.get("max_ease"))
 
-    # Get filtered cards
+    # Modify the SRSService to handle the None comparison
+    # This can be done in one of two ways:
+
+    # 1. Add a custom filter to handle None dates directly in the filters
+    filters["handle_none_dates"] = True
+
+    # 2. Get filtered cards
     cards = srs_service.get_filtered_cards(filters)
 
     # Get category counts for sidebar
@@ -436,7 +448,8 @@ def add_card():
             new_card["next_review_at"] = datetime.now(UTC)
         else:
             # Set review date to tomorrow by default
-            new_card["next_review_at"] = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+            new_card["next_review_at"] = datetime.now(UTC).replace(hour=0, minute=0, second=0,
+                                                                   microsecond=0) + timedelta(days=1)
 
         # Save the card
         card = srs_service.create(new_card)

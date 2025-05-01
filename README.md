@@ -1,4 +1,4 @@
-New:
+# Repomix
 
 ```
 docker run -v "$(pwd)":/app -it --rm ghcr.io/yamadashy/repomix --style markdown
@@ -8,7 +8,11 @@ docker run -v "$(pwd)":/app -it --rm ghcr.io/yamadashy/repomix --style markdown
 clear && flask --app app.app run
 ```
 
+# Tree
 
+```
+clear &&  tree -P '*.py' -P '*.html' -P '*.js' -I 'venv' --prune
+```
 
 
 Commands
@@ -349,123 +353,123 @@ Here's my tree. I want this to be as DRY as possible and use existing code and p
 ├── README_FOR_TESTING.md
 ├── add_page.py
 ├── app
-│   ├── __init__.py
-│   ├── app.py
-│   ├── crm.db
-│   ├── flask_session
-│   │   └── 2029240f6d1128be89ddc32729463129
-│   ├── models
-│   │   ├── __init__.py
-│   │   ├── base.py
-│   │   ├── capability.py
-│   │   ├── capability_category.py
-│   │   ├── company.py
-│   │   ├── company_capability.py
-│   │   ├── contact.py
-│   │   ├── crisp_score.py
-│   │   ├── mixins.py
-│   │   ├── note.py
-│   │   ├── opportunity.py
-│   │   ├── relationship.py
-│   │   ├── table_config.py
-│   │   ├── task.py
-│   │   └── user.py
-│   ├── routes
-│   │   ├── __init__.py
-│   │   ├── api
-│   │   │   ├── __init__.py
-│   │   │   ├── companies.py
-│   │   │   ├── contacts.py
-│   │   │   ├── generic.py
-│   │   │   ├── opportunities.py
-│   │   │   ├── search.py
-│   │   │   ├── table_config.py
-│   │   │   ├── tasks.py
-│   │   │   └── users.py
-│   │   ├── base
-│   │   │   ├── __init__.py
-│   │   │   ├── components
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── data_route_handler.py
-│   │   │   │   ├── form_handler.py
-│   │   │   │   ├── item_manager.py
-│   │   │   │   ├── json_validator.py
-│   │   │   │   ├── request_logger.py
-│   │   │   │   ├── table_config_manager.py
-│   │   │   │   └── template_renderer.py
-│   │   │   └── crud_base.py
-│   │   ├── router.py
-│   │   ├── ui
-│   │   │   ├── companies.py
-│   │   │   ├── contacts.py
-│   │   │   ├── opportunities.py
-│   │   │   ├── tasks.py
-│   │   │   └── users.py
-│   │   ├── web
-│   │   │   ├── __init__.py
-│   │   │   ├── auth.py
-│   │   │   ├── companies.py
-│   │   │   ├── contacts.py
-│   │   │   ├── crisp_score.py
-│   │   │   ├── generic.py
-│   │   │   ├── main.py
-│   │   │   ├── opportunities.py
-│   │   │   ├── relationship.py
-│   │   │   ├── tasks.py
-│   │   │   └── users.py
-│   │   └── web.py
-│   ├── services
-│   │   ├── __init__.py
-│   │   ├── company_capability_service.py
-│   │   ├── crud_service.py
-│   │   ├── mention.py
-│   │   ├── relationship_service.py
-│   │   ├── user_service.py
-│   │   └── validator_mixin.py
-│   ├── static
-│   │   ├── css
-│   │   │   ├── autoComplete.css
-│   │   │   ├── avatar.css
-│   │   │   ├── dropdown.css
-│   │   │   ├── main.css
-│   │   │   ├── navbar.css
-│   │   │   ├── style.css
-│   │   │   └── table.css
-│   │   └── js
-│   │       ├── pages
-│   │       └── table
-│   └── templates
-│       ├── base
-│       │   ├── common
-│       │   └── errors
-│       ├── components
-│       ├── create_view_edit
-│       │   └── components
-│       ├── entity_tables
-│       ├── macros
-│       │   └── form_fields
-│       └── relationship
+│   ├── __init__.py
+│   ├── app.py
+│   ├── crm.db
+│   ├── flask_session
+│   │   └── 2029240f6d1128be89ddc32729463129
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   ├── capability.py
+│   │   ├── capability_category.py
+│   │   ├── company.py
+│   │   ├── company_capability.py
+│   │   ├── contact.py
+│   │   ├── crisp_score.py
+│   │   ├── mixins.py
+│   │   ├── note.py
+│   │   ├── opportunity.py
+│   │   ├── relationship.py
+│   │   ├── table_config.py
+│   │   ├── task.py
+│   │   └── user.py
+│   ├── routes
+│   │   ├── __init__.py
+│   │   ├── api
+│   │   │   ├── __init__.py
+│   │   │   ├── companies.py
+│   │   │   ├── contacts.py
+│   │   │   ├── generic.py
+│   │   │   ├── opportunities.py
+│   │   │   ├── search.py
+│   │   │   ├── table_config.py
+│   │   │   ├── tasks.py
+│   │   │   └── users.py
+│   │   ├── base
+│   │   │   ├── __init__.py
+│   │   │   ├── components
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── data_route_handler.py
+│   │   │   │   ├── form_handler.py
+│   │   │   │   ├── item_manager.py
+│   │   │   │   ├── json_validator.py
+│   │   │   │   ├── request_logger.py
+│   │   │   │   ├── table_config_manager.py
+│   │   │   │   └── template_renderer.py
+│   │   │   └── crud_base.py
+│   │   ├── router.py
+│   │   ├── ui
+│   │   │   ├── companies.py
+│   │   │   ├── contacts.py
+│   │   │   ├── opportunities.py
+│   │   │   ├── tasks.py
+│   │   │   └── users.py
+│   │   ├── web
+│   │   │   ├── __init__.py
+│   │   │   ├── auth.py
+│   │   │   ├── companies.py
+│   │   │   ├── contacts.py
+│   │   │   ├── crisp_score.py
+│   │   │   ├── generic.py
+│   │   │   ├── main.py
+│   │   │   ├── opportunities.py
+│   │   │   ├── relationship.py
+│   │   │   ├── tasks.py
+│   │   │   └── users.py
+│   │   └── web.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── company_capability_service.py
+│   │   ├── crud_service.py
+│   │   ├── mention.py
+│   │   ├── relationship_service.py
+│   │   ├── user_service.py
+│   │   └── validator_mixin.py
+│   ├── static
+│   │   ├── css
+│   │   │   ├── autoComplete.css
+│   │   │   ├── avatar.css
+│   │   │   ├── dropdown.css
+│   │   │   ├── main.css
+│   │   │   ├── navbar.css
+│   │   │   ├── style.css
+│   │   │   └── table.css
+│   │   └── js
+│   │       ├── pages
+│   │       └── table
+│   └── templates
+│       ├── base
+│       │   ├── common
+│       │   └── errors
+│       ├── components
+│       ├── create_view_edit
+│       │   └── components
+│       ├── entity_tables
+│       ├── macros
+│       │   └── form_fields
+│       └── relationship
 ├── config.py
 ├── create_admin.py
 ├── create_db.py
 ├── crm.db
 ├── detailed_test_report_20250331_130405.log
 ├── flask_session
-│   └── 2029240f6d1128be89ddc32729463129
+│   └── 2029240f6d1128be89ddc32729463129
 ├── htmlcov
-│   ├── favicon_32_cb_58284776.png
-│   ├── keybd_closed_cb_ce680311.png
-│   ├── status.json
-│   └── style_cb_8e611ae1.css
+│   ├── favicon_32_cb_58284776.png
+│   ├── keybd_closed_cb_ce680311.png
+│   ├── status.json
+│   └── style_cb_8e611ae1.css
 ├── migrations
-│   ├── README
-│   ├── alembic.ini
-│   ├── env.py
-│   ├── script.py.mako
-│   └── versions
-│       └── 40adf23510af_initial_migration.py
+│   ├── README
+│   ├── alembic.ini
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions
+│       └── 40adf23510af_initial_migration.py
 ├── mypy_report
-│   └── index.txt
+│   └── index.txt
 ├── pyproject.toml
 ├── requirements.txt
 ├── run_checks.sh
@@ -475,20 +479,20 @@ Here's my tree. I want this to be as DRY as possible and use existing code and p
     ├── conftest.py
     ├── conftest_skip.py
     ├── fixtures
-    │   ├── __init__.py
-    │   └── mock_data.py
+    │   ├── __init__.py
+    │   └── mock_data.py
     ├── functional
-    │   ├── __init__.py
-    │   ├── test_auth_flow.py
-    │   ├── test_auth_flow_simple.py
-    │   └── test_mock_auth.py
+    │   ├── __init__.py
+    │   ├── test_auth_flow.py
+    │   ├── test_auth_flow_simple.py
+    │   └── test_mock_auth.py
     ├── mark_db_tests.py
     ├── skip_db_tests.py
     └── unit
         ├── __init__.py
         ├── models
-        │   ├── __init__.py
-        │   └── test_user_model.py
+        │   ├── __init__.py
+        │   └── test_user_model.py
         ├── test_auth_additional.py
         ├── test_auth_basic.py
         ├── test_auth_routes.py
