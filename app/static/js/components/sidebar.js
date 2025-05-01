@@ -1,75 +1,36 @@
-/**
- * Sidebar Component - Core Functionality
- *
- * Handles the main sidebar functionality including:
- * - Collapsing/expanding the sidebar
- * - Persisting sidebar state across page loads
- * - Logging sidebar interactions
- *
- * @module components/sidebar
- * @requires core/logger
- */
-
-import log from '../core/logger.js';
-
-const SCRIPT_NAME = 'sidebar.js';
-
-// Log that the sidebar component has loaded
-log("info", SCRIPT_NAME, "init", "🚀 Sidebar component loaded");
-
-/**
- * Initialize the sidebar component when the DOM is fully loaded
- */
-document.addEventListener('DOMContentLoaded', () => {
-  log("info", SCRIPT_NAME, "dom", "Setting up sidebar interactions");
-
+// Update to sidebar.js
+document.addEventListener('DOMContentLoaded', function() {
   const sidebar = document.getElementById('sidebar');
-  const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
-  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
-  const sidebarOverlay = document.getElementById('sidebar-overlay');
+  const overlay = document.getElementById('sidebar-overlay');
+  const collapseBtn = document.getElementById('sidebarCollapseBtn');
+  const toggleBtn = document.getElementById('sidebarToggleBtn');
   const body = document.body;
 
-  // Initialize sidebar state from localStorage
-  initializeSidebarState();
+  // Toggle mobile sidebar
+  toggleBtn?.addEventListener('click', function() {
+    sidebar.classList.toggle('show');
+    overlay.classList.toggle('show');
+  });
 
-  // Set up event listeners
-  setupEventListeners();
+  // Collapse sidebar (desktop)
+  collapseBtn?.addEventListener('click', function() {
+    body.classList.toggle('sidebar-collapsed');
+  });
 
-  log("info", SCRIPT_NAME, "final", "Sidebar functionality initialized");
+  // Close sidebar when clicking overlay
+  overlay?.addEventListener('click', function() {
+    sidebar.classList.remove('show');
+    overlay.classList.remove('show');
+  });
 
-  /**
-   * Initialize the sidebar state based on localStorage
-   */
-  function initializeSidebarState() {
-    // Check if sidebar is collapsed in localStorage
-    const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-    if (isSidebarCollapsed) {
-      body.classList.add('sidebar-collapsed');
-      log("debug", SCRIPT_NAME, "state", "Sidebar initialized as collapsed from storage");
-    }
-  }
-
-  /**
-   * Set up all event listeners for sidebar interactions
-   */
-  function setupEventListeners() {
-    // Collapse button (desktop)
-    sidebarCollapseBtn.addEventListener('click', () => {
-      body.classList.toggle('sidebar-collapsed');
-      const isNowCollapsed = body.classList.contains('sidebar-collapsed');
-      localStorage.setItem('sidebarCollapsed', isNowCollapsed);
-      log("info", SCRIPT_NAME, "action", `Sidebar ${isNowCollapsed ? 'collapsed' : 'expanded'}`);
-    });
-
-    // Toggle button and overlay (mobile)
-    sidebarToggleBtn.addEventListener('click', () => {
-      body.classList.remove('sidebar-open');
-      log("info", SCRIPT_NAME, "action", "Sidebar closed on mobile");
-    });
-
-    sidebarOverlay.addEventListener('click', () => {
-      body.classList.remove('sidebar-open');
-      log("info", SCRIPT_NAME, "action", "Sidebar closed via overlay");
+  // Close sidebar when clicking links on mobile
+  const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  if (window.innerWidth < 992) {
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        sidebar.classList.remove('show');
+        overlay.classList.remove('show');
+      });
     });
   }
 });

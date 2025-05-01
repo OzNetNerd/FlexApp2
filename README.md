@@ -11,7 +11,7 @@ clear && flask --app app.app run
 # Tree
 
 ```
-clear &&  tree -P '*.py' -P '*.html' -P '*.js' -I 'venv' --prune
+ clear &&  tree -P '*.py' -P '*.html' -P '*.js' -P *.css -I 'venv' --prune
 ```
 
 

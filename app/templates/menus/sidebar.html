@@ -1,4 +1,4 @@
-<!-- START TEMPLATE: components/sidebar/sidebar.html -->
+<!-- START TEMPLATE: menus/sidebar.html -->
 {# ------------------------------------------------------------------------------
   File: sidebar.html
   Purpose: Left sidebar navigation with collapsible functionality
@@ -11,7 +11,8 @@
 ------------------------------------------------------------------------------ #}
 
 {% from 'macros/navigation.html' import get_endpoint, is_active, get_url %}
-{% include 'menus/nav_items.html' %}
+{% from 'menus/nav_items.html' import get_nav_items %}
+{% set nav_items = get_nav_items() %}
 
 <div id="sidebar" class="sidebar">
   <div class="sidebar-header">
@@ -56,4 +57,4 @@
 
 <!-- Load component styles -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
-<!-- END TEMPLATE: components/sidebar/sidebar.html -->
+<!-- END TEMPLATE: menus/sidebar.html -->
