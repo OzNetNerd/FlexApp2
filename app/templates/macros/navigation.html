@@ -19,14 +19,15 @@
 #}
 
 {% macro get_endpoint(item) %}
-  {%- if item.name == 'settings' %}
+  {% set item_name = (item.name if item is mapping and item.name is defined else item) | trim %}
+  {%- if item_name == 'settings' %}
     {{- 'settings_bp.index' -}}
-  {%- elif item.name == 'relationships' %}
+  {%- elif item_name == 'relationships' %}
     {{- 'relationships_bp.index' -}}
-  {%- elif item.name == 'crisp_scores' %}
+  {%- elif item_name == 'crisp_scores' %}
     {{- 'crisp_scores_bp.index' -}}
   {%- else %}
-    {{- item.name + '_bp.index' -}}
+    {{- item_name + '_bp.index' -}}
   {%- endif %}
 {% endmacro %}
 
@@ -39,14 +40,15 @@
 #}
 
 {% macro is_active(item) %}
-  {%- if item.name == 'settings' %}
+  {% set item_name = item.name if item is mapping and item.name is defined else item %}
+  {%- if item_name == 'settings' %}
     {{- request.endpoint == 'settings_bp.index' -}}
-  {%- elif item.name == 'relationships' %}
+  {%- elif item_name == 'relationships' %}
     {{- request.endpoint == 'relationships_bp.index' -}}
-  {%- elif item.name == 'crisp_scores' %}
+  {%- elif item_name == 'crisp_scores' %}
     {{- request.endpoint == 'crisp_scores_bp.index' -}}
   {%- else %}
-    {{- request.endpoint and request.endpoint.startswith(item.name + '_bp.') -}}
+    {{- request.endpoint and request.endpoint.startswith(item_name + '_bp.') -}}
   {%- endif %}
 {% endmacro %}
 
@@ -62,14 +64,15 @@
 #}
 
 {% macro get_url(item) %}
-  {%- if item.name == 'settings' %}
+  {% set item_name = item.name if item is mapping and item.name is defined else item %}
+  {%- if item_name == 'settings' %}
     {{- url_for('settings_bp.index') -}}
-  {%- elif item.name == 'relationships' %}
+  {%- elif item_name == 'relationships' %}
     {{- url_for('relationships_bp.index') -}}
-  {%- elif item.name == 'crisp_scores' %}
+  {%- elif item_name == 'crisp_scores' %}
     {{- url_for('crisp_scores_bp.index') -}}
   {%- else %}
-    {{- url_for(item.name + '_bp.index') -}}
+    {{- url_for(item_name + '_bp.index') -}}
   {%- endif %}
 {% endmacro %}
 

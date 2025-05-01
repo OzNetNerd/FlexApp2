@@ -34,8 +34,8 @@
 
         <li class="sidebar-item {% if is_active_item %}active{% endif %}">
           <a href="{{ item_url }}" class="sidebar-link" {% if is_active_item %}aria-current="page"{% endif %}>
-            <i class="fas {{ item.icon }} sidebar-icon"></i>
-            <span class="sidebar-text">{{ item.display_name }}</span>
+            <i class="fas {{ item.icon|default('fa-circle') }} sidebar-icon"></i>
+            <span class="sidebar-text">{{ item.display_name|default(item) }}</span>
             {% if is_active_item %}<span class="active-indicator"></span>{% endif %}
           </a>
         </li>
