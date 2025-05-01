@@ -3,13 +3,13 @@
 
 import os
 import sys
-from datetime import datetime
 import logging
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
-from datetime import datetime, UTC
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 # Import the models directly
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from app.models import Capability, CapabilityCategory, Company, CompanyCapability, Contact, Note, Opportunity, Task, User, db
+from app.models import Capability, CapabilityCategory, Company, CompanyCapability, Contact, Note, Opportunity, Task, \
+    User, db
 from app.models.relationship import Relationship
 from app.models.pages.srs import SRS
 
@@ -68,12 +69,12 @@ def create_or_update(model, match_by: dict, data: dict):
 def seed_users():
     """Seed users into the database."""
     users = [
-        ("alice", "Alice Johnson", "alice@example.com", False),
-        ("bob", "Bob Smith", "bob@example.com", False),
-        ("carol", "Carol White", "carol@example.com", False),
-        ("dave", "Dave Black", "dave@example.com", False),
-        ("eve", "Eve Grey", "eve@example.com", False),
-        ("admin", "Admin User", "admin@example.com", True),
+        ("morgan", "Morgan Chen", "morgan.chen@prismasecurity.com", False),
+        ("taylor", "Taylor Rodriguez", "taylor.rodriguez@prismasecurity.com", False),
+        ("jordan", "Jordan Patel", "jordan.patel@prismasecurity.com", False),
+        ("alex", "Alex Singh", "alex.singh@prismasecurity.com", False),
+        ("casey", "Casey Washington", "casey.washington@prismasecurity.com", False),
+        ("admin", "Admin User", "admin@prismasecurity.com", True),
     ]
 
     for username, name, email, is_admin in users:
@@ -94,13 +95,20 @@ def seed_users():
 def seed_companies():
     """Seed companies into the database."""
     companies = [
-        ("FlexTech", "A flexible software consultancy."),
-        ("CloudCorp", "Leaders in scalable cloud infrastructure."),
-        ("DataSolve", "Data-driven business intelligence solutions."),
-        ("CyberTrust", "Next-gen cybersecurity solutions."),
-        ("GreenGrid", "Sustainable smart grid technology provider."),
-        ("Acme Inc", "Technology company"),
-        ("Beta Corp", "Manufacturing company"),
+        ("Nimbus Financial",
+         "Large financial services company with hybrid cloud environment, primarily AWS and on-prem."),
+        ("Velocity Healthcare Systems",
+         "Healthcare provider with growing Azure footprint and strict compliance requirements."),
+        ("GlobalTech Retail",
+         "Multi-national retailer operating across GCP, AWS, and Azure with containerized microservices."),
+        ("Quantum Innovations",
+         "Fast-growing SaaS provider with cloud-native architecture using Kubernetes across multiple clouds."),
+        ("Meridian Energy",
+         "Energy company with critical infrastructure transitioning from on-prem to AWS cloud services."),
+        ("Axion Logistics",
+         "Supply chain company with legacy systems and new cloud initiatives creating security visibility gaps."),
+        ("Horizon Media Group",
+         "Media company with extensive data analytics workloads running in multi-cloud environment."),
     ]
 
     for name, description in companies:
@@ -114,21 +122,23 @@ def seed_contacts():
     companies = Company.query.all()
     contacts_data = [
         # Assigned to companies dynamically
-        ("Liam", "Walker", None, "0400012345"),
-        ("Noah", "Lee", None, "0400112345"),
-        ("Olivia", "Davis", None, "0400212345"),
-        ("Emma", "Martin", None, "0400312345"),
-        ("Ava", "Lopez", None, "0400412345"),
+        ("James", "Wilson", None, "415-555-9876", "CISO"),
+        ("Sarah", "Martinez", None, "212-555-7832", "Cloud Security Architect"),
+        ("Michael", "Thompson", None, "650-555-3214", "DevSecOps Lead"),
+        ("Emily", "Johnson", None, "312-555-8765", "CTO"),
+        ("David", "Patel", None, "408-555-2398", "VP of Infrastructure"),
+        ("Jennifer", "Garcia", None, "206-555-4567", "Cloud Operations Manager"),
+        ("Robert", "Kim", None, "617-555-8901", "Security Operations Director"),
         # Pre-assigned IDs
-        ("Test", "User", 1, None),
-        ("Test2", "User2", 2, None),
+        ("Priya", "Sharma", 1, "202-555-1234", "Director of Cloud Transformation"),
+        ("Daniel", "Roberts", 2, "512-555-5678", "CISO"),
     ]
 
-    for i, (first_name, last_name, contact_id, phone) in enumerate(contacts_data):
-        # For the first 5 contacts, assign to companies dynamically
-        if i < 5:
+    for i, (first_name, last_name, contact_id, phone, title) in enumerate(contacts_data):
+        # For the first 7 contacts, assign to companies dynamically
+        if i < 7:
             company = companies[i % len(companies)]
-            email = f"{first_name.lower()}@{company.name.lower().replace(' ', '')}.com"
+            email = f"{first_name.lower()}.{last_name.lower()}@{company.name.lower().replace(' ', '')}.com"
             create_or_update(
                 Contact,
                 {"first_name": first_name, "last_name": last_name},
@@ -136,13 +146,24 @@ def seed_contacts():
                     "phone_number": phone,
                     "email": email,
                     "company": company,
+                    "title": title,
                 },
             )
         # For the last 2 contacts with pre-assigned IDs
         else:
             existing = Contact.query.filter_by(id=contact_id).first()
             if not existing:
-                contact = Contact(id=contact_id, first_name=first_name, last_name=last_name)
+                company = companies[contact_id % len(companies)]
+                email = f"{first_name.lower()}.{last_name.lower()}@{company.name.lower().replace(' ', '')}.com"
+                contact = Contact(
+                    id=contact_id,
+                    first_name=first_name,
+                    last_name=last_name,
+                    phone_number=phone,
+                    email=email,
+                    title=title,
+                    company=company
+                )
                 db.session.add(contact)
                 logger.info(f"Created contact with ID {contact_id}: {first_name} {last_name}")
 
@@ -152,17 +173,17 @@ def seed_contacts():
 
 def seed_capabilities_and_categories():
     """Seed capabilities and categories into the database."""
-    categories = ["Security", "Data", "Infrastructure", "DevOps", "AI"]
+    categories = ["Cloud Security", "DevSecOps", "Compliance", "Identity", "Network Security"]
     for category in categories:
         create_or_update(CapabilityCategory, {"name": category}, {})
     db.session.commit()
 
     capability_map = {
-        "Security": ["Penetration Testing", "Risk Assessment"],
-        "Data": ["ETL", "Data Warehousing"],
-        "Infrastructure": ["Load Balancing"],
-        "DevOps": ["CI/CD Pipelines"],
-        "AI": ["ML Model Training"],
+        "Cloud Security": ["CSPM", "CWPP", "Container Security", "Cloud IAM Security", "Cloud Data Security"],
+        "DevSecOps": ["Pipeline Security", "IaC Scanning", "Container Registry Scanning", "SBOM Management"],
+        "Compliance": ["HIPAA", "PCI-DSS", "SOC2", "GDPR", "ISO27001"],
+        "Identity": ["Privileged Access Management", "SSO Integration", "Zero Trust Implementation"],
+        "Network Security": ["ZTNA", "Cloud Network Segmentation", "API Security"],
     }
 
     for category_name, capability_names in capability_map.items():
@@ -178,11 +199,31 @@ def seed_company_capabilities():
     companies = Company.query.all()
     capabilities = Capability.query.all()
 
-    for i, company in enumerate(companies):
-        cap = capabilities[i % len(capabilities)]
-        existing = CompanyCapability.query.filter_by(company_id=company.id, capability_id=cap.id).first()
-        if not existing:
-            db.session.add(CompanyCapability(company=company, capability=cap))
+    # Create more realistic relationships between companies and capabilities
+    company_capability_map = {
+        "Nimbus Financial": ["CSPM", "Cloud IAM Security", "Privileged Access Management", "PCI-DSS"],
+        "Velocity Healthcare Systems": ["HIPAA", "CSPM", "Cloud Data Security", "ZTNA"],
+        "GlobalTech Retail": ["Container Security", "Pipeline Security", "Cloud Network Segmentation"],
+        "Quantum Innovations": ["Container Security", "IaC Scanning", "SBOM Management", "API Security"],
+        "Meridian Energy": ["CSPM", "CWPP", "SOC2", "SSO Integration"],
+        "Axion Logistics": ["CSPM", "Zero Trust Implementation", "Cloud Network Segmentation"],
+        "Horizon Media Group": ["Cloud Data Security", "GDPR", "API Security", "Container Registry Scanning"],
+    }
+
+    for company_name, capability_names in company_capability_map.items():
+        company = Company.query.filter_by(name=company_name).first()
+        if not company:
+            continue
+
+        for cap_name in capability_names:
+            capability = Capability.query.filter_by(name=cap_name).first()
+            if not capability:
+                continue
+
+            existing = CompanyCapability.query.filter_by(company_id=company.id, capability_id=capability.id).first()
+            if not existing:
+                db.session.add(CompanyCapability(company=company, capability=capability))
+
     db.session.commit()
     logger.info("✅ CompanyCapabilities seeded.")
 
@@ -192,21 +233,68 @@ def seed_opportunities():
     companies = Company.query.all()
 
     opportunities_data = [
-        # Dynamic company assignment
-        ("Cloud Expansion", "Opportunity to expand our cloud services.", "New", "Prospecting", 50000.0, None),
-        ("Security Partnership", "Partnership with a major security firm.", "New", "Prospecting", 100000.0, None),
-        ("Data Analytics Project", "Project for a large data analytics firm.", "Won", "Negotiation", 150000.0, None),
-        ("Software Licensing", "Renewal of software licenses for an enterprise.", "Lost", "Closed", 30000.0, None),
-        ("Cybersecurity Solutions", "Comprehensive cybersecurity solutions for a client.", "New", "Prospecting", 200000.0, None),
-        # Fixed company assignment
-        ("New Website", "Build a new website", "New", "Prospecting", 10000.0, 1),
-        ("Software Upgrade", "Upgrade ERP system", "In Progress", "Negotiation", 25000.0, 2),
+        (
+            "Prisma Cloud Enterprise Deployment",
+            "Full Prisma Cloud platform deployment across multi-cloud environment with CSPM, CWPP, and DSPM modules.",
+            "In Progress",
+            "Technical Evaluation",
+            750000.0,
+            "Nimbus Financial"
+        ),
+        (
+            "Healthcare Compliance Automation",
+            "Implementation of Prisma Cloud for automated HIPAA compliance reporting and remediation.",
+            "New",
+            "Proposal",
+            350000.0,
+            "Velocity Healthcare Systems"
+        ),
+        (
+            "Container Security Initiative",
+            "Securing container deployments across development and production with Prisma Cloud.",
+            "Won",
+            "Closed Won",
+            480000.0,
+            "GlobalTech Retail"
+        ),
+        (
+            "Cloud Security Posture Assessment",
+            "Comprehensive assessment of current cloud security posture with recommendations for improvement.",
+            "Lost",
+            "Closed Lost",
+            120000.0,
+            "Quantum Innovations"
+        ),
+        (
+            "Critical Infrastructure Protection",
+            "Securing cloud migration of critical energy infrastructure with Prisma Cloud.",
+            "New",
+            "Discovery",
+            680000.0,
+            "Meridian Energy"
+        ),
+        (
+            "Supply Chain Security Transformation",
+            "Complete security transformation program for hybrid cloud environment.",
+            "In Progress",
+            "Negotiation",
+            520000.0,
+            "Axion Logistics"
+        ),
+        (
+            "Data Protection and Compliance",
+            "Implementing Prisma Cloud Data Security with focus on regulatory compliance.",
+            "New",
+            "Qualification",
+            280000.0,
+            "Horizon Media Group"
+        ),
     ]
 
-    for name, description, status, stage, value, company_id in opportunities_data:
-        # If company_id is specified, use it; otherwise, select a company using a consistent method
-        if company_id is None:
-            company_id = companies[len(opportunities_data) % len(companies)].id
+    for name, description, status, stage, value, company_name in opportunities_data:
+        company = Company.query.filter_by(name=company_name).first()
+        if not company:
+            continue
 
         create_or_update(
             Opportunity,
@@ -216,7 +304,7 @@ def seed_opportunities():
                 "status": status,
                 "stage": stage,
                 "value": value,
-                "company_id": company_id,
+                "company_id": company.id,
             },
         )
     db.session.commit()
@@ -234,75 +322,85 @@ def seed_tasks():
 
     tasks = [
         (
-            "Follow up on Cloud Expansion",
-            "Follow up with the client about the cloud expansion opportunity.",
-            "2025-06-30",
+            "Prepare Prisma Cloud technical demo",
+            "Schedule and prepare technical demonstration of Prisma Cloud CSPM and CWPP capabilities.",
             "Pending",
             "High",
             "Opportunity",
-            opportunities[0].id,
+            "Prisma Cloud Enterprise Deployment",
+            "morgan"
         ),
         (
-            "Review security partnership terms",
-            "Review the proposed terms for the security partnership.",
-            "2025-05-15",
+            "Draft healthcare compliance presentation",
+            "Create presentation on how Prisma Cloud automates compliance for HIPAA requirements.",
             "In Progress",
             "Medium",
             "Opportunity",
-            opportunities[1].id,
+            "Healthcare Compliance Automation",
+            "taylor"
         ),
         (
-            "Prepare proposal for data analytics",
-            "Prepare a detailed proposal for the data analytics project.",
-            "2025-04-20",
+            "Container security workshop",
+            "Conduct hands-on workshop with client DevOps team on container security best practices.",
             "Pending",
             "High",
             "Opportunity",
-            opportunities[2].id,
+            "Container Security Initiative",
+            "jordan"
         ),
         (
-            "Renew software licenses",
-            "Process the renewal for software licenses for the enterprise.",
-            "2025-07-10",
+            "Conduct security posture assessment",
+            "Complete the cloud security posture assessment and document findings for client presentation.",
             "Completed",
-            "Low",
+            "Medium",
             "Opportunity",
-            opportunities[3].id,
+            "Cloud Security Posture Assessment",
+            "alex"
         ),
         (
-            "Cybersecurity audit for client",
-            "Complete the cybersecurity audit for the client and report findings.",
-            "2025-06-05",
+            "Critical infrastructure risk analysis",
+            "Analyze potential security risks during cloud migration of critical infrastructure.",
             "Pending",
             "High",
             "Opportunity",
-            opportunities[4].id,
+            "Critical Infrastructure Protection",
+            "casey"
         ),
         (
-            "User feedback analysis",
-            "Analyze user feedback on the latest release.",
-            "2025-05-01",
+            "Update security transformation proposal",
+            "Revise proposal based on client feedback and updated requirements.",
             "Pending",
             "Medium",
-            "User",
-            users[0].id,
+            "Opportunity",
+            "Supply Chain Security Transformation",
+            "morgan"
         ),
         (
-            "Internal team meeting",
-            "Schedule an internal team meeting for next week.",
-            "2025-04-25",
-            "Completed",
-            "Low",
-            "User",
-            users[1].id,
+            "Prepare data compliance requirements document",
+            "Document specific regulatory requirements and map to Prisma Cloud capabilities.",
+            "Pending",
+            "Medium",
+            "Opportunity",
+            "Data Protection and Compliance",
+            "taylor"
         ),
     ]
 
-    task_assignments = min(len(users), len(opportunities))
+    for title, description, status, priority, notable_type, opportunity_name, username in tasks:
+        # Find the opportunity
+        opportunity = next((o for o in opportunities if o.name == opportunity_name), None)
+        if not opportunity:
+            continue
 
-    for i in range(task_assignments):
-        title, description, due_date, status, priority, notable_type, notable_id = tasks[i]
-        due_date = datetime.strptime(due_date, "%Y-%m-%d").replace(tzinfo=UTC)
+        # Find the user
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            continue
+
+        # Set due date to 30 days from now in UTC
+        due_date = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0, microsecond=0)
+        due_date = due_date.replace(day=due_date.day + 30)
+
         create_or_update(
             Task,
             {"title": title},
@@ -312,7 +410,8 @@ def seed_tasks():
                 "status": status,
                 "priority": priority,
                 "notable_type": notable_type,
-                "notable_id": notable_id,
+                "notable_id": opportunity.id,
+                "assigned_to": user.id,
             },
         )
     db.session.commit()
@@ -321,35 +420,92 @@ def seed_tasks():
 
 def seed_notes():
     """Seed notes for Companies, Contacts, and Opportunities."""
-    user = User.query.first()
-    if not user:
+    users = User.query.all()
+
+    if len(users) == 0:
         logger.warning("❌ No user available to assign notes.")
         return
 
     # Seed notes for companies
     for company in Company.query.all():
+        user = users[hash(company.name) % len(users)]
+
+        if company.name == "Nimbus Financial":
+            content = "Key customer with large AWS and Azure footprint. Security team is concerned about IAM misconfigurations and over-privileged roles. Looking to consolidate security tools and automate remediation."
+        elif company.name == "Velocity Healthcare Systems":
+            content = "Struggling with HIPAA compliance in their Azure environment. Their CISO mentioned they had a security incident last quarter related to misconfigured storage containers. Very interested in automated compliance reporting."
+        elif company.name == "GlobalTech Retail":
+            content = "Recently adopted Kubernetes for their e-commerce platform. Development team moving fast but security team concerned about container vulnerabilities. Need visibility into their container security posture."
+        elif company.name == "Quantum Innovations":
+            content = "Fast-moving startup with all cloud-native architecture. Security is not their primary focus, but recent customer requirements are pushing them to improve security posture. Price sensitive."
+        elif company.name == "Meridian Energy":
+            content = "Critical infrastructure provider with strict regulatory requirements. Moving sensitive workloads to AWS and concerned about security during migration. Board-level visibility on security initiatives."
+        elif company.name == "Axion Logistics":
+            content = "Complex environment with mix of legacy systems and new cloud services. Security team understaffed and looking for ways to automate security processes. Particularly concerned about secure cloud networking."
+        elif company.name == "Horizon Media Group":
+            content = "Handles large volumes of user data subject to GDPR. Recent expansion of analytics platform across multiple clouds has created security blind spots. Looking for unified security visibility."
+        else:
+            content = f"Note for company {company.name}"
+
         create_or_update(
             Note,
             {"notable_type": "Company", "notable_id": company.id, "user_id": user.id},
-            {"content": f"Note for company {company.name}", "processed_content": f"<p>Note for company {company.name}</p>"},
+            {"content": content, "processed_content": f"<p>{content}</p>"},
         )
 
     # Seed notes for contacts
     for contact in Contact.query.all():
+        user = users[hash(contact.email) % len(users)]
         full_name = f"{contact.first_name} {contact.last_name}"
+
+        if contact.title == "CISO":
+            content = f"Met with {full_name} during the cloud security summit. Very knowledgeable about cloud security challenges. Primary decision maker for security investments. Concerned about compliance automation and reporting to the board."
+        elif "Security" in contact.title:
+            content = f"{full_name} is technically focused and wants details on how Prisma Cloud handles container vulnerabilities and IaC scanning. Prefers hands-on demos over slideware. Looking for security that doesn't slow down development."
+        elif "CTO" in contact.title:
+            content = f"{full_name} is concerned about shadow IT and unmanaged cloud resources. Wants to enable developer velocity while maintaining security. Interested in API integration capabilities of Prisma Cloud."
+        elif "Operations" in contact.title:
+            content = f"{full_name} manages the cloud operations team. Frustrated with current alert volume and looking for automated remediation. Wants better visibility across multi-cloud environment."
+        elif "VP" in contact.title:
+            content = f"{full_name} is evaluating consolidation of security tools to reduce costs. Needs executive-level reporting for board meetings. Interested in ROI metrics for security investments."
+        elif "Director" in contact.title:
+            content = f"{full_name} is leading the cloud transformation initiative. Looking for security that can keep pace with rapid adoption of new cloud services. Wants a partner, not just a vendor."
+        else:
+            content = f"Note for contact {full_name}"
+
         create_or_update(
             Note,
             {"notable_type": "Contact", "notable_id": contact.id, "user_id": user.id},
-            {"content": f"Note for contact {full_name}", "processed_content": f"<p>Note for contact {full_name}</p>"},
+            {"content": content, "processed_content": f"<p>{content}</p>"},
         )
 
     # Seed notes for opportunities
     for opportunity in Opportunity.query.all():
+        user = users[hash(opportunity.name) % len(users)]
+
+        if "Enterprise Deployment" in opportunity.name:
+            content = "Multi-phase deployment planned. Initial focus on AWS environment, followed by Azure in Q3. Client concerned about maintaining compliance during rapid cloud expansion. POC showed 70% reduction in cloud misconfigurations."
+        elif "Compliance" in opportunity.name:
+            content = "Client needs automated compliance reporting for HIPAA. Current manual process takes 2 weeks each quarter. Prisma Cloud demo showed ability to reduce to 2 days with higher accuracy. Technical team convinced, now working on business case."
+        elif "Container" in opportunity.name:
+            content = "POC results were very positive. Client found 28 critical vulnerabilities in production containers. Now moving to full deployment across all environments. Integration with CI/CD pipeline is key requirement."
+        elif "Assessment" in opportunity.name:
+            content = "Assessment completed but client decided to delay implementation due to budget constraints. Plan to re-engage next quarter when new fiscal year begins. Keep relationship warm."
+        elif "Infrastructure" in opportunity.name:
+            content = "High-visibility project with board oversight. Client concerned about securing critical infrastructure during cloud migration. Need to demonstrate compliance with energy sector regulations. Timeline accelerated due to recent incidents."
+        elif "Transformation" in opportunity.name:
+            content = "Complex multi-year engagement. First phase focused on securing cloud workloads, second phase on Zero Trust implementation. Multiple stakeholders with different priorities. Regular executive briefings required."
+        elif "Data Protection" in opportunity.name:
+            content = "Initial discovery showed significant data compliance gaps. Client handling PII across multiple cloud environments without consistent controls. Proposal focuses on data classification, encryption, and access monitoring."
+        else:
+            content = f"Note for opportunity {opportunity.name}"
+
         create_or_update(
             Note,
             {"notable_type": "Opportunity", "notable_id": opportunity.id, "user_id": user.id},
-            {"content": f"Note for opportunity {opportunity.name}", "processed_content": f"<p>Note for opportunity {opportunity.name}</p>"},
+            {"content": content, "processed_content": f"<p>{content}</p>"},
         )
+
     db.session.commit()
     logger.info("✅ Notes seeded.")
 
@@ -360,98 +516,162 @@ def seed_relationships():
     contacts = Contact.query.all()
     companies = Company.query.all()
 
-    # Define some relationship types
-    relationship_types = ["Manages", "Works With", "Reports To", "Client", "Partner", "Vendor"]
+    # Define relationship types relevant to cloud security sales
+    relationship_types = ["Account Executive", "Solution Architect", "Technical Champion", "Economic Buyer",
+                          "Decision Maker", "Influencer", "Partner", "Channel Manager"]
 
-    # Create user-to-user relationships
-    for i in range(len(users) - 1):
-        user1 = users[i]
-        user2 = users[i + 1]
-        rel_type = relationship_types[i % len(relationship_types)]
+    # Create user-to-user relationships (internal team structure)
+    create_or_update(
+        Relationship,
+        {"entity1_type": "user", "entity1_id": User.query.filter_by(username="morgan").first().id,
+         "entity2_type": "user", "entity2_id": User.query.filter_by(username="taylor").first().id},
+        {"relationship_type": "Account Manager"}
+    )
 
-        existing = Relationship.query.filter_by(entity1_type="user", entity1_id=user1.id, entity2_type="user", entity2_id=user2.id).first()
+    create_or_update(
+        Relationship,
+        {"entity1_type": "user", "entity1_id": User.query.filter_by(username="taylor").first().id,
+         "entity2_type": "user", "entity2_id": User.query.filter_by(username="jordan").first().id},
+        {"relationship_type": "Solution Architect"}
+    )
 
-        if not existing:
-            relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user1.id, entity2_type="user", entity2_id=user2.id, relationship_type=rel_type
-            )
-            db.session.add(relationship)
-            logger.info(f"Created relationship: User {user1.username} {rel_type} User {user2.username}")
+    create_or_update(
+        Relationship,
+        {"entity1_type": "user", "entity1_id": User.query.filter_by(username="jordan").first().id,
+         "entity2_type": "user", "entity2_id": User.query.filter_by(username="alex").first().id},
+        {"relationship_type": "Sales Engineer"}
+    )
 
-    # Create user-to-contact relationships
-    for i in range(min(len(users), len(contacts))):
-        user = users[i]
-        contact = contacts[i]
-        rel_type = relationship_types[(i + 2) % len(relationship_types)]
+    create_or_update(
+        Relationship,
+        {"entity1_type": "user", "entity1_id": User.query.filter_by(username="casey").first().id,
+         "entity2_type": "user", "entity2_id": User.query.filter_by(username="admin").first().id},
+        {"relationship_type": "Reports To"}
+    )
 
-        existing = Relationship.query.filter_by(
-            entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id
-        ).first()
+    # Create realistic user-to-contact relationships
+    relationships = [
+        ("morgan", "James Wilson", "Account Executive"),
+        ("taylor", "Sarah Martinez", "Solution Architect"),
+        ("jordan", "Michael Thompson", "Technical Advisor"),
+        ("alex", "Emily Johnson", "Sales Engineer"),
+        ("casey", "David Patel", "Account Manager"),
+        ("morgan", "Jennifer Garcia", "Executive Sponsor"),
+        ("taylor", "Robert Kim", "Technical Champion"),
+    ]
 
-        if not existing:
-            relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id, relationship_type=rel_type
-            )
-            db.session.add(relationship)
-            logger.info(f"Created relationship: User {user.username} {rel_type} Contact {contact.first_name} {contact.last_name}")
+    for username, contact_name, rel_type in relationships:
+        user = User.query.filter_by(username=username).first()
+        first_name, last_name = contact_name.split(" ", 1)
+        contact = Contact.query.filter_by(first_name=first_name, last_name=last_name).first()
+
+        if user and contact:
+            existing = Relationship.query.filter_by(
+                entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id
+            ).first()
+
+            if not existing:
+                relationship = Relationship.create_relationship(
+                    entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id,
+                    relationship_type=rel_type
+                )
+                db.session.add(relationship)
+                logger.info(
+                    f"Created relationship: User {user.username} {rel_type} Contact {contact.first_name} {contact.last_name}")
 
     # Create user-to-company relationships
-    for i in range(min(len(users), len(companies))):
-        user = users[i]
-        company = companies[i]
-        rel_type = relationship_types[(i + 4) % len(relationship_types)]
+    company_relationships = [
+        ("morgan", "Nimbus Financial", "Account Owner"),
+        ("taylor", "Velocity Healthcare Systems", "Account Owner"),
+        ("jordan", "GlobalTech Retail", "Technical Lead"),
+        ("alex", "Quantum Innovations", "Solution Architect"),
+        ("casey", "Meridian Energy", "Account Owner"),
+        ("morgan", "Axion Logistics", "Executive Sponsor"),
+        ("taylor", "Horizon Media Group", "Account Owner"),
+    ]
 
-        existing = Relationship.query.filter_by(
-            entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id
-        ).first()
+    for username, company_name, rel_type in company_relationships:
+        user = User.query.filter_by(username=username).first()
+        company = Company.query.filter_by(name=company_name).first()
 
-        if not existing:
-            relationship = Relationship.create_relationship(
-                entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id, relationship_type=rel_type
-            )
-            db.session.add(relationship)
-            logger.info(f"Created relationship: User {user.username} {rel_type} Company {company.name}")
+        if user and company:
+            existing = Relationship.query.filter_by(
+                entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id
+            ).first()
+
+            if not existing:
+                relationship = Relationship.create_relationship(
+                    entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id,
+                    relationship_type=rel_type
+                )
+                db.session.add(relationship)
+                logger.info(f"Created relationship: User {user.username} {rel_type} Company {company.name}")
 
     db.session.commit()
     logger.info("✅ Relationships seeded.")
 
 
 def seed_srs_items():
-    """Seed SRS items for learning and recall."""
+    """Seed SRS items for learning and recall about cloud security customers."""
     logger.info("Processing SRS cards...")
     sample_cards = [
         # Contact cards
-        {"notable_type": "Contact", "notable_id": 1, "question": "What is Test User's last name?", "answer": "User"},
-        {"notable_type": "Contact", "notable_id": 2, "question": "What is Test2 User2's first name?", "answer": "Test2"},
-        {"notable_type": "Contact", "notable_id": 1, "question": "Which contact has ID #1?", "answer": "Test User"},
+        {"notable_type": "Contact", "notable_id": 1, "question": "What is Priya Sharma's role at her company?",
+         "answer": "Director of Cloud Transformation"},
+        {"notable_type": "Contact", "notable_id": 2, "question": "What is Daniel Roberts' position?", "answer": "CISO"},
+        {"notable_type": "Contact", "notable_id": 1, "question": "Which company does Priya Sharma work for?",
+         "answer": "Nimbus Financial"},
+
         # Company cards
-        {"notable_type": "Company", "notable_id": 1, "question": "What industry is Acme Inc in?", "answer": "Technology company"},
-        {"notable_type": "Company", "notable_id": 2, "question": "What is Beta Corp's main business?", "answer": "Manufacturing company"},
+        {"notable_type": "Company", "notable_id": 1,
+         "question": "What is Nimbus Financial's primary cloud environment?",
+         "answer": "Hybrid cloud environment, primarily AWS and on-prem"},
+        {"notable_type": "Company", "notable_id": 2,
+         "question": "What compliance requirements does Velocity Healthcare Systems have?",
+         "answer": "HIPAA compliance with strict requirements"},
+        {"notable_type": "Company", "notable_id": 3, "question": "What cloud platforms does GlobalTech Retail use?",
+         "answer": "GCP, AWS, and Azure with containerized microservices"},
+
         # Opportunity cards
         {
             "notable_type": "Opportunity",
             "notable_id": 1,
-            "question": "What is the value of the New Website opportunity?",
-            "answer": "$10,000",
+            "question": "What is the value of the Prisma Cloud Enterprise Deployment opportunity?",
+            "answer": "$750,000",
         },
         {
             "notable_type": "Opportunity",
             "notable_id": 2,
-            "question": "What stage is the Software Upgrade opportunity in?",
-            "answer": "Negotiation",
+            "question": "What stage is the Healthcare Compliance Automation opportunity in?",
+            "answer": "Proposal",
         },
         {
             "notable_type": "Opportunity",
-            "notable_id": 2,
-            "question": "Which company is associated with the Software Upgrade opportunity?",
-            "answer": "Beta Corp (ID: 2)",
+            "notable_id": 3,
+            "question": "Which company is associated with the Container Security Initiative opportunity?",
+            "answer": "GlobalTech Retail",
+        },
+
+        # Cloud security specific cards
+        {
+            "notable_type": "Company",
+            "notable_id": 5,
+            "question": "Why is cloud security especially critical for Meridian Energy?",
+            "answer": "They are an energy company with critical infrastructure transitioning to AWS cloud services",
+        },
+        {
+            "notable_type": "Company",
+            "notable_id": 6,
+            "question": "What is Axion Logistics' main security challenge?",
+            "answer": "Security visibility gaps between legacy systems and new cloud initiatives",
         },
     ]
 
     for card_data in sample_cards:
         create_or_update(
             SRS,
-            {"notable_type": card_data["notable_type"], "notable_id": card_data["notable_id"], "question": card_data["question"]},
+            {"notable_type": card_data["notable_type"], "notable_id": card_data["notable_id"],
+             "question": card_data["question"]},
             {"answer": card_data["answer"]},
         )
 
