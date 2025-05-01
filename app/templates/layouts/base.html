@@ -1,4 +1,5 @@
 <!-- START TEMPLATE: app/templates/layouts/base.html -->
+
 {# ------------------------------------------------------------------------------
   File: base.html | Purpose: Main application layout template
   Description:
@@ -21,13 +22,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}CRM{% endblock %}</title>
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" rel="stylesheet" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+
 
     <script type="module" src="{{ url_for('static', filename='js/core/pageInit.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/components/toasts.js') }}"></script>

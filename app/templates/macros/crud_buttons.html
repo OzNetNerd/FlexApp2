@@ -1,3 +1,26 @@
+<!-- START TEMPLATE: macros/crud_buttons.html -->
+
+{#
+  Template: crud_buttons.html
+
+  Provides reusable Jinja2 macros for standard CRUD actions:
+#}
+
+
+{#
+  • crud_buttons(endpoint_prefix, id=None, entity_name="", model_name="", read_only=true)
+      Renders a row of buttons for creating, viewing, editing, saving, and deleting entities.
+      – endpoint_prefix : Flask blueprint name (e.g. "user")
+      – id              : optional entity ID for edit/view/delete links
+      – entity_name     : human-readable name of the entity (unused by default)
+      – model_name      : internal model name (unused by default)
+      – read_only       : if true, shows Add/Edit/Delete/Back; if false, shows Save/Update/Cancel
+
+  Usage:
+    {{ buttons.crud_buttons('user', id=user.id) }}
+
+#}
+
 {% macro crud_buttons(endpoint_prefix, id=None, entity_name="", model_name="", read_only=true) %}
   <div class="d-flex gap-2">
     {% if read_only %}
@@ -40,6 +63,16 @@
   </div>
 {% endmacro %}
 
+
+{#
+  • delete_modal(endpoint_prefix, id=None)
+      Renders a Bootstrap confirmation modal for deletion.
+      – endpoint_prefix : Flask blueprint name
+      – id              : entity ID to delete when confirmed
+
+    {{ buttons.delete_modal('user', id=user.id) }}
+#}
+
 {% macro delete_modal(endpoint_prefix, id=None) %}
 <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog"
      aria-labelledby="deleteModalLabel" aria-hidden="true" data-bs-scroll="false">
@@ -67,3 +100,5 @@
   </div>
 </div>
 {% endmacro %}
+
+<!-- END TEMPLATE: macros/crud_buttons.html -->

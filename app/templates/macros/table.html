@@ -1,0 +1,53 @@
+{#
+  render_filter(filter)
+      Renders a Bootstrap-styled filter control based on the given config object:
+        – field       : query-param name
+        – label       : visible label text
+        – type        : "select", "date", "number", or default text input
+        – options     : for select dropdowns (list of values or {label,value} maps)
+        – width, lg_width : Bootstrap column spans
+        – filterType  : how to compare (equals, contains, greaterThanOrEqual, etc.)
+      Automatically binds values to/from request.args for DRY filter bars.
+#}
+
+{% macro render_filter(filter) %}
+  <div class="col-md-{{ filter.width|default(6) }} col-lg-{{ filter.lg_width|default(filter.width|default(4)) }}">
+    <label for="filter_{{ filter.field }}" class="form-label fw-medium small mb-1">{{ filter.label }}</label>
+
+    {% if filter.type == 'select' %}
+      <select class="form-select form-select-sm" id="filter_{{ filter.field }}" name="{{ filter.field }}" data-filter-type="{{ filter.filterType|default('equals') }}">
+        <option value="">-- All --</option>
+        {% for option in filter.options %}
+          {% if option is mapping %}
+            <option value="{{ option.value }}" {% if request.args.get(filter.field) == option.value|string %}selected{% endif %}>{{ option.label }}</option>
+          {% else %}
+            <option value="{{ option }}" {% if request.args.get(filter.field) == option|string %}selected{% endif %}>{{ option }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+
+    {% elif filter.type == 'date' %}
+      <div class="input-group input-group-sm">
+        <input type="date" class="form-control" id="filter_{{ filter.field }}_start" name="{{ filter.field }}_start"
+               data-filter-type="greaterThanOrEqual" value="{{ request.args.get(filter.field + '_start', '') }}">
+        <span class="input-group-text">to</span>
+        <input type="date" class="form-control" id="filter_{{ filter.field }}_end" name="{{ filter.field }}_end"
+               data-filter-type="lessThanOrEqual" value="{{ request.args.get(filter.field + '_end', '') }}">
+      </div>
+
+    {% elif filter.type == 'number' %}
+      <div class="input-group input-group-sm">
+        <input type="number" class="form-control" id="filter_{{ filter.field }}_min" name="{{ filter.field }}_min"
+               placeholder="Min" data-filter-type="greaterThanOrEqual" value="{{ request.args.get(filter.field + '_min', '') }}">
+        <span class="input-group-text">to</span>
+        <input type="number" class="form-control" id="filter_{{ filter.field }}_max" name="{{ filter.field }}_max"
+               placeholder="Max" data-filter-type="lessThanOrEqual" value="{{ request.args.get(filter.field + '_max', '') }}">
+      </div>
+
+    {% else %}
+      <input type="{{ filter.type|default('text') }}" class="form-control form-control-sm" id="filter_{{ filter.field }}"
+             name="{{ filter.field }}" placeholder="{{ filter.placeholder|default(filter.label) }}"
+             data-filter-type="{{ filter.filterType|default('contains') }}" value="{{ request.args.get(filter.field, '') }}">
+    {% endif %}
+  </div>
+{% endmacro %}

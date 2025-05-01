@@ -504,3 +504,11 @@ if (!window.__tableInitialized) {
 }
 
 export default initializeTable;
+
+window.addEventListener('error', function(e) {
+  log("error", "global", "uncaught", `Script error: ${e.message} in ${e.filename} line ${e.lineno}`);
+  const container = document.querySelector('#table-container');
+  if (container) {
+    container.innerHTML = `<div class="alert alert-danger m-3">Error loading table: ${e.message}</div>`;
+  }
+});

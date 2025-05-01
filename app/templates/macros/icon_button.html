@@ -1,0 +1,30 @@
+<!-- START TEMPLATE: macros/icon_button.html -->
+
+{#
+  Template: icon_button.html
+
+  Provides a reusable Jinja2 macro to render a link styled as a button with a Font Awesome icon.
+
+  • icon_button(href, class, icon, text)
+      Renders:
+        <a href="{{ href }}" class="{{ class }}">
+          <i class="fas fa-{{ icon }} me-1"></i> {{ text }}
+        </a>
+      – href  : URL or endpoint for the link
+      – class : CSS classes to apply to the <a> element (e.g., "btn btn-primary")
+      – icon  : Font Awesome icon name (without the "fa-" prefix)
+      – text  : Button label text
+
+  Usage:
+    {% import 'partials/icon_button.html' as ui %}
+    {{ ui.icon_button(url_for('user.create'), 'btn btn-success', 'plus', 'New User') }}
+#}
+
+
+{% macro icon_button(href, class, icon, text) %}
+  <a href="{{ href }}" class="{{ class }}">
+    <i class="fas fa-{{ icon }} me-1"></i> {{ text }}
+  </a>
+{% endmacro %}
+
+<!-- END TEMPLATE: macros/icon_button.html -->

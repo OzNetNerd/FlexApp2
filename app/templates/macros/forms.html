@@ -1,3 +1,36 @@
+<!-- START TEMPLATE: macros/forms.html -->
+
+{#
+  Template: forms.html
+
+  Provides a reusable Jinja2 macro to render form fields with full read/write and read-only support.
+
+  • render_field(entry, read_only=false, column_class="col-md-6")
+      – entry          : dict or object with attributes:
+          • id or name     : used to set the input’s id and name
+          • label          : visible label text
+          • type           : one of "text", "textarea", "select", "checkbox",
+                              "date", "number", "autocomplete", or "readonly"
+          • value          : current field value
+          • options        : for "select" and "autocomplete" types (list of strings or {value,label/text} maps)
+          • required       : boolean, marks input as required and shows asterisk
+          • help_text      : optional help string shown below the field
+      – read_only      : if true, renders all inputs as disabled/read-only
+      – column_class   : Bootstrap column class for field container
+
+  Behavior:
+    • Chooses the correct HTML control (input, textarea, select, checkbox)
+      based on entry.type.
+    • Handles read-only rendering by disabling inputs or showing plain display.
+    • Automatically applies Bootstrap form-control/form-check classes.
+    • Renders a help-text block when provided and not in read-only mode.
+
+  Usage:
+    {% import 'partials/forms.html' as forms %}
+    {{ forms.render_field(field_entry, read_only=is_view_mode) }}
+#}
+
+
 {% macro render_field(entry, read_only=false, column_class="col-md-6") %}
   <div class="{{ column_class }} mb-3">
     {# Use the provided entry.id or entry.name as the field identifier #}
@@ -93,3 +126,5 @@
     {% endif %}
   </div>
 {% endmacro %}
+
+<!-- END TEMPLATE: macros/forms.html -->
