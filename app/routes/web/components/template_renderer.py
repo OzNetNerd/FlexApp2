@@ -179,6 +179,14 @@ def render_debug_panel(
 
 
 def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, int], str]:
+    """Render a Jinja template safely using Flask's built-in Jinja environment.
+
+    Args:
+        render_safely_config: Configuration holding endpoint name, template path, context, etc.
+
+    Returns:
+        The rendered template string, or an error tuple (body, status_code).
+    """
     current_endpoint = render_safely_config.endpoint_name or request.endpoint or "unknown endpoint"
     logger.info(f"🔍 Routing to endpoint: {current_endpoint}")
     logger.info(f"🔍 Using template: {render_safely_config.template_path!r}")
@@ -188,9 +196,10 @@ def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, 
     logger.debug(f"📝 Request args: {request.args}")
     logger.debug(f"📝 Request headers: {dict(request.headers)}")
 
-    template_env = create_template_environment()
-    current_path = request.path
+    # Use Flask’s pre-configured environment so url_for, request, session, etc. are available
+    template_env = current_app.jinja_env
 
+    current_path = request.path
     logger.info(
         f"🔍 Attempting to render template {render_safely_config.template_path!r} for "
         f"{render_safely_config.endpoint_name!r} ({current_path!r})"
@@ -225,9 +234,10 @@ def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, 
 
     except Exception as e:
         logger.exception(
-            f"❌ Error rendering template {render_safely_config.template_path!r} " f"at endpoint {render_safely_config.endpoint_name!r}"
+            f"❌ Error rendering template {render_safely_config.template_path!r} "
+            f"at endpoint {render_safely_config.endpoint_name!r}"
         )
-        logger.error(f"❌ Exception details: {type(e).__name__}: {str(e)}")
+        logger.error(f"❌ Exception details: {type(e).__name__}: {e}")
         return handle_template_error(
             e,
             render_safely_config.template_path,

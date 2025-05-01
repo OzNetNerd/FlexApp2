@@ -2,6 +2,9 @@
 
 import log from '/static/js/core/logger.js';
 
+// scriptName name for logging
+const scriptName = "toasts.js";
+
 // Simple toast system that doesn't rely heavily on Bootstrap
 const ToastSystem = {
   initialized: false,
@@ -12,7 +15,7 @@ const ToastSystem = {
   init: function() {
     if (this.initialized) return;
 
-    log("debug", "toasts.js", "init", "Initializing simplified toast system");
+    log("debug", scriptName, "init", "Initializing simplified toast system");
 
     // Create container if it doesn't exist
     this.container = document.querySelector('.toast-container');
@@ -32,10 +35,13 @@ const ToastSystem = {
     this.template = document.getElementById('liveToast');
 
     this.initialized = true;
-    log("info", "toasts.js", "init", "Simplified toast system initialized");
+    log("info", scriptName, "init", "Simplified toast system initialized");
 
     // Process any queued toasts
     this.processQueue();
+    
+    // Show confirmation toast that system is initialized
+    this.createToast("Toast system initialized", "success");
   },
 
   processQueue: function() {
@@ -94,7 +100,7 @@ const ToastSystem = {
         toast.remove();
       }, 6000);
 
-      log("debug", "toasts.js", "createToast", `🍞 Showing toast: ${message} (${type})`);
+      log("debug", scriptName, "createToast", `🍞 Showing toast: ${message} (${type})`);
     } catch (err) {
       console.error("Error creating toast:", err);
     }
@@ -103,7 +109,7 @@ const ToastSystem = {
 
 // Initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
-  log("debug", "toasts.js", "DOMContentLoaded", "Initializing toast notifications");
+  log("debug", scriptName, "DOMContentLoaded", "Initializing toast notifications");
 
   // Initialize in a small delay to ensure DOM is ready
   setTimeout(() => {
