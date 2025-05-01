@@ -20,9 +20,9 @@ logger = get_logger()
 @dataclass
 class RenderSafelyConfig:
     template_path: str
+    context: WebContext
     error_message: str
     endpoint_name: str
-    context: Optional[WebContext] = None
 
 
 class LoggingUndefined(DebugUndefined):
@@ -187,9 +187,6 @@ def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, 
         The rendered template string, or an error tuple (body, status_code).
     """
     current_endpoint = render_safely_config.endpoint_name or request.endpoint or "unknown endpoint"
-    current_path = request.path
-
-    # Log request information
     logger.info(f"🔍 Routing to endpoint: {current_endpoint}")
     logger.info(f"🔍 Using template: {render_safely_config.template_path!r}")
     logger.debug(f"📝 Request ID: {id(request)}")
@@ -197,27 +194,29 @@ def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, 
     logger.debug(f"📝 Request path: {request.path}")
     logger.debug(f"📝 Request args: {request.args}")
     logger.debug(f"📝 Request headers: {dict(request.headers)}")
+
+    # Use Flask’s pre-configured environment so url_for, request, session, etc. are available
+    template_env = current_app.jinja_env
+
+    current_path = request.path
     logger.info(
         f"🔍 Attempting to render template {render_safely_config.template_path!r} for "
         f"{render_safely_config.endpoint_name!r} ({current_path!r})"
     )
     logger.debug(f"🔧 Context data: {render_safely_config.context}")
 
-    # Prepare context dictionary
     try:
-        context_dict = {} if render_safely_config.context is None else render_safely_config.context.to_dict()
-    except ValueError as ve:
-        logger.error(f"❌ Error converting context to dictionary: {ve}")
-        return handle_template_error(
-            ve,
-            render_safely_config.template_path,
-            render_safely_config.endpoint_name,
-            f"Error preparing data: {ve}",
-        )
+        try:
+            context_dict = render_safely_config.context.to_dict()
+        except ValueError as ve:
+            logger.error(f"❌ Error converting context to dictionary: {ve}")
+            return handle_template_error(
+                ve,
+                render_safely_config.template_path,
+                render_safely_config.endpoint_name,
+                f"Error preparing data: {ve}",
+            )
 
-    # Use Flask's pre-configured environment and render template
-    try:
-        template_env = current_app.jinja_env
         template = template_env.get_template(render_safely_config.template_path)
         logger.debug(f"Template {render_safely_config.template_path!r} loaded successfully")
 

@@ -21,6 +21,7 @@ def index():
         template_path="pages/misc/home.html",
         error_message="Error rendering dashboard home page",
         endpoint_name="index"
+        con
     )
 
     return render_safely(config)
