@@ -1,0 +1,365 @@
+I want you to give me a plan on splitting the js, html, and css code into separate files. Where necessary, I want you to combine code into a single file or split it across multiple files.
+
+If a HTML file can be removed and ported to js completely, do it. If a HTML file is going to be small and it would make sense to roll it into another file, do it. Do not make any breaking changes.
+
+Add docstrings for all files. And for HTML, add a header and footer like so:
+
+```
+<!-- START TEMPLATE: x/x.html -->
+<!-- END TEMPLATE: x/x.html -->
+```
+Before giving me code, give me a succinct explanation of your plan.
+
+REMEMBER, GIVE ME YOUR PLAN FIRST. DO NOT GIVE ME CODE UNTIL I ASK FOR IT.
+
+AND, DO NOT GIVE ME UPDATES TO EXISTING FILES. ASK FOR THEM BEFORE YOU UPDATE THEM.
+
+```
+.
+├── README Cleanup.html
+├── app
+│   ├── __init__.py
+│   ├── app.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   ├── capability.py
+│   │   ├── capability_category.py
+│   │   ├── company_capability.py
+│   │   ├── crisp_score.py
+│   │   ├── mixins.py
+│   │   ├── pages
+│   │   │   ├── __init__.py
+│   │   │   ├── company.py
+│   │   │   ├── contact.py
+│   │   │   ├── note.py
+│   │   │   ├── opportunity.py
+│   │   │   ├── setting.py
+│   │   │   ├── srs.py
+│   │   │   ├── task.py
+│   │   │   └── user.py
+│   │   ├── relationship.py
+│   │   └── table_config.py
+│   ├── routes
+│   │   ├── __init__.py
+│   │   ├── api
+│   │   │   ├── __init__.py
+│   │   │   ├── companies.py
+│   │   │   ├── contacts.py
+│   │   │   ├── context.py
+│   │   │   ├── json_utils.py
+│   │   │   ├── notes.py
+│   │   │   ├── opportunities.py
+│   │   │   ├── relationships.py
+│   │   │   ├── route_registration.py
+│   │   │   ├── search.py
+│   │   │   ├── srs.py
+│   │   │   ├── tasks.py
+│   │   │   └── users.py
+│   │   ├── api_router.py
+│   │   ├── base_context.py
+│   │   ├── web
+│   │   │   ├── __init__.py
+│   │   │   ├── auth.py
+│   │   │   ├── blueprint_factory.py
+│   │   │   ├── companies.py
+│   │   │   ├── components
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── autocomplete.py
+│   │   │   │   ├── json_validator.py
+│   │   │   │   ├── relationships.py
+│   │   │   │   ├── request_logger.py
+│   │   │   │   └── template_renderer.py
+│   │   │   ├── contacts.py
+│   │   │   ├── context.py
+│   │   │   ├── crisp_score.py
+│   │   │   ├── home.py
+│   │   │   ├── opportunities.py
+│   │   │   ├── relationships.py
+│   │   │   ├── route_registration.py
+│   │   │   ├── settings.py
+│   │   │   ├── srs.py
+│   │   │   ├── tasks.py
+│   │   │   └── users.py
+│   │   └── web_router.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── auth.py
+│   │   ├── category_service.py
+│   │   ├── crud_service.py
+│   │   ├── note_service.py
+│   │   ├── relationship_service.py
+│   │   ├── search_service.py
+│   │   ├── srs_service.py
+│   │   ├── user_service.py
+│   │   └── validator_mixin.py
+│   ├── static
+│   │   ├── js
+│   │   │   ├── components
+│   │   │   │   ├── autoComplete.js
+│   │   │   │   ├── buttons.js
+│   │   │   │   ├── form.js
+│   │   │   │   ├── modal.js
+│   │   │   │   ├── table.js
+│   │   │   │   ├── tabs.js
+│   │   │   │   └── toasts.js
+│   │   │   ├── core
+│   │   │   │   ├── config.js
+│   │   │   │   ├── events.js
+│   │   │   │   ├── logger.js
+│   │   │   │   ├── module.js
+│   │   │   │   └── utils.js
+│   │   │   ├── main.js
+│   │   │   ├── pages
+│   │   │   │   ├── common.js
+│   │   │   │   ├── entityList.js
+│   │   │   │   ├── entityView.js
+│   │   │   │   ├── notesSection.js
+│   │   │   │   └── srs
+│   │   │   │       └── review.js
+│   │   │   └── services
+│   │   │       ├── apiService.js
+│   │   │       ├── notificationService.js
+│   │   │       └── uiService.js
+│   │   └── js_old
+│   │       ├── apiService.js
+│   │       ├── autoComplete.js
+│   │       ├── logger.js
+│   │       ├── main.js
+│   │       ├── pages
+│   │       │   ├── create_view_edit.js
+│   │       │   ├── create_view_edit_contact.js
+│   │       │   ├── create_view_edit_task.js
+│   │       │   ├── edit.js
+│   │       │   ├── footer_buttons.js
+│   │       │   ├── header_buttons.js
+│   │       │   ├── index.js
+│   │       │   ├── notes_section.js
+│   │       │   ├── pills_nav.js
+│   │       │   └── table_template.js
+│   │       ├── table
+│   │       │   ├── tableConfig.js
+│   │       │   ├── tableInit.js
+│   │       │   └── tableUtils.js
+│   │       ├── table.js
+│   │       ├── toasts.js
+│   │       └── utils.js
+│   ├── templates
+│   │   ├── layouts
+│   │   │   ├── base.html
+│   │   │   ├── crud_base_view.html
+│   │   │   └── table_index.html
+│   │   ├── macros
+│   │   │   ├── crud_buttons.html
+│   │   │   ├── entity.html
+│   │   │   ├── forms.html
+│   │   │   ├── layout.html
+│   │   │   └── navigation.html
+│   │   ├── macros_old
+│   │   │   ├── card_old.html
+│   │   │   ├── developer.html
+│   │   │   ├── entity_old.html
+│   │   │   ├── form_components_old.html
+│   │   │   ├── form_old.html
+│   │   │   ├── tabs_old.html
+│   │   │   └── ui_old.html
+│   │   ├── macros_oldest
+│   │   │   ├── _notes_section_old.html
+│   │   │   ├── fields_old.html
+│   │   │   ├── render_form_fields_old.html
+│   │   │   ├── render_notes_old.html
+│   │   │   └── tabs_old.html
+│   │   ├── menus
+│   │   │   ├── nav_items.html
+│   │   │   ├── navbar.html
+│   │   │   └── sidebar.html
+│   │   ├── pages
+│   │   │   ├── companies
+│   │   │   │   ├── index.html
+│   │   │   │   ├── tabs
+│   │   │   │   │   ├── capabilities.html
+│   │   │   │   │   ├── contacts.html
+│   │   │   │   │   ├── general.html
+│   │   │   │   │   └── opportunities.html
+│   │   │   │   └── view.html
+│   │   │   ├── contacts
+│   │   │   │   ├── index.html
+│   │   │   │   ├── tabs
+│   │   │   │   │   ├── companies.html
+│   │   │   │   │   ├── general.html
+│   │   │   │   │   ├── professional.html
+│   │   │   │   │   ├── related.html
+│   │   │   │   │   └── technologies.html
+│   │   │   │   └── view.html
+│   │   │   ├── errors
+│   │   │   │   ├── 404.html
+│   │   │   │   └── 500.html
+│   │   │   ├── misc
+│   │   │   │   ├── admin.html
+│   │   │   │   ├── home.html
+│   │   │   │   ├── login.html
+│   │   │   │   ├── notes.html
+│   │   │   │   ├── settings.html
+│   │   │   │   └── tshoot.html
+│   │   │   ├── opportunities
+│   │   │   │   ├── index.html
+│   │   │   │   ├── tabs
+│   │   │   │   │   ├── companies.html
+│   │   │   │   │   ├── contacts.html
+│   │   │   │   │   ├── details.html
+│   │   │   │   │   ├── general.html
+│   │   │   │   │   └── related.html
+│   │   │   │   └── view.html
+│   │   │   ├── settings
+│   │   │   │   └── index.html
+│   │   │   ├── srs
+│   │   │   │   ├── base.html
+│   │   │   │   ├── create_card.html
+│   │   │   │   ├── create_category.html
+│   │   │   │   ├── dashboard.html
+│   │   │   │   ├── edit.html
+│   │   │   │   ├── filtered_cards.html
+│   │   │   │   ├── index.html
+│   │   │   │   ├── review.html
+│   │   │   │   └── view.html
+│   │   │   ├── tasks
+│   │   │   │   ├── index.html
+│   │   │   │   ├── tabs
+│   │   │   │   │   ├── details.html
+│   │   │   │   │   ├── general.html
+│   │   │   │   │   └── related.html
+│   │   │   │   └── view.html
+│   │   │   └── users
+│   │   │       ├── index.html
+│   │   │       ├── tabs
+│   │   │       │   ├── about.html
+│   │   │       │   ├── account.html
+│   │   │       │   ├── activity.html
+│   │   │       │   ├── permissions.html
+│   │   │       │   └── profile.html
+│   │   │       └── view.html
+│   │   ├── partials
+│   │   │   └── developer_tools.html
+│   │   └── shared_tabs
+│   │       └── notes.html
+│   ├── templates_old
+│   │   ├── base
+│   │   │   ├── common
+│   │   │   │   ├── _autocomplete.html
+│   │   │   │   ├── _footer_buttons.html
+│   │   │   │   ├── _pills_nav_content.html
+│   │   │   │   └── _table.html
+│   │   │   ├── core
+│   │   │   │   ├── _base.html
+│   │   │   │   ├── _debug_panel.html
+│   │   │   │   ├── _head.html
+│   │   │   │   ├── _navbar.html
+│   │   │   │   ├── _scripts.html
+│   │   │   │   └── _toasts.html
+│   │   │   ├── errors
+│   │   │   │   ├── 404.html
+│   │   │   │   └── 500.html
+│   │   │   └── macros
+│   │   │       ├── entity_macros.html
+│   │   │       ├── render_form_fields.html
+│   │   │       ├── render_notes.html
+│   │   │       └── tabs.html
+│   │   ├── page_templates
+│   │   │   ├── _create_view_edit.html
+│   │   │   ├── _entity_table.html
+│   │   │   └── components
+│   │   │       └── create_view_edit
+│   │   │           ├── _header_buttons.html
+│   │   │           ├── _header_heading.html
+│   │   │           └── _header_tabs.html
+│   │   ├── pages
+│   │   │   ├── companies
+│   │   │   │   ├── create.html
+│   │   │   │   ├── edit.html
+│   │   │   │   ├── index.html
+│   │   │   │   └── view.html
+│   │   │   ├── contacts
+│   │   │   │   ├── create.html
+│   │   │   │   ├── edit.html
+│   │   │   │   ├── index.html
+│   │   │   │   └── view.html
+│   │   │   ├── crud
+│   │   │   │   ├── create_view_edit_company.html
+│   │   │   │   ├── create_view_edit_contact.html
+│   │   │   │   ├── create_view_edit_opportunity.html
+│   │   │   │   ├── create_view_edit_srs_item.html
+│   │   │   │   ├── create_view_edit_task.html
+│   │   │   │   ├── create_view_edit_user.html
+│   │   │   │   └── sections
+│   │   │   │       ├── _about.html
+│   │   │   │       ├── _crisp.html
+│   │   │   │       ├── _fancy_notes_section.html
+│   │   │   │       ├── _meddpicc.html
+│   │   │   │       ├── _notes.html
+│   │   │   │       ├── _notes_section.html
+│   │   │   │       ├── _org_chart.html
+│   │   │   │       ├── _relationship_section.html
+│   │   │   │       └── old_notes_tab.html
+│   │   │   ├── misc
+│   │   │   │   ├── admin.html
+│   │   │   │   ├── home.html
+│   │   │   │   ├── login.html
+│   │   │   │   ├── notes.html
+│   │   │   │   ├── settings.html
+│   │   │   │   └── tshoot.html
+│   │   │   ├── opportunities
+│   │   │   │   ├── create.html
+│   │   │   │   ├── edit.html
+│   │   │   │   ├── index.html
+│   │   │   │   └── view.html
+│   │   │   ├── srs
+│   │   │   │   ├── create.html
+│   │   │   │   ├── edit.html
+│   │   │   │   ├── index.html
+│   │   │   │   └── view.html
+│   │   │   ├── tables
+│   │   │   │   └── srs_items.html
+│   │   │   ├── tasks
+│   │   │   │   ├── create.html
+│   │   │   │   ├── edit.html
+│   │   │   │   ├── index.html
+│   │   │   │   └── view.html
+│   │   │   └── users
+│   │   │       ├── create.html
+│   │   │       ├── edit.html
+│   │   │       ├── index.html
+│   │   │       └── view.html
+│   │   └── relationship
+│   │       └── add.html
+│   └── utils
+│       ├── app_logging.py
+│       ├── model_registry.py
+│       └── router_utils.py
+├── config.py
+├── db_setup.py
+└── tests
+    ├── __init__.py
+    ├── conftest.py
+    ├── conftest_skip.py
+    ├── fixtures
+    │   ├── __init__.py
+    │   └── mock_data.py
+    ├── functional
+    │   ├── __init__.py
+    │   ├── test_auth_flow.py
+    │   ├── test_auth_flow_simple.py
+    │   └── test_mock_auth.py
+    ├── mark_db_tests.py
+    ├── skip_db_tests.py
+    └── unit
+        ├── __init__.py
+        ├── models
+        │   ├── __init__.py
+        │   └── test_user_model.py
+        ├── test_auth_additional.py
+        ├── test_auth_basic.py
+        ├── test_auth_routes.py
+        ├── test_basic.py
+        ├── test_login_redirect.py
+        └── test_login_view.py
+```
