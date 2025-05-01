@@ -13,6 +13,7 @@ from markupsafe import Markup, escape
 
 from app.routes.web.context import WebContext
 from app.utils.app_logging import get_logger
+from app.utils.app_logging import get_logger, log_message_and_variables
 
 logger = get_logger()
 
@@ -103,7 +104,7 @@ def get_jinja_variables(context_dict):
         jinja_variables[key] = flask_value
 
     # Log all variables being returned
-    logger.info(f"Jinja variables: {jinja_variables}")
+    log_message_and_variables("Jinja variables:", jinja_variables)
 
     return jinja_variables
 

@@ -1,12 +1,9 @@
 {# ------------------------------------------------------------------------------
   File: navbar.html | Purpose: Top nav bar with search, nav items, user menu
-  Inputs:
-    - request.endpoint: Active Flask route
-    - current_user: Flask-Login user object
+  Imports:
+    - navigation.html: For shared navigation items
   Variables:
-    - nav_items: List of nav entries (name, display_name, icon)
-  Blocks:
-    - additional_nav_items: Inject custom nav links
+    - current_user: Flask-Login user object
   Features:
     - Bootstrap 5 responsive nav
     - Dynamic user avatar and links
@@ -14,33 +11,12 @@
 ------------------------------------------------------------------------------ #}
 
 {%- set scriptName = 'navbar.html' -%}
-{%- set nav_items = [
-  {'name': 'companies', 'display_name': 'Companies', 'icon': 'fa-building'},
-  {'name': 'contacts', 'display_name': 'Contacts', 'icon': 'fa-address-card'},
-  {'name': 'opportunities', 'display_name': 'Opportunities', 'icon': 'fa-chart-line'},
-  {'name': 'users', 'display_name': 'Users', 'icon': 'fa-users'},
-  {'name': 'tasks', 'display_name': 'Tasks', 'icon': 'fa-tasks'},
-  {'name': 'settings', 'display_name': 'Settings', 'icon': 'fa-cog'}
-] -%}
+{% from 'macros/navigation.html' import get_endpoint, is_active, get_url %}
+{% include 'menus/nav_items.html' %}
 
-{# Log Initial Template Load #}
 <script type="module">
   import log from '{{ url_for('static', filename='js/core/logger.js') }}';
   log("info", "{{ scriptName }}", "init", "🚀 Template {{ scriptName }} loaded");
-
-  // Use JSON.parse to handle the HTML-encoded data
-  log("debug", "{{ scriptName }}", "vars", "Available variables:", {{ nav_items }});
-
-  log("debug", "{{ scriptName }}", "context", "Current endpoint: {{ request.endpoint }}");
-  log("debug", "{{ scriptName }}", "auth", "User authenticated: {{ current_user.is_authenticated }}");
-</script>
-
-
-{# Set Context Variables (precompute values to avoid inline logic in HTML) #}
-{% set show_navbar = show_navbar %}
-<script type="module">
-  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-  log("debug", "{{ scriptName }}", "context", "show_navbar value: {{ show_navbar }}");
 </script>
 
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top bg-white">
@@ -49,7 +25,7 @@
     log("debug", "{{ scriptName }}", "render", "Rendering navbar container");
   </script>
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="/static">
+    <a class="navbar-brand d-flex align-items-center" href="/">
       <div class="brand-icon-container me-2"><i class="fas fa-building"></i></div>
       <span class="fw-bold">CRM Dashboard</span>
     </a>
@@ -58,6 +34,7 @@
       log("debug", "{{ scriptName }}", "render", "Brand logo rendered");
     </script>
 
+    <!-- Mobile toggle for navbar -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
       aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
       <i class="fas fa-bars"></i>
@@ -68,53 +45,28 @@
         import log from '{{ url_for('static', filename='js/core/logger.js') }}';
         log("debug", "{{ scriptName }}", "render", "Starting nav items rendering");
       </script>
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        {%- for item in nav_items %}
-          {# Updated to include the _bp suffix for blueprint endpoints #}
-          {%- if item.name == 'settings' %}
-            {%- set endpoint = 'settings_bp.index' -%}
-          {%- elif item.name == 'relationships' %}
-            {%- set endpoint = 'relationships_bp.index' -%}
-          {%- elif item.name == 'crisp_scores' %}
-            {%- set endpoint = 'crisp_scores_bp.index' -%}
-          {%- else %}
-            {%- set endpoint = item.name + '_bp.index' -%}
-          {%- endif %}
 
-          {# Check if current endpoint matches this nav item's endpoint #}
-          {%- if item.name == 'settings' %}
-            {%- set is_active = request.endpoint == 'settings_bp.index' -%}
-          {%- elif item.name == 'relationships' %}
-            {%- set is_active = request.endpoint == 'relationships_bp.index' -%}
-          {%- elif item.name == 'crisp_scores' %}
-            {%- set is_active = request.endpoint == 'crisp_scores_bp.index' -%}
-          {%- else %}
-            {%- set is_active = request.endpoint and request.endpoint.startswith(item.name + '_bp.') -%}
-          {%- endif %}
+      <!-- Navigation Items (hidden on mobile as they'll be in sidebar) -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-none d-lg-flex">
+        {% for item in nav_items %}
+          {% set endpoint = get_endpoint(item) %}
+          {% set is_active_item = is_active(item) %}
+          {% set item_url = get_url(item) %}
 
           <li class="nav-item">
-            <a class="nav-link {% if is_active %}active{% endif %}"
-               {# Updated URL generation for the renamed routes with blueprint prefixes #}
-               {% if item.name == 'settings' %}
-                 href="{{ url_for('settings_bp.index') }}"
-               {% elif item.name == 'relationships' %}
-                 href="{{ url_for('relationships_bp.index') }}"
-               {% elif item.name == 'crisp_scores' %}
-                 href="{{ url_for('crisp_scores_bp.index') }}"
-               {% else %}
-                 href="{{ url_for(item.name + '_bp.index') }}"
-               {% endif %}
-               {% if is_active %}aria-current="page"{% endif %}>
+            <a class="nav-link {% if is_active_item %}active{% endif %}"
+               href="{{ item_url }}"
+               {% if is_active_item %}aria-current="page"{% endif %}>
               <i class="fas {{ item.icon }} nav-icon me-1"></i>
               {{ item.display_name }}
-              {% if is_active %}<span class="visually-hidden">(current)</span>{% endif %}
+              {% if is_active_item %}<span class="visually-hidden">(current)</span>{% endif %}
             </a>
           </li>
           <script type="module">
             import log from '{{ url_for('static', filename='js/core/logger.js') }}';
             log("debug", "{{ scriptName }}", "nav_item", "Rendered nav item: {{ item.name }}");
           </script>
-        {%- endfor %}
+        {% endfor %}
 
         {% block additional_nav_items %}
           <!-- Custom nav items injected here -->
@@ -125,6 +77,7 @@
         {% endblock %}
       </ul>
 
+      <!-- Search Bar -->
       <div class="d-none d-md-flex search-container me-3">
         <div class="input-group">
           <span class="input-group-text border-0 bg-transparent"><i class="fas fa-search"></i></span>
@@ -143,6 +96,7 @@
         </button>
       </div>
 
+      <!-- Notifications -->
       <div class="notification-icon me-3 d-none d-md-block">
         <a href="#" class="position-relative">
           <i class="fas fa-bell"></i>
@@ -152,6 +106,7 @@
         </a>
       </div>
 
+      <!-- User Menu -->
       <div class="user-menu">
         <script type="module">
           import log from '{{ url_for('static', filename='js/core/logger.js') }}';
@@ -223,71 +178,6 @@
   </div>
 </nav>
 
-<!-- Check DOM loaded status -->
-<script type="module">
-  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-  document.addEventListener('DOMContentLoaded', () => {
-    log("info", "{{ scriptName }}", "dom", "DOM fully loaded and navbar visible");
-    // Check if navbar is actually visible
-    const navbar = document.querySelector('nav.navbar');
-    if (navbar) {
-      log("info", "{{ scriptName }}", "verify", "📏 Navbar dimensions: " + navbar.offsetWidth + "x" + navbar.offsetHeight);
-      // Log CSS computed styles to check visibility
-      const styles = window.getComputedStyle(navbar);
-      log("debug", "{{ scriptName }}", "styles", "Navbar display: " + styles.display + ", visibility: " + styles.visibility);
-    } else {
-      log("error", "{{ scriptName }}", "verify", "❌ Navbar element not found in DOM");
-    }
-  });
-</script>
-
-<!-- Bootstrap JS error checking -->
-<script type="module">
-  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-  setTimeout(() => {
-    if (typeof bootstrap !== 'undefined') {
-      log("info", "{{ scriptName }}", "deps", "Bootstrap JS is loaded");
-    } else {
-      log("error", "{{ scriptName }}", "deps", "❌ Bootstrap JS not found - navigation may not work");
-    }
-    // Check if FontAwesome is loaded by testing an icon
-    const iconElement = document.querySelector('.fas');
-    if (iconElement) {
-      const iconStyle = window.getComputedStyle(iconElement, ':before');
-      if (iconStyle.content && iconStyle.content !== 'none' && iconStyle.content !== 'normal') {
-        log("info", "{{ scriptName }}", "deps", "FontAwesome icons loaded correctly");
-      } else {
-        log("error", "{{ scriptName }}", "deps", "❌ FontAwesome icons not rendering properly");
-      }
-    }
-  }, 500);
-</script>
-
-<!-- Log Final Template Render -->
-<script type="module">
-  import log from '{{ url_for('static', filename='js/core/logger.js') }}';
-  log("info", "{{ scriptName }}", "final", "Navbar rendered successfully");
-</script>
-
-<!-- JavaScript for Theme Toggle - Make the function globally available -->
-<script>
-  // Make toggleTheme globally available
-  window.toggleTheme = function() {
-    const currentTheme = document.body.getAttribute('data-theme');
-    if (currentTheme === 'dark') {
-      document.body.setAttribute('data-theme', 'light');
-    } else {
-      document.body.setAttribute('data-theme', 'dark');
-    }
-  }
-
-  // Add event listener after DOM is loaded
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('themeToggleBtn').addEventListener('click', window.toggleTheme);
-  });
-</script>
-
-<!-- Theme button styles -->
 <style>
   /* Theme Toggle Button Styles */
   .btn-icon {
@@ -304,7 +194,7 @@
     color: #000;
   }
 
-  /* Optional dark mode styles */
+  /* Dark mode styles */
   [data-theme="dark"] .btn-icon {
     color: #e9ecef;
   }
@@ -312,6 +202,17 @@
   [data-theme="dark"] .btn-icon:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: #fff;
+  }
+
+  [data-theme="dark"] .navbar {
+    background-color: #212529 !important;
+    border-bottom: 1px solid #343a40;
+  }
+
+  [data-theme="dark"] .navbar-brand,
+  [data-theme="dark"] .nav-link,
+  [data-theme="dark"] .user-name {
+    color: #e9ecef;
   }
 
   /* Notification Badge */

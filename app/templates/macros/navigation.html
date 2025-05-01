@@ -1,0 +1,40 @@
+{# ------------------------------------------------------------------------------
+  File: navigation.html | Purpose: Define shared navigation item utility macros
+  This file contains utility macros for navigation without the get_nav_items macro
+------------------------------------------------------------------------------ #}
+
+{% macro get_endpoint(item) %}
+  {%- if item.name == 'settings' %}
+    {{- 'settings_bp.index' -}}
+  {%- elif item.name == 'relationships' %}
+    {{- 'relationships_bp.index' -}}
+  {%- elif item.name == 'crisp_scores' %}
+    {{- 'crisp_scores_bp.index' -}}
+  {%- else %}
+    {{- item.name + '_bp.index' -}}
+  {%- endif %}
+{% endmacro %}
+
+{% macro is_active(item) %}
+  {%- if item.name == 'settings' %}
+    {{- request.endpoint == 'settings_bp.index' -}}
+  {%- elif item.name == 'relationships' %}
+    {{- request.endpoint == 'relationships_bp.index' -}}
+  {%- elif item.name == 'crisp_scores' %}
+    {{- request.endpoint == 'crisp_scores_bp.index' -}}
+  {%- else %}
+    {{- request.endpoint and request.endpoint.startswith(item.name + '_bp.') -}}
+  {%- endif %}
+{% endmacro %}
+
+{% macro get_url(item) %}
+  {%- if item.name == 'settings' %}
+    {{- url_for('settings_bp.index') -}}
+  {%- elif item.name == 'relationships' %}
+    {{- url_for('relationships_bp.index') -}}
+  {%- elif item.name == 'crisp_scores' %}
+    {{- url_for('crisp_scores_bp.index') -}}
+  {%- else %}
+    {{- url_for(item.name + '_bp.index') -}}
+  {%- endif %}
+{% endmacro %}

@@ -37,9 +37,9 @@ def log_instance_vars(instance_details, instance, exclude: list[str] = None) -> 
         logger.info("  ℹ️ (No exclusions)")
 
 
-def log_message_and_vars(message: str, vars: dict) -> None:
+def log_message_and_variables(message: str, variables: dict) -> None:
     logger.info(message)
-    for key, value in vars.items():
+    for key, value in variables.items():
         logger.info(f"  📝 {key}: {value}")
 
 

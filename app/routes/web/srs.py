@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS
 from app.services.srs_service import SRSService
 from app.routes.web.blueprint_factory import create_crud_blueprint, BlueprintConfig
-from app.utils.app_logging import get_logger, log_message_and_vars
+from app.utils.app_logging import get_logger, log_message_and_variables
 
 logger = get_logger()
 
@@ -400,7 +400,7 @@ def filtered_cards():
     }
 
     template_name = "pages/srs/filtered_cards.html"
-    log_message_and_vars(f"📄 Vars being sent to template:", template_data)
+    log_message_and_variables(f"📄 Vars being sent to template:", template_data)
     logger.info(f"📄 Rendering template: {template_name}")
     return render_template(template_name, **template_data)
 
