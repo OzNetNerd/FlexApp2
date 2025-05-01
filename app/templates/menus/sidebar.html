@@ -8,8 +8,6 @@
     - Toggle button for expanding/collapsing
 ------------------------------------------------------------------------------ #}
 
-{% from 'macros/navigation.html' import get_endpoint, is_active, get_url %}
-
 <div id="sidebar" class="sidebar">
   <div class="sidebar-header">
     <a class="sidebar-brand d-flex align-items-center" href="/">
@@ -24,12 +22,10 @@
   <div class="sidebar-content">
     <ul class="sidebar-nav">
       {% for item in navbar_entries %}
-        {% set endpoint = get_endpoint(item) %}
-        {% set is_active_item = is_active(item) %}
-        {% set item_url = item.url|default(get_url(item)) %}
+        {% set is_active_item = request.path == item.url %}
 
         <li class="sidebar-item {% if is_active_item %}active{% endif %}">
-          <a href="{{ item_url }}" class="sidebar-link" {% if is_active_item %}aria-current="page"{% endif %}>
+          <a href="{{ item.url }}" class="sidebar-link" {% if is_active_item %}aria-current="page"{% endif %}>
             <i class="fas fa-{{ item.icon|default('circle') }} sidebar-icon"></i>
             <span class="sidebar-text">{{ item.name }}</span>
             {% if is_active_item %}<span class="active-indicator"></span>{% endif %}

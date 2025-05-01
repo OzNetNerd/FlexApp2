@@ -8,8 +8,6 @@
     - Dynamic user avatar and links
 ------------------------------------------------------------------------------ #}
 
-{% from 'macros/navigation.html' import get_endpoint, is_active, get_url %}
-
 <!-- Link to CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 
@@ -30,13 +28,11 @@
       <!-- Navigation Items (hidden on mobile as they'll be in sidebar) -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-none d-lg-flex">
         {% for item in navbar_entries %}
-          {% set endpoint = get_endpoint(item) %}
-          {% set is_active_item = is_active(item) %}
-          {% set item_url = item.url|default(get_url(item)) %}
+          {% set is_active_item = request.path == item.url %}
 
           <li class="nav-item">
             <a class="nav-link {% if is_active_item %}active{% endif %}"
-               href="{{ item_url }}"
+               href="{{ item.url }}"
                {% if is_active_item %}aria-current="page"{% endif %}>
               <i class="fas fa-{{ item.icon }} nav-icon me-1"></i>
               {{ item.name }}
