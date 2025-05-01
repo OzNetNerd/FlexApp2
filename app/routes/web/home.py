@@ -19,7 +19,6 @@ def index():
     # Create configuration for render_safely
     config = RenderSafelyConfig(
         template_path="pages/misc/home.html",
-        context=None,
         error_message="Error rendering dashboard home page",
         endpoint_name="index"
     )
