@@ -4,7 +4,7 @@ from datetime import datetime, UTC, timedelta  # Added timedelta import
 from app.models.pages.srs import SRS
 from app.services.srs_service import SRSService
 from app.routes.web.blueprint_factory import create_crud_blueprint, BlueprintConfig
-from app.utils.app_logging import get_logger
+from app.utils.app_logging import get_logger, log_message_and_vars
 
 logger = get_logger()
 
@@ -398,8 +398,10 @@ def filtered_cards():
         "now": datetime.now(UTC),  # For comparing with due dates
     }
 
-    logger.info("Rendering filtered cards view")
-    return render_template("pages/srs/filtered_cards.html", **template_data)
+    template_name = "pages/srs/filtered_cards.html"
+    log_message_and_vars(f"📄 Rendering template: {template_name}", template_data)
+    return render_template(template_name, **template_data)
+
 
 
 @srs_bp.route("/batch-action", methods=["POST"])
