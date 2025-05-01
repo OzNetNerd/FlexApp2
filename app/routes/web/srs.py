@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from flask_login import login_required, current_user
-from datetime import datetime, UTC, timedelta  # Added timedelta import
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS
 from app.services.srs_service import SRSService
 from app.routes.web.blueprint_factory import create_crud_blueprint, BlueprintConfig
@@ -395,7 +396,7 @@ def filtered_cards():
         "learning_stages": learning_stages,
         "difficulty_counts": difficulty_counts,
         "performance_counts": performance_counts,
-        "now": datetime.now(UTC),  # For comparing with due dates
+        "now": datetime.now(ZoneInfo("UTC")),
     }
 
     template_name = "pages/srs/filtered_cards.html"
@@ -436,7 +437,7 @@ def batch_action():
                     "ease_factor": DEFAULT_EASE_FACTOR,
                     "review_count": 0,
                     "successful_reps": 0,
-                    "next_review_at": datetime.now(UTC),
+                    "next_review_at": datetime.now(ZoneInfo("UTC")),
                     "last_reviewed_at": None,
                     "last_rating": None,
                 }
@@ -512,18 +513,18 @@ def add_card():
             "interval": 0,
             "review_count": 0,
             "successful_reps": 0,
-            "created_at": datetime.now(UTC),
-            "updated_at": datetime.now(UTC),
+            "created_at": datetime.now(ZoneInfo("UTC")),
+            "updated_at": datetime.now(ZoneInfo("UTC")),
         }
 
         # Set review date to today if immediate review requested
         if review_immediately:
             logger.info("Setting card for immediate review")
-            new_card["next_review_at"] = datetime.now(UTC)
+            new_card["next_review_at"] = datetime.now(ZoneInfo("UTC"))
         else:
             # Set review date to tomorrow by default
             logger.info("Setting card for review tomorrow")
-            new_card["next_review_at"] = datetime.now(UTC).replace(hour=0, minute=0, second=0,
+            new_card["next_review_at"] = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0,
                                                                    microsecond=0) + timedelta(days=1)
 
         # Save the card

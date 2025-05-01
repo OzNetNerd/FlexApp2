@@ -1,4 +1,5 @@
-from datetime import UTC, datetime
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from sqlalchemy.orm import relationship
 
 from app.models.base import db, BaseModel
@@ -68,7 +69,10 @@ class ReviewHistory(BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     srs_item_id = db.Column(db.Integer, db.ForeignKey("srs.id"))
-    timestamp = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    timestamp = db.Column(
+        db.DateTime(timezone=True),
+        default=lambda: datetime.now(ZoneInfo("UTC"))
+    )
     rating = db.Column(db.Integer)
     interval = db.Column(db.Float)
     ease_factor = db.Column(db.Float)
