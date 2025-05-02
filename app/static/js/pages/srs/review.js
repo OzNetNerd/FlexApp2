@@ -233,11 +233,28 @@ function submitReview() {
     return false; // Prevent default action
   }
 
+  // Update the rating display in the modal
+  document.getElementById('modal-rating-display').textContent = rating;
+
+  // Show the confirmation modal
+  const confirmModal = new bootstrap.Modal(document.getElementById('confirmReviewModal'));
+  confirmModal.show();
+
+  // Return false to prevent default action
+  return false;
+}
+
+// New function to handle the actual submission after confirmation
+function confirmAndSubmitReview() {
+  const answerGiven = document.querySelector('textarea[name="answer_given"]').value || "";
+  const rating = parseInt(document.getElementById('rating-select').value);
+
+  // Close the modal
+  const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmReviewModal'));
+  confirmModal.hide();
+
   // Call the function to submit the review
   submitReviewToServer(answerGiven, rating);
-
-  // Return false to prevent default action if this is used as an onclick handler
-  return false;
 }
 
 // Function for submitting the review to the server

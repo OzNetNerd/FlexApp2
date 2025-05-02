@@ -119,6 +119,21 @@
 {% endset %}
 
 {{ modals.notification('finishedModal', 'Review Complete!', content, footer) }}
+
+<!-- Review Confirmation Modal -->
+{% set confirm_content %}
+<p>Are you sure you want to submit this review with rating <strong><span id="modal-rating-display"></span></strong>?</p>
+<div class="text-center mt-3 mb-2">
+  <i class="bi bi-question-circle text-primary" style="font-size: 3rem;"></i>
+</div>
+{% endset %}
+
+{% set confirm_footer %}
+{{ buttons.icon_button(onclick="confirmAndSubmitReview()", class="btn", colour="success", icon="check", text="Confirm") }}
+{{ buttons.icon_button(onclick="dismissConfirmModal()", class="btn", colour="secondary", icon="x", text="Cancel") }}
+{% endset %}
+
+{{ modals.notification('confirmReviewModal', 'Confirm Review', confirm_content, confirm_footer) }}
 {% endblock %}
 
 {% block srs_scripts %}
