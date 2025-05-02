@@ -202,6 +202,9 @@ document.getElementById('review-form').addEventListener('submit', function (e) {
   // Show the rating section
   document.getElementById('rating-section').classList.remove('d-none');
 
+  // Show the rating controls
+  document.getElementById('rating-controls').classList.remove('d-none');
+
   // Hide the original submit button
   const submitBtn = document.getElementById('submit-btn');
   submitBtn.style.display = 'none';
@@ -227,8 +230,8 @@ document.getElementById('review-form').addEventListener('submit', function (e) {
     submitReview(answerGiven, rating);
   });
 
-  // Add the next button to the submit container
-  submitBtn.parentNode.appendChild(nextBtn);
+  // Add the next button to the container
+  document.getElementById('next-button-container').appendChild(nextBtn);
 });
 
 // Function for submitting the review
@@ -296,7 +299,6 @@ async function submitReview(answerGiven, rating) {
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Page loaded, initializing...");
   document.getElementById('rating-slider').value = "";
-  // Remove the line that disables the submit button
   fetchPreviewIntervals();
   updateAllRatingLabels();
   updateProgressBar(0);
