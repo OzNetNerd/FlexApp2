@@ -9,86 +9,93 @@
 
 {% block srs_content %}
   <!-- Question Card -->
-  {{ section_card('question-circle', 'Question', 'text-primary', 'bg-primary-subtle', entity.question) }}
+  <div class="mb-4">
+    {{ section_card('question-circle', 'Question', 'text-primary', 'bg-primary-subtle', entity.question) }}
+  </div>
 
-<!-- Answer Card -->
-{% call section_card(
-    icon="pencil-square",
-    title="Your Answer",
-    text_color="text-success",
-    bg_color="bg-success-subtle"
-) %}
-  <form id="review-form" data-entity-id="{{ entity.id }}">
-    {{ csrf_input }}
-    <div class="mb-4">
-      <textarea
-        name="answer_given"
-        class="form-control"
-        rows="4"
-        placeholder="Type your answer here..."
-        autofocus></textarea>
-    </div>
-    <div class="d-flex justify-content-end">
-      <button type="submit" id="submit-btn" class="btn btn-primary">
-        <i class="bi bi-check-circle me-1"></i> Submit
-      </button>
-    </div>
-  </form>
-{% endcall %}
+  <!-- Answer Card -->
+  <div class="mb-4">
+    {% call section_card(
+        icon="pencil-square",
+        title="Your Answer",
+        text_color="text-success",
+        bg_color="bg-success-subtle"
+    ) %}
+      <form id="review-form" data-entity-id="{{ entity.id }}">
+        {{ csrf_input }}
+        <div class="mb-4">
+          <textarea
+            name="answer_given"
+            class="form-control"
+            rows="4"
+            placeholder="Type your answer here..."
+            autofocus></textarea>
+        </div>
+        <div class="d-flex justify-content-end">
+          <button type="submit" id="submit-btn" class="btn btn-primary">
+            <i class="bi bi-check-circle me-1"></i> Submit
+          </button>
+        </div>
+      </form>
+    {% endcall %}
+  </div>
 
-<div class="row mb-4 d-none" id="rating-section">
-  <div class="col-md-6 d-flex align-items-end justify-content-end">
-    <div class="text-muted small me-3">
-      {% if entity.last_reviewed %}
-      <div>Last reviewed: {{ entity.last_reviewed.strftime('%Y-%m-%d') }}</div>
-      {% endif %}
-      {% if entity.due_date %}
-      <div>Next review: {{ entity.due_date.strftime('%Y-%m-%d') }}</div>
-      {% endif %}
+  <div class="d-none" id="rating-section">
+    <div class="col-md-6 d-flex align-items-end justify-content-end">
+      <div class="text-muted small me-3">
+        {% if entity.last_reviewed %}
+        <div>Last reviewed: {{ entity.last_reviewed.strftime('%Y-%m-%d') }}</div>
+        {% endif %}
+        {% if entity.due_date %}
+        <div>Next review: {{ entity.due_date.strftime('%Y-%m-%d') }}</div>
+        {% endif %}
+      </div>
     </div>
   </div>
-</div>
 
-<div id="answer-container" class="border rounded p-3 mb-3 bg-light d-none">
-  <h5 class="text-muted"><i class="bi bi-check-circle me-2"></i>Correct Answer</h5>
-  <div>{{ entity.answer }}</div>
-</div>
+  <div id="answer-container" class="d-none mb-4">
+    {% call section_card("check-circle", "Correct Answer", "text-info", "bg-info-subtle") %}
+      {{ entity.answer }}
+    {% endcall %}
+  </div>
 
-<div id="rating-controls" class="d-none">
-  <div class="col-md-6">
-    <label class="form-label fw-bold">How well did you know this?</label>
-    <div class="rating-container d-flex align-items-start gap-3">
-      <div>
-        <input type="range" class="form-range" id="rating-slider" min="0" max="5" value=""
-              oninput="updateRating(this.value)" title="Drag to select rating">
-        <div class="small text-muted mt-1">
-          Delay: <span id="delay-preview">(select rating)</span>
+  <div id="rating-controls" class="d-none mb-4">
+    {% call section_card("star-half", "Knowledge Rating", "text-warning", "bg-warning-subtle") %}
+      <div class="col-md-6">
+        <label class="form-label fw-bold">How well did you know this?</label>
+        <div class="rating-container d-flex align-items-start gap-3">
+          <div>
+            <input type="range" class="form-range" id="rating-slider" min="0" max="5" value=""
+                  oninput="updateRating(this.value)" title="Drag to select rating">
+            <div class="small text-muted mt-1">
+              Delay: <span id="delay-preview">(select rating)</span>
+            </div>
+          </div>
+          <select name="rating" id="rating-select" class="form-select" style="width: 180px"
+                  onchange="updateSlider(this.value)" required>
+            <option value="" selected disabled>-- Select rating --</option>
+            <option value="0">0 - No recall</option>
+            <option value="1">1 - Failed</option>
+            <option value="2">2 - Difficult</option>
+            <option value="3">3 - Hesitant</option>
+            <option value="4">4 - Easy</option>
+            <option value="5">5 - Perfect</option>
+          </select>
         </div>
       </div>
-      <select name="rating" id="rating-select" class="form-select" style="width: 180px"
-              onchange="updateSlider(this.value)" required>
-        <option value="" selected disabled>-- Select rating --</option>
-        <option value="0">0 - No recall</option>
-        <option value="1">1 - Failed</option>
-        <option value="2">2 - Difficult</option>
-        <option value="3">3 - Hesitant</option>
-        <option value="4">4 - Easy</option>
-        <option value="5">5 - Perfect</option>
-      </select>
-    </div>
-  </div>
 
-  <div class="mt-3">
-    <div class="progress" style="height: 6px;">
-      <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%;"
-          aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-    </div>
+      <div class="mt-3">
+        <div class="progress" style="height: 6px;">
+          <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%;"
+              aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+    {% endcall %}
   </div>
 
   <div id="next-button-container" class="d-flex justify-content-end mt-3">
     <!-- Next button will be inserted here by JavaScript -->
   </div>
-</div>
 {% endblock %}
 
 {% block modals %}
