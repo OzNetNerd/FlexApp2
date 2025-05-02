@@ -10,38 +10,40 @@
 <div class="card mb-4 shadow-sm">
   <div class="container-fluid mt-3">
     <div class="row mb-3">
-      <div class="col-12 d-flex align-items-center">
+      <div class="col-md-3">
         {% if show_heading|default(true) %}
-          <h1 class="h3 mb-0 me-auto">{{ entity_title|default('Items') }}</h1>
+          <h1 class="h3 mb-0">{{ entity_title|default('Items') }}</h1>
         {% endif %}
+      </div>
 
-        <div class="d-flex align-items-center">
-          <div class="input-group input-group-sm me-2" style="width: 150px;">
-            <span class="input-group-text"><i class="fas fa-search"></i></span>
-            <input type="text" id="globalSearch" class="form-control" placeholder="Search...">
-          </div>
+      <div class="col-md-6 d-flex justify-content-center align-items-center">
+        <div class="input-group me-2" style="width: 80%;">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
+          <input type="text" id="globalSearch" class="form-control" placeholder="Search...">
+        </div>
 
-          {% block action_buttons %}
-            {{ buttons.add(entity_base_route, entity_type="Company") }}
-          {% endblock %}
-
-          {% block extra_action_buttons %}{% endblock %}
-
-          <div class="dropdown ms-2">
-            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="columnSelectorBtn" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="fas fa-columns me-1"></i> Columns
-            </button>
-            <div class="dropdown-menu p-3" style="width: 250px;" aria-labelledby="columnSelectorBtn">
-              <div class="d-flex justify-content-between mb-2">
-                <button id="selectAllColumns" class="btn btn-sm btn-outline-primary">Select All</button>
-                <button id="clearAllColumns" class="btn btn-sm btn-outline-secondary">Clear All</button>
-              </div>
-              <div id="columnSelectorItems" class="mt-2">
-                <!-- Column checkboxes will be added here dynamically -->
-              </div>
+        <div class="dropdown ms-2">
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="columnSelectorBtn" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-columns me-1"></i> Columns
+          </button>
+          <div class="dropdown-menu p-3" style="width: 16rem;" aria-labelledby="columnSelectorBtn">
+            <div class="d-flex justify-content-between mb-2">
+              {{ buttons.icon_button(type="button", class="btn btn-sm", colour="outline-primary", icon="check-square", text="Select All", onclick="", form="selectAllColumns") }}
+              {{ buttons.icon_button(type="button", class="btn btn-sm", colour="outline-secondary", icon="square", text="Clear All", onclick="", form="clearAllColumns") }}
+            </div>
+            <div id="columnSelectorItems" class="mt-2">
+              <!-- Column checkboxes will be added here dynamically -->
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="col-md-3 d-flex justify-content-end align-items-center">
+        {% block action_buttons %}
+          {{ buttons.add(entity_base_route, entity_type="Company") }}
+        {% endblock %}
+
+        {% block extra_action_buttons %}{% endblock %}
       </div>
     </div>
 
@@ -87,7 +89,7 @@
                  class="ag-theme-alpine"
                  data-api-url="{{ api_url|default('') }}"
                  data-entity-name="{{ entity_name|default('item') }}"
-                 style="height: 600px; width: 100%;">
+                 style="min-height: 40rem; width: 100%;">
             </div>
           </div>
         </div>
@@ -99,6 +101,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.min.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/components/table.js') }}"></script>
 {% endblock %}
-
 
 <!-- END TEMPLATE: layouts/table_index.html -->
