@@ -1,22 +1,27 @@
 {% macro section_card(icon, title, text_color="text-primary", bg_color="bg-primary-subtle", content="") %}
   <div class="card shadow-sm mb-4">
     <div class="card-header {{ bg_color }} d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 {{ text_color }}"><i class="bi bi-{{ icon }} me-2"></i>{{ title }}</h5>
+      <h5 class="mb-0 {{ text_color }}">
+        <i class="bi bi-{{ icon }} me-2"></i>{{ title }}
+      </h5>
     </div>
     <div class="card-body">
       {% if caller %}
         {{ caller() }}
       {% else %}
-        <p class="card-text fs-6">{{ content }}</p>
+        <p class="card-text fs-6 mb-0">{{ content }}</p>
       {% endif %}
     </div>
   </div>
 {% endmacro %}
 
-
 {% macro notification_card(icon, title, text_color="text-muted", bg_color="bg-light", content="") %}
   <div class="border rounded p-3 mb-3 {{ bg_color }}">
-    <h5 class="{{ text_color }}"><i class="bi bi-{{ icon }} me-2"></i>{{ title }}</h5>
-    <div>{{ content }}</div>
+    <h5 class="{{ text_color }}">
+      <i class="bi bi-{{ icon }} me-2"></i>{{ title }}
+    </h5>
+    <div class="mt-2">
+      <p class="card-text fs-6 mb-0">{{ content }}</p>
+    </div>
   </div>
 {% endmacro %}
