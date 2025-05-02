@@ -36,41 +36,41 @@
   </form>
 {% endcall %}
 
-      <div class="row mb-4">
-        <div class="col-md-6">
-          <label class="form-label fw-bold">How well did you know this?</label>
-          <div class="rating-container d-flex align-items-start gap-3">
-            <div>
-              <input type="range" class="form-range" id="rating-slider" min="0" max="5" value=""
-                    oninput="updateRating(this.value)" title="Drag to select rating">
-              <div class="small text-muted mt-1">
-                Delay: <span id="delay-preview">(select rating)</span>
-              </div>
-            </div>
-            <select name="rating" id="rating-select" class="form-select" style="width: 180px"
-                    onchange="updateSlider(this.value)" required>
-              <option value="" selected disabled>-- Select rating --</option>
-              <option value="0">0 - No recall</option>
-              <option value="1">1 - Failed</option>
-              <option value="2">2 - Difficult</option>
-              <option value="3">3 - Hesitant</option>
-              <option value="4">4 - Easy</option>
-              <option value="5">5 - Perfect</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="col-md-6 d-flex align-items-end justify-content-end">
-          <div class="text-muted small me-3">
-            {% if entity.last_reviewed %}
-            <div>Last reviewed: {{ entity.last_reviewed.strftime('%Y-%m-%d') }}</div>
-            {% endif %}
-            {% if entity.due_date %}
-            <div>Next review: {{ entity.due_date.strftime('%Y-%m-%d') }}</div>
-            {% endif %}
-          </div>
+<div class="row mb-4 d-none" id="rating-section">
+  <div class="col-md-6">
+    <label class="form-label fw-bold">How well did you know this?</label>
+    <div class="rating-container d-flex align-items-start gap-3">
+      <div>
+        <input type="range" class="form-range" id="rating-slider" min="0" max="5" value=""
+              oninput="updateRating(this.value)" title="Drag to select rating">
+        <div class="small text-muted mt-1">
+          Delay: <span id="delay-preview">(select rating)</span>
         </div>
       </div>
+      <select name="rating" id="rating-select" class="form-select" style="width: 180px"
+              onchange="updateSlider(this.value)" required>
+        <option value="" selected disabled>-- Select rating --</option>
+        <option value="0">0 - No recall</option>
+        <option value="1">1 - Failed</option>
+        <option value="2">2 - Difficult</option>
+        <option value="3">3 - Hesitant</option>
+        <option value="4">4 - Easy</option>
+        <option value="5">5 - Perfect</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="col-md-6 d-flex align-items-end justify-content-end">
+    <div class="text-muted small me-3">
+      {% if entity.last_reviewed %}
+      <div>Last reviewed: {{ entity.last_reviewed.strftime('%Y-%m-%d') }}</div>
+      {% endif %}
+      {% if entity.due_date %}
+      <div>Next review: {{ entity.due_date.strftime('%Y-%m-%d') }}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 
       <div id="answer-container" class="border rounded p-3 mb-3 bg-light d-none">
         <h5 class="text-muted"><i class="bi bi-check-circle me-2"></i>Correct Answer</h5>

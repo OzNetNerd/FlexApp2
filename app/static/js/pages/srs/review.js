@@ -190,12 +190,51 @@ document.addEventListener('keydown', function (event) {
   }
 });
 
-document.getElementById('review-form').addEventListener('submit', async function (e) {
+document.getElementById('review-form').addEventListener('submit', function (e) {
   e.preventDefault();
-  const form = e.target;
+
+  // Store the answer given
+  const answerGiven = document.querySelector('textarea[name="answer_given"]').value || "";
+
+  // Show the answer container
+  document.getElementById('answer-container').classList.remove('d-none');
+
+  // Show the rating section
+  document.getElementById('rating-section').classList.remove('d-none');
+
+  // Hide the original submit button
+  const submitBtn = document.getElementById('submit-btn');
+  submitBtn.style.display = 'none';
+
+  // Add a "Next" button
+  const nextBtn = document.createElement('button');
+  nextBtn.type = 'button';
+  nextBtn.id = 'next-btn';
+  nextBtn.className = 'btn btn-success';
+  nextBtn.innerHTML = '<i class="bi bi-arrow-right me-1"></i> Next';
+
+  // Add event listener for the next button
+  nextBtn.addEventListener('click', function() {
+    const rating = parseInt(document.getElementById('rating-select').value);
+
+    // Check if rating is selected
+    if (isNaN(rating)) {
+      alert('Please select a rating before proceeding.');
+      return;
+    }
+
+    // Call the submit review function with the collected data
+    submitReview(answerGiven, rating);
+  });
+
+  // Add the next button to the submit container
+  submitBtn.parentNode.appendChild(nextBtn);
+});
+
+// Function for submitting the review
+async function submitReview(answerGiven, rating) {
+  const form = document.getElementById('review-form');
   const entityId = form.dataset.entityId;
-  const rating = parseInt(document.getElementById('rating-select').value);
-  const answer_given = form.querySelector('textarea[name="answer_given"]').value || "";
 
   // Find CSRF token by checking various possible implementations
   let csrfToken = "";
@@ -207,7 +246,7 @@ document.getElementById('review-form').addEventListener('submit', async function
     }
   }
 
-  console.log("Submitting review:", { entityId, rating, answer_given: answer_given.substring(0, 20) + "..." });
+  console.log("Submitting review:", { entityId, rating, answer_given: answerGiven.substring(0, 20) + "..." });
 
   try {
     const response = await fetch(`/api/srs/${entityId}/review`, {
@@ -218,7 +257,7 @@ document.getElementById('review-form').addEventListener('submit', async function
       },
       body: JSON.stringify({
         rating,
-        answer_given
+        answer_given: answerGiven
       })
     });
 
@@ -252,7 +291,7 @@ document.getElementById('review-form').addEventListener('submit', async function
     console.error("Error submitting review:", err);
     alert('An error occurred submitting your review. Please try again.');
   }
-});
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Page loaded, initializing...");
