@@ -229,32 +229,23 @@ function submitReview() {
 
   // Check if rating is selected
   if (isNaN(rating)) {
-    alert('Please select a rating before proceeding.');
+    // Show the rating required modal instead of alert
+    const requiredModal = new bootstrap.Modal(document.getElementById('ratingRequiredModal'));
+    requiredModal.show();
     return false; // Prevent default action
   }
 
-  // Update the rating display in the modal
-  document.getElementById('modal-rating-display').textContent = rating;
-
-  // Show the confirmation modal
-  const confirmModal = new bootstrap.Modal(document.getElementById('confirmReviewModal'));
-  confirmModal.show();
-
-  // Return false to prevent default action
+  // Submit directly without confirmation
+  submitReviewToServer(answerGiven, rating);
   return false;
 }
 
-// New function to handle the actual submission after confirmation
-function confirmAndSubmitReview() {
-  const answerGiven = document.querySelector('textarea[name="answer_given"]').value || "";
-  const rating = parseInt(document.getElementById('rating-select').value);
-
-  // Close the modal
-  const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmReviewModal'));
-  confirmModal.hide();
-
-  // Call the function to submit the review
-  submitReviewToServer(answerGiven, rating);
+// Function to dismiss the rating required modal
+function dismissRequiredModal() {
+  const modal = bootstrap.Modal.getInstance(document.getElementById('ratingRequiredModal'));
+  if (modal) {
+    modal.hide();
+  }
 }
 
 // Function for submitting the review to the server
