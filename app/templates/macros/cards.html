@@ -4,7 +4,11 @@
       <h5 class="mb-0 {{ text_color }}"><i class="bi bi-{{ icon }} me-2"></i>{{ title }}</h5>
     </div>
     <div class="card-body">
-      <p class="card-text fs-6">{{ content }}</p>
+      {% if caller %}
+        {{ caller() }}
+      {% else %}
+        <p class="card-text fs-6">{{ content }}</p>
+      {% endif %}
     </div>
   </div>
 {% endmacro %}

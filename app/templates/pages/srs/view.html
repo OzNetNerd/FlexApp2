@@ -12,22 +12,24 @@
   {{ section_card('question-circle', 'Question', 'text-primary', 'bg-primary-subtle', entity.question) }}
 
 <!-- Answer Card -->
-<div class="card shadow-sm mb-4">
-  <div class="card-header bg-success-subtle d-flex justify-content-between align-items-center">
-    <h5 class="mb-0 text-success"><i class="bi bi-pencil-square me-2"></i>Your Answer</h5>
-  </div>
-  <div class="card-body">
-    <form id="review-form" data-entity-id="{{ entity.id }}">
-      {{ csrf_input }}
-
-      <div class="mb-4">
-        <textarea
-          name="answer_given"
-          class="form-control"
-          rows="4"
-          placeholder="Type your answer here..."
-          autofocus></textarea>
-      </div>
+{% call section_card(
+    icon="pencil-square",
+    title="Your Answer",
+    text_color="text-success",
+    bg_color="bg-success-subtle"
+) %}
+  <form id="review-form" data-entity-id="{{ entity.id }}">
+    {{ csrf_input }}
+    <div class="mb-4">
+      <textarea
+        name="answer_given"
+        class="form-control"
+        rows="4"
+        placeholder="Type your answer here..."
+        autofocus></textarea>
+    </div>
+  </form>
+{% endcall %}
 
       <div class="row mb-4">
         <div class="col-md-6">
