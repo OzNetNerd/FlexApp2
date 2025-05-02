@@ -90,18 +90,15 @@ function updateAllRatingLabels() {
 }
 
 function updateLivePreview(value) {
-  const preview = document.getElementById('delay-preview');
   const tooltip = document.getElementById('rating-slider');
 
   if (value === "") {
-    preview.textContent = "(select rating)";
     tooltip.title = "Drag to select rating";
     return;
   }
 
   const days = intervalPreviewMap[value];
   const delay = days !== undefined ? describeDelay(days) : "?";
-  preview.textContent = `(${delay})`;
   tooltip.title = `Next review in ${delay}`;
 }
 
@@ -302,14 +299,4 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchPreviewIntervals();
   updateAllRatingLabels();
   updateProgressBar(0);
-
-  // Set a timeout to ensure we have values displayed even if API fails
-  setTimeout(() => {
-    const delayEl = document.getElementById('delay-preview');
-    if (delayEl.textContent === "(loading...)") {
-      console.log("API request timed out or failed, using default values");
-      delayEl.textContent = "(using defaults)";
-      updateAllRatingLabels();
-    }
-  }, 3000); // 3 second timeout
 });
