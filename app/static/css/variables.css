@@ -122,3 +122,15 @@ These variables make it easier to maintain consistent colors, spacing, and styli
   --sidebar-bg: var(--color-bg-secondary);
   --sidebar-border-color: var(--color-border-light);
 }
+
+.nav-link {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-family); /* Adding from variables.css */
+  font-size: var(--font-size-base); /* Adding from variables.css */
+  padding: 0.8rem 1rem;
+  border-radius: var(--border-radius-lg);
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+}
