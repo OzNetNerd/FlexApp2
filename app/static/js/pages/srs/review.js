@@ -73,9 +73,9 @@ function updateAllRatingLabels() {
   // Default rating descriptions
   const ratingDescriptions = {
     0: "No recall",
-    1: "Failed",
-    2: "Difficult",
-    3: "Hesitant",
+    1: "Very Hard",
+    2: "Hard",
+    3: "Normal",
     4: "Easy",
     5: "Perfect"
   };
