@@ -1,6 +1,6 @@
 <!-- START TEMPLATE: macros/buttons.html -->
 
-{% macro button(href=None, type=None, class="btn", icon_lib="fas", icon=None,
+{% macro icon_button(href=None, type=None, class="btn", icon_lib="fas", icon=None,
                 text=None, form=None, onclick=None) %}
   {% if href %}
     <a href="{{ href }}" class="{{ class }}" {% if onclick %}onclick="{{ onclick }}"{% endif %}>

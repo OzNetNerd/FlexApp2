@@ -1,49 +1,8 @@
 <!-- START TEMPLATE: layouts/table_index.html -->
 
-{#
-  Template: table_index.html
-
-  Extends the base layout and renders an index/list view for any entity.
-
-  • title block
-      Sets the page <title> via {{ page_title }}.
-
-  • icon_button import
-      Reuses macros for consistent action buttons.
-
-  • Header section
-      - Optional main heading (entity_title)
-      - Global search input
-      - Primary action button (Add {{ entity_name }})
-      - Extra action buttons block
-      - Column selector dropdown
-
-  • Filters panel (optional)
-      Renders Filters config via macros.render_filter(filter)
-      Includes Apply and Reset controls
-
-  • Table card
-      - Optional card header/title
-      - table_actions block for additional controls
-      - AG-Grid container initialized via data attributes:
-          • data-api-url: grid data endpoint
-          • data-entity-name: used in table.js
-
-  • Scripts
-      - AG-Grid core library
-      - table.js module for dynamic table setup
-
-  Usage:
-    Render with context:
-      page_title, entity_name, entity_title,
-      entity_base_route, api_url,
-      filters (list of filter configs),
-      show_heading, show_card_header, show_card_title
-#}
-
 {% extends 'layouts/base.html' %}
 {% import 'macros/table.html' as table %}
-{% import 'macros/icon_button.html' as button %}
+{% import 'macros/buttons.html' as buttons %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
@@ -63,7 +22,7 @@
           </div>
 
           {% block action_buttons %}
-            {{ button.icon_button(url_for(entity_base_route + '.create'), 'btn btn-sm btn-primary', 'plus', 'Add ' + entity_name|default('Item')) }}
+            {{ buttons.icon_button(url_for(entity_base_route + '.create'), 'btn btn-sm btn-primary', 'plus', 'Add ' + entity_name|default('Item')) }}
           {% endblock %}
 
           {% block extra_action_buttons %}{% endblock %}
