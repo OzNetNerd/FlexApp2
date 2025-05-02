@@ -84,23 +84,6 @@
       </div>
     </form>
   </div>
-
-  <div class="card-footer bg-white">
-    <div class="row text-center small text-muted">
-      <div class="col-4">
-        <div id="total-cards" class="fw-bold">{{ stats.total_cards if stats else 0 }}</div>
-        <div>Total Cards</div>
-      </div>
-      <div class="col-4">
-        <div id="cards-due" class="fw-bold">{{ stats.cards_due if stats else 0 }}</div>
-        <div>Due Today</div>
-      </div>
-      <div class="col-4">
-        <div id="cards-reviewed" class="fw-bold">{{ stats.cards_reviewed_today if stats else 0 }}</div>
-        <div>Reviewed Today</div>
-      </div>
-    </div>
-  </div>
 {% endblock %}
 
 {% block modals %}
