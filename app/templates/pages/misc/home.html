@@ -1,6 +1,5 @@
-<!-- START TEMPLATE: home.html -->
-
 {% extends "layouts/base.html" %}
+{% import "macros/widgets.html" as components %}
 
 {% block title %}CRM Dashboard - Home{% endblock %}
 
@@ -17,39 +16,23 @@
 
 <!-- Navigation Cards -->
 <div class="row mb-4">
-  <div class="col-md-4 mb-3">
-    <a href="/companies" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-building text-primary" style="font-size: 2.5rem;"></i>
-        </div>
-        <h2 class="h5 card-title">Companies</h2>
-        <p class="card-text text-muted">Manage all your client companies</p>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-4 mb-3">
-    <a href="/customers" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-people text-success" style="font-size: 2.5rem;"></i>
-        </div>
-        <h2 class="h5 card-title">Customers</h2>
-        <p class="card-text text-muted">Manage individual customer contacts</p>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-4 mb-3">
-    <a href="/opportunities" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-graph-up-arrow text-danger" style="font-size: 2.5rem;"></i>
-        </div>
-        <h2 class="h5 card-title">Opportunities</h2>
-        <p class="card-text text-muted">Track sales opportunities and deals</p>
-      </div>
-    </a>
-  </div>
+  {{ components.navigation_card(
+    "bi bi-building", "text-primary", 
+    "Companies", "Manage all your client companies", 
+    "/companies"
+  ) }}
+  
+  {{ components.navigation_card(
+    "bi bi-people", "text-success", 
+    "Customers", "Manage individual customer contacts", 
+    "/customers"
+  ) }}
+  
+  {{ components.navigation_card(
+    "bi bi-graph-up-arrow", "text-danger", 
+    "Opportunities", "Track sales opportunities and deals", 
+    "/opportunities"
+  ) }}
 </div>
 
 <!-- Summary Section -->
@@ -61,38 +44,10 @@
       </div>
       <div class="card-body">
         <div class="row">
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stat-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="display-4 text-primary mb-2">4</div>
-                <div class="text-uppercase fw-bold small text-muted">Companies</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stat-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="display-4 text-success mb-2">9</div>
-                <div class="text-uppercase fw-bold small text-muted">Contacts</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stat-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="display-4 text-danger mb-2">7</div>
-                <div class="text-uppercase fw-bold small text-muted">Deals</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6">
-            <div class="stat-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="display-4 text-info mb-2">$925K</div>
-                <div class="text-uppercase fw-bold small text-muted">Pipeline</div>
-              </div>
-            </div>
-          </div>
+          {{ components.stat_card("4", "Companies", "text-primary") }}
+          {{ components.stat_card("9", "Contacts", "text-success") }}
+          {{ components.stat_card("7", "Deals", "text-danger") }}
+          {{ components.stat_card("$925K", "Pipeline", "text-info") }}
         </div>
 
         <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
@@ -159,51 +114,35 @@
       </div>
       <div class="card-body">
         <ul class="list-group list-group-flush">
-          <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
-            <div class="activity-icon bg-warning text-white d-flex align-items-center justify-content-center">
-              <i class="bi bi-graph-up"></i>
-            </div>
-            <div class="ms-3">
-              <p class="mb-0">Deal progressed: <strong>GlobalTech - Moved to Negotiation</strong></p>
-              <small class="text-muted">1 hour ago</small>
-            </div>
-          </li>
-          <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
-            <div class="activity-icon bg-primary text-white d-flex align-items-center justify-content-center">
-              <i class="bi bi-person-plus"></i>
-            </div>
-            <div class="ms-3">
-              <p class="mb-0">New contact added: <strong>Sarah Johnson</strong></p>
-              <small class="text-muted">3 hours ago</small>
-            </div>
-          </li>
-          <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
-            <div class="activity-icon bg-danger text-white d-flex align-items-center justify-content-center">
-              <i class="bi bi-building-add"></i>
-            </div>
-            <div class="ms-3">
-              <p class="mb-0">New company added: <strong>Quantum Solutions</strong></p>
-              <small class="text-muted">Yesterday</small>
-            </div>
-          </li>
-          <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
-            <div class="activity-icon bg-success text-white d-flex align-items-center justify-content-center">
-              <i class="bi bi-currency-dollar"></i>
-            </div>
-            <div class="ms-3">
-              <p class="mb-0">Deal closed: <strong>Fusion Industries - $185,000</strong></p>
-              <small class="text-muted">2 days ago</small>
-            </div>
-          </li>
-          <li class="list-group-item d-flex align-items-center border-0 py-3">
-            <div class="activity-icon bg-info text-white d-flex align-items-center justify-content-center">
-              <i class="bi bi-calendar-event"></i>
-            </div>
-            <div class="ms-3">
-              <p class="mb-0">Meeting scheduled with <strong>NexGen Systems</strong></p>
-              <small class="text-muted">March 27, 2025</small>
-            </div>
-          </li>
+          {{ components.activity_item(
+            "bi bi-graph-up", "bg-warning",
+            "Deal progressed: <strong>GlobalTech - Moved to Negotiation</strong>",
+            "1 hour ago"
+          ) }}
+          
+          {{ components.activity_item(
+            "bi bi-person-plus", "bg-primary",
+            "New contact added: <strong>Sarah Johnson</strong>",
+            "3 hours ago"
+          ) }}
+          
+          {{ components.activity_item(
+            "bi bi-building-add", "bg-danger",
+            "New company added: <strong>Quantum Solutions</strong>",
+            "Yesterday"
+          ) }}
+          
+          {{ components.activity_item(
+            "bi bi-currency-dollar", "bg-success",
+            "Deal closed: <strong>Fusion Industries - $185,000</strong>",
+            "2 days ago"
+          ) }}
+          
+          {{ components.activity_item(
+            "bi bi-calendar-event", "bg-info",
+            "Meeting scheduled with <strong>NexGen Systems</strong>",
+            "March 27, 2025"
+          ) }}
         </ul>
       </div>
     </div>
@@ -256,4 +195,3 @@
 }
 </style>
 {% endblock %}
-<!-- END TEMPLATE: home.html -->
