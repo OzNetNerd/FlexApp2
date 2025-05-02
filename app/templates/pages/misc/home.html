@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-{% import "macros/widgets.html" as components %}
+{% import "macros/widgets.html" as widgets %}
 
 {% block title %}CRM Dashboard - Home{% endblock %}
 
@@ -16,19 +16,19 @@
 
 <!-- Navigation Cards -->
 <div class="row mb-4">
-  {{ components.navigation_card(
+  {{ widgets.navigation_card(
     "bi bi-building", "text-primary", 
     "Companies", "Manage all your client companies", 
     "/companies"
   ) }}
   
-  {{ components.navigation_card(
+  {{ widgets.navigation_card(
     "bi bi-people", "text-success", 
     "Customers", "Manage individual customer contacts", 
     "/customers"
   ) }}
   
-  {{ components.navigation_card(
+  {{ widgets.navigation_card(
     "bi bi-graph-up-arrow", "text-danger", 
     "Opportunities", "Track sales opportunities and deals", 
     "/opportunities"
@@ -44,10 +44,10 @@
       </div>
       <div class="card-body">
         <div class="row">
-          {{ components.stat_card("4", "Companies", "text-primary") }}
-          {{ components.stat_card("9", "Contacts", "text-success") }}
-          {{ components.stat_card("7", "Deals", "text-danger") }}
-          {{ components.stat_card("$925K", "Pipeline", "text-info") }}
+          {{ widgets.stat_card("4", "Companies", "text-primary") }}
+          {{ widgets.stat_card("9", "Contacts", "text-success") }}
+          {{ widgets.stat_card("7", "Deals", "text-danger") }}
+          {{ widgets.stat_card("$925K", "Pipeline", "text-info") }}
         </div>
 
         <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
@@ -114,31 +114,31 @@
       </div>
       <div class="card-body">
         <ul class="list-group list-group-flush">
-          {{ components.activity_item(
+          {{ widgets.activity_item(
             "bi bi-graph-up", "bg-warning",
             "Deal progressed: <strong>GlobalTech - Moved to Negotiation</strong>",
             "1 hour ago"
           ) }}
           
-          {{ components.activity_item(
+          {{ widgets.activity_item(
             "bi bi-person-plus", "bg-primary",
             "New contact added: <strong>Sarah Johnson</strong>",
             "3 hours ago"
           ) }}
           
-          {{ components.activity_item(
+          {{ widgets.activity_item(
             "bi bi-building-add", "bg-danger",
             "New company added: <strong>Quantum Solutions</strong>",
             "Yesterday"
           ) }}
           
-          {{ components.activity_item(
+          {{ widgets.activity_item(
             "bi bi-currency-dollar", "bg-success",
             "Deal closed: <strong>Fusion Industries - $185,000</strong>",
             "2 days ago"
           ) }}
           
-          {{ components.activity_item(
+          {{ widgets.activity_item(
             "bi bi-calendar-event", "bg-info",
             "Meeting scheduled with <strong>NexGen Systems</strong>",
             "March 27, 2025"
