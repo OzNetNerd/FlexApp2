@@ -470,3 +470,15 @@ Includes cards, buttons, badges, avatars, and other UI components
 .list-group-item:hover {
   background-color: rgba(var(--color-black-rgb), 0.01);
 }
+
+/* Custom white navigation cards */
+.nav-card {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text-primary);
+}
