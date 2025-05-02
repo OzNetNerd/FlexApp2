@@ -2,7 +2,7 @@
 {% set mode = 'review' %}
 
 {% block header_buttons %}
-  {{ crud.crud_buttons('srs_bp', entity.id) }}
+  {{ buttons.crud_buttons('srs_bp', entity.id) }}
   <span class="badge bg-primary text-white ms-2 rounded-pill px-3">Card {{ current_index|default(1) }} of {{ total_cards|default(1) }}</span>
 {% endblock %}
 
@@ -117,7 +117,7 @@
 
 {% block modals %}
 <!-- Delete Confirmation Modal -->
-{{ crud.delete_modal('srs_bp', entity.id) }}
+{{ buttons.delete_modal('srs_bp', entity.id) }}
 
 <!-- Finished review message modal -->
 <div class="modal fade" id="finishedModal" tabindex="-1" aria-labelledby="finishedModalLabel" aria-hidden="true">
