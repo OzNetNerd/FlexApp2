@@ -5,14 +5,13 @@
         <i class="bi bi-{{ icon }} me-2"></i>{{ title }}
       </h5>
     </div>
-    <div class="card-body">
-      {% if caller %}
-        {{ caller() }}
-      {% else %}
-        <p class="card-text fs-6 mb-0">{{ content }}</p>
-      {% endif %}
-    </div>
-  </div>
+<div class="card-body">
+  {% if caller %}
+    {{ caller() }}
+  {% else %}
+    <p class="card-text fs-6 mb-0">{{ content }}</p>
+  {% endif %}
+</div>
 {% endmacro %}
 
 {% macro notification_card(icon, title, text_color="text-muted", bg_color="bg-light", content="") %}
@@ -21,7 +20,7 @@
       <i class="bi bi-{{ icon }} me-2"></i>{{ title }}
     </h5>
     <div class="mt-2">
-      <p class="card-text fs-6 mb-0">{{ content }}</p>
+      <p class="card-body">{{ content }}</p>
     </div>
   </div>
 {% endmacro %}

@@ -32,6 +32,7 @@ Includes cards, buttons, badges, avatars, and other UI components
 .card-body {
   padding: var(--spacing-xl);
   overflow-x: visible; /* Ensure dropdowns are visible */
+  font-size: 1rem; /* This is equivalent to fs-6 in Bootstrap */
 }
 
 /* Navigation Card */
