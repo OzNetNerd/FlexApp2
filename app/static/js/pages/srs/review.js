@@ -107,14 +107,12 @@ function updateLivePreview(value) {
 
 function updateRating(value) {
   if (value === "") {
-    document.getElementById('submit-btn').disabled = true;
     document.getElementById('rating-select').value = "";
     updateProgressBar(0);
     updateLivePreview("");
     return;
   }
 
-  document.getElementById('submit-btn').disabled = false;
   document.getElementById('rating-select').value = value;
   updateProgressBar(value);
   updateLivePreview(value);
@@ -122,7 +120,6 @@ function updateRating(value) {
 
 function updateSlider(value) {
   document.getElementById('rating-slider').value = value;
-  document.getElementById('submit-btn').disabled = value === "";
   updateProgressBar(value === "" ? 0 : value);
   updateLivePreview(value);
 }
@@ -260,9 +257,9 @@ document.getElementById('review-form').addEventListener('submit', async function
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Page loaded, initializing...");
   document.getElementById('rating-slider').value = "";
-  document.getElementById('submit-btn').disabled = true;
+  // Remove the line that disables the submit button
   fetchPreviewIntervals();
-  updateAllRatingLabels(); // Show default values immediately
+  updateAllRatingLabels();
   updateProgressBar(0);
 
   // Set a timeout to ensure we have values displayed even if API fails
