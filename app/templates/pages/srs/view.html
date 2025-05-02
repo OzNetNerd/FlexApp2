@@ -1,6 +1,8 @@
 {% extends "pages/srs/base.html" %}
 {% set mode = 'review' %}
 {% from "macros/cards.html" import section_card %}
+{% import 'macros/modals.html' as modals %}
+{% import 'macros/buttons.html' as buttons %}
 
 {% block srs_content %}
   <!-- Question Card -->
@@ -102,28 +104,21 @@
 
 {% block modals %}
 <!-- Delete Confirmation Modal -->
-{{ buttons.delete_modal('srs_bp', entity.id) }}
+{{ modals.delete_modal('srs_bp', entity.id) }}
 
 <!-- Finished review message modal -->
-<div class="modal fade" id="finishedModal" tabindex="-1" aria-labelledby="finishedModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="finishedModalLabel">Review Complete!</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>Congratulations! You've completed all your flashcards for this session.</p>
-        <div class="text-center mt-3 mb-2">
-          <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <a href="/srs/dashboard" class="btn btn-primary">Go to Dashboard</a>
-      </div>
-    </div>
-  </div>
+{% set content %}
+<p>Congratulations! You've completed all your flashcards for this session.</p>
+<div class="text-center mt-3 mb-2">
+  <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
 </div>
+{% endset %}
+
+{% set footer %}
+{{ buttons.icon_button(href="/srs/dashboard", class="btn", colour="primary", icon="home", text="Go to Dashboard") }}
+{% endset %}
+
+{{ modals.notification('finishedModal', 'Review Complete!', content, footer) }}
 {% endblock %}
 
 {% block srs_scripts %}

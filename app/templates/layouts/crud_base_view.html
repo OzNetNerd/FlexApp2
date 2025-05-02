@@ -27,6 +27,7 @@
 {% import 'macros/layout.html' as layout %}
 {% import 'macros/entity.html' as entity %}
 {% import 'macros/buttons.html' as buttons %}
+{% import 'macros/modals.html' as modals %}
 {% import 'macros/headings.html' as headings %}
 
 {% block content %}
@@ -56,7 +57,7 @@
 </div>
 
 <!-- Delete Confirmation Modal - Rendered using crud macro -->
-{{ buttons.delete_modal(request.endpoint.rsplit('.',1)[0], id) }}
+{{ modals.delete_modal(request.endpoint.rsplit('.',1)[0], id) }}
 {% endblock %}
 
 {% block extra_js %}
