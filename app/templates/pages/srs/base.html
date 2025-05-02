@@ -20,10 +20,8 @@
 
   <div class="card-body p-4">
     {% block srs_content %}{% endblock %}
-  </div>
 
-  {% if mode == 'review' %}
-  <!-- Stats Footer -->
+    {% if mode == 'review' %}
   <div class="card-footer bg-white">
     <div class="row text-center small text-muted">
       <div class="col-4">
@@ -42,6 +40,9 @@
   </div>
   {% endif %}
 </div>
+  </div>
+
+
 
 <!-- Modal blocks that can be overridden by child templates -->
 {% block modals %}{% endblock %}

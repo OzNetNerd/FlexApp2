@@ -28,6 +28,15 @@
         placeholder="Type your answer here..."
         autofocus></textarea>
     </div>
+    <div class="d-flex justify-content-end">
+      <button type="button" id="show-answer-btn" class="btn btn-outline-secondary me-2" onclick="toggleAnswer()">
+        Show Answer
+      </button>
+
+      <button type="submit" id="submit-btn" class="btn btn-primary" disabled>
+        <i class="bi bi-check-circle me-1"></i> Submit
+      </button>
+    </div>
   </form>
 {% endcall %}
 
@@ -64,14 +73,6 @@
             <div>Next review: {{ entity.due_date.strftime('%Y-%m-%d') }}</div>
             {% endif %}
           </div>
-
-          <button type="button" id="show-answer-btn" class="btn btn-outline-secondary me-2" onclick="toggleAnswer()">
-            Show Answer
-          </button>
-
-          <button type="submit" id="submit-btn" class="btn btn-primary" disabled>
-            <i class="bi bi-check-circle me-1"></i> Submit
-          </button>
         </div>
       </div>
 
