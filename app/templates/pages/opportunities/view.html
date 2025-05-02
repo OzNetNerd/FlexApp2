@@ -85,20 +85,6 @@
     </form>
   {% endif %}
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Get the active tab button
-    const activeTab = document.querySelector('.nav-link.active[data-bs-toggle="tab"]');
-    if (activeTab) {
-      // Get the target tab pane ID
-      const targetId = activeTab.getAttribute('data-bs-target');
-      // Find the tab pane
-      const tabPane = document.querySelector(targetId);
-      if (tabPane) {
-        // Add the necessary classes to make it visible
-        tabPane.classList.add('show', 'active');
-      }
-    }
-  });
-</script>
+  <!-- Link to the external JavaScript file for tab functionality -->
+  <script src="{{ url_for('static', filename='js/pages/tabs.js') }}"></script>
 {% endblock %}
