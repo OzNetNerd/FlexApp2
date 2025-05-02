@@ -31,38 +31,38 @@
                      read_only=true, form_id="main-form", icon_lib="fas") %}
   <div class="d-flex gap-2">
     {% if read_only %}
-      {{ button(href=url_for(endpoint_prefix + '.create'),
+      {{ icon_button(href=url_for(endpoint_prefix + '.create'),
                 class="btn btn-primary fw-bold",
                 icon_lib=icon_lib, icon="plus", text="Add") }}
 
       {% if id %}
-        {{ button(href=url_for(endpoint_prefix + '.edit', entity_id=id),
+        {{ icon_button(href=url_for(endpoint_prefix + '.edit', entity_id=id),
                   class="btn btn-warning text-dark fw-bold",
                   icon_lib=icon_lib, icon="edit", text="Edit") }}
 
-        {{ button(type="button", class="btn btn-danger",
+        {{ icon_button(type="button", class="btn btn-danger",
                   icon_lib=icon_lib, icon="trash", text="Delete",
                   onclick="openDeleteModal()") }}
       {% endif %}
 
-      {{ button(href=url_for(endpoint_prefix + '.index'),
+      {{ icon_button(href=url_for(endpoint_prefix + '.index'),
                 class="btn btn-secondary",
                 icon_lib=icon_lib, icon="arrow-left", text="Back") }}
     {% else %}
       {% if id %}
-        {{ button(href=url_for(endpoint_prefix + '.view', entity_id=id),
+        {{ icon_button(href=url_for(endpoint_prefix + '.view', entity_id=id),
                   class="btn btn-secondary",
                   icon_lib=icon_lib, icon="times", text="Cancel") }}
 
-        {{ button(type="submit", class="btn btn-primary",
+        {{ icon_button(type="submit", class="btn btn-primary",
                   icon_lib=icon_lib, icon="save", text="Update",
                   form=form_id) }}
       {% else %}
-        {{ button(href=url_for(endpoint_prefix + '.index'),
+        {{ icon_button(href=url_for(endpoint_prefix + '.index'),
                   class="btn btn-secondary",
                   icon_lib=icon_lib, icon="times", text="Cancel") }}
 
-        {{ button(type="submit", class="btn btn-primary",
+        {{ icon_button(type="submit", class="btn btn-primary",
                   icon_lib=icon_lib, icon="save", text="Save",
                   form=form_id) }}
       {% endif %}
@@ -84,12 +84,12 @@
         Are you sure you want to delete this item? This action cannot be undone.
       </div>
       <div class="modal-footer">
-        {{ button(type="button", class="btn btn-secondary",
+        {{ icon_button(type="button", class="btn btn-secondary",
                  text="Cancel", onclick="closeDeleteModal()") }}
 
         <form action="{{ url_for(endpoint_prefix + '.delete', entity_id=id) }}" method="POST">
           {{ csrf_input }}
-          {{ button(type="submit", class="btn btn-danger", text="Confirm") }}
+          {{ icon_button(type="submit", class="btn btn-danger", text="Confirm") }}
         </form>
       </div>
     </div>
