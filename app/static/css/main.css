@@ -12,3 +12,4 @@ This is the only CSS file you need to include in your HTML
 @import url("sidebar.css");
 @import url("tables.css");
 @import url("themes.css");
+@import url("dashboard.css");
