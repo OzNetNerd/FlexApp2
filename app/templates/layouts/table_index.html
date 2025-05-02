@@ -66,13 +66,11 @@
 
   <div class="card-body p-0">
     {% if show_card_header|default(true) %}
-      <div class="bg-light py-2 border-bottom d-flex flex-wrap align-items-center px-3">
-        {% if show_card_title|default(false) %}
-          <h5 class="mb-0 me-3 fs-6 fw-semibold">{{ entity_title|default('Items') }} List</h5>
-        {% endif %}
-        <div class="ms-auto d-flex gap-2">
-          {% block table_actions %}{% endblock %}
-        </div>
+      {% if show_card_title|default(false) %}
+        <h5 class="mb-0 me-3 fs-6 fw-semibold">{{ entity_title|default('Items') }} List</h5>
+      {% endif %}
+      <div class="ms-auto d-flex gap-2">
+        {% block table_actions %}{% endblock %}
       </div>
     {% endif %}
 
