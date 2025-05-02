@@ -2,11 +2,6 @@
 {% set mode = 'review' %}
 {% from "macros/cards.html" import section_card %}
 
-{% block header_buttons %}
-  {{ buttons.crud_buttons('srs_bp', entity.id) }}
-  <span class="badge bg-primary text-white ms-2 rounded-pill px-3">Card {{ current_index|default(1) }} of {{ total_cards|default(1) }}</span>
-{% endblock %}
-
 {% block srs_content %}
   <!-- Question Card -->
   <div class="mb-4">
