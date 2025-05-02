@@ -9,5 +9,6 @@ This is the only CSS file you need to include in your HTML
 @import url("components.css");
 @import url("forms.css");
 @import url("navbar.css");
+@import url("sidebar.css");
 @import url("tables.css");
 @import url("themes.css");

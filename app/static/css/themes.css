@@ -5,31 +5,74 @@ Contains dark theme variables and style overrides
 
 /* ===== Dark Mode Variables ===== */
 [data-theme="dark"] {
+  /* Typography */
+  --font-weight-normal: 300;
+
   /* Background colors */
   --color-bg-primary: #121212;
   --color-bg-secondary: #1e1e1e;
   --color-bg-light: #252525;
   --color-bg-lighter: #1e1e1e;
-  --bg-card: #2d2d2d;
-  --bg-section-heading: #252525;
 
   /* Text colors */
   --color-text-primary: #e1e1e1;
   --color-text-secondary: #b0b0b0;
   --color-text-muted: #909090;
-  --text-section-heading: #e1e1e1;
+  --color-text-light: #909090;
+  --color-text-white: #e1e1e1;
 
   /* Border colors */
   --color-border: #444444;
   --color-border-light: #444444;
   --color-border-lighter: #333333;
-  --border-section-heading: #565656;
 
-  /* Component colors */
+  /* Primary colors */
   --color-primary: #7d75ff;
   --color-primary-hover: #6a64e0;
   --color-primary-light: rgba(125, 117, 255, 0.15);
   --color-primary-lighter: rgba(125, 117, 255, 0.08);
+  --color-primary-rgb: 125, 117, 255;
+
+  /* Secondary colors */
+  --color-secondary: #6c7583;
+  --color-secondary-hover: #5a6270;
+  --color-secondary-light: rgba(108, 117, 131, 0.15);
+  --color-secondary-lighter: rgba(108, 117, 131, 0.08);
+  --color-secondary-rgb: 108, 117, 131;
+
+  /* Status colors */
+  --color-success: #4fd1c5;
+  --color-success-hover: #38a89d;
+  --color-success-light: rgba(79, 209, 197, 0.15);
+  --color-success-lighter: rgba(79, 209, 197, 0.08);
+  --color-success-rgb: 79, 209, 197;
+
+  --color-danger: #fc8181;
+  --color-danger-hover: #e53e3e;
+  --color-danger-light: rgba(252, 129, 129, 0.15);
+  --color-danger-lighter: rgba(252, 129, 129, 0.08);
+  --color-danger-rgb: 252, 129, 129;
+
+  --color-warning: #f6ad55;
+  --color-warning-hover: #dd6b20;
+  --color-warning-light: rgba(246, 173, 85, 0.15);
+  --color-warning-lighter: rgba(246, 173, 85, 0.08);
+  --color-warning-rgb: 246, 173, 85;
+
+  --color-info: #63b3ed;
+  --color-info-hover: #3182ce;
+  --color-info-light: rgba(99, 179, 237, 0.15);
+  --color-info-lighter: rgba(99, 179, 237, 0.08);
+  --color-info-rgb: 99, 179, 237;
+
+  /* Section Components */
+  --bg-section-heading: #252525;
+  --text-section-heading: #e1e1e1;
+  --border-section-heading: #565656;
+
+  /* Sidebar variables */
+  --sidebar-bg: #1e1e1e;
+  --sidebar-border-color: #333333;
 
   /* Shadow adjustments */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -64,7 +107,7 @@ Contains dark theme variables and style overrides
 
 /* Stat cards */
 [data-theme="dark"] .stat-card {
-  background-color: #2a2a2a !important;
+  background-color: var(--color-bg-secondary) !important;
   color: var(--color-text-primary) !important;
 }
 
@@ -77,22 +120,18 @@ Contains dark theme variables and style overrides
   color: var(--color-text-primary) !important;
 }
 
-[data-theme="dark"] .sidebar-item .active {
-  background-color: var(--color-primary-light) !important;
-}
-
 /* Form elements */
 [data-theme="dark"] .form-control-plaintext,
 [data-theme="dark"] .form-control,
 [data-theme="dark"] .input-group-text {
-  background-color: var(--bg-card) !important;
+  background-color: var(--color-bg-secondary) !important;
   color: var(--color-text-primary) !important;
   border-color: var(--color-border) !important;
 }
 
 /* Search container */
 [data-theme="dark"] .search-container {
-  background-color: #2a2a2a !important;
+  background-color: var(--color-bg-light) !important;
 }
 
 /* Borders */
@@ -105,16 +144,16 @@ Contains dark theme variables and style overrides
 [data-theme="dark"] .btn-light,
 [data-theme="dark"] .btn-outline-secondary,
 [data-theme="dark"] .btn-sidebar-collapse {
-  background-color: #2d2d2d;
-  color: #e1e1e1;
-  border-color: #444444;
+  background-color: var(--color-bg-light);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
 }
 
 [data-theme="dark"] .btn-light:hover,
 [data-theme="dark"] .btn-outline-secondary:hover,
 [data-theme="dark"] .btn-sidebar-collapse:hover {
-  background-color: #3a3a3a;
-  color: #ffffff;
+  background-color: var(--color-bg-lighter);
+  color: var(--color-text-white);
 }
 
 /* Text colors */
@@ -124,29 +163,29 @@ Contains dark theme variables and style overrides
 }
 
 [data-theme="dark"] .text-primary {
-  color: #7d75ff !important;
+  color: var(--color-primary) !important;
 }
 
 [data-theme="dark"] .text-success {
-  color: #4fd1c5 !important;
+  color: var(--color-success) !important;
 }
 
 [data-theme="dark"] .text-danger {
-  color: #fc8181 !important;
+  color: var(--color-danger) !important;
 }
 
 [data-theme="dark"] .text-info {
-  color: #63b3ed !important;
+  color: var(--color-info) !important;
 }
 
 /* ===== Navigation Cards ===== */
 [data-theme="dark"] .nav-card {
-  background-color: #2d2d2d;
+  background-color: var(--color-primary);
   box-shadow: var(--shadow-md);
 }
 
 [data-theme="dark"] .nav-card:hover {
-  background-color: #333333;
+  background-color: var(--color-primary-hover);
   box-shadow: var(--shadow-lg);
 }
 
@@ -190,28 +229,28 @@ Contains dark theme variables and style overrides
 
 /* ===== Table Component Dark Mode Overrides ===== */
 [data-theme="dark"] .ag-theme-alpine {
-  --ag-header-background-color: #252525;
-  --ag-background-color: #1e1e1e;
-  --ag-odd-row-background-color: #252525;
-  --ag-header-foreground-color: #e1e1e1;
-  --ag-foreground-color: #e1e1e1;
-  --ag-border-color: #444444;
-  --ag-secondary-border-color: #333333;
-  --ag-row-border-color: #333333;
-  --ag-row-hover-color: rgba(125, 117, 255, 0.1);
-  --ag-selected-row-background-color: rgba(125, 117, 255, 0.2);
-  --ag-checkbox-unchecked-color: #909090;
-  --ag-checkbox-indeterminate-color: #909090;
+  --ag-header-background-color: var(--color-bg-light);
+  --ag-background-color: var(--color-bg-secondary);
+  --ag-odd-row-background-color: var(--color-bg-light);
+  --ag-header-foreground-color: var(--color-text-primary);
+  --ag-foreground-color: var(--color-text-primary);
+  --ag-border-color: var(--color-border);
+  --ag-secondary-border-color: var(--color-border-lighter);
+  --ag-row-border-color: var(--color-border-lighter);
+  --ag-row-hover-color: rgba(var(--color-primary-rgb), 0.1);
+  --ag-selected-row-background-color: rgba(var(--color-primary-rgb), 0.2);
+  --ag-checkbox-unchecked-color: var(--color-text-muted);
+  --ag-checkbox-indeterminate-color: var(--color-text-muted);
 }
 
 [data-theme="dark"] .ag-theme-alpine .ag-header-cell-sorted-asc .ag-header-cell-label,
 [data-theme="dark"] .ag-theme-alpine .ag-header-cell-sorted-desc .ag-header-cell-label {
-  color: #7d75ff;
+  color: var(--color-primary);
 }
 
 /* ===== Form Elements Dark Mode Overrides ===== */
 [data-theme="dark"] .input-container {
-  background-color: var(--bg-card);
+  background-color: var(--color-bg-secondary);
   border-color: var(--color-border);
 }
 
@@ -220,18 +259,18 @@ Contains dark theme variables and style overrides
 }
 
 [data-theme="dark"] .autocomplete-items {
-  background-color: var(--bg-card);
+  background-color: var(--color-bg-secondary);
   border-color: var(--color-border);
 }
 
 [data-theme="dark"] .autocomplete-item:hover,
 [data-theme="dark"] .highlight {
-  background-color: #333333;
+  background-color: var(--color-bg-light);
 }
 
 /* ===== Dropdown Dark Mode Overrides ===== */
 [data-theme="dark"] .dropdown-menu {
-  background-color: var(--bg-card);
+  background-color: var(--color-bg-secondary);
   border-color: var(--color-border);
 }
 
@@ -240,8 +279,8 @@ Contains dark theme variables and style overrides
 }
 
 [data-theme="dark"] .dropdown-item:hover {
-  background-color: rgba(125, 117, 255, 0.08);
-  color: #a5a0ff;
+  background-color: var(--color-primary-lighter);
+  color: var(--color-primary);
 }
 
 [data-theme="dark"] .dropdown-divider {
@@ -250,19 +289,20 @@ Contains dark theme variables and style overrides
 
 /* ===== Avatar Dark Mode Overrides ===== */
 [data-theme="dark"] .avatar-container,
-[data-theme="dark"] .avatar-circle {
-  background-color: #333333;
-  color: #b0b0b0;
+[data-theme="dark"] .avatar-circle,
+[data-theme="dark"] .icon-container {
+  background-color: var(--color-bg-light);
+  color: var(--color-text-secondary);
 }
 
 /* ===== Badge Dark Mode Overrides ===== */
 [data-theme="dark"] .badge {
-  background-color: #333333;
+  background-color: var(--color-bg-light);
   color: var(--color-text-primary);
 }
 
 [data-theme="dark"] .badge-remove {
-  color: #909090;
+  color: var(--color-text-muted);
 }
 
 [data-theme="dark"] .badge-remove:hover {
@@ -275,18 +315,37 @@ Contains dark theme variables and style overrides
 }
 
 [data-theme="dark"] .sidebar-link:hover {
-  background-color: #2a2a2a;
+  background-color: var(--color-primary-lighter);
 }
 
-[data-theme="dark"] .sidebar-item .active {
+[data-theme="dark"] .sidebar-link.active {
   background-color: var(--color-primary-light);
-}
-
-[data-theme="dark"] .active-indicator {
-  background-color: var(--color-primary);
 }
 
 /* ===== Highlights Container ===== */
 [data-theme="dark"] .highlights-container {
-  background-color: #252525 !important;
+  background-color: var(--color-bg-light) !important;
+}
+
+/* ===== Tables dark mode ===== */
+[data-theme="dark"] .table {
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .table th {
+  background-color: var(--color-bg-light);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .table td {
+  border-color: var(--color-border-lighter);
+}
+
+[data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+  background-color: var(--color-bg-light);
+}
+
+[data-theme="dark"] .table-striped tbody tr:hover,
+[data-theme="dark"] .table tbody tr:hover {
+  background-color: rgba(var(--color-primary-rgb), 0.1);
 }

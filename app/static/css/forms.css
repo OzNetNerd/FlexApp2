@@ -7,12 +7,19 @@ Elements related to user input and form interaction
 .form-control {
   border-radius: var(--border-radius-md);
   font-size: var(--font-size-base);
+  border-color: var(--color-border);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .form-control:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(var(--color-primary-rgb), 0.25);
+}
+
+.form-control-plaintext {
+  color: var(--color-text-primary);
 }
 
 .form-control-plaintext.bg-light {
@@ -22,6 +29,7 @@ Elements related to user input and form interaction
   padding-top: 0.375rem;
   padding-bottom: 0.375rem;
   line-height: 1.5;
+  background-color: var(--color-bg-light) !important;
 }
 
 .tab-content .form-control-plaintext {
@@ -38,7 +46,7 @@ Elements related to user input and form interaction
   align-items: center;
   min-height: 40px;
   position: relative;
-  background-color: white;
+  background-color: var(--color-bg-secondary);
 }
 
 .entity-input {
@@ -48,6 +56,8 @@ Elements related to user input and form interaction
   font-size: var(--font-size-sm);
   padding: 8px;
   min-width: 120px;
+  background-color: transparent;
+  color: var(--color-text-primary);
 }
 
 .autocomplete-items {
@@ -58,7 +68,7 @@ Elements related to user input and form interaction
   top: 100%;
   left: 0;
   right: 0;
-  background-color: white;
+  background-color: var(--color-bg-secondary);
   max-height: 200px;
   overflow-y: auto;
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
@@ -68,16 +78,17 @@ Elements related to user input and form interaction
 .autocomplete-item {
   padding: 10px;
   cursor: pointer;
+  color: var(--color-text-primary);
 }
 
 .autocomplete-item:hover,
 .highlight {
-  background-color: #f1f1f1;
+  background-color: var(--color-bg-light);
 }
 
 /* ===== Search Input ===== */
 .search-container {
-  background-color: #f3f4f6;
+  background-color: var(--color-bg-light);
   border-radius: 100px;
   padding: 0 0.75rem;
   max-width: 250px;
@@ -87,25 +98,28 @@ Elements related to user input and form interaction
   background-color: transparent;
   font-size: 0.9rem;
   padding: 0.5rem 0.25rem;
+  border: none;
 }
 
 .search-container .input-group-text {
-  color: #9ca3af;
+  color: var(--color-text-muted);
   font-size: 0.85rem;
+  background-color: transparent;
+  border: none;
 }
 
 /* Standard search input */
 #globalSearch {
-  border-radius: 0 6px 6px 0;
-  border: 1px solid #cbd5e0;
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  border: 1px solid var(--color-border-light);
   height: 38px;
 }
 
 .input-group-text {
-  background-color: white;
-  border: 1px solid #cbd5e0;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-light);
   border-right: none;
-  border-radius: 6px 0 0 6px;
+  border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
 }
 
 /* ===== Column Selector ===== */
@@ -124,8 +138,8 @@ Elements related to user input and form interaction
 }
 
 .column-list .form-check-input:checked {
-  background-color: #4299e1;
-  border-color: #4299e1;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 /* Column selector checkbox styling */
@@ -151,12 +165,12 @@ Elements related to user input and form interaction
 }
 
 #columnSelectorItems .form-check-input:checked + .form-check-label {
-  color: #3182ce;
+  color: var(--color-primary);
 }
 
 #columnSelectorItems .form-check-input:checked {
-  background-color: #3182ce;
-  border-color: #3182ce;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 #columnSelectorItems .form-check-input:checked ~ .form-check-label::before {
@@ -166,7 +180,7 @@ Elements related to user input and form interaction
   top: 0;
   bottom: 0;
   width: 3px;
-  background-color: #3182ce;
+  background-color: var(--color-primary);
   border-radius: 2px;
 }
 

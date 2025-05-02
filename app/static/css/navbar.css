@@ -5,7 +5,7 @@ Navbar styles - navigation elements and related components
 /* ===== Navbar Base Styles ===== */
 .navbar {
   background-color: var(--color-bg-secondary);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(var(--color-black-rgb), 0.08);
   padding: 0.75rem 0;
   transition: all var(--transition-base);
   height: var(--navbar-height);
@@ -18,19 +18,12 @@ Navbar styles - navigation elements and related components
   font-size: 1.3rem;
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
-}
-
-.brand-icon-container {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, var(--color-primary), #7e5bef);
-  border-radius: var(--border-radius-xl);
-  color: white;
-  font-size: 1.1rem;
+  text-decoration: none;
 }
+
+/* Brand icon is now defined in components.css */
 
 /* ===== Nav Item Styles ===== */
 .navbar-nav {
@@ -63,17 +56,17 @@ Navbar styles - navigation elements and related components
   font-weight: var(--font-weight-semibold);
 }
 
-/* Active page link from style.css */
+/* Consolidated active page link */
 .active-link {
-  background-color: #70a1ff !important;
-  color: white !important;
-  font-weight: bold;
+  background-color: var(--color-primary);
+  color: var(--color-text-white);
+  font-weight: var(--font-weight-semibold);
 }
 
-/* Hover effect from style.css */
+/* Consolidated hover effect */
 .hover-effect:hover {
-  background-color: #a5c8ff;
-  color: white !important;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .nav-icon {
@@ -100,15 +93,15 @@ Navbar styles - navigation elements and related components
   width: 8px;
   top: 12%;
   right: -2px;
-  border: 2px solid white;
+  border: 2px solid var(--color-bg-secondary);
 }
 
 /* ===== Mobile Styles ===== */
 .navbar-toggler {
   border: none;
   padding: 0.6rem;
-  color: #4b5563;
-  background-color: #f3f4f6;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-light);
   border-radius: var(--border-radius-lg);
 }
 
@@ -118,7 +111,7 @@ Navbar styles - navigation elements and related components
 
 @media (max-width: 991.98px) {
   .navbar-collapse {
-    background-color: white;
+    background-color: var(--color-bg-secondary);
     padding: 1rem;
     border-radius: var(--border-radius-xl);
     box-shadow: var(--shadow-lg);

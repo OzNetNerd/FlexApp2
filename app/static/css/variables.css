@@ -15,47 +15,78 @@ These variables make it easier to maintain consistent colors, spacing, and styli
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
 
-  /* Colors - Light Theme */
+  /* Colors - Primary palette */
   --color-primary: #4f46e5;
   --color-primary-hover: #4338ca;
   --color-primary-light: rgba(79, 70, 229, 0.1);
   --color-primary-lighter: rgba(79, 70, 229, 0.06);
+  --color-primary-rgb: 79, 70, 229;
 
+  /* Secondary palette */
   --color-secondary: #535b69;
   --color-secondary-hover: #444b57;
+  --color-secondary-light: rgba(83, 91, 105, 0.1);
+  --color-secondary-lighter: rgba(83, 91, 105, 0.06);
+  --color-secondary-rgb: 83, 91, 105;
 
-  --color-success: #38b2ac;
-  --color-success-hover: #2c7a7b;
-  --color-success-light: rgba(25, 135, 84, 0.15);
+  /* Neutral colors */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-white-rgb: 255, 255, 255;
+  --color-black-rgb: 0, 0, 0;
 
-  --color-danger: #ef4444;
-  --color-danger-hover: #c53030;
-  --color-danger-light: rgba(239, 68, 68, 0.06);
-
-  --color-warning: #C05621;
-  --color-info: #2B6CB0;
-
+  /* Text colors */
   --color-text-primary: #2d3748;
   --color-text-secondary: #4a5568;
   --color-text-muted: #6b7280;
   --color-text-light: #718096;
+  --color-text-white: var(--color-white);
 
+  /* Status colors */
+  --color-success: #38b2ac;
+  --color-success-hover: #2c7a7b;
+  --color-success-light: rgba(56, 178, 172, 0.15);
+  --color-success-lighter: rgba(56, 178, 172, 0.06);
+  --color-success-rgb: 56, 178, 172;
+
+  --color-danger: #ef4444;
+  --color-danger-hover: #c53030;
+  --color-danger-light: rgba(239, 68, 68, 0.15);
+  --color-danger-lighter: rgba(239, 68, 68, 0.06);
+  --color-danger-rgb: 239, 68, 68;
+
+  --color-warning: #c05621;
+  --color-warning-hover: #9c4221;
+  --color-warning-light: rgba(192, 86, 33, 0.15);
+  --color-warning-lighter: rgba(192, 86, 33, 0.06);
+  --color-warning-rgb: 192, 86, 33;
+
+  --color-info: #2b6cb0;
+  --color-info-hover: #2c5282;
+  --color-info-light: rgba(43, 108, 176, 0.15);
+  --color-info-lighter: rgba(43, 108, 176, 0.06);
+  --color-info-rgb: 43, 108, 176;
+
+  /* Background colors */
   --color-bg-primary: #f0f4f8;
   --color-bg-secondary: #ffffff;
   --color-bg-light: #f7fafc;
   --color-bg-lighter: #f8fafc;
 
+  /* Border colors */
   --color-border: #dee2e6;
   --color-border-light: #e2e8f0;
   --color-border-lighter: #edf2f7;
 
-  /* Spacing */
+  /* Spacing system */
   --spacing-xs: 0.3rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 0.75rem;
   --spacing-base: 1rem;
   --spacing-lg: 1.25rem;
   --spacing-xl: 1.5rem;
+  --spacing-2xl: 2rem;
+  --spacing-3xl: 3rem;
 
   /* Borders */
   --border-radius-sm: 4px;
@@ -78,7 +109,16 @@ These variables make it easier to maintain consistent colors, spacing, and styli
   /* Animation */
   --transition-fast: 0.2s ease;
   --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  --transition-properties-hover: background-color, color, border-color, box-shadow, transform;
+  --transition-properties-base: background-color, color, border-color;
 
   /* Navigation */
   --navbar-height: 60px;
+
+  /* Sidebar */
+  --sidebar-width: 250px;
+  --sidebar-collapsed-width: 60px;
+  --sidebar-bg: var(--color-bg-secondary);
+  --sidebar-border-color: var(--color-border-light);
 }
