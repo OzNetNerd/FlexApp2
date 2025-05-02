@@ -1,0 +1,14 @@
+{% macro page_heading(icon, title, message='') %}
+<h3 class="h4 mb-0 text-primary me-3">
+    <i class="{{ icon }}"></i>
+    {{ title }} <span class="text-info">{{ message }}</span>
+</h3>
+{% endmacro %}
+
+{% macro model_heading(model_name, entity_name='', read_only=false) %}
+  {% if read_only %}
+    {{ page_heading('fas fa-eye me-2', 'View ' ~ model_name, entity_name) }}
+  {% else %}
+    {{ page_heading('fas fa-edit me-2', 'Edit ' ~ model_name, entity_name) }}
+  {% endif %}
+{% endmacro %}
