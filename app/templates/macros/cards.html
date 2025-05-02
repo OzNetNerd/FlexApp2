@@ -1,0 +1,10 @@
+{% macro section_card(icon, title, text_color="text-primary", bg_color="bg-primary-subtle", content="") %}
+  <div class="card shadow-sm mb-4">
+    <div class="card-header {{ bg_color }} d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 {{ text_color }}"><i class="bi bi-{{ icon }} me-2"></i>{{ title }}</h5>
+    </div>
+    <div class="card-body">
+      <p class="card-text fs-6">{{ content }}</p>
+    </div>
+  </div>
+{% endmacro %}
