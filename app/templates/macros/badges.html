@@ -1,0 +1,5 @@
+{% macro status_badge(bg_color="bg-primary", text_color="text-white", content="") %}
+  <span class="badge {{ bg_color }} {{ text_color }} ms-2 rounded-pill px-3">
+    {{ content }}
+  </span>
+{% endmacro %}
