@@ -25,6 +25,17 @@ Contains dark theme variables and style overrides
   --color-border-lighter: #333333;
   --border-section-heading: #565656;
 
+  /* Component colors */
+  --color-primary: #7d75ff;
+  --color-primary-hover: #6a64e0;
+  --color-primary-light: rgba(125, 117, 255, 0.15);
+  --color-primary-lighter: rgba(125, 117, 255, 0.08);
+
+  /* Shadow adjustments */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+
   /* Apply base styles */
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
@@ -36,41 +47,117 @@ Contains dark theme variables and style overrides
 [data-theme="dark"] .navbar,
 [data-theme="dark"] .card,
 [data-theme="dark"] .card-header,
-[data-theme="dark"] .card-body {
+[data-theme="dark"] .card-body,
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .sidebar-header,
+[data-theme="dark"] .sidebar-footer {
   background-color: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Cards and general UI elements */
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-light {
+  background-color: var(--color-bg-secondary) !important;
+}
+
+/* Stat cards */
+[data-theme="dark"] .stat-card {
+  background-color: #2a2a2a !important;
   color: var(--color-text-primary) !important;
 }
 
 /* Navigation elements */
 [data-theme="dark"] .nav-link,
+[data-theme="dark"] .sidebar-link,
 [data-theme="dark"] .navbar-brand,
-[data-theme="dark"] .form-label {
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .sidebar-text {
   color: var(--color-text-primary) !important;
+}
+
+[data-theme="dark"] .sidebar-item .active {
+  background-color: var(--color-primary-light) !important;
 }
 
 /* Form elements */
 [data-theme="dark"] .form-control-plaintext,
-[data-theme="dark"] .form-control {
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .input-group-text {
   background-color: var(--bg-card) !important;
   color: var(--color-text-primary) !important;
   border-color: var(--color-border) !important;
 }
 
+/* Search container */
+[data-theme="dark"] .search-container {
+  background-color: #2a2a2a !important;
+}
+
 /* Borders */
-[data-theme="dark"] .border {
+[data-theme="dark"] .border,
+[data-theme="dark"] .border-bottom {
   border-color: var(--color-border) !important;
 }
 
 /* Buttons */
-[data-theme="dark"] .btn-light {
+[data-theme="dark"] .btn-light,
+[data-theme="dark"] .btn-outline-secondary,
+[data-theme="dark"] .btn-sidebar-collapse {
   background-color: #2d2d2d;
   color: #e1e1e1;
   border-color: #444444;
 }
 
+[data-theme="dark"] .btn-light:hover,
+[data-theme="dark"] .btn-outline-secondary:hover,
+[data-theme="dark"] .btn-sidebar-collapse:hover {
+  background-color: #3a3a3a;
+  color: #ffffff;
+}
+
 /* Text colors */
-[data-theme="dark"] .text-muted {
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] small.text-muted {
   color: var(--color-text-muted) !important;
+}
+
+[data-theme="dark"] .text-primary {
+  color: #7d75ff !important;
+}
+
+[data-theme="dark"] .text-success {
+  color: #4fd1c5 !important;
+}
+
+[data-theme="dark"] .text-danger {
+  color: #fc8181 !important;
+}
+
+[data-theme="dark"] .text-info {
+  color: #63b3ed !important;
+}
+
+/* ===== Navigation Cards ===== */
+[data-theme="dark"] .nav-card {
+  background-color: #2d2d2d;
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .nav-card:hover {
+  background-color: #333333;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===== Recent Activity Section ===== */
+[data-theme="dark"] .list-group-item {
+  background-color: transparent !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .activity-icon {
+  box-shadow: var(--shadow-md);
 }
 
 /* ===== Section Component Dark Mode Overrides ===== */
@@ -111,15 +198,15 @@ Contains dark theme variables and style overrides
   --ag-border-color: #444444;
   --ag-secondary-border-color: #333333;
   --ag-row-border-color: #333333;
-  --ag-row-hover-color: rgba(79, 70, 229, 0.1);
-  --ag-selected-row-background-color: rgba(79, 70, 229, 0.2);
+  --ag-row-hover-color: rgba(125, 117, 255, 0.1);
+  --ag-selected-row-background-color: rgba(125, 117, 255, 0.2);
   --ag-checkbox-unchecked-color: #909090;
   --ag-checkbox-indeterminate-color: #909090;
 }
 
 [data-theme="dark"] .ag-theme-alpine .ag-header-cell-sorted-asc .ag-header-cell-label,
 [data-theme="dark"] .ag-theme-alpine .ag-header-cell-sorted-desc .ag-header-cell-label {
-  color: #7e5bef;
+  color: #7d75ff;
 }
 
 /* ===== Form Elements Dark Mode Overrides ===== */
@@ -153,8 +240,12 @@ Contains dark theme variables and style overrides
 }
 
 [data-theme="dark"] .dropdown-item:hover {
-  background-color: rgba(79, 70, 229, 0.08);
+  background-color: rgba(125, 117, 255, 0.08);
   color: #a5a0ff;
+}
+
+[data-theme="dark"] .dropdown-divider {
+  border-color: var(--color-border);
 }
 
 /* ===== Avatar Dark Mode Overrides ===== */
@@ -176,4 +267,26 @@ Contains dark theme variables and style overrides
 
 [data-theme="dark"] .badge-remove:hover {
   color: var(--color-danger);
+}
+
+/* ===== Sidebar Specific Overrides ===== */
+[data-theme="dark"] .sidebar {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .sidebar-link:hover {
+  background-color: #2a2a2a;
+}
+
+[data-theme="dark"] .sidebar-item .active {
+  background-color: var(--color-primary-light);
+}
+
+[data-theme="dark"] .active-indicator {
+  background-color: var(--color-primary);
+}
+
+/* ===== Highlights Container ===== */
+[data-theme="dark"] .highlights-container {
+  background-color: #252525 !important;
 }

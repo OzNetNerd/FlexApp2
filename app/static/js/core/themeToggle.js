@@ -1,24 +1,58 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Check for theme preference in localStorage
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+  // Function to set theme
+  const setTheme = (theme) => {
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+
+    // Update toggle button icon
+    if (themeToggleBtn) {
+      const icon = themeToggleBtn.querySelector('i');
+      if (icon) {
+        if (theme === 'dark') {
+          icon.className = 'fas fa-sun';
+        } else {
+          icon.className = 'fas fa-moon';
+        }
+      }
+    }
+
+    console.info(`Theme set to: ${theme}`);
+  };
+
+  // Check for theme preference
   const savedTheme = localStorage.getItem('theme');
+
   if (savedTheme) {
-    document.body.setAttribute('data-theme', savedTheme);
-    console.debug(`Applied saved theme: ${savedTheme}`);
+    // Use saved preference
+    setTheme(savedTheme);
+  } else if (prefersDarkScheme.matches) {
+    // Use system preference if no saved preference
+    setTheme('dark');
+  } else {
+    // Default to light
+    setTheme('light');
   }
 
-  // Theme toggle handler for both navbar and sidebar
+  // Theme toggle handler
   window.toggleTheme = function() {
     const currentTheme = document.body.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.body.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    console.info(`Theme switched to: ${newTheme}`);
-  }
+    setTheme(newTheme);
+  };
 
   // Add event listener to theme toggle button
-  const themeToggleBtn = document.getElementById('themeToggleBtn');
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', window.toggleTheme);
     console.debug("Theme toggle button initialized");
   }
+
+  // Listen for system preference changes
+  prefersDarkScheme.addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+      setTheme(e.matches ? 'dark' : 'light');
+    }
+  });
 });
