@@ -32,12 +32,12 @@
   <div class="d-flex gap-2">
     {% if read_only %}
       {{ icon_button(href=url_for(endpoint_prefix + '.create'),
-                class="btn btn-primary fw-bold",
+                class="btn btn-primary",
                 icon_lib=icon_lib, icon="plus", text="Add") }}
 
       {% if id %}
         {{ icon_button(href=url_for(endpoint_prefix + '.edit', entity_id=id),
-                  class="btn btn-warning text-dark fw-bold",
+                  class="btn btn-warning text-dark",
                   icon_lib=icon_lib, icon="edit", text="Edit") }}
 
         {{ icon_button(type="button", class="btn btn-danger",
