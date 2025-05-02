@@ -138,9 +138,16 @@ Table styles - AG Grid theme and custom table styling
 
 /* Table container height */
 #table-container {
-  height: calc(100vh - 280px);
-  min-height: 420px;
+  min-height: 420px; /* Ensures the container has a minimum height */
+  padding-top: 10px; /* Adds a slight gap above the table content */
+  padding-bottom: 20px; /* Adds a slight gap below the table content */
 }
+
+/* Optional: Add padding to the table itself to create space inside */
+table {
+  padding: 10px; /* Adjust as needed */
+}
+
 
 /* Responsive table wrapper */
 .table-responsive {
