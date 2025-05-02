@@ -1,18 +1,30 @@
 <!-- START TEMPLATE: macros/buttons.html -->
 
-{% macro icon_button(href=None, type=None, class="btn", icon_lib="fas", icon=None,
+{% macro icon_button(href=None, type=None, class="btn", colour=None, icon_lib="fas", icon=None,
                 text=None, form=None, onclick=None) %}
+  {% set button_class = class %}
+  {% if colour %}
+    {% set button_class = button_class + " btn-" + colour %}
+  {% endif %}
   {% if href %}
-    <a href="{{ href }}" class="{{ class }}" {% if onclick %}onclick="{{ onclick }}"{% endif %}>
-      {% if icon %}<i class="{{ icon_lib }} {{ icon_lib }}-{{ icon }} me-1"></i>{% endif %} {{ text }}
+    <a href="{{ href }}" class="{{ button_class }}" {% if onclick %}onclick="{{ onclick }}"{% endif %}>
+      {% if icon %}<i class="{{ icon_lib }} fa-{{ icon }} me-1"></i>{% endif %} {{ text }}
     </a>
   {% else %}
-    <button type="{{ type or 'button' }}" class="{{ class }}"
+    <button type="{{ type or 'button' }}" class="{{ button_class }}"
       {% if form %}form="{{ form }}"{% endif %}
       {% if onclick %}onclick="{{ onclick }}"{% endif %}>
       {% if icon %}<i class="{{ icon_lib }} {{ icon_lib }}-{{ icon }} me-1"></i>{% endif %} {{ text }}
     </button>
   {% endif %}
+{% endmacro %}
+
+{% macro add(endpoint, entity_type="Item", class="btn btn-primary", icon_lib="fas") %}
+  {{ icon_button(href=url_for(endpoint + '.create'),
+                class=class,
+                icon_lib=icon_lib,
+                icon="plus",
+                text="Add " + entity_type) }}
 {% endmacro %}
 
 {% macro crud_buttons(endpoint_prefix, id=None, entity_name="", model_name="",

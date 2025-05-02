@@ -22,7 +22,7 @@
           </div>
 
           {% block action_buttons %}
-            {{ buttons.icon_button(url_for(entity_base_route + '.create'), 'btn btn-sm btn-primary', 'plus', 'Add ' + entity_name|default('Item')) }}
+            {{ buttons.add(entity_base_route, entity_type="Company") }}
           {% endblock %}
 
           {% block extra_action_buttons %}{% endblock %}
