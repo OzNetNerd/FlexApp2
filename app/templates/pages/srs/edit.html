@@ -34,29 +34,30 @@
           autofocus></textarea>
       </div>
 
-      <div class="row mb-4">
-        <div class="col-md-6">
-          <label class="form-label fw-bold">How well did you know this?</label>
-          <div class="rating-container d-flex align-items-start gap-3">
-            <div>
-              <input type="range" class="form-range" id="rating-slider" min="0" max="5" value=""
-                     oninput="updateRating(this.value)" title="Drag to select rating">
-              <div class="small text-muted mt-1">
-                Delay: <span id="delay-preview">(select rating)</span>
-              </div>
-            </div>
-            <select name="rating" id="rating-select" class="form-select" style="width: 180px"
-                    onchange="updateSlider(this.value)" required>
-              <option value="" selected disabled>-- Select rating --</option>
-              <option value="0">0 - No recall</option>
-              <option value="1">1 - Very Hard</option>
-              <option value="2">2 - Hard</option>
-              <option value="3">3 - Normal</option>
-              <option value="4">4 - Easy</option>
-              <option value="5">5 - Perfect</option>
-            </select>
-          </div>
+<div class="row mb-4">
+  <div class="col-md-6">
+    <label class="form-label fw-bold">How well did you know this?</label>
+    <div class="rating-container d-flex align-items-start gap-3">
+      <div>
+        <input type="range" class="form-range" id="rating-slider" min="0" max="5" value=""
+               oninput="updateRating(this.value)" title="Drag to select rating">
+        <div class="small text-muted mt-1">
+          Delay: <span id="delay-preview">(select rating)</span>
         </div>
+      </div>
+      <select name="rating" id="rating-select" class="form-select card-body" style="width: 180px"
+              onchange="updateSlider(this.value)" required>
+        <option value="" selected disabled>-- Select rating --</option>
+        <option value="0">0 - No recall</option>
+        <option value="1">1 - Very Hard</option>
+        <option value="2">2 - Hard</option>
+        <option value="3">3 - Normal</option>
+        <option value="4">4 - Easy</option>
+        <option value="5">5 - Perfect</option>
+      </select>
+    </div>
+  </div>
+</div>
 
         <div class="col-md-6 d-flex align-items-end justify-content-end">
           <div class="text-muted small me-3">
