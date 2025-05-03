@@ -26,6 +26,7 @@ Run tests:
 clear && pytest -v --markers
 clear && pytest -v
 clear && pytest -vvs tests/functional/test_mock_auth.py
+clear && pytest tests/unit/utils/test_model_registry.py
 clear && pytest --collect-only
 clear && pytest -v --rootdir=/mnt/c/Will/code/FlexApp2 -c=/mnt/c/Will/code/FlexApp2/pytest.ini
 ```
