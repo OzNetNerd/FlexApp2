@@ -69,10 +69,7 @@ class ReviewHistory(BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     srs_item_id = db.Column(db.Integer, db.ForeignKey("srs.id"))
-    timestamp = db.Column(
-        db.DateTime(timezone=True),
-        default=lambda: datetime.now(ZoneInfo("UTC"))
-    )
+    timestamp = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(ZoneInfo("UTC")))
     rating = db.Column(db.Integer)
     interval = db.Column(db.Float)
     ease_factor = db.Column(db.Float)

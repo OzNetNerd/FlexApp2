@@ -216,8 +216,7 @@ class SRSService:
             logger.info("SRSService: No items found, success rate is 0")
             return 0
 
-        successful_items = sum(
-            1 for item in all_items if item.successful_reps and item.review_count and item.review_count > 0)
+        successful_items = sum(1 for item in all_items if item.successful_reps and item.review_count and item.review_count > 0)
         logger.info(f"SRSService: Found {successful_items} successful items out of {len(all_items)} total")
 
         success_rate = int((successful_items / len(all_items)) * 100) if len(all_items) > 0 else 0
@@ -266,18 +265,15 @@ class SRSService:
                 return interval
             elif fsrs_rating == 2:
                 interval = min(item.interval * HARD_MULTIPLIER, MAX_INTERVAL)
-                logger.info(
-                    f"SRSService: Rating 2 (Hard) - setting interval to {interval:.2f} days (x{HARD_MULTIPLIER})")
+                logger.info(f"SRSService: Rating 2 (Hard) - setting interval to {interval:.2f} days (x{HARD_MULTIPLIER})")
                 return interval
             elif fsrs_rating == 3:
                 interval = min(item.interval * GOOD_MULTIPLIER, MAX_INTERVAL)
-                logger.info(
-                    f"SRSService: Rating 3 (Good) - setting interval to {interval:.2f} days (x{GOOD_MULTIPLIER})")
+                logger.info(f"SRSService: Rating 3 (Good) - setting interval to {interval:.2f} days (x{GOOD_MULTIPLIER})")
                 return interval
             else:
                 interval = min(item.interval * EASY_MULTIPLIER, MAX_INTERVAL)
-                logger.info(
-                    f"SRSService: Rating 4 (Easy) - setting interval to {interval:.2f} days (x{EASY_MULTIPLIER})")
+                logger.info(f"SRSService: Rating 4 (Easy) - setting interval to {interval:.2f} days (x{EASY_MULTIPLIER})")
                 return interval
 
     def _calculate_new_ease_factor(self, item: SRS, ui_rating: int) -> float:
@@ -416,8 +412,7 @@ class SRSService:
                 logger.info(f"SRSService: Found review with interval {review.interval} for item {review.srs_item_id}")
                 # Check if this is the first time the card crossed the threshold
                 prev_reviews = (
-                    ReviewHistory.query.filter(ReviewHistory.srs_item_id == review.srs_item_id,
-                                               ReviewHistory.timestamp < review.timestamp)
+                    ReviewHistory.query.filter(ReviewHistory.srs_item_id == review.srs_item_id, ReviewHistory.timestamp < review.timestamp)
                     .order_by(ReviewHistory.timestamp.desc())
                     .first()
                 )
@@ -506,8 +501,7 @@ class SRSService:
                 logger.info(f"SRSService: Review {review.id} was perfect (rating {review.rating})")
             else:
                 # Stop counting as soon as we hit a non-perfect review
-                logger.info(
-                    f"SRSService: Found non-perfect review {review.id} (rating {review.rating}), stopping count")
+                logger.info(f"SRSService: Found non-perfect review {review.id} (rating {review.rating}), stopping count")
                 break
 
         logger.info(f"SRSService: Total consecutive perfect reviews: {consecutive_count}")
@@ -640,8 +634,7 @@ class SRSService:
         if performance == "struggling":
             # Cards with low success rate (< 60% correct)
             logger.info("SRSService: Querying for struggling cards (success rate < 60%)")
-            cards = SRS.query.filter(SRS.review_count > 2,
-                                     (SRS.successful_reps * 100 / SRS.review_count) < 60).all()  # At least 3 reviews
+            cards = SRS.query.filter(SRS.review_count > 2, (SRS.successful_reps * 100 / SRS.review_count) < 60).all()  # At least 3 reviews
         elif performance == "average":
             # Cards with average success rate (60-85%)
             logger.info("SRSService: Querying for average performance cards (60% <= success rate <= 85%)")
@@ -699,21 +692,33 @@ class SRSService:
         elif strategy_name == "priority_first":
             # Cards that are most overdue first
             logger.info("SRSService: Applying 'priority_first' strategy (most overdue first)")
-            cards = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))).order_by(
-                SRS.next_review_at).all()
+            cards = (
+                SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")))
+                .order_by(SRS.next_review_at)
+                .all()
+            )
 
         elif strategy_name == "hard_cards_first":
             # Focus on difficult cards first
             logger.info("SRSService: Applying 'hard_cards_first' strategy (ease_factor <= 1.7)")
-            cards = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
-                                     SRS.ease_factor <= 1.7).order_by(SRS.ease_factor).all()
+            cards = (
+                SRS.query.filter(
+                    SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")), SRS.ease_factor <= 1.7
+                )
+                .order_by(SRS.ease_factor)
+                .all()
+            )
 
         elif strategy_name == "mastery_boost":
             # Cards that are close to mastery (interval between 15-21 days)
             logger.info("SRSService: Applying 'mastery_boost' strategy (interval between 15-21 days)")
             cards = (
-                SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
-                                 SRS.interval >= 15, SRS.interval <= 21)
+                SRS.query.filter(
+                    SRS.next_review_at.isnot(None),
+                    SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
+                    SRS.interval >= 15,
+                    SRS.interval <= 21,
+                )
                 .order_by(SRS.interval.desc())
                 .all()
             )
@@ -726,7 +731,7 @@ class SRSService:
                     SRS.next_review_at.isnot(None),
                     SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
                     SRS.review_count > 2,
-                    (SRS.successful_reps * 100 / SRS.review_count) < 70
+                    (SRS.successful_reps * 100 / SRS.review_count) < 70,
                 )
                 .order_by((SRS.successful_reps * 100 / SRS.review_count))
                 .all()
@@ -738,8 +743,11 @@ class SRSService:
             new_cards = SRS.query.filter(SRS.review_count == 0).limit(5).all()
             logger.info(f"SRSService: Found {len(new_cards)} new cards")
 
-            due_cards = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
-                                         SRS.review_count > 0).limit(10).all()
+            due_cards = (
+                SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")), SRS.review_count > 0)
+                .limit(10)
+                .all()
+            )
             logger.info(f"SRSService: Found {len(due_cards)} due cards")
 
             cards = new_cards + due_cards
@@ -811,7 +819,8 @@ class SRSService:
             opportunity_items = [item for item in all_items if item.notable_type == "opportunity"]
 
             logger.info(
-                f"SRSService: Found {len(company_items)} company items, {len(contact_items)} contact items, {len(opportunity_items)} opportunity items")
+                f"SRSService: Found {len(company_items)} company items, {len(contact_items)} contact items, {len(opportunity_items)} opportunity items"
+            )
 
             progress = {
                 "company": calculate_progress(company_items),
@@ -929,8 +938,7 @@ class SRSService:
         # Add predefined categories first
         for category_id, info in predefined.items():
             count = category_counts.get(category_id, 0)
-            result.append(
-                {"id": category_id, "name": info["name"], "color": info["color"], "icon": info["icon"], "count": count})
+            result.append({"id": category_id, "name": info["name"], "color": info["color"], "icon": info["icon"], "count": count})
             logger.info(f"SRSService: Added predefined category: {category_id} with count {count}")
 
         # Add custom categories from database that aren't in predefined list
@@ -1027,8 +1035,7 @@ class SRSService:
         logger.info(f"SRSService: Performance counts: {performance_counts}")
 
         logger.info("SRSService: Calculating average values")
-        avg_ease = sum(card.ease_factor or DEFAULT_EASE_FACTOR for card in all_cards) / len(
-            all_cards) if all_cards else DEFAULT_EASE_FACTOR
+        avg_ease = sum(card.ease_factor or DEFAULT_EASE_FACTOR for card in all_cards) / len(all_cards) if all_cards else DEFAULT_EASE_FACTOR
         avg_interval = sum(card.interval or 0 for card in all_cards) / len(all_cards) if all_cards else 0
         logger.info(f"SRSService: Average ease factor: {avg_ease:.2f}, average interval: {avg_interval:.2f}")
 
@@ -1036,8 +1043,7 @@ class SRSService:
         weekly_reviews = self.count_weekly_reviews()
         mastered_this_month = self.count_mastered_cards_this_month()
 
-        logger.info(
-            f"SRSService: Streak days: {streak_days}, weekly reviews: {weekly_reviews}, mastered this month: {mastered_this_month}")
+        logger.info(f"SRSService: Streak days: {streak_days}, weekly reviews: {weekly_reviews}, mastered this month: {mastered_this_month}")
 
         stats = {
             **basic_stats,

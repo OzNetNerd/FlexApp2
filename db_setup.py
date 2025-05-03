@@ -17,8 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Import the models directly
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from app.models import Capability, CapabilityCategory, Company, CompanyCapability, Contact, Note, Opportunity, Task, \
-    User, db
+from app.models import Capability, CapabilityCategory, Company, CompanyCapability, Contact, Note, Opportunity, Task, User, db
 from app.models.relationship import Relationship
 from app.models.pages.srs import SRS
 
@@ -95,20 +94,13 @@ def seed_users():
 def seed_companies():
     """Seed companies into the database."""
     companies = [
-        ("Nimbus Financial",
-         "Large financial services company with hybrid cloud environment, primarily AWS and on-prem."),
-        ("Velocity Healthcare Systems",
-         "Healthcare provider with growing Azure footprint and strict compliance requirements."),
-        ("GlobalTech Retail",
-         "Multi-national retailer operating across GCP, AWS, and Azure with containerized microservices."),
-        ("Quantum Innovations",
-         "Fast-growing SaaS provider with cloud-native architecture using Kubernetes across multiple clouds."),
-        ("Meridian Energy",
-         "Energy company with critical infrastructure transitioning from on-prem to AWS cloud services."),
-        ("Axion Logistics",
-         "Supply chain company with legacy systems and new cloud initiatives creating security visibility gaps."),
-        ("Horizon Media Group",
-         "Media company with extensive data analytics workloads running in multi-cloud environment."),
+        ("Nimbus Financial", "Large financial services company with hybrid cloud environment, primarily AWS and on-prem."),
+        ("Velocity Healthcare Systems", "Healthcare provider with growing Azure footprint and strict compliance requirements."),
+        ("GlobalTech Retail", "Multi-national retailer operating across GCP, AWS, and Azure with containerized microservices."),
+        ("Quantum Innovations", "Fast-growing SaaS provider with cloud-native architecture using Kubernetes across multiple clouds."),
+        ("Meridian Energy", "Energy company with critical infrastructure transitioning from on-prem to AWS cloud services."),
+        ("Axion Logistics", "Supply chain company with legacy systems and new cloud initiatives creating security visibility gaps."),
+        ("Horizon Media Group", "Media company with extensive data analytics workloads running in multi-cloud environment."),
     ]
 
     for name, description in companies:
@@ -156,13 +148,7 @@ def seed_contacts():
                 company = companies[contact_id % len(companies)]
                 email = f"{first_name.lower()}.{last_name.lower()}@{company.name.lower().replace(' ', '')}.com"
                 contact = Contact(
-                    id=contact_id,
-                    first_name=first_name,
-                    last_name=last_name,
-                    phone_number=phone,
-                    email=email,
-                    title=title,
-                    company=company
+                    id=contact_id, first_name=first_name, last_name=last_name, phone_number=phone, email=email, title=title, company=company
                 )
                 db.session.add(contact)
                 logger.info(f"Created contact with ID {contact_id}: {first_name} {last_name}")
@@ -239,7 +225,7 @@ def seed_opportunities():
             "In Progress",
             "Technical Evaluation",
             750000.0,
-            "Nimbus Financial"
+            "Nimbus Financial",
         ),
         (
             "Healthcare Compliance Automation",
@@ -247,7 +233,7 @@ def seed_opportunities():
             "New",
             "Proposal",
             350000.0,
-            "Velocity Healthcare Systems"
+            "Velocity Healthcare Systems",
         ),
         (
             "Container Security Initiative",
@@ -255,7 +241,7 @@ def seed_opportunities():
             "Won",
             "Closed Won",
             480000.0,
-            "GlobalTech Retail"
+            "GlobalTech Retail",
         ),
         (
             "Cloud Security Posture Assessment",
@@ -263,7 +249,7 @@ def seed_opportunities():
             "Lost",
             "Closed Lost",
             120000.0,
-            "Quantum Innovations"
+            "Quantum Innovations",
         ),
         (
             "Critical Infrastructure Protection",
@@ -271,7 +257,7 @@ def seed_opportunities():
             "New",
             "Discovery",
             680000.0,
-            "Meridian Energy"
+            "Meridian Energy",
         ),
         (
             "Supply Chain Security Transformation",
@@ -279,7 +265,7 @@ def seed_opportunities():
             "In Progress",
             "Negotiation",
             520000.0,
-            "Axion Logistics"
+            "Axion Logistics",
         ),
         (
             "Data Protection and Compliance",
@@ -287,7 +273,7 @@ def seed_opportunities():
             "New",
             "Qualification",
             280000.0,
-            "Horizon Media Group"
+            "Horizon Media Group",
         ),
     ]
 
@@ -328,7 +314,7 @@ def seed_tasks():
             "High",
             "Opportunity",
             "Prisma Cloud Enterprise Deployment",
-            "morgan"
+            "morgan",
         ),
         (
             "Draft healthcare compliance presentation",
@@ -337,7 +323,7 @@ def seed_tasks():
             "Medium",
             "Opportunity",
             "Healthcare Compliance Automation",
-            "taylor"
+            "taylor",
         ),
         (
             "Container security workshop",
@@ -346,7 +332,7 @@ def seed_tasks():
             "High",
             "Opportunity",
             "Container Security Initiative",
-            "jordan"
+            "jordan",
         ),
         (
             "Conduct security posture assessment",
@@ -355,7 +341,7 @@ def seed_tasks():
             "Medium",
             "Opportunity",
             "Cloud Security Posture Assessment",
-            "alex"
+            "alex",
         ),
         (
             "Critical infrastructure risk analysis",
@@ -364,7 +350,7 @@ def seed_tasks():
             "High",
             "Opportunity",
             "Critical Infrastructure Protection",
-            "casey"
+            "casey",
         ),
         (
             "Update security transformation proposal",
@@ -373,7 +359,7 @@ def seed_tasks():
             "Medium",
             "Opportunity",
             "Supply Chain Security Transformation",
-            "morgan"
+            "morgan",
         ),
         (
             "Prepare data compliance requirements document",
@@ -382,7 +368,7 @@ def seed_tasks():
             "Medium",
             "Opportunity",
             "Data Protection and Compliance",
-            "taylor"
+            "taylor",
         ),
     ]
 
@@ -517,36 +503,60 @@ def seed_relationships():
     companies = Company.query.all()
 
     # Define relationship types relevant to cloud security sales
-    relationship_types = ["Account Executive", "Solution Architect", "Technical Champion", "Economic Buyer",
-                          "Decision Maker", "Influencer", "Partner", "Channel Manager"]
+    relationship_types = [
+        "Account Executive",
+        "Solution Architect",
+        "Technical Champion",
+        "Economic Buyer",
+        "Decision Maker",
+        "Influencer",
+        "Partner",
+        "Channel Manager",
+    ]
 
     # Create user-to-user relationships (internal team structure)
     create_or_update(
         Relationship,
-        {"entity1_type": "user", "entity1_id": User.query.filter_by(username="morgan").first().id,
-         "entity2_type": "user", "entity2_id": User.query.filter_by(username="taylor").first().id},
-        {"relationship_type": "Account Manager"}
+        {
+            "entity1_type": "user",
+            "entity1_id": User.query.filter_by(username="morgan").first().id,
+            "entity2_type": "user",
+            "entity2_id": User.query.filter_by(username="taylor").first().id,
+        },
+        {"relationship_type": "Account Manager"},
     )
 
     create_or_update(
         Relationship,
-        {"entity1_type": "user", "entity1_id": User.query.filter_by(username="taylor").first().id,
-         "entity2_type": "user", "entity2_id": User.query.filter_by(username="jordan").first().id},
-        {"relationship_type": "Solution Architect"}
+        {
+            "entity1_type": "user",
+            "entity1_id": User.query.filter_by(username="taylor").first().id,
+            "entity2_type": "user",
+            "entity2_id": User.query.filter_by(username="jordan").first().id,
+        },
+        {"relationship_type": "Solution Architect"},
     )
 
     create_or_update(
         Relationship,
-        {"entity1_type": "user", "entity1_id": User.query.filter_by(username="jordan").first().id,
-         "entity2_type": "user", "entity2_id": User.query.filter_by(username="alex").first().id},
-        {"relationship_type": "Sales Engineer"}
+        {
+            "entity1_type": "user",
+            "entity1_id": User.query.filter_by(username="jordan").first().id,
+            "entity2_type": "user",
+            "entity2_id": User.query.filter_by(username="alex").first().id,
+        },
+        {"relationship_type": "Sales Engineer"},
     )
 
     create_or_update(
         Relationship,
-        {"entity1_type": "user", "entity1_id": User.query.filter_by(username="casey").first().id,
-         "entity2_type": "user", "entity2_id": User.query.filter_by(username="admin").first().id},
-        {"relationship_type": "Reports To"}
+        {
+            "entity1_type": "user",
+            "entity1_id": User.query.filter_by(username="casey").first().id,
+            "entity2_type": "user",
+            "entity2_id": User.query.filter_by(username="admin").first().id,
+        },
+        {"relationship_type": "Reports To"},
     )
 
     # Create realistic user-to-contact relationships
@@ -572,12 +582,10 @@ def seed_relationships():
 
             if not existing:
                 relationship = Relationship.create_relationship(
-                    entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id,
-                    relationship_type=rel_type
+                    entity1_type="user", entity1_id=user.id, entity2_type="contact", entity2_id=contact.id, relationship_type=rel_type
                 )
                 db.session.add(relationship)
-                logger.info(
-                    f"Created relationship: User {user.username} {rel_type} Contact {contact.first_name} {contact.last_name}")
+                logger.info(f"Created relationship: User {user.username} {rel_type} Contact {contact.first_name} {contact.last_name}")
 
     # Create user-to-company relationships
     company_relationships = [
@@ -601,8 +609,7 @@ def seed_relationships():
 
             if not existing:
                 relationship = Relationship.create_relationship(
-                    entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id,
-                    relationship_type=rel_type
+                    entity1_type="user", entity1_id=user.id, entity2_type="company", entity2_id=company.id, relationship_type=rel_type
                 )
                 db.session.add(relationship)
                 logger.info(f"Created relationship: User {user.username} {rel_type} Company {company.name}")
@@ -616,22 +623,33 @@ def seed_srs_items():
     logger.info("Processing SRS cards...")
     sample_cards = [
         # Contact cards
-        {"notable_type": "Contact", "notable_id": 1, "question": "What is Priya Sharma's role at her company?",
-         "answer": "Director of Cloud Transformation"},
+        {
+            "notable_type": "Contact",
+            "notable_id": 1,
+            "question": "What is Priya Sharma's role at her company?",
+            "answer": "Director of Cloud Transformation",
+        },
         {"notable_type": "Contact", "notable_id": 2, "question": "What is Daniel Roberts' position?", "answer": "CISO"},
-        {"notable_type": "Contact", "notable_id": 1, "question": "Which company does Priya Sharma work for?",
-         "answer": "Nimbus Financial"},
-
+        {"notable_type": "Contact", "notable_id": 1, "question": "Which company does Priya Sharma work for?", "answer": "Nimbus Financial"},
         # Company cards
-        {"notable_type": "Company", "notable_id": 1,
-         "question": "What is Nimbus Financial's primary cloud environment?",
-         "answer": "Hybrid cloud environment, primarily AWS and on-prem"},
-        {"notable_type": "Company", "notable_id": 2,
-         "question": "What compliance requirements does Velocity Healthcare Systems have?",
-         "answer": "HIPAA compliance with strict requirements"},
-        {"notable_type": "Company", "notable_id": 3, "question": "What cloud platforms does GlobalTech Retail use?",
-         "answer": "GCP, AWS, and Azure with containerized microservices"},
-
+        {
+            "notable_type": "Company",
+            "notable_id": 1,
+            "question": "What is Nimbus Financial's primary cloud environment?",
+            "answer": "Hybrid cloud environment, primarily AWS and on-prem",
+        },
+        {
+            "notable_type": "Company",
+            "notable_id": 2,
+            "question": "What compliance requirements does Velocity Healthcare Systems have?",
+            "answer": "HIPAA compliance with strict requirements",
+        },
+        {
+            "notable_type": "Company",
+            "notable_id": 3,
+            "question": "What cloud platforms does GlobalTech Retail use?",
+            "answer": "GCP, AWS, and Azure with containerized microservices",
+        },
         # Opportunity cards
         {
             "notable_type": "Opportunity",
@@ -651,7 +669,6 @@ def seed_srs_items():
             "question": "Which company is associated with the Container Security Initiative opportunity?",
             "answer": "GlobalTech Retail",
         },
-
         # Cloud security specific cards
         {
             "notable_type": "Company",
@@ -670,8 +687,7 @@ def seed_srs_items():
     for card_data in sample_cards:
         create_or_update(
             SRS,
-            {"notable_type": card_data["notable_type"], "notable_id": card_data["notable_id"],
-             "question": card_data["question"]},
+            {"notable_type": card_data["notable_type"], "notable_id": card_data["notable_id"], "question": card_data["question"]},
             {"answer": card_data["answer"]},
         )
 

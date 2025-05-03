@@ -13,7 +13,8 @@ import shutil
 from datetime import datetime
 from typing import Dict, List, Set, Tuple, Optional, Any
 
-DEFAULT_EXEMPT_PREFIXES = ['fixtures', 'functional', 'integrations', 'unit']
+DEFAULT_EXEMPT_PREFIXES = ["fixtures", "functional", "integrations", "unit"]
+
 
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments.
@@ -23,18 +24,16 @@ def parse_arguments() -> argparse.Namespace:
     """
     # Default exempt prefixes
 
-
-    parser = argparse.ArgumentParser(description='Sync test structure with app structure')
-    parser.add_argument('--app-dir', default='app', help='Application directory (default: app)')
-    parser.add_argument('--test-dir', default='tests', help='Test directory (default: tests)')
-    parser.add_argument('--dry-run', action='store_true', help='Show what would be done without making changes')
-    parser.add_argument('--ignore-file', default='.testignore',
-                        help='File containing ignore patterns (default: .testignore)')
-    parser.add_argument('--clean', action='store_true', help='Remove stale test files/directories')
-    parser.add_argument('--template', choices=['basic', 'pytest', 'unittest'], default='pytest',
-                        help='Test file template (default: pytest)')
-    parser.add_argument('--exempt-prefixes', nargs='+', default=[],
-                        help='Additional test directory prefixes to exempt from stale checking')
+    parser = argparse.ArgumentParser(description="Sync test structure with app structure")
+    parser.add_argument("--app-dir", default="app", help="Application directory (default: app)")
+    parser.add_argument("--test-dir", default="tests", help="Test directory (default: tests)")
+    parser.add_argument("--dry-run", action="store_true", help="Show what would be done without making changes")
+    parser.add_argument("--ignore-file", default=".testignore", help="File containing ignore patterns (default: .testignore)")
+    parser.add_argument("--clean", action="store_true", help="Remove stale test files/directories")
+    parser.add_argument(
+        "--template", choices=["basic", "pytest", "unittest"], default="pytest", help="Test file template (default: pytest)"
+    )
+    parser.add_argument("--exempt-prefixes", nargs="+", default=[], help="Additional test directory prefixes to exempt from stale checking")
 
     args = parser.parse_args()
 
@@ -55,8 +54,8 @@ def get_ignore_patterns(ignore_file: str) -> List[str]:
     """
     patterns = []
     if os.path.exists(ignore_file):
-        with open(ignore_file, 'r') as f:
-            patterns = [line.strip() for line in f if line.strip() and not line.startswith('#')]
+        with open(ignore_file, "r") as f:
+            patterns = [line.strip() for line in f if line.strip() and not line.startswith("#")]
     return patterns
 
 
@@ -92,7 +91,7 @@ def get_relative_paths(base_dir: str, ignore_patterns: List[str]) -> Set[str]:
         dirs[:] = [d for d in dirs if not is_ignored(os.path.join(root, d), ignore_patterns)]
 
         for file in files:
-            if file.endswith('.py') and not file.startswith('__'):
+            if file.endswith(".py") and not file.startswith("__"):
                 full_path = os.path.join(root, file)
                 if not is_ignored(full_path, ignore_patterns):
                     rel_path = os.path.relpath(full_path, base_dir)
@@ -111,9 +110,9 @@ def create_test_stub(file_path: str, module_path: str, template_type: str) -> st
     Returns:
         str: The content of the test stub.
     """
-    app_module = module_path.replace('/', '.').replace('.py', '')
+    app_module = module_path.replace("/", ".").replace(".py", "")
 
-    if template_type == 'basic':
+    if template_type == "basic":
         return f"""# Tests for {app_module}
 # Created: {datetime.now().strftime('%Y-%m-%d')}
 
@@ -125,7 +124,7 @@ def test_module_imports():
     except ImportError:
         assert False, f"Failed to import {app_module}"
 """
-    elif template_type == 'pytest':
+    elif template_type == "pytest":
         return f"""# Tests for {app_module}
 # Created: {datetime.now().strftime('%Y-%m-%d')}
 import pytest
@@ -137,7 +136,7 @@ def test_module_imports():
 
 # TODO: Add more specific tests
 """
-    elif template_type == 'unittest':
+    elif template_type == "unittest":
         return f"""# Tests for {app_module}
 # Created: {datetime.now().strftime('%Y-%m-%d')}
 import unittest
@@ -206,7 +205,7 @@ def ensure_test_structure(app_file_paths: Set[str], args: argparse.Namespace) ->
                     init_file = os.path.join(current_path, "__init__.py")
                     if not os.path.exists(init_file):
                         try:
-                            with open(init_file, 'w') as f:
+                            with open(init_file, "w") as f:
                                 f.write(f"# Test package for {current_path}\n")
                             print(f"[INIT CREATED] {init_file}")
                             created_inits_count += 1
@@ -219,7 +218,7 @@ def ensure_test_structure(app_file_paths: Set[str], args: argparse.Namespace) ->
                 try:
                     app_module = f"{args.app_dir}.{rel_path.replace(os.sep, '.').replace('.py', '')}"
                     test_content = create_test_stub(rel_path, app_module, args.template)
-                    with open(test_file_path, 'w') as tf:
+                    with open(test_file_path, "w") as tf:
                         tf.write(test_content)
                     print(f"[FILE CREATED] {test_file_path}")
                     created_files_count += 1
@@ -233,7 +232,7 @@ def ensure_test_structure(app_file_paths: Set[str], args: argparse.Namespace) ->
     root_init = os.path.join(args.test_dir, "__init__.py")
     if not os.path.exists(root_init) and not args.dry_run:
         try:
-            with open(root_init, 'w') as f:
+            with open(root_init, "w") as f:
                 f.write(f"# Root test package\n")
             print(f"[INIT CREATED] {root_init}")
             created_inits_count += 1
@@ -264,7 +263,7 @@ def find_stale_test_dirs(app_file_paths: Set[str], args: argparse.Namespace) -> 
     found_test_dirs = set()
     for root, dirs, _ in os.walk(args.test_dir):
         for dir_name in dirs:
-            if dir_name != '__pycache__':  # Skip __pycache__ directories
+            if dir_name != "__pycache__":  # Skip __pycache__ directories
                 test_subdir = os.path.relpath(os.path.join(root, dir_name), args.test_dir)
                 found_test_dirs.add(test_subdir)
 
@@ -275,8 +274,7 @@ def find_stale_test_dirs(app_file_paths: Set[str], args: argparse.Namespace) -> 
     stale_dirs_list = []
     for dir_path in sorted(potentially_stale):
         # Skip if directory matches any exempted prefix
-        if any(dir_path == prefix or dir_path.startswith(f"{prefix}/")
-               for prefix in args.exempt_prefixes):
+        if any(dir_path == prefix or dir_path.startswith(f"{prefix}/") for prefix in args.exempt_prefixes):
             continue
 
         stale_dir_path = os.path.join(args.test_dir, dir_path)
@@ -317,13 +315,12 @@ def find_stale_test_files(app_file_paths: Set[str], args: argparse.Namespace) ->
 
     for root, _, files in os.walk(args.test_dir):
         for file_name in files:
-            if file_name.startswith('test_') and file_name.endswith('.py'):
+            if file_name.startswith("test_") and file_name.endswith(".py"):
                 rel_path = os.path.relpath(os.path.join(root, file_name), args.test_dir)
 
                 # Skip if file is in an exempted directory
                 rel_dir = os.path.dirname(rel_path)
-                if any(rel_dir == prefix or rel_dir.startswith(f"{prefix}/")
-                       for prefix in args.exempt_prefixes):
+                if any(rel_dir == prefix or rel_dir.startswith(f"{prefix}/") for prefix in args.exempt_prefixes):
                     continue
 
                 if rel_path not in expected_test_files:
@@ -404,5 +401,5 @@ def main() -> int:
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

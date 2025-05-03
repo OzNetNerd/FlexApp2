@@ -5,6 +5,7 @@ This file provides common fixtures that can be used across all tests, including 
 test client setup, and authenticated client setup. It also provides convenience fixtures for
 accessing mock data.
 """
+
 import os
 import sys
 import pytest
@@ -20,6 +21,7 @@ from .fixtures.mock_data import TEST_USERS
 # Global variable to track if we've registered the blueprints
 _app_instance = None
 
+
 @pytest.fixture(scope="session")
 def app():
     """Create and configure the Flask app for testing."""
@@ -28,6 +30,7 @@ def app():
         return _app_instance
 
     from app.app import create_app
+
     _app_instance = create_app()
 
     # Override configuration for testing
@@ -62,10 +65,7 @@ def db(app):
     # Add test users from our mock data
     for user_data in TEST_USERS:
         user = User(
-            email=user_data["email"],
-            password_hash=user_data["password_hash"],
-            name=user_data["name"],
-            username=user_data.get("username")
+            email=user_data["email"], password_hash=user_data["password_hash"], name=user_data["name"], username=user_data.get("username")
         )
         # Explicitly set the user ID for testing
         user.id = user_data["id"]
@@ -99,6 +99,7 @@ def auth_client(client):
 def mock_user():
     """Return a mock user from the test data."""
     return TEST_USERS[0]
+
 
 def pytest_configure(config):
     """Register custom markers."""

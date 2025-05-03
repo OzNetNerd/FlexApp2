@@ -15,10 +15,7 @@ class TestAuthRoutes:
 
     def test_login_post_accepts_data(self, client):
         """Test that the POST method for the login route accepts form data."""
-        response = client.post(
-            "/auth/login",
-            data={"email": "test@example.com", "password": "password123"}
-        )
+        response = client.post("/auth/login", data={"email": "test@example.com", "password": "password123"})
         assert response.status_code in [200, 302, 401, 422]
 
     def test_logout_exists(self, client):

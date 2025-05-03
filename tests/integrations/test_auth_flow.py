@@ -36,13 +36,7 @@ class TestAuthenticationFlow:
     def test_remember_me_functionality(self, client, mock_user):
         """Test the 'remember me' functionality during login."""
         response = client.post(
-            "/auth/login",
-            data={
-                "email": mock_user["email"],
-                "password": mock_user["password"],
-                "remember": "1"
-            },
-            follow_redirects=True
+            "/auth/login", data={"email": mock_user["email"], "password": mock_user["password"], "remember": "1"}, follow_redirects=True
         )
         assert response.status_code == 200
 

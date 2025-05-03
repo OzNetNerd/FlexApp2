@@ -18,11 +18,7 @@ srs_service = SRSService()
 
 # Create the blueprint config
 logger.info("Creating SRS blueprint configuration")
-srs_config = BlueprintConfig(
-    model_class=SRS,
-    service=srs_service,
-    create_template="pages/srs/create.html"
-)
+srs_config = BlueprintConfig(model_class=SRS, service=srs_service, create_template="pages/srs/create.html")
 
 # Create the blueprint using the config
 logger.info("Creating SRS blueprint")
@@ -90,8 +86,7 @@ def dashboard():
     progress_data = srs_service.get_learning_progress_data(months=7)
 
     logger.info("Rendering SRS dashboard")
-    return render_template("pages/srs/dashboard.html", stats=stats, categories=categories, due_cards=due_cards,
-                           progress_data=progress_data)
+    return render_template("pages/srs/dashboard.html", stats=stats, categories=categories, due_cards=due_cards, progress_data=progress_data)
 
 
 # Due cards route
@@ -220,8 +215,7 @@ def cards_by_learning_stage(stage):
     cards = srs_service.get_cards_by_learning_stage(stage)
     logger.info(f"Retrieved {len(cards)} cards in learning stage {stage}")
 
-    stage_names = {"new": "New Cards", "learning": "Learning Cards", "reviewing": "Review Cards",
-                   "mastered": "Mastered Cards"}
+    stage_names = {"new": "New Cards", "learning": "Learning Cards", "reviewing": "Review Cards", "mastered": "Mastered Cards"}
 
     logger.info(f"Rendering filtered cards for learning stage: {stage_names[stage]}")
     return render_template(
@@ -281,8 +275,7 @@ def cards_by_performance(performance):
     cards = srs_service.get_cards_by_performance(performance)
     logger.info(f"Retrieved {len(cards)} cards with performance {performance}")
 
-    performance_names = {"struggling": "Struggling Cards", "average": "Average Performance Cards",
-                         "strong": "Strong Performance Cards"}
+    performance_names = {"struggling": "Struggling Cards", "average": "Average Performance Cards", "strong": "Strong Performance Cards"}
 
     logger.info(f"Rendering filtered cards for performance: {performance_names[performance]}")
     return render_template(
@@ -405,7 +398,6 @@ def filtered_cards():
     return render_template(template_name, **template_data)
 
 
-
 @srs_bp.route("/batch-action", methods=["POST"])
 @login_required
 def batch_action():
@@ -524,8 +516,9 @@ def add_card():
         else:
             # Set review date to tomorrow by default
             logger.info("Setting card for review tomorrow")
-            new_card["next_review_at"] = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0,
-                                                                   microsecond=0) + timedelta(days=1)
+            new_card["next_review_at"] = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(
+                days=1
+            )
 
         # Save the card
         card = srs_service.create(new_card)

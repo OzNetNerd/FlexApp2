@@ -18,6 +18,7 @@ NAVBAR_ENTRIES = [
     {"name": "Flash Cards", "url": "/srs", "icon": "book"},
 ]
 
+
 class WebContext(BaseContext):
     """Base context class for web template rendering."""
 

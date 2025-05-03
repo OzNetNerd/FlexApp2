@@ -2,6 +2,7 @@ from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
+
 class BaseContext:
     """Base context class for all contexts (API and web)."""
 

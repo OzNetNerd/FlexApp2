@@ -1,6 +1,7 @@
 # app/services/category_service.py
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+
 # from app.models.pages.srs import Category, SRS
 from app.utils.app_logging import get_logger
 
@@ -29,18 +30,19 @@ class CategoryService:
 
         for category in categories:
             total_count = len(category.cards) if category.cards else 0
-            due_count = sum(
-                1 for card in category.cards if card.next_review_at and card.next_review_at <= datetime.now(ZoneInfo("UTC")))
+            due_count = sum(1 for card in category.cards if card.next_review_at and card.next_review_at <= datetime.now(ZoneInfo("UTC")))
 
-            result.append({
-                "id": category.id,
-                "name": category.name,
-                "color": category.color,
-                "icon": category.icon,
-                "total": total_count,
-                "due": due_count,
-                "progress": self._calculate_progress(category.cards)
-            })
+            result.append(
+                {
+                    "id": category.id,
+                    "name": category.name,
+                    "color": category.color,
+                    "icon": category.icon,
+                    "total": total_count,
+                    "due": due_count,
+                    "progress": self._calculate_progress(category.cards),
+                }
+            )
 
         return result
 

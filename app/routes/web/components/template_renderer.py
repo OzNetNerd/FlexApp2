@@ -233,8 +233,7 @@ def render_safely(render_safely_config: RenderSafelyConfig) -> Union[Tuple[str, 
 
     except Exception as e:
         logger.exception(
-            f"❌ Error rendering template {render_safely_config.template_path!r} "
-            f"at endpoint {render_safely_config.endpoint_name!r}"
+            f"❌ Error rendering template {render_safely_config.template_path!r} " f"at endpoint {render_safely_config.endpoint_name!r}"
         )
         logger.error(f"❌ Exception details: {type(e).__name__}: {e}")
         return handle_template_error(
