@@ -1,8 +1,22 @@
 # Running Tests
 ## Setup
 
+Activate venv:
+
 ```
 clear && source /mnt/c/Will/code/FlexApp2/venv/bin/activate
+```
+
+Get tree:
+
+```
+clear &&  tree -P '*.py' -I 'venv' --prune
+```
+
+Run tests:
+
+```
+clear && pytest -v
 ```
 
 ## Basic Test Execution

@@ -145,8 +145,7 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     return app
 
 
-# Entrypoint
-app = create_app()
-
+# Only create the app instance when running directly
 if __name__ == "__main__":
+    app = create_app()
     app.run(debug=True)
