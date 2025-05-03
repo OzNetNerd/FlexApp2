@@ -23,51 +23,61 @@ def tasks_dashboard():
         Task.created_at.desc()
     ).limit(5).all()
 
-    # Calculate simple statistics
+    # Overdue and due today stats needed by the template
+    overdue_tasks = db.session.query(Task).filter(
+        Task.due_date < datetime.now().date(),
+        Task.status != 'completed'
+    ).count()
+
+    due_today = db.session.query(Task).filter(
+        Task.due_date == datetime.now().date()
+    ).count()
+
+    # Calculate statistics
+    completed_count = db.session.query(Task).filter(Task.status == 'completed').count()
+    in_progress_count = db.session.query(Task).filter(Task.status == 'in_progress').count()
+    not_started_count = db.session.query(Task).filter(Task.status == 'pending').count()
+
+    # Update stats dictionary to include all needed values
     stats = {
         "total_tasks": total_tasks,
-        "completed_tasks": db.session.query(Task).filter(Task.status == 'completed').count(),
-        "in_progress_tasks": db.session.query(Task).filter(Task.status == 'in_progress').count(),
-        "pending_tasks": db.session.query(Task).filter(Task.status == 'pending').count()
+        "completed_tasks": completed_count,
+        "in_progress_tasks": in_progress_count,
+        "pending_tasks": not_started_count,
+        "overdue_tasks": overdue_tasks,
+        "due_today": due_today
     }
 
-    # Get tasks by status
-    segments = [
-        {
-            "name": "Completed",
-            "count": db.session.query(Task).filter(Task.status == 'completed').count(),
-            "percentage": calculate_percentage(
-                db.session.query(Task).filter(Task.status == 'completed').count(),
-                total_tasks
-            )
+    # Convert segments to dictionary structure expected by template
+    segments = {
+        "completed": {
+            "count": completed_count,
+            "percentage": calculate_percentage(completed_count, total_tasks)
         },
-        {
-            "name": "In Progress",
-            "count": db.session.query(Task).filter(Task.status == 'in_progress').count(),
-            "percentage": calculate_percentage(
-                db.session.query(Task).filter(Task.status == 'in_progress').count(),
-                total_tasks
-            )
+        "in_progress": {
+            "count": in_progress_count,
+            "percentage": calculate_percentage(in_progress_count, total_tasks)
         },
-        {
-            "name": "Pending",
-            "count": db.session.query(Task).filter(Task.status == 'pending').count(),
-            "percentage": calculate_percentage(
-                db.session.query(Task).filter(Task.status == 'pending').count(),
-                total_tasks
-            )
+        "not_started": {
+            "count": not_started_count,
+            "percentage": calculate_percentage(not_started_count, total_tasks)
         }
-    ]
+    }
 
-    # Sample data for activity chart
-    activity_data = prepare_activity_data()
+    # Rename activity_data to completion_data to match template
+    completion_data = prepare_activity_data()
+
+    # Get upcoming tasks for the table section
+    upcoming_tasks = db.session.query(Task).filter(
+        Task.due_date >= datetime.now().date()
+    ).order_by(Task.due_date.asc()).limit(5).all()
 
     return render_template(
         "pages/tasks/dashboard.html",
         stats=stats,
         segments=segments,
-        top_tasks=top_tasks,
-        activity_data=activity_data
+        upcoming_tasks=upcoming_tasks,  # Changed from top_tasks to upcoming_tasks
+        completion_data=completion_data  # Changed from activity_data to completion_data
     )
 
 
