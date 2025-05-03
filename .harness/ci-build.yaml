@@ -6,17 +6,19 @@ pipeline:
   properties:
     ci:
       codebase:
-        build: <+input>  # Allows manual or trigger-based branch selection
+        build: <+input>
   stages:
     - stage:
         name: Format Check
         identifier: format_check
         type: CI
         spec:
-          infrastructure:
-            type: Docker
-            spec:
-              image: python:3.9  # Choose appropriate Python version
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
           execution:
             steps:
               - step:
