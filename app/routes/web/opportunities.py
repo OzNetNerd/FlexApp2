@@ -1,12 +1,11 @@
 from sqlalchemy import func, extract
 import random
 from app.models import Opportunity
-from flask import render_template
+from flask import render_template, request
 from flask_login import login_required
 from datetime import datetime, timedelta
 from app.routes.web.blueprint_factory import create_crud_blueprint, BlueprintConfig
 from app.models.base import db
-
 
 opportunities_bp = create_crud_blueprint(BlueprintConfig(model_class=Opportunity))
 
@@ -68,7 +67,7 @@ def opportunities_dashboard():
     forecast_data = prepare_forecast_data()
 
     return render_template(
-        "opportunities/dashboard.html",
+        "pages/opportunities/dashboard.html",
         stats=stats,
         stages=stages,
         hot_opportunities=hot_opportunities,
@@ -144,3 +143,103 @@ def prepare_forecast_data():
         "forecast": forecast,
         "pipeline": pipeline
     }
+
+
+@opportunities_bp.route("/filtered", methods=["GET"])
+@login_required
+def filtered_opportunities():
+    # Get filter parameters
+    status = request.args.get('status')
+    stage = request.args.get('stage')
+    priority = request.args.get('priority')
+
+    # Start with base query
+    query = Opportunity.query
+
+    # Apply filters if provided
+    if status:
+        query = query.filter_by(status=status)
+
+    if stage:
+        query = query.filter_by(stage=stage)
+
+    if priority:
+        query = query.filter_by(priority=priority)
+
+    # Get opportunities
+    opportunities = query.order_by(Opportunity.close_date.asc()).all()
+
+    return render_template(
+        "pages/opportunities/filtered.html",
+        opportunities=opportunities,
+        filters={
+            'status': status,
+            'stage': stage,
+            'priority': priority
+        }
+    )
+
+
+@opportunities_bp.route("/statistics", methods=["GET"])
+@login_required
+def statistics():
+    # Get overall statistics
+    total_opportunities = Opportunity.query.count()
+    active_opportunities = Opportunity.query.filter_by(status="active").count()
+    won_opportunities = Opportunity.query.filter_by(status="won").count()
+    lost_opportunities = Opportunity.query.filter_by(status="lost").count()
+
+    # Calculate pipeline value by stage
+    pipeline_by_stage = db.session.query(
+        Opportunity.stage,
+        func.count().label('count'),
+        func.sum(Opportunity.value).label('value')
+    ).filter_by(status="active").group_by(Opportunity.stage).all()
+
+    # Calculate monthly won deals for the past 12 months
+    monthly_data = []
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+
+    for i in range(12):
+        month = (current_month - i) % 12
+        if month == 0:
+            month = 12
+        year = current_year - ((current_month - i) // 12)
+
+        # Month name for label
+        month_name = datetime(year, month, 1).strftime('%b %Y')
+
+        # Count of won deals for this month
+        won_count = Opportunity.query.filter(
+            Opportunity.status == "won",
+            extract('month', Opportunity.close_date) == month,
+            extract('year', Opportunity.close_date) == year
+        ).count()
+
+        # Value of won deals for this month
+        won_value = db.session.query(func.sum(Opportunity.value)).filter(
+            Opportunity.status == "won",
+            extract('month', Opportunity.close_date) == month,
+            extract('year', Opportunity.close_date) == year
+        ).scalar() or 0
+
+        monthly_data.append({
+            'month': month_name,
+            'won_count': won_count,
+            'won_value': won_value
+        })
+
+    # Reverse the list to get chronological order
+    monthly_data.reverse()
+
+    return render_template(
+        "pages/opportunities/statistics.html",
+        total_opportunities=total_opportunities,
+        active_opportunities=active_opportunities,
+        won_opportunities=won_opportunities,
+        lost_opportunities=lost_opportunities,
+        pipeline_by_stage=pipeline_by_stage,
+        monthly_data=monthly_data,
+        currency_symbol="$"
+    )

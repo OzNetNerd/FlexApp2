@@ -1,0 +1,264 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Sales Analytics{% endblock %}
+
+{% block content %}
+<!-- Page Header Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-2">Sales Analytics</h1>
+          <p class="text-muted mb-0">Data insights to improve your sales performance</p>
+        </div>
+        <a href="{{ url_for('opportunities_bp.opportunities_dashboard') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+  <div class="col-md-3 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body text-center">
+        <div class="display-4 text-primary mb-2">{{ active_opportunities }}</div>
+        <div class="text-uppercase fw-bold small text-muted">Active Opportunities</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body text-center">
+        <div class="display-4 text-success mb-2">{{ won_opportunities }}</div>
+        <div class="text-uppercase fw-bold small text-muted">Won Deals</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body text-center">
+        <div class="display-4 text-danger mb-2">{{ lost_opportunities }}</div>
+        <div class="text-uppercase fw-bold small text-muted">Lost Deals</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body text-center">
+        {% set win_rate = (won_opportunities / (won_opportunities + lost_opportunities) * 100)|round if (won_opportunities + lost_opportunities) > 0 else 0 %}
+        <div class="display-4 text-warning mb-2">{{ win_rate }}%</div>
+        <div class="text-uppercase fw-bold small text-muted">Win Rate</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Monthly Performance Chart -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Monthly Performance</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px; position: relative;">
+          <canvas id="monthlyPerformanceChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pipeline by Stage -->
+<div class="row mb-4">
+  <div class="col-md-6 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Pipeline by Stage</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 250px; position: relative;">
+          <canvas id="pipelineByStageChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Pipeline Value by Stage</h2>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Stage</th>
+                <th>Count</th>
+                <th>Value</th>
+                <th>Avg. Deal Size</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for stage in pipeline_by_stage %}
+              <tr>
+                <td>
+                  {% if stage.stage == 'qualification' %}
+                    <span class="badge bg-info">Qualification</span>
+                  {% elif stage.stage == 'negotiation' %}
+                    <span class="badge bg-primary">Negotiation</span>
+                  {% elif stage.stage == 'closing' %}
+                    <span class="badge bg-warning">Closing</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ stage.stage|title }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ stage.count }}</td>
+                <td>{{ currency_symbol }}{{ stage.value|int|format(',') }}</td>
+                <td>{{ currency_symbol }}{{ (stage.value / stage.count)|int|format(',') if stage.count > 0 else 0 }}</td>
+              </tr>
+              {% endfor %}
+              {% if not pipeline_by_stage %}
+              <tr>
+                <td colspan="4" class="text-center py-3">No active opportunities</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detailed Monthly Data -->
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Monthly Performance Data</h2>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Deals Won</th>
+                <th>Total Value</th>
+                <th>Avg. Deal Size</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for month_data in monthly_data %}
+              <tr>
+                <td>{{ month_data.month }}</td>
+                <td>{{ month_data.won_count }}</td>
+                <td>{{ currency_symbol }}{{ month_data.won_value|int|format(',') }}</td>
+                <td>{{ currency_symbol }}{{ (month_data.won_value / month_data.won_count)|int|format(',') if month_data.won_count > 0 else 0 }}</td>
+              </tr>
+              {% endfor %}
+              {% if not monthly_data %}
+              <tr>
+                <td colspan="4" class="text-center py-3">No data available</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+  document.addEventListener('DOMContentLoaded', function() {
+    // Monthly Performance Chart
+    const monthlyCtx = document.getElementById('monthlyPerformanceChart').getContext('2d');
+    const monthlyChart = new Chart(monthlyCtx, {
+      type: 'bar',
+      data: {
+        labels: [{% for month_data in monthly_data %}'{{ month_data.month }}',{% endfor %}],
+        datasets: [{
+          label: 'Won Deals Value',
+          backgroundColor: 'rgba(40, 167, 69, 0.8)',
+          data: [{% for month_data in monthly_data %}{{ month_data.won_value }},{% endfor %}]
+        }, {
+          label: 'Won Deals Count',
+          type: 'line',
+          borderColor: 'rgba(0, 123, 255, 0.8)',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointBackgroundColor: 'rgba(0, 123, 255, 0.8)',
+          yAxisID: 'y1',
+          data: [{% for month_data in monthly_data %}{{ month_data.won_count }},{% endfor %}]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Deal Value ({{ currency_symbol }})'
+            }
+          },
+          y1: {
+            beginAtZero: true,
+            position: 'right',
+            grid: {
+              drawOnChartArea: false
+            },
+            title: {
+              display: true,
+              text: 'Number of Deals'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'top'
+          }
+        }
+      }
+    });
+
+    // Pipeline by Stage Chart
+    const pipelineCtx = document.getElementById('pipelineByStageChart').getContext('2d');
+    const pipelineChart = new Chart(pipelineCtx, {
+      type: 'doughnut',
+      data: {
+        labels: [{% for stage in pipeline_by_stage %}'{{ stage.stage|title }}',{% endfor %}],
+        datasets: [{
+          data: [{% for stage in pipeline_by_stage %}{{ stage.count }},{% endfor %}],
+          backgroundColor: [
+            'rgba(23, 162, 184, 0.8)',  // info - qualification
+            'rgba(0, 123, 255, 0.8)',   // primary - negotiation
+            'rgba(255, 193, 7, 0.8)',   // warning - closing
+            'rgba(108, 117, 125, 0.8)'  // secondary - others
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right'
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

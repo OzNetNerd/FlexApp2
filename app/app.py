@@ -78,6 +78,18 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     def now():
         return datetime.now(ZoneInfo("UTC"))
 
+    @app.template_filter('currencyfmt')
+    def currencyfmt_filter(value):
+        """Format the value as currency."""
+        if value is None:
+            return "N/A"
+
+        # Get currency symbol from app config or use default
+        currency_symbol = app.config.get('CURRENCY_SYMBOL', '$')
+
+        # Format with thousand separators and 2 decimal places
+        return f"{currency_symbol}{value:,.2f}"
+
     @app.errorhandler(TypeError)
     def handle_type_error(e: TypeError):
         """Render a friendly error page when a TypeError occurs."""

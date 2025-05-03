@@ -1,0 +1,192 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Filtered Opportunities{% endblock %}
+
+{% block content %}
+<!-- Page Header Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-2">Filtered Opportunities</h1>
+          <p class="text-muted mb-0">
+            {% if filters.status %}
+              Status: <span class="fw-bold">{{ filters.status|title }}</span>
+            {% endif %}
+
+            {% if filters.stage %}
+              {% if filters.status %} • {% endif %}
+              Stage: <span class="fw-bold">{{ filters.stage|title }}</span>
+            {% endif %}
+
+            {% if filters.priority %}
+              {% if filters.status or filters.stage %} • {% endif %}
+              Priority: <span class="fw-bold">{{ filters.priority|title }}</span>
+            {% endif %}
+
+            {% if not filters.status and not filters.stage and not filters.priority %}
+              All opportunities
+            {% endif %}
+          </p>
+        </div>
+        <div>
+          <a href="{{ url_for('opportunities_bp.opportunities_dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+          </a>
+          <a href="{{ url_for('opportunities_bp.create') }}" class="btn btn-primary ms-2">
+            <i class="bi bi-plus-circle"></i> New Deal
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Controls -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Filter Options</h2>
+      </div>
+      <div class="card-body">
+        <form action="{{ url_for('opportunities_bp.filtered_opportunities') }}" method="get" class="row g-3">
+          <div class="col-md-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status">
+              <option value="">All Statuses</option>
+              <option value="active" {% if filters.status == 'active' %}selected{% endif %}>Active</option>
+              <option value="won" {% if filters.status == 'won' %}selected{% endif %}>Won</option>
+              <option value="lost" {% if filters.status == 'lost' %}selected{% endif %}>Lost</option>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="stage" class="form-label">Stage</label>
+            <select class="form-select" id="stage" name="stage">
+              <option value="">All Stages</option>
+              <option value="qualification" {% if filters.stage == 'qualification' %}selected{% endif %}>Qualification</option>
+              <option value="negotiation" {% if filters.stage == 'negotiation' %}selected{% endif %}>Negotiation</option>
+              <option value="closing" {% if filters.stage == 'closing' %}selected{% endif %}>Closing</option>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="priority" class="form-label">Priority</label>
+            <select class="form-select" id="priority" name="priority">
+              <option value="">All Priorities</option>
+              <option value="high" {% if filters.priority == 'high' %}selected{% endif %}>High</option>
+              <option value="medium" {% if filters.priority == 'medium' %}selected{% endif %}>Medium</option>
+              <option value="low" {% if filters.priority == 'low' %}selected{% endif %}>Low</option>
+            </select>
+          </div>
+
+          <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+            <a href="{{ url_for('opportunities_bp.filtered_opportunities') }}" class="btn btn-outline-secondary">Reset</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Opportunities Table -->
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Results</h2>
+        <span class="badge bg-secondary">{{ opportunities|length }} opportunities</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Deal Name</th>
+                <th scope="col">Company</th>
+                <th scope="col">Stage</th>
+                <th scope="col">Value</th>
+                <th scope="col">Close Date</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Probability</th>
+                <th scope="col" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for opportunity in opportunities %}
+              <tr>
+                <td class="ps-4">{{ opportunity.name }}</td>
+                <td>{{ opportunity.company_name }}</td>
+                <td>
+                  {% if opportunity.stage == 'qualification' %}
+                    <span class="badge bg-info">Qualification</span>
+                  {% elif opportunity.stage == 'negotiation' %}
+                    <span class="badge bg-primary">Negotiation</span>
+                  {% elif opportunity.stage == 'closing' %}
+                    <span class="badge bg-warning">Closing</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ opportunity.stage }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ opportunity.value|currencyfmt }}</td>
+                <td>{{ opportunity.close_date.strftime('%Y-%m-%d') }}</td>
+                <td>
+                  {% if opportunity.priority == 'high' %}
+                    <span class="badge bg-danger">High</span>
+                  {% elif opportunity.priority == 'medium' %}
+                    <span class="badge bg-warning">Medium</span>
+                  {% elif opportunity.priority == 'low' %}
+                    <span class="badge bg-success">Low</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ opportunity.priority }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ opportunity.probability }}%;" aria-valuenow="{{ opportunity.probability }}" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <small class="text-muted">{{ opportunity.probability }}%</small>
+                </td>
+                <td class="text-center">
+                  <a href="{{ url_for('opportunities_bp.view', opportunity_id=opportunity.id) }}" class="btn btn-sm btn-outline-primary me-1">View</a>
+                  <a href="{{ url_for('opportunities_bp.edit', opportunity_id=opportunity.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </td>
+              </tr>
+              {% endfor %}
+              {% if not opportunities %}
+              <tr>
+                <td colspan="8" class="text-center py-4">
+                  <div class="text-muted">
+                    <i class="bi bi-info-circle-fill fs-4 mb-2 d-block"></i>
+                    <p class="mb-2">No opportunities match your filter criteria.</p>
+                    <a href="{{ url_for('opportunities_bp.filtered_opportunities') }}" class="btn btn-outline-primary btn-sm">Clear Filters</a>
+                  </div>
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block head_extra %}
+<style>
+  /* Badge styling */
+  .badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+  }
+
+  /* Table hover effect */
+  .table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+  }
+</style>
+{% endblock %}
