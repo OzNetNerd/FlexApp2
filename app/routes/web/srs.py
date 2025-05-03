@@ -18,7 +18,7 @@ srs_service = SRSService()
 
 # Create the blueprint config
 logger.info("Creating SRS blueprint configuration")
-srs_config = BlueprintConfig(model_class=SRS, service=srs_service, create_template="pages/srs/create.html")
+srs_config = BlueprintConfig(model_class=SRS, service=srs_service)
 
 # Create the blueprint using the config
 logger.info("Creating SRS blueprint")

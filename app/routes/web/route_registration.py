@@ -10,6 +10,7 @@ from flask_login import login_required
 from app.routes.web.components.template_renderer import RenderSafelyConfig, render_safely
 from app.routes.web.context import TableContext, WebContext
 from app.utils.app_logging import get_logger
+from app.routes.web.template_config import TemplateConfig
 
 logger = get_logger()
 
@@ -32,23 +33,10 @@ class CrudRouteConfig:
     entity_table_name: str
     service: Any
     model_class: Any
-
-    # Template paths with explicit initialization
-    index_template: str = ""
-    create_template: str = ""
-    view_template: str = ""
-    edit_template: str = ""
+    template_config: TemplateConfig
 
     def get_template(self, route_type: str, default: str) -> str:
-        if route_type == "index":
-            return self.index_template or default
-        elif route_type == "create":
-            return self.create_template or default
-        elif route_type == "view":
-            return self.view_template or default
-        elif route_type == "edit":
-            return self.edit_template or default
-        return default
+        return self.template_config.get_template(route_type, default)
 
 
 def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
