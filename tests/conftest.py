@@ -99,3 +99,11 @@ def auth_client(client):
 def mock_user():
     """Return a mock user from the test data."""
     return TEST_USERS[0]
+
+def pytest_configure(config):
+    """Register custom markers."""
+    config.addinivalue_line("markers", "db: marks tests that require database access")
+    config.addinivalue_line("markers", "integration: marks integration tests")
+    config.addinivalue_line("markers", "functional: marks functional tests")
+    config.addinivalue_line("markers", "unit: marks unit tests")
+    config.addinivalue_line("markers", "slow: marks tests that are slow")
