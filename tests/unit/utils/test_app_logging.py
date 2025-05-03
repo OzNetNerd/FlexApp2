@@ -137,7 +137,7 @@ def test_function_name_filter():
     assert stream.getvalue().strip() == "custom_function: Test message"
 
 @patch("app.utils.app_logging.logger")
-def test_start_timer_and_log_elapsed():
+def test_start_timer_and_log_elapsed(mock_logger):
     """Test timer and elapsed time logging"""
     with patch("time.time") as mock_time:
         # First call to time.time() in start_timer
@@ -148,7 +148,7 @@ def test_start_timer_and_log_elapsed():
         # Second call to time.time() in log_elapsed
         mock_time.return_value = 1002.5
 
-        with patch("app.app_logging.logger") as mock_logger:
+        with patch("app.utils.app_logging.logger") as mock_logger:
             log_elapsed(timer, "Operation completed")
             mock_logger.debug.assert_called_once_with("⏱️ Operation completed: 2.5000 seconds")
 
@@ -157,7 +157,7 @@ def test_logging_undefined_str():
     """Test LoggingUndefined string conversion"""
     undef = LoggingUndefined(name="missing_var")
 
-    with patch("app.app_logging.logger") as mock_logger:
+    with patch("app.utils.app_logging.logger") as mock_logger:
         str_val = str(undef)
 
     assert str_val == "<<undefined: missing_var>>"
@@ -169,7 +169,7 @@ def test_logging_undefined_getitem():
     """Test LoggingUndefined item access"""
     undef = LoggingUndefined(name="missing_dict")
 
-    with patch("app.app_logging.logger") as mock_logger:
+    with patch("app.utils.app_logging.logger") as mock_logger:
         item = undef["key"]
 
     assert isinstance(item, LoggingUndefined)
@@ -181,7 +181,7 @@ def test_logging_undefined_getattr():
     """Test LoggingUndefined attribute access"""
     undef = LoggingUndefined(name="missing_obj")
 
-    with patch("app.app_logging.logger") as mock_logger:
+    with patch("app.utils.app_logging.logger") as mock_logger:
         attr = undef.attribute
 
     assert isinstance(attr, LoggingUndefined)
