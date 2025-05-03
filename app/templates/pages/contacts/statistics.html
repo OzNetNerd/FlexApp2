@@ -1,0 +1,260 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Contacts Statistics{% endblock %}
+
+{% block content %}
+<!-- Page Header Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-2">Contacts Statistics</h1>
+          <p class="text-muted mb-0">Overview of your contact database metrics</p>
+        </div>
+        <a href="{{ url_for('contacts_bp.contacts_dashboard') }}" class="btn btn-outline-primary">
+          <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Statistics Summary Cards -->
+<div class="row mb-4">
+  <div class="col-md-3 col-sm-6 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4 text-center">
+        <div class="mb-3">
+          <i class="bi bi-people text-primary" style="font-size: 2.5rem;"></i>
+        </div>
+        <div class="display-5 fw-bold mb-2">{{ total_contacts }}</div>
+        <p class="text-muted mb-0">Total Contacts</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4 text-center">
+        <div class="mb-3">
+          <i class="bi bi-briefcase text-success" style="font-size: 2.5rem;"></i>
+        </div>
+        <div class="display-5 fw-bold mb-2">{{ with_opportunities }}</div>
+        <p class="text-muted mb-0">With Opportunities</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4 text-center">
+        <div class="mb-3">
+          <i class="bi bi-building text-info" style="font-size: 2.5rem;"></i>
+        </div>
+        <div class="display-5 fw-bold mb-2">{{ total_contacts - without_company }}</div>
+        <p class="text-muted mb-0">With Companies</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4 text-center">
+        <div class="mb-3">
+          <i class="bi bi-award text-warning" style="font-size: 2.5rem;"></i>
+        </div>
+        <div class="display-5 fw-bold mb-2">{{ with_skills }}</div>
+        <p class="text-muted mb-0">With Skills</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Skill Distribution Chart & Contact Metrics -->
+<div class="row mb-4">
+  <div class="col-md-6 mb-4 mb-md-0">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Skill Level Distribution</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px; position: relative;">
+          <canvas id="skillDistributionChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Contact Metrics</h2>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4">Metric</th>
+                <th class="text-end pe-4">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="ps-4">Contacts with Opportunities</td>
+                <td class="text-end pe-4">{{ with_opportunities }} ({{ (with_opportunities / total_contacts * 100)|round|int if total_contacts > 0 else 0 }}%)</td>
+              </tr>
+              <tr>
+                <td class="ps-4">Contacts with Companies</td>
+                <td class="text-end pe-4">{{ total_contacts - without_company }} ({{ ((total_contacts - without_company) / total_contacts * 100)|round|int if total_contacts > 0 else 0 }}%)</td>
+              </tr>
+              <tr>
+                <td class="ps-4">Contacts without Companies</td>
+                <td class="text-end pe-4">{{ without_company }} ({{ (without_company / total_contacts * 100)|round|int if total_contacts > 0 else 0 }}%)</td>
+              </tr>
+              <tr>
+                <td class="ps-4">Contacts with Skills</td>
+                <td class="text-end pe-4">{{ with_skills }} ({{ (with_skills / total_contacts * 100)|round|int if total_contacts > 0 else 0 }}%)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Primary Skill Area Distribution -->
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Primary Skill Area Distribution</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px; position: relative;">
+          <canvas id="skillAreaChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+  document.addEventListener('DOMContentLoaded', function() {
+    // Skill Level Distribution Chart
+    const skillData = [
+      {% for skill_level, count in skill_distribution %}
+        {% if skill_level %}
+          { level: "{{ skill_level }}", count: {{ count }} },
+        {% else %}
+          { level: "Not Set", count: {{ count }} },
+        {% endif %}
+      {% endfor %}
+    ];
+
+    const skillLabels = skillData.map(item => item.level);
+    const skillCounts = skillData.map(item => item.count);
+    const skillColors = [
+      'rgba(23, 162, 184, 0.8)',  // Info (Expert)
+      'rgba(0, 123, 255, 0.8)',   // Primary (Advanced)
+      'rgba(40, 167, 69, 0.8)',   // Success (Intermediate)
+      'rgba(255, 193, 7, 0.8)',   // Warning (Beginner)
+      'rgba(108, 117, 125, 0.8)'  // Secondary (Not Set)
+    ];
+
+    const skillDistributionCtx = document.getElementById('skillDistributionChart').getContext('2d');
+    const skillDistributionChart = new Chart(skillDistributionCtx, {
+      type: 'pie',
+      data: {
+        labels: skillLabels,
+        datasets: [{
+          data: skillCounts,
+          backgroundColor: skillColors.slice(0, skillLabels.length),
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+
+    // Primary Skill Area Distribution Chart
+    const skillAreaData = [
+      {% for skill_area, count in skill_area_distribution %}
+        {% if skill_area %}
+          { area: "{{ skill_area }}", count: {{ count }} },
+        {% endif %}
+      {% endfor %}
+    ];
+
+    const skillAreaLabels = skillAreaData.map(item => item.area);
+    const skillAreaCounts = skillAreaData.map(item => item.count);
+
+    // Generate colors for the skill areas
+    const getRandomColorset = (count) => {
+      const baseColors = [
+        'rgba(0, 123, 255, 0.7)',    // Blue
+        'rgba(40, 167, 69, 0.7)',    // Green
+        'rgba(220, 53, 69, 0.7)',    // Red
+        'rgba(255, 193, 7, 0.7)',    // Yellow
+        'rgba(23, 162, 184, 0.7)',   // Cyan
+        'rgba(111, 66, 193, 0.7)',   // Purple
+        'rgba(253, 126, 20, 0.7)',   // Orange
+        'rgba(32, 201, 151, 0.7)'    // Teal
+      ];
+
+      const colors = [];
+      for (let i = 0; i < count; i++) {
+        colors.push(baseColors[i % baseColors.length]);
+      }
+      return colors;
+    };
+
+    const skillAreaColors = getRandomColorset(skillAreaLabels.length);
+
+    const skillAreaCtx = document.getElementById('skillAreaChart').getContext('2d');
+    const skillAreaChart = new Chart(skillAreaCtx, {
+      type: 'bar',
+      data: {
+        labels: skillAreaLabels,
+        datasets: [{
+          label: 'Number of Contacts',
+          data: skillAreaCounts,
+          backgroundColor: skillAreaColors,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            grid: {
+              display: false
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Number of Contacts'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

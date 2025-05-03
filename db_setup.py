@@ -131,7 +131,7 @@ def seed_contacts():
         ("Daniel", "Roberts", 2, "512-555-5678", "CISO"),
     ]
 
-    for i, (first_name, last_name, contact_id, phone, title) in enumerate(contacts_data):
+    for i, (first_name, last_name, contact_id, phone, role_title) in enumerate(contacts_data):
         # For the first 7 contacts, assign to companies dynamically
         if i < 7:
             company = companies[i % len(companies)]
@@ -143,7 +143,7 @@ def seed_contacts():
                     "phone_number": phone,
                     "email": email,
                     "company": company,
-                    "title": title,
+                    "role": role_title,
                 },
             )
         # For the last 2 contacts with pre-assigned IDs
@@ -153,7 +153,7 @@ def seed_contacts():
                 company = companies[contact_id % len(companies)]
                 email = f"{first_name.lower()}.{last_name.lower()}@{company.name.lower().replace(' ', '')}.com"
                 contact = Contact(
-                    id=contact_id, first_name=first_name, last_name=last_name, phone_number=phone, email=email, title=title, company=company
+                    id=contact_id, first_name=first_name, last_name=last_name, phone_number=phone, email=email, role=role_title, company=company
                 )
                 db.session.add(contact)
                 logger.info(f"Created contact with ID {contact_id}: {first_name} {last_name}")
@@ -476,17 +476,17 @@ def seed_notes():
         user = users[hash(contact.email) % len(users)]
         full_name = f"{contact.first_name} {contact.last_name}"
 
-        if contact.title == "CISO":
+        if contact.role == "CISO":
             content = f"Met with {full_name} during the cloud security summit. Very knowledgeable about cloud security challenges. Primary decision maker for security investments. Concerned about compliance automation and reporting to the board."
-        elif "Security" in contact.title:
+        elif "Security" in contact.role:
             content = f"{full_name} is technically focused and wants details on how Prisma Cloud handles container vulnerabilities and IaC scanning. Prefers hands-on demos over slideware. Looking for security that doesn't slow down development."
-        elif "CTO" in contact.title:
+        elif "CTO" in contact.role:
             content = f"{full_name} is concerned about shadow IT and unmanaged cloud resources. Wants to enable developer velocity while maintaining security. Interested in API integration capabilities of Prisma Cloud."
-        elif "Operations" in contact.title:
+        elif "Operations" in contact.role:
             content = f"{full_name} manages the cloud operations team. Frustrated with current alert volume and looking for automated remediation. Wants better visibility across multi-cloud environment."
-        elif "VP" in contact.title:
+        elif "VP" in contact.role:
             content = f"{full_name} is evaluating consolidation of security tools to reduce costs. Needs executive-level reporting for board meetings. Interested in ROI metrics for security investments."
-        elif "Director" in contact.title:
+        elif "Director" in contact.role:
             content = f"{full_name} is leading the cloud transformation initiative. Looking for security that can keep pace with rapid adoption of new cloud services. Wants a partner, not just a vendor."
         else:
             content = f"Note for contact {full_name}"
