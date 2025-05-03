@@ -58,7 +58,7 @@ def test_get_logger():
     assert "test_app_logging" in logger.name
 
 
-@patch("app.app_logging.logger")
+@patch("app.utils.app_logging.logger")
 def test_log_instance_vars_no_exclusions(mock_logger):
     """Test log_instance_vars with no exclusions"""
 
@@ -79,7 +79,7 @@ def test_log_instance_vars_no_exclusions(mock_logger):
     mock_logger.info.assert_any_call("  ℹ️ (No exclusions)")
 
 
-@patch("app.app_logging.logger")
+@patch("app.utils.app_logging.logger")
 def test_log_instance_vars_with_exclusions(mock_logger):
     """Test log_instance_vars with exclusions"""
 
@@ -99,7 +99,7 @@ def test_log_instance_vars_with_exclusions(mock_logger):
     mock_logger.info.assert_any_call("  ℹ️ (Excluded: private)")
 
 
-@patch("app.app_logging.logger")
+@patch("app.utils.app_logging.logger")
 def test_log_message_and_variables(mock_logger):
     """Test logging message with variables"""
     variables = {"var1": "value1", "var2": 42, "var3": [1, 2, 3]}
