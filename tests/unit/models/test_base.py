@@ -131,6 +131,8 @@ class TestBaseModel:
         class MockRelatedItem:
             def __init__(self, name):
                 self.name = name
+                # Add _sa_instance_state to prevent AttributeError
+                self._sa_instance_state = None
             # No id attribute
 
         # Since to_dict() expects SQLAlchemy relationships, we need to create
@@ -152,9 +154,9 @@ class TestBaseModel:
         def mock_get_parent(obj):
             return mock_parent
 
-        # Apply our mocks
-        monkeypatch.setattr(model, "related_items", mock_items)
-        monkeypatch.setattr(model, "parent", mock_parent)
+        # Apply our mocks using properties like other tests do
+        monkeypatch.setattr(TestModel, "related_items", property(mock_get_related_items))
+        monkeypatch.setattr(TestModel, "parent", property(mock_get_parent))
 
         # Test
         data = model.to_dict()
