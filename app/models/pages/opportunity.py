@@ -1,3 +1,4 @@
+from datetime import datetime
 from app.models.base import BaseModel, db
 from app.utils.app_logging import get_logger
 
@@ -11,9 +12,12 @@ class Opportunity(BaseModel):
 
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
-    status = db.Column(db.String(20), default="New")
-    stage = db.Column(db.String(50), default="Prospecting")
+    status = db.Column(db.String(20), default="active")
+    stage = db.Column(db.String(50), default="qualification")
     value = db.Column(db.Float, default=0.0)
+    priority = db.Column(db.String(20), default="medium")
+    close_date = db.Column(db.DateTime)
+    last_activity_date = db.Column(db.DateTime, default=datetime.now)
 
     company_id = db.Column(db.Integer, db.ForeignKey("companies.id"))
 

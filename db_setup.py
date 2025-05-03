@@ -218,6 +218,12 @@ def seed_opportunities():
     """Seed opportunities into the database."""
     companies = Company.query.all()
 
+    # Get current date and future dates for close_date
+    now = datetime.now(ZoneInfo("UTC"))
+    q3_close = now.replace(month=9, day=30, hour=0, minute=0, second=0, microsecond=0)
+    q4_close = now.replace(month=12, day=31, hour=0, minute=0, second=0, microsecond=0)
+    next_year_close = now.replace(year=now.year + 1, month=3, day=31, hour=0, minute=0, second=0, microsecond=0)
+
     opportunities_data = [
         (
             "Prisma Cloud Enterprise Deployment",
@@ -226,6 +232,8 @@ def seed_opportunities():
             "Technical Evaluation",
             750000.0,
             "Nimbus Financial",
+            "high",
+            q3_close,
         ),
         (
             "Healthcare Compliance Automation",
@@ -234,6 +242,8 @@ def seed_opportunities():
             "Proposal",
             350000.0,
             "Velocity Healthcare Systems",
+            "medium",
+            q3_close,
         ),
         (
             "Container Security Initiative",
@@ -242,6 +252,8 @@ def seed_opportunities():
             "Closed Won",
             480000.0,
             "GlobalTech Retail",
+            "medium",
+            now.replace(month=now.month - 1, day=15),
         ),
         (
             "Cloud Security Posture Assessment",
@@ -250,6 +262,8 @@ def seed_opportunities():
             "Closed Lost",
             120000.0,
             "Quantum Innovations",
+            "low",
+            now.replace(month=now.month - 2, day=1),
         ),
         (
             "Critical Infrastructure Protection",
@@ -258,6 +272,8 @@ def seed_opportunities():
             "Discovery",
             680000.0,
             "Meridian Energy",
+            "high",
+            q4_close,
         ),
         (
             "Supply Chain Security Transformation",
@@ -266,6 +282,8 @@ def seed_opportunities():
             "Negotiation",
             520000.0,
             "Axion Logistics",
+            "medium",
+            q3_close,
         ),
         (
             "Data Protection and Compliance",
@@ -274,10 +292,12 @@ def seed_opportunities():
             "Qualification",
             280000.0,
             "Horizon Media Group",
+            "low",
+            next_year_close,
         ),
     ]
 
-    for name, description, status, stage, value, company_name in opportunities_data:
+    for name, description, status, stage, value, company_name, priority, close_date in opportunities_data:
         company = Company.query.filter_by(name=company_name).first()
         if not company:
             continue
@@ -291,6 +311,9 @@ def seed_opportunities():
                 "stage": stage,
                 "value": value,
                 "company_id": company.id,
+                "priority": priority,
+                "close_date": close_date,
+                "last_activity_date": datetime.now(ZoneInfo("UTC")),
             },
         )
     db.session.commit()

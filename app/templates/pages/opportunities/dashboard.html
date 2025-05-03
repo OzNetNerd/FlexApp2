@@ -1,0 +1,462 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}CRM Dashboard - Opportunities{% endblock %}
+
+{% block content %}
+<!-- Page Header Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <h1 class="h3 mb-2">Sales Opportunities</h1>
+      <p class="text-muted">Track and manage your sales pipeline efficiently</p>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions Cards -->
+<div class="row mb-4">
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('opportunities_bp.filtered_opportunities', status='active') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-funnel text-primary" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Active Deals</h2>
+        <p class="card-text text-muted">View your pipeline</p>
+        <div class="badge bg-danger">{{ stats.active_count }}</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('opportunities_bp.create') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-plus-circle text-success" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Create Deal</h2>
+        <p class="card-text text-muted">Add new opportunity</p>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('opportunities_bp.filtered_opportunities', status='won') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-trophy text-warning" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Won Deals</h2>
+        <p class="card-text text-muted">View closed-won deals</p>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('opportunities_bp.statistics') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-bar-chart text-info" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Analytics</h2>
+        <p class="card-text text-muted">Pipeline insights</p>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Summary Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Pipeline Summary</h2>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-primary mb-2">{{ stats.total_value|currencyfmt }}</div>
+                <div class="text-uppercase fw-bold small text-muted">Pipeline Value</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-danger mb-2">{{ stats.deal_count }}</div>
+                <div class="text-uppercase fw-bold small text-muted">Open Deals</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-success mb-2">{{ stats.win_rate }}%</div>
+                <div class="text-uppercase fw-bold small text-muted">Win Rate</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-info mb-2">{{ stats.avg_deal_size|currencyfmt }}</div>
+                <div class="text-uppercase fw-bold small text-muted">Avg Deal Size</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
+          <div class="highlights-container">
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-check-circle text-success me-1"></i>
+                <span class="fw-bold">{{ stats.closing_soon }}</span> deals closing within 30 days
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-trophy text-warning me-1"></i>
+                <span class="fw-bold">{{ stats.won_this_month }}</span> deals won this month
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-chart-line text-primary me-1"></i>
+                Win rate improved by <span class="fw-bold">{{ stats.win_rate_change }}%</span> this quarter
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-hourglass-half text-danger me-1"></i>
+                <span class="fw-bold">{{ stats.stale_count }}</span> deals with no activity for 14+ days
+              </p>
+            </div>
+          </div>
+
+          <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
+            <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pipeline Stages Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Pipeline Stages</h2>
+        <a href="{{ url_for('opportunities_bp.filtered_opportunities') }}" class="btn btn-sm btn-outline-primary">View All Deals</a>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="category-icon bg-info text-white d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-shuffle"></i>
+                  </div>
+                  <h3 class="h6 mb-0">Qualification</h3>
+                </div>
+                <p class="small text-muted mb-2">{{ stages[0].count }} deals · {{ stages[0].value|currencyfmt }}</p>
+                <div class="progress mb-3" style="height: 5px;">
+                  <div class="progress-bar bg-info" role="progressbar" style="width: {{ stages[0].percentage }}%;" aria-valuenow="{{ stages[0].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <a href="{{ url_for('opportunities_bp.filtered_opportunities', stage='qualification') }}" class="btn btn-sm btn-outline-info">View Deals</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-chat-dots"></i>
+                  </div>
+                  <h3 class="h6 mb-0">Negotiation</h3>
+                </div>
+                <p class="small text-muted mb-2">{{ stages[1].count }} deals · {{ stages[1].value|currencyfmt }}</p>
+                <div class="progress mb-3" style="height: 5px;">
+                  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ stages[1].percentage }}%;" aria-valuenow="{{ stages[1].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <a href="{{ url_for('opportunities_bp.filtered_opportunities', stage='negotiation') }}" class="btn btn-sm btn-outline-primary">View Deals</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="category-icon bg-warning text-white d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-hand-thumbs-up"></i>
+                  </div>
+                  <h3 class="h6 mb-0">Closing</h3>
+                </div>
+                <p class="small text-muted mb-2">{{ stages[2].count }} deals · {{ stages[2].value|currencyfmt }}</p>
+                <div class="progress mb-3" style="height: 5px;">
+                  <div class="progress-bar bg-warning" role="progressbar" style="width: {{ stages[2].percentage }}%;" aria-valuenow="{{ stages[2].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <a href="{{ url_for('opportunities_bp.filtered_opportunities', stage='closing') }}" class="btn btn-sm btn-outline-warning">View Deals</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hot Opportunities Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Hot Opportunities</h2>
+        <div>
+          <a href="{{ url_for('opportunities_bp.filtered_opportunities', priority='high') }}" class="btn btn-sm btn-outline-primary me-2">
+            <i class="bi bi-funnel"></i> Filter Deals
+          </a>
+          <a href="{{ url_for('opportunities_bp.create') }}" class="btn btn-sm btn-primary">Add Deal</a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Deal Name</th>
+                <th scope="col">Company</th>
+                <th scope="col">Stage</th>
+                <th scope="col">Value</th>
+                <th scope="col">Close Date</th>
+                <th scope="col">Probability</th>
+                <th scope="col" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for opportunity in hot_opportunities %}
+              <tr>
+                <td class="ps-4">{{ opportunity.name }}</td>
+                <td>{{ opportunity.company_name }}</td>
+                <td>
+                  {% if opportunity.stage == 'qualification' %}
+                    <span class="badge bg-info">Qualification</span>
+                  {% elif opportunity.stage == 'negotiation' %}
+                    <span class="badge bg-primary">Negotiation</span>
+                  {% elif opportunity.stage == 'closing' %}
+                    <span class="badge bg-warning">Closing</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ opportunity.stage }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ opportunity.value|currencyfmt }}</td>
+                <td>{{ opportunity.close_date.strftime('%Y-%m-%d') }}</td>
+                <td>
+                  <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ opportunity.probability }}%;" aria-valuenow="{{ opportunity.probability }}" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <small class="text-muted">{{ opportunity.probability }}%</small>
+                </td>
+                <td class="text-center">
+                  <a href="{{ url_for('opportunities_bp.view', opportunity_id=opportunity.id) }}" class="btn btn-sm btn-outline-primary me-1">View</a>
+                  <a href="{{ url_for('opportunities_bp.edit', opportunity_id=opportunity.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </td>
+              </tr>
+              {% endfor %}
+              {% if not hot_opportunities %}
+              <tr>
+                <td colspan="7" class="text-center py-4">
+                  <div class="text-muted">
+                    <i class="bi bi-info-circle-fill fs-4 mb-2"></i>
+                    <p>No hot opportunities at the moment. Create a new deal?</p>
+                  </div>
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer bg-white text-center">
+        <a href="{{ url_for('opportunities_bp.filtered_opportunities', priority='high') }}" class="text-decoration-none">
+          View all {{ stats.hot_opportunities_count }} hot opportunities
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sales Forecast Chart -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Sales Forecast</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px; position: relative;">
+          <canvas id="salesForecastChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+  // Initialize the highlights slider
+  document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.highlights-container');
+    const items = document.querySelectorAll('.highlight-item');
+    let currentIndex = 0;
+
+    document.querySelector('.btn-highlight-next').addEventListener('click', function() {
+      currentIndex = (currentIndex + 1) % items.length;
+      container.scrollTo({
+        left: currentIndex * container.offsetWidth,
+        behavior: 'smooth'
+      });
+    });
+
+    document.querySelector('.btn-highlight-prev').addEventListener('click', function() {
+      currentIndex = (currentIndex - 1 + items.length) % items.length;
+      container.scrollTo({
+        left: currentIndex * container.offsetWidth,
+        behavior: 'smooth'
+      });
+    });
+
+    // Auto-scroll highlights
+    setInterval(() => {
+      document.querySelector('.btn-highlight-next').click();
+    }, 5000);
+
+    // Initialize sales forecast chart
+    const ctx = document.getElementById('salesForecastChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: {{ forecast_data.labels|tojson }},
+        datasets: [
+          {
+            label: 'Closed Won',
+            backgroundColor: 'rgba(40, 167, 69, 0.8)',
+            data: {{ forecast_data.closed_won|tojson }}
+          },
+          {
+            label: 'Forecast',
+            backgroundColor: 'rgba(0, 123, 255, 0.8)',
+            data: {{ forecast_data.forecast|tojson }}
+          },
+          {
+            label: 'Pipeline',
+            backgroundColor: 'rgba(108, 117, 125, 0.8)',
+            data: {{ forecast_data.pipeline|tojson }}
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            stacked: true,
+            grid: {
+              display: false
+            }
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Amount ({{ currency_symbol }})'
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          },
+          legend: {
+            position: 'top'
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+{% block head_extra %}
+<style>
+/* Activity Icons */
+.activity-icon,
+.category-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.activity-icon:hover,
+.category-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Navigation cards hover effect */
+.nav-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Highlights container */
+.highlights-container {
+  display: flex;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.highlight-item {
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Badge styling */
+.nav-card .badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.8rem;
+}
+</style>
+{% endblock %}
