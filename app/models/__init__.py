@@ -11,7 +11,7 @@ from app.models.base import BaseModel, db
 from app.models.capability import Capability
 from app.models.capability_category import CapabilityCategory
 from app.models.company_capability import CompanyCapability
-from app.models.crisp_score import CRISPScore
+from app.models.pages.crisp import CRISPScore
 from app.models.mixins import ValidatorMixin
 from app.models.relationship import Relationship
 from app.models.table_config import TableConfig

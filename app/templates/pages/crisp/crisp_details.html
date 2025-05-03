@@ -1,0 +1,313 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}CRISP Score Details{% endblock %}
+
+{% block content %}
+<!-- Page Header Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-2">CRISP Score Details</h1>
+          <p class="text-muted mb-0">
+            Trust assessment for {{ score.relationship_display_name }}
+            <span class="ms-2 small text-muted">{{ score.created_at|date }}</span>
+          </p>
+        </div>
+        <div>
+          <a href="{{ url_for('crisp_scores_bp.dashboard') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+          </a>
+          <a href="{{ url_for('crisp_scores_bp.edit_score', score_id=score.id) }}" class="btn btn-primary">
+            <i class="bi bi-pencil me-1"></i> Edit Score
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Score Overview Card -->
+<div class="row mb-4">
+  <div class="col-md-4 mb-4 mb-md-0">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">CRISP Score</h2>
+      </div>
+      <div class="card-body text-center p-4">
+        <div class="crisp-score-circle mx-auto mb-3 position-relative" style="width: 160px; height: 160px;">
+          <div class="position-absolute top-0 start-0 end-0 bottom-0 d-flex align-items-center justify-content-center">
+            <div>
+              <h2 class="display-4 mb-0 fw-bold">{{ score.total_score|round(1) }}</h2>
+              <p class="text-muted mb-0">out of 10</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <h3 class="h6 mb-1">Trust Level</h3>
+          <span class="badge {% if score.total_score >= 3 %}bg-success{% elif score.total_score >= 2 %}bg-warning{% else %}bg-danger{% endif %} px-3 py-2 fs-6">
+            {% if score.total_score >= 3 %}
+              Strong Trust
+            {% elif score.total_score >= 2 %}
+              Moderate Trust
+            {% else %}
+              Trust at Risk
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="mt-4">
+          <div class="d-flex justify-content-between mb-2">
+            <span>Created</span>
+            <span class="text-muted">{{ score.created_at|date }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>Last Updated</span>
+            <span class="text-muted">{{ score.updated_at|date }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Component Breakdown</h2>
+      </div>
+      <div class="card-body">
+        <!-- Credibility -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between mb-2">
+            <div class="d-flex align-items-center">
+              <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; border-radius: 50%;">
+                <i class="bi bi-shield-check"></i>
+              </div>
+              <span class="fw-bold">Credibility</span>
+            </div>
+            <span class="badge bg-primary px-2">{{ score.credibility }} / 10</span>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ score.credibility * 10 }}%;" aria-valuenow="{{ score.credibility }}" aria-valuemin="0" aria-valuemax="10"></div>
+          </div>
+        </div>
+
+        <!-- Reliability -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between mb-2">
+            <div class="d-flex align-items-center">
+              <div class="category-icon bg-success text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; border-radius: 50%;">
+                <i class="bi bi-clock-history"></i>
+              </div>
+              <span class="fw-bold">Reliability</span>
+            </div>
+            <span class="badge bg-success px-2">{{ score.reliability }} / 10</span>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ score.reliability * 10 }}%;" aria-valuenow="{{ score.reliability }}" aria-valuemin="0" aria-valuemax="10"></div>
+          </div>
+        </div>
+
+        <!-- Intimacy -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between mb-2">
+            <div class="d-flex align-items-center">
+              <div class="category-icon bg-info text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; border-radius: 50%;">
+                <i class="bi bi-people"></i>
+              </div>
+              <span class="fw-bold">Intimacy</span>
+            </div>
+            <span class="badge bg-info px-2">{{ score.intimacy }} / 10</span>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-info" role="progressbar" style="width: {{ score.intimacy * 10 }}%;" aria-valuenow="{{ score.intimacy }}" aria-valuemin="0" aria-valuemax="10"></div>
+          </div>
+        </div>
+
+        <!-- Self-orientation -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between mb-2">
+            <div class="d-flex align-items-center">
+              <div class="category-icon bg-warning text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; border-radius: 50%;">
+                <i class="bi bi-eye"></i>
+              </div>
+              <span class="fw-bold">Self-orientation</span>
+              <span class="ms-1 small text-muted">(lower is better)</span>
+            </div>
+            <span class="badge bg-warning px-2">{{ score.self_orientation }} / 10</span>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ score.self_orientation * 10 }}%;" aria-valuenow="{{ score.self_orientation }}" aria-valuemin="0" aria-valuemax="10"></div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <h3 class="h6 mb-2">Trust Formula</h3>
+          <div class="bg-light rounded p-3 text-center">
+            <p class="mb-1 fw-bold">
+              (Credibility + Reliability + Intimacy) / Self-orientation
+            </p>
+            <p class="mb-0">
+              ({{ score.credibility }} + {{ score.reliability }} + {{ score.intimacy }}) / {{ score.self_orientation }} = {{ score.total_score|round(1) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notes and History Section -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Assessment Notes</h2>
+      </div>
+      <div class="card-body">
+        {% if score.notes %}
+          <p class="mb-0">{{ score.notes }}</p>
+        {% else %}
+          <p class="text-muted mb-0">No notes were added to this assessment.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Historical Trend</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px; position: relative;">
+          <canvas id="historicalScoreChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+  document.addEventListener('DOMContentLoaded', function() {
+    // Style the CRISP score circle based on the score
+    const score = {{ score.total_score }};
+    const scoreCircle = document.querySelector('.crisp-score-circle');
+
+    let circleColor;
+    if (score >= 3) {
+      circleColor = '#28a745';  // success
+    } else if (score >= 2) {
+      circleColor = '#ffc107';  // warning
+    } else {
+      circleColor = '#dc3545';  // danger
+    }
+
+    scoreCircle.style.background = `conic-gradient(${circleColor} ${score/10*360}deg, #e9ecef ${score/10*360}deg)`;
+    scoreCircle.style.borderRadius = '50%';
+
+    // Historical Chart
+    const historicalCtx = document.getElementById('historicalScoreChart').getContext('2d');
+    const historicalChart = new Chart(historicalCtx, {
+      type: 'line',
+      data: {
+        labels: {{ historical_dates|tojson }},
+        datasets: [
+          {
+            label: 'Total CRISP Score',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            borderColor: 'rgba(0, 123, 255, 1)',
+            borderWidth: 2,
+            fill: true,
+            data: {{ historical_scores|tojson }}
+          },
+          {
+            label: 'Credibility',
+            backgroundColor: 'rgba(0, 0, 0, 0)',
+            borderColor: 'rgba(0, 123, 255, 0.8)',
+            borderWidth: 1,
+            borderDash: [5, 5],
+            pointRadius: 3,
+            fill: false,
+            data: {{ historical_credibility|tojson }}
+          },
+          {
+            label: 'Reliability',
+            backgroundColor: 'rgba(0, 0, 0, 0)',
+            borderColor: 'rgba(40, 167, 69, 0.8)',
+            borderWidth: 1,
+            borderDash: [5, 5],
+            pointRadius: 3,
+            fill: false,
+            data: {{ historical_reliability|tojson }}
+          },
+          {
+            label: 'Intimacy',
+            backgroundColor: 'rgba(0, 0, 0, 0)',
+            borderColor: 'rgba(23, 162, 184, 0.8)',
+            borderWidth: 1,
+            borderDash: [5, 5],
+            pointRadius: 3,
+            fill: false,
+            data: {{ historical_intimacy|tojson }}
+          },
+          {
+            label: 'Self-orientation',
+            backgroundColor: 'rgba(0, 0, 0, 0)',
+            borderColor: 'rgba(255, 193, 7, 0.8)',
+            borderWidth: 1,
+            borderDash: [5, 5],
+            pointRadius: 3,
+            fill: false,
+            data: {{ historical_self_orientation|tojson }}
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 10,
+            title: {
+              display: true,
+              text: 'Score Value'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+{% block head_extra %}
+<style>
+  .crisp-score-circle {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .crisp-score-circle::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: white;
+    border-radius: 50%;
+  }
+</style>
+{% endblock %}

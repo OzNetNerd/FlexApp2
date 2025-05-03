@@ -1,0 +1,251 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}CRISP Score Comparison{% endblock %}
+
+{% block content %}
+<!-- Page Header Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-2">CRISP Score Comparison</h1>
+          <p class="text-muted mb-0">Compare trust assessments across multiple relationships</p>
+        </div>
+        <a href="{{ url_for('crisp_scores_bp.dashboard') }}" class="btn btn-outline-primary">
+          <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Comparison Form -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Select Relationships to Compare</h2>
+      </div>
+      <div class="card-body">
+        <form action="{{ url_for('crisp_scores_bp.comparison') }}" method="GET" class="row g-3">
+          <div class="col-md-9">
+            <select class="form-select" id="relationships" name="relationship_ids" multiple>
+              {% for relationship in all_relationships %}
+              <option value="{{ relationship.id }}" {% if relationship.id in selected_relationships %}selected{% endif %}>
+                {{ relationship.display_name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <div class="d-grid w-100">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-bar-chart-line me-1"></i> Compare
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if selected_relationships %}
+<!-- Comparison Charts -->
+<div class="row mb-4">
+  <div class="col-md-6 mb-4 mb-md-0">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Total CRISP Score Comparison</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px; position: relative;">
+          <canvas id="totalScoreComparisonChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Component Comparison</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px; position: relative;">
+          <canvas id="componentComparisonChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detailed Comparison Table -->
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Detailed Comparison</h2>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Relationship</th>
+                <th scope="col" class="text-center">Credibility</th>
+                <th scope="col" class="text-center">Reliability</th>
+                <th scope="col" class="text-center">Intimacy</th>
+                <th scope="col" class="text-center">Self-orientation</th>
+                <th scope="col" class="text-center">Total Score</th>
+                <th scope="col" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for relationship in comparison_data %}
+              <tr>
+                <td class="ps-4">
+                  <div class="d-flex align-items-center">
+                    <div class="company-avatar bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                      <i class="bi bi-building text-secondary"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold">{{ relationship.display_name }}</div>
+                      <small class="text-muted">Last updated: {{ relationship.last_updated|date }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">{{ relationship.credibility }}</td>
+                <td class="text-center">{{ relationship.reliability }}</td>
+                <td class="text-center">{{ relationship.intimacy }}</td>
+                <td class="text-center">{{ relationship.self_orientation }}</td>
+                <td class="text-center">
+                  <span class="badge {% if relationship.total_score >= 3 %}bg-success{% elif relationship.total_score >= 2 %}bg-warning{% else %}bg-danger{% endif %}">
+                    {{ relationship.total_score|round(1) }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <a href="{{ url_for('crisp_scores_bp.view_score', score_id=relationship.score_id) }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<!-- No comparison data yet -->
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-bar-chart-line fs-1 text-muted mb-3"></i>
+        <h3 class="h5 mb-2">No Relationships Selected for Comparison</h3>
+        <p class="text-muted mb-4">Please select two or more relationships to compare their trust scores.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script type="module">
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Select2 for the relationship selection
+    $('#relationships').select2({
+      placeholder: 'Select relationships to compare (maximum 5)',
+      maximumSelectionLength: 5
+    });
+
+    {% if selected_relationships %}
+    // Total Score Comparison Chart
+    const totalScoreCtx = document.getElementById('totalScoreComparisonChart').getContext('2d');
+    const totalScoreChart = new Chart(totalScoreCtx, {
+      type: 'bar',
+      data: {
+        labels: {{ comparison_labels|tojson }},
+        datasets: [{
+          label: 'Total CRISP Score',
+          backgroundColor: [
+            'rgba(0, 123, 255, 0.8)',
+            'rgba(40, 167, 69, 0.8)',
+            'rgba(23, 162, 184, 0.8)',
+            'rgba(255, 193, 7, 0.8)',
+            'rgba(220, 53, 69, 0.8)'
+          ],
+          data: {{ comparison_scores|tojson }}
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 10,
+            title: {
+              display: true,
+              text: 'Score Value'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+
+    // Component Comparison Radar Chart
+    const componentCtx = document.getElementById('componentComparisonChart').getContext('2d');
+    const componentChart = new Chart(componentCtx, {
+      type: 'radar',
+      data: {
+        labels: ['Credibility', 'Reliability', 'Intimacy', 'Self-orientation'],
+        datasets: {{ component_datasets|tojson }}
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: {
+            angleLines: {
+              display: true
+            },
+            suggestedMin: 0,
+            suggestedMax: 10
+          }
+        }
+      }
+    });
+    {% endif %}
+  });
+</script>
+{% endblock %}
+
+{% block head_extra %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+  .select2-container .select2-selection--multiple {
+    min-height: 38px;
+  }
+
+  .select2-container--default .select2-selection--multiple {
+    border: 1px solid #ced4da;
+  }
+</style>
+{% endblock %}

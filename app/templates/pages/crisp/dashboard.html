@@ -1,0 +1,332 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}CRISP Score Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-2">CRISP Score Dashboard</h1>
+          <p class="text-muted mb-0">Monitor and manage trust scores across your relationships</p>
+        </div>
+        <div>
+          <a href="{{ url_for('crisp_scores_bp.create_score') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> New CRISP Score
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Metrics Cards -->
+<div class="row mb-4">
+  <div class="col-md-3 col-sm-6 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4 text-center">
+        <div class="mb-3">
+          <i class="bi bi-graph-up text-primary" style="font-size: 2.5rem;"></i>
+        </div>
+        <div class="display-5 fw-bold mb-2">{{ avg_score|round(1) }}</div>
+        <p class="text-muted mb-0">Average CRISP Score</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4 text-center">
+        <div class="mb-3">
+          <i class="bi bi-star-fill text-warning" style="font-size: 2.5rem;"></i>
+        </div>
+        <div class="display-5 fw-bold mb-2">{{ high_trust_count }}</div>
+        <p class="text-muted mb-0">High Trust Relationships</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4 text-center">
+        <div class="mb-3">
+          <i class="bi bi-exclamation-triangle text-danger" style="font-size: 2.5rem;"></i>
+        </div>
+        <div class="display-5 fw-bold mb-2">{{ low_trust_count }}</div>
+        <p class="text-muted mb-0">At-Risk Relationships</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6 mb-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4 text-center">
+        <div class="mb-3">
+          <i class="bi bi-clipboard-check text-success" style="font-size: 2.5rem;"></i>
+        </div>
+        <div class="display-5 fw-bold mb-2">{{ total_assessments }}</div>
+        <p class="text-muted mb-0">Total Assessments</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CRISP Scores Distribution Chart -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">CRISP Score Distribution</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px; position: relative;">
+          <canvas id="crispDistributionChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CRISP Components Radar Chart -->
+<div class="row mb-4">
+  <div class="col-md-6 mb-4 mb-md-0">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">CRISP Components Analysis</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px; position: relative;">
+          <canvas id="crispComponentsChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Component Averages</h2>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4">Component</th>
+                <th class="text-end pe-4">Average Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="ps-4">
+                  <div class="d-flex align-items-center">
+                    <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; border-radius: 50%;">
+                      <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div>Credibility</div>
+                  </div>
+                </td>
+                <td class="text-end pe-4">{{ avg_credibility|round(1) }} / 10</td>
+              </tr>
+              <tr>
+                <td class="ps-4">
+                  <div class="d-flex align-items-center">
+                    <div class="category-icon bg-success text-white d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; border-radius: 50%;">
+                      <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div>Reliability</div>
+                  </div>
+                </td>
+                <td class="text-end pe-4">{{ avg_reliability|round(1) }} / 10</td>
+              </tr>
+              <tr>
+                <td class="ps-4">
+                  <div class="d-flex align-items-center">
+                    <div class="category-icon bg-info text-white d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; border-radius: 50%;">
+                      <i class="bi bi-people"></i>
+                    </div>
+                    <div>Intimacy</div>
+                  </div>
+                </td>
+                <td class="text-end pe-4">{{ avg_intimacy|round(1) }} / 10</td>
+              </tr>
+              <tr>
+                <td class="ps-4">
+                  <div class="d-flex align-items-center">
+                    <div class="category-icon bg-warning text-white d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; border-radius: 50%;">
+                      <i class="bi bi-eye"></i>
+                    </div>
+                    <div>Self-orientation</div>
+                  </div>
+                </td>
+                <td class="text-end pe-4">{{ avg_self_orientation|round(1) }} / 10</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Top and Bottom Relationships Table -->
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Recent CRISP Assessments</h2>
+        <a href="{{ url_for('crisp_scores_bp.list_scores') }}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Relationship</th>
+                <th scope="col" class="text-center">Credibility</th>
+                <th scope="col" class="text-center">Reliability</th>
+                <th scope="col" class="text-center">Intimacy</th>
+                <th scope="col" class="text-center">Self-orientation</th>
+                <th scope="col" class="text-center">Total Score</th>
+                <th scope="col" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for score in recent_scores %}
+              <tr>
+                <td class="ps-4">
+                  <div class="d-flex align-items-center">
+                    <div class="company-avatar bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                      <i class="bi bi-building text-secondary"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold">{{ score.relationship_display_name }}</div>
+                      <small class="text-muted">{{ score.created_at|date }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">{{ score.credibility }}</td>
+                <td class="text-center">{{ score.reliability }}</td>
+                <td class="text-center">{{ score.intimacy }}</td>
+                <td class="text-center">{{ score.self_orientation }}</td>
+                <td class="text-center">
+                  <span class="badge {% if score.total_score >= 3 %}bg-success{% elif score.total_score >= 2 %}bg-warning{% else %}bg-danger{% endif %}">
+                    {{ score.total_score|round(1) }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <a href="{{ url_for('crisp_scores_bp.view_score', score_id=score.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a href="{{ url_for('crisp_scores_bp.edit_score', score_id=score.id) }}" class="btn btn-sm btn-outline-secondary me-1">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+              {% if not recent_scores %}
+              <tr>
+                <td colspan="7" class="text-center py-5">
+                  <div class="text-muted">
+                    <i class="bi bi-clipboard-x fs-3 mb-3 d-block"></i>
+                    <p class="mb-1">No CRISP scores have been recorded yet</p>
+                    <a href="{{ url_for('crisp_scores_bp.create_score') }}" class="btn btn-primary mt-2">
+                      <i class="bi bi-plus-circle me-1"></i> Add First CRISP Score
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+  document.addEventListener('DOMContentLoaded', function() {
+    // CRISP Distribution Chart
+    const distributionCtx = document.getElementById('crispDistributionChart').getContext('2d');
+    const distributionChart = new Chart(distributionCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Very Low (<1)', 'Low (1-2)', 'Moderate (2-3)', 'Good (3-4)', 'Excellent (4+)'],
+        datasets: [{
+          label: 'Number of Relationships',
+          backgroundColor: [
+            'rgba(220, 53, 69, 0.8)',
+            'rgba(255, 193, 7, 0.8)',
+            'rgba(255, 136, 0, 0.8)',
+            'rgba(40, 167, 69, 0.8)',
+            'rgba(0, 123, 255, 0.8)'
+          ],
+          data: {{ score_distribution|tojson }}
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Number of Relationships'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+
+    // CRISP Components Radar Chart
+    const componentsCtx = document.getElementById('crispComponentsChart').getContext('2d');
+    const componentsChart = new Chart(componentsCtx, {
+      type: 'radar',
+      data: {
+        labels: ['Credibility', 'Reliability', 'Intimacy', 'Self-orientation'],
+        datasets: [{
+          label: 'Average Score',
+          data: [
+            {{ avg_credibility }},
+            {{ avg_reliability }},
+            {{ avg_intimacy }},
+            {{ avg_self_orientation }}
+          ],
+          backgroundColor: 'rgba(0, 123, 255, 0.2)',
+          borderColor: 'rgba(0, 123, 255, 1)',
+          pointBackgroundColor: 'rgba(0, 123, 255, 1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(0, 123, 255, 1)'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: {
+            angleLines: {
+              display: true
+            },
+            suggestedMin: 0,
+            suggestedMax: 10
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
