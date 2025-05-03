@@ -1,0 +1,482 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}CRM Dashboard - Tasks{% endblock %}
+
+{% block content %}
+<!-- Page Header Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <h1 class="h3 mb-2">Task Management</h1>
+      <p class="text-muted">Track and manage your tasks efficiently</p>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions Cards -->
+<div class="row mb-4">
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('tasks_bp.filtered_tasks', status='pending') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-hourglass-split text-warning" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Pending Tasks</h2>
+        <p class="card-text text-muted">Tasks awaiting action</p>
+        <div class="badge bg-warning">{{ stats.pending_tasks }}</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('tasks_bp.create') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-plus-circle text-success" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Add Task</h2>
+        <p class="card-text text-muted">Create new task</p>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('tasks_bp.filtered_tasks', priority='high') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-exclamation-triangle text-danger" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">High Priority</h2>
+        <p class="card-text text-muted">View urgent tasks</p>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('tasks_bp.statistics') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-bar-chart text-info" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Analytics</h2>
+        <p class="card-text text-muted">Task insights</p>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Summary Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Tasks Summary</h2>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-primary mb-2">{{ stats.total_tasks }}</div>
+                <div class="text-uppercase fw-bold small text-muted">Total Tasks</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-success mb-2">{{ stats.completed_tasks }}</div>
+                <div class="text-uppercase fw-bold small text-muted">Completed</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-warning mb-2">{{ stats.pending_tasks }}</div>
+                <div class="text-uppercase fw-bold small text-muted">Pending</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-danger mb-2">{{ stats.overdue_tasks }}</div>
+                <div class="text-uppercase fw-bold small text-muted">Overdue</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
+          <div class="highlights-container">
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-tasks text-success me-1"></i>
+                <span class="fw-bold">{{ stats.completed_tasks }}</span> tasks completed
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-hourglass-half text-warning me-1"></i>
+                <span class="fw-bold">{{ stats.pending_tasks }}</span> tasks pending
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-calendar-day text-primary me-1"></i>
+                <span class="fw-bold">{{ stats.due_today }}</span> tasks due today
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-exclamation-circle text-danger me-1"></i>
+                <span class="fw-bold">{{ stats.overdue_tasks }}</span> tasks overdue
+              </p>
+            </div>
+          </div>
+
+          <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
+            <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Task Segments Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Task Status</h2>
+        <a href="{{ url_for('tasks_bp.filtered_tasks') }}" class="btn btn-sm btn-outline-primary">View All Tasks</a>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="category-icon bg-success text-white d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-check-circle"></i>
+                  </div>
+                  <h3 class="h6 mb-0">Completed</h3>
+                </div>
+                <p class="small text-muted mb-2">{{ segments.completed.count }} tasks · finished</p>
+                <div class="progress mb-3" style="height: 5px;">
+                  <div class="progress-bar bg-success" role="progressbar" style="width: {{ segments.completed.percentage }}%;" aria-valuenow="{{ segments.completed.percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <a href="{{ url_for('tasks_bp.filtered_tasks', status='completed') }}" class="btn btn-sm btn-outline-success">View Tasks</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="category-icon bg-warning text-white d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-hourglass-split"></i>
+                  </div>
+                  <h3 class="h6 mb-0">In Progress</h3>
+                </div>
+                <p class="small text-muted mb-2">{{ segments.in_progress.count }} tasks · being worked on</p>
+                <div class="progress mb-3" style="height: 5px;">
+                  <div class="progress-bar bg-warning" role="progressbar" style="width: {{ segments.in_progress.percentage }}%;" aria-valuenow="{{ segments.in_progress.percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <a href="{{ url_for('tasks_bp.filtered_tasks', status='in_progress') }}" class="btn btn-sm btn-outline-warning">View Tasks</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-clock"></i>
+                  </div>
+                  <h3 class="h6 mb-0">Not Started</h3>
+                </div>
+                <p class="small text-muted mb-2">{{ segments.not_started.count }} tasks · pending</p>
+                <div class="progress mb-3" style="height: 5px;">
+                  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ segments.not_started.percentage }}%;" aria-valuenow="{{ segments.not_started.percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <a href="{{ url_for('tasks_bp.filtered_tasks', status='not_started') }}" class="btn btn-sm btn-outline-primary">View Tasks</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upcoming Tasks Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Upcoming Tasks</h2>
+        <div>
+          <a href="{{ url_for('tasks_bp.filtered_tasks') }}" class="btn btn-sm btn-outline-primary me-2">
+            <i class="bi bi-funnel"></i> Filter Tasks
+          </a>
+          <a href="{{ url_for('tasks_bp.create') }}" class="btn btn-sm btn-primary">Add Task</a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Task Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Due Date</th>
+                <th scope="col">Status</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Assigned To</th>
+                <th scope="col" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for task in upcoming_tasks %}
+              <tr>
+                <td class="ps-4">{{ task.title }}</td>
+                <td>{{ task.description|truncate(50) if task.description else "" }}</td>
+                <td>
+                  {% if task.due_date %}
+                    {% if task.is_overdue %}
+                      <span class="text-danger">{{ task.due_date.strftime('%b %d, %Y') }}</span>
+                    {% else %}
+                      {{ task.due_date.strftime('%b %d, %Y') }}
+                    {% endif %}
+                  {% else %}
+                    <span class="text-muted">No date set</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if task.status == 'completed' %}
+                    <span class="badge bg-success">Completed</span>
+                  {% elif task.status == 'in_progress' %}
+                    <span class="badge bg-warning">In Progress</span>
+                  {% else %}
+                    <span class="badge bg-primary">Not Started</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if task.priority == 'high' %}
+                    <span class="badge bg-danger">High</span>
+                  {% elif task.priority == 'medium' %}
+                    <span class="badge bg-warning">Medium</span>
+                  {% else %}
+                    <span class="badge bg-info">Low</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if task.assigned_to %}
+                    {{ task.assigned_to.name }}
+                  {% else %}
+                    <span class="text-muted">Unassigned</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  <a href="{{ url_for('tasks_bp.view', entity_id=task.id) }}" class="btn btn-sm btn-outline-primary me-1">View</a>
+                  <a href="{{ url_for('tasks_bp.edit', entity_id=task.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </td>
+              </tr>
+              {% endfor %}
+              {% if not upcoming_tasks %}
+              <tr>
+                <td colspan="7" class="text-center py-4">
+                  <div class="text-muted">
+                    <i class="bi bi-info-circle-fill fs-4 mb-2"></i>
+                    <p>No upcoming tasks. Add a task?</p>
+                  </div>
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer bg-white text-center">
+        <a href="{{ url_for('tasks_bp.filtered_tasks') }}" class="text-decoration-none">
+          View all {{ stats.total_tasks }} tasks
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Task Completion Chart -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Task Completion Trend</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px; position: relative;">
+          <canvas id="taskCompletionChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+  // Initialize the highlights slider
+  document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.highlights-container');
+    const items = document.querySelectorAll('.highlight-item');
+    let currentIndex = 0;
+
+    document.querySelector('.btn-highlight-next').addEventListener('click', function() {
+      currentIndex = (currentIndex + 1) % items.length;
+      container.scrollTo({
+        left: currentIndex * container.offsetWidth,
+        behavior: 'smooth'
+      });
+    });
+
+    document.querySelector('.btn-highlight-prev').addEventListener('click', function() {
+      currentIndex = (currentIndex - 1 + items.length) % items.length;
+      container.scrollTo({
+        left: currentIndex * container.offsetWidth,
+        behavior: 'smooth'
+      });
+    });
+
+    // Auto-scroll highlights
+    setInterval(() => {
+      document.querySelector('.btn-highlight-next').click();
+    }, 5000);
+
+    // Initialize task completion chart
+    const ctx = document.getElementById('taskCompletionChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: {{ completion_data.labels|tojson }},
+        datasets: [
+          {
+            label: 'Completed Tasks',
+            backgroundColor: 'rgba(40, 167, 69, 0.2)',
+            borderColor: 'rgba(40, 167, 69, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(40, 167, 69, 1)',
+            pointRadius: 4,
+            fill: true,
+            data: {{ completion_data.completed_tasks|tojson }}
+          },
+          {
+            label: 'New Tasks',
+            backgroundColor: 'rgba(0, 123, 255, 0.2)',
+            borderColor: 'rgba(0, 123, 255, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(0, 123, 255, 1)',
+            pointRadius: 4,
+            fill: true,
+            data: {{ completion_data.new_tasks|tojson }}
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            grid: {
+              display: false
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Number of Tasks'
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          },
+          legend: {
+            position: 'top'
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+{% block head_extra %}
+<style>
+/* Activity Icons */
+.activity-icon,
+.category-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.activity-icon:hover,
+.category-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Navigation cards hover effect */
+.nav-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Highlights container */
+.highlights-container {
+  display: flex;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.highlight-item {
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Badge styling */
+.nav-card .badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.8rem;
+}
+</style>
+{% endblock %}

@@ -17,6 +17,15 @@ class Task(BaseModel):
     priority = db.Column(db.String(20), default="Medium")
     notable_type = db.Column(db.String(50), nullable=False, default="User")
     notable_id = db.Column(db.Integer, nullable=False, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    assigned_to_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+
+    # Relationship with User model
+    assigned_to = db.relationship('User', foreign_keys=[assigned_to_id],
+                                  backref=db.backref('assigned_tasks', lazy='dynamic'))
+
+    # Additional timestamp for completion tracking
+    completed_at = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self) -> str:
         """Readable string representation.
@@ -25,6 +34,19 @@ class Task(BaseModel):
             str: Summary with task title.
         """
         return f"<Task {self.title!r}>"
+
+    @property
+    def is_overdue(self) -> bool:
+        """Check if task is overdue.
+
+        Returns:
+            bool: True if due date is in the past and task is not completed.
+        """
+        return (
+                self.due_date is not None and
+                self.due_date < datetime.utcnow() and
+                self.status.lower() != 'completed'
+        )
 
     def save(self, notable_type: str = "User", notable_id: int = 1) -> "Task":
         """Persist task to the database with logging.
@@ -40,6 +62,13 @@ class Task(BaseModel):
             self.notable_type = notable_type
         if not self.notable_id:
             self.notable_id = notable_id
+
+        # If status was changed to completed, set completed_at
+        if self.status == 'completed' and not self.completed_at:
+            self.completed_at = datetime.utcnow()
+        # If status was changed from completed, clear completed_at
+        elif self.status != 'completed' and self.completed_at:
+            self.completed_at = None
 
         logger.info(f"Saving task {self.title!r} with status {self.status!r}")
         super().save()

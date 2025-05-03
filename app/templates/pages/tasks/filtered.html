@@ -1,0 +1,256 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Filtered Tasks{% endblock %}
+
+{% block content %}
+<!-- Page Header Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-2">Filtered Tasks</h1>
+          <p class="text-muted mb-0">
+            {% if filters.status == 'completed' %}
+              Completed tasks
+            {% elif filters.status == 'in_progress' %}
+              Tasks in progress
+            {% elif filters.status == 'not_started' %}
+              Tasks not started
+            {% elif filters.priority == 'high' %}
+              High priority tasks
+            {% elif filters.priority == 'medium' %}
+              Medium priority tasks
+            {% elif filters.priority == 'low' %}
+              Low priority tasks
+            {% elif filters.due_date == 'today' %}
+              Tasks due today
+            {% elif filters.due_date == 'overdue' %}
+              Overdue tasks
+            {% elif filters.due_date == 'this_week' %}
+              Tasks due this week
+            {% else %}
+              All tasks
+            {% endif %}
+          </p>
+        </div>
+        <div>
+          <a href="{{ url_for('tasks_bp.tasks_dashboard') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+          </a>
+          <a href="{{ url_for('tasks_bp.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Add Task
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Controls -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Filter Tasks</h2>
+      </div>
+      <div class="card-body">
+        <form action="{{ url_for('tasks_bp.filtered_tasks') }}" method="GET" class="row g-3">
+          <div class="col-md-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status">
+              <option value="">All Statuses</option>
+              <option value="completed" {% if filters.status == 'completed' %}selected{% endif %}>Completed</option>
+              <option value="in_progress" {% if filters.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+              <option value="not_started" {% if filters.status == 'not_started' %}selected{% endif %}>Not Started</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="priority" class="form-label">Priority</label>
+            <select class="form-select" id="priority" name="priority">
+              <option value="">All Priorities</option>
+              <option value="high" {% if filters.priority == 'high' %}selected{% endif %}>High</option>
+              <option value="medium" {% if filters.priority == 'medium' %}selected{% endif %}>Medium</option>
+              <option value="low" {% if filters.priority == 'low' %}selected{% endif %}>Low</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="due_date" class="form-label">Due Date</label>
+            <select class="form-select" id="due_date" name="due_date">
+              <option value="">All Due Dates</option>
+              <option value="today" {% if filters.due_date == 'today' %}selected{% endif %}>Due Today</option>
+              <option value="overdue" {% if filters.due_date == 'overdue' %}selected{% endif %}>Overdue</option>
+              <option value="this_week" {% if filters.due_date == 'this_week' %}selected{% endif %}>Due This Week</option>
+              <option value="next_week" {% if filters.due_date == 'next_week' %}selected{% endif %}>Due Next Week</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="assigned_to" class="form-label">Assigned To</label>
+            <select class="form-select" id="assigned_to" name="assigned_to">
+              <option value="">All Assignees</option>
+              {% for assignee in assignees %}
+              <option value="{{ assignee.id }}" {% if filters.assigned_to == assignee.id|string %}selected{% endif %}>{{ assignee.name }}</option>
+              {% endfor %}
+              <option value="unassigned" {% if filters.assigned_to == 'unassigned' %}selected{% endif %}>Unassigned</option>
+            </select>
+          </div>
+          <div class="col-12 text-end">
+            <a href="{{ url_for('tasks_bp.filtered_tasks') }}" class="btn btn-outline-secondary me-2">Clear Filters</a>
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tasks Table -->
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Tasks ({{ tasks|length }})</h2>
+        <div class="dropdown">
+          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-download me-1"></i> Export
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exportDropdown">
+            <li><a class="dropdown-item" href="#">Export as CSV</a></li>
+            <li><a class="dropdown-item" href="#">Export as Excel</a></li>
+            <li><a class="dropdown-item" href="#">Export as PDF</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Task</th>
+                <th scope="col">Description</th>
+                <th scope="col">Due Date</th>
+                <th scope="col" class="text-center">Status</th>
+                <th scope="col" class="text-center">Priority</th>
+                <th scope="col">Assigned To</th>
+                <th scope="col" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for task in tasks %}
+              <tr>
+                <td class="ps-4">
+                  <div class="d-flex align-items-center">
+                    <div class="task-icon rounded-circle d-flex align-items-center justify-content-center me-2"
+                         style="width: 40px; height: 40px;
+                         {% if task.status == 'completed' %}
+                           background-color: rgba(40, 167, 69, 0.1);
+                         {% elif task.status == 'in_progress' %}
+                           background-color: rgba(255, 193, 7, 0.1);
+                         {% else %}
+                           background-color: rgba(13, 110, 253, 0.1);
+                         {% endif %}">
+                      {% if task.status == 'completed' %}
+                        <i class="bi bi-check-circle text-success"></i>
+                      {% elif task.status == 'in_progress' %}
+                        <i class="bi bi-hourglass-split text-warning"></i>
+                      {% else %}
+                        <i class="bi bi-clock text-primary"></i>
+                      {% endif %}
+                    </div>
+                    <div>
+                      <div class="fw-bold">{{ task.title }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-muted">{{ task.description|truncate(50) if task.description else "-" }}</td>
+                <td>
+                  {% if task.due_date %}
+                    {% if task.is_overdue %}
+                      <span class="text-danger">{{ task.due_date.strftime('%b %d, %Y') }}</span>
+                    {% else %}
+                      {{ task.due_date.strftime('%b %d, %Y') }}
+                    {% endif %}
+                  {% else %}
+                    <span class="text-muted">No date set</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  {% if task.status == 'completed' %}
+                    <span class="badge bg-success">Completed</span>
+                  {% elif task.status == 'in_progress' %}
+                    <span class="badge bg-warning">In Progress</span>
+                  {% else %}
+                    <span class="badge bg-primary">Not Started</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  {% if task.priority == 'high' %}
+                    <span class="badge bg-danger">High</span>
+                  {% elif task.priority == 'medium' %}
+                    <span class="badge bg-warning">Medium</span>
+                  {% else %}
+                    <span class="badge bg-info">Low</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if task.assigned_to %}
+                    {{ task.assigned_to.name }}
+                  {% else %}
+                    <span class="text-muted">Unassigned</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  <a href="{{ url_for('tasks_bp.view', entity_id=task.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a href="{{ url_for('tasks_bp.edit', entity_id=task.id) }}" class="btn btn-sm btn-outline-secondary me-1">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ task.id }}">
+                    <i class="bi bi-trash"></i>
+                  </button>
+
+                  <!-- Delete Modal -->
+                  <div class="modal fade" id="deleteModal{{ task.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ task.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="deleteModalLabel{{ task.id }}">Confirm Delete</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Are you sure you want to delete the task <strong>{{ task.title }}</strong>? This action cannot be undone.
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          <form action="{{ url_for('tasks_bp.delete', entity_id=task.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+              {% if not tasks %}
+              <tr>
+                <td colspan="7" class="text-center py-5">
+                  <div class="text-muted">
+                    <i class="bi bi-search fs-3 mb-3 d-block"></i>
+                    <p class="mb-1">No tasks found matching your criteria</p>
+                    <a href="{{ url_for('tasks_bp.create') }}" class="btn btn-primary mt-2">
+                      <i class="bi bi-plus-circle me-1"></i> Add a Task
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

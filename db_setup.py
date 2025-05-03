@@ -410,19 +410,23 @@ def seed_tasks():
         due_date = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0, microsecond=0)
         due_date = due_date.replace(day=due_date.day + 30)
 
-        create_or_update(
-            Task,
-            {"title": title},
-            {
-                "description": description,
-                "due_date": due_date,
-                "status": status,
-                "priority": priority,
-                "notable_type": notable_type,
-                "notable_id": opportunity.id,
-                "assigned_to": user.id,
-            },
-        )
+        # Set completed_at timestamp if the task is completed
+        completed_at = None
+        if status.lower() == "completed":
+            completed_at = datetime.now(ZoneInfo("UTC"))
+
+        task_data = {
+            "description": description,
+            "due_date": due_date,
+            "status": status,
+            "priority": priority,
+            "notable_type": notable_type,
+            "notable_id": opportunity.id,
+            "assigned_to_id": user.id,  # Updated to use assigned_to_id instead of assigned_to
+            "completed_at": completed_at  # Set the completed_at timestamp for completed tasks
+        }
+
+        create_or_update(Task, {"title": title}, task_data)
     db.session.commit()
     logger.info("✅ Tasks seeded.")
 
