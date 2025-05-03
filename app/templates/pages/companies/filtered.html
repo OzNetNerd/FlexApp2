@@ -1,0 +1,198 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Filtered Companies{% endblock %}
+
+{% block content %}
+<!-- Page Header Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-2">Filtered Companies</h1>
+          <p class="text-muted mb-0">
+            {% if filters.has_opportunities == 'yes' %}
+              Companies with opportunities
+            {% elif filters.has_opportunities == 'no' %}
+              Companies with no opportunities
+            {% elif filters.has_contacts == 'yes' %}
+              Companies with contacts
+            {% elif filters.has_contacts == 'no' %}
+              Companies with no contacts
+            {% elif filters.has_capabilities == 'yes' %}
+              Companies with capabilities
+            {% elif filters.has_capabilities == 'no' %}
+              Companies with no capabilities
+            {% else %}
+              All companies
+            {% endif %}
+          </p>
+        </div>
+        <div>
+          <a href="{{ url_for('companies_bp.companies_dashboard') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+          </a>
+          <a href="{{ url_for('companies_bp.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Add Company
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Controls -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">Filter Companies</h2>
+      </div>
+      <div class="card-body">
+        <form action="{{ url_for('companies_bp.filtered_companies') }}" method="GET" class="row g-3">
+          <div class="col-md-4">
+            <label for="has_opportunities" class="form-label">Opportunities</label>
+            <select class="form-select" id="has_opportunities" name="has_opportunities">
+              <option value="">All Companies</option>
+              <option value="yes" {% if filters.has_opportunities == 'yes' %}selected{% endif %}>With Opportunities</option>
+              <option value="no" {% if filters.has_opportunities == 'no' %}selected{% endif %}>No Opportunities</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="has_contacts" class="form-label">Contacts</label>
+            <select class="form-select" id="has_contacts" name="has_contacts">
+              <option value="">All Companies</option>
+              <option value="yes" {% if filters.has_contacts == 'yes' %}selected{% endif %}>With Contacts</option>
+              <option value="no" {% if filters.has_contacts == 'no' %}selected{% endif %}>No Contacts</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="has_capabilities" class="form-label">Capabilities</label>
+            <select class="form-select" id="has_capabilities" name="has_capabilities">
+              <option value="">All Companies</option>
+              <option value="yes" {% if filters.has_capabilities == 'yes' %}selected{% endif %}>With Capabilities</option>
+              <option value="no" {% if filters.has_capabilities == 'no' %}selected{% endif %}>No Capabilities</option>
+            </select>
+          </div>
+          <div class="col-12 text-end">
+            <a href="{{ url_for('companies_bp.filtered_companies') }}" class="btn btn-outline-secondary me-2">Clear Filters</a>
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Companies Table -->
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Companies ({{ companies|length }})</h2>
+        <div class="dropdown">
+          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-download me-1"></i> Export
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exportDropdown">
+            <li><a class="dropdown-item" href="#">Export as CSV</a></li>
+            <li><a class="dropdown-item" href="#">Export as Excel</a></li>
+            <li><a class="dropdown-item" href="#">Export as PDF</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Company</th>
+                <th scope="col">Description</th>
+                <th scope="col" class="text-center">Opportunities</th>
+                <th scope="col" class="text-center">Contacts</th>
+                <th scope="col" class="text-center">Notes</th>
+                <th scope="col" class="text-center">Capabilities</th>
+                <th scope="col" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for company in companies %}
+              <tr>
+                <td class="ps-4">
+                  <div class="d-flex align-items-center">
+                    <div class="company-avatar bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                      <i class="bi bi-building text-secondary"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold">{{ company.name }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-muted">{{ company.description|truncate(50) if company.description else "-" }}</td>
+                <td class="text-center">
+                  <span class="badge bg-primary">{{ company.opportunities.count() }}</span>
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-info">{{ company.contacts|default([])|length }}</span>
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-secondary">{{ company.notes|default([])|length }}</span>
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-success">{{ company.company_capabilities.count() }}</span>
+                </td>
+                <td class="text-center">
+                  <a href="{{ url_for('companies_bp.view', company_id=company.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a href="{{ url_for('companies_bp.edit', company_id=company.id) }}" class="btn btn-sm btn-outline-secondary me-1">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ company.id }}">
+                    <i class="bi bi-trash"></i>
+                  </button>
+
+                  <!-- Delete Modal -->
+                  <div class="modal fade" id="deleteModal{{ company.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ company.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="deleteModalLabel{{ company.id }}">Confirm Delete</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Are you sure you want to delete <strong>{{ company.name }}</strong>? This action cannot be undone.
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          <form action="{{ url_for('companies_bp.delete', company_id=company.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+              {% if not companies %}
+              <tr>
+                <td colspan="7" class="text-center py-5">
+                  <div class="text-muted">
+                    <i class="bi bi-search fs-3 mb-3 d-block"></i>
+                    <p class="mb-1">No companies found matching your criteria</p>
+                    <a href="{{ url_for('companies_bp.create') }}" class="btn btn-primary mt-2">
+                      <i class="bi bi-plus-circle me-1"></i> Add a Company
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
