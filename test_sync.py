@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Test Structure Synchronizer.
 
 This module ensures pytest files and directories match the application structure.
@@ -14,6 +13,7 @@ import shutil
 from datetime import datetime
 from typing import Dict, List, Set, Tuple, Optional, Any
 
+DEFAULT_EXEMPT_PREFIXES = ['fixtures', 'functional', 'integrations', 'unit']
 
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments.
@@ -21,6 +21,9 @@ def parse_arguments() -> argparse.Namespace:
     Returns:
         argparse.Namespace: The parsed command line arguments.
     """
+    # Default exempt prefixes
+
+
     parser = argparse.ArgumentParser(description='Sync test structure with app structure')
     parser.add_argument('--app-dir', default='app', help='Application directory (default: app)')
     parser.add_argument('--test-dir', default='tests', help='Test directory (default: tests)')
@@ -30,7 +33,15 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument('--clean', action='store_true', help='Remove stale test files/directories')
     parser.add_argument('--template', choices=['basic', 'pytest', 'unittest'], default='pytest',
                         help='Test file template (default: pytest)')
-    return parser.parse_args()
+    parser.add_argument('--exempt-prefixes', nargs='+', default=[],
+                        help='Additional test directory prefixes to exempt from stale checking')
+
+    args = parser.parse_args()
+
+    # Combine default exempt prefixes with user-provided ones
+    args.exempt_prefixes = DEFAULT_EXEMPT_PREFIXES + args.exempt_prefixes
+
+    return args
 
 
 def get_ignore_patterns(ignore_file: str) -> List[str]:
@@ -235,28 +246,40 @@ def ensure_test_structure(app_file_paths: Set[str], args: argparse.Namespace) ->
 def find_stale_test_dirs(app_file_paths: Set[str], args: argparse.Namespace) -> List[str]:
     """Find test directories that no longer have a corresponding app directory.
 
+    Identifies test directories that don't have matching app directories,
+    excluding directories that match exempt prefixes.
+
     Args:
-        app_file_paths (Set[str]): Set of relative paths to app files.
-        args (argparse.Namespace): Command-line arguments.
+        app_file_paths: Set of relative paths to app files.
+        args: Command-line arguments including exempt_prefixes.
 
     Returns:
-        List[str]: List of stale test directory paths.
+        List of stale test directory paths.
     """
+    # Get valid directory paths based on app structure
     valid_test_dirs = {os.path.dirname(p) for p in app_file_paths}
     valid_test_dirs.add("")  # Add root directory
-    found_test_dirs = set()
 
+    # Find all test directories
+    found_test_dirs = set()
     for root, dirs, _ in os.walk(args.test_dir):
         for dir_name in dirs:
             if dir_name != '__pycache__':  # Skip __pycache__ directories
                 test_subdir = os.path.relpath(os.path.join(root, dir_name), args.test_dir)
                 found_test_dirs.add(test_subdir)
 
-    stale_dirs = sorted(found_test_dirs - valid_test_dirs)
-    stale_dirs_list = []
+    # Get potentially stale directories (not in app structure)
+    potentially_stale = found_test_dirs - valid_test_dirs
 
-    for stale in stale_dirs:
-        stale_dir_path = os.path.join(args.test_dir, stale)
+    # Filter out exempted prefixes
+    stale_dirs_list = []
+    for dir_path in sorted(potentially_stale):
+        # Skip if directory matches any exempted prefix
+        if any(dir_path == prefix or dir_path.startswith(f"{prefix}/")
+               for prefix in args.exempt_prefixes):
+            continue
+
+        stale_dir_path = os.path.join(args.test_dir, dir_path)
         stale_dirs_list.append(stale_dir_path)
         print(f"[STALE DIR] {stale_dir_path}")
 
@@ -276,13 +299,13 @@ def find_stale_test_files(app_file_paths: Set[str], args: argparse.Namespace) ->
     """Find test files that no longer have a corresponding app file.
 
     Args:
-        app_file_paths (Set[str]): Set of relative paths to app files.
-        args (argparse.Namespace): Command-line arguments.
+        app_file_paths: Set of relative paths to app files.
+        args: Command-line arguments including exempt_prefixes.
 
     Returns:
-        List[str]: List of stale test file paths.
+        List of stale test file paths.
     """
-    # Create a mapping of expected test files for each app file
+    # Create mapping of expected test files
     expected_test_files = {}
     for path in app_file_paths:
         dir_name = os.path.dirname(path)
@@ -296,6 +319,12 @@ def find_stale_test_files(app_file_paths: Set[str], args: argparse.Namespace) ->
         for file_name in files:
             if file_name.startswith('test_') and file_name.endswith('.py'):
                 rel_path = os.path.relpath(os.path.join(root, file_name), args.test_dir)
+
+                # Skip if file is in an exempted directory
+                rel_dir = os.path.dirname(rel_path)
+                if any(rel_dir == prefix or rel_dir.startswith(f"{prefix}/")
+                       for prefix in args.exempt_prefixes):
+                    continue
 
                 if rel_path not in expected_test_files:
                     stale_file_path = os.path.join(args.test_dir, rel_path)
