@@ -18,16 +18,20 @@ def contacts_dashboard():
     total_contacts = Contact.query.count()
 
     # Get top contacts (those associated with most opportunities)
+    # Use the opportunity_relationships for joining instead of the property
     top_contacts = db.session.query(
-        Contact, db.func.count(Contact.opportunities).label('opportunity_count')
-    ).outerjoin(Contact.opportunities).group_by(Contact.id).order_by(
-        db.func.count(Contact.opportunities).desc()
+        Contact,
+        db.func.count(Contact.opportunity_relationships).label('opportunity_count')
+    ).outerjoin(
+        Contact.opportunity_relationships
+    ).group_by(Contact.id).order_by(
+        db.func.count(Contact.opportunity_relationships).desc()
     ).limit(5).all()
 
     # Calculate simple statistics
     stats = {
         "total_contacts": total_contacts,
-        "with_opportunities": db.session.query(Contact).join(Contact.opportunities).distinct().count(),
+        "with_opportunities": db.session.query(Contact).filter(Contact.opportunity_relationships.any()).distinct().count(),
         "with_skills": db.session.query(Contact).filter(Contact.skill_level.isnot(None)).count(),
         "with_companies": db.session.query(Contact).filter(Contact.company_id.isnot(None)).count()
     }
@@ -131,9 +135,9 @@ def filtered_contacts():
     # Get contacts with opportunities
     has_opportunities = request.args.get('has_opportunities')
     if has_opportunities == 'yes':
-        query = query.filter(Contact.opportunities.any())
+        query = query.filter(Contact.opportunity_relationships.any())
     elif has_opportunities == 'no':
-        query = query.filter(~Contact.opportunities.any())
+        query = query.filter(~Contact.opportunity_relationships.any())
 
     # Get contacts with companies
     has_company = request.args.get('has_company')
@@ -171,8 +175,8 @@ def statistics():
     # Total contacts
     total_contacts = Contact.query.count()
 
-    # Contacts with opportunities
-    with_opportunities = db.session.query(Contact).join(Contact.opportunities).distinct().count()
+    # Contacts with opportunities - use opportunity_relationships instead of the property
+    with_opportunities = db.session.query(Contact).filter(Contact.opportunity_relationships.any()).distinct().count()
 
     # Contacts with skills
     with_skills = db.session.query(Contact).filter(Contact.skill_level.isnot(None)).count()
