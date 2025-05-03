@@ -78,7 +78,7 @@ def db(app):
                 email=user_data["email"],
                 password_hash=user_data["password_hash"],
                 name=user_data["name"],
-                username=user_data.get("username")
+                username=user_data.get("username"),
             )
             # Explicitly set the user ID for testing
             user.id = user_data["id"]

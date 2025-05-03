@@ -68,12 +68,12 @@ def create_or_update(model, match_by: dict, data: dict):
 def seed_users():
     """Seed users into the database."""
     users = [
-        ("morgan", "Morgan Chen", "morgan.chen@prismasecurity.com", False),
-        ("taylor", "Taylor Rodriguez", "taylor.rodriguez@prismasecurity.com", False),
-        ("jordan", "Jordan Patel", "jordan.patel@prismasecurity.com", False),
-        ("alex", "Alex Singh", "alex.singh@prismasecurity.com", False),
-        ("casey", "Casey Washington", "casey.washington@prismasecurity.com", False),
-        ("admin", "Admin User", "admin@prismasecurity.com", True),
+        ("morgan", "Morgan Chen", "morgan.chen@example.com", False),
+        ("taylor", "Taylor Rodriguez", "taylor.rodriguez@example.com", False),
+        ("jordan", "Jordan Patel", "jordan.patel@example.com", False),
+        ("alex", "Alex Singh", "alex.singh@example.com", False),
+        ("casey", "Casey Washington", "casey.washington@example.com", False),
+        ("admin", "Admin User", "admin@example.com.com", True),
     ]
 
     for username, name, email, is_admin in users:

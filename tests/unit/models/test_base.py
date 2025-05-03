@@ -7,11 +7,13 @@ from app.models.base import BaseModel, db
 
 class TestModel(BaseModel):
     """Test model for BaseModel tests."""
+
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False, info={"label": "Name", "section": "Main", "required": True})
     active = Column(Boolean, default=True, info={"widget": "checkbox", "section": "Status"})
     description = Column(Text, nullable=True, info={"widget": "textarea", "section": "Details"})
     birth_date = Column(Date, nullable=True, info={"section": "Details"})
+
 
 # Create class at module level, not within test method
 class DynamicCompany(BaseModel):
@@ -21,6 +23,148 @@ class DynamicCompany(BaseModel):
 
 @pytest.mark.db
 class TestBaseModel:
+    # Split the problematic test into separate test methods to avoid recursion
+
+    def test_to_dict_with_null_relationships(self, db, monkeypatch):
+        """Test to_dict method with null relationships."""
+        model = TestModel(name="Test Null Relationships")
+        db.session.add(model)
+        db.session.commit()
+
+        # Set up mock relationships
+        class MockRelationship:
+            def __init__(self, key):
+                self.key = key
+
+        mock_relationships = [MockRelationship("related_items"), MockRelationship("parent")]
+        monkeypatch.setattr(model.__mapper__, "relationships", mock_relationships)
+
+        # Set relationships to None
+        monkeypatch.setattr(model, "related_items", None)
+        monkeypatch.setattr(model, "parent", None)
+
+        # Test
+        data = model.to_dict()
+        assert data["related_items"] is None
+        assert data["parent"] is None
+
+    def test_to_dict_with_list_relationships(self, db, monkeypatch):
+        """Test to_dict method with list relationships."""
+        model = TestModel(name="Test List Relationships")
+        db.session.add(model)
+        db.session.commit()
+
+        # Set up mock relationships
+        class MockRelationship:
+            def __init__(self, key):
+                self.key = key
+
+        class MockItem:
+            def __init__(self, id):
+                self.id = id
+
+        mock_relationships = [MockRelationship("related_items")]
+        monkeypatch.setattr(model.__mapper__, "relationships", mock_relationships)
+
+        # Set relationship to a list
+        related_items = [MockItem(1), MockItem(2), MockItem(3)]
+        monkeypatch.setattr(model, "related_items", related_items)
+
+        # Test
+        data = model.to_dict()
+        assert data["related_items"] == [1, 2, 3]
+
+    def test_to_dict_with_single_relationship(self, db, monkeypatch):
+        """Test to_dict method with single object relationship."""
+        model = TestModel(name="Test Single Relationship")
+        db.session.add(model)
+        db.session.commit()
+
+        # Set up mock relationships
+        class MockRelationship:
+            def __init__(self, key):
+                self.key = key
+
+        class MockItem:
+            def __init__(self, id):
+                self.id = id
+
+        mock_relationships = [MockRelationship("parent")]
+        monkeypatch.setattr(model.__mapper__, "relationships", mock_relationships)
+
+        # Set relationship to a single object
+        parent = MockItem(42)
+        monkeypatch.setattr(model, "parent", parent)
+
+        # Test
+        data = model.to_dict()
+        assert data["parent"] == 42
+
+    def test_to_dict_with_relationships_without_id(self, db, monkeypatch):
+        """Test to_dict method with relationships without id attribute."""
+        model = TestModel(name="Test Relationships Without ID")
+        db.session.add(model)
+        db.session.commit()
+
+        # Set up mock relationships
+        class MockRelationship:
+            def __init__(self, key):
+                self.key = key
+
+        class MockItem:
+            def __init__(self, id):
+                self.id = id
+
+        class MockItemWithoutId:
+            def __init__(self, name):
+                self.name = name
+
+        mock_relationships = [MockRelationship("related_items"), MockRelationship("parent")]
+        monkeypatch.setattr(model.__mapper__, "relationships", mock_relationships)
+
+        # List case
+        related_items_without_id = [MockItem(1), MockItemWithoutId("no_id"), MockItem(3)]
+        monkeypatch.setattr(model, "related_items", related_items_without_id)
+
+        # Single object case
+        parent_without_id = MockItemWithoutId("parent")
+        monkeypatch.setattr(model, "parent", parent_without_id)
+
+        # Test
+        data = model.to_dict()
+        assert data["related_items"] == [1, 3]  # The item without id should be skipped
+        assert data["parent"] is None  # Should return None for object without id
+
+    def test_to_dict_with_relationship_exception(self, db, monkeypatch):
+        """Test to_dict method with relationship that raises an exception."""
+        model = TestModel(name="Test Exception Relationships")
+        db.session.add(model)
+        db.session.commit()
+
+        # Set up mock relationship that will cause an exception
+        class MockRelationship:
+            def __init__(self, key):
+                self.key = key
+
+        mock_relationships = [MockRelationship("error_relationship")]
+        monkeypatch.setattr(model.__mapper__, "relationships", mock_relationships)
+
+        # Create a descriptor that raises an exception when accessed
+        class ExceptionProperty:
+            def __get__(self, obj, objtype=None):
+                raise Exception("Test exception")
+
+        # Add the descriptor to the model class
+        type(model).error_relationship = ExceptionProperty()
+
+        try:
+            # Test
+            data = model.to_dict()
+            assert data["error_relationship"] is None
+        finally:
+            # Clean up
+            delattr(type(model), "error_relationship")
+
     def test_tablename_generation(self):
         """Test automatic tablename generation."""
         assert TestModel.__tablename__ == "testmodels"
