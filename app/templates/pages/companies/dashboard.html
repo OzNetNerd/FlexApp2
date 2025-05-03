@@ -262,14 +262,22 @@
                   <span class="badge bg-info">{{ company.contacts|default([])|length }}</span>
                 </td>
                 <td>
-                  <span class="badge bg-secondary">{{ company.notes|default([])|length }}</span>
+                  {% if company.notes is defined and company.notes is not none %}
+                    {% if company.notes is iterable and not company.notes is string %}
+                      <span class="badge bg-secondary">{{ company.notes|length }}</span>
+                    {% else %}
+                      <span class="badge bg-secondary">1</span>
+                    {% endif %}
+                  {% else %}
+                    <span class="badge bg-secondary">0</span>
+                  {% endif %}
                 </td>
                 <td>
                   <span class="badge bg-success">{{ company.company_capabilities.count() }}</span>
                 </td>
                 <td class="text-center">
-                  <a href="{{ url_for('companies_bp.view', company_id=company.id) }}" class="btn btn-sm btn-outline-primary me-1">View</a>
-                  <a href="{{ url_for('companies_bp.edit', company_id=company.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                  <a href="{{ url_for('companies_bp.view', entity_id=company.id) }}" class="btn btn-sm btn-outline-primary me-1">View</a>
+                  <a href="{{ url_for('companies_bp.edit', entity_id=company.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
                 </td>
               </tr>
               {% endfor %}

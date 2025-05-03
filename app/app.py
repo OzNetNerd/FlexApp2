@@ -9,6 +9,8 @@ from typing import Type
 from flask import Flask, current_app, make_response, redirect, request, url_for
 from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
+from werkzeug.routing import Rule
+
 
 from app.models import Setting, User
 from app.models.base import db
@@ -23,6 +25,10 @@ logger = get_logger()
 login_manager = LoginManager()
 migrate = Migrate()
 
+class CustomRule(Rule):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("strict_slashes", False)
+        super().__init__(*args, **kwargs)
 
 @login_manager.unauthorized_handler
 def unauthorized() -> "flask.wrappers.Response":
@@ -40,6 +46,8 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
         Flask: The configured Flask application.
     """
     app = Flask(__name__, static_folder="static", static_url_path="/static")
+    app.url_rule_class = CustomRule
+    app.url_map.strict_slashes = False
     app.config.from_object(config_class)
 
     if not app.config["LOG_HTTP_REQUESTS"]:
