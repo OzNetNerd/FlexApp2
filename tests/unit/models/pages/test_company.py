@@ -72,20 +72,20 @@ class TestCompanyDatabase:
         assert company_id is not None
 
         # Read
-        retrieved = Company.query.get(company_id)
+        retrieved = db.session.get(Company, company_id)
         assert retrieved.name == "DB Test Company"
         assert retrieved.description == "DB Test Description"
 
         # Update
         retrieved.name = "Updated Company"
         db.session.commit()
-        updated = Company.query.get(company_id)
+        updated = db.session.get(Company, company_id)
         assert updated.name == "Updated Company"
 
         # Delete
         db.session.delete(updated)
         db.session.commit()
-        deleted = Company.query.get(company_id)
+        deleted = db.session.get(Company, company_id)
         assert deleted is None
 
     def test_nullable_constraints(self, clean_db):
