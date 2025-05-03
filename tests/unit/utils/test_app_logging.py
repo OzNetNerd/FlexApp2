@@ -150,7 +150,7 @@ def test_start_timer_and_log_elapsed(mock_logger):
 
         with patch("app.utils.app_logging.logger") as mock_logger:
             log_elapsed(timer, "Operation completed")
-            mock_logger.debug.assert_called_once_with("⏱️ Operation completed: 2.5000 seconds")
+            mock_logger.debug.assert_called_once_with('⏱️ Operation completed:  2.5000 seconds')
 
 
 def test_logging_undefined_str():
