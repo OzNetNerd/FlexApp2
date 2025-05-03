@@ -39,9 +39,6 @@ const ToastSystem = {
 
     // Process any queued toasts
     this.processQueue();
-    
-    // Show confirmation toast that system is initialized
-    this.createToast("Toast system initialized", "success");
   },
 
   processQueue: function() {
@@ -119,6 +116,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Public function for showing toasts
 export function showToast(message, type = 'success') {
+  // Filter out initialization toast messages
+  if (typeof message === "string" &&
+      (message.includes("initialized") || message.includes("Initializing"))) {
+    // Just log these messages but don't show the toast
+    log("debug", "toasts.js", "showToast", `🍞 Initialization toast suppressed: ${message}`);
+    return;
+  }
+
   // Convert "error" to "danger" to match Bootstrap's classes
   if (type === "error") {
     type = "danger";
