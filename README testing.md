@@ -1,7 +1,7 @@
 # Claude
 
 ```
-Write pytest tests for the following files. I have all the code I need to set up flask, etc, I just need the tests
+Write pytest tests for the following files. I have all the code I need to set up flask, etc, I just need the tests. If any test runs into issues, you need to update the test code only. Do not tell me to update the app code.
 ```
 
 # Codecov
