@@ -1,3 +1,32 @@
+Move js styling to css
+
+e.g
+
+```
+toast.style.margin
+    styleEl.textContent = `
+        .column-selector-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 4px;
+            border-radius: 4px;
+            background: white;
+            border: none;
+        }
+        .column-selector-checkbox {
+            margin-right: 10px;
+            min-width: 16px;
+            min-height: 16px;
+        }
+        .column-selector-label {
+            margin-bottom: 0;
+            cursor: pointer;
+            user-select: none;
+        }
+    `;
+```
+
 I want you to give me a plan on splitting the js, html, and css code into separate files. Where necessary, I want you to combine code into a single file or split it across multiple files.
 
 If a HTML file can be removed and ported to js completely, do it. If a HTML file is going to be small and it would make sense to roll it into another file, do it. Do not make any breaking changes.

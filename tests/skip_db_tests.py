@@ -1,6 +1,8 @@
 """
-Execute this script to create a pytest.ini file that skips database-dependent tests.
-This makes it easier to focus on basic tests that don't need database access.
+Create a pytest.ini file that skips database-dependent tests.
+
+This script creates a pytest.ini configuration that automatically excludes tests
+marked with 'db', making it easier to run only lightweight tests.
 """
 
 PYTEST_INI_CONTENT = """

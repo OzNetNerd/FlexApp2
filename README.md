@@ -1,3 +1,9 @@
+# Harness
+
+```
+ git push https://username:$HARNESS_GIT_TOKEN@git.harness.io/oNOg8zc5RHyb-7VNI5dloQ/default/FlexApp2/FlexApp2.git main
+```
+
 # Repomix
 
 ```

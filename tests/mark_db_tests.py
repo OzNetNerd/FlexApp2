@@ -1,5 +1,8 @@
 """
 Add database test markers to test files.
+
+This script scans all test files and adds @pytest.mark.db markers to tests
+that use the db fixture, making it easier to selectively run or skip them.
 """
 
 import re
