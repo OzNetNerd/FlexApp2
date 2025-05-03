@@ -1,0 +1,26 @@
+pipeline:
+  name: Run Black Formatter
+  identifier: run_black_formatter
+  projectIdentifier: flask_app_devops
+  orgIdentifier: default
+  properties:
+    ci:
+      codebase:
+        build: <+input>  # Allows manual or trigger-based branch selection
+  stages:
+    - stage:
+        name: Format Check
+        identifier: format_check
+        type: CI
+        spec:
+          execution:
+            steps:
+              - step:
+                  name: Run Black
+                  identifier: run_black
+                  type: Run
+                  spec:
+                    shell: Sh
+                    command: |
+                      pip install black
+                      black --check .
