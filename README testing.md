@@ -1,4 +1,11 @@
-# Running Tests
+# Codecov
+
+```
+pytest --cov=. --cov-report=term-missing --cov-config=.coveragerc --skip-empty
+
+```
+
+# Pytest
 ## Setup
 
 Activate venv:
