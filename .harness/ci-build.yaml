@@ -1,7 +1,7 @@
 pipeline:
   name: Run Black Formatter
   identifier: run_black_formatter
-  projectIdentifier: flask_app_devops
+  projectIdentifier: FlexApp2
   orgIdentifier: default
   properties:
     ci:
