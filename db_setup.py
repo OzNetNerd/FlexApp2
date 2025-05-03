@@ -35,6 +35,11 @@ def setup_db():
 
     if not db_exists:
         logger.info("Creating new database...")
+        # Ensure the database directory exists
+        db_dir = os.path.dirname(db_file)
+        if db_dir and not os.path.exists(db_dir):
+            os.makedirs(db_dir)
+            logger.info(f"Created database directory: {db_dir}")
     else:
         logger.info("Database already exists, updating as needed...")
 
@@ -360,7 +365,7 @@ def seed_tasks():
         (
             "Conduct security posture assessment",
             "Complete the cloud security posture assessment and document findings for client presentation.",
-            "Completed",
+            "completed",
             "Medium",
             "Opportunity",
             "Cloud Security Posture Assessment",
@@ -412,7 +417,7 @@ def seed_tasks():
 
         # Set completed_at timestamp if the task is completed
         completed_at = None
-        if status.lower() == "completed":
+        if status == "completed":
             completed_at = datetime.now(ZoneInfo("UTC"))
 
         task_data = {
