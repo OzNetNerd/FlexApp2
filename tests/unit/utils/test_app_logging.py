@@ -191,9 +191,10 @@ def test_logging_undefined_getattr():
 
 def test_logging_undefined_clear():
     """Test clearing missing variables"""
-    # Using the correct initialization parameters
-    LoggingUndefined(hint=None, obj=None, name="var1")
-    LoggingUndefined(hint=None, obj=None, name="var2")
+    undef1 = LoggingUndefined(hint=None, obj=None, name="var1")
+    undef2 = LoggingUndefined(hint=None, obj=None, name="var2")
+    str(undef1)  # This calls __str__ which calls _log
+    str(undef2)  # This adds the variable to _missing_variables
 
     assert len(LoggingUndefined._missing_variables) >= 2
     LoggingUndefined.clear_missing_variables()
@@ -202,8 +203,12 @@ def test_logging_undefined_clear():
 
 def test_logging_undefined_raise():
     """Test raising exception for missing variables"""
-    LoggingUndefined(hint=None, obj=None, name="var3")
-    LoggingUndefined(hint=None, obj=None, name="var4")
+    undef3 = LoggingUndefined(hint=None, obj=None, name="var3")
+    undef4 = LoggingUndefined(hint=None, obj=None, name="var4")
+
+    # Trigger logging by converting to string
+    str(undef3)
+    str(undef4)
 
     with pytest.raises(RuntimeError) as excinfo:
         LoggingUndefined.raise_if_missing()
