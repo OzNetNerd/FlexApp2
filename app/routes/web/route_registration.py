@@ -169,7 +169,8 @@ def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, enti
 
 def register_crud_routes(config: CrudRouteConfig) -> None:
     bp = config.blueprint
-    bp.add_url_rule(rule="/", endpoint="index", view_func=route_handler("index", config), methods=["GET"])
+    # Removed the index route from here
+    # bp.add_url_rule(rule="/", endpoint="index", view_func=route_handler("index", config), methods=["GET"])
     bp.add_url_rule(rule="/create", endpoint="create", view_func=route_handler("create", config), methods=["GET", "POST"])
     bp.add_url_rule(rule="/<int:entity_id>", endpoint="view", view_func=route_handler("view", config), methods=["GET"])
     bp.add_url_rule(

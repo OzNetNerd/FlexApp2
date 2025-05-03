@@ -26,7 +26,7 @@ srs_bp = create_crud_blueprint(srs_config)
 
 
 # Dashboard route
-@srs_bp.route("/dashboard", methods=["GET"])
+@srs_bp.route("/", methods=["GET"])
 @login_required
 def dashboard():
     """Render the flashcard dashboard."""
