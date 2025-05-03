@@ -136,7 +136,7 @@ def test_function_name_filter():
     # Check output
     assert stream.getvalue().strip() == "custom_function: Test message"
 
-
+@patch("app.utils.app_logging.logger")
 def test_start_timer_and_log_elapsed():
     """Test timer and elapsed time logging"""
     with patch("time.time") as mock_time:
