@@ -13,6 +13,10 @@ pipeline:
         identifier: format_check
         type: CI
         spec:
+          infrastructure:
+            type: Docker
+            spec:
+              image: python:3.9  # Choose appropriate Python version
           execution:
             steps:
               - step:
