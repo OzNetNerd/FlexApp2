@@ -16,7 +16,16 @@ clear &&  tree -P '*.py' -I 'venv' --prune
 Run tests:
 
 ```
+clear && pytest -v --markers
 clear && pytest -v
+clear && pytest -vvs tests/functional/test_mock_auth.py
+clear && pytest --collect-only
+clear && pytest -v --rootdir=/mnt/c/Will/code/FlexApp2 -c=/mnt/c/Will/code/FlexApp2/pytest.ini
+```
+
+```
+# Doesn't work
+# clear && pytest --config=pytest.ini
 ```
 
 ## Basic Test Execution

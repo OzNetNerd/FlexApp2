@@ -20,7 +20,7 @@ addopts = -v -k "not db"
 
 def create_pytest_ini():
     """Create a pytest.ini file in the current directory."""
-    with open("pytest.ini", "w") as f:
+    with open("../pytest.ini", "w") as f:
         f.write(PYTEST_INI_CONTENT)
     print("Created pytest.ini with settings to skip database tests.")
     print("Run 'pytest' to run only non-database tests.")
