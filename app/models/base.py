@@ -46,17 +46,22 @@ class BaseModel(db.Model):
     def to_dict(self) -> dict:
         data = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         for rel in self.__mapper__.relationships:
+            key = rel.key
+            data[key] = None  # Default to None
+
             try:
-                val = getattr(self, rel.key)
+                val = getattr(self, key)
             except Exception as e:
-                logger.warning(f"Error reading relationship {rel.key}: {e}")
-                val = None
+                logger.warning(f"Error reading relationship {key}: {e}")
+                continue  # Skip to the next relationship
+
             if val is None:
-                data[rel.key] = None
+                continue  # Keep the default None value
             elif isinstance(val, list):
-                data[rel.key] = [item.id for item in val if hasattr(item, "id")]
+                data[key] = [getattr(item, "id", None) for item in val if hasattr(item, "id")]
             else:
-                data[rel.key] = getattr(val, "id", None)
+                data[key] = getattr(val, "id", None)
+
         return data
 
     def save(self) -> "BaseModel":

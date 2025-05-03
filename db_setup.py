@@ -73,7 +73,7 @@ def seed_users():
         ("jordan", "Jordan Patel", "jordan.patel@example.com", False),
         ("alex", "Alex Singh", "alex.singh@example.com", False),
         ("casey", "Casey Washington", "casey.washington@example.com", False),
-        ("admin", "Admin User", "admin@example.com.com", True),
+        ("admin", "Admin User", "admin@example.com", True),
     ]
 
     for username, name, email, is_admin in users:
