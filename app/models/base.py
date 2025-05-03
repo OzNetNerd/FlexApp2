@@ -44,23 +44,31 @@ class BaseModel(db.Model):
             setattr(self, key, value)
 
     def to_dict(self) -> dict:
+        # Get column data
         data = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+        # Process relationships
         for rel in self.__mapper__.relationships:
             key = rel.key
-            data[key] = None  # Default to None
+
+            # Initialize relationship value to None
+            data[key] = None
 
             try:
+                # Try to get the relationship value
                 val = getattr(self, key)
-            except Exception as e:
-                logger.warning(f"Error reading relationship {key}: {e}")
-                continue  # Skip to the next relationship
 
-            if val is None:
-                continue  # Keep the default None value
-            elif isinstance(val, list):
-                data[key] = [getattr(item, "id", None) for item in val if hasattr(item, "id")]
-            else:
-                data[key] = getattr(val, "id", None)
+                # Only process if not None
+                if val is not None:
+                    if isinstance(val, list):
+                        # Extract IDs from list items
+                        data[key] = [item.id for item in val if hasattr(item, "id")]
+                    else:
+                        # Extract ID from single object
+                        data[key] = getattr(val, "id", None)
+            except Exception as e:
+                # Log error but keep None as the value
+                logger.warning(f"Error processing relationship {key}: {e}")
 
         return data
 
