@@ -11,8 +11,6 @@ companies_bp = create_crud_blueprint(BlueprintConfig(model_class=Company))
 
 
 # Companies Dashboard route
-@companies_bp.route("/", methods=["GET"])
-@login_required
 def companies_dashboard():
     # Get basic statistics
     total_companies = Company.query.count()
@@ -23,6 +21,15 @@ def companies_dashboard():
     ).outerjoin(Company.opportunities).group_by(Company.id).order_by(
         db.func.count(Company.opportunities).desc()
     ).limit(5).all()
+
+    # Ensure notes is always a list for each company
+    for company, _ in top_companies:
+        if hasattr(company, 'notes'):
+            # If notes is None or not iterable, convert to a list
+            if company.notes is None:
+                company.notes = []
+            elif not hasattr(company.notes, '__iter__') or isinstance(company.notes, str):
+                company.notes = [company.notes]
 
     # Calculate simple statistics
     stats = {
