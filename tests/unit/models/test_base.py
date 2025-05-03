@@ -54,6 +54,8 @@ class TestBaseModel:
         """Create tables before tests and drop them after."""
         db.create_all()
         yield
+        # Ensure all transactions are cleared
+        db.session.remove()
         db.drop_all()
 
     def test_to_dict_with_null_relationships(self, db, monkeypatch):
@@ -168,23 +170,27 @@ class TestBaseModel:
         db.session.add(model)
         db.session.commit()
 
-        # Add a relationship property that raises exception
+        # Add a relationship property to the mapper relationships
         class MockRelationship:
             def __init__(self, key):
                 self.key = key
 
-        # Add the error relationship to the mapper relationships
-        monkeypatch.setattr(model.__mapper__, "relationships",
-                            list(model.__mapper__.relationships) + [MockRelationship("error_relationship")])
+        # Create mock relationships list with our error relationship
+        original_relationships = list(model.__mapper__.relationships)
+        mock_rel = MockRelationship("error_relationship")
 
-        # Define a property that raises an exception when accessed
-        def error_getter(obj):
+        # Add property to the instance that raises exception when accessed
+        def raise_error(self):
             raise Exception("Test exception")
 
-        # Apply the property
-        monkeypatch.setattr(TestModel, "error_relationship", property(error_getter))
+        # Apply to instance
+        TestModel.error_relationship = property(raise_error)
 
-        # Test that to_dict handles this gracefully
+        # Apply our mocked relationships list
+        monkeypatch.setattr(model.__mapper__, "relationships",
+                            original_relationships + [mock_rel])
+
+        # Test
         data = model.to_dict()
         assert data["error_relationship"] is None
 
