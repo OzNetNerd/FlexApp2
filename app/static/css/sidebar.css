@@ -81,6 +81,21 @@ body.sidebar-collapsed .sidebar {
   min-height: var(--navbar-height);
 }
 
+/* Center toggle button when sidebar is collapsed */
+body.sidebar-collapsed .sidebar-header {
+    display: flex;
+    justify-content: center;
+    position: relative; /* Needed for transform */
+}
+
+body.sidebar-collapsed .sidebar-toggle {
+    margin: 0; /* Reset margins */
+    padding: 0; /* Reset padding */
+    position: absolute; /* Override default positioning */
+    left: 50%;       /* Initial center position */
+    transform: translateX(-50%) translateX(20px); /* Precise adjustment */
+}
+
 .sidebar-brand {
   display: flex;
   align-items: center;
@@ -193,8 +208,10 @@ body.sidebar-collapsed .sidebar {
 }
 
 /* Ensure proper sidebar-collapsed state */
-body.sidebar-collapsed .sidebar {
-  width: var(--sidebar-collapsed-width);
+body.sidebar-collapsed .sidebar-toggle {
+    margin-left: auto; /* Push to the right */
+    margin-right: auto; /* Maintain some centering context */
+    padding-left: 155px; /* Add some left padding to visually shift it */
 }
 
 body.sidebar-collapsed .brand-text,
@@ -210,4 +227,3 @@ body.sidebar-collapsed .sidebar-toggle i {
 body.sidebar-collapsed .sidebar-icon {
   margin-right: 0;
 }
-
