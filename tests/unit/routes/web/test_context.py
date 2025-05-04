@@ -1,7 +1,6 @@
 # Tests for app.routes.web.context
 # Created: 2025-05-03
 import pytest
-from app.routes.web.context import *
 
 
 def test_module_imports():

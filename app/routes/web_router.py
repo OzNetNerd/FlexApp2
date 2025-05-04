@@ -2,7 +2,7 @@
 
 from flask import Flask
 
-from app.routes.web.route_registration import register_crud_routes
+from routes.web.utils.route_registration import register_crud_routes
 from app.utils.router_utils import register_blueprint_routes
 
 
@@ -29,7 +29,7 @@ def register_web_blueprints(app: Flask) -> None:
     """
     register_blueprint_routes(
         app=app,
-        package_path="app.routes.web",
+        package_path="app.routes.web.pages",
         config_suffix="_crud_config",
         register_func=register_crud_routes,
         blueprint_suffix="_bp",

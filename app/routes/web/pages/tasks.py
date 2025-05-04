@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime, timedelta
 import random
 from app.models.pages.task import Task
-from app.routes.web.blueprint_factory import create_crud_blueprint, BlueprintConfig
+from routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
 from app.models.base import db
 
 # Create the blueprint with the Task model

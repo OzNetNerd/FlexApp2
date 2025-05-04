@@ -8,9 +8,9 @@ from flask import Blueprint, redirect, request, url_for
 from flask_login import login_required
 
 from app.routes.web.components.template_renderer import RenderSafelyConfig, render_safely
-from app.routes.web.context import TableContext, WebContext
+from routes.web.utils.context import TableContext, WebContext
 from app.utils.app_logging import get_logger
-from app.routes.web.template_config import TemplateConfig
+from routes.web.utils.template_config import TemplateConfig
 
 logger = get_logger()
 

@@ -1,10 +1,9 @@
 # app/routes/web/auth.py
 
 from flask import Blueprint
-from werkzeug.security import check_password_hash  # required for testing
 
 from app.models.pages.user import User
-from app.routes.web.route_registration import register_auth_route
+from routes.web.utils.route_registration import register_auth_route
 from app.services.auth import AuthService
 from app.utils.app_logging import get_logger
 

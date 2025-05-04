@@ -1,7 +1,6 @@
 # Tests for app.routes.web.auth
 # Created: 2025-05-03
 import pytest
-from app.routes.web.auth import *
 
 
 def test_module_imports():

@@ -1,11 +1,9 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import login_required, current_user
+from flask import flash, redirect, render_template, request, url_for
+from flask_login import login_required
 
 from app.models import Crisp, Relationship, db
 from app.utils.app_logging import get_logger
-from app.routes.web.blueprint_factory import create_crud_blueprint, BlueprintConfig
-from datetime import datetime, timedelta
-import json
+from routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
 
 logger = get_logger()
 

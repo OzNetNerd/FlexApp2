@@ -1,7 +1,6 @@
 # Tests for app.routes.web.settings
 # Created: 2025-05-03
 import pytest
-from app.routes.web.settings import *
 
 
 def test_module_imports():

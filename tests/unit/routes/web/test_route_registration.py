@@ -1,7 +1,6 @@
 # Tests for app.routes.web.route_registration
 # Created: 2025-05-03
 import pytest
-from app.routes.web.route_registration import *
 
 
 def test_module_imports():

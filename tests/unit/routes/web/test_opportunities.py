@@ -1,7 +1,6 @@
 # Tests for app.routes.web.opportunities
 # Created: 2025-05-03
 import pytest
-from app.routes.web.opportunities import *
 
 
 def test_module_imports():
