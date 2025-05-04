@@ -1,17 +1,17 @@
-# relationship.py
+# app/models/relationship.py
+
 from app.models.base import BaseModel, db
+from app.models.mixins import RelationshipMixin
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
 
-class Relationship(BaseModel):
+class Relationship(BaseModel, RelationshipMixin):
+    """Generic relationship model connecting any two entities."""
+
     __tablename__ = "relationships"
 
-    # Add primary key
-    id = db.Column(db.Integer, primary_key=True)
-
-    # Generic entity fields
     entity1_type = db.Column(db.String(50), nullable=False)
     entity1_id = db.Column(db.Integer, nullable=False)
     entity2_type = db.Column(db.String(50), nullable=False)
@@ -40,7 +40,8 @@ class Relationship(BaseModel):
 
     __table_args__ = (
         db.UniqueConstraint(
-            "entity1_type", "entity1_id", "entity2_type", "entity2_id", "relationship_type", name="_entity_relationship_uc"
+            "entity1_type", "entity1_id", "entity2_type", "entity2_id", "relationship_type",
+            name="_entity_relationship_uc"
         ),
     )
 
@@ -67,7 +68,8 @@ class Relationship(BaseModel):
             )
         )
         if related_entity_type:
-            query = query.filter(db.or_(cls.entity1_type == related_entity_type, cls.entity2_type == related_entity_type))
+            query = query.filter(
+                db.or_(cls.entity1_type == related_entity_type, cls.entity2_type == related_entity_type))
         return query.all()
 
     def get_related_entity(self, from_entity_type, from_entity_id):
@@ -75,3 +77,13 @@ class Relationship(BaseModel):
             return self.entity2_type, self.entity2_id
         else:
             return self.entity1_type, self.entity1_id
+
+    @property
+    def entity1(self):
+        """Get the source entity of the relationship."""
+        return self.get_entity(self.entity1_type, self.entity1_id)
+
+    @property
+    def entity2(self):
+        """Get the target entity of the relationship."""
+        return self.get_entity(self.entity2_type, self.entity2_id)

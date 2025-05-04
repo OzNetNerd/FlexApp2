@@ -1,6 +1,6 @@
 # app/models/base.py
 
-from datetime import date
+from datetime import date, datetime
 from collections import OrderedDict
 
 from flask_sqlalchemy import SQLAlchemy
@@ -13,6 +13,10 @@ db = SQLAlchemy()
 
 class BaseModel(db.Model):
     __abstract__ = True
+
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @declared_attr
     @classmethod
@@ -73,17 +77,39 @@ class BaseModel(db.Model):
         return data
 
     def save(self) -> "BaseModel":
-        logger.info(f"Saving {self.__class__.__name__}")
+        """Persist model instance to the database with logging.
+
+        Returns:
+            BaseModel: The saved instance.
+        """
+        model_name = self.__class__.__name__
+        id_str = f"ID={getattr(self, 'id', 'New')}"
+
+        if hasattr(self, 'name'):
+            id_str += f" {self.name!r}"
+        elif hasattr(self, 'title'):
+            id_str += f" {self.title!r}"
+
+        logger.info(f"Saving {model_name} {id_str}")
         db.session.add(self)
         db.session.commit()
-        logger.info(f"Saved {self.__class__.__name__} with ID={self.id}")
+        logger.info(f"Saved {model_name} with ID={self.id}")
         return self
 
     def delete(self) -> None:
-        logger.info(f"Deleting {self.__class__.__name__} ID={self.id}")
+        """Remove model instance from the database with logging."""
+        model_name = self.__class__.__name__
+        id_str = f"ID={self.id}"
+
+        if hasattr(self, 'name'):
+            id_str += f" {self.name!r}"
+        elif hasattr(self, 'title'):
+            id_str += f" {self.title!r}"
+
+        logger.info(f"Deleting {model_name} {id_str}")
         db.session.delete(self)
         db.session.commit()
-        logger.info(f"Deleted {self.__class__.__name__} ID={self.id}")
+        logger.info(f"Deleted {model_name} {id_str}")
 
     @staticmethod
     def _infer_widget(col_type) -> str:

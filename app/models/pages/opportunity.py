@@ -1,3 +1,5 @@
+# app/models/opportunity.py
+
 from datetime import datetime
 from app.models.base import BaseModel, db
 from app.utils.app_logging import get_logger
@@ -7,8 +9,6 @@ logger = get_logger()
 
 class Opportunity(BaseModel):
     __tablename__ = "opportunities"
-
-    id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
@@ -40,23 +40,6 @@ class Opportunity(BaseModel):
             str: Identifier showing the opportunity name.
         """
         return f"<Opportunity {self.name!r}>"
-
-    def save(self) -> "Opportunity":
-        """Persist opportunity to the database with logging.
-
-        Returns:
-            Opportunity: The saved instance.
-        """
-        logger.info(f"Saving opportunity with name {self.name!r} and status {self.status!r}")
-        super().save()
-        logger.info(f"Opportunity {self.name!r} saved successfully.")
-        return self
-
-    def delete(self) -> None:
-        """Remove opportunity from the database with logging."""
-        logger.info(f"Deleting opportunity with name {self.name!r}")
-        super().delete()
-        logger.info(f"Opportunity {self.name!r} deleted successfully.")
 
     @property
     def contacts(self):

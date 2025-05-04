@@ -1,3 +1,5 @@
+# app/models/setting.py
+
 from sqlalchemy import inspect
 
 from app.models.base import BaseModel, db
@@ -8,9 +10,6 @@ logger = get_logger()
 
 class Setting(BaseModel):
     __tablename__ = "settings"
-
-    # Add primary key
-    id = db.Column(db.Integer, primary_key=True)
 
     key = db.Column(db.String(100), unique=True, nullable=False)
     value = db.Column(db.Text, nullable=True)
@@ -23,17 +22,6 @@ class Setting(BaseModel):
 
     def __repr__(self) -> str:
         return f"<Setting {self.key!r}: {self.value!r}>"
-
-    def save(self) -> "Setting":
-        logger.info(f"Saving setting {self.key!r} with value {self.value!r}")
-        super().save()
-        logger.info(f"Setting {self.key!r} saved successfully.")
-        return self
-
-    def delete(self) -> None:
-        logger.info(f"Deleting setting {self.key!r}")
-        super().delete()
-        logger.info(f"Setting {self.key!r} deleted successfully.")
 
     @classmethod
     def seed(cls) -> None:

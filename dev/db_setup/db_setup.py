@@ -4,6 +4,12 @@
 import os
 import sys
 import logging
+
+# Add parent directory to path to access app
+parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(parent_dir)
+
+# Import modules from libs
 from libs.db_core import setup_db
 from libs.seeders import run_all_seeders
 

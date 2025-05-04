@@ -1,3 +1,5 @@
+# app/models/crisp.py
+
 from app.models.base import BaseModel, db
 from app.utils.app_logging import get_logger
 
@@ -6,9 +8,6 @@ logger = get_logger()
 
 class CRISPScore(BaseModel):
     __tablename__ = "crisp_scores"
-
-    # Add primary key
-    id = db.Column(db.Integer, primary_key=True)
 
     relationship_id = db.Column(db.Integer, db.ForeignKey("relationships.id"), nullable=False)
     relationship = db.relationship("Relationship", back_populates="crisp_scores")

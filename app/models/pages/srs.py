@@ -1,11 +1,11 @@
-from datetime import datetime
-from zoneinfo import ZoneInfo
+# app/models/srs.py
+
+from app.models.base import BaseModel, db
+from app.models.mixins import NotableMixin, TimezoneMixin
 from sqlalchemy.orm import relationship
 
-from app.models.base import db, BaseModel
 
-
-class SRS(BaseModel):
+class SRS(BaseModel, NotableMixin, TimezoneMixin):
     """
     SRS model for spaced repetition learning cards.
 
@@ -16,11 +16,8 @@ class SRS(BaseModel):
 
     __tablename__ = "srs"
 
-    id = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.Text, nullable=False)
     answer = db.Column(db.Text, nullable=False)
-    notable_id = db.Column(db.Integer)
-    notable_type = db.Column(db.String(50))
 
     # Use timezone=True to store timezone information
     next_review_at = db.Column(db.DateTime(timezone=True))
@@ -57,7 +54,7 @@ class SRS(BaseModel):
         }
 
 
-class ReviewHistory(BaseModel):
+class ReviewHistory(BaseModel, TimezoneMixin):
     """
     Stores the history of SRS card reviews.
 
@@ -67,17 +64,10 @@ class ReviewHistory(BaseModel):
 
     __tablename__ = "review_history"
 
-    id = db.Column(db.Integer, primary_key=True)
     srs_item_id = db.Column(db.Integer, db.ForeignKey("srs.id"))
-    timestamp = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(ZoneInfo("UTC")))
     rating = db.Column(db.Integer)
     interval = db.Column(db.Float)
     ease_factor = db.Column(db.Float)
 
     # Relationship to SRS item
     srs_item = relationship("SRS", back_populates="review_history")
-
-    def save(self):
-        """Save the review history to the database."""
-        db.session.add(self)
-        db.session.commit()

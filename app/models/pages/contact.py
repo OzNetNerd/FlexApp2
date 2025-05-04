@@ -1,4 +1,4 @@
-# contact.py
+# app/models/contact.py
 
 from app.models.base import BaseModel, db
 from app.models.relationship import Relationship  # reuse the generic Relationship model
@@ -9,8 +9,6 @@ logger = get_logger()
 
 class Contact(BaseModel):
     __tablename__ = "contacts"
-
-    id = db.Column(db.Integer, primary_key=True)
 
     # --- Contact Information ---
     first_name = db.Column(db.String(127), nullable=False)

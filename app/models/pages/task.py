@@ -1,31 +1,26 @@
-from datetime import datetime
+# app/models/task.py
 
 from app.models.base import BaseModel, db
+from app.models.mixins import NotableMixin
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
 
-class Task(BaseModel):
+class Task(BaseModel, NotableMixin):
     __tablename__ = "tasks"
 
-    id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     due_date = db.Column(db.DateTime)
     status = db.Column(db.String(20), default="Pending")
     priority = db.Column(db.String(20), default="Medium")
-    notable_type = db.Column(db.String(50), nullable=False, default="User")
-    notable_id = db.Column(db.Integer, nullable=False, default=1)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     assigned_to_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True)
 
     # Relationship with User model
     assigned_to = db.relationship('User', foreign_keys=[assigned_to_id],
                                   backref=db.backref('assigned_tasks', lazy='dynamic'))
-
-    # Additional timestamp for completion tracking
-    completed_at = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self) -> str:
         """Readable string representation.
@@ -42,44 +37,30 @@ class Task(BaseModel):
         Returns:
             bool: True if due date is in the past and task is not completed.
         """
+        from datetime import datetime
+
         return (
                 self.due_date is not None and
                 self.due_date < datetime.utcnow() and
                 self.status.lower() != 'completed'
         )
 
-    def save(self, notable_type: str = "User", notable_id: int = 1) -> "Task":
-        """Persist task to the database with logging.
-
-        Args:
-            notable_type (str): The type of object linked to the task. Defaults to "User".
-            notable_id (int): The ID of the object linked to the task. Defaults to 1.
+    def save(self) -> "Task":
+        """Persist task to the database with status tracking.
 
         Returns:
             Task: The saved task instance.
         """
-        if not self.notable_type:
-            self.notable_type = notable_type
-        if not self.notable_id:
-            self.notable_id = notable_id
+        from datetime import datetime
 
         # If status was changed to completed, set completed_at
-        if self.status == 'completed' and not self.completed_at:
+        if self.status.lower() == 'completed' and not self.completed_at:
             self.completed_at = datetime.utcnow()
         # If status was changed from completed, clear completed_at
-        elif self.status != 'completed' and self.completed_at:
+        elif self.status.lower() != 'completed' and self.completed_at:
             self.completed_at = None
 
-        logger.info(f"Saving task {self.title!r} with status {self.status!r}")
-        super().save()
-        logger.info(f"Task {self.title!r} saved successfully.")
-        return self
-
-    def delete(self) -> None:
-        """Remove task from the database with logging."""
-        logger.info(f"Deleting task {self.title!r}")
-        super().delete()
-        logger.info(f"Task {self.title!r} deleted successfully.")
+        return super().save()
 
     @classmethod
     def create_from_form(cls, form_data):
@@ -91,6 +72,8 @@ class Task(BaseModel):
         Returns:
             Task: The created task instance
         """
+        from datetime import datetime
+
         if "notable_type" not in form_data or not form_data["notable_type"]:
             form_data["notable_type"] = "User"
 
