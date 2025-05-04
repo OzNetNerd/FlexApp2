@@ -346,7 +346,7 @@ class SRSService:
         logger.info("SRSService: Calculating review streak days")
         # Get dates with activity
         today = datetime.now(ZoneInfo("UTC")).date()
-        history_dates = set(h.timestamp.date() for h in ReviewHistory.query.all())
+        history_dates = set(h.created_at.date() for h in ReviewHistory.query.all())
         logger.info(f"SRSService: Found activity on {len(history_dates)} different days")
 
         if not history_dates:
@@ -402,7 +402,7 @@ class SRSService:
         mastered_cards = 0
 
         # Get unique cards with reviews this month
-        month_reviews = ReviewHistory.query.filter(ReviewHistory.timestamp >= first_of_month).all()
+        month_reviews = ReviewHistory.query.filter(ReviewHistory.created_at >= first_of_month).all()
         logger.info(f"SRSService: Found {len(month_reviews)} reviews this month")
 
         # Get unique card IDs with intervals crossing the threshold this month
@@ -412,7 +412,10 @@ class SRSService:
                 logger.info(f"SRSService: Found review with interval {review.interval} for item {review.srs_item_id}")
                 # Check if this is the first time the card crossed the threshold
                 prev_reviews = (
-                    ReviewHistory.query.filter(ReviewHistory.srs_item_id == review.srs_item_id, ReviewHistory.timestamp < review.timestamp)
+                    ReviewHistory.query.filter(
+                        ReviewHistory.srs_item_id == review.srs_item_id,
+                        ReviewHistory.timestamp < review.timestamp
+                    )
                     .order_by(ReviewHistory.timestamp.desc())
                     .first()
                 )
@@ -433,7 +436,7 @@ class SRSService:
         week_ago = now - timedelta(days=7)
         logger.info(f"SRSService: Counting reviews between {week_ago.isoformat()} and {now.isoformat()}")
 
-        count = ReviewHistory.query.filter(ReviewHistory.timestamp >= week_ago, ReviewHistory.timestamp <= now).count()
+        count = ReviewHistory.query.filter(ReviewHistory.created_at >= week_ago, ReviewHistory.created_at <= now).count()
         logger.info(f"SRSService: Found {count} reviews in the past 7 days")
         return count
 
@@ -455,12 +458,12 @@ class SRSService:
 
         # Get reviews for current and previous months
         current_month_reviews = ReviewHistory.query.filter(
-            ReviewHistory.timestamp >= current_month_start, ReviewHistory.timestamp < now
+            ReviewHistory.created_at >= current_month_start, ReviewHistory.created_at < now
         ).all()
         logger.info(f"SRSService: Found {len(current_month_reviews)} reviews in current month")
 
         prev_month_reviews = ReviewHistory.query.filter(
-            ReviewHistory.timestamp >= prev_month_start, ReviewHistory.timestamp < current_month_start
+            ReviewHistory.created_at >= prev_month_start, ReviewHistory.created_at < current_month_start
         ).all()
         logger.info(f"SRSService: Found {len(prev_month_reviews)} reviews in previous month")
 
@@ -490,7 +493,7 @@ class SRSService:
         """Count the number of consecutive perfect reviews (rating 4-5) in the most recent history."""
         logger.info("SRSService: Counting consecutive perfect reviews")
         # Get all review history ordered by time, most recent first
-        history = ReviewHistory.query.order_by(ReviewHistory.timestamp.desc()).all()
+        history = ReviewHistory.query.order_by(ReviewHistory.created_at.desc()).all()
         logger.info(f"SRSService: Found {len(history)} total reviews in history")
 
         # Count consecutive perfect reviews
@@ -906,7 +909,7 @@ class SRSService:
         logger.info(f"SRSService: Cards due today: {due_today}")
 
         today_start = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0, microsecond=0)
-        reviewed_today = ReviewHistory.query.filter(ReviewHistory.timestamp >= today_start).count()
+        reviewed_today = ReviewHistory.query.filter(ReviewHistory.created_at >= today_start).count()
         logger.info(f"SRSService: Cards reviewed today: {reviewed_today}")
 
         stats = {"total_cards": total, "cards_due": due_today, "cards_reviewed_today": reviewed_today}
@@ -996,7 +999,7 @@ class SRSService:
         today_start = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0, microsecond=0)
         logger.info(f"SRSService: Today started at {today_start.isoformat()}")
 
-        count = ReviewHistory.query.filter(ReviewHistory.timestamp >= today_start).count()
+        count = ReviewHistory.query.filter(ReviewHistory.created_at >= today_start).count()
         logger.info(f"SRSService: Found {count} reviews completed today")
         return count
 
