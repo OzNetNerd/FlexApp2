@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional
 @dataclass
 class TemplateConfig:
     """Shared configuration for template paths used in CRUD operations."""
+
     model_class: Any
     index_template: Optional[str] = None
     create_template: Optional[str] = None

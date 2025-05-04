@@ -15,12 +15,11 @@ class Task(BaseModel, NotableMixin):
     due_date = db.Column(db.DateTime)
     status = db.Column(db.String(20), default="Pending")
     priority = db.Column(db.String(20), default="Medium")
-    assigned_to_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    assigned_to_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     completed_at = db.Column(db.DateTime, nullable=True)
 
     # Relationship with User model
-    assigned_to = db.relationship('User', foreign_keys=[assigned_to_id],
-                                  backref=db.backref('assigned_tasks', lazy='dynamic'))
+    assigned_to = db.relationship("User", foreign_keys=[assigned_to_id], backref=db.backref("assigned_tasks", lazy="dynamic"))
 
     def __repr__(self) -> str:
         """Readable string representation.
@@ -39,11 +38,7 @@ class Task(BaseModel, NotableMixin):
         """
         from datetime import datetime
 
-        return (
-                self.due_date is not None and
-                self.due_date < datetime.utcnow() and
-                self.status.lower() != 'completed'
-        )
+        return self.due_date is not None and self.due_date < datetime.utcnow() and self.status.lower() != "completed"
 
     def save(self) -> "Task":
         """Persist task to the database with status tracking.
@@ -54,10 +49,10 @@ class Task(BaseModel, NotableMixin):
         from datetime import datetime
 
         # If status was changed to completed, set completed_at
-        if self.status.lower() == 'completed' and not self.completed_at:
+        if self.status.lower() == "completed" and not self.completed_at:
             self.completed_at = datetime.utcnow()
         # If status was changed from completed, clear completed_at
-        elif self.status.lower() != 'completed' and self.completed_at:
+        elif self.status.lower() != "completed" and self.completed_at:
             self.completed_at = None
 
         return super().save()

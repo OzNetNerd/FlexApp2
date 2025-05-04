@@ -85,9 +85,9 @@ class BaseModel(db.Model):
         model_name = self.__class__.__name__
         id_str = f"ID={getattr(self, 'id', 'New')}"
 
-        if hasattr(self, 'name'):
+        if hasattr(self, "name"):
             id_str += f" {self.name!r}"
-        elif hasattr(self, 'title'):
+        elif hasattr(self, "title"):
             id_str += f" {self.title!r}"
 
         logger.info(f"Saving {model_name} {id_str}")
@@ -101,9 +101,9 @@ class BaseModel(db.Model):
         model_name = self.__class__.__name__
         id_str = f"ID={self.id}"
 
-        if hasattr(self, 'name'):
+        if hasattr(self, "name"):
             id_str += f" {self.name!r}"
-        elif hasattr(self, 'title'):
+        elif hasattr(self, "title"):
             id_str += f" {self.title!r}"
 
         logger.info(f"Deleting {model_name} {id_str}")

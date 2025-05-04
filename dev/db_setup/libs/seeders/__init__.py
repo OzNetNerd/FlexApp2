@@ -25,6 +25,7 @@ from .srs import seed_srs_items
 
 logger = logging.getLogger(__name__)
 
+
 def run_all_seeders():
     """Run all seeder functions in the correct order."""
     seeders = [

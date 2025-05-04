@@ -7,27 +7,30 @@ from app.models.base import BaseModel, db
 
 # Association table for many-to-many relationship
 association_table = Table(
-    'test_association',
+    "test_association",
     BaseModel.metadata,
-    Column('test_model_id', Integer, ForeignKey('testmodels.id')),
-    Column('related_model_id', Integer, ForeignKey('relatedmodels.id'))
+    Column("test_model_id", Integer, ForeignKey("testmodels.id")),
+    Column("related_model_id", Integer, ForeignKey("relatedmodels.id")),
 )
 
 
 class RelatedModel(BaseModel):
     """Related model for testing relationships."""
+
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
 
 
 class ItemWithoutId(BaseModel):
     """Model without id attribute for testing edge cases."""
+
     name = Column(String(50), primary_key=True)
     value = Column(String(50))
 
 
 class TestModel(BaseModel):
     """Test model for BaseModel tests."""
+
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False, info={"label": "Name", "section": "Main", "required": True})
     active = Column(Boolean, default=True, info={"widget": "checkbox", "section": "Status"})
@@ -35,7 +38,7 @@ class TestModel(BaseModel):
     birth_date = Column(Date, nullable=True, info={"section": "Details"})
 
     # Add relationship fields
-    parent_id = Column(Integer, ForeignKey('relatedmodels.id'), nullable=True)
+    parent_id = Column(Integer, ForeignKey("relatedmodels.id"), nullable=True)
     parent = relationship("RelatedModel", foreign_keys=[parent_id])
     related_items = relationship("RelatedModel", secondary=association_table)
 
@@ -90,10 +93,7 @@ class TestBaseModel:
         db.session.flush()  # Get IDs without committing
 
         # Create model with relationships
-        model = TestModel(
-            name="Test List Relationships",
-            related_items=[item1, item2, item3]
-        )
+        model = TestModel(name="Test List Relationships", related_items=[item1, item2, item3])
         db.session.add(model)
         db.session.commit()
 
@@ -109,10 +109,7 @@ class TestBaseModel:
         db.session.flush()  # Get ID without committing
 
         # Create model with relationship
-        model = TestModel(
-            name="Test Single Relationship",
-            parent=parent
-        )
+        model = TestModel(name="Test Single Relationship", parent=parent)
         db.session.add(model)
         db.session.commit()
 
@@ -133,6 +130,7 @@ class TestBaseModel:
                 self.name = name
                 # Add _sa_instance_state to prevent AttributeError
                 self._sa_instance_state = None
+
             # No id attribute
 
         # Since to_dict() expects SQLAlchemy relationships, we need to create
@@ -189,8 +187,7 @@ class TestBaseModel:
         TestModel.error_relationship = property(raise_error)
 
         # Apply our mocked relationships list
-        monkeypatch.setattr(model.__mapper__, "relationships",
-                            original_relationships + [mock_rel])
+        monkeypatch.setattr(model.__mapper__, "relationships", original_relationships + [mock_rel])
 
         # Test
         data = model.to_dict()

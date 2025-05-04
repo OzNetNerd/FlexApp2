@@ -12,6 +12,7 @@ from app.models import Note, Company, Contact, Opportunity, User
 
 logger = logging.getLogger(__name__)
 
+
 def seed_notes():
     """Seed notes for Companies, Contacts, and Opportunities."""
     users = User.query.all()

@@ -40,7 +40,7 @@ def dashboard():
         sum(1 for score in all_scores if 1 <= score.total_score < 2),  # Low
         sum(1 for score in all_scores if 2 <= score.total_score < 3),  # Moderate
         sum(1 for score in all_scores if 3 <= score.total_score < 4),  # Good
-        sum(1 for score in all_scores if score.total_score >= 4)  # Excellent
+        sum(1 for score in all_scores if score.total_score >= 4),  # Excellent
     ]
 
     # Get recent scores
@@ -52,7 +52,9 @@ def dashboard():
         if relationship:
             entity1_type = relationship.entity1_type
             entity2_type = relationship.entity2_type
-            score.relationship_display_name = f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+            score.relationship_display_name = (
+                f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+            )
 
     return render_template(
         "pages/crisp/dashboard.html",
@@ -65,7 +67,7 @@ def dashboard():
         low_trust_count=low_trust_count,
         total_assessments=total_assessments,
         score_distribution=score_distribution,
-        recent_scores=recent_scores
+        recent_scores=recent_scores,
     )
 
 
@@ -82,12 +84,11 @@ def list_scores():
         if relationship:
             entity1_type = relationship.entity1_type
             entity2_type = relationship.entity2_type
-            score.relationship_display_name = f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+            score.relationship_display_name = (
+                f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+            )
 
-    return render_template(
-        "pages/crisp/list.html",
-        scores=scores
-    )
+    return render_template("pages/crisp/list.html", scores=scores)
 
 
 @crisp_scores_bp.route("/score/<int:score_id>")
@@ -100,11 +101,12 @@ def view_score(score_id):
     # Prepare relationship display name
     entity1_type = relationship.entity1_type
     entity2_type = relationship.entity2_type
-    score.relationship_display_name = f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+    score.relationship_display_name = (
+        f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+    )
 
     # Get historical scores for this relationship
-    historical_scores = CRISPScore.query.filter_by(relationship_id=score.relationship_id).order_by(
-        CRISPScore.created_at).all()
+    historical_scores = CRISPScore.query.filter_by(relationship_id=score.relationship_id).order_by(CRISPScore.created_at).all()
 
     # Prepare data for historical chart
     historical_dates = [score.created_at.strftime("%Y-%m-%d") for score in historical_scores]
@@ -122,7 +124,7 @@ def view_score(score_id):
         historical_credibility=historical_credibility,
         historical_reliability=historical_reliability,
         historical_intimacy=historical_intimacy,
-        historical_self_orientation=historical_self_orientation
+        historical_self_orientation=historical_self_orientation,
     )
 
 
@@ -137,14 +139,11 @@ def create_score():
     for relationship in relationships:
         entity1_type = relationship.entity1_type
         entity2_type = relationship.entity2_type
-        relationship.display_name = f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+        relationship.display_name = (
+            f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+        )
 
-    return render_template(
-        "pages/crisp/form.html",
-        relationships=relationships,
-        score=None,
-        relationship=None
-    )
+    return render_template("pages/crisp/form.html", relationships=relationships, score=None, relationship=None)
 
 
 @crisp_scores_bp.route("/edit/<int:score_id>")
@@ -157,13 +156,11 @@ def edit_score(score_id):
     # Prepare relationship display name
     entity1_type = relationship.entity1_type
     entity2_type = relationship.entity2_type
-    relationship.display_name = f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
-
-    return render_template(
-        "pages/crisp/form.html",
-        score=score,
-        relationship=relationship
+    relationship.display_name = (
+        f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
     )
+
+    return render_template("pages/crisp/form.html", score=score, relationship=relationship)
 
 
 @crisp_scores_bp.route("/score/<int:relationship_id>", methods=["POST"])
@@ -179,7 +176,7 @@ def submit(relationship_id):
             reliability=int(request.form["reliability"]),
             intimacy=int(request.form["intimacy"]),
             self_orientation=int(request.form["self_orientation"]),
-            notes=request.form.get("notes", "")
+            notes=request.form.get("notes", ""),
         )
         db.session.add(score)
         db.session.commit()
@@ -205,7 +202,7 @@ def submit_new():
             reliability=int(request.form["reliability"]),
             intimacy=int(request.form["intimacy"]),
             self_orientation=int(request.form["self_orientation"]),
-            notes=request.form.get("notes", "")
+            notes=request.form.get("notes", ""),
         )
         db.session.add(score)
         db.session.commit()
@@ -228,7 +225,9 @@ def comparison():
     for relationship in all_relationships:
         entity1_type = relationship.entity1_type
         entity2_type = relationship.entity2_type
-        relationship.display_name = f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+        relationship.display_name = (
+            f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+        )
 
     # Get selected relationships from query parameters
     selected_ids = request.args.getlist("relationship_ids", type=int)
@@ -241,57 +240,62 @@ def comparison():
     # Prepare comparison data if relationships are selected
     if selected_ids:
         colors = [
-            {'border': 'rgba(0, 123, 255, 1)', 'background': 'rgba(0, 123, 255, 0.2)'},
-            {'border': 'rgba(40, 167, 69, 1)', 'background': 'rgba(40, 167, 69, 0.2)'},
-            {'border': 'rgba(23, 162, 184, 1)', 'background': 'rgba(23, 162, 184, 0.2)'},
-            {'border': 'rgba(255, 193, 7, 1)', 'background': 'rgba(255, 193, 7, 0.2)'},
-            {'border': 'rgba(220, 53, 69, 1)', 'background': 'rgba(220, 53, 69, 0.2)'}
+            {"border": "rgba(0, 123, 255, 1)", "background": "rgba(0, 123, 255, 0.2)"},
+            {"border": "rgba(40, 167, 69, 1)", "background": "rgba(40, 167, 69, 0.2)"},
+            {"border": "rgba(23, 162, 184, 1)", "background": "rgba(23, 162, 184, 0.2)"},
+            {"border": "rgba(255, 193, 7, 1)", "background": "rgba(255, 193, 7, 0.2)"},
+            {"border": "rgba(220, 53, 69, 1)", "background": "rgba(220, 53, 69, 0.2)"},
         ]
 
         for i, relationship_id in enumerate(selected_ids):
             relationship = Relationship.query.get(relationship_id)
             if relationship:
                 # Get the most recent CRISP score for this relationship
-                latest_score = CRISPScore.query.filter_by(relationship_id=relationship_id).order_by(
-                    CRISPScore.created_at.desc()).first()
+                latest_score = CRISPScore.query.filter_by(relationship_id=relationship_id).order_by(CRISPScore.created_at.desc()).first()
 
                 if latest_score:
                     # Prepare display data
                     entity1_type = relationship.entity1_type
                     entity2_type = relationship.entity2_type
-                    display_name = f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+                    display_name = (
+                        f"{entity1_type.capitalize()} {relationship.entity1_id} - {entity2_type.capitalize()} {relationship.entity2_id}"
+                    )
 
-                    comparison_data.append({
-                        'display_name': display_name,
-                        'credibility': latest_score.credibility,
-                        'reliability': latest_score.reliability,
-                        'intimacy': latest_score.intimacy,
-                        'self_orientation': latest_score.self_orientation,
-                        'total_score': latest_score.total_score,
-                        'last_updated': latest_score.updated_at,
-                        'score_id': latest_score.id
-                    })
+                    comparison_data.append(
+                        {
+                            "display_name": display_name,
+                            "credibility": latest_score.credibility,
+                            "reliability": latest_score.reliability,
+                            "intimacy": latest_score.intimacy,
+                            "self_orientation": latest_score.self_orientation,
+                            "total_score": latest_score.total_score,
+                            "last_updated": latest_score.updated_at,
+                            "score_id": latest_score.id,
+                        }
+                    )
 
                     comparison_labels.append(display_name)
                     comparison_scores.append(float(latest_score.total_score))
 
                     # Prepare radar chart dataset
                     color = colors[i % len(colors)]
-                    component_datasets.append({
-                        'label': display_name,
-                        'data': [
-                            latest_score.credibility,
-                            latest_score.reliability,
-                            latest_score.intimacy,
-                            latest_score.self_orientation
-                        ],
-                        'backgroundColor': color['background'],
-                        'borderColor': color['border'],
-                        'pointBackgroundColor': color['border'],
-                        'pointBorderColor': '#fff',
-                        'pointHoverBackgroundColor': '#fff',
-                        'pointHoverBorderColor': color['border']
-                    })
+                    component_datasets.append(
+                        {
+                            "label": display_name,
+                            "data": [
+                                latest_score.credibility,
+                                latest_score.reliability,
+                                latest_score.intimacy,
+                                latest_score.self_orientation,
+                            ],
+                            "backgroundColor": color["background"],
+                            "borderColor": color["border"],
+                            "pointBackgroundColor": color["border"],
+                            "pointBorderColor": "#fff",
+                            "pointHoverBackgroundColor": "#fff",
+                            "pointHoverBorderColor": color["border"],
+                        }
+                    )
 
     return render_template(
         "pages/crisp/comparison.html",
@@ -300,7 +304,7 @@ def comparison():
         comparison_data=comparison_data,
         comparison_labels=comparison_labels,
         comparison_scores=comparison_scores,
-        component_datasets=component_datasets
+        component_datasets=component_datasets,
     )
 
 

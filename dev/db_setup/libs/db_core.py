@@ -16,6 +16,7 @@ sys.path.append(root_dir)
 
 from app.models.base import db
 
+
 def setup_db():
     """Setup the database connection without using Flask"""
     # Use crm.db in the root directory

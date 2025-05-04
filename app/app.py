@@ -25,10 +25,24 @@ logger = get_logger()
 login_manager = LoginManager()
 migrate = Migrate()
 
+NAVBAR_ENTRIES = {
+    "navbar_entries": [
+        {"name": "Home", "url": "/", "icon": "home"},
+        {"name": "Users", "url": "/users", "icon": "user"},
+        {"name": "Companies", "url": "/companies", "icon": "building"},
+        {"name": "Contacts", "url": "/contacts", "icon": "address-book"},
+        {"name": "Opportunities", "url": "/opportunities", "icon": "bullseye"},
+        {"name": "Tasks", "url": "/tasks", "icon": "check-square"},
+        {"name": "Flash Cards", "url": "/srs", "icon": "book"},
+    ]
+}
+
+
 class CustomRule(Rule):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("strict_slashes", False)
         super().__init__(*args, **kwargs)
+
 
 @login_manager.unauthorized_handler
 def unauthorized() -> "flask.wrappers.Response":
@@ -86,14 +100,18 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     def now():
         return datetime.now(ZoneInfo("UTC"))
 
-    @app.template_filter('currencyfmt')
+    @app.context_processor
+    def inject_navbar_entries():
+        return NAVBAR_ENTRIES
+
+    @app.template_filter("currencyfmt")
     def currencyfmt_filter(value):
         """Format the value as currency."""
         if value is None:
             return "N/A"
 
         # Get currency symbol from app config or use default
-        currency_symbol = app.config.get('CURRENCY_SYMBOL', '$')
+        currency_symbol = app.config.get("CURRENCY_SYMBOL", "$")
 
         # Format with thousand separators and 2 decimal places
         return f"{currency_symbol}{value:,.2f}"

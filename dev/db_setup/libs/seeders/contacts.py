@@ -12,6 +12,7 @@ from app.models import Contact, Company
 
 logger = logging.getLogger(__name__)
 
+
 def seed_contacts():
     """Seed contacts into the database."""
     companies = Company.query.all()
@@ -51,7 +52,13 @@ def seed_contacts():
                 company = companies[contact_id % len(companies)]
                 email = f"{first_name.lower()}.{last_name.lower()}@{company.name.lower().replace(' ', '')}.com"
                 contact = Contact(
-                    id=contact_id, first_name=first_name, last_name=last_name, phone_number=phone, email=email, role=role_title, company=company
+                    id=contact_id,
+                    first_name=first_name,
+                    last_name=last_name,
+                    phone_number=phone,
+                    email=email,
+                    role=role_title,
+                    company=company,
                 )
                 db.session.add(contact)
                 logger.info(f"Created contact with ID {contact_id}: {first_name} {last_name}")

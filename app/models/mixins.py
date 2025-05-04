@@ -54,12 +54,7 @@ class NotableMixin:
         # Lazy import models to avoid circular references
         from app.models import Company, Contact, Opportunity, User
 
-        mapping = {
-            "Company": Company,
-            "Contact": Contact,
-            "Opportunity": Opportunity,
-            "User": User
-        }
+        mapping = {"Company": Company, "Contact": Contact, "Opportunity": Opportunity, "User": User}
 
         model = mapping.get(self.notable_type)
         return model.query.get(self.notable_id) if model else None
@@ -103,12 +98,7 @@ class RelationshipMixin:
         # Lazy import models to avoid circular references
         from app.models import Company, Contact, Opportunity, User
 
-        type_map = {
-            "user": User,
-            "contact": Contact,
-            "company": Company,
-            "opportunity": Opportunity
-        }
+        type_map = {"user": User, "contact": Contact, "company": Company, "opportunity": Opportunity}
 
         model_class = type_map.get(entity_type.lower())
         if not model_class:

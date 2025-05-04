@@ -12,6 +12,7 @@ from app.models.pages.srs import SRS
 
 logger = logging.getLogger(__name__)
 
+
 def seed_srs_items():
     """Seed SRS items for learning and recall about cloud security customers."""
     logger.info("Processing SRS cards...")

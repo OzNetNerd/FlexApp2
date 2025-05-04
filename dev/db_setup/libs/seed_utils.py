@@ -13,6 +13,7 @@ from app.models.base import db
 
 logger = logging.getLogger(__name__)
 
+
 def create_or_update(model, match_by: dict, data: dict):
     """Create or update an instance of the model based on the match criteria."""
     instance = model.query.filter_by(**match_by).first()
@@ -27,6 +28,7 @@ def create_or_update(model, match_by: dict, data: dict):
         db.session.add(instance)
         logger.info(f"Created new {model.__name__}: {match_by}")
     return instance
+
 
 def safe_commit():
     """Safely commit changes to the database."""

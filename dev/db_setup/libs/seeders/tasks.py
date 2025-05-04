@@ -120,7 +120,7 @@ def seed_tasks():
             "notable_type": notable_type,
             "notable_id": opportunity.id,
             "assigned_to_id": user.id,
-            "completed_at": completed_at
+            "completed_at": completed_at,
         }
 
         create_or_update(Task, {"title": title}, task_data)

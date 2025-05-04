@@ -22,46 +22,39 @@ def opportunities_dashboard():
         "win_rate": calculate_win_rate(),
         "avg_deal_size": calculate_avg_deal_size(),
         "closing_soon": Opportunity.query.filter(
-            Opportunity.status == "active",
-            Opportunity.close_date <= (datetime.now() + timedelta(days=30))
+            Opportunity.status == "active", Opportunity.close_date <= (datetime.now() + timedelta(days=30))
         ).count(),
         "won_this_month": Opportunity.query.filter(
             Opportunity.status == "won",
-            extract('month', Opportunity.close_date) == datetime.now().month,
-            extract('year', Opportunity.close_date) == datetime.now().year
+            extract("month", Opportunity.close_date) == datetime.now().month,
+            extract("year", Opportunity.close_date) == datetime.now().year,
         ).count(),
         "win_rate_change": calculate_win_rate_change(),
         "stale_count": calculate_stale_opportunities(),
-        "hot_opportunities_count": Opportunity.query.filter_by(priority="high").count()
+        "hot_opportunities_count": Opportunity.query.filter_by(priority="high").count(),
     }
 
     # Get pipeline stages data
     stages = [
         {
             "count": Opportunity.query.filter_by(stage="qualification", status="active").count(),
-            "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="qualification",
-                                                                             status="active").scalar() or 0,
-            "percentage": calculate_stage_percentage("qualification")
+            "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="qualification", status="active").scalar() or 0,
+            "percentage": calculate_stage_percentage("qualification"),
         },
         {
             "count": Opportunity.query.filter_by(stage="negotiation", status="active").count(),
-            "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="negotiation",
-                                                                             status="active").scalar() or 0,
-            "percentage": calculate_stage_percentage("negotiation")
+            "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="negotiation", status="active").scalar() or 0,
+            "percentage": calculate_stage_percentage("negotiation"),
         },
         {
             "count": Opportunity.query.filter_by(stage="closing", status="active").count(),
-            "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="closing",
-                                                                             status="active").scalar() or 0,
-            "percentage": calculate_stage_percentage("closing")
-        }
+            "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="closing", status="active").scalar() or 0,
+            "percentage": calculate_stage_percentage("closing"),
+        },
     ]
 
     # Get hot opportunities
-    hot_opportunities = Opportunity.query.filter_by(
-        status="active",
-        priority="high"
-    ).order_by(Opportunity.close_date.asc()).limit(5).all()
+    hot_opportunities = Opportunity.query.filter_by(status="active", priority="high").order_by(Opportunity.close_date.asc()).limit(5).all()
 
     # Prepare forecast data for chart
     forecast_data = prepare_forecast_data()
@@ -72,7 +65,7 @@ def opportunities_dashboard():
         stages=stages,
         hot_opportunities=hot_opportunities,
         forecast_data=forecast_data,
-        currency_symbol="$"
+        currency_symbol="$",
     )
 
 
@@ -98,10 +91,7 @@ def calculate_win_rate_change():
 
 def calculate_stale_opportunities():
     two_weeks_ago = datetime.now() - timedelta(days=14)
-    return Opportunity.query.filter(
-        Opportunity.status == "active",
-        Opportunity.last_activity_date <= two_weeks_ago
-    ).count()
+    return Opportunity.query.filter(Opportunity.status == "active", Opportunity.last_activity_date <= two_weeks_ago).count()
 
 
 def calculate_stage_percentage(stage):
@@ -129,7 +119,7 @@ def prepare_forecast_data():
         year = current_year + ((current_month + i) // 12)
 
         # Month name for label
-        month_name = datetime(year, month, 1).strftime('%b %Y')
+        month_name = datetime(year, month, 1).strftime("%b %Y")
         months.append(month_name)
 
         # Sample data - in a real app, these would be calculated from the database
@@ -137,21 +127,16 @@ def prepare_forecast_data():
         forecast.append(random.randint(100000, 200000))
         pipeline.append(random.randint(200000, 400000))
 
-    return {
-        "labels": months,
-        "closed_won": closed_won,
-        "forecast": forecast,
-        "pipeline": pipeline
-    }
+    return {"labels": months, "closed_won": closed_won, "forecast": forecast, "pipeline": pipeline}
 
 
 @opportunities_bp.route("/filtered", methods=["GET"])
 @login_required
 def filtered_opportunities():
     # Get filter parameters
-    status = request.args.get('status')
-    stage = request.args.get('stage')
-    priority = request.args.get('priority')
+    status = request.args.get("status")
+    stage = request.args.get("stage")
+    priority = request.args.get("priority")
 
     # Start with base query
     query = Opportunity.query
@@ -170,13 +155,7 @@ def filtered_opportunities():
     opportunities = query.order_by(Opportunity.close_date.asc()).all()
 
     return render_template(
-        "pages/opportunities/filtered.html",
-        opportunities=opportunities,
-        filters={
-            'status': status,
-            'stage': stage,
-            'priority': priority
-        }
+        "pages/opportunities/filtered.html", opportunities=opportunities, filters={"status": status, "stage": stage, "priority": priority}
     )
 
 
@@ -190,11 +169,12 @@ def statistics():
     lost_opportunities = Opportunity.query.filter_by(status="lost").count()
 
     # Calculate pipeline value by stage
-    pipeline_by_stage = db.session.query(
-        Opportunity.stage,
-        func.count().label('count'),
-        func.sum(Opportunity.value).label('value')
-    ).filter_by(status="active").group_by(Opportunity.stage).all()
+    pipeline_by_stage = (
+        db.session.query(Opportunity.stage, func.count().label("count"), func.sum(Opportunity.value).label("value"))
+        .filter_by(status="active")
+        .group_by(Opportunity.stage)
+        .all()
+    )
 
     # Calculate monthly won deals for the past 12 months
     monthly_data = []
@@ -208,27 +188,26 @@ def statistics():
         year = current_year - ((current_month - i) // 12)
 
         # Month name for label
-        month_name = datetime(year, month, 1).strftime('%b %Y')
+        month_name = datetime(year, month, 1).strftime("%b %Y")
 
         # Count of won deals for this month
         won_count = Opportunity.query.filter(
-            Opportunity.status == "won",
-            extract('month', Opportunity.close_date) == month,
-            extract('year', Opportunity.close_date) == year
+            Opportunity.status == "won", extract("month", Opportunity.close_date) == month, extract("year", Opportunity.close_date) == year
         ).count()
 
         # Value of won deals for this month
-        won_value = db.session.query(func.sum(Opportunity.value)).filter(
-            Opportunity.status == "won",
-            extract('month', Opportunity.close_date) == month,
-            extract('year', Opportunity.close_date) == year
-        ).scalar() or 0
+        won_value = (
+            db.session.query(func.sum(Opportunity.value))
+            .filter(
+                Opportunity.status == "won",
+                extract("month", Opportunity.close_date) == month,
+                extract("year", Opportunity.close_date) == year,
+            )
+            .scalar()
+            or 0
+        )
 
-        monthly_data.append({
-            'month': month_name,
-            'won_count': won_count,
-            'won_value': won_value
-        })
+        monthly_data.append({"month": month_name, "won_count": won_count, "won_value": won_value})
 
     # Reverse the list to get chronological order
     monthly_data.reverse()
@@ -241,5 +220,5 @@ def statistics():
         lost_opportunities=lost_opportunities,
         pipeline_by_stage=pipeline_by_stage,
         monthly_data=monthly_data,
-        currency_symbol="$"
+        currency_symbol="$",
     )

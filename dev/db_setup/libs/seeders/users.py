@@ -13,6 +13,7 @@ from app.models.pages.user import User
 
 logger = logging.getLogger(__name__)
 
+
 def seed_users():
     """Seed users into the database."""
     users = [

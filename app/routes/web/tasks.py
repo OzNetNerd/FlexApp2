@@ -17,26 +17,17 @@ def tasks_dashboard():
     total_tasks = Task.query.count()
 
     # Get top tasks (those with highest priority or most recent)
-    top_tasks = db.session.query(
-        Task
-    ).order_by(
-        Task.created_at.desc()
-    ).limit(5).all()
+    top_tasks = db.session.query(Task).order_by(Task.created_at.desc()).limit(5).all()
 
     # Overdue and due today stats needed by the template
-    overdue_tasks = db.session.query(Task).filter(
-        Task.due_date < datetime.now().date(),
-        Task.status != 'completed'
-    ).count()
+    overdue_tasks = db.session.query(Task).filter(Task.due_date < datetime.now().date(), Task.status != "completed").count()
 
-    due_today = db.session.query(Task).filter(
-        Task.due_date == datetime.now().date()
-    ).count()
+    due_today = db.session.query(Task).filter(Task.due_date == datetime.now().date()).count()
 
     # Calculate statistics
-    completed_count = db.session.query(Task).filter(Task.status == 'completed').count()
-    in_progress_count = db.session.query(Task).filter(Task.status == 'in_progress').count()
-    not_started_count = db.session.query(Task).filter(Task.status == 'pending').count()
+    completed_count = db.session.query(Task).filter(Task.status == "completed").count()
+    in_progress_count = db.session.query(Task).filter(Task.status == "in_progress").count()
+    not_started_count = db.session.query(Task).filter(Task.status == "pending").count()
 
     # Update stats dictionary to include all needed values
     stats = {
@@ -45,39 +36,28 @@ def tasks_dashboard():
         "in_progress_tasks": in_progress_count,
         "pending_tasks": not_started_count,
         "overdue_tasks": overdue_tasks,
-        "due_today": due_today
+        "due_today": due_today,
     }
 
     # Convert segments to dictionary structure expected by template
     segments = {
-        "completed": {
-            "count": completed_count,
-            "percentage": calculate_percentage(completed_count, total_tasks)
-        },
-        "in_progress": {
-            "count": in_progress_count,
-            "percentage": calculate_percentage(in_progress_count, total_tasks)
-        },
-        "not_started": {
-            "count": not_started_count,
-            "percentage": calculate_percentage(not_started_count, total_tasks)
-        }
+        "completed": {"count": completed_count, "percentage": calculate_percentage(completed_count, total_tasks)},
+        "in_progress": {"count": in_progress_count, "percentage": calculate_percentage(in_progress_count, total_tasks)},
+        "not_started": {"count": not_started_count, "percentage": calculate_percentage(not_started_count, total_tasks)},
     }
 
     # Rename activity_data to completion_data to match template
     completion_data = prepare_activity_data()
 
     # Get upcoming tasks for the table section
-    upcoming_tasks = db.session.query(Task).filter(
-        Task.due_date >= datetime.now().date()
-    ).order_by(Task.due_date.asc()).limit(5).all()
+    upcoming_tasks = db.session.query(Task).filter(Task.due_date >= datetime.now().date()).order_by(Task.due_date.asc()).limit(5).all()
 
     return render_template(
         "pages/tasks/dashboard.html",
         stats=stats,
         segments=segments,
         upcoming_tasks=upcoming_tasks,  # Changed from top_tasks to upcoming_tasks
-        completion_data=completion_data  # Changed from activity_data to completion_data
+        completion_data=completion_data,  # Changed from activity_data to completion_data
     )
 
 
@@ -98,7 +78,7 @@ def prepare_activity_data():
 
     for i in range(7):
         day = today - timedelta(days=i)
-        day_name = day.strftime('%a %d')
+        day_name = day.strftime("%a %d")
         days.append(day_name)
 
         # Sample data - in a real app, these would be calculated from the database
@@ -110,11 +90,7 @@ def prepare_activity_data():
     completed_tasks.reverse()
     new_tasks.reverse()
 
-    return {
-        "labels": days,
-        "completed_tasks": completed_tasks,
-        "new_tasks": new_tasks
-    }
+    return {"labels": days, "completed_tasks": completed_tasks, "new_tasks": new_tasks}
 
 
 @tasks_bp.route("/filtered", methods=["GET"])
@@ -124,38 +100,30 @@ def filtered_tasks():
     query = Task.query
 
     # Filter by status
-    status = request.args.get('status')
+    status = request.args.get("status")
     if status:
         query = query.filter(Task.status == status)
 
     # Filter by priority
-    priority = request.args.get('priority')
+    priority = request.args.get("priority")
     if priority:
         query = query.filter(Task.priority == priority)
 
     # Filter by due date
-    due_date = request.args.get('due_date')
-    if due_date == 'today':
+    due_date = request.args.get("due_date")
+    if due_date == "today":
         query = query.filter(Task.due_date == datetime.now().date())
-    elif due_date == 'this_week':
+    elif due_date == "this_week":
         today = datetime.now().date()
         end_of_week = today + timedelta(days=(6 - today.weekday()))
         query = query.filter(Task.due_date.between(today, end_of_week))
-    elif due_date == 'overdue':
-        query = query.filter(Task.due_date < datetime.now().date(), Task.status != 'completed')
+    elif due_date == "overdue":
+        query = query.filter(Task.due_date < datetime.now().date(), Task.status != "completed")
 
     # Get tasks
     tasks = query.order_by(Task.due_date.asc()).all()
 
-    return render_template(
-        "pages/tasks/filtered.html",
-        tasks=tasks,
-        filters={
-            'status': status,
-            'priority': priority,
-            'due_date': due_date
-        }
-    )
+    return render_template("pages/tasks/filtered.html", tasks=tasks, filters={"status": status, "priority": priority, "due_date": due_date})
 
 
 @tasks_bp.route("/statistics", methods=["GET"])
@@ -165,20 +133,17 @@ def statistics():
     total_tasks = Task.query.count()
 
     # Tasks by status
-    completed_tasks = db.session.query(Task).filter(Task.status == 'completed').count()
-    in_progress_tasks = db.session.query(Task).filter(Task.status == 'in_progress').count()
-    pending_tasks = db.session.query(Task).filter(Task.status == 'pending').count()
+    completed_tasks = db.session.query(Task).filter(Task.status == "completed").count()
+    in_progress_tasks = db.session.query(Task).filter(Task.status == "in_progress").count()
+    pending_tasks = db.session.query(Task).filter(Task.status == "pending").count()
 
     # Tasks by priority
-    high_priority = db.session.query(Task).filter(Task.priority == 'high').count()
-    medium_priority = db.session.query(Task).filter(Task.priority == 'medium').count()
-    low_priority = db.session.query(Task).filter(Task.priority == 'low').count()
+    high_priority = db.session.query(Task).filter(Task.priority == "high").count()
+    medium_priority = db.session.query(Task).filter(Task.priority == "medium").count()
+    low_priority = db.session.query(Task).filter(Task.priority == "low").count()
 
     # Overdue tasks
-    overdue_tasks = db.session.query(Task).filter(
-        Task.due_date < datetime.now().date(),
-        Task.status != 'completed'
-    ).count()
+    overdue_tasks = db.session.query(Task).filter(Task.due_date < datetime.now().date(), Task.status != "completed").count()
 
     return render_template(
         "pages/tasks/statistics.html",
@@ -189,5 +154,5 @@ def statistics():
         high_priority=high_priority,
         medium_priority=medium_priority,
         low_priority=low_priority,
-        overdue_tasks=overdue_tasks
+        overdue_tasks=overdue_tasks,
     )

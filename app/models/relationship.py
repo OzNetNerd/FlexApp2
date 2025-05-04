@@ -40,8 +40,7 @@ class Relationship(BaseModel, RelationshipMixin):
 
     __table_args__ = (
         db.UniqueConstraint(
-            "entity1_type", "entity1_id", "entity2_type", "entity2_id", "relationship_type",
-            name="_entity_relationship_uc"
+            "entity1_type", "entity1_id", "entity2_type", "entity2_id", "relationship_type", name="_entity_relationship_uc"
         ),
     )
 
@@ -68,8 +67,7 @@ class Relationship(BaseModel, RelationshipMixin):
             )
         )
         if related_entity_type:
-            query = query.filter(
-                db.or_(cls.entity1_type == related_entity_type, cls.entity2_type == related_entity_type))
+            query = query.filter(db.or_(cls.entity1_type == related_entity_type, cls.entity2_type == related_entity_type))
         return query.all()
 
     def get_related_entity(self, from_entity_type, from_entity_id):

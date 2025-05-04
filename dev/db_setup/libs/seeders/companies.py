@@ -13,6 +13,7 @@ from app.models import Company
 
 logger = logging.getLogger(__name__)
 
+
 def seed_companies():
     """Seed companies into the database."""
     for name, description in COMPANIES:

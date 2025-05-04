@@ -16,6 +16,7 @@ logger = get_logger()
 @dataclass
 class BlueprintConfig:
     """Configuration class for creating CRUD blueprints."""
+
     model_class: Any
     service: Optional[Any] = None
     url_prefix: Optional[str] = None
@@ -43,7 +44,7 @@ def create_crud_blueprint(config: BlueprintConfig) -> Blueprint:
         entity_table_name=model_class.__entity_name__,
         service=service,
         model_class=model_class,
-        template_config=config.template_config
+        template_config=config.template_config,
     )
 
     register_crud_routes(route_config)

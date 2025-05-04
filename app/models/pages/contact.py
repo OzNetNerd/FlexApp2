@@ -59,19 +59,17 @@ class Contact(BaseModel):
     opportunity_relationships = db.relationship(
         "Relationship",
         primaryjoin="and_(or_(and_(Relationship.entity1_type=='contact', foreign(Relationship.entity1_id)==Contact.id, Relationship.entity2_type=='opportunity'), and_(Relationship.entity2_type=='contact', foreign(Relationship.entity2_id)==Contact.id, Relationship.entity1_type=='opportunity')))",
-        viewonly=True
+        viewonly=True,
     )
 
     # Tasks imported from the tasks table; assumes a Task model exists.
     tasks = db.relationship(
-        "Task", primaryjoin="and_(Task.notable_type=='contact', foreign(Task.notable_id)==Contact.id)",
-        backref="contact", lazy="dynamic"
+        "Task", primaryjoin="and_(Task.notable_type=='contact', foreign(Task.notable_id)==Contact.id)", backref="contact", lazy="dynamic"
     )
 
     # Notes using the polymorphic Note model.
     notes = db.relationship(
-        "Note", primaryjoin="and_(Note.notable_type=='Contact', foreign(Note.notable_id)==Contact.id)",
-        backref="contact"
+        "Note", primaryjoin="and_(Note.notable_type=='Contact', foreign(Note.notable_id)==Contact.id)", backref="contact"
     )
 
     @property
@@ -103,8 +101,7 @@ class Contact(BaseModel):
         Looks for relationships where this contact is the target (entity2)
         and the relationship_type is 'manager'.
         """
-        rels = Relationship.query.filter_by(entity2_type="contact", entity2_id=self.id,
-                                            relationship_type="manager").all()
+        rels = Relationship.query.filter_by(entity2_type="contact", entity2_id=self.id, relationship_type="manager").all()
         managers = []
         for rel in rels:
             if rel.entity1_type == "user":
@@ -124,8 +121,7 @@ class Contact(BaseModel):
         Looks for relationships where this contact is the source (entity1)
         and the relationship_type is 'manager'.
         """
-        rels = Relationship.query.filter_by(entity1_type="contact", entity1_id=self.id,
-                                            relationship_type="manager").all()
+        rels = Relationship.query.filter_by(entity1_type="contact", entity1_id=self.id, relationship_type="manager").all()
         subs = []
         for rel in rels:
             if rel.entity2_type == "contact":
@@ -217,12 +213,11 @@ class Contact(BaseModel):
 
         # Clear existing opportunity relationships for this contact
         Relationship.query.filter(
-            ((Relationship.entity1_type == "contact") & (Relationship.entity1_id == self.id) & (
-                        Relationship.entity2_type == "opportunity"))
+            ((Relationship.entity1_type == "contact") & (Relationship.entity1_id == self.id) & (Relationship.entity2_type == "opportunity"))
             | (
-                    (Relationship.entity2_type == "contact")
-                    & (Relationship.entity2_id == self.id)
-                    & (Relationship.entity1_type == "opportunity")
+                (Relationship.entity2_type == "contact")
+                & (Relationship.entity2_id == self.id)
+                & (Relationship.entity1_type == "opportunity")
             )
         ).delete()
 
@@ -237,7 +232,6 @@ class Contact(BaseModel):
                     opp_id = int(opportunity)
 
                 relationship = Relationship(
-                    entity1_type="contact", entity1_id=self.id, entity2_type="opportunity", entity2_id=opp_id,
-                    relationship_type="linked"
+                    entity1_type="contact", entity1_id=self.id, entity2_type="opportunity", entity2_id=opp_id, relationship_type="linked"
                 )
                 db.session.add(relationship)

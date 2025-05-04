@@ -14,6 +14,7 @@ from app.models import Company, Opportunity
 
 logger = logging.getLogger(__name__)
 
+
 def seed_opportunities():
     """Seed opportunities into the database."""
     companies = Company.query.all()

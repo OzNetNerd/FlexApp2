@@ -13,6 +13,7 @@ from app.models.relationship import Relationship
 
 logger = logging.getLogger(__name__)
 
+
 def seed_relationships():
     """Seed relationships between entities in the database."""
     users = User.query.all()

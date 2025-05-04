@@ -8,16 +8,6 @@ from app.utils.app_logging import get_logger, log_instance_vars
 
 logger = get_logger()
 
-NAVBAR_ENTRIES = [
-    {"name": "Home", "url": "/", "icon": "home"},
-    {"name": "Users", "url": "/users", "icon": "user"},
-    {"name": "Companies", "url": "/companies", "icon": "building"},
-    {"name": "Contacts", "url": "/contacts", "icon": "address-book"},
-    {"name": "Opportunities", "url": "/opportunities", "icon": "bullseye"},
-    {"name": "Tasks", "url": "/tasks", "icon": "check-square"},
-    {"name": "Flash Cards", "url": "/srs", "icon": "book"},
-]
-
 
 class WebContext(BaseContext):
     """Base context class for web template rendering."""
@@ -33,7 +23,6 @@ class WebContext(BaseContext):
         self.title = title or kwargs.get("table_name", entity_table_name)
         self.current_user = current_user
         self.read_only = read_only
-        self.navbar_entries = NAVBAR_ENTRIES
 
 
 class TableContext(WebContext):

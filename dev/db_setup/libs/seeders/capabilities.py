@@ -13,6 +13,7 @@ from app.models import Capability, CapabilityCategory, Company, CompanyCapabilit
 
 logger = logging.getLogger(__name__)
 
+
 def seed_capabilities_and_categories():
     """Seed capabilities and categories into the database."""
     categories = ["Cloud Security", "DevSecOps", "Compliance", "Identity", "Network Security"]
@@ -26,6 +27,7 @@ def seed_capabilities_and_categories():
             create_or_update(Capability, {"name": cap_name}, {"category": category})
     safe_commit()
     logger.info("✅ Capabilities and categories seeded.")
+
 
 def seed_company_capabilities():
     """Seed company capabilities into the database."""
