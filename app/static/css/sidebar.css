@@ -14,6 +14,8 @@ Sidebar styles - sidebar layout and components
   flex-direction: column;
   z-index: 1040;
   transition: all var(--transition-base);
+  border-right: none !important;
+  box-shadow: none !important;
 }
 
 /* Main content wrapper should be pushed right to make room for sidebar */
@@ -76,24 +78,25 @@ body.sidebar-collapsed .sidebar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--sidebar-border-color);
+  border-bottom: none;             /* removed divider */
+  box-shadow: none;                /* remove any shadow if present */
   height: var(--navbar-height);
   min-height: var(--navbar-height);
 }
 
 /* Center toggle button when sidebar is collapsed */
 body.sidebar-collapsed .sidebar-header {
-    display: flex;
-    justify-content: center;
-    position: relative; /* Needed for transform */
+  display: flex;
+  justify-content: center;
+  position: relative; /* Needed for transform */
 }
 
 body.sidebar-collapsed .sidebar-toggle {
-    margin: 0; /* Reset margins */
-    padding: 0; /* Reset padding */
-    position: absolute; /* Override default positioning */
-    left: 50%;       /* Initial center position */
-    transform: translateX(-50%) translateX(20px); /* Precise adjustment */
+  margin: 0; /* Reset margins */
+  padding: 0; /* Reset padding */
+  position: absolute; /* Override default positioning */
+  left: 50%;       /* Initial center position */
+  transform: translateX(-50%) translateX(20px); /* Precise adjustment */
 }
 
 .sidebar-brand {
@@ -186,7 +189,8 @@ body.sidebar-collapsed .sidebar-toggle {
   padding: var(--spacing-base);
   display: flex;
   justify-content: flex-end;
-  border-top: 1px solid var(--sidebar-border-color);
+  border-top: none;               /* removed divider */
+  box-shadow: none;               /* remove any shadow if present */
 }
 
 .btn-sidebar-collapse {
@@ -209,9 +213,9 @@ body.sidebar-collapsed .sidebar-toggle {
 
 /* Ensure proper sidebar-collapsed state */
 body.sidebar-collapsed .sidebar-toggle {
-    margin-left: auto; /* Push to the right */
-    margin-right: auto; /* Maintain some centering context */
-    padding-left: 155px; /* Add some left padding to visually shift it */
+  margin-left: auto; /* Push to the right */
+  margin-right: auto; /* Maintain some centering context */
+  padding-left: 155px; /* Add some left padding to visually shift it */
 }
 
 body.sidebar-collapsed .brand-text,
@@ -226,4 +230,120 @@ body.sidebar-collapsed .sidebar-toggle i {
 
 body.sidebar-collapsed .sidebar-icon {
   margin-right: 0;
+}
+
+/* Submenu styles */
+.has-submenu {
+  position: relative;
+}
+
+.submenu-toggle {
+  cursor: pointer;
+  position: relative;
+}
+
+.submenu-indicator {
+  position: absolute;
+  right: var(--spacing-base);
+  transition: transform var(--transition-fast);
+}
+
+.has-submenu.open .submenu-indicator {
+  transform: rotate(-180deg);
+}
+
+.submenu {
+  list-style: none;
+  padding-left: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--transition-base);
+}
+
+.has-submenu.open .submenu {
+  max-height: 500px; /* Allows submenu to expand fully */
+}
+
+.submenu-item {
+  margin-bottom: var(--spacing-xxs);
+}
+
+.submenu-link {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-base) var(--spacing-xs) calc(var(--spacing-base) * 2);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  position: relative;
+  font-size: 0.9rem;
+}
+
+.submenu-link:hover {
+  background-color: var(--color-primary-lighter);
+  color: var(--color-primary);
+}
+
+.submenu-link.active {
+  background-color: var(--color-primary-lightest);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.submenu-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--color-primary);
+}
+
+.submenu-icon {
+  width: 16px;
+  text-align: center;
+  margin-right: var(--spacing-sm);
+  font-size: 0.85rem;
+}
+
+.submenu-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Collapsed sidebar adjustments for submenus */
+body.sidebar-collapsed .submenu-indicator {
+  display: none;
+}
+
+body.sidebar-collapsed .submenu {
+  position: absolute;
+  left: var(--sidebar-collapsed-width);
+  top: 0;
+  min-width: 200px;
+  background-color: var(--sidebar-bg);
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  box-shadow: var(--shadow-md);
+  max-height: 0;
+  overflow: hidden;
+  z-index: 1050;
+}
+
+body.sidebar-collapsed .has-submenu:hover .submenu {
+  max-height: 500px;
+}
+
+body.sidebar-collapsed .submenu-link {
+  padding: var(--spacing-sm) var(--spacing-base);
+}
+
+@media (max-width: 991.98px) {
+  body.sidebar-collapsed .submenu {
+    position: static;
+    box-shadow: none;
+  }
 }

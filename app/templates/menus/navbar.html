@@ -1,38 +1,30 @@
-{# ------------------------------------------------------------------------------
-  File: navbar.html | Purpose: Top nav bar with search, nav items, user menu
-  Variables:
-    - current_user: Flask-Login user object
-    - navbar_entries: From context NAVBAR_ENTRIES
-  Features:
-    - Bootstrap 5 responsive nav
-    - Dynamic user avatar and links
------------------------------------------------------------------------------- #}
+{# ------------------------------------------------------------------------------ #}
+{# File: navbar.html | Purpose: Top nav bar with only search, theme toggle, notifications, and user menu #}
+{# ------------------------------------------------------------------------------ #}
 
-<!-- Link to CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top bg-white">
   <div class="container">
+    <!-- Brand and toggle button commented out
     <a class="navbar-brand d-flex align-items-center" href="/">
       <div class="brand-icon-container me-2"><i class="fas fa-building"></i></div>
       <span class="fw-bold">CRM Dashboard</span>
     </a>
 
-    <!-- Mobile toggle for navbar -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
       aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
       <i class="fas fa-bars"></i>
     </button>
+    -->
 
-    <div class="collapse navbar-collapse" id="navbarContent">
-      <!-- Navigation Items (hidden on mobile as they'll be in sidebar) -->
+    <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+      <!-- Navigation items commented out
       <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-none d-lg-flex">
         {% for item in navbar_entries %}
           {% set is_active_item = request.path == item.url %}
-
           <li class="nav-item">
-            <a class="nav-link {% if is_active_item %}active{% endif %}"
-               href="{{ item.url }}"
+            <a class="nav-link {% if is_active_item %}active{% endif %}" href="{{ item.url }}"
                {% if is_active_item %}aria-current="page"{% endif %}>
               <i class="fas fa-{{ item.icon }} nav-icon me-1"></i>
               {{ item.name }}
@@ -40,11 +32,8 @@
             </a>
           </li>
         {% endfor %}
-
-        {% block additional_nav_items %}
-          <!-- Custom nav items injected here -->
-        {% endblock %}
       </ul>
+      -->
 
       <!-- Search Bar -->
       <div class="d-none d-md-flex search-container me-3">
@@ -83,9 +72,7 @@
               {% endif %}
             </div>
             <div class="user-info d-none d-md-block">
-              <span class="user-name">
-                {{ current_user.name if current_user.is_authenticated else 'Account' }}
-              </span>
+              <span class="user-name">{{ current_user.name if current_user.is_authenticated else 'Account' }}</span>
               <i class="fas fa-chevron-down ms-1 small"></i>
             </div>
           </a>
@@ -119,5 +106,4 @@
   </div>
 </nav>
 
-<!-- Include JavaScript at the end of the file -->
 <script type="module" src="{{ url_for('static', filename='js/components/navbar.js') }}"></script>

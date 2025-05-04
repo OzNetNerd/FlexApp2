@@ -8,6 +8,57 @@
     - Toggle button for expanding/collapsing
 ------------------------------------------------------------------------------ #}
 
+{# Example of how your navbar_entries data structure should look:
+   navbar_entries = [
+     {
+       "name": "Dashboard",
+       "url": "/dashboard",
+       "icon": "tachometer-alt"
+     },
+     {
+       "name": "Users",
+       "icon": "users",
+       "children": [
+         {"name": "All Users", "url": "/users", "icon": "list"},
+         {"name": "New User", "url": "/users/new", "icon": "user-plus"},
+         {"name": "User Groups", "url": "/users/groups", "icon": "user-tag"}
+       ]
+     },
+     {
+       "name": "Customers",
+       "icon": "handshake",
+       "children": [
+         {"name": "All Customers", "url": "/customers", "icon": "users"},
+         {"name": "New Customer", "url": "/customers/new", "icon": "user-plus"},
+         {"name": "Leads", "url": "/customers/leads", "icon": "user-check"}
+       ]
+     },
+     {
+       "name": "Sales",
+       "icon": "chart-line",
+       "children": [
+         {"name": "Opportunities", "url": "/sales/opportunities", "icon": "lightbulb"},
+         {"name": "Deals", "url": "/sales/deals", "icon": "handshake"},
+         {"name": "Invoices", "url": "/sales/invoices", "icon": "file-invoice-dollar"}
+       ]
+     },
+     {
+       "name": "Reports",
+       "url": "/reports",
+       "icon": "chart-bar"
+     },
+     {
+       "name": "Settings",
+       "icon": "cog",
+       "children": [
+         {"name": "Profile", "url": "/settings/profile", "icon": "user-cog"},
+         {"name": "Company", "url": "/settings/company", "icon": "building"},
+         {"name": "Preferences", "url": "/settings/preferences", "icon": "sliders-h"}
+       ]
+     }
+   ]
+#}
+
 <div id="sidebar" class="sidebar">
   <div class="sidebar-header">
     <a class="sidebar-brand d-flex align-items-center" href="/">
@@ -23,13 +74,33 @@
     <ul class="sidebar-nav">
       {% for item in navbar_entries %}
         {% set is_active_item = request.path == item.url %}
+        {% set has_children = item.children|default(false) %}
 
-        <li class="sidebar-item {% if is_active_item %}active{% endif %}">
-          <a href="{{ item.url }}" class="sidebar-link" {% if is_active_item %}aria-current="page"{% endif %}>
-            <i class="fas fa-{{ item.icon|default('circle') }} sidebar-icon"></i>
-            <span class="sidebar-text">{{ item.name }}</span>
-            {% if is_active_item %}<span class="active-indicator"></span>{% endif %}
-          </a>
+        <li class="sidebar-item {% if is_active_item %}active{% endif %} {% if has_children %}has-submenu{% endif %}">
+          {% if has_children %}
+            <a href="#" class="sidebar-link submenu-toggle">
+              <i class="fas fa-{{ item.icon|default('circle') }} sidebar-icon"></i>
+              <span class="sidebar-text">{{ item.name }}</span>
+              <i class="fas fa-chevron-down submenu-indicator"></i>
+            </a>
+            <ul class="submenu">
+              {% for child in item.children %}
+                {% set is_active_child = request.path == child.url %}
+                <li class="submenu-item {% if is_active_child %}active{% endif %}">
+                  <a href="{{ child.url }}" class="submenu-link" {% if is_active_child %}aria-current="page"{% endif %}>
+                    <i class="fas fa-{{ child.icon|default('circle') }} submenu-icon"></i>
+                    <span class="submenu-text">{{ child.name }}</span>
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <a href="{{ item.url }}" class="sidebar-link" {% if is_active_item %}aria-current="page"{% endif %}>
+              <i class="fas fa-{{ item.icon|default('circle') }} sidebar-icon"></i>
+              <span class="sidebar-text">{{ item.name }}</span>
+              {% if is_active_item %}<span class="active-indicator"></span>{% endif %}
+            </a>
+          {% endif %}
         </li>
       {% endfor %}
     </ul>
