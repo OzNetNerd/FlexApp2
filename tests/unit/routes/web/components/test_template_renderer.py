@@ -1,7 +1,7 @@
-# Tests for app.routes.web.components.template_renderer
+# Tests for app.routes.web.utils.template_renderer
 # Created: 2025-05-03
 import pytest
-from app.routes.web.components.template_renderer import *
+from app.routes.web.utils.template_renderer import *
 
 
 def test_module_imports():

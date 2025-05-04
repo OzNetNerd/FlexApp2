@@ -15,7 +15,7 @@ from werkzeug.routing import Rule
 from app.models import Setting, User
 from app.models.base import db
 from app.routes.api_router import register_api_blueprints
-from app.routes.web.components.template_renderer import handle_template_error
+from app.routes.web.utils.template_renderer import handle_template_error
 from app.routes.web_router import register_web_blueprints
 from app.utils.app_logging import get_logger
 from config import Config

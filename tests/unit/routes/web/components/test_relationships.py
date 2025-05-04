@@ -1,7 +1,7 @@
-# Tests for app.routes.web.components.relationships
+# Tests for app.routes.web.utils.relationships
 # Created: 2025-05-03
 import pytest
-from app.routes.web.components.relationships import *
+from app.routes.web.utils.relationships import *
 
 
 def test_module_imports():

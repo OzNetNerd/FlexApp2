@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS
 from app.services.srs_service import SRSService
-from routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
+from app.routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
 from app.utils.app_logging import get_logger, log_message_and_variables
 
 logger = get_logger()

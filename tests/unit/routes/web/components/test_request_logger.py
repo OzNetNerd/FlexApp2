@@ -1,7 +1,7 @@
-# Tests for app.routes.web.components.request_logger
+# Tests for app.routes.web.utils.request_logger
 # Created: 2025-05-03
 import pytest
-from app.routes.web.components.request_logger import *
+from app.routes.web.utils.request_logger import *
 
 
 def test_module_imports():

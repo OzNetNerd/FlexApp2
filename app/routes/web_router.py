@@ -2,7 +2,7 @@
 
 from flask import Flask
 
-from routes.web.utils.route_registration import register_crud_routes
+from app.routes.web.utils.route_registration import register_crud_routes
 from app.utils.router_utils import register_blueprint_routes
 
 

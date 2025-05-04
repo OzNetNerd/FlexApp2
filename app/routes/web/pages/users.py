@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from flask import render_template, request
 from flask_login import login_required
 from app.models import User, Note, Opportunity
-from routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
+from app.routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
 from app.services.user_service import UserService
 from app.models.base import db
 

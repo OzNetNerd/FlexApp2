@@ -11,7 +11,7 @@ from jinja2 import DebugUndefined, Environment
 from jinja2.exceptions import TemplateNotFound
 from markupsafe import Markup, escape
 
-from routes.web.utils.context import BaseContext
+from app.routes.web.utils.context import BaseContext
 from app.utils.app_logging import get_logger, log_message_and_variables
 
 logger = get_logger()

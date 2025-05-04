@@ -1,7 +1,7 @@
-# Tests for app.routes.web.components.autocomplete
+# Tests for app.routes.web.utils.autocomplete
 # Created: 2025-05-03
 import pytest
-from app.routes.web.components.autocomplete import *
+from app.routes.web.utils.autocomplete import *
 
 
 def test_module_imports():

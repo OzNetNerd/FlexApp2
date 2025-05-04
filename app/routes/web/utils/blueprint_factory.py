@@ -4,10 +4,10 @@ from typing import Any, Optional
 from dataclasses import dataclass
 from flask import Blueprint
 
-from routes.web.utils.route_registration import register_crud_routes, CrudRouteConfig
+from app.routes.web.utils.route_registration import register_crud_routes, CrudRouteConfig
 from app.services.crud_service import CRUDService
 from app.utils.app_logging import get_logger
-from routes.web.utils.template_config import TemplateConfig
+from app.routes.web.utils.template_config import TemplateConfig
 
 
 logger = get_logger()

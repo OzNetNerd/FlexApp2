@@ -1,7 +1,7 @@
-# Tests for app.routes.web.components.json_validator
+# Tests for app.routes.web.utils.json_validator
 # Created: 2025-05-03
 import pytest
-from app.routes.web.components.json_validator import *
+from app.routes.web.utils.json_validator import *
 
 
 def test_module_imports():

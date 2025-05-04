@@ -7,10 +7,10 @@ from typing import Any, Callable, Dict, List, Optional
 from flask import Blueprint, redirect, request, url_for
 from flask_login import login_required
 
-from app.routes.web.components.template_renderer import RenderSafelyConfig, render_safely
-from routes.web.utils.context import TableContext, WebContext
+from app.routes.web.utils.template_renderer import RenderSafelyConfig, render_safely
+from app.routes.web.utils.context import TableContext, WebContext
 from app.utils.app_logging import get_logger
-from routes.web.utils.template_config import TemplateConfig
+from app.routes.web.utils.template_config import TemplateConfig
 
 logger = get_logger()
 

@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 import random
 from app.models.pages.company import Company
-from routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
+from app.routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
 from app.models.base import db
 
 # Create the blueprint with the Company model

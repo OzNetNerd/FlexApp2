@@ -3,7 +3,7 @@ from flask_login import login_required
 
 from app.models import Crisp, Relationship, db
 from app.utils.app_logging import get_logger
-from routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
+from app.routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
 
 logger = get_logger()
 
