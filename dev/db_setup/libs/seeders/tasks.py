@@ -10,9 +10,9 @@ from libs.seed_utils import create_or_update, safe_commit
 # Setup paths
 root_dir, _ = setup_paths()
 
-from app.models.task import Task
+from app.models.pages.task import Task
 from app.models.pages.user import User
-from app.models.opportunity import Opportunity
+from app.models.pages.opportunity import Opportunity
 
 logger = logging.getLogger(__name__)
 
