@@ -86,6 +86,21 @@ def get_jinja_variables(context_dict):
     # Start with context dictionary
     jinja_variables = context_dict.copy()
 
+    # Add variables from context processors
+    try:
+        # Add app-level context processors
+        for processor in current_app.template_context_processors[None]:
+            if callable(processor):
+                jinja_variables.update(processor())
+
+        # Add blueprint-specific context processors if applicable
+        if request.blueprint and request.blueprint in current_app.template_context_processors:
+            for processor in current_app.template_context_processors[request.blueprint]:
+                if callable(processor):
+                    jinja_variables.update(processor())
+    except Exception as e:
+        logger.warning(f"Error applying context processors: {e}")
+
     # Define Flask globals dictionary
     flask_globals = {
         "url_for": url_for,
@@ -99,7 +114,8 @@ def get_jinja_variables(context_dict):
     for key, flask_value in flask_globals.items():
         if key in jinja_variables:
             context_value = jinja_variables[key]
-            logger.warning(f"⚠️ CONFLICT: '{key}' from context ({context_value}) overridden by Flask global ({flask_value})")
+            logger.warning(
+                f"⚠️ CONFLICT: '{key}' from context ({context_value}) overridden by Flask global ({flask_value})")
         jinja_variables[key] = flask_value
 
     # Log all variables being returned
