@@ -5,6 +5,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from logging import INFO, Formatter, StreamHandler
 from typing import Type
+from app.graphql import init_graphql
 
 from flask import Flask, current_app, make_response, redirect, request, url_for
 from flask_login import LoginManager, current_user
@@ -60,6 +61,7 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
         Flask: The configured Flask application.
     """
     app = Flask(__name__, static_folder="static", static_url_path="/static")
+    init_graphql(app)
     app.url_rule_class = CustomRule
     app.url_map.strict_slashes = False
     app.config.from_object(config_class)
