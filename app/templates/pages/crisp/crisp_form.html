@@ -12,7 +12,7 @@
           <h1 class="h3 mb-2">{% if score %}Edit{% else %}Add{% endif %} CRISP Score</h1>
           <p class="text-muted mb-0">{% if score %}Update the{% else %}Create a new{% endif %} trust assessment for a relationship</p>
         </div>
-        <a href="{{ url_for('crisp_scores_bp.dashboard') }}" class="btn btn-outline-primary">
+        <a href="{{ url_for('crisp_bp.dashboard') }}" class="btn btn-outline-primary">
           <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
         </a>
       </div>
@@ -28,7 +28,7 @@
         <h2 class="h5 mb-0">CRISP Score Details</h2>
       </div>
       <div class="card-body">
-        <form action="{{ url_for('crisp_scores_bp.submit', relationship_id=relationship.id) if relationship else url_for('crisp_scores_bp.submit_new') }}" method="POST">
+        <form action="{{ url_for('crisp_bp.submit', relationship_id=relationship.id) if relationship else url_for('crisp_bp.submit_new') }}" method="POST">
           {% if not relationship %}
           <div class="mb-4">
             <label for="relationship" class="form-label">Select Relationship</label>
@@ -142,7 +142,7 @@
           </div>
 
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <a href="{{ url_for('crisp_scores_bp.dashboard') }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+            <a href="{{ url_for('crisp_bp.dashboard') }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
             <button type="submit" class="btn btn-primary">
               {% if score %}Update{% else %}Create{% endif %} CRISP Score
             </button>

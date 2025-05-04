@@ -36,7 +36,7 @@ class Relationship(BaseModel, RelationshipMixin):
     )
 
     # CRISP scores relationship
-    crisp_scores = db.relationship("CRISPScore", back_populates="relationship", cascade="all, delete-orphan")
+    crisp = db.relationship("Crisp", back_populates="relationship", cascade="all, delete-orphan")
 
     __table_args__ = (
         db.UniqueConstraint(

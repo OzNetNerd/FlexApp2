@@ -1,23 +1,23 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required, current_user
 
-from app.models import CRISPScore, Relationship, db
+from app.models import Crisp, Relationship, db
 from app.utils.app_logging import get_logger
+from app.routes.web.blueprint_factory import create_crud_blueprint, BlueprintConfig
 from datetime import datetime, timedelta
 import json
 
 logger = get_logger()
 
-# Define blueprint with explicit prefix
-crisp_scores_bp = Blueprint("crisp_scores_bp", __name__, url_prefix="/crisp")
+crisp_bp = create_crud_blueprint(BlueprintConfig(model_class=Crisp))
 
 
-@crisp_scores_bp.route("/dashboard")
+@crisp_bp.route("/", methods=["GET"])
 @login_required
-def dashboard():
+def crisp_dashboard():
     """CRISP Score Dashboard with metrics and visualizations."""
     # Get basic statistics
-    all_scores = CRISPScore.query.all()
+    all_scores = Crisp.query.all()
     total_assessments = len(all_scores)
 
     # Calculate averages
@@ -44,7 +44,7 @@ def dashboard():
     ]
 
     # Get recent scores
-    recent_scores = db.session.query(CRISPScore).order_by(CRISPScore.created_at.desc()).limit(10).all()
+    recent_scores = db.session.query(Crisp).order_by(Crisp.created_at.desc()).limit(10).all()
 
     # Prepare relationship display names
     for score in recent_scores:
@@ -71,12 +71,12 @@ def dashboard():
     )
 
 
-@crisp_scores_bp.route("/scores")
+@crisp_bp.route("/scores")
 @login_required
 def list_scores():
     """List all CRISP scores with filtering options."""
     # Get all scores with their relationships
-    scores = CRISPScore.query.order_by(CRISPScore.created_at.desc()).all()
+    scores = Crisp.query.order_by(Crisp.created_at.desc()).all()
 
     # Prepare relationship display names
     for score in scores:
@@ -91,11 +91,11 @@ def list_scores():
     return render_template("pages/crisp/list.html", scores=scores)
 
 
-@crisp_scores_bp.route("/score/<int:score_id>")
+@crisp_bp.route("/score/<int:score_id>")
 @login_required
 def view_score(score_id):
     """View the details of a specific CRISP score."""
-    score = CRISPScore.query.get_or_404(score_id)
+    score = Crisp.query.get_or_404(score_id)
     relationship = Relationship.query.get(score.relationship_id)
 
     # Prepare relationship display name
@@ -106,7 +106,7 @@ def view_score(score_id):
     )
 
     # Get historical scores for this relationship
-    historical_scores = CRISPScore.query.filter_by(relationship_id=score.relationship_id).order_by(CRISPScore.created_at).all()
+    historical_scores = Crisp.query.filter_by(relationship_id=score.relationship_id).order_by(Crisp.created_at).all()
 
     # Prepare data for historical chart
     historical_dates = [score.created_at.strftime("%Y-%m-%d") for score in historical_scores]
@@ -128,7 +128,7 @@ def view_score(score_id):
     )
 
 
-@crisp_scores_bp.route("/create")
+@crisp_bp.route("/create")
 @login_required
 def create_score():
     """Form to create a new CRISP score."""
@@ -146,11 +146,11 @@ def create_score():
     return render_template("pages/crisp/form.html", relationships=relationships, score=None, relationship=None)
 
 
-@crisp_scores_bp.route("/edit/<int:score_id>")
+@crisp_bp.route("/edit/<int:score_id>")
 @login_required
 def edit_score(score_id):
     """Form to edit an existing CRISP score."""
-    score = CRISPScore.query.get_or_404(score_id)
+    score = Crisp.query.get_or_404(score_id)
     relationship = Relationship.query.get(score.relationship_id)
 
     # Prepare relationship display name
@@ -163,14 +163,14 @@ def edit_score(score_id):
     return render_template("pages/crisp/form.html", score=score, relationship=relationship)
 
 
-@crisp_scores_bp.route("/score/<int:relationship_id>", methods=["POST"])
+@crisp_bp.route("/score/<int:relationship_id>", methods=["POST"])
 @login_required
 def submit(relationship_id):
     """Submit a CRISP score for a relationship."""
     relationship = Relationship.query.get_or_404(relationship_id)
 
     try:
-        score = CRISPScore(
+        score = Crisp(
             relationship_id=relationship.id,
             credibility=int(request.form["credibility"]),
             reliability=int(request.form["reliability"]),
@@ -185,10 +185,10 @@ def submit(relationship_id):
         db.session.rollback()
         flash(f"Error submitting CRISP score: {str(e)}", "danger")
 
-    return redirect(url_for("crisp_scores_bp.dashboard"))
+    return redirect(url_for("crisp_bp.dashboard"))
 
 
-@crisp_scores_bp.route("/submit-new", methods=["POST"])
+@crisp_bp.route("/submit-new", methods=["POST"])
 @login_required
 def submit_new():
     """Submit a CRISP score for a newly selected relationship."""
@@ -196,7 +196,7 @@ def submit_new():
         relationship_id = int(request.form["relationship_id"])
         relationship = Relationship.query.get_or_404(relationship_id)
 
-        score = CRISPScore(
+        score = Crisp(
             relationship_id=relationship.id,
             credibility=int(request.form["credibility"]),
             reliability=int(request.form["reliability"]),
@@ -211,10 +211,10 @@ def submit_new():
         db.session.rollback()
         flash(f"Error submitting CRISP score: {str(e)}", "danger")
 
-    return redirect(url_for("crisp_scores_bp.dashboard"))
+    return redirect(url_for("crisp_bp.dashboard"))
 
 
-@crisp_scores_bp.route("/comparison")
+@crisp_bp.route("/comparison")
 @login_required
 def comparison():
     """Compare CRISP scores across multiple relationships."""
@@ -251,7 +251,7 @@ def comparison():
             relationship = Relationship.query.get(relationship_id)
             if relationship:
                 # Get the most recent CRISP score for this relationship
-                latest_score = CRISPScore.query.filter_by(relationship_id=relationship_id).order_by(CRISPScore.created_at.desc()).first()
+                latest_score = Crisp.query.filter_by(relationship_id=relationship_id).order_by(Crisp.created_at.desc()).first()
 
                 if latest_score:
                     # Prepare display data

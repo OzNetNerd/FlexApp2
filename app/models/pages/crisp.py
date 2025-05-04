@@ -6,11 +6,11 @@ from app.utils.app_logging import get_logger
 logger = get_logger()
 
 
-class CRISPScore(BaseModel):
-    __tablename__ = "crisp_scores"
+class Crisp(BaseModel):
+    __tablename__ = "crisp"
 
     relationship_id = db.Column(db.Integer, db.ForeignKey("relationships.id"), nullable=False)
-    relationship = db.relationship("Relationship", back_populates="crisp_scores")
+    relationship = db.relationship("Relationship", back_populates="crisp")
 
     credibility = db.Column(db.Integer, nullable=False)
     reliability = db.Column(db.Integer, nullable=False)
@@ -26,7 +26,7 @@ class CRISPScore(BaseModel):
         Returns:
             str: Summary of the score and associated relationship.
         """
-        return f"<CRISPScore Relationship={self.relationship_id} Total={self.total_score}>"
+        return f"<Crisp Relationship={self.relationship_id} Total={self.total_score}>"
 
     def calculate_total(self) -> None:
         """Calculate the CRISP total score using the standard formula.
@@ -48,11 +48,11 @@ class CRISPScore(BaseModel):
         else:
             self.total_score = float(c + r + i) / s
 
-    def save(self) -> "CRISPScore":
+    def save(self) -> "Crisp":
         """Override save to compute total score before persisting.
 
         Returns:
-            CRISPScore: The saved instance.
+            Crisp: The saved instance.
         """
         logger.info("Calculating CRISP total score before saving.")
         self.calculate_total()
