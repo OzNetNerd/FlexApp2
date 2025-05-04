@@ -150,7 +150,7 @@ def get_top_users(limit=5):
     for user, notes_count in users_with_counts:
         # Count opportunities associated with user
         opportunities_count = db.session.query(func.count(Opportunity.id)).filter(
-            Opportunity.created_by == user.id
+            Opportunity.created_by_id == user.id  # Changed from created_by to created_by_id
         ).scalar() or 0
 
         # Create a dictionary with user and additional attributes
@@ -268,7 +268,7 @@ def filtered_users():
         user_dict = user.__dict__.copy()
         user_dict['notes_count'] = Note.query.filter_by(user_id=user.id).count()
         user_dict['opportunities_count'] = db.session.query(func.count(Opportunity.id)).filter(
-            Opportunity.created_by == user.id
+            Opportunity.created_by_id == user.id  # Changed from created_by to created_by_id
         ).scalar() or 0
         users.append(user_dict)
 
@@ -306,7 +306,7 @@ def statistics():
     # Admin users
     admin_notes = db.session.query(func.count(Note.id)).join(User).filter(User.is_admin == True).scalar() or 0
     admin_opportunities = db.session.query(func.count(Opportunity.id)).join(
-        User, Opportunity.created_by == User.id
+        User, Opportunity.created_by_id == User.id  # Changed from created_by to created_by_id
     ).filter(User.is_admin == True).scalar() or 0
 
     user_activity_by_role.append({
@@ -319,7 +319,7 @@ def statistics():
     # Regular users
     regular_notes = db.session.query(func.count(Note.id)).join(User).filter(User.is_admin == False).scalar() or 0
     regular_opportunities = db.session.query(func.count(Opportunity.id)).join(
-        User, Opportunity.created_by == User.id
+        User, Opportunity.created_by_id == User.id  # Changed from created_by to created_by_id
     ).filter(User.is_admin == False).scalar() or 0
 
     user_activity_by_role.append({
