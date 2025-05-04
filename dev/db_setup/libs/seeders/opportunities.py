@@ -10,7 +10,7 @@ from libs.seed_utils import create_or_update, safe_commit
 # Setup paths
 root_dir, _ = setup_paths()
 
-from app.models import Company, Opportunity
+from app.models import Company, Opportunity, User  # Add User import
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +18,13 @@ logger = logging.getLogger(__name__)
 def seed_opportunities():
     """Seed opportunities into the database."""
     companies = Company.query.all()
+
+    # Get admin user or default to ID 1
+    admin_user = User.query.filter_by(is_admin=True).first() or User.query.get(1)
+    if not admin_user:
+        logger.warning("No admin user found for opportunities. Using None for created_by_id.")
+
+    created_by_id = admin_user.id if admin_user else None
 
     # Get current date and future dates for close_date
     now = datetime.now(ZoneInfo("UTC"))
@@ -115,6 +122,7 @@ def seed_opportunities():
                 "priority": priority,
                 "close_date": close_date,
                 "last_activity_date": datetime.now(ZoneInfo("UTC")),
+                "created_by_id": created_by_id,  # Add the new field
             },
         )
     safe_commit()

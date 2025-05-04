@@ -1,0 +1,461 @@
+<!-- dashboard.html for users -->
+{% extends "layouts/base.html" %}
+
+{% block title %}CRM Dashboard - Users{% endblock %}
+
+{% block content %}
+<!-- Page Header Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <h1 class="h3 mb-2">User Management</h1>
+      <p class="text-muted">Track and manage your system users efficiently</p>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions Cards -->
+<div class="row mb-4">
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('users_bp.filtered_users', is_admin='false') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-people text-primary" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Regular Users</h2>
+        <p class="card-text text-muted">View standard users</p>
+        <div class="badge bg-danger">{{ stats.regular_count }}</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('users_bp.create') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-person-plus text-success" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Create User</h2>
+        <p class="card-text text-muted">Add new user</p>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('users_bp.filtered_users', is_admin='true') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-shield-lock text-warning" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Admin Users</h2>
+        <p class="card-text text-muted">View administrators</p>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 mb-3">
+    <a href="{{ url_for('users_bp.statistics') }}" class="nav-card card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="bi bi-bar-chart text-info" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 class="h5 card-title">Analytics</h2>
+        <p class="card-text text-muted">User insights</p>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Summary Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">User Summary</h2>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-primary mb-2">{{ stats.total_users }}</div>
+                <div class="text-uppercase fw-bold small text-muted">Total Users</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-danger mb-2">{{ stats.admin_count }}</div>
+                <div class="text-uppercase fw-bold small text-muted">Admin Users</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-success mb-2">{{ stats.new_users_month }}</div>
+                <div class="text-uppercase fw-bold small text-muted">New This Month</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="stat-card card border-0 bg-light h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-info mb-2">{{ stats.avg_notes }}</div>
+                <div class="text-uppercase fw-bold small text-muted">Avg Notes/User</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
+          <div class="highlights-container">
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-user-check text-success me-1"></i>
+                <span class="fw-bold">{{ stats.active_users }}</span> active users this week
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-trophy text-warning me-1"></i>
+                <span class="fw-bold">{{ stats.top_user }}</span> created the most opportunities
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-chart-line text-primary me-1"></i>
+                User activity increased by <span class="fw-bold">{{ stats.activity_increase }}%</span> this month
+              </p>
+            </div>
+
+            <div class="highlight-item">
+              <p class="h6 mb-0 fw-normal">
+                <i class="fas fa-hourglass-half text-danger me-1"></i>
+                <span class="fw-bold">{{ stats.inactive_count }}</span> users with no activity for 14+ days
+              </p>
+            </div>
+          </div>
+
+          <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
+            <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- User Categories Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">User Categories</h2>
+        <a href="{{ url_for('users_bp.filtered_users') }}" class="btn btn-sm btn-outline-primary">View All Users</a>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="category-icon bg-info text-white d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-person"></i>
+                  </div>
+                  <h3 class="h6 mb-0">Regular Users</h3>
+                </div>
+                <p class="small text-muted mb-2">{{ user_categories[0].count }} users · {{ user_categories[0].activity }} notes</p>
+                <div class="progress mb-3" style="height: 5px;">
+                  <div class="progress-bar bg-info" role="progressbar" style="width: {{ user_categories[0].percentage }}%;" aria-valuenow="{{ user_categories[0].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <a href="{{ url_for('users_bp.filtered_users', is_admin='false') }}" class="btn btn-sm btn-outline-info">View Users</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-shield-lock"></i>
+                  </div>
+                  <h3 class="h6 mb-0">Admin Users</h3>
+                </div>
+                <p class="small text-muted mb-2">{{ user_categories[1].count }} users · {{ user_categories[1].activity }} notes</p>
+                <div class="progress mb-3" style="height: 5px;">
+                  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ user_categories[1].percentage }}%;" aria-valuenow="{{ user_categories[1].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <a href="{{ url_for('users_bp.filtered_users', is_admin='true') }}" class="btn btn-sm btn-outline-primary">View Admins</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="category-icon bg-warning text-white d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-calendar-check"></i>
+                  </div>
+                  <h3 class="h6 mb-0">New Users</h3>
+                </div>
+                <p class="small text-muted mb-2">{{ user_categories[2].count }} users · {{ user_categories[2].activity }} notes</p>
+                <div class="progress mb-3" style="height: 5px;">
+                  <div class="progress-bar bg-warning" role="progressbar" style="width: {{ user_categories[2].percentage }}%;" aria-valuenow="{{ user_categories[2].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <a href="{{ url_for('users_bp.filtered_users', period='month') }}" class="btn btn-sm btn-outline-warning">View New Users</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Top Users Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Top Active Users</h2>
+        <div>
+          <a href="{{ url_for('users_bp.filtered_users') }}" class="btn btn-sm btn-outline-primary me-2">
+            <i class="bi bi-funnel"></i> Filter Users
+          </a>
+          <a href="{{ url_for('users_bp.create') }}" class="btn btn-sm btn-primary">Add User</a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Username</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Created</th>
+                <th scope="col">Notes</th>
+                <th scope="col">Opportunities</th>
+                <th scope="col" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in top_users %}
+              <tr>
+                <td class="ps-4">{{ user.username }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                  {% if user.is_admin %}
+                    <span class="badge bg-primary">Admin</span>
+                  {% else %}
+                    <span class="badge bg-info">User</span>
+                  {% endif %}
+                </td>
+                <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                <td>{{ user.notes_count }}</td>
+                <td>{{ user.opportunities_count }}</td>
+                <td class="text-center">
+                  <a href="{{ url_for('users_bp.view', user_id=user.id) }}" class="btn btn-sm btn-outline-primary me-1">View</a>
+                  <a href="{{ url_for('users_bp.edit', user_id=user.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </td>
+              </tr>
+              {% endfor %}
+              {% if not top_users %}
+              <tr>
+                <td colspan="8" class="text-center py-4">
+                  <div class="text-muted">
+                    <i class="bi bi-info-circle-fill fs-4 mb-2"></i>
+                    <p>No users found. Create a new user?</p>
+                  </div>
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer bg-white text-center">
+        <a href="{{ url_for('users_bp.filtered_users') }}" class="text-decoration-none">
+          View all {{ stats.total_users }} users
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- User Activity Chart -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="h5 mb-0">User Activity</h2>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px; position: relative;">
+          <canvas id="userActivityChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+  // Initialize the highlights slider
+  document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.highlights-container');
+    const items = document.querySelectorAll('.highlight-item');
+    let currentIndex = 0;
+
+    document.querySelector('.btn-highlight-next').addEventListener('click', function() {
+      currentIndex = (currentIndex + 1) % items.length;
+      container.scrollTo({
+        left: currentIndex * container.offsetWidth,
+        behavior: 'smooth'
+      });
+    });
+
+    document.querySelector('.btn-highlight-prev').addEventListener('click', function() {
+      currentIndex = (currentIndex - 1 + items.length) % items.length;
+      container.scrollTo({
+        left: currentIndex * container.offsetWidth,
+        behavior: 'smooth'
+      });
+    });
+
+    // Auto-scroll highlights
+    setInterval(() => {
+      document.querySelector('.btn-highlight-next').click();
+    }, 5000);
+
+    // Initialize user activity chart
+    const ctx = document.getElementById('userActivityChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: {{ activity_data.labels|tojson }},
+        datasets: [
+          {
+            label: 'Notes Created',
+            borderColor: 'rgba(40, 167, 69, 0.8)',
+            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+            tension: 0.3,
+            data: {{ activity_data.notes|tojson }}
+          },
+          {
+            label: 'Opportunities Created',
+            borderColor: 'rgba(0, 123, 255, 0.8)',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            tension: 0.3,
+            data: {{ activity_data.opportunities|tojson }}
+          },
+          {
+            label: 'Logins',
+            borderColor: 'rgba(255, 193, 7, 0.8)',
+            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+            tension: 0.3,
+            borderDash: [5, 5],
+            data: {{ activity_data.logins|tojson }}
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            grid: {
+              display: false
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Activity Count'
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          },
+          legend: {
+            position: 'top'
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+{% block head_extra %}
+<style>
+/* Activity Icons */
+.activity-icon,
+.category-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.activity-icon:hover,
+.category-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Navigation cards hover effect */
+.nav-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Highlights container */
+.highlights-container {
+  display: flex;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.highlight-item {
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Badge styling */
+.nav-card .badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.8rem;
+}
+</style>
+{% endblock %}

@@ -18,6 +18,8 @@ class Opportunity(BaseModel):
     priority = db.Column(db.String(20), default="medium")
     close_date = db.Column(db.DateTime)
     last_activity_date = db.Column(db.DateTime, default=datetime.now)
+    created_by_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    created_by = db.relationship("User", foreign_keys=[created_by_id])
 
     company_id = db.Column(db.Integer, db.ForeignKey("companies.id"))
 
