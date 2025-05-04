@@ -17,3 +17,5 @@ mypy
 typecov
 requests
 fsrs
+strawberry-graphql[flask]
+sqlalchemy-utils
