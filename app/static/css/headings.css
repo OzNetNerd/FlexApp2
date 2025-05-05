@@ -46,7 +46,6 @@ h6 { font-size: 0.875rem; }
 
 .large-card-icon { /* <i class="bi bi-building large-icon"></i> */
   font-size: 2.5rem;
-  color: var(--bs-primary);
 }
 
 .large-card-title-subtext { /* <p class="card-text text-muted"> */
