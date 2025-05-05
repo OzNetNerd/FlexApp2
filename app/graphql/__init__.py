@@ -1,3 +1,5 @@
+# MIGRATED
+
 # app/graphql/__init__.py
 from strawberry.flask.views import GraphQLView
 from app.graphql.schema import schema

@@ -1,3 +1,5 @@
+# MIGRATED
+
 # app/graphql/schema.py
 import strawberry
 from app.graphql.resolvers.user import UserQueries, UserMutations
