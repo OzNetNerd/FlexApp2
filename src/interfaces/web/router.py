@@ -9,11 +9,7 @@ from src.interfaces.web.routes.crud_routes import register_crud_routes
 from src.infrastructure.utils.router_utils import register_blueprint_routes
 
 
-def register_web_blueprints(
-        app: Flask,
-        package_path: str = "src.interfaces.web.pages",
-        exclusions: Optional[List[str]] = None
-) -> None:
+def register_web_blueprints(app: Flask, package_path: str = "src.interfaces.web.pages", exclusions: Optional[List[str]] = None) -> None:
     """Register web blueprints with their CRUD routes automatically.
 
     Args:

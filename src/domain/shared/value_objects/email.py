@@ -43,7 +43,7 @@ class Email:
         Returns:
             bool: True if email format is valid.
         """
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return bool(re.match(pattern, email))
 
     @property
@@ -54,12 +54,12 @@ class Email:
     @property
     def domain(self):
         """Get the domain part of the email."""
-        return self._value.split('@')[1]
+        return self._value.split("@")[1]
 
     @property
     def username(self):
         """Get the username part of the email."""
-        return self._value.split('@')[0]
+        return self._value.split("@")[0]
 
     def __eq__(self, other):
         """Compare two email objects for equality."""

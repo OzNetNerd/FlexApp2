@@ -4,6 +4,7 @@ Repository interfaces for the Company domain.
 This module defines the repository interfaces that provide data access
 for Company domain entities, following DDD principles.
 """
+
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
 
@@ -48,12 +49,7 @@ class CompanyRepository(Repository[Company], ABC):
         pass
 
     @abstractmethod
-    async def get_paginated(
-            self,
-            limit: int = 20,
-            offset: int = 0,
-            filters: Optional[Dict[str, Any]] = None
-    ) -> List[Company]:
+    async def get_paginated(self, limit: int = 20, offset: int = 0, filters: Optional[Dict[str, Any]] = None) -> List[Company]:
         """
         Retrieve a paginated list of companies with optional filtering.
 

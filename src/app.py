@@ -8,6 +8,7 @@ Flask application instance using a Domain-Driven Design architecture.
 """
 
 from src.infrastructure.flask.app_factory import create_app
+
 # from config import Config  # Remove or comment this line
 
 if __name__ == "__main__":

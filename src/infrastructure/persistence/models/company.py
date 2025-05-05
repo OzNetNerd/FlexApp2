@@ -18,8 +18,7 @@ class Company(BaseModel):
     opportunities = db.relationship("Opportunity", backref="company", lazy="dynamic")
     notes = db.relationship(
         "Note",
-        primaryjoin=("and_(Note.notable_id == foreign(Company.id), "
-                     "Note.notable_type == 'Company')"),
+        primaryjoin=("and_(Note.notable_id == foreign(Company.id), " "Note.notable_type == 'Company')"),
     )
     company_capabilities = db.relationship(
         "CompanyCapability",

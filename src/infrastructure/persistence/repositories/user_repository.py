@@ -3,7 +3,7 @@
 from typing import Optional, List
 from src.domain.user.entities import User as UserEntity
 from src.domain.user.repositories import UserRepository
-from infrastructure.persistence.models.user import User as UserModel
+from src.infrastructure.persistence.models.user import User as UserModel
 
 
 class SQLAlchemyUserRepository(UserRepository):
@@ -21,12 +21,7 @@ class SQLAlchemyUserRepository(UserRepository):
 
     def add(self, user: UserEntity) -> UserEntity:
         """Add a new user."""
-        model = UserModel(
-            username=user.username,
-            name=user.name,
-            email=user.email,
-            is_admin=user.is_admin
-        )
+        model = UserModel(username=user.username, name=user.name, email=user.email, is_admin=user.is_admin)
         model.save()
         return self._to_entity(model)
 
@@ -80,5 +75,5 @@ class SQLAlchemyUserRepository(UserRepository):
             created_at=str(model.created_at),
             updated_at=str(model.updated_at) if model.updated_at else None,
             related_users=model.to_dict().get("related_users", ""),
-            related_companies=model.to_dict().get("related_companies", "")
+            related_companies=model.to_dict().get("related_companies", ""),
         )

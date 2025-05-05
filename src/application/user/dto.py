@@ -16,6 +16,7 @@ class UserDTO:
         email: The user's email address.
         is_admin: Whether the user has administrative privileges.
     """
+
     id: Optional[int] = None
     username: str = ""
     name: str = ""
@@ -23,7 +24,7 @@ class UserDTO:
     is_admin: bool = False
 
     @classmethod
-    def from_entity(cls, user) -> 'UserDTO':
+    def from_entity(cls, user) -> "UserDTO":
         """
         Create a DTO from a user entity.
 
@@ -33,13 +34,7 @@ class UserDTO:
         Returns:
             A UserDTO containing the entity data.
         """
-        return cls(
-            id=user.id,
-            username=user.username,
-            name=user.name,
-            email=user.email,
-            is_admin=user.is_admin
-        )
+        return cls(id=user.id, username=user.username, name=user.name, email=user.email, is_admin=user.is_admin)
 
 
 @dataclass
@@ -54,6 +49,7 @@ class CreateUserDTO:
         password: The password for authentication.
         is_admin: Whether the user has administrative privileges.
     """
+
     username: str
     name: str
     email: str
@@ -73,6 +69,7 @@ class UpdateUserDTO:
         password: The password for authentication.
         is_admin: Whether the user has administrative privileges.
     """
+
     username: Optional[str] = None
     name: Optional[str] = None
     email: Optional[str] = None

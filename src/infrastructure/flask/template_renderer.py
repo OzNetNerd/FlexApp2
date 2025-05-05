@@ -30,6 +30,7 @@ class RenderSafelyConfig:
         error_message: Message to display if rendering fails.
         endpoint_name: Name of the endpoint being rendered.
     """
+
     template_path: str
     context: Any  # BaseContext
     error_message: str
@@ -42,6 +43,7 @@ class LoggingUndefined(DebugUndefined):
     Extends Jinja's DebugUndefined to provide detailed logging when
     undefined variables are accessed in templates.
     """
+
     _missing_variables = set()
 
     def _log(self, msg: str) -> None:
@@ -66,8 +68,7 @@ class LoggingUndefined(DebugUndefined):
     def __getitem__(self, key):
         """Handle attempts to access items on undefined variables."""
         self._log(f"Attempted to access key {key!r} on undefined variable")
-        return self.__class__(hint=self._undefined_hint, obj=self._undefined_obj,
-                              name=f"{self._undefined_name}[{key!r}]")
+        return self.__class__(hint=self._undefined_hint, obj=self._undefined_obj, name=f"{self._undefined_name}[{key!r}]")
 
     def __getattr__(self, attr):
         """Handle attempts to access attributes on undefined variables."""
@@ -108,9 +109,7 @@ def render_safely(config: RenderSafelyConfig) -> Union[str, Tuple[str, int]]:
             context_dict = config.context.to_dict()
         except ValueError as ve:
             logger.error(f"❌ Error converting context to dictionary: {ve}")
-            return handle_template_error(
-                ve, config.template_path, config.endpoint_name, f"Error preparing data: {ve}"
-            )
+            return handle_template_error(ve, config.template_path, config.endpoint_name, f"Error preparing data: {ve}")
 
         template = template_env.get_template(config.template_path)
         LoggingUndefined.clear_missing_variables()
@@ -125,12 +124,8 @@ def render_safely(config: RenderSafelyConfig) -> Union[str, Tuple[str, int]]:
         return rendered
 
     except Exception as e:
-        logger.exception(
-            f"❌ Error rendering template {config.template_path!r} at endpoint {config.endpoint_name!r}"
-        )
-        return handle_template_error(
-            e, config.template_path, config.endpoint_name, config.error_message
-        )
+        logger.exception(f"❌ Error rendering template {config.template_path!r} at endpoint {config.endpoint_name!r}")
+        return handle_template_error(e, config.template_path, config.endpoint_name, config.error_message)
 
 
 def _get_jinja_variables(context_dict: Dict[str, Any]) -> Dict[str, Any]:
@@ -147,9 +142,7 @@ def _get_jinja_variables(context_dict: Dict[str, Any]) -> Dict[str, Any]:
     return context_dict
 
 
-def handle_template_error(
-        e: Exception, template_name: str, endpoint_name: str, fallback_error_message: str
-) -> Tuple[str, int]:
+def handle_template_error(e: Exception, template_name: str, endpoint_name: str, fallback_error_message: str) -> Tuple[str, int]:
     """Handle exceptions during template rendering.
 
     Args:

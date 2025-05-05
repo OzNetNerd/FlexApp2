@@ -4,14 +4,15 @@ Unit of Work implementation.
 This module provides the UnitOfWork class that orchestrates
 repository access and transaction management for the application.
 """
+
 from typing import Any, Optional, Type, TypeVar, Generic
 
 from src.domain.company.repositories import CompanyRepository
 from src.infrastructure.persistence.repositories.company_repository import SQLCompanyRepository
 
 # Generic type for commands and queries
-T = TypeVar('T')
-R = TypeVar('R')
+T = TypeVar("T")
+R = TypeVar("R")
 
 
 class UnitOfWork:
@@ -101,11 +102,11 @@ class UnitOfWork:
         # Determine the domain area from the query's module
         module_name = query.__class__.__module__
 
-        if 'company' in module_name:
+        if "company" in module_name:
             return await query.execute(self.company_repository)
-        elif 'customer' in module_name:
+        elif "customer" in module_name:
             return await query.execute(self.customer_repository)
-        elif 'opportunity' in module_name:
+        elif "opportunity" in module_name:
             return await query.execute(self.opportunity_repository)
         else:
             raise ValueError(f"Unknown query type: {query.__class__.__name__}")
@@ -126,11 +127,11 @@ class UnitOfWork:
         # Determine the domain area from the command's module
         module_name = command.__class__.__module__
 
-        if 'company' in module_name:
+        if "company" in module_name:
             result = await command.execute(self.company_repository)
-        elif 'customer' in module_name:
+        elif "customer" in module_name:
             result = await command.execute(self.customer_repository)
-        elif 'opportunity' in module_name:
+        elif "opportunity" in module_name:
             result = await command.execute(self.opportunity_repository)
         else:
             raise ValueError(f"Unknown command type: {command.__class__.__name__}")

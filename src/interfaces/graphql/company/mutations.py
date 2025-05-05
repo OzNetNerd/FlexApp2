@@ -4,14 +4,11 @@ GraphQL mutation resolvers for the Company domain.
 This module defines the mutation resolvers related to the Company domain
 that will be available in the GraphQL API.
 """
+
 import strawberry
 from typing import Optional
 
-from src.application.company.commands import (
-    CreateCompanyCommand,
-    UpdateCompanyCommand,
-    DeleteCompanyCommand
-)
+from src.application.company.commands import CreateCompanyCommand, UpdateCompanyCommand, DeleteCompanyCommand
 from src.interfaces.graphql.company.types import Company, CompanyInput
 
 
@@ -35,22 +32,13 @@ class CompanyMutations:
         Returns:
             Company: The newly created company
         """
-        command = CreateCompanyCommand(
-            name=input.name,
-            website=input.website,
-            industry=input.industry
-        )
+        command = CreateCompanyCommand(name=input.name, website=input.website, industry=input.industry)
 
         result = await info.context.unit_of_work.execute_command(command)
         return result
 
     @strawberry.mutation
-    async def update_company(
-            self,
-            info,
-            id: int,
-            input: CompanyInput
-    ) -> Optional[Company]:
+    async def update_company(self, info, id: int, input: CompanyInput) -> Optional[Company]:
         """
         Update an existing company.
 
@@ -62,12 +50,7 @@ class CompanyMutations:
         Returns:
             Optional[Company]: The updated company or None if not found
         """
-        command = UpdateCompanyCommand(
-            company_id=id,
-            name=input.name,
-            website=input.website,
-            industry=input.industry
-        )
+        command = UpdateCompanyCommand(company_id=id, name=input.name, website=input.website, industry=input.industry)
 
         result = await info.context.unit_of_work.execute_command(command)
         return result

@@ -22,9 +22,19 @@ class Contact(BaseEntity):
         role_level: Seniority level.
     """
 
-    def __init__(self, id=None, first_name=None, last_name=None, email=None,
-                 phone_number=None, role=None, role_level=None, company_id=None,
-                 created_at=None, updated_at=None):
+    def __init__(
+        self,
+        id=None,
+        first_name=None,
+        last_name=None,
+        email=None,
+        phone_number=None,
+        role=None,
+        role_level=None,
+        company_id=None,
+        created_at=None,
+        updated_at=None,
+    ):
         """
         Initialize a contact.
 

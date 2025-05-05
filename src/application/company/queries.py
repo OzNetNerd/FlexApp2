@@ -4,6 +4,7 @@ Company query objects for the application layer.
 This module contains query objects that retrieve company data according to
 Domain-Driven Design principles, separating query concerns from command concerns.
 """
+
 from dataclasses import dataclass
 from typing import List, Optional, Any
 
@@ -19,6 +20,7 @@ class GetCompanyQuery:
     Attributes:
         company_id: The ID of the company to retrieve
     """
+
     company_id: int
 
     async def execute(self, repository: CompanyRepository) -> Optional[CompanyDTO]:
@@ -48,6 +50,7 @@ class ListCompaniesQuery:
         offset: Number of companies to skip
         filters: Optional dictionary of filters to apply
     """
+
     limit: int = 20
     offset: int = 0
     filters: Optional[dict] = None
@@ -74,6 +77,7 @@ class GetCompanyDetailsQuery:
     Attributes:
         company_id: The ID of the company to retrieve details for
     """
+
     company_id: int
 
     async def execute(self, repository: CompanyRepository) -> Optional[CompanyDetailsDTO]:

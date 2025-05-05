@@ -4,6 +4,7 @@ Core domain entities for the capability domain.
 This module contains the business entities representing capabilities and their categories,
 completely decoupled from any persistence or infrastructure concerns.
 """
+
 from typing import List, Optional
 from dataclasses import dataclass, field
 from uuid import UUID
@@ -20,6 +21,7 @@ class CapabilityCategory(Entity):
         id: Unique identifier for the category.
         name: The display name of the category.
     """
+
     id: UUID
     name: str
 
@@ -35,6 +37,7 @@ class Capability(Entity):
         category: The category this capability belongs to.
         category_id: Reference to the category UUID (for persistence).
     """
+
     id: UUID
     name: str
     category: Optional[CapabilityCategory] = None
@@ -66,6 +69,7 @@ class CompanyCapability:
         capability_id: Reference to a capability.
         proficiency_level: Optional rating of the company's proficiency.
     """
+
     company_id: UUID
     capability_id: UUID
     proficiency_level: Optional[int] = None

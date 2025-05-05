@@ -6,12 +6,12 @@ from flask import Flask
 
 
 def register_blueprint_routes(
-        app: Flask,
-        package_path: str,
-        register_func: Callable,
-        blueprint_suffix: str,
-        config_suffix: str,
-        exclusions: Optional[List[str]] = None,
+    app: Flask,
+    package_path: str,
+    register_func: Callable,
+    blueprint_suffix: str,
+    config_suffix: str,
+    exclusions: Optional[List[str]] = None,
 ) -> None:
     """Auto-discover and register blueprints with the Flask application.
 

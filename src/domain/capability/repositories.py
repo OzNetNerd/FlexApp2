@@ -3,6 +3,7 @@ Repository interfaces for the capability domain.
 
 Defines the contracts that infrastructure implementations must fulfill.
 """
+
 from abc import ABC, abstractmethod
 from typing import List, Optional
 from uuid import UUID

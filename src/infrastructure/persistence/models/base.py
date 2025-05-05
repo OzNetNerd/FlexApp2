@@ -4,6 +4,7 @@ Base SQLAlchemy model and database configuration.
 This module provides the database connection and base model class that
 all SQLAlchemy models inherit from.
 """
+
 from collections import OrderedDict
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Type, TypeVar
@@ -19,7 +20,7 @@ logger = get_logger(__name__)
 # SQLAlchemy instance
 db = SQLAlchemy()
 
-T = TypeVar('T', bound='BaseModel')
+T = TypeVar("T", bound="BaseModel")
 
 
 class BaseModel(db.Model):
@@ -34,6 +35,7 @@ class BaseModel(db.Model):
         created_at: When the record was created.
         updated_at: When the record was last updated.
     """
+
     __abstract__ = True
 
     id = db.Column(db.Integer, primary_key=True)

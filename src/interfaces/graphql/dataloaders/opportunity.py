@@ -3,6 +3,7 @@ Opportunity DataLoader implementation.
 
 This module provides DataLoader functionality for Opportunity entities.
 """
+
 from typing import List, Optional
 from src.interfaces.graphql.dataloaders.base import BaseLoader
 from src.domain.opportunity.entities import Opportunity
@@ -27,10 +28,7 @@ class OpportunityLoader(BaseLoader[Opportunity, int]):
         Returns:
             List[Optional[Opportunity]]: List of loaded opportunity entities
         """
-        return await self.load_by_ids(
-            opportunity_ids,
-            lambda uow: uow.opportunity_repository
-        )
+        return await self.load_by_ids(opportunity_ids, lambda uow: uow.opportunity_repository)
 
     async def load_one(self, opportunity_id: int) -> Optional[Opportunity]:
         """

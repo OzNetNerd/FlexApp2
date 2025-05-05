@@ -17,6 +17,7 @@ class EntityApiContext:
         entity: The entity object.
         message: Optional message to include in the response.
     """
+
     entity_table_name: str
     entity: Any
     message: Optional[str] = None
@@ -31,6 +32,7 @@ class ListApiContext:
         items: List of entity objects.
         total_count: Optional total count of items.
     """
+
     entity_table_name: str
     items: List[Any]
     total_count: Optional[int] = None
@@ -45,6 +47,7 @@ class ErrorApiContext:
         status_code: HTTP status code.
         details: Optional additional error details.
     """
+
     message: str
     status_code: int = 400
     details: Optional[Dict[str, Any]] = None

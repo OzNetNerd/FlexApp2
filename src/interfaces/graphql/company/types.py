@@ -4,6 +4,7 @@ GraphQL type definitions for Company domain entities.
 This module defines the GraphQL types that represent Company domain
 entities and their relationships in the GraphQL schema.
 """
+
 import strawberry
 from typing import List, Optional
 from datetime import datetime
@@ -20,6 +21,7 @@ class Company:
     This type represents the basic properties of a company and
     provides resolver methods for related entities.
     """
+
     id: int
     name: str
     website: Optional[str] = None
@@ -28,7 +30,7 @@ class Company:
     updated_at: datetime
 
     @strawberry.field
-    async def customers(self, info) -> List['Customer']:
+    async def customers(self, info) -> List["Customer"]:
         """
         Resolve the customers associated with this company.
 
@@ -49,6 +51,7 @@ class CompanyInput:
     This type defines the fields that can be provided when
     creating or updating a company through GraphQL mutations.
     """
+
     name: str
     website: Optional[str] = None
     industry: Optional[str] = None
@@ -62,12 +65,13 @@ class CompanyDetails(Company):
     This type includes all fields from the base Company type and adds
     additional detailed information that might not be needed in all contexts.
     """
+
     description: Optional[str] = None
     employee_count: Optional[int] = None
     annual_revenue: Optional[float] = None
 
     @classmethod
-    def from_dto(cls, dto: CompanyDetailsDTO) -> 'CompanyDetails':
+    def from_dto(cls, dto: CompanyDetailsDTO) -> "CompanyDetails":
         """
         Create a CompanyDetails GraphQL type from a DTO.
 
@@ -86,5 +90,5 @@ class CompanyDetails(Company):
             updated_at=dto.updated_at,
             description=dto.description,
             employee_count=dto.employee_count,
-            annual_revenue=dto.annual_revenue
+            annual_revenue=dto.annual_revenue,
         )

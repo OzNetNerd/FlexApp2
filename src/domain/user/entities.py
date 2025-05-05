@@ -21,16 +21,16 @@ class User(Entity):
     """
 
     def __init__(
-            self,
-            id: int,
-            username: str,
-            name: str,
-            email: str,
-            is_admin: bool = False,
-            created_at: Optional[str] = None,
-            updated_at: Optional[str] = None,
-            related_users: Optional[str] = None,
-            related_companies: Optional[str] = None
+        self,
+        id: int,
+        username: str,
+        name: str,
+        email: str,
+        is_admin: bool = False,
+        created_at: Optional[str] = None,
+        updated_at: Optional[str] = None,
+        related_users: Optional[str] = None,
+        related_companies: Optional[str] = None,
     ):
         """Initialize a new User instance."""
         self.id = id

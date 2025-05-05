@@ -10,12 +10,12 @@ from flask import Flask
 
 
 def register_blueprint_routes(
-        app: Flask,
-        package_path: str,
-        config_suffix: str,
-        register_func: Callable,
-        blueprint_suffix: str,
-        exclusions: Optional[List[str]] = None,
+    app: Flask,
+    package_path: str,
+    config_suffix: str,
+    register_func: Callable,
+    blueprint_suffix: str,
+    exclusions: Optional[List[str]] = None,
 ) -> None:
     """Register blueprint routes based on a convention-based discovery approach.
 

@@ -8,11 +8,7 @@ from src.interfaces.api.crud_routes import register_api_crud_routes
 from src.infrastructure.utils.router_utils import register_blueprint_routes
 
 
-def register_api_blueprints(
-        app: Flask,
-        package_path: str = "src.interfaces.api.routes",
-        exclusions: Optional[List[str]] = None
-) -> None:
+def register_api_blueprints(app: Flask, package_path: str = "src.interfaces.api.routes", exclusions: Optional[List[str]] = None) -> None:
     """Register API blueprints with their CRUD routes automatically.
 
     This function scans the specified package for modules containing API

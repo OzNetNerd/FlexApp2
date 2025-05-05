@@ -9,6 +9,7 @@ from application.user.dto import UserDTO
 @strawberry.type
 class User:
     """GraphQL User type representation."""
+
     id: int
     username: str
     name: str
@@ -31,7 +32,7 @@ class User:
             created_at=entity.created_at,
             updated_at=entity.updated_at,
             related_users=entity.related_users,
-            related_companies=entity.related_companies
+            related_companies=entity.related_companies,
         )
 
     @classmethod
@@ -46,13 +47,14 @@ class User:
             created_at=dto.created_at,
             updated_at=dto.updated_at,
             related_users=dto.related_users,
-            related_companies=dto.related_companies
+            related_companies=dto.related_companies,
         )
 
 
 @strawberry.input
 class CreateUserInput:
     """Input type for creating a user."""
+
     username: str
     name: str
     email: str
@@ -63,6 +65,7 @@ class CreateUserInput:
 @strawberry.input
 class UpdateUserInput:
     """Input type for updating a user."""
+
     username: Optional[str] = None
     name: Optional[str] = None
     email: Optional[str] = None

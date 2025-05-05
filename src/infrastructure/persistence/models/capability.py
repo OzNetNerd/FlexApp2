@@ -4,6 +4,7 @@ SQLAlchemy models for the capability domain.
 These models map the domain entities to database tables, focusing solely on
 persistence concerns without domain logic.
 """
+
 from src.infrastructure.persistence.models.base import BaseModel, db
 from src.infrastructure.logging import get_logger
 
@@ -19,6 +20,7 @@ class CapabilityCategory(BaseModel):
         name: Category name.
         capabilities: Relationship to child capabilities.
     """
+
     name = db.Column(db.String(100), nullable=False, unique=True)
     capabilities = db.relationship("Capability", backref="category", lazy="dynamic")
 
@@ -36,6 +38,7 @@ class Capability(BaseModel):
         category_id: Foreign key to the parent category.
         company_capabilities: Relationship to company associations.
     """
+
     name = db.Column(db.String(100), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey("capability_categories.id"), nullable=False)
 
@@ -71,6 +74,7 @@ class CompanyCapability(BaseModel):
         company: Relationship to the company.
         capability: Relationship to the capability.
     """
+
     company_id = db.Column(db.Integer, db.ForeignKey("companies.id"), nullable=False)
     capability_id = db.Column(db.Integer, db.ForeignKey("capabilities.id"), nullable=False)
 

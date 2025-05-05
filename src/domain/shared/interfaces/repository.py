@@ -4,11 +4,12 @@ Base repository interface for Domain-Driven Design.
 This module defines the generic repository interface that all
 domain-specific repositories should implement.
 """
+
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, List, Optional, Any
 
 # Define a generic type for entities
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class Repository(Generic[T], ABC):

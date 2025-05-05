@@ -30,18 +30,17 @@ class Opportunity(BaseModel):
     contact_relationships = db.relationship(
         "Relationship",
         primaryjoin="and_(or_(and_(Relationship.entity1_type=='opportunity', "
-                    "foreign(Relationship.entity1_id)==Opportunity.id, "
-                    "Relationship.entity2_type=='contact'), "
-                    "and_(Relationship.entity2_type=='opportunity', "
-                    "foreign(Relationship.entity2_id)==Opportunity.id, "
-                    "Relationship.entity1_type=='contact')))",
+        "foreign(Relationship.entity1_id)==Opportunity.id, "
+        "Relationship.entity2_type=='contact'), "
+        "and_(Relationship.entity2_type=='opportunity', "
+        "foreign(Relationship.entity2_id)==Opportunity.id, "
+        "Relationship.entity1_type=='contact')))",
         viewonly=True,
     )
 
     notes = db.relationship(
         "Note",
-        primaryjoin="and_(Note.notable_id == foreign(Opportunity.id), "
-                    "Note.notable_type == 'Opportunity')",
+        primaryjoin="and_(Note.notable_id == foreign(Opportunity.id), " "Note.notable_type == 'Opportunity')",
     )
 
     def __repr__(self) -> str:

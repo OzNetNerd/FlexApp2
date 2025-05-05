@@ -4,13 +4,14 @@ Base DataLoader classes that implement common loading functionality.
 This module provides base classes for implementing DataLoaders in a consistent
 and DRY way across the application.
 """
+
 from typing import List, Dict, Optional, TypeVar, Generic, Callable, Type, Any
 import strawberry
 from dataclasses import dataclass
 
 # Define generic type variables for flexibility
-T = TypeVar('T')  # Entity type
-K = TypeVar('K')  # Key type (usually int or str)
+T = TypeVar("T")  # Entity type
+K = TypeVar("K")  # Key type (usually int or str)
 
 
 class BaseLoader(Generic[T, K]):
@@ -66,6 +67,7 @@ class DataLoaderContext:
     This class provides a single place to store and access all DataLoaders
     needed for resolving GraphQL queries.
     """
+
     company_loader: Any
     customer_loader: Any
     opportunity_loader: Any

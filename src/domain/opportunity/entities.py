@@ -26,9 +26,21 @@ class Opportunity(BaseEntity):
     STATUSES = ["active", "inactive", "on_hold", "closed"]
     PRIORITIES = ["low", "medium", "high", "critical"]
 
-    def __init__(self, id=None, name=None, description=None, status="active",
-                 stage="qualification", value=0.0, priority="medium", close_date=None,
-                 created_by_id=None, company_id=None, created_at=None, updated_at=None):
+    def __init__(
+        self,
+        id=None,
+        name=None,
+        description=None,
+        status="active",
+        stage="qualification",
+        value=0.0,
+        priority="medium",
+        close_date=None,
+        created_by_id=None,
+        company_id=None,
+        created_at=None,
+        updated_at=None,
+    ):
         """
         Initialize an opportunity.
 

@@ -3,6 +3,7 @@ Customer DataLoader implementation.
 
 This module provides DataLoader functionality for Customer entities.
 """
+
 from typing import List, Optional
 from src.interfaces.graphql.dataloaders.base import BaseLoader
 from src.domain.customer.entities import Customer
@@ -27,10 +28,7 @@ class CustomerLoader(BaseLoader[Customer, int]):
         Returns:
             List[Optional[Customer]]: List of loaded customer entities
         """
-        return await self.load_by_ids(
-            customer_ids,
-            lambda uow: uow.customer_repository
-        )
+        return await self.load_by_ids(customer_ids, lambda uow: uow.customer_repository)
 
     async def load_one(self, customer_id: int) -> Optional[Customer]:
         """

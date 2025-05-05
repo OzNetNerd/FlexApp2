@@ -39,11 +39,7 @@ class Task(BaseModel, NotableMixin):
     assigned_to_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     completed_at = db.Column(db.DateTime, nullable=True)
 
-    assigned_to = db.relationship(
-        "User",
-        foreign_keys=[assigned_to_id],
-        backref=db.backref("assigned_tasks", lazy="dynamic")
-    )
+    assigned_to = db.relationship("User", foreign_keys=[assigned_to_id], backref=db.backref("assigned_tasks", lazy="dynamic"))
 
     def __repr__(self) -> str:
         """Return string representation of the task."""
@@ -69,8 +65,7 @@ class Relationship(BaseModel):
     user = db.relationship(
         "User",
         foreign_keys="[Relationship.entity1_id]",
-        primaryjoin="and_(User.id == Relationship.entity1_id, "
-                    "Relationship.entity1_type == 'user')",
+        primaryjoin="and_(User.id == Relationship.entity1_id, " "Relationship.entity1_type == 'user')",
         back_populates="relationships",
         overlaps="contact",
     )
@@ -78,8 +73,7 @@ class Relationship(BaseModel):
     contact = db.relationship(
         "Contact",
         foreign_keys="[Relationship.entity1_id]",
-        primaryjoin="and_(Contact.id == Relationship.entity1_id, "
-                    "Relationship.entity1_type == 'contact')",
+        primaryjoin="and_(Contact.id == Relationship.entity1_id, " "Relationship.entity1_type == 'contact')",
         back_populates="relationships",
         overlaps="user",
     )

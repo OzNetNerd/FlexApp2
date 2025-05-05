@@ -3,6 +3,7 @@ Value objects for representing relationships between entities.
 
 These value objects capture the semantics of connections between domain entities.
 """
+
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Any, Optional
@@ -13,6 +14,7 @@ class RelationshipType(Enum):
     """
     Enumeration of possible relationship types between entities.
     """
+
     EMPLOYEE = auto()
     MANAGER = auto()
     CUSTOMER = auto()
@@ -22,7 +24,7 @@ class RelationshipType(Enum):
     OTHER = auto()
 
     @classmethod
-    def from_string(cls, value: str) -> 'RelationshipType':
+    def from_string(cls, value: str) -> "RelationshipType":
         """
         Converts a string to a RelationshipType.
 
@@ -50,6 +52,7 @@ class EntityReference:
         entity_type: The type of the entity.
         entity_id: The unique identifier of the entity.
     """
+
     entity_type: str
     entity_id: UUID
 
@@ -67,6 +70,7 @@ class Relationship:
         entity2: Reference to the second entity.
         relationship_type: The type of relationship.
     """
+
     entity1: EntityReference
     entity2: EntityReference
     relationship_type: Optional[RelationshipType] = None

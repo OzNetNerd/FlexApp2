@@ -4,14 +4,11 @@ GraphQL query resolvers for the Company domain.
 This module defines the query resolvers related to the Company domain
 that will be available in the GraphQL API.
 """
+
 import strawberry
 from typing import List, Optional
 
-from src.application.company.queries import (
-    GetCompanyQuery,
-    ListCompaniesQuery,
-    GetCompanyDetailsQuery
-)
+from src.application.company.queries import GetCompanyQuery, ListCompaniesQuery, GetCompanyDetailsQuery
 from src.interfaces.graphql.company.types import Company, CompanyDetails
 
 
@@ -40,12 +37,7 @@ class CompanyQueries:
         return result if result else None
 
     @strawberry.field
-    async def companies(
-            self,
-            info,
-            limit: Optional[int] = 20,
-            offset: Optional[int] = 0
-    ) -> List[Company]:
+    async def companies(self, info, limit: Optional[int] = 20, offset: Optional[int] = 0) -> List[Company]:
         """
         Get a paginated list of companies.
 

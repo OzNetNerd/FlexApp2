@@ -16,6 +16,7 @@ class DevelopmentConfig(BaseConfig):
     Configuration settings specific to the development environment.
     Enables debug mode and uses less strict security settings.
     """
+
     DEBUG = True
 
     # In development, we use less strict security settings
@@ -23,10 +24,7 @@ class DevelopmentConfig(BaseConfig):
     REMEMBER_COOKIE_SECURE = False
 
     # Database configuration - uses the default SQLite database
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL",
-        f"sqlite:///{PROJECT_ROOT}/crm.db"
-    )
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", f"sqlite:///{PROJECT_ROOT}/crm.db")
 
 
 class TestingConfig(BaseConfig):
@@ -35,6 +33,7 @@ class TestingConfig(BaseConfig):
     Configuration settings specific to the testing environment.
     Uses in-memory SQLite database and enables testing mode.
     """
+
     TESTING = True
     DEBUG = True
 
@@ -51,6 +50,7 @@ class ProductionConfig(BaseConfig):
     Configuration settings specific to the production environment.
     Enforces strict security settings and disables debug mode.
     """
+
     DEBUG = False
 
     # In production, we enforce strict security settings

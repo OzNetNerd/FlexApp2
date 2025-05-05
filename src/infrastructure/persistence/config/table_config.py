@@ -4,6 +4,7 @@ Configuration for database table UI representation.
 This module provides functionality to store and retrieve UI configuration
 for database tables, such as column visibility and formatting.
 """
+
 import json
 from typing import Dict, Optional, Any
 
@@ -22,6 +23,7 @@ class TableConfig(BaseModel):
         table_name: Name of the table this config applies to.
         column_config: JSON string of column configuration.
     """
+
     table_name = db.Column(db.String(50), unique=True, nullable=False)
     column_config = db.Column(db.Text, nullable=False)
 
@@ -75,8 +77,7 @@ class TableConfig(BaseModel):
             config_dict = config.config
             if isinstance(config_dict, list):
                 logger.info(f"Converting legacy format for table {table_name!r}")
-                column_overrides = {col["field"]: {k: v for k, v in col.items() if k != "field"} for col in config_dict
-                                    if "field" in col}
+                column_overrides = {col["field"]: {k: v for k, v in col.items() if k != "field"} for col in config_dict if "field" in col}
                 return {
                     "autoGenerateColumns": True,
                     "columnOverrides": column_overrides,
@@ -140,8 +141,7 @@ class TableConfig(BaseModel):
         return cls.set_config(table_name, config)
 
     @classmethod
-    def add_column_override(cls, table_name: str, field_name: str,
-                            override_properties: Dict[str, Any]) -> "TableConfig":
+    def add_column_override(cls, table_name: str, field_name: str, override_properties: Dict[str, Any]) -> "TableConfig":
         """
         Add or update override settings for a specific column.
 

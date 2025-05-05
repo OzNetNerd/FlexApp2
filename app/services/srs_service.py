@@ -412,10 +412,7 @@ class SRSService:
                 logger.info(f"SRSService: Found review with interval {review.interval} for item {review.srs_item_id}")
                 # Check if this is the first time the card crossed the threshold
                 prev_reviews = (
-                    ReviewHistory.query.filter(
-                        ReviewHistory.srs_item_id == review.srs_item_id,
-                        ReviewHistory.timestamp < review.timestamp
-                    )
+                    ReviewHistory.query.filter(ReviewHistory.srs_item_id == review.srs_item_id, ReviewHistory.timestamp < review.timestamp)
                     .order_by(ReviewHistory.timestamp.desc())
                     .first()
                 )

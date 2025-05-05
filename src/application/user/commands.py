@@ -32,13 +32,7 @@ class UserCommandHandler:
         Returns:
             A DTO of the created user.
         """
-        user = User(
-            username=dto.username,
-            name=dto.name,
-            email=dto.email,
-            password=dto.password,
-            is_admin=dto.is_admin
-        )
+        user = User(username=dto.username, name=dto.name, email=dto.email, password=dto.password, is_admin=dto.is_admin)
         created_user = self.user_repository.add(user)
         return UserDTO.from_entity(created_user)
 

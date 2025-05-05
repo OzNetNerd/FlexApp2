@@ -75,12 +75,7 @@ class TableContext(WebContext):
     """
 
     def __init__(
-            self,
-            entity_table_name: Optional[str] = None,
-            title: str = "",
-            read_only: bool = True,
-            action: Optional[str] = None,
-            **kwargs
+        self, entity_table_name: Optional[str] = None, title: str = "", read_only: bool = True, action: Optional[str] = None, **kwargs
     ):
         """Initialize the table context with table-specific attributes.
 
@@ -109,16 +104,16 @@ class EntityContext(WebContext):
     """
 
     def __init__(
-            self,
-            action: str,
-            entity: Any,
-            autocomplete_fields: Optional[List[dict]] = None,
-            error_message: str = "",
-            title: str = "",
-            read_only: bool = True,
-            entity_table_name: str = "",
-            entity_id: Any = None,
-            **kwargs,
+        self,
+        action: str,
+        entity: Any,
+        autocomplete_fields: Optional[List[dict]] = None,
+        error_message: str = "",
+        title: str = "",
+        read_only: bool = True,
+        entity_table_name: str = "",
+        entity_id: Any = None,
+        **kwargs,
     ):
         """Initialize the context for entity views.
 

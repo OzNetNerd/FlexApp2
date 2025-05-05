@@ -27,5 +27,5 @@ class User:
             created_at=str(model.created_at),
             updated_at=str(model.updated_at) if model.updated_at else None,
             related_users=model.to_dict().get("related_users", ""),
-            related_companies=model.to_dict().get("related_companies", "")
+            related_companies=model.to_dict().get("related_companies", ""),
         )

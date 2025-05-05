@@ -37,9 +37,7 @@ def configure_logging(app_name: str = "app") -> logging.Logger:
     console_handler.setLevel(log_level)
 
     # Create a formatter
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     console_handler.setFormatter(formatter)
 
     # Add the console handler to the logger
@@ -54,10 +52,7 @@ def configure_logging(app_name: str = "app") -> logging.Logger:
     return logger
 
 
-def create_file_handler(
-        log_level: int,
-        formatter: logging.Formatter
-) -> Optional[logging.Handler]:
+def create_file_handler(log_level: int, formatter: logging.Formatter) -> Optional[logging.Handler]:
     """Create a file handler for logging to a file.
 
     Args:
@@ -77,9 +72,7 @@ def create_file_handler(
         os.makedirs(log_dir, exist_ok=True)
 
         # Create file handler
-        file_handler = logging.FileHandler(
-            os.path.join(log_dir, "app.log")
-        )
+        file_handler = logging.FileHandler(os.path.join(log_dir, "app.log"))
         file_handler.setLevel(log_level)
         file_handler.setFormatter(formatter)
         return file_handler

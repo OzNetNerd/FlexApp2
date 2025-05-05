@@ -50,7 +50,7 @@ class Phone:
         if not phone:
             return None
         # Keep only digits, +, and spaces
-        return re.sub(r'[^\d+\s]', '', phone)
+        return re.sub(r"[^\d+\s]", "", phone)
 
     @staticmethod
     def _is_valid_phone(phone):
@@ -64,7 +64,7 @@ class Phone:
             bool: True if phone format is valid.
         """
         # Very basic validation - at least 7 digits
-        digits = re.sub(r'[^\d]', '', phone)
+        digits = re.sub(r"[^\d]", "", phone)
         return len(digits) >= 7
 
     @property

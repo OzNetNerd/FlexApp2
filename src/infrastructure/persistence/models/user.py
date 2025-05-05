@@ -26,8 +26,7 @@ class User(BaseModel, UserMixin):
     relationships = db.relationship(
         "Relationship",
         foreign_keys="[Relationship.entity1_id]",
-        primaryjoin="and_(User.id == Relationship.entity1_id, "
-                    "Relationship.entity1_type == 'user')",
+        primaryjoin="and_(User.id == Relationship.entity1_id, " "Relationship.entity1_type == 'user')",
         back_populates="user",
         cascade="all, delete-orphan",
         overlaps="contact",

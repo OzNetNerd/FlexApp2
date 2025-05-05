@@ -3,6 +3,7 @@ Company DataLoader implementation.
 
 This module provides DataLoader functionality for Company entities.
 """
+
 from typing import List, Optional
 from src.interfaces.graphql.dataloaders.base import BaseLoader
 from src.domain.company.entities import Company
@@ -27,10 +28,7 @@ class CompanyLoader(BaseLoader[Company, int]):
         Returns:
             List[Optional[Company]]: List of loaded company entities
         """
-        return await self.load_by_ids(
-            company_ids,
-            lambda uow: uow.company_repository
-        )
+        return await self.load_by_ids(company_ids, lambda uow: uow.company_repository)
 
     async def load_one(self, company_id: int) -> Optional[Company]:
         """

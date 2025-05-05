@@ -10,9 +10,9 @@ from typing import Optional, List, Dict, Any
 from src.domain.company.entities import Company
 from src.domain.company.repositories import CompanyRepository
 from src.domain.shared.value_objects.relationship import Relationship
-from infrastructure.persistence.unit_of_work import UnitOfWork
+from src.infrastructure.persistence.unit_of_work import UnitOfWork
 from src.domain.company.events import CompanyCreated, CompanyUpdated, CompanyDeleted
-from infrastructure.messaging.event_bus import EventBus
+from src.infrastructure.messaging.event_bus import EventBus
 
 
 @dataclass(frozen=True)
@@ -29,6 +29,7 @@ class CreateCompanyCommand:
         capabilities: List of capability IDs the company has.
         primary_contact_id: ID of primary contact person.
     """
+
     name: str
     industry: Optional[str] = None
     website: Optional[str] = None
@@ -53,6 +54,7 @@ class UpdateCompanyCommand:
         capabilities: Updated list of capability IDs.
         primary_contact_id: Updated primary contact ID.
     """
+
     id: int
     name: Optional[str] = None
     industry: Optional[str] = None
@@ -71,6 +73,7 @@ class DeleteCompanyCommand:
     Attributes:
         id: ID of company to delete.
     """
+
     id: int
 
 
@@ -82,12 +85,7 @@ class CompanyCommandHandler:
     and related domain objects.
     """
 
-    def __init__(
-            self,
-            company_repository: CompanyRepository,
-            unit_of_work: UnitOfWork,
-            event_bus: EventBus
-    ):
+    def __init__(self, company_repository: CompanyRepository, unit_of_work: UnitOfWork, event_bus: EventBus):
         """
         Initialize command handler with required dependencies.
 
@@ -116,7 +114,7 @@ class CompanyCommandHandler:
                 industry=command.industry,
                 website=command.website,
                 address=command.address,
-                description=command.description
+                description=command.description,
             )
 
             # Add capabilities if provided

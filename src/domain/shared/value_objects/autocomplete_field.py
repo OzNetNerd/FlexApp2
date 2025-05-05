@@ -24,6 +24,7 @@ class AutoCompleteField:
         data_api_url: URL for data source.
         related_ids: List of related entity IDs.
     """
+
     title: str
     id: str
     placeholder: str
@@ -33,12 +34,12 @@ class AutoCompleteField:
 
 
 def create_autocomplete_field(
-        title: str,
-        relationships: Optional[List[dict]] = None,
-        field_id: Optional[str] = None,
-        placeholder: Optional[str] = None,
-        name: Optional[str] = None,
-        data_api_url: Optional[str] = None
+    title: str,
+    relationships: Optional[List[dict]] = None,
+    field_id: Optional[str] = None,
+    placeholder: Optional[str] = None,
+    name: Optional[str] = None,
+    data_api_url: Optional[str] = None,
 ) -> AutoCompleteField:
     """Create an AutoCompleteField with sensible defaults.
 

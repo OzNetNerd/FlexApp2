@@ -44,10 +44,7 @@ def register_middleware(app):
         whitelisted = {"auth_bp.login", "auth_bp.logout", "static", "debug_session"}
         if not authenticated:
             # Allow access to whitelisted endpoints, static assets, API endpoints
-            if (endpoint in whitelisted or
-                    endpoint.startswith("static") or
-                    endpoint.startswith("api_") or
-                    endpoint.endswith(".data")):
+            if endpoint in whitelisted or endpoint.startswith("static") or endpoint.startswith("api_") or endpoint.endswith(".data"):
                 return None
             return redirect(url_for("auth_bp.login", next=request.path))
 

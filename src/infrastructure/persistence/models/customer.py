@@ -51,8 +51,7 @@ class Contact(BaseModel):
     # --- Relationships ---
     relationships = db.relationship(
         "Relationship",
-        primaryjoin="and_(foreign(Relationship.entity1_id)==Contact.id, "
-                    "Relationship.entity1_type=='contact')",
+        primaryjoin="and_(foreign(Relationship.entity1_id)==Contact.id, " "Relationship.entity1_type=='contact')",
         back_populates="contact",
         overlaps="user,relationships",
     )
@@ -60,27 +59,20 @@ class Contact(BaseModel):
     opportunity_relationships = db.relationship(
         "Relationship",
         primaryjoin="and_(or_(and_(Relationship.entity1_type=='contact', "
-                    "foreign(Relationship.entity1_id)==Contact.id, "
-                    "Relationship.entity2_type=='opportunity'), "
-                    "and_(Relationship.entity2_type=='contact', "
-                    "foreign(Relationship.entity2_id)==Contact.id, "
-                    "Relationship.entity1_type=='opportunity')))",
+        "foreign(Relationship.entity1_id)==Contact.id, "
+        "Relationship.entity2_type=='opportunity'), "
+        "and_(Relationship.entity2_type=='contact', "
+        "foreign(Relationship.entity2_id)==Contact.id, "
+        "Relationship.entity1_type=='opportunity')))",
         viewonly=True,
     )
 
     tasks = db.relationship(
-        "Task",
-        primaryjoin="and_(Task.notable_type=='contact', "
-                    "foreign(Task.notable_id)==Contact.id)",
-        backref="contact",
-        lazy="dynamic"
+        "Task", primaryjoin="and_(Task.notable_type=='contact', " "foreign(Task.notable_id)==Contact.id)", backref="contact", lazy="dynamic"
     )
 
     notes = db.relationship(
-        "Note",
-        primaryjoin="and_(Note.notable_type=='Contact', "
-                    "foreign(Note.notable_id)==Contact.id)",
-        backref="contact"
+        "Note", primaryjoin="and_(Note.notable_type=='Contact', " "foreign(Note.notable_id)==Contact.id)", backref="contact"
     )
 
     @property

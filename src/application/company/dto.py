@@ -4,6 +4,7 @@ Data Transfer Objects (DTOs) for the Company domain.
 This module contains DTOs that transfer company data between the domain
 and application layers, following DDD principles.
 """
+
 from dataclasses import dataclass
 from typing import Optional
 from datetime import datetime
@@ -24,6 +25,7 @@ class CompanyDTO:
         created_at: Creation timestamp
         updated_at: Last update timestamp
     """
+
     id: int
     name: str
     website: Optional[str]
@@ -48,7 +50,7 @@ class CompanyDTO:
             website=entity.website,
             industry=entity.industry,
             created_at=entity.created_at,
-            updated_at=entity.updated_at
+            updated_at=entity.updated_at,
         )
 
 
@@ -64,6 +66,7 @@ class CompanyDetailsDTO(CompanyDTO):
         employee_count: Number of employees at the company
         annual_revenue: Annual revenue of the company
     """
+
     description: Optional[str] = None
     employee_count: Optional[int] = None
     annual_revenue: Optional[float] = None
@@ -86,7 +89,7 @@ class CompanyDetailsDTO(CompanyDTO):
             industry=entity.industry,
             created_at=entity.created_at,
             updated_at=entity.updated_at,
-            description=getattr(entity, 'description', None),
-            employee_count=getattr(entity, 'employee_count', None),
-            annual_revenue=getattr(entity, 'annual_revenue', None)
+            description=getattr(entity, "description", None),
+            employee_count=getattr(entity, "employee_count", None),
+            annual_revenue=getattr(entity, "annual_revenue", None),
         )

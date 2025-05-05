@@ -34,9 +34,4 @@ def register_error_handlers(app):
             Response: A rendered error template.
         """
         logger.error(f"TypeError: {e}")
-        return handle_template_error(
-            e,
-            request.endpoint or "",
-            request.path,
-            "An error occurred while preparing the page context"
-        )
+        return handle_template_error(e, request.endpoint or "", request.path, "An error occurred while preparing the page context")

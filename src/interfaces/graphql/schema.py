@@ -4,6 +4,7 @@ GraphQL schema definition that combines all domain query and mutation types.
 This module defines the root schema for the GraphQL API by composing
 query and mutation types from different domain contexts.
 """
+
 import strawberry
 from typing import Any
 
@@ -44,6 +45,7 @@ class Mutation(CompanyMutations, CustomerMutations, OpportunityMutations):
     This class inherits from all domain mutation classes to provide a unified
     GraphQL mutation interface across all domain contexts.
     """
+
     pass
 
 

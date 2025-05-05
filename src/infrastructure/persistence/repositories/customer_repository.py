@@ -109,11 +109,7 @@ class CompanyRepository(Repository):
             Company: Domain entity.
         """
         return Company(
-            id=model.id,
-            name=model.name,
-            description=model.description,
-            created_at=model.created_at,
-            updated_at=model.updated_at
+            id=model.id, name=model.name, description=model.description, created_at=model.created_at, updated_at=model.updated_at
         )
 
     def _to_model(self, entity: Company) -> CompanyModel:
@@ -127,9 +123,5 @@ class CompanyRepository(Repository):
             CompanyModel: ORM model.
         """
         return CompanyModel(
-            id=entity.id,
-            name=entity.name,
-            description=entity.description,
-            created_at=entity.created_at,
-            updated_at=entity.updated_at
+            id=entity.id, name=entity.name, description=entity.description, created_at=entity.created_at, updated_at=entity.updated_at
         )

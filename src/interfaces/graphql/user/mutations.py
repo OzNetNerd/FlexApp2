@@ -18,26 +18,14 @@ class UserMutations:
     @strawberry.mutation
     def create_user(self, input: CreateUserInput) -> User:
         """Create a new user."""
-        dto = CreateUserDTO(
-            username=input.username,
-            name=input.name,
-            email=input.email,
-            password=input.password,
-            is_admin=input.is_admin
-        )
+        dto = CreateUserDTO(username=input.username, name=input.name, email=input.email, password=input.password, is_admin=input.is_admin)
         result_dto = self.command_handler.create_user(dto)
         return User.from_dto(result_dto)
 
     @strawberry.mutation
     def update_user(self, id: int, input: UpdateUserInput) -> Optional[User]:
         """Update an existing user."""
-        dto = UpdateUserDTO(
-            username=input.username,
-            name=input.name,
-            email=input.email,
-            password=input.password,
-            is_admin=input.is_admin
-        )
+        dto = UpdateUserDTO(username=input.username, name=input.name, email=input.email, password=input.password, is_admin=input.is_admin)
         result_dto = self.command_handler.update_user(id, dto)
         return User.from_dto(result_dto) if result_dto else None
 

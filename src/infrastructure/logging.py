@@ -20,9 +20,7 @@ def configure_logging(app):
     # Configure console logging at INFO level
     console_handler = StreamHandler()
     console_handler.setLevel(INFO)
-    console_handler.setFormatter(
-        Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    )
+    console_handler.setFormatter(Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 
     root_logger = logging.getLogger()
     root_logger.setLevel(INFO)

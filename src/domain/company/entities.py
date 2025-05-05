@@ -39,8 +39,7 @@ class CompanyCapability(BaseEntity):
     A bridge entity between Company and Capability entities.
     """
 
-    def __init__(self, id=None, company_id=None, capability_id=None,
-                 level=None, created_at=None, updated_at=None):
+    def __init__(self, id=None, company_id=None, capability_id=None, level=None, created_at=None, updated_at=None):
         """
         Initialize a company capability.
 

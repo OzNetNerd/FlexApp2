@@ -29,10 +29,10 @@ class Money:
         elif isinstance(amount, Decimal):
             self._amount = amount
         else:
-            self._amount = Decimal('0')
+            self._amount = Decimal("0")
 
         # Round to 2 decimal places
-        self._amount = self._amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        self._amount = self._amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
         self._currency = currency
 
     @property
@@ -70,8 +70,7 @@ class Money:
     def __eq__(self, other):
         """Compare two money objects for equality."""
         if isinstance(other, Money):
-            return (self.amount == other.amount and
-                    self.currency == other.currency)
+            return self.amount == other.amount and self.currency == other.currency
         return False
 
     def __str__(self):

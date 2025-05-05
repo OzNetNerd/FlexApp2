@@ -32,11 +32,7 @@ class BaseContext:
         Returns:
             str: A string containing the class name and all non-private attributes
         """
-        attributes = ", ".join(
-            f"{key}={repr(value)}"
-            for key, value in vars(self).items()
-            if not key.startswith("_")
-        )
+        attributes = ", ".join(f"{key}={repr(value)}" for key, value in vars(self).items() if not key.startswith("_"))
         return f"{self.__class__.__name__}({attributes})"
 
     def __str__(self) -> str:
@@ -53,8 +49,4 @@ class BaseContext:
         Returns:
             Dict[str, Any]: Dictionary containing all non-private attributes
         """
-        return {
-            key: value
-            for key, value in vars(self).items()
-            if not key.startswith("_")
-        }
+        return {key: value for key, value in vars(self).items() if not key.startswith("_")}

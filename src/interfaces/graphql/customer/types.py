@@ -12,6 +12,7 @@ class Customer:
 
     GraphQL representation of a customer in the system.
     """
+
     id: int
     name: str
     email: str
@@ -21,7 +22,7 @@ class Customer:
     updated_at: datetime
 
     @classmethod
-    def from_dto(cls, dto) -> 'Customer':
+    def from_dto(cls, dto) -> "Customer":
         """
         Create a GraphQL Customer from a CustomerDTO.
 
@@ -38,13 +39,14 @@ class Customer:
             phone=dto.phone,
             company_id=dto.company_id,
             created_at=dto.created_at,
-            updated_at=dto.updated_at
+            updated_at=dto.updated_at,
         )
 
 
 @strawberry.input
 class CreateCustomerInput:
     """Input type for creating a customer."""
+
     name: str
     email: str
     phone: Optional[str] = None
@@ -54,6 +56,7 @@ class CreateCustomerInput:
 @strawberry.input
 class UpdateCustomerInput:
     """Input type for updating a customer."""
+
     name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None

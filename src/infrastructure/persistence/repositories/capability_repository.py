@@ -3,6 +3,7 @@ SQLAlchemy implementation of capability repositories.
 
 These repositories implement the domain repository interfaces using SQLAlchemy models.
 """
+
 from typing import List, Optional
 from uuid import UUID
 
@@ -70,9 +71,7 @@ class SQLAlchemyCapabilityRepository(CapabilityRepository):
             model = CapabilityModel.query.get(int(capability.id))
             if not model:
                 model = CapabilityModel(
-                    id=int(capability.id),
-                    name=capability.name,
-                    category_id=int(capability.category_id) if capability.category_id else None
+                    id=int(capability.id), name=capability.name, category_id=int(capability.category_id) if capability.category_id else None
                 )
             else:
                 model.name = capability.name
@@ -131,11 +130,7 @@ class SQLAlchemyCapabilityRepository(CapabilityRepository):
         """
         models = CompanyCapabilityModel.query.filter_by(company_id=int(company_id)).all()
         return [
-            DomainCompanyCapability(
-                company_id=UUID(int=model.company_id),
-                capability_id=UUID(int=model.capability_id)
-            )
-            for model in models
+            DomainCompanyCapability(company_id=UUID(int=model.company_id), capability_id=UUID(int=model.capability_id)) for model in models
         ]
 
     def _to_domain_entity(self, model: CapabilityModel) -> DomainCapability:
@@ -150,16 +145,13 @@ class SQLAlchemyCapabilityRepository(CapabilityRepository):
         """
         category = None
         if model.category:
-            category = DomainCapabilityCategory(
-                id=UUID(int=model.category.id),
-                name=model.category.name
-            )
+            category = DomainCapabilityCategory(id=UUID(int=model.category.id), name=model.category.name)
 
         return DomainCapability(
             id=UUID(int=model.id),
             name=model.name,
             category=category,
-            category_id=UUID(int=model.category_id) if model.category_id else None
+            category_id=UUID(int=model.category_id) if model.category_id else None,
         )
 
 
@@ -184,10 +176,7 @@ class SQLAlchemyCapabilityCategoryRepository(CapabilityCategoryRepository):
         try:
             model = CapabilityCategoryModel.query.get(int(category.id))
             if not model:
-                model = CapabilityCategoryModel(
-                    id=int(category.id),
-                    name=category.name
-                )
+                model = CapabilityCategoryModel(id=int(category.id), name=category.name)
             else:
                 model.name = category.name
 
@@ -215,7 +204,4 @@ class SQLAlchemyCapabilityCategoryRepository(CapabilityCategoryRepository):
 
     def _to_domain_entity(self, model: CapabilityCategoryModel) -> DomainCapabilityCategory:
         """Converts a database model to a domain entity."""
-        return DomainCapabilityCategory(
-            id=UUID(int=model.id),
-            name=model.name
-        )
+        return DomainCapabilityCategory(id=UUID(int=model.id), name=model.name)

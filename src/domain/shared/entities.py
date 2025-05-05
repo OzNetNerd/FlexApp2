@@ -41,8 +41,17 @@ class Note(BaseEntity):
         notable_id: ID of entity this note is attached to.
     """
 
-    def __init__(self, id=None, content=None, user_id=None, notable_type=None,
-                 notable_id=None, processed_content=None, created_at=None, updated_at=None):
+    def __init__(
+        self,
+        id=None,
+        content=None,
+        user_id=None,
+        notable_type=None,
+        notable_id=None,
+        processed_content=None,
+        created_at=None,
+        updated_at=None,
+    ):
         """
         Initialize a note.
 
@@ -89,10 +98,21 @@ class Task(BaseEntity):
     STATUSES = ["Pending", "In Progress", "Completed", "Cancelled"]
     PRIORITIES = ["Low", "Medium", "High", "Urgent"]
 
-    def __init__(self, id=None, title=None, description=None, due_date=None,
-                 status="Pending", priority="Medium", assigned_to_id=None,
-                 notable_type=None, notable_id=None, completed_at=None,
-                 created_at=None, updated_at=None):
+    def __init__(
+        self,
+        id=None,
+        title=None,
+        description=None,
+        due_date=None,
+        status="Pending",
+        priority="Medium",
+        assigned_to_id=None,
+        notable_type=None,
+        notable_id=None,
+        completed_at=None,
+        created_at=None,
+        updated_at=None,
+    ):
         """
         Initialize a task.
 
@@ -178,9 +198,7 @@ class Task(BaseEntity):
         Returns:
             bool: True if due date is in the past and task is not completed.
         """
-        return (self.due_date is not None and
-                self.due_date < datetime.now() and
-                self.status != "Completed")
+        return self.due_date is not None and self.due_date < datetime.now() and self.status != "Completed"
 
     def complete(self):
         """Mark the task as completed."""
@@ -205,9 +223,17 @@ class Relationship(BaseEntity):
         relationship_type: Type of relationship (e.g., manager, linked).
     """
 
-    def __init__(self, id=None, entity1_type=None, entity1_id=None,
-                 entity2_type=None, entity2_id=None, relationship_type=None,
-                 created_at=None, updated_at=None):
+    def __init__(
+        self,
+        id=None,
+        entity1_type=None,
+        entity1_id=None,
+        entity2_type=None,
+        entity2_id=None,
+        relationship_type=None,
+        created_at=None,
+        updated_at=None,
+    ):
         """
         Initialize a relationship.
 
@@ -246,9 +272,19 @@ class Crisp(BaseEntity):
         total_score: Calculated total CRISP score.
     """
 
-    def __init__(self, id=None, relationship_id=None, credibility=0, reliability=0,
-                 intimacy=0, self_orientation=0, notes=None, total_score=None,
-                 created_at=None, updated_at=None):
+    def __init__(
+        self,
+        id=None,
+        relationship_id=None,
+        credibility=0,
+        reliability=0,
+        intimacy=0,
+        self_orientation=0,
+        notes=None,
+        total_score=None,
+        created_at=None,
+        updated_at=None,
+    ):
         """
         Initialize a CRISP score.
 

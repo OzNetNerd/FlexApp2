@@ -48,11 +48,11 @@ class ApiCrudRouteConfig:
 
 
 def handle_api_crud_operation(
-        endpoint: str,
-        service: Any,
-        entity_table_name: str,
-        entity_id: Optional[Union[int, str]] = None,
-        data: Optional[Dict[str, Any]] = None,
+    endpoint: str,
+    service: Any,
+    entity_table_name: str,
+    entity_id: Optional[Union[int, str]] = None,
+    data: Optional[Dict[str, Any]] = None,
 ) -> Any:
     """Handle CRUD operations and return appropriate context objects.
 
@@ -74,83 +74,46 @@ def handle_api_crud_operation(
         if endpoint == CRUDEndpoint.GET_ALL.value:
             result = service.get_all()
             if hasattr(result, "items"):
-                return ListApiContext(
-                    entity_table_name=entity_table_name,
-                    items=result.items,
-                    total_count=getattr(result, "total", None)
-                )
-            return ListApiContext(
-                entity_table_name=entity_table_name,
-                items=result
-            )
+                return ListApiContext(entity_table_name=entity_table_name, items=result.items, total_count=getattr(result, "total", None))
+            return ListApiContext(entity_table_name=entity_table_name, items=result)
 
         # GET_BY_ID operation
         if endpoint == CRUDEndpoint.GET_BY_ID.value and entity_id is not None:
             entity = service.get_by_id(entity_id)
             if not entity:
-                return ErrorApiContext(
-                    message=f"{entity_table_name} not found",
-                    status_code=404
-                )
-            return EntityApiContext(
-                entity_table_name=entity_table_name,
-                entity=entity
-            )
+                return ErrorApiContext(message=f"{entity_table_name} not found", status_code=404)
+            return EntityApiContext(entity_table_name=entity_table_name, entity=entity)
 
         # CREATE operation
         if endpoint == CRUDEndpoint.CREATE.value and data is not None:
             entity = service.create(data)
-            return EntityApiContext(
-                entity_table_name=entity_table_name,
-                entity=entity,
-                message=f"{entity_table_name} created successfully"
-            )
+            return EntityApiContext(entity_table_name=entity_table_name, entity=entity, message=f"{entity_table_name} created successfully")
 
         # UPDATE operation
         if endpoint == CRUDEndpoint.UPDATE.value and entity_id is not None and data is not None:
             existing = service.get_by_id(entity_id)
             if not existing:
-                return ErrorApiContext(
-                    message=f"{entity_table_name} not found",
-                    status_code=404
-                )
+                return ErrorApiContext(message=f"{entity_table_name} not found", status_code=404)
             entity = service.update(existing, data)
-            return EntityApiContext(
-                entity_table_name=entity_table_name,
-                entity=entity,
-                message=f"{entity_table_name} updated successfully"
-            )
+            return EntityApiContext(entity_table_name=entity_table_name, entity=entity, message=f"{entity_table_name} updated successfully")
 
         # DELETE operation
         if endpoint == CRUDEndpoint.DELETE.value and entity_id is not None:
             existing = service.get_by_id(entity_id)
             if not existing:
-                return ErrorApiContext(
-                    message=f"{entity_table_name} not found",
-                    status_code=404
-                )
+                return ErrorApiContext(message=f"{entity_table_name} not found", status_code=404)
             service.delete(entity_id)
             return {"message": f"{entity_table_name} deleted successfully"}
 
         # Invalid operation
-        return ErrorApiContext(
-            message="Invalid operation or parameters",
-            status_code=400
-        )
+        return ErrorApiContext(message="Invalid operation or parameters", status_code=400)
     except Exception as e:
         logger.error(f"Error in API CRUD operation {endpoint!r}: {e}", exc_info=True)
-        return ErrorApiContext(
-            message="Internal server error",
-            status_code=500
-        )
+        return ErrorApiContext(message="Internal server error", status_code=500)
 
 
 def register_api_route(
-        blueprint: Blueprint,
-        url: str,
-        handler: Callable[..., ResponseReturnValue],
-        endpoint: str,
-        methods: Optional[List[str]] = None
+    blueprint: Blueprint, url: str, handler: Callable[..., ResponseReturnValue], endpoint: str, methods: Optional[List[str]] = None
 ) -> None:
     """Register a single route on an API blueprint.
 
@@ -161,19 +124,10 @@ def register_api_route(
         endpoint: Endpoint name for the route.
         methods: HTTP methods allowed for the route.
     """
-    blueprint.add_url_rule(
-        rule=url,
-        endpoint=endpoint,
-        view_func=handler,
-        methods=methods or ["GET"]
-    )
+    blueprint.add_url_rule(rule=url, endpoint=endpoint, view_func=handler, methods=methods or ["GET"])
 
 
-def create_crud_handler(
-        action: str,
-        service: Any,
-        entity_name: str
-) -> Tuple[str, List[str], Callable[..., Any]]:
+def create_crud_handler(action: str, service: Any, entity_name: str) -> Tuple[str, List[str], Callable[..., Any]]:
     """Create a handler function for a specific CRUD action.
 
     Args:
@@ -185,30 +139,35 @@ def create_crud_handler(
         A tuple of (url, methods, handler_function).
     """
     if action == CRUDEndpoint.GET_ALL.value:
+
         def handler():
             return handle_api_crud_operation(action, service, entity_name)
 
         return "/", ["GET"], handler
 
     if action == CRUDEndpoint.GET_BY_ID.value:
+
         def handler(entity_id):
             return handle_api_crud_operation(action, service, entity_name, entity_id)
 
         return "/<int:entity_id>", ["GET"], handler
 
     if action == CRUDEndpoint.CREATE.value:
+
         def handler():
             return handle_api_crud_operation(action, service, entity_name, data=request.get_json())
 
         return "/", ["POST"], handler
 
     if action == CRUDEndpoint.UPDATE.value:
+
         def handler(entity_id):
             return handle_api_crud_operation(action, service, entity_name, entity_id, data=request.get_json())
 
         return "/<int:entity_id>", ["PUT"], handler
 
     if action == CRUDEndpoint.DELETE.value:
+
         def handler(entity_id):
             return handle_api_crud_operation(action, service, entity_name, entity_id)
 

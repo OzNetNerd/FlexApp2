@@ -23,6 +23,7 @@ logger = get_logger(__name__)
 
 class CRUDEndpoint(Enum):
     """Enum representing standard CRUD endpoints."""
+
     index = "index"
     create = "create"
     view = "view"
@@ -53,6 +54,7 @@ class CrudRouteConfig:
         model_class: Model class for the entities.
         template_config: Template configuration.
     """
+
     blueprint: Blueprint
     entity_table_name: str
     service: Any
@@ -87,13 +89,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
     pass
 
 
-def handle_crud_operation(
-        endpoint: str,
-        service: Any,
-        blueprint_name: str,
-        entity_id: Optional[int],
-        form_data: Dict[str, Any]
-) -> Any:
+def handle_crud_operation(endpoint: str, service: Any, blueprint_name: str, entity_id: Optional[int], form_data: Dict[str, Any]) -> Any:
     """Handle CRUD operations based on form submissions.
 
     Args:
@@ -120,8 +116,7 @@ def register_crud_routes(config: CrudRouteConfig) -> None:
     bp = config.blueprint
 
     # Register routes for all CRUD operations
-    bp.add_url_rule(rule="/create", endpoint="create", view_func=route_handler("create", config),
-                    methods=["GET", "POST"])
+    bp.add_url_rule(rule="/create", endpoint="create", view_func=route_handler("create", config), methods=["GET", "POST"])
     bp.add_url_rule(rule="/<int:entity_id>", endpoint="view", view_func=route_handler("view", config), methods=["GET"])
     bp.add_url_rule(
         rule="/<int:entity_id>/edit",
@@ -143,13 +138,7 @@ def register_crud_routes(config: CrudRouteConfig) -> None:
     )
 
 
-def register_auth_route(
-        blueprint: Blueprint,
-        url: str,
-        handler: Callable,
-        endpoint_name: str,
-        methods: Optional[List[str]] = None
-) -> None:
+def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint_name: str, methods: Optional[List[str]] = None) -> None:
     """Register an authentication-related route.
 
     Args:

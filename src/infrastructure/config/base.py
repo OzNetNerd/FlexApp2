@@ -84,7 +84,4 @@ class BaseConfig:
             Dict[str, Any]: Configuration dictionary containing all public attributes
                 of this class (those not starting with an underscore).
         """
-        return {
-            key: value for key, value in cls.__dict__.items()
-            if not key.startswith('_') and not callable(value)
-        }
+        return {key: value for key, value in cls.__dict__.items() if not key.startswith("_") and not callable(value)}

@@ -27,6 +27,7 @@ class BlueprintConfig:
         url_prefix: Optional URL prefix for the blueprint.
         template_config: Optional template configuration.
     """
+
     model_class: Any
     service: Optional[Any] = None
     url_prefix: Optional[str] = None

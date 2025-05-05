@@ -3,6 +3,7 @@ Base entity interface for the domain layer.
 
 Defines core functionality for all domain entities.
 """
+
 from abc import ABC
 from dataclasses import dataclass, field
 from typing import Any, Optional
@@ -20,6 +21,7 @@ class Entity(ABC):
     Attributes:
         id: The unique identifier of the entity.
     """
+
     id: UUID = field(default_factory=uuid4)
 
     def __eq__(self, other: Any) -> bool:

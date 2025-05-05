@@ -3,6 +3,7 @@ Data Transfer Objects for the capability domain.
 
 These classes facilitate data exchange between the domain and interface layers.
 """
+
 from dataclasses import dataclass
 from typing import List, Optional
 from uuid import UUID
@@ -17,6 +18,7 @@ class CapabilityCategoryDTO:
         id: Category ID (None for new categories).
         name: Category name.
     """
+
     name: str
     id: Optional[UUID] = None
 
@@ -32,6 +34,7 @@ class CapabilityDTO:
         category_id: ID of the category this capability belongs to.
         category_name: Name of the category (optional, for display purposes).
     """
+
     name: str
     category_id: UUID
     id: Optional[UUID] = None
@@ -49,6 +52,7 @@ class CompanyCapabilityDTO:
         capability_name: Name of the capability (optional, for display).
         category_name: Name of the category (optional, for display).
     """
+
     company_id: UUID
     capability_id: UUID
     capability_name: Optional[str] = None
