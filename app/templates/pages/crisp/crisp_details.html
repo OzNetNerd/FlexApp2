@@ -10,7 +10,7 @@
       <div class="d-flex justify-content-between align-items-center">
         <div>
           <h1 class="page-heading">CRISP Score Details</h1>
-          <p class="text-muted mb-0">
+          <p class="text-muted emphasised-text">
             Trust assessment for {{ score.relationship_display_name }}
             <span class="ms-2 small text-muted">{{ score.created_at|date }}</span>
           </p>
@@ -39,8 +39,8 @@
         <div class="crisp-score-circle mx-auto mb-3 position-relative" style="width: 160px; height: 160px;">
           <div class="position-absolute top-0 start-0 end-0 bottom-0 d-flex align-items-center justify-content-center">
             <div>
-              <h2 class="display-4 mb-0 fw-bold">{{ score.total_score|round(1) }}</h2>
-              <p class="text-muted mb-0">out of 10</p>
+              <h2 class="display-4 emphasised-text fw-bold">{{ score.total_score|round(1) }}</h2>
+              <p class="text-muted emphasised-text">out of 10</p>
             </div>
           </div>
         </div>
@@ -149,7 +149,7 @@
             <p class="mb-1 fw-bold">
               (Credibility + Reliability + Intimacy) / Self-orientation
             </p>
-            <p class="mb-0">
+            <p class="emphasised-text">
               ({{ score.credibility }} + {{ score.reliability }} + {{ score.intimacy }}) / {{ score.self_orientation }} = {{ score.total_score|round(1) }}
             </p>
           </div>
@@ -168,9 +168,9 @@
       </div>
       <div class="card-body">
         {% if score.notes %}
-          <p class="mb-0">{{ score.notes }}</p>
+          <p class="emphasised-text">{{ score.notes }}</p>
         {% else %}
-          <p class="text-muted mb-0">No notes were added to this assessment.</p>
+          <p class="text-muted emphasised-text">No notes were added to this assessment.</p>
         {% endif %}
       </div>
     </div>

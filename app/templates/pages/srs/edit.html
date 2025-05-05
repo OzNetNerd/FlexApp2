@@ -7,7 +7,7 @@
 {% block view_template_content %}
 <div class="card shadow-sm mb-4">
   <div class="card-header bg-light d-flex justify-content-between align-items-center">
-    <h4 class="mb-0">Question</h4>
+    <h4 class="emphasised-text">Question</h4>
     {% if entity.category %}
     <span class="badge bg-primary">{{ entity.category }}</span>
     {% endif %}
@@ -19,7 +19,7 @@
 
 <div class="card shadow-sm">
   <div class="card-header bg-light">
-    <h4 class="mb-0">Your Answer</h4>
+    <h4 class="emphasised-text">Your Answer</h4>
   </div>
   <div class="card-body">
     <form id="review-form" data-entity-id="{{ entity.id }}">

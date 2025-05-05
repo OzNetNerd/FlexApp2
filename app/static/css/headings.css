@@ -59,7 +59,7 @@ h6 { font-size: 0.875rem; }
   font-size: 1.25rem;           /* same as Bootstrap h5 */
   font-weight: 500;          /* h5 font weight */
   line-height: 1.2;
-  margin-bottom: 0;          /* same as mb-0 */
+  margin-bottom: 0;          /* same as emphasised-text */
   color: var(--color-text-primary);
   letter-spacing: -0.01em;
 }
@@ -78,3 +78,26 @@ h6 { font-size: 0.875rem; }
   font-size: 14px;
   color: var(--color-text-muted, #6c757d);
 }
+
+.section-subcard-info-heading {
+  font-size: 16px;
+  font-weight: 500;      /* typical h6 weight */
+  line-height: 1.2;
+  margin-bottom: 0;      /* same as emphasised-text */
+  letter-spacing: -0.16px;
+}
+
+.section-subcard-info-subtext {
+  font-size: 14px;
+  color: var(--color-text-muted, #6c757d);
+  line-height: 21px;
+  margin-bottom: 8px;
+}
+
+.emphasised-text {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  margin-bottom: 0;
+}
+

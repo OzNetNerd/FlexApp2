@@ -10,7 +10,7 @@
       <div class="d-flex justify-content-between align-items-center">
         <div>
           <h1 class="page-heading">Companies Statistics</h1>
-          <p class="text-muted mb-0">Overview of your company accounts data</p>
+          <p class="text-muted emphasised-text">Overview of your company accounts data</p>
         </div>
         <a href="{{ url_for('companies_bp.companies_dashboard') }}" class="btn btn-outline-primary">
           <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
@@ -29,7 +29,7 @@
           <i class="bi bi-building text-primary large-card-icon"></i>
         </div>
         <div class="display-5 fw-bold mb-2">{{ total_companies }}</div>
-        <p class="text-muted mb-0">Total Companies</p>
+        <p class="text-muted emphasised-text">Total Companies</p>
       </div>
     </div>
   </div>
@@ -40,7 +40,7 @@
           <i class="bi bi-briefcase text-success large-card-icon"></i>
         </div>
         <div class="display-5 fw-bold mb-2">{{ with_opportunities }}</div>
-        <p class="text-muted mb-0">With Opportunities</p>
+        <p class="text-muted emphasised-text">With Opportunities</p>
       </div>
     </div>
   </div>
@@ -51,7 +51,7 @@
           <i class="bi bi-people text-info large-card-icon"></i>
         </div>
         <div class="display-5 fw-bold mb-2">{{ with_contacts }}</div>
-        <p class="text-muted mb-0">With Contacts</p>
+        <p class="text-muted emphasised-text">With Contacts</p>
       </div>
     </div>
   </div>
@@ -62,7 +62,7 @@
           <i class="bi bi-exclamation-triangle text-danger large-card-icon"></i>
         </div>
         <div class="display-5 fw-bold mb-2">{{ no_engagement }}</div>
-        <p class="text-muted mb-0">No Engagement</p>
+        <p class="text-muted emphasised-text">No Engagement</p>
       </div>
     </div>
   </div>
@@ -89,7 +89,7 @@
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-hover mb-0">
+          <table class="table table-hover emphasised-text">
             <thead class="table-light">
               <tr>
                 <th class="ps-4">Metric</th>

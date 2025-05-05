@@ -109,28 +109,28 @@
         <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
           <div class="highlights-container">
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-user-check text-success me-1"></i>
                 <span class="fw-bold">{{ stats.active_users }}</span> active users this week
               </p>
             </div>
 
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-trophy text-warning me-1"></i>
                 <span class="fw-bold">{{ stats.top_user }}</span> created the most opportunities
               </p>
             </div>
 
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-chart-line text-primary me-1"></i>
                 User activity increased by <span class="fw-bold">{{ stats.activity_increase }}%</span> this month
               </p>
             </div>
 
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-hourglass-half text-danger me-1"></i>
                 <span class="fw-bold">{{ stats.inactive_count }}</span> users with no activity for 14+ days
               </p>
@@ -168,9 +168,9 @@
                   <div class="category-icon bg-info text-white d-flex align-items-center justify-content-center me-3">
                     <i class="bi bi-person"></i>
                   </div>
-                  <h3 class="h6 mb-0">Regular Users</h3>
+                  <h3 class="section-subcard-info-heading">Regular Users</h3>
                 </div>
-                <p class="small text-muted mb-2">{{ user_categories[0].count }} users · {{ user_categories[0].activity }} notes</p>
+                <p class="section-subcard-info-subtext">{{ user_categories[0].count }} users · {{ user_categories[0].activity }} notes</p>
                 <div class="progress mb-3" style="height: 5px;">
                   <div class="progress-bar bg-info" role="progressbar" style="width: {{ user_categories[0].percentage }}%;" aria-valuenow="{{ user_categories[0].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
@@ -187,9 +187,9 @@
                   <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-3">
                     <i class="bi bi-shield-lock"></i>
                   </div>
-                  <h3 class="h6 mb-0">Admin Users</h3>
+                  <h3 class="section-subcard-info-heading">Admin Users</h3>
                 </div>
-                <p class="small text-muted mb-2">{{ user_categories[1].count }} users · {{ user_categories[1].activity }} notes</p>
+                <p class="section-subcard-info-subtext">{{ user_categories[1].count }} users · {{ user_categories[1].activity }} notes</p>
                 <div class="progress mb-3" style="height: 5px;">
                   <div class="progress-bar bg-primary" role="progressbar" style="width: {{ user_categories[1].percentage }}%;" aria-valuenow="{{ user_categories[1].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
@@ -206,9 +206,9 @@
                   <div class="category-icon bg-warning text-white d-flex align-items-center justify-content-center me-3">
                     <i class="bi bi-calendar-check"></i>
                   </div>
-                  <h3 class="h6 mb-0">New Users</h3>
+                  <h3 class="section-subcard-info-heading">New Users</h3>
                 </div>
-                <p class="small text-muted mb-2">{{ user_categories[2].count }} users · {{ user_categories[2].activity }} notes</p>
+                <p class="section-subcard-info-subtext">{{ user_categories[2].count }} users · {{ user_categories[2].activity }} notes</p>
                 <div class="progress mb-3" style="height: 5px;">
                   <div class="progress-bar bg-warning" role="progressbar" style="width: {{ user_categories[2].percentage }}%;" aria-valuenow="{{ user_categories[2].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
@@ -239,7 +239,7 @@
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-hover mb-0">
+          <table class="table table-hover emphasised-text">
             <thead class="table-light">
               <tr>
                 <th scope="col" class="ps-4">Username</th>

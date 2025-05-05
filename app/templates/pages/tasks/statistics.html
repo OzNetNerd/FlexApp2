@@ -10,7 +10,7 @@
       <div class="d-flex justify-content-between align-items-center">
         <div>
           <h1 class="page-heading">Tasks Statistics</h1>
-          <p class="text-muted mb-0">Overview of your task management data</p>
+          <p class="text-muted emphasised-text">Overview of your task management data</p>
         </div>
         <a href="{{ url_for('tasks_bp.tasks_dashboard') }}" class="btn btn-outline-primary">
           <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
@@ -29,7 +29,7 @@
           <i class="bi bi-list-check text-primary large-card-icon"></i>
         </div>
         <div class="display-5 fw-bold mb-2">{{ total_tasks }}</div>
-        <p class="text-muted mb-0">Total Tasks</p>
+        <p class="text-muted emphasised-text">Total Tasks</p>
       </div>
     </div>
   </div>
@@ -40,7 +40,7 @@
           <i class="bi bi-check2-circle text-success large-card-icon"></i>
         </div>
         <div class="display-5 fw-bold mb-2">{{ completed_tasks }}</div>
-        <p class="text-muted mb-0">Completed Tasks</p>
+        <p class="text-muted emphasised-text">Completed Tasks</p>
       </div>
     </div>
   </div>
@@ -51,7 +51,7 @@
           <i class="bi bi-hourglass-split text-warning large-card-icon"></i>
         </div>
         <div class="display-5 fw-bold mb-2">{{ pending_tasks }}</div>
-        <p class="text-muted mb-0">Pending Tasks</p>
+        <p class="text-muted emphasised-text">Pending Tasks</p>
       </div>
     </div>
   </div>
@@ -62,7 +62,7 @@
           <i class="bi bi-exclamation-triangle text-danger large-card-icon"></i>
         </div>
         <div class="display-5 fw-bold mb-2">{{ overdue_tasks }}</div>
-        <p class="text-muted mb-0">Overdue Tasks</p>
+        <p class="text-muted emphasised-text">Overdue Tasks</p>
       </div>
     </div>
   </div>
@@ -89,7 +89,7 @@
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-hover mb-0">
+          <table class="table table-hover emphasised-text">
             <thead class="table-light">
               <tr>
                 <th class="ps-4">Metric</th>

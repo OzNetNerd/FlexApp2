@@ -108,28 +108,28 @@
         <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
           <div class="highlights-container">
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-check-circle text-success me-1"></i>
                 <span class="fw-bold">{{ stats.closing_soon }}</span> deals closing within 30 days
               </p>
             </div>
 
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-trophy text-warning me-1"></i>
                 <span class="fw-bold">{{ stats.won_this_month }}</span> deals won this month
               </p>
             </div>
 
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-chart-line text-primary me-1"></i>
                 Win rate improved by <span class="fw-bold">{{ stats.win_rate_change }}%</span> this quarter
               </p>
             </div>
 
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-hourglass-half text-danger me-1"></i>
                 <span class="fw-bold">{{ stats.stale_count }}</span> deals with no activity for 14+ days
               </p>
@@ -167,9 +167,9 @@
                   <div class="category-icon bg-info text-white d-flex align-items-center justify-content-center me-3">
                     <i class="bi bi-shuffle"></i>
                   </div>
-                  <h3 class="h6 mb-0">Qualification</h3>
+                  <h3 class="section-subcard-info-heading">Qualification</h3>
                 </div>
-                <p class="small text-muted mb-2">{{ stages[0].count }} deals · {{ stages[0].value|currencyfmt }}</p>
+                <p class="section-subcard-info-subtext">{{ stages[0].count }} deals · {{ stages[0].value|currencyfmt }}</p>
                 <div class="progress mb-3" style="height: 5px;">
                   <div class="progress-bar bg-info" role="progressbar" style="width: {{ stages[0].percentage }}%;" aria-valuenow="{{ stages[0].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
@@ -186,9 +186,9 @@
                   <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-3">
                     <i class="bi bi-chat-dots"></i>
                   </div>
-                  <h3 class="h6 mb-0">Negotiation</h3>
+                  <h3 class="section-subcard-info-heading">Negotiation</h3>
                 </div>
-                <p class="small text-muted mb-2">{{ stages[1].count }} deals · {{ stages[1].value|currencyfmt }}</p>
+                <p class="section-subcard-info-subtext">{{ stages[1].count }} deals · {{ stages[1].value|currencyfmt }}</p>
                 <div class="progress mb-3" style="height: 5px;">
                   <div class="progress-bar bg-primary" role="progressbar" style="width: {{ stages[1].percentage }}%;" aria-valuenow="{{ stages[1].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
@@ -205,9 +205,9 @@
                   <div class="category-icon bg-warning text-white d-flex align-items-center justify-content-center me-3">
                     <i class="bi bi-hand-thumbs-up"></i>
                   </div>
-                  <h3 class="h6 mb-0">Closing</h3>
+                  <h3 class="section-subcard-info-heading">Closing</h3>
                 </div>
-                <p class="small text-muted mb-2">{{ stages[2].count }} deals · {{ stages[2].value|currencyfmt }}</p>
+                <p class="section-subcard-info-subtext">{{ stages[2].count }} deals · {{ stages[2].value|currencyfmt }}</p>
                 <div class="progress mb-3" style="height: 5px;">
                   <div class="progress-bar bg-warning" role="progressbar" style="width: {{ stages[2].percentage }}%;" aria-valuenow="{{ stages[2].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
@@ -238,7 +238,7 @@
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-hover mb-0">
+          <table class="table table-hover emphasised-text">
             <thead class="table-light">
               <tr>
                 <th scope="col" class="ps-4">Deal Name</th>

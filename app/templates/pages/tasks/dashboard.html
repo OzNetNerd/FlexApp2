@@ -108,28 +108,28 @@
         <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
           <div class="highlights-container">
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-tasks text-success me-1"></i>
                 <span class="fw-bold">{{ stats.completed_tasks }}</span> tasks completed
               </p>
             </div>
 
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-hourglass-half text-warning me-1"></i>
                 <span class="fw-bold">{{ stats.pending_tasks }}</span> tasks pending
               </p>
             </div>
 
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-calendar-day text-primary me-1"></i>
                 <span class="fw-bold">{{ stats.due_today }}</span> tasks due today
               </p>
             </div>
 
             <div class="highlight-item">
-              <p class="h6 mb-0 fw-normal">
+              <p class="section-subcard-info-heading fw-normal">
                 <i class="fas fa-exclamation-circle text-danger me-1"></i>
                 <span class="fw-bold">{{ stats.overdue_tasks }}</span> tasks overdue
               </p>
@@ -167,9 +167,9 @@
                   <div class="category-icon bg-success text-white d-flex align-items-center justify-content-center me-3">
                     <i class="bi bi-check-circle"></i>
                   </div>
-                  <h3 class="h6 mb-0">Completed</h3>
+                  <h3 class="section-subcard-info-heading">Completed</h3>
                 </div>
-                <p class="small text-muted mb-2">{{ segments.completed.count }} tasks · finished</p>
+                <p class="section-subcard-info-subtext">{{ segments.completed.count }} tasks · finished</p>
                 <div class="progress mb-3" style="height: 5px;">
                   <div class="progress-bar bg-success" role="progressbar" style="width: {{ segments.completed.percentage }}%;" aria-valuenow="{{ segments.completed.percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
@@ -186,9 +186,9 @@
                   <div class="category-icon bg-warning text-white d-flex align-items-center justify-content-center me-3">
                     <i class="bi bi-hourglass-split"></i>
                   </div>
-                  <h3 class="h6 mb-0">In Progress</h3>
+                  <h3 class="section-subcard-info-heading">In Progress</h3>
                 </div>
-                <p class="small text-muted mb-2">{{ segments.in_progress.count }} tasks · being worked on</p>
+                <p class="section-subcard-info-subtext">{{ segments.in_progress.count }} tasks · being worked on</p>
                 <div class="progress mb-3" style="height: 5px;">
                   <div class="progress-bar bg-warning" role="progressbar" style="width: {{ segments.in_progress.percentage }}%;" aria-valuenow="{{ segments.in_progress.percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
@@ -205,9 +205,9 @@
                   <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-3">
                     <i class="bi bi-clock"></i>
                   </div>
-                  <h3 class="h6 mb-0">Not Started</h3>
+                  <h3 class="section-subcard-info-heading">Not Started</h3>
                 </div>
-                <p class="small text-muted mb-2">{{ segments.not_started.count }} tasks · pending</p>
+                <p class="section-subcard-info-subtext">{{ segments.not_started.count }} tasks · pending</p>
                 <div class="progress mb-3" style="height: 5px;">
                   <div class="progress-bar bg-primary" role="progressbar" style="width: {{ segments.not_started.percentage }}%;" aria-valuenow="{{ segments.not_started.percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
@@ -238,7 +238,7 @@
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-hover mb-0">
+          <table class="table table-hover emphasised-text">
             <thead class="table-light">
               <tr>
                 <th scope="col" class="ps-4">Task Name</th>

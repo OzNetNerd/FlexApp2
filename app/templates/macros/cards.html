@@ -1,7 +1,7 @@
 {% macro section_card(icon, title, text_color="text-primary", bg_color="bg-primary-subtle", content="") %}
   <div class="card shadow-sm mb-4">
     <div class="card-header {{ bg_color }} d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 {{ text_color }}">
+      <h5 class="emphasised-text {{ text_color }}">
         <i class="bi bi-{{ icon }} me-2"></i>{{ title }}
       </h5>
     </div>
@@ -9,7 +9,7 @@
   {% if caller %}
     {{ caller() }}
   {% else %}
-    <p class="card-text fs-6 mb-0">{{ content }}</p>
+    <p class="card-text fs-6 emphasised-text">{{ content }}</p>
   {% endif %}
 </div>
 {% endmacro %}

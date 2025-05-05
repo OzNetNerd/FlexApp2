@@ -7,7 +7,7 @@
     <!-- Filter Panel -->
     <div class="card border-0 shadow-sm mb-4">
       <div class="card-header bg-white">
-        <h5 class="mb-0">Filter Cards</h5>
+        <h5 class="emphasised-text">Filter Cards</h5>
       </div>
       <div class="card-body">
         <form id="filter-form" method="GET" action="{{ url_for('srs_bp.filtered_cards') }}">
@@ -114,7 +114,7 @@
     <!-- Category Stats Panel -->
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h5 class="mb-0">Categories</h5>
+        <h5 class="emphasised-text">Categories</h5>
       </div>
       <div class="card-body p-0">
         <div class="list-group list-group-flush">
@@ -159,7 +159,7 @@
     <!-- Learning Stage Filters -->
     <div class="card border-0 shadow-sm mt-4">
       <div class="card-header bg-white">
-        <h5 class="mb-0">Learning Stages</h5>
+        <h5 class="emphasised-text">Learning Stages</h5>
       </div>
       <div class="card-body p-0">
         <div class="list-group list-group-flush">
@@ -202,7 +202,7 @@
     <!-- Difficulty Filters -->
     <div class="card border-0 shadow-sm mt-4">
       <div class="card-header bg-white">
-        <h5 class="mb-0">By Difficulty</h5>
+        <h5 class="emphasised-text">By Difficulty</h5>
       </div>
       <div class="card-body p-0">
         <div class="list-group list-group-flush">
@@ -237,7 +237,7 @@
     <!-- Performance Filters -->
     <div class="card border-0 shadow-sm mt-4">
       <div class="card-header bg-white">
-        <h5 class="mb-0">By Performance</h5>
+        <h5 class="emphasised-text">By Performance</h5>
       </div>
       <div class="card-body p-0">
         <div class="list-group list-group-flush">
@@ -272,7 +272,7 @@
     <!-- Review Strategies -->
     <div class="card border-0 shadow-sm mt-4">
       <div class="card-header bg-white">
-        <h5 class="mb-0">Review Strategies</h5>
+        <h5 class="emphasised-text">Review Strategies</h5>
       </div>
       <div class="card-body p-0">
         <div class="list-group list-group-flush">
@@ -326,7 +326,7 @@
   <div class="col-md-9">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">{{ title }}</h4>
+        <h4 class="emphasised-text">{{ title }}</h4>
         <span class="badge bg-primary">{{ cards|length }} cards</span>
       </div>
       <div class="card-body p-0">
@@ -372,7 +372,7 @@
         <!-- Cards List -->
         {% if cards %}
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
+          <table class="table table-hover align-middle emphasised-text">
             <thead class="table-light">
               <tr>
                 <th width="40" class="ps-3">#</th>
