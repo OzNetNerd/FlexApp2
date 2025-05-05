@@ -4,9 +4,9 @@ DataLoader initialization module.
 This module provides factory functions to create all necessary
 data loaders for the GraphQL context.
 """
-from interfaces.graphql.dataloaders.company import CompanyLoader
-from interfaces.graphql.dataloaders.customer import CustomerLoader
-from interfaces.graphql.dataloaders.opportunity import OpportunityLoader
+from src.interfaces.graphql.dataloaders.company import CompanyLoader
+from src.interfaces.graphql.dataloaders.customer import CustomerLoader
+from src.interfaces.graphql.dataloaders.opportunity import OpportunityLoader
 
 
 def create_dataloaders(unit_of_work):

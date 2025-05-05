@@ -8,12 +8,12 @@ import strawberry
 from typing import Any
 
 # Import domain-specific query and mutation types
-from interfaces.graphql.company.queries import CompanyQueries
-from interfaces.graphql.company.mutations import CompanyMutations
-from interfaces.graphql.customer.queries import CustomerQueries
-from interfaces.graphql.customer.mutations import CustomerMutations
-from interfaces.graphql.opportunity.queries import OpportunityQueries
-from interfaces.graphql.opportunity.mutations import OpportunityMutations
+from src.interfaces.graphql.company.queries import CompanyQueries
+from src.interfaces.graphql.company.mutations import CompanyMutations
+from src.interfaces.graphql.customer.queries import CustomerQueries
+from src.interfaces.graphql.customer.mutations import CustomerMutations
+from src.interfaces.graphql.opportunity.queries import OpportunityQueries
+from src.interfaces.graphql.opportunity.mutations import OpportunityMutations
 
 
 @strawberry.type

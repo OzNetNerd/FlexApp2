@@ -1,8 +1,8 @@
 """Opportunity domain entities."""
 
 from datetime import datetime
-from domain.shared.entities import BaseEntity
-from domain.shared.value_objects.money import Money
+from src.domain.shared.entities import BaseEntity
+from src.domain.shared.value_objects.money import Money
 
 
 class Opportunity(BaseEntity):

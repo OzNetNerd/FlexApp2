@@ -4,8 +4,8 @@ Customer DataLoader implementation.
 This module provides DataLoader functionality for Customer entities.
 """
 from typing import List, Optional
-from interfaces.graphql.dataloaders.base import BaseLoader
-from domain.customer.entities import Customer
+from src.interfaces.graphql.dataloaders.base import BaseLoader
+from src.domain.customer.entities import Customer
 
 
 class CustomerLoader(BaseLoader[Customer, int]):

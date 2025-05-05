@@ -4,8 +4,8 @@ Opportunity DataLoader implementation.
 This module provides DataLoader functionality for Opportunity entities.
 """
 from typing import List, Optional
-from interfaces.graphql.dataloaders.base import BaseLoader
-from domain.opportunity.entities import Opportunity
+from src.interfaces.graphql.dataloaders.base import BaseLoader
+from src.domain.opportunity.entities import Opportunity
 
 
 class OpportunityLoader(BaseLoader[Opportunity, int]):

@@ -10,8 +10,8 @@ from flask import request, g
 
 from infrastructure.persistence.unit_of_work import UnitOfWork
 from infrastructure.auth.services import get_current_user
-from interfaces.graphql.dataloaders import create_dataloaders
-from interfaces.graphql.dataloaders.base import DataLoaderContext
+from src.interfaces.graphql.dataloaders import create_dataloaders
+from src.interfaces.graphql.dataloaders.base import DataLoaderContext
 
 
 @dataclass

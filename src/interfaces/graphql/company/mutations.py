@@ -12,7 +12,7 @@ from application.company.commands import (
     UpdateCompanyCommand,
     DeleteCompanyCommand
 )
-from interfaces.graphql.company.types import Company, CompanyInput
+from src.interfaces.graphql.company.types import Company, CompanyInput
 
 
 @strawberry.type

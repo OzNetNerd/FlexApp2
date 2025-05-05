@@ -1,8 +1,8 @@
 """Customer domain entities."""
 
-from domain.shared.entities import BaseEntity
-from domain.shared.value_objects.email import Email
-from domain.shared.value_objects.phone import Phone
+from src.domain.shared.entities import BaseEntity
+from src.domain.shared.value_objects.email import Email
+from src.domain.shared.value_objects.phone import Phone
 
 
 class Contact(BaseEntity):

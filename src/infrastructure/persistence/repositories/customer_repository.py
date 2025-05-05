@@ -3,8 +3,8 @@
 from typing import List, Optional
 
 from src.infrastructure.persistence.models.company import Company as CompanyModel
-from domain.company.entities import Company
-from domain.shared.interfaces.repository import Repository
+from src.domain.company.entities import Company
+from src.domain.shared.interfaces.repository import Repository
 from src.infrastructure.flask.extensions import db
 
 

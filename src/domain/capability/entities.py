@@ -8,7 +8,7 @@ from typing import List, Optional
 from dataclasses import dataclass, field
 from uuid import UUID
 
-from domain.shared.interfaces.entity import Entity
+from src.domain.shared.interfaces.entity import Entity
 
 
 @dataclass(frozen=True)

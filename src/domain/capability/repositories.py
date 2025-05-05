@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 from uuid import UUID
 
-from domain.capability.entities import Capability, CapabilityCategory, CompanyCapability
+from src.domain.capability.entities import Capability, CapabilityCategory, CompanyCapability
 
 
 class CapabilityRepository(ABC):

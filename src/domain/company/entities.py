@@ -1,6 +1,6 @@
 """Company domain entities."""
 
-from domain.shared.entities import BaseEntity
+from src.domain.shared.entities import BaseEntity
 
 
 class Company(BaseEntity):

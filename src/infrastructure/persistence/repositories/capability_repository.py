@@ -8,10 +8,10 @@ from uuid import UUID
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from domain.capability.entities import Capability as DomainCapability
-from domain.capability.entities import CapabilityCategory as DomainCapabilityCategory
-from domain.capability.entities import CompanyCapability as DomainCompanyCapability
-from domain.capability.repositories import CapabilityRepository, CapabilityCategoryRepository
+from src.domain.capability.entities import Capability as DomainCapability
+from src.domain.capability.entities import CapabilityCategory as DomainCapabilityCategory
+from src.domain.capability.entities import CompanyCapability as DomainCompanyCapability
+from src.domain.capability.repositories import CapabilityRepository, CapabilityCategoryRepository
 from src.infrastructure.persistence.models.base import db
 from src.infrastructure.persistence.models.capability import (
     Capability as CapabilityModel,

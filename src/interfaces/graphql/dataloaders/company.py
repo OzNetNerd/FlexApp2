@@ -4,8 +4,8 @@ Company DataLoader implementation.
 This module provides DataLoader functionality for Company entities.
 """
 from typing import List, Optional
-from interfaces.graphql.dataloaders.base import BaseLoader
-from domain.company.entities import Company
+from src.interfaces.graphql.dataloaders.base import BaseLoader
+from src.domain.company.entities import Company
 
 
 class CompanyLoader(BaseLoader[Company, int]):

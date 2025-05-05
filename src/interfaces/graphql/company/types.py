@@ -9,7 +9,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from application.company.dto import CompanyDTO, CompanyDetailsDTO
-from interfaces.graphql.customer.types import Customer
+from src.interfaces.graphql.customer.types import Customer
 
 
 @strawberry.type

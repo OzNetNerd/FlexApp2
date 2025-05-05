@@ -7,12 +7,12 @@ that will be available in the GraphQL API.
 import strawberry
 from typing import List, Optional
 
-from application.company.queries import (
+from src.application.company.queries import (
     GetCompanyQuery,
     ListCompaniesQuery,
     GetCompanyDetailsQuery
 )
-from interfaces.graphql.company.types import Company, CompanyDetails
+from src.interfaces.graphql.company.types import Company, CompanyDetails
 
 
 @strawberry.type

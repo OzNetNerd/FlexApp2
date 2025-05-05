@@ -5,8 +5,8 @@ This module provides the necessary setup for integrating GraphQL
 with a Flask application, using Strawberry and the defined schema.
 """
 from strawberry.flask.views import GraphQLView
-from interfaces.graphql.schema import schema
-from interfaces.graphql.context import get_graphql_context
+from src.interfaces.graphql.schema import schema
+from src.interfaces.graphql.context import get_graphql_context
 
 
 def init_graphql(app):
