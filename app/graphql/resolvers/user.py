@@ -49,18 +49,46 @@ class UserQueries:
 class UserMutations:
     @strawberry.mutation
     def create_user(self, input: CreateUserInput) -> User:
-        user_dict = vars(input)
-        user = user_service.create(user_dict)
+        # Convert input to dict
+        data = {
+            "username": input.username,
+            "name": input.name,
+            "email": input.email,
+            "password": input.password,
+            "is_admin": input.is_admin,
+        }
+
+        # Validate
+        errors = user_service.validate_create(data)
+        if errors:
+            raise ValueError(", ".join(errors))
+
+        # Create user
+        user = user_service.create(data)
         return User.from_model(user)
 
     @strawberry.mutation
     def update_user(self, id: int, input: UpdateUserInput) -> Optional[User]:
-        user_dict = {k: v for k, v in vars(input).items() if v is not None}
-        user = user_service.update(id, user_dict)
+        # Get user
+        user = user_service.get_by_id(id)
         if not user:
             return None
+
+        # Convert input to dict, filtering out None values
+        data = {k: v for k, v in vars(input).items() if v is not None}
+
+        # Validate
+        errors = user_service.validate_update(user, data)
+        if errors:
+            raise ValueError(", ".join(errors))
+
+        # Update
+        user = user_service.update(id, data)
         return User.from_model(user)
 
     @strawberry.mutation
     def delete_user(self, id: int) -> bool:
+        user = user_service.get_by_id(id)
+        if not user:
+            return False
         return user_service.delete(id)

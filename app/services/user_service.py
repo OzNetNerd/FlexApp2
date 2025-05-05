@@ -6,9 +6,14 @@ from app.services.validator_mixin import ValidatorMixin
 
 
 class UserService(CRUDService, ValidatorMixin):
-    """Custom service for User model with validation."""
+    """Service for User model operations with validation.
+
+    This service handles business logic and data validation for User entities,
+    providing a layer between GraphQL resolvers and the database model.
+    """
 
     def validate_create(self, data):
+        """Validate data for user creation."""
         errors = []
         required_fields = ["username", "email", "password"]
 
@@ -24,6 +29,7 @@ class UserService(CRUDService, ValidatorMixin):
         return errors
 
     def validate_update(self, entity, data):
+        """Validate data for user updates."""
         errors = []
 
         username = data.get("username")
@@ -38,3 +44,7 @@ class UserService(CRUDService, ValidatorMixin):
                 errors.append("Email must be unique.")
 
         return errors
+
+    def search_by_username(self, query):
+        """Search users by username."""
+        return User.search_by_username(query)

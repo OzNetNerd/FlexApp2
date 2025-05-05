@@ -1,3 +1,12 @@
+# GraphQL & Services
+
+Looking at your code, you're actually following a good separation of concerns between GraphQL and services:
+
+GraphQL layer (resolvers): Handles query/mutation parsing, input validation, type conversions
+Service layer: Handles business logic, validation, data persistence
+
+This pattern is common and recommended even when migrating from REST to GraphQL. Your UserService provides functionality that's still valuable - validation and database operations - regardless of whether it's being called from REST endpoints or GraphQL resolvers._
+
 # GraphQL Migration Plan
 ## Setup GraphQL Foundation
 
