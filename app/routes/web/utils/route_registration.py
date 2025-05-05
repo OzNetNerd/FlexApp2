@@ -1,3 +1,5 @@
+# MIGRATED
+
 # app/routes/web/route_registration.py - Improved debugging
 
 from dataclasses import dataclass

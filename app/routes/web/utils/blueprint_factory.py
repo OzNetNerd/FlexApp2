@@ -1,3 +1,5 @@
+# MIGRATED
+
 # app/routes/web/blueprint_factory.py
 
 from typing import Any, Optional
