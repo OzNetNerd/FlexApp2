@@ -1,3 +1,7 @@
+```
+ python -m src.app
+```
+
 CRISP PROJECTION - OUR PLAN TO GET TO STRONGER CRISP
 SALES TRAINING
 LMS/Training system?
