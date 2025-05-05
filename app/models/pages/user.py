@@ -1,3 +1,4 @@
+# MIGRATED
 # app/models/user.py
 
 from flask_login import UserMixin

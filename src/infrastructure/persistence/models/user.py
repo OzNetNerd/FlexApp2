@@ -3,8 +3,8 @@
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from infrastructure.persistence.models.base import BaseModel
-from infrastructure.flask.extensions import db
+from src.infrastructure.persistence.models.base import BaseModel
+from src.infrastructure.flask.extensions import db
 
 
 class User(BaseModel, UserMixin):

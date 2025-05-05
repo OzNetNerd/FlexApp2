@@ -12,13 +12,13 @@ from domain.capability.entities import Capability as DomainCapability
 from domain.capability.entities import CapabilityCategory as DomainCapabilityCategory
 from domain.capability.entities import CompanyCapability as DomainCompanyCapability
 from domain.capability.repositories import CapabilityRepository, CapabilityCategoryRepository
-from infrastructure.persistence.models.base import db
-from infrastructure.persistence.models.capability import (
+from src.infrastructure.persistence.models.base import db
+from src.infrastructure.persistence.models.capability import (
     Capability as CapabilityModel,
     CapabilityCategory as CapabilityCategoryModel,
     CompanyCapability as CompanyCapabilityModel,
 )
-from infrastructure.logging import get_logger
+from src.infrastructure.logging import get_logger
 
 logger = get_logger(__name__)
 

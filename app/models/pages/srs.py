@@ -1,3 +1,4 @@
+# MIGRATED
 # app/models/srs.py
 
 from app.models.base import BaseModel, db

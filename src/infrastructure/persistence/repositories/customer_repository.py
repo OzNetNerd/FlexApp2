@@ -2,10 +2,10 @@
 
 from typing import List, Optional
 
-from infrastructure.persistence.models.company import Company as CompanyModel
+from src.infrastructure.persistence.models.company import Company as CompanyModel
 from domain.company.entities import Company
 from domain.shared.interfaces.repository import Repository
-from infrastructure.flask.extensions import db
+from src.infrastructure.flask.extensions import db
 
 
 class CompanyRepository(Repository):

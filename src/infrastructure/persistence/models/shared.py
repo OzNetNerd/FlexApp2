@@ -1,7 +1,7 @@
 """Shared ORM models used across domains."""
 
-from infrastructure.persistence.models.base import BaseModel, NotableMixin
-from infrastructure.flask.extensions import db
+from src.infrastructure.persistence.models.base import BaseModel, NotableMixin
+from src.infrastructure.flask.extensions import db
 
 
 class Note(BaseModel, NotableMixin):

@@ -2,9 +2,9 @@
 
 from sqlalchemy import inspect
 
-from infrastructure.persistence.models.base import BaseModel
-from infrastructure.flask.extensions import db
-from infrastructure.logging import get_logger
+from src.infrastructure.persistence.models.base import BaseModel
+from src.infrastructure.flask.extensions import db
+from src.infrastructure.logging import get_logger
 
 logger = get_logger()
 

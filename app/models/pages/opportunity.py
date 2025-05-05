@@ -1,3 +1,4 @@
+# MIGRATED
 # app/models/opportunity.py
 
 from datetime import datetime

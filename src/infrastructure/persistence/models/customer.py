@@ -1,7 +1,7 @@
 """ORM models for the customer domain."""
 
-from infrastructure.persistence.models.base import BaseModel
-from infrastructure.flask.extensions import db
+from src.infrastructure.persistence.models.base import BaseModel
+from src.infrastructure.flask.extensions import db
 
 
 class Contact(BaseModel):

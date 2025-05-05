@@ -7,8 +7,8 @@ for database tables, such as column visibility and formatting.
 import json
 from typing import Dict, Optional, Any
 
-from infrastructure.persistence.models.base import BaseModel, db
-from infrastructure.logging import get_logger
+from src.infrastructure.persistence.models.base import BaseModel, db
+from src.infrastructure.logging import get_logger
 
 logger = get_logger(__name__)
 

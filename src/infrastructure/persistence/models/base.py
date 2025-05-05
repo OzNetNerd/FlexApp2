@@ -12,7 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 
-from infrastructure.logging import get_logger
+from src.infrastructure.logging import get_logger
 
 logger = get_logger(__name__)
 

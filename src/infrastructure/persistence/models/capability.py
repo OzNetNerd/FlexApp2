@@ -4,8 +4,8 @@ SQLAlchemy models for the capability domain.
 These models map the domain entities to database tables, focusing solely on
 persistence concerns without domain logic.
 """
-from infrastructure.persistence.models.base import BaseModel, db
-from infrastructure.logging import get_logger
+from src.infrastructure.persistence.models.base import BaseModel, db
+from src.infrastructure.logging import get_logger
 
 logger = get_logger(__name__)
 

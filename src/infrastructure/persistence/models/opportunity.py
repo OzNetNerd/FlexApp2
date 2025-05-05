@@ -1,8 +1,8 @@
 """ORM models for the opportunity domain."""
 
 from datetime import datetime
-from infrastructure.persistence.models.base import BaseModel
-from infrastructure.flask.extensions import db
+from src.infrastructure.persistence.models.base import BaseModel
+from src.infrastructure.flask.extensions import db
 
 
 class Opportunity(BaseModel):

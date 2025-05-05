@@ -9,7 +9,7 @@ This module defines application-wide error handlers.
 from flask import request
 
 from src.infrastructure.logging import get_logger
-from src.interfaces.web.utils.template_renderer import handle_template_error
+from src.infrastructure.flask.template_renderer import handle_template_error
 
 logger = get_logger()
 

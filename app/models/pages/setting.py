@@ -1,3 +1,4 @@
+# MIGRATED
 # app/models/setting.py
 
 from sqlalchemy import inspect
