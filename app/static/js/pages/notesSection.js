@@ -181,7 +181,7 @@ filterNotesByDateRange = () => {
           <div class="note-item mb-3 p-3 border rounded shadow-sm">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <strong class="text-primary">${user}</strong>
-              <small class="text-muted">${date}</small>
+              <span class="info-text-small">${date}</span>
             </div>
             <div class="note-content">${n.processed_content || n.content || '(No content)'}</div>
           </div>`;

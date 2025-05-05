@@ -272,7 +272,7 @@
                   <div class="progress" style="height: 6px;">
                     <div class="progress-bar bg-success" role="progressbar" style="width: {{ opportunity.probability }}%;" aria-valuenow="{{ opportunity.probability }}" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <small class="text-muted">{{ opportunity.probability }}%</small>
+                  <span class="info-text-small">{ opportunity.probability }}%</span>
                 </td>
                 <td class="text-center">
                   <a href="{{ url_for('opportunities_bp.view', opportunity_id=opportunity.id) }}" class="btn btn-sm btn-outline-primary me-1">View</a>

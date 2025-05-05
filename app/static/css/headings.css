@@ -101,3 +101,11 @@ h6 { font-size: 0.875rem; }
   margin-bottom: 0;
 }
 
+.info-text-small {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-text-muted, #6c757d);
+  line-height: 21px;
+}
+
+
