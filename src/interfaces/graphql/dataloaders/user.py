@@ -2,7 +2,7 @@
 
 from typing import List, Dict, Any
 from .base import BaseDataLoader
-from domain.user.repositories import UserRepository
+from src.domain.user.repositories import UserRepository
 from infrastructure.persistence.repositories.user_repository import SQLAlchemyUserRepository
 
 

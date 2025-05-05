@@ -1,8 +1,8 @@
 """User command handlers."""
 
 from typing import Optional, Dict, Any
-from domain.user.entities import User
-from domain.user.repositories import UserRepository
+from src.domain.user.entities import User
+from src.domain.user.repositories import UserRepository
 from application.user.dto import CreateUserDTO, UpdateUserDTO, UserDTO
 
 

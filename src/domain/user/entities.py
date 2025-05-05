@@ -1,7 +1,7 @@
 """User domain entity representing a system user."""
 
 from typing import Optional
-from domain.shared.interfaces.entity import Entity
+from src.domain.shared.interfaces.entity import Entity
 
 
 class User(Entity):

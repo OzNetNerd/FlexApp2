@@ -1,7 +1,7 @@
 """User query handlers."""
 
 from typing import List, Optional
-from domain.user.repositories import UserRepository
+from src.domain.user.repositories import UserRepository
 from application.user.dto import UserDTO
 
 

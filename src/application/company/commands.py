@@ -7,11 +7,11 @@ on company entities, as well as handlers that process these commands.
 
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Any
-from domain.company.entities import Company
-from domain.company.repositories import CompanyRepository
-from domain.shared.value_objects.relationship import Relationship
+from src.domain.company.entities import Company
+from src.domain.company.repositories import CompanyRepository
+from src.domain.shared.value_objects.relationship import Relationship
 from infrastructure.persistence.unit_of_work import UnitOfWork
-from domain.company.events import CompanyCreated, CompanyUpdated, CompanyDeleted
+from src.domain.company.events import CompanyCreated, CompanyUpdated, CompanyDeleted
 from infrastructure.messaging.event_bus import EventBus
 
 

@@ -1,8 +1,8 @@
 """SQLAlchemy implementation of the UserRepository interface."""
 
 from typing import Optional, List
-from domain.user.entities import User as UserEntity
-from domain.user.repositories import UserRepository
+from src.domain.user.entities import User as UserEntity
+from src.domain.user.repositories import UserRepository
 from infrastructure.persistence.models.user import User as UserModel
 
 

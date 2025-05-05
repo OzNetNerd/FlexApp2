@@ -2,7 +2,7 @@
 
 import strawberry
 from typing import Optional
-from domain.user.entities import User as UserEntity
+from src.domain.user.entities import User as UserEntity
 from application.user.dto import UserDTO
 
 
