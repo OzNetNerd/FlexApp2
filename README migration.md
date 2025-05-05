@@ -7,77 +7,206 @@ I'm migrating my app to DDD style. Review the attached file(s) and:
 3. Tell me where to put the file(s).
 
 ```
-# Create the main directory structure
-mkdir -p src/domain/{customer,company,opportunity}/
-mkdir -p src/domain/shared/{value_objects,interfaces}
-mkdir -p src/application/{customer,company,opportunity}
-mkdir -p src/infrastructure/{persistence/{repositories,models},auth,messaging}
-mkdir -p src/interfaces/graphql/{customer,company,opportunity}
-mkdir -p src/interfaces/api
-
-# Create domain layer files
-for domain in customer company opportunity; do
-    touch src/domain/$domain/__init__.py
-    touch src/domain/$domain/entities.py
-    touch src/domain/$domain/value_objects.py
-    touch src/domain/$domain/aggregates.py
-    touch src/domain/$domain/repositories.py
-    touch src/domain/$domain/services.py
-    touch src/domain/$domain/events.py
-    touch src/domain/$domain/exceptions.py
-done
-
-# Create shared domain files
-touch src/domain/shared/__init__.py
-touch src/domain/shared/value_objects/__init__.py
-touch src/domain/shared/value_objects/email.py
-touch src/domain/shared/value_objects/phone.py
-touch src/domain/shared/value_objects/money.py
-touch src/domain/shared/interfaces/__init__.py
-touch src/domain/shared/interfaces/repository.py
-
-# Create application layer files
-for domain in customer company opportunity; do
-    touch src/application/$domain/__init__.py
-    touch src/application/$domain/commands.py
-    touch src/application/$domain/queries.py
-    touch src/application/$domain/dto.py
-done
-touch src/application/__init__.py
-
-# Create infrastructure layer files
-touch src/infrastructure/__init__.py
-touch src/infrastructure/persistence/__init__.py
-touch src/infrastructure/persistence/repositories/__init__.py
-touch src/infrastructure/persistence/models/__init__.py
-touch src/infrastructure/persistence/unit_of_work.py
-for domain in customer company opportunity; do
-    touch src/infrastructure/persistence/repositories/${domain}_repository.py
-    touch src/infrastructure/persistence/models/$domain.py
-done
-touch src/infrastructure/auth/__init__.py
-touch src/infrastructure/auth/services.py
-touch src/infrastructure/messaging/__init__.py
-touch src/infrastructure/messaging/event_bus.py
-
-# Create interface layer files
-touch src/interfaces/__init__.py
-touch src/interfaces/graphql/__init__.py
-touch src/interfaces/graphql/schema.py
-for domain in customer company opportunity; do
-    touch src/interfaces/graphql/$domain/__init__.py
-    touch src/interfaces/graphql/$domain/types.py
-    touch src/interfaces/graphql/$domain/queries.py
-    touch src/interfaces/graphql/$domain/mutations.py
-done
-touch src/interfaces/api/__init__.py
-
-# Create application entry point
-touch src/app.py
+src/
+├── app.py
+├── application
+│   ├── __init__.py
+│   ├── company
+│   │   ├── __init__.py
+│   │   ├── commands.py
+│   │   ├── dto.py
+│   │   └── queries.py
+│   ├── customer
+│   │   ├── __init__.py
+│   │   ├── commands.py
+│   │   ├── dto.py
+│   │   └── queries.py
+│   └── opportunity
+│       ├── __init__.py
+│       ├── commands.py
+│       ├── dto.py
+│       └── queries.py
+├── domain
+│   ├── company
+│   │   ├── __init__.py
+│   │   ├── aggregates.py
+│   │   ├── entities.py
+│   │   ├── events.py
+│   │   ├── exceptions.py
+│   │   ├── repositories.py
+│   │   ├── services.py
+│   │   └── value_objects.py
+│   ├── customer
+│   │   ├── __init__.py
+│   │   ├── aggregates.py
+│   │   ├── entities.py
+│   │   ├── events.py
+│   │   ├── exceptions.py
+│   │   ├── repositories.py
+│   │   ├── services.py
+│   │   └── value_objects.py
+│   ├── opportunity
+│   │   ├── __init__.py
+│   │   ├── aggregates.py
+│   │   ├── entities.py
+│   │   ├── events.py
+│   │   ├── exceptions.py
+│   │   ├── repositories.py
+│   │   ├── services.py
+│   │   └── value_objects.py
+│   └── shared
+│       ├── __init__.py
+│       ├── constants.py
+│       ├── interfaces
+│       │   ├── __init__.py
+│       │   └── repository.py
+│       └── value_objects
+│           ├── __init__.py
+│           ├── email.py
+│           ├── money.py
+│           └── phone.py
+├── infrastructure
+│   ├── __init__.py
+│   ├── auth
+│   │   ├── __init__.py
+│   │   ├── services.py
+│   │   └── user_loader.py
+│   ├── flask
+│   │   ├── app_factory.py
+│   │   ├── error_handlers.py
+│   │   ├── extensions.py
+│   │   ├── middleware.py
+│   │   └── template_utils.py
+│   ├── logging.py
+│   ├── messaging
+│   │   ├── __init__.py
+│   │   └── event_bus.py
+│   └── persistence
+│       ├── __init__.py
+│       ├── models
+│       │   ├── __init__.py
+│       │   ├── company.py
+│       │   ├── customer.py
+│       │   └── opportunity.py
+│       ├── repositories
+│       │   ├── __init__.py
+│       │   ├── company_repository.py
+│       │   ├── customer_repository.py
+│       │   └── opportunity_repository.py
+│       ├── seeders.py
+│       └── unit_of_work.py
+└── interfaces
+    ├── __init__.py
+    ├── api
+    │   └── __init__.py
+    └── graphql
+        ├── __init__.py
+        ├── company
+        │   ├── __init__.py
+        │   ├── mutations.py
+        │   ├── queries.py
+        │   └── types.py
+        ├── customer
+        │   ├── __init__.py
+        │   ├── mutations.py
+        │   ├── queries.py
+        │   └── types.py
+        ├── opportunity
+        │   ├── __init__.py
+        │   ├── mutations.py
+        │   ├── queries.py
+        │   └── types.py
+        └── schema.py
 ```
 
+# Migration Order for Your Current Files
+Here's the recommended order to migrate your existing files to the DDD structure, focusing on maintaining functionality throughout the process:
 
-Key Architectural Components
+## Core Domain Models & Value Objects
+
+models/base.py → Move to src/domain/shared/interfaces
+models/mixins.py → Split into appropriate src/domain/shared components
+utils/model_registry.py → Adapt for new structure in src/domain/shared
+
+
+## Company Domain
+
+models/pages/company.py → src/domain/company/entities.py
+models/capability.py & models/capability_category.py → src/domain/company/value_objects.py
+models/company_capability.py → src/domain/company/aggregates.py
+services/crud_service.py (company parts) → src/domain/company/services.py
+routes/api/companies.py → src/interfaces/api/company_controller.py
+
+
+## Contact/Customer Domain
+
+models/pages/contact.py → src/domain/customer/entities.py
+routes/api/contacts.py → src/interfaces/api/customer_controller.py
+services/crud_service.py (contact parts) → src/domain/customer/services.py
+
+
+## Opportunity Domain
+
+models/pages/opportunity.py → src/domain/opportunity/entities.py
+models/pages/srs.py → src/domain/opportunity/entities.py (if related)
+routes/api/opportunities.py → src/interfaces/api/opportunity_controller.py
+services/crud_service.py (opportunity parts) → src/domain/opportunity/services.py
+
+
+## Relationship Management
+
+models/relationship.py → Create appropriate relationship models in respective domains
+services/relationship_service.py → Distribute to appropriate domain services
+
+
+## Infrastructure Layer
+
+services/auth.py → src/infrastructure/auth/services.py
+services/validator_mixin.py → src/infrastructure/persistence/validation.py
+Create repository implementations based on your CRUD service
+
+
+## Application Layer Services
+
+services/category_service.py → src/application/company/commands.py & queries.py
+services/note_service.py → Appropriate application service
+services/search_service.py → src/application/shared/search_service.py
+services/srs_service.py → src/application/opportunity/commands.py & queries.py
+services/user_service.py → src/application/customer/commands.py & queries.py
+
+
+## API Interfaces
+
+routes/api_router.py → src/interfaces/api/__init__.py
+routes/web_router.py → Adapt for new API structure
+Migrate remaining route files to appropriate interface components
+
+
+## App Entry Point
+
+app.py → src/app.py (update with new imports and structure)
+
+
+
+## Migration Approach:
+
+1. Start with core domain models to establish your foundational building blocks 
+2. Migrate one domain at a time (company → customer → opportunity) to ensure you can test each domain as you go 
+3. Implement infrastructure layer as you need persistence for the domains you've migrated 
+4. Build application services that coordinate between domains 
+5. Update interfaces to work with the new application services 
+6. Finally update the app entry point to wire everything together
+
+This approach allows you to:
+
+1. Maintain functionality by completing one domain before moving to the next
+2. Test throughout the migration process
+3. Gradually transition from your old architecture to DDD
+4. Avoid having to make a "big bang" cutover that could break everything
+
+
+
+# Key Architectural Components
 1. Domain Layer
 This is the core of your business logic, containing:
 
