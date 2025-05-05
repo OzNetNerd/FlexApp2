@@ -147,6 +147,21 @@ class BaseModel(db.Model):
         logger.info(f"Saved {model_name} with ID={self.id}")
         return self
 
+    def update(self, **kwargs) -> "BaseModel":
+        """
+        Update the model with the given keyword arguments.
+
+        Args:
+            **kwargs: Attributes to update.
+
+        Returns:
+            Self: The updated instance.
+        """
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+        return self.save()
+
     def delete(self) -> None:
         """Remove model instance from the database with logging."""
         model_name = self.__class__.__name__
@@ -239,3 +254,14 @@ class BaseModel(db.Model):
             sections[section_name].append(field)
 
         return sections
+
+
+class NotableMixin:
+    """
+    Mixin for polymorphic entities that can be associated with different models.
+
+    Provides fields for polymorphic relationships.
+    """
+
+    notable_type = db.Column(db.String(50), nullable=False)
+    notable_id = db.Column(db.Integer, nullable=False)
