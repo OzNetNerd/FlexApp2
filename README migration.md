@@ -10,167 +10,178 @@ I'm migrating my app to DDD style. Review the attached file(s) and:
 src/
 ├── app.py
 ├── application
-│     ├── __init__.py
-│     ├── capability
-│     │     └── dto.py
-│     ├── company
-│     │     ├── __init__.py
-│     │     ├── commands.py
-│     │     ├── dto.py
-│     │     └── queries.py
-│     ├── customer
-│     │     ├── __init__.py
-│     │     ├── commands.py
-│     │     ├── dto.py
-│     │     └── queries.py
-│     └── opportunity
-│         ├── __init__.py
-│         ├── commands.py
-│         ├── dto.py
-│         └── queries.py
+│   ├── __init__.py
+│   ├── capability
+│   │   └── dto.py
+│   ├── company
+│   │   ├── __init__.py
+│   │   ├── commands.py
+│   │   ├── dto.py
+│   │   └── queries.py
+│   ├── customer
+│   │   ├── __init__.py
+│   │   ├── commands.py
+│   │   ├── dto.py
+│   │   └── queries.py
+│   └── opportunity
+│       ├── __init__.py
+│       ├── commands.py
+│       ├── dto.py
+│       └── queries.py
 ├── domain
-│     ├── capability
-│     │     ├── entities.py
-│     │     └── repositories.py
-│     ├── company
-│     │     ├── __init__.py
-│     │     ├── aggregates.py
-│     │     ├── entities.py
-│     │     ├── events.py
-│     │     ├── exceptions.py
-│     │     ├── repositories.py
-│     │     ├── services.py
-│     │     └── value_objects.py
-│     ├── customer
-│     │     ├── __init__.py
-│     │     ├── aggregates.py
-│     │     ├── entities.py
-│     │     ├── events.py
-│     │     ├── exceptions.py
-│     │     ├── repositories.py
-│     │     ├── services.py
-│     │     └── value_objects.py
-│     ├── opportunity
-│     │     ├── __init__.py
-│     │     ├── aggregates.py
-│     │     ├── entities.py
-│     │     ├── events.py
-│     │     ├── exceptions.py
-│     │     ├── repositories.py
-│     │     ├── services.py
-│     │     └── value_objects.py
-│     └── shared
-│         ├── __init__.py
-│         ├── constants.py
-│         ├── entities.py
-│         ├── interfaces
-│         │     ├── __init__.py
-│         │     ├── entity.py
-│         │     └── repository.py
-│         ├── services
-│         │     └── relationship_service.py
-│         └── value_objects
-│             ├── __init__.py
-│             ├── autocomplete_field.py
-│             ├── email.py
-│             ├── money.py
-│             ├── phone.py
-│             └── relationship.py
+│   ├── capability
+│   │   ├── entities.py
+│   │   └── repositories.py
+│   ├── company
+│   │   ├── __init__.py
+│   │   ├── aggregates.py
+│   │   ├── entities.py
+│   │   ├── events.py
+│   │   ├── exceptions.py
+│   │   ├── repositories.py
+│   │   ├── services.py
+│   │   └── value_objects.py
+│   ├── customer
+│   │   ├── __init__.py
+│   │   ├── aggregates.py
+│   │   ├── entities.py
+│   │   ├── events.py
+│   │   ├── exceptions.py
+│   │   ├── repositories.py
+│   │   ├── services.py
+│   │   └── value_objects.py
+│   ├── opportunity
+│   │   ├── __init__.py
+│   │   ├── aggregates.py
+│   │   ├── entities.py
+│   │   ├── events.py
+│   │   ├── exceptions.py
+│   │   ├── repositories.py
+│   │   ├── services.py
+│   │   └── value_objects.py
+│   ├── shared
+│   │   ├── __init__.py
+│   │   ├── constants.py
+│   │   ├── entities.py
+│   │   ├── interfaces
+│   │   │   ├── __init__.py
+│   │   │   ├── entity.py
+│   │   │   └── repository.py
+│   │   ├── services
+│   │   │   └── relationship_service.py
+│   │   └── value_objects
+│   │       ├── __init__.py
+│   │       ├── autocomplete_field.py
+│   │       ├── email.py
+│   │       ├── money.py
+│   │       ├── phone.py
+│   │       └── relationship.py
+│   └── user
+│       ├── entities.py
+│       └── repositories.py
 ├── infrastructure
-│     ├── __init__.py
-│     ├── auth
-│     │     ├── __init__.py
-│     │     ├── services.py
-│     │     └── user_loader.py
-│     ├── config
-│     │     ├── __init__.py
-│     │     ├── base.py
-│     │     └── environments.py
-│     ├── context
-│     │     └── base_context.py
-│     ├── flask
-│     │     ├── app_factory.py
-│     │     ├── blueprint_factory.py
-│     │     ├── error_handlers.py
-│     │     ├── extensions.py
-│     │     ├── middleware.py
-│     │     ├── template_config.py
-│     │     ├── template_renderer.py
-│     │     └── template_utils.py
-│     ├── logging
-│     │     ├── __init__.py
-│     │     └── config.py
-│     ├── logging.py
-│     ├── messaging
-│     │     ├── __init__.py
-│     │     └── event_bus.py
-│     ├── persistence
-│     │     ├── __init__.py
-│     │     ├── config
-│     │     │     └── table_config.py
-│     │     ├── json_validator.py
-│     │     ├── models
-│     │     │     ├── __init__.py
-│     │     │     ├── base.py
-│     │     │     ├── capability.py
-│     │     │     ├── company.py
-│     │     │     ├── customer.py
-│     │     │     ├── opportunity.py
-│     │     │     ├── setting.py
-│     │     │     ├── shared.py
-│     │     │     └── user.py
-│     │     ├── repositories
-│     │     │     ├── __init__.py
-│     │     │     ├── capability_repository.py
-│     │     │     ├── company_repository.py
-│     │     │     ├── customer_repository.py
-│     │     │     └── opportunity_repository.py
-│     │     ├── seeders.py
-│     │     └── unit_of_work.py
-│     └── utils
-│         ├── router_registry.py
-│         └── router_utils.py
+│   ├── __init__.py
+│   ├── auth
+│   │   ├── __init__.py
+│   │   ├── services.py
+│   │   └── user_loader.py
+│   ├── config
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   └── environments.py
+│   ├── context
+│   │   └── base_context.py
+│   ├── flask
+│   │   ├── app_factory.py
+│   │   ├── blueprint_factory.py
+│   │   ├── error_handlers.py
+│   │   ├── extensions.py
+│   │   ├── middleware.py
+│   │   ├── template_config.py
+│   │   ├── template_renderer.py
+│   │   └── template_utils.py
+│   ├── logging
+│   │   ├── __init__.py
+│   │   └── config.py
+│   ├── logging.py
+│   ├── messaging
+│   │   ├── __init__.py
+│   │   └── event_bus.py
+│   ├── persistence
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   └── table_config.py
+│   │   ├── json_validator.py
+│   │   ├── models
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   ├── capability.py
+│   │   │   ├── company.py
+│   │   │   ├── customer.py
+│   │   │   ├── opportunity.py
+│   │   │   ├── setting.py
+│   │   │   ├── shared.py
+│   │   │   └── user.py
+│   │   ├── repositories
+│   │   │   ├── __init__.py
+│   │   │   ├── capability_repository.py
+│   │   │   ├── company_repository.py
+│   │   │   ├── customer_repository.py
+│   │   │   ├── opportunity_repository.py
+│   │   │   └── user_repository.py
+│   │   ├── seeders.py
+│   │   └── unit_of_work.py
+│   └── utils
+│       ├── router_registry.py
+│       └── router_utils.py
 └── interfaces
     ├── __init__.py
     ├── api
-    │     ├── __init__.py
-    │     ├── context.py
-    │     ├── crud_routes.py
-    │     ├── json_utils.py
-    │     └── router.py
+    │   ├── __init__.py
+    │   ├── context.py
+    │   ├── crud_routes.py
+    │   ├── json_utils.py
+    │   └── router.py
     ├── graphql
-    │     ├── __init__.py
-    │     ├── company
-    │     │     ├── __init__.py
-    │     │     ├── mutations.py
-    │     │     ├── queries.py
-    │     │     └── types.py
-    │     ├── context.py
-    │     ├── customer
-    │     │     ├── __init__.py
-    │     │     ├── mutations.py
-    │     │     ├── queries.py
-    │     │     └── types.py
-    │     ├── dataloaders
-    │     │     ├── __init__.py
-    │     │     ├── base.py
-    │     │     ├── company.py
-    │     │     ├── customer.py
-    │     │     └── opportunity.py
-    │     ├── opportunity
-    │     │     ├── __init__.py
-    │     │     ├── mutations.py
-    │     │     ├── queries.py
-    │     │     └── types.py
-    │     └── schema.py
+    │   ├── __init__.py
+    │   ├── company
+    │   │   ├── __init__.py
+    │   │   ├── mutations.py
+    │   │   ├── queries.py
+    │   │   └── types.py
+    │   ├── context.py
+    │   ├── customer
+    │   │   ├── __init__.py
+    │   │   ├── mutations.py
+    │   │   ├── queries.py
+    │   │   └── types.py
+    │   ├── dataloaders
+    │   │   ├── __init__.py
+    │   │   ├── base.py
+    │   │   ├── company.py
+    │   │   ├── customer.py
+    │   │   ├── opportunity.py
+    │   │   └── user.py
+    │   ├── opportunity
+    │   │   ├── __init__.py
+    │   │   ├── mutations.py
+    │   │   ├── queries.py
+    │   │   └── types.py
+    │   ├── schema.py
+    │   └── user
+    │       ├── __init__.py
+    │       ├── mutations.py
+    │       ├── queries.py
+    │       └── types.py
     └── web
         ├── router.py
         ├── routes
-        │     └── crud_routes.py
+        │   └── crud_routes.py
         └── views
             └── context.py
 
-37 directories, 125 files
+39 directories, 133 files
+
 
 ```
 

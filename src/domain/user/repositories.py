@@ -1,90 +1,54 @@
 """User repository interface defining data access methods."""
 
-from typing import Optional, List
-from domain.shared.interfaces.repository import Repository
-from .entities import User
+from abc import ABC, abstractmethod
+from typing import List, Optional
+from src.domain.shared.interfaces.repository import Repository
+from src.domain.user.entities import User
 
 
-class UserRepository(Repository):
-    """Repository interface for User entities."""
+class UserRepository(Repository[User], ABC):
+    """
+    Repository interface for User entity operations.
 
+    Defines the contract for user persistence operations.
+    """
+
+    @abstractmethod
     def get_by_id(self, id: int) -> Optional[User]:
-        """
-        Get a user by ID.
-
-        Args:
-            id: The user ID to retrieve
-
-        Returns:
-            User if found, None otherwise
-        """
+        """Get a user by ID."""
         pass
 
+    @abstractmethod
     def get_all(self) -> List[User]:
-        """
-        Get all users.
-
-        Returns:
-            List of all users
-        """
+        """Get all users."""
         pass
 
+    @abstractmethod
     def add(self, user: User) -> User:
-        """
-        Add a new user.
-
-        Args:
-            user: User to add
-
-        Returns:
-            Added user with new ID
-        """
+        """Add a new user."""
         pass
 
+    @abstractmethod
     def update(self, user: User) -> User:
-        """
-        Update an existing user.
-
-        Args:
-            user: User to update
-
-        Returns:
-            Updated user
-        """
+        """Update an existing user."""
         pass
 
+    @abstractmethod
     def delete(self, id: int) -> bool:
-        """
-        Delete a user.
-
-        Args:
-            id: ID of user to delete
-
-        Returns:
-            True if deleted, False otherwise
-        """
+        """Delete a user."""
         pass
 
+    @abstractmethod
     def get_by_username(self, username: str) -> Optional[User]:
-        """
-        Get a user by username.
-
-        Args:
-            username: Username to search for
-
-        Returns:
-            User if found, None otherwise
-        """
+        """Get a user by username."""
         pass
 
+    @abstractmethod
     def get_by_email(self, email: str) -> Optional[User]:
-        """
-        Get a user by email.
+        """Get a user by email."""
+        pass
 
-        Args:
-            email: Email to search for
-
-        Returns:
-            User if found, None otherwise
-        """
+    @abstractmethod
+    def search_by_username(self, query: str) -> List[User]:
+        """Search for users by username pattern match."""
         pass
