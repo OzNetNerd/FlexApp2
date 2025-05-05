@@ -7,7 +7,7 @@ This module contains functions to seed the database with initial data.
 """
 
 from src.infrastructure.flask.extensions import db
-from src.domain.setting.entities import Setting
+from src.infrastructure.persistence.models.setting import Setting
 from src.infrastructure.logging import get_logger
 
 logger = get_logger()

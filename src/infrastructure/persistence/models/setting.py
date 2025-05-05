@@ -1,3 +1,5 @@
+# src/infrastructure/persistence/models/setting.py
+
 """ORM model for system settings."""
 
 from sqlalchemy import inspect
