@@ -22,9 +22,6 @@ def register_api_blueprints(
         app: The Flask application instance
         package_path: The package path to scan for blueprint modules
         exclusions: Optional list of module names to exclude from registration
-
-    Returns:
-        None
     """
     register_blueprint_routes(
         app=app,

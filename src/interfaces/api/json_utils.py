@@ -10,7 +10,7 @@ from typing import Any, Callable, Dict, Union
 from flask import jsonify, Response
 from flask.typing import ResponseReturnValue
 
-from interfaces.api.context import EntityApiContext, ErrorApiContext, ListApiContext
+from src.interfaces.api.context import EntityApiContext, ErrorApiContext, ListApiContext
 
 
 def serialize_context(context: Any) -> Dict[str, Any]:

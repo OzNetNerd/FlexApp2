@@ -13,9 +13,9 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from flask import Blueprint, request
 from flask.typing import ResponseReturnValue
 
-from infrastructure.logging import get_logger
-from interfaces.api.context import EntityApiContext, ErrorApiContext, ListApiContext
-from interfaces.api.json_utils import json_endpoint
+from src.infrastructure.logging import get_logger
+from src.interfaces.api.context import EntityApiContext, ErrorApiContext, ListApiContext
+from src.interfaces.api.json_utils import json_endpoint
 
 logger = get_logger()
 
