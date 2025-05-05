@@ -26,7 +26,7 @@
     <div class="card border-0 shadow-sm h-100">
       <div class="card-body text-center">
         <div class="section-card-subcard-number text-primary">{{ active_opportunities }}</div>
-        <div class="text-uppercase fw-bold small text-muted">Active Opportunities</div>
+        <div class="section-card-subcard-text">Active Opportunities</div>
       </div>
     </div>
   </div>
@@ -34,7 +34,7 @@
     <div class="card border-0 shadow-sm h-100">
       <div class="card-body text-center">
         <div class="section-card-subcard-number text-success">{{ won_opportunities }}</div>
-        <div class="text-uppercase fw-bold small text-muted">Won Deals</div>
+        <div class="section-card-subcard-text">Won Deals</div>
       </div>
     </div>
   </div>
@@ -42,7 +42,7 @@
     <div class="card border-0 shadow-sm h-100">
       <div class="card-body text-center">
         <div class="section-card-subcard-number text-danger">{{ lost_opportunities }}</div>
-        <div class="text-uppercase fw-bold small text-muted">Lost Deals</div>
+        <div class="section-card-subcard-text">Lost Deals</div>
       </div>
     </div>
   </div>
@@ -51,7 +51,7 @@
       <div class="card-body text-center">
         {% set win_rate = (won_opportunities / (won_opportunities + lost_opportunities) * 100)|round if (won_opportunities + lost_opportunities) > 0 else 0 %}
         <div class="display-4 text-warning mb-2">{{ win_rate }}%</div>
-        <div class="text-uppercase fw-bold small text-muted">Win Rate</div>
+        <div class="section-card-subcard-text">Win Rate</div>
       </div>
     </div>
   </div>

@@ -71,3 +71,10 @@ h6 { font-size: 0.875rem; }
   margin-bottom: 0.5rem;    /* same as .mb-2 */
   letter-spacing: -0.01em;
 }
+
+.section-card-subcard-text {
+  text-transform: uppercase !important;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-text-muted, #6c757d);
+}
