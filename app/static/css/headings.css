@@ -1,0 +1,57 @@
+/* ========================================
+   Heading Styles - Global Defaults
+   Used for all section and content headers
+======================================== */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem; /* default spacing across all headings */
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.875rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.875rem; }
+
+/* ========================================
+   Semantic Heading Classes
+   Used for improved readability in HTML
+======================================== */
+.page-heading { /* <h1 class="h3 mb-2"> */
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.page-subtext { /* <p class="text-muted"> */
+  color: var(--color-text-muted, #6c757d);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.large-card-title { /* <h2 class="h5 card-title"> */
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.large-card-icon { /* <i class="bi bi-building large-icon"></i> */
+  font-size: 2.5rem;
+  color: var(--bs-primary);
+}
+
+.large-card-title-subtext { /* <p class="card-text text-muted"> */
+  font-size: 1rem;
+  color: var(--color-text-muted, #6c757d);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}

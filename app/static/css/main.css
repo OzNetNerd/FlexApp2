@@ -6,7 +6,7 @@ This is the only CSS file you need to include in your HTML
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 @import url("variables.css");
 @import url("base.css");
-@import url("components.css");
+@import url("headings.css");
 @import url("forms.css");
 @import url("navbar.css");
 @import url("sidebar.css");
