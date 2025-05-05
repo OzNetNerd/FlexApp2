@@ -12,10 +12,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from src.domain.company.entities import Company
 from src.domain.company.repositories import CompanyRepository
 from src.domain.company.exceptions import CompanyNotFoundError, CompanyOperationError
- from src.infrastructure.persistence.models.company import CompanyModel
- from src.infrastructure.persistence.models.capability import CapabilityModel
- from src.infrastructure.persistence.models.shared import CompanyCapabilityModel
- from src.infrastructure.logging import get_logger
+from src.infrastructure.persistence.models.company import CompanyModel
+from src.infrastructure.persistence.models.capability import CapabilityModel
+from src.infrastructure.persistence.models.shared import CompanyCapabilityModel
+from src.infrastructure.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -53,7 +53,7 @@ class SQLCompanyRepository(CompanyRepository):
                 website=company.website,
                 address=company.address,
                 description=company.description,
-                primary_contact_id=company.primary_contact_id if hasattr(company, 'primary_contact_id') else None
+                primary_contact_id=company.primary_contact_id if hasattr(company, "primary_contact_id") else None,
             )
 
             # Add to session
@@ -61,12 +61,9 @@ class SQLCompanyRepository(CompanyRepository):
             self.session.flush()  # Get ID without committing transaction
 
             # Add capabilities if any
-            if hasattr(company, 'capabilities') and company.capabilities:
+            if hasattr(company, "capabilities") and company.capabilities:
                 for capability_id in company.capabilities:
-                    company_capability = CompanyCapabilityModel(
-                        company_id=company_model.id,
-                        capability_id=capability_id
-                    )
+                    company_capability = CompanyCapabilityModel(company_id=company_model.id, capability_id=capability_id)
                     self.session.add(company_capability)
 
             # Update domain entity with generated ID
@@ -88,9 +85,7 @@ class SQLCompanyRepository(CompanyRepository):
             Company domain entity or None if not found
         """
         try:
-            company_model = self.session.query(CompanyModel).filter(
-                CompanyModel.id == company_id
-            ).first()
+            company_model = self.session.query(CompanyModel).filter(CompanyModel.id == company_id).first()
 
             if not company_model:
                 return None
@@ -131,9 +126,7 @@ class SQLCompanyRepository(CompanyRepository):
             CompanyOperationError: If database operation fails
         """
         try:
-            company_model = self.session.query(CompanyModel).filter(
-                CompanyModel.id == company.id
-            ).first()
+            company_model = self.session.query(CompanyModel).filter(CompanyModel.id == company.id).first()
 
             if not company_model:
                 raise CompanyNotFoundError(f"Company with ID {company.id} not found")
@@ -145,22 +138,17 @@ class SQLCompanyRepository(CompanyRepository):
             company_model.address = company.address
             company_model.description = company.description
 
-            if hasattr(company, 'primary_contact_id'):
+            if hasattr(company, "primary_contact_id"):
                 company_model.primary_contact_id = company.primary_contact_id
 
             # Update capabilities if present
-            if hasattr(company, 'capabilities'):
+            if hasattr(company, "capabilities"):
                 # Remove existing capabilities
-                self.session.query(CompanyCapabilityModel).filter(
-                    CompanyCapabilityModel.company_id == company.id
-                ).delete()
+                self.session.query(CompanyCapabilityModel).filter(CompanyCapabilityModel.company_id == company.id).delete()
 
                 # Add new capabilities
                 for capability_id in company.capabilities:
-                    company_capability = CompanyCapabilityModel(
-                        company_id=company.id,
-                        capability_id=capability_id
-                    )
+                    company_capability = CompanyCapabilityModel(company_id=company.id, capability_id=capability_id)
                     self.session.add(company_capability)
 
             return company
@@ -181,14 +169,10 @@ class SQLCompanyRepository(CompanyRepository):
         """
         try:
             # Delete related company capabilities first
-            self.session.query(CompanyCapabilityModel).filter(
-                CompanyCapabilityModel.company_id == company_id
-            ).delete()
+            self.session.query(CompanyCapabilityModel).filter(CompanyCapabilityModel.company_id == company_id).delete()
 
             # Delete the company
-            result = self.session.query(CompanyModel).filter(
-                CompanyModel.id == company_id
-            ).delete()
+            result = self.session.query(CompanyModel).filter(CompanyModel.id == company_id).delete()
 
             return result > 0
 
@@ -207,9 +191,7 @@ class SQLCompanyRepository(CompanyRepository):
             List of matching company domain entities
         """
         try:
-            company_models = self.session.query(CompanyModel).filter(
-                CompanyModel.name.ilike(f"%{name}%")
-            ).all()
+            company_models = self.session.query(CompanyModel).filter(CompanyModel.name.ilike(f"%{name}%")).all()
 
             return [self._map_to_entity(model) for model in company_models]
 
@@ -228,12 +210,12 @@ class SQLCompanyRepository(CompanyRepository):
             List of company domain entities with the specified capability
         """
         try:
-            company_models = self.session.query(CompanyModel).join(
-                CompanyCapabilityModel,
-                CompanyModel.id == CompanyCapabilityModel.company_id
-            ).filter(
-                CompanyCapabilityModel.capability_id == capability_id
-            ).all()
+            company_models = (
+                self.session.query(CompanyModel)
+                .join(CompanyCapabilityModel, CompanyModel.id == CompanyCapabilityModel.company_id)
+                .filter(CompanyCapabilityModel.capability_id == capability_id)
+                .all()
+            )
 
             return [self._map_to_entity(model) for model in company_models]
 
@@ -258,7 +240,7 @@ class SQLCompanyRepository(CompanyRepository):
             industry=model.industry,
             website=model.website,
             address=model.address,
-            description=model.description
+            description=model.description,
         )
 
         # Set primary contact if exists
@@ -267,9 +249,7 @@ class SQLCompanyRepository(CompanyRepository):
 
         # Get capabilities
         try:
-            capability_models = self.session.query(CompanyCapabilityModel).filter(
-                CompanyCapabilityModel.company_id == model.id
-            ).all()
+            capability_models = self.session.query(CompanyCapabilityModel).filter(CompanyCapabilityModel.company_id == model.id).all()
 
             company.capabilities = [cm.capability_id for cm in capability_models]
 
