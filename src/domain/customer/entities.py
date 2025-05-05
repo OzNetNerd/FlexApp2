@@ -3,6 +3,7 @@
 from src.domain.shared.entities import BaseEntity
 from src.domain.shared.value_objects.email import Email
 from src.domain.shared.value_objects.phone import Phone
+from src.domain.shared.value_objects.relationship import Relationship
 
 
 class Contact(BaseEntity):
@@ -112,3 +113,100 @@ class Contact(BaseEntity):
     def __repr__(self) -> str:
         """Return string representation of the contact."""
         return f"<Contact {self.id} {self.full_name}>"
+
+
+class Customer(BaseEntity):
+    """
+    A customer entity representing an organization or company.
+
+    Attributes:
+        name: Customer's company name.
+        address: Physical address.
+        company_relationships: Relationships with other entities.
+    """
+
+    def __init__(
+        self,
+        id=None,
+        name=None,
+        email=None,
+        phone_number=None,
+        address=None,
+        company_relationships=None,
+        created_at=None,
+        updated_at=None,
+    ):
+        """
+        Initialize a customer.
+
+        Args:
+            id: Unique identifier.
+            name: Customer name (required).
+            email: Customer main email address.
+            phone_number: Customer main phone number.
+            address: Physical address.
+            company_relationships: Relationships with other companies.
+            created_at: Creation timestamp.
+            updated_at: Last update timestamp.
+        """
+        super().__init__(id, created_at, updated_at)
+        self.name = name
+        self._email = None
+        self.email = email
+        self._phone_number = None
+        self.phone_number = phone_number
+        self.address = address
+        self.company_relationships = company_relationships or []
+
+    @property
+    def email(self):
+        """Get the customer's email."""
+        return self._email.value if self._email else None
+
+    @email.setter
+    def email(self, value):
+        """
+        Set the customer's email, validating it as an Email value object.
+
+        Args:
+            value: Email address string.
+        """
+        if value:
+            self._email = Email(value)
+
+    @property
+    def phone_number(self):
+        """Get the customer's phone number."""
+        return self._phone_number.value if self._phone_number else None
+
+    @phone_number.setter
+    def phone_number(self, value):
+        """
+        Set the customer's phone number, validating it as a Phone value object.
+
+        Args:
+            value: Phone number string.
+        """
+        if value:
+            self._phone_number = Phone(value)
+
+    def add_company_relationship(self, company_id, role=None, notes=None):
+        """
+        Add a relationship with another company.
+
+        Args:
+            company_id: ID of the related company.
+            role: Relationship role or type.
+            notes: Additional relationship notes.
+        """
+        relationship = Relationship(
+            entity_id=company_id,
+            entity_type="company",
+            role=role,
+            notes=notes
+        )
+        self.company_relationships.append(relationship)
+
+    def __repr__(self) -> str:
+        """Return string representation of the customer."""
+        return f"<Customer {self.id} {self.name}>"
