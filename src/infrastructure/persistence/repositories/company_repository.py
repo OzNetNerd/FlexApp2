@@ -12,9 +12,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from src.domain.company.entities import Company
 from src.domain.company.repositories import CompanyRepository
 from src.domain.company.exceptions import CompanyNotFoundError, CompanyOperationError
-from src.infrastructure.persistence.models.company import CompanyModel
-from src.infrastructure.persistence.models.capability import CapabilityModel
-from src.infrastructure.persistence.models.shared import CompanyCapabilityModel
+from src.infrastructure.persistence.models.company import Company as CompanyModel
 from src.infrastructure.logging import get_logger
 
 logger = get_logger(__name__)
