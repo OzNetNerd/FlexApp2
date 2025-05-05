@@ -20,7 +20,7 @@ h6 { font-size: 0.875rem; }
    Semantic Heading Classes
    Used for improved readability in HTML
 ======================================== */
-.page-heading { /* <h1 class="h3 mb-2"> */
+.page-heading {
   font-size: 1.75rem;
   font-weight: 500;
   line-height: 1.2;
@@ -29,17 +29,17 @@ h6 { font-size: 0.875rem; }
   letter-spacing: -0.01em;
 }
 
-.page-subtext { /* <p class="text-muted"> */
+.page-heading-subtext {
   color: var(--color-text-muted, #6c757d);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   line-height: 1.5;
   margin-bottom: 1rem;
 }
 
-.large-card-title { /* <h2 class="h5 card-title"> */
+.large-card-title { /* <h2 class="large-card-title"> */
   font-size: 1.25rem;
   font-weight: 500;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--bs-card-title-spacer-y);
   color: var(--color-text-primary);
   letter-spacing: -0.01em;
 }

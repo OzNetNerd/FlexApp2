@@ -328,14 +328,14 @@
           if (data.context) {
             contextData.innerHTML = formatObject(data.context);
           } else {
-            contextData.innerHTML = '<p class="text-muted">No context data available</p>';
+            contextData.innerHTML = '<p class="page-heading-subtext">No context data available</p>';
           }
 
           // Display request data
           if (data.request) {
             requestData.innerHTML = formatObject(data.request);
           } else {
-            requestData.innerHTML = '<p class="text-muted">No request data available</p>';
+            requestData.innerHTML = '<p class="page-heading-subtext">No request data available</p>';
           }
         })
         .catch(error => {
