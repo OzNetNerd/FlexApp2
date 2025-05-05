@@ -1,5 +1,3 @@
-# app/app.py
-
 import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
