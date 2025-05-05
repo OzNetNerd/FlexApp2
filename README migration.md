@@ -23,8 +23,12 @@ src/
 │   │   ├── commands.py
 │   │   ├── dto.py
 │   │   └── queries.py
-│   └── opportunity
-│       ├── __init__.py
+│   ├── opportunity
+│   │   ├── __init__.py
+│   │   ├── commands.py
+│   │   ├── dto.py
+│   │   └── queries.py
+│   └── user
 │       ├── commands.py
 │       ├── dto.py
 │       └── queries.py
@@ -180,9 +184,7 @@ src/
         └── views
             └── context.py
 
-39 directories, 133 files
-
-
+40 directories, 136 files
 ```
 
 # Migration Order for Your Current Files
