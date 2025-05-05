@@ -1,5 +1,6 @@
 {% extends "layouts/base.html" %}
 {% import "macros/widgets.html" as widgets %}
+{% import "macros/highlights.html" as highlight_macros %}
 
 {% block title %}CRM Dashboard - Home{% endblock %}
 
@@ -17,20 +18,20 @@
 <!-- Navigation Cards -->
 <div class="row mb-4">
   {{ widgets.navigation_card(
-    "bi bi-building", "text-primary", 
-    "Companies", "Manage all your client companies", 
+    "bi bi-building", "text-primary",
+    "Companies", "Manage all your client companies",
     "/companies"
   ) }}
-  
+
   {{ widgets.navigation_card(
-    "bi bi-people", "text-success", 
-    "Customers", "Manage individual customer contacts", 
+    "bi bi-people", "text-success",
+    "Customers", "Manage individual customer contacts",
     "/customers"
   ) }}
-  
+
   {{ widgets.navigation_card(
-    "bi bi-graph-up-arrow", "text-danger", 
-    "Opportunities", "Track sales opportunities and deals", 
+    "bi bi-graph-up-arrow", "text-danger",
+    "Opportunities", "Track sales opportunities and deals",
     "/opportunities"
   ) }}
 </div>
@@ -50,58 +51,32 @@
           {{ widgets.stat_card("$925K", "Pipeline", "text-info") }}
         </div>
 
-        <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
-          <div class="highlights-container">
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <span class="text-primary fw-bold">4</span> companies ·
-                <span class="text-success fw-bold">9</span> contacts ·
-                <span class="text-danger fw-bold">7</span> deals =
-                <span class="text-info fw-bold">$925K</span> pipeline
-              </p>
-            </div>
+        {{ highlight_macros.highlights([
+          {
+            'content': '<span class="text-primary fw-bold">4</span> companies · <span class="text-success fw-bold">9</span> contacts · <span class="text-danger fw-bold">7</span> deals = <span class="text-info fw-bold">$925K</span> pipeline'
+          },
+          {
+            'icon': 'fas fa-arrow-up',
+            'icon_class': 'text-success',
+            'content': '<span class="fw-bold">$125K</span> added to pipeline this week'
+          },
+          {
+            'icon': 'fas fa-chart-line',
+            'icon_class': 'text-primary',
+            'content': '<span class="fw-bold">3</span> deals progressed to next stage'
+          },
+          {
+            'icon': 'fas fa-percentage',
+            'icon_class': 'text-warning',
+            'content': 'CRIP score increased by <span class="fw-bold">12%</span> this month'
+          },
+          {
+            'icon': 'fas fa-trophy',
+            'icon_class': 'text-danger',
+            'content': '<span class="fw-bold">2</span> net new logos added this quarter'
+          }
+        ]) }}
 
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-arrow-up text-success me-1"></i>
-                <span class="fw-bold">$125K</span> added to pipeline this week
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-chart-line text-primary me-1"></i>
-                <span class="fw-bold">3</span> deals progressed to next stage
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-percentage text-warning me-1"></i>
-                CRIP score increased by <span class="fw-bold">12%</span> this month
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-trophy text-danger me-1"></i>
-                <span class="fw-bold">2</span> net new logos added this quarter
-              </p>
-            </div>
-          </div>
-
-          <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
-            <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-secondary btn-highlight-playpause ms-1 me-1">
-              <i class="fas fa-pause"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </div>

@@ -81,9 +81,9 @@ h6 { font-size: 0.875rem; }
 
 .section-subcard-info-heading {
   font-size: 16px;
-  font-weight: 500;      /* typical h6 weight */
+  font-weight: 500;
   line-height: 1.2;
-  margin-bottom: 0;      /* same as emphasised-text */
+  margin-bottom: 0;
   letter-spacing: -0.16px;
 }
 
@@ -108,4 +108,9 @@ h6 { font-size: 0.875rem; }
   line-height: 21px;
 }
 
-
+.highlights-scrolling-text {
+  font-size: 16px;
+  line-height: 1.2;
+  margin-bottom: 0;
+  letter-spacing: -0.16px;
+}

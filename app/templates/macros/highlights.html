@@ -1,0 +1,28 @@
+{% macro highlights(items) %}
+<div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
+  <div class="highlights-container">
+    {% for item in items %}
+    <div class="highlight-item">
+      <p class="highlights-scrolling-text">
+        {% if item.icon %}
+        <i class="{{ item.icon }} {{ item.icon_class }} me-1"></i>
+        {% endif %}
+        {{ item.content|safe }}
+      </p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
+    <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <button class="btn btn-sm btn-outline-secondary btn-highlight-playpause ms-1 me-1">
+      <i class="fas fa-pause"></i>
+    </button>
+    <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+</div>
+{% endmacro %}
