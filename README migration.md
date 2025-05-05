@@ -6,11 +6,12 @@ I'm migrating my app to DDD style. Review the attached file(s) and:
 2. Annotate the code and add informative Google style docstrings.
 3. Tell me where to put the file(s).
 
-```
-src/
+```src/
 ├── app.py
 ├── application
 │   ├── __init__.py
+│   ├── capability
+│   │   └── dto.py
 │   ├── company
 │   │   ├── __init__.py
 │   │   ├── commands.py
@@ -27,6 +28,9 @@ src/
 │       ├── dto.py
 │       └── queries.py
 ├── domain
+│   ├── capability
+│   │   ├── entities.py
+│   │   └── repositories.py
 │   ├── company
 │   │   ├── __init__.py
 │   │   ├── aggregates.py
@@ -57,66 +61,104 @@ src/
 │   └── shared
 │       ├── __init__.py
 │       ├── constants.py
+│       ├── entities.py
 │       ├── interfaces
 │       │   ├── __init__.py
+│       │   ├── entity.py
 │       │   └── repository.py
+│       ├── services
+│       │   └── relationship_service.py
 │       └── value_objects
 │           ├── __init__.py
+│           ├── autocomplete_field.py
 │           ├── email.py
 │           ├── money.py
-│           └── phone.py
+│           ├── phone.py
+│           └── relationship.py
 ├── infrastructure
 │   ├── __init__.py
 │   ├── auth
 │   │   ├── __init__.py
 │   │   ├── services.py
 │   │   └── user_loader.py
+│   ├── config
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   └── environments.py
+│   ├── context
+│   │   └── base_context.py
 │   ├── flask
 │   │   ├── app_factory.py
+│   │   ├── blueprint_factory.py
 │   │   ├── error_handlers.py
 │   │   ├── extensions.py
 │   │   ├── middleware.py
+│   │   ├── template_config.py
+│   │   ├── template_renderer.py
 │   │   └── template_utils.py
+│   ├── logging
+│   │   ├── __init__.py
+│   │   └── config.py
 │   ├── logging.py
 │   ├── messaging
 │   │   ├── __init__.py
 │   │   └── event_bus.py
-│   └── persistence
-│       ├── __init__.py
-│       ├── models
-│       │   ├── __init__.py
-│       │   ├── company.py
-│       │   ├── customer.py
-│       │   └── opportunity.py
-│       ├── repositories
-│       │   ├── __init__.py
-│       │   ├── company_repository.py
-│       │   ├── customer_repository.py
-│       │   └── opportunity_repository.py
-│       ├── seeders.py
-│       └── unit_of_work.py
+│   ├── persistence
+│   │   ├── __init__.py
+│   │   ├── config
+│   │   │   └── table_config.py
+│   │   ├── json_validator.py
+│   │   ├── models
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   ├── capability.py
+│   │   │   ├── company.py
+│   │   │   ├── customer.py
+│   │   │   ├── opportunity.py
+│   │   │   ├── setting.py
+│   │   │   ├── shared.py
+│   │   │   └── user.py
+│   │   ├── repositories
+│   │   │   ├── __init__.py
+│   │   │   ├── capability_repository.py
+│   │   │   ├── company_repository.py
+│   │   │   ├── customer_repository.py
+│   │   │   └── opportunity_repository.py
+│   │   ├── seeders.py
+│   │   └── unit_of_work.py
+│   └── utils
+│       └── router_utils.py
 └── interfaces
     ├── __init__.py
     ├── api
-    │   └── __init__.py
-    └── graphql
-        ├── __init__.py
-        ├── company
-        │   ├── __init__.py
-        │   ├── mutations.py
-        │   ├── queries.py
-        │   └── types.py
-        ├── customer
-        │   ├── __init__.py
-        │   ├── mutations.py
-        │   ├── queries.py
-        │   └── types.py
-        ├── opportunity
-        │   ├── __init__.py
-        │   ├── mutations.py
-        │   ├── queries.py
-        │   └── types.py
-        └── schema.py
+    │   ├── __init__.py
+    │   └── router.py
+    ├── graphql
+    │   ├── __init__.py
+    │   ├── company
+    │   │   ├── __init__.py
+    │   │   ├── mutations.py
+    │   │   ├── queries.py
+    │   │   └── types.py
+    │   ├── customer
+    │   │   ├── __init__.py
+    │   │   ├── mutations.py
+    │   │   ├── queries.py
+    │   │   └── types.py
+    │   ├── opportunity
+    │   │   ├── __init__.py
+    │   │   ├── mutations.py
+    │   │   ├── queries.py
+    │   │   └── types.py
+    │   └── schema.py
+    └── web
+        ├── router.py
+        ├── routes
+        │   └── crud_routes.py
+        └── views
+            └── context.py
+
+36 directories, 115 files
 ```
 
 # Migration Order for Your Current Files

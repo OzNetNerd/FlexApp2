@@ -16,8 +16,8 @@ from src.infrastructure.flask.middleware import register_middleware
 from src.infrastructure.flask.template_utils import register_template_utils
 from src.infrastructure.flask.error_handlers import register_error_handlers
 from src.infrastructure.logging import configure_logging, get_logger
-from src.interfaces.api import register_api_blueprints
-from src.interfaces.web import register_web_blueprints
+from src.interfaces.api.router import register_api_blueprints
+from src.interfaces.web.router import register_web_blueprints
 from src.interfaces.graphql import init_graphql
 from src.domain.shared.constants import NAVBAR_ENTRIES
 from src.infrastructure.persistence.seeders import seed_database
