@@ -22,7 +22,7 @@
           <i class="bi bi-person-check text-primary large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Active Contacts</h2>
-        <p class="card-text text-muted">With opportunities</p>
+        <p class="large-card-title-subtext">With opportunities</p>
         <div class="badge bg-danger">{{ stats.with_opportunities }}</div>
       </div>
     </a>
@@ -34,7 +34,7 @@
           <i class="bi bi-person-plus text-success large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Add Contact</h2>
-        <p class="card-text text-muted">Create new contact</p>
+        <p class="large-card-title-subtext">Create new contact</p>
       </div>
     </a>
   </div>
@@ -45,7 +45,7 @@
           <i class="bi bi-building text-warning large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Company Linked</h2>
-        <p class="card-text text-muted">View contacts with companies</p>
+        <p class="large-card-title-subtext">View contacts with companies</p>
       </div>
     </a>
   </div>
@@ -56,7 +56,7 @@
           <i class="bi bi-bar-chart text-info large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Analytics</h2>
-        <p class="card-text text-muted">Contact insights</p>
+        <p class="large-card-title-subtext">Contact insights</p>
       </div>
     </a>
   </div>
@@ -67,7 +67,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h2 class="h5 mb-0">Contacts Summary</h2>
+        <h2 class="section-card-heading">Contacts Summary</h2>
       </div>
       <div class="card-body">
         <div class="row">
@@ -155,7 +155,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">Skill Level Distribution</h2>
+        <h2 class="section-card-heading">Skill Level Distribution</h2>
         <a href="{{ url_for('contacts_bp.filtered_contacts') }}" class="btn btn-sm btn-outline-primary">View All Contacts</a>
       </div>
       <div class="card-body">
@@ -247,7 +247,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">Top Contacts</h2>
+        <h2 class="section-card-heading">Top Contacts</h2>
         <div>
           <a href="{{ url_for('contacts_bp.filtered_contacts', has_opportunities='yes') }}" class="btn btn-sm btn-outline-primary me-2">
             <i class="bi bi-funnel"></i> Filter Contacts
@@ -328,7 +328,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h2 class="h5 mb-0">Contact Growth</h2>
+        <h2 class="section-card-heading">Contact Growth</h2>
       </div>
       <div class="card-body">
         <div style="height: 300px; position: relative;">

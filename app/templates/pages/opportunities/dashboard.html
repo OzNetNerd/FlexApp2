@@ -22,7 +22,7 @@
           <i class="bi bi-funnel text-primary large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Active Deals</h2>
-        <p class="card-text text-muted">View your pipeline</p>
+        <p class="large-card-title-subtext">View your pipeline</p>
         <div class="badge bg-danger">{{ stats.active_count }}</div>
       </div>
     </a>
@@ -34,7 +34,7 @@
           <i class="bi bi-plus-circle text-success large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Create Deal</h2>
-        <p class="card-text text-muted">Add new opportunity</p>
+        <p class="large-card-title-subtext">Add new opportunity</p>
       </div>
     </a>
   </div>
@@ -45,7 +45,7 @@
           <i class="bi bi-trophy text-warning large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Won Deals</h2>
-        <p class="card-text text-muted">View closed-won deals</p>
+        <p class="large-card-title-subtext">View closed-won deals</p>
       </div>
     </a>
   </div>
@@ -56,7 +56,7 @@
           <i class="bi bi-bar-chart text-info large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Analytics</h2>
-        <p class="card-text text-muted">Pipeline insights</p>
+        <p class="large-card-title-subtext">Pipeline insights</p>
       </div>
     </a>
   </div>
@@ -67,7 +67,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h2 class="h5 mb-0">Pipeline Summary</h2>
+        <h2 class="section-card-heading">Pipeline Summary</h2>
       </div>
       <div class="card-body">
         <div class="row">
@@ -155,7 +155,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">Pipeline Stages</h2>
+        <h2 class="section-card-heading">Pipeline Stages</h2>
         <a href="{{ url_for('opportunities_bp.filtered_opportunities') }}" class="btn btn-sm btn-outline-primary">View All Deals</a>
       </div>
       <div class="card-body">
@@ -228,7 +228,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">Hot Opportunities</h2>
+        <h2 class="section-card-heading">Hot Opportunities</h2>
         <div>
           <a href="{{ url_for('opportunities_bp.filtered_opportunities', priority='high') }}" class="btn btn-sm btn-outline-primary me-2">
             <i class="bi bi-funnel"></i> Filter Deals
@@ -308,7 +308,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h2 class="h5 mb-0">Sales Forecast</h2>
+        <h2 class="section-card-heading">Sales Forecast</h2>
       </div>
       <div class="card-body">
         <div style="height: 300px; position: relative;">

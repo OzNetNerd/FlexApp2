@@ -23,7 +23,7 @@
           <i class="bi bi-people text-primary large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Regular Users</h2>
-        <p class="card-text text-muted">View standard users</p>
+        <p class="large-card-title-subtext">View standard users</p>
         <div class="badge bg-danger">{{ stats.regular_count }}</div>
       </div>
     </a>
@@ -35,7 +35,7 @@
           <i class="bi bi-person-plus text-success large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Create User</h2>
-        <p class="card-text text-muted">Add new user</p>
+        <p class="large-card-title-subtext">Add new user</p>
       </div>
     </a>
   </div>
@@ -46,7 +46,7 @@
           <i class="bi bi-shield-lock text-warning large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Admin Users</h2>
-        <p class="card-text text-muted">View administrators</p>
+        <p class="large-card-title-subtext">View administrators</p>
       </div>
     </a>
   </div>
@@ -57,7 +57,7 @@
           <i class="bi bi-bar-chart text-info large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Analytics</h2>
-        <p class="card-text text-muted">User insights</p>
+        <p class="large-card-title-subtext">User insights</p>
       </div>
     </a>
   </div>
@@ -68,7 +68,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h2 class="h5 mb-0">User Summary</h2>
+        <h2 class="section-card-heading">User Summary</h2>
       </div>
       <div class="card-body">
         <div class="row">
@@ -156,7 +156,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">User Categories</h2>
+        <h2 class="section-card-heading">User Categories</h2>
         <a href="{{ url_for('users_bp.filtered_users') }}" class="btn btn-sm btn-outline-primary">View All Users</a>
       </div>
       <div class="card-body">
@@ -229,7 +229,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">Top Active Users</h2>
+        <h2 class="section-card-heading">Top Active Users</h2>
         <div>
           <a href="{{ url_for('users_bp.filtered_users') }}" class="btn btn-sm btn-outline-primary me-2">
             <i class="bi bi-funnel"></i> Filter Users
@@ -302,7 +302,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h2 class="h5 mb-0">User Activity</h2>
+        <h2 class="section-card-heading">User Activity</h2>
       </div>
       <div class="card-body">
         <div style="height: 300px; position: relative;">

@@ -22,7 +22,7 @@
           <i class="bi bi-building text-primary large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Active Accounts</h2>
-        <p class="card-text text-muted">With opportunities</p>
+        <p class="large-card-title-subtext">With opportunities</p>
         <div class="badge bg-danger">{{ stats.with_opportunities }}</div>
       </div>
     </a>
@@ -34,7 +34,7 @@
           <i class="bi bi-plus-circle text-success large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Add Company</h2>
-        <p class="card-text text-muted">Create new account</p>
+        <p class="large-card-title-subtext">Create new account</p>
       </div>
     </a>
   </div>
@@ -45,7 +45,7 @@
           <i class="bi bi-person-lines-fill text-warning large-card-icon"></i>
         </div>
         <h2 class="large-card-title">With Contacts</h2>
-        <p class="card-text text-muted">View companies with contacts</p>
+        <p class="large-card-title-subtext">View companies with contacts</p>
       </div>
     </a>
   </div>
@@ -56,7 +56,7 @@
           <i class="bi bi-bar-chart text-info large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Analytics</h2>
-        <p class="card-text text-muted">Company insights</p>
+        <p class="large-card-title-subtext">Company insights</p>
       </div>
     </a>
   </div>
@@ -67,7 +67,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h2 class="h5 mb-0">Companies Summary</h2>
+        <h2 class="section-card-heading">Companies Summary</h2>
       </div>
       <div class="card-body">
         <div class="row">
@@ -155,7 +155,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">Engagement Segments</h2>
+        <h2 class="section-card-heading">Engagement Segments</h2>
         <a href="{{ url_for('companies_bp.filtered_companies') }}" class="btn btn-sm btn-outline-primary">View All Companies</a>
       </div>
       <div class="card-body">
@@ -228,7 +228,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">Top Companies</h2>
+        <h2 class="section-card-heading">Top Companies</h2>
         <div>
           <a href="{{ url_for('companies_bp.filtered_companies', has_opportunities='yes') }}" class="btn btn-sm btn-outline-primary me-2">
             <i class="bi bi-funnel"></i> Filter Companies
@@ -309,7 +309,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h2 class="h5 mb-0">Company Growth</h2>
+        <h2 class="section-card-heading">Company Growth</h2>
       </div>
       <div class="card-body">
         <div style="height: 300px; position: relative;">

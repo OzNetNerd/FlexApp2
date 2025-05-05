@@ -22,7 +22,7 @@
           <i class="bi bi-alarm text-primary large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Due Cards</h2>
-        <p class="card-text text-muted">Review cards due today</p>
+        <p class="large-card-title-subtext">Review cards due today</p>
         <div class="badge bg-danger">{{ stats.due_today }}</div>
       </div>
     </a>
@@ -34,7 +34,7 @@
           <i class="bi bi-plus-circle text-success large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Create Card</h2>
-        <p class="card-text text-muted">Add new flashcards</p>
+        <p class="large-card-title-subtext">Add new flashcards</p>
       </div>
     </a>
   </div>
@@ -45,7 +45,7 @@
           <i class="bi bi-collection text-info large-card-icon"></i>
         </div>
         <h2 class="large-card-title">All Cards</h2>
-        <p class="card-text text-muted">View your entire collection</p>
+        <p class="large-card-title-subtext">View your entire collection</p>
       </div>
     </a>
   </div>
@@ -56,7 +56,7 @@
           <i class="bi bi-bar-chart text-warning large-card-icon"></i>
         </div>
         <h2 class="large-card-title">Statistics</h2>
-        <p class="card-text text-muted">Track your learning progress</p>
+        <p class="large-card-title-subtext">Track your learning progress</p>
       </div>
     </a>
   </div>
@@ -67,7 +67,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h2 class="h5 mb-0">Learning Summary</h2>
+        <h2 class="section-card-heading">Learning Summary</h2>
       </div>
       <div class="card-body">
         <div class="row">
@@ -155,7 +155,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">Card Categories</h2>
+        <h2 class="section-card-heading">Card Categories</h2>
         <a href="{{ url_for('srs_bp.filtered_cards') }}" class="btn btn-sm btn-outline-primary">Browse All Cards</a>
       </div>
       <div class="card-body">
@@ -228,7 +228,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">Cards Due Today</h2>
+        <h2 class="section-card-heading">Cards Due Today</h2>
         <div>
           <a href="{{ url_for('srs_bp.filtered_cards', due_only=1) }}" class="btn btn-sm btn-outline-primary me-2">
             <i class="bi bi-funnel"></i> Filter Cards
@@ -299,7 +299,7 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h2 class="h5 mb-0">Learning Progress</h2>
+        <h2 class="section-card-heading">Learning Progress</h2>
       </div>
       <div class="card-body">
         <div style="height: 300px; position: relative;">

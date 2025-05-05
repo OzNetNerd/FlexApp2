@@ -25,7 +25,7 @@
   <div class="col-md-8 mx-auto">
     <div class="card border-0 shadow-sm mb-4">
       <div class="card-header bg-white">
-        <h2 class="h5 mb-0">CRISP Score Details</h2>
+        <h2 class="section-card-heading">CRISP Score Details</h2>
       </div>
       <div class="card-body">
         <form action="{{ url_for('crisp_bp.submit', relationship_id=relationship.id) if relationship else url_for('crisp_bp.submit_new') }}" method="POST">
@@ -48,7 +48,7 @@
               <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; border-radius: 50%;">
                 <i class="bi bi-shield-check"></i>
               </div>
-              <h3 class="h5 mb-0">Credibility</h3>
+              <h3 class="section-card-heading">Credibility</h3>
             </div>
             <p class="text-muted mb-3">How trustworthy, accurate, and honest is this relationship? Do they demonstrate expertise and competence?</p>
 
@@ -67,7 +67,7 @@
               <div class="category-icon bg-success text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; border-radius: 50%;">
                 <i class="bi bi-clock-history"></i>
               </div>
-              <h3 class="h5 mb-0">Reliability</h3>
+              <h3 class="section-card-heading">Reliability</h3>
             </div>
             <p class="text-muted mb-3">How dependable and consistent is this relationship? Do they follow through on commitments?</p>
 
@@ -86,7 +86,7 @@
               <div class="category-icon bg-info text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; border-radius: 50%;">
                 <i class="bi bi-people"></i>
               </div>
-              <h3 class="h5 mb-0">Intimacy</h3>
+              <h3 class="section-card-heading">Intimacy</h3>
             </div>
             <p class="text-muted mb-3">How strong is the emotional connection and psychological safety in this relationship?</p>
 
@@ -105,7 +105,7 @@
               <div class="category-icon bg-warning text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; border-radius: 50%;">
                 <i class="bi bi-eye"></i>
               </div>
-              <h3 class="h5 mb-0">Self-orientation</h3>
+              <h3 class="section-card-heading">Self-orientation</h3>
             </div>
             <p class="text-muted mb-3">How focused are they on their own interests vs. yours? (Lower is better - indicates more focus on you)</p>
 
