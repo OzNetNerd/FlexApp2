@@ -1,3 +1,4 @@
+# MIGRATED
 # company_capability.py
 
 from app.models.base import BaseModel, db

@@ -1,3 +1,4 @@
+# MIGRATED
 # app/models/mixins.py
 
 from datetime import datetime

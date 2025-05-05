@@ -1,18 +1,39 @@
-# MIGRATED
-# app/models/base.py
+"""
+Base SQLAlchemy model and database configuration.
 
-from datetime import date, datetime
+This module provides the database connection and base model class that
+all SQLAlchemy models inherit from.
+"""
 from collections import OrderedDict
+from datetime import date, datetime
+from typing import Any, Dict, List, Optional, Type, TypeVar
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
-from app.utils.app_logging import get_logger
 
-logger = get_logger()
+from infrastructure.logging import get_logger
+
+logger = get_logger(__name__)
+
+# SQLAlchemy instance
 db = SQLAlchemy()
+
+T = TypeVar('T', bound='BaseModel')
 
 
 class BaseModel(db.Model):
+    """
+    Base SQLAlchemy model providing common functionality.
+
+    All database models should inherit from this class to gain common
+    functionality like timestamps, serialization, and CRUD operations.
+
+    Attributes:
+        id: Primary key for the model.
+        created_at: When the record was created.
+        updated_at: When the record was last updated.
+    """
     __abstract__ = True
 
     id = db.Column(db.Integer, primary_key=True)
@@ -23,9 +44,10 @@ class BaseModel(db.Model):
     @classmethod
     def __tablename__(cls) -> str:
         """
-        Automatically pluralize class names for table names:
-        - If the class name ends with 'y', drop the 'y' and add 'ies' (Company → companies)
-        - Otherwise just add 's' (User → users)
+        Automatically pluralize class names for table names.
+
+        Returns:
+            The table name derived from the model class name.
         """
         name = cls.__name__.lower()
         if name.endswith("y"):
@@ -35,20 +57,47 @@ class BaseModel(db.Model):
     @declared_attr
     @classmethod
     def __entity_name__(cls) -> str:
+        """
+        Gets the singular entity name.
+
+        Returns:
+            The entity name (class name).
+        """
         return cls.__name__
 
     @declared_attr
     @classmethod
     def __entity_plural__(cls) -> str:
+        """
+        Gets the plural entity name.
+
+        Returns:
+            The plural entity name (table name).
+        """
         return cls.__tablename__
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
+        """
+        Initialize a model instance with the provided attributes.
+
+        Args:
+            **kwargs: Attribute values to set on the instance.
+
+        Raises:
+            AttributeError: If an unknown attribute is provided.
+        """
         for key, value in kwargs.items():
             if not hasattr(self, key):
                 raise AttributeError(f"{self.__class__.__name__} has no attribute {key!r}")
             setattr(self, key, value)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert the model instance to a dictionary.
+
+        Returns:
+            Dictionary representation of the model.
+        """
         # Get column data
         data = {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
@@ -78,10 +127,11 @@ class BaseModel(db.Model):
         return data
 
     def save(self) -> "BaseModel":
-        """Persist model instance to the database with logging.
+        """
+        Persist model instance to the database with logging.
 
         Returns:
-            BaseModel: The saved instance.
+            The saved instance.
         """
         model_name = self.__class__.__name__
         id_str = f"ID={getattr(self, 'id', 'New')}"
@@ -112,8 +162,40 @@ class BaseModel(db.Model):
         db.session.commit()
         logger.info(f"Deleted {model_name} {id_str}")
 
+    @classmethod
+    def find_by_id(cls: Type[T], id: int) -> Optional[T]:
+        """
+        Find a model instance by its primary key.
+
+        Args:
+            id: The primary key value to look for.
+
+        Returns:
+            The model instance if found, None otherwise.
+        """
+        return cls.query.get(id)
+
+    @classmethod
+    def find_all(cls: Type[T]) -> List[T]:
+        """
+        Find all instances of this model.
+
+        Returns:
+            List of all instances.
+        """
+        return cls.query.all()
+
     @staticmethod
     def _infer_widget(col_type) -> str:
+        """
+        Infer the appropriate UI widget type for a column.
+
+        Args:
+            col_type: The SQLAlchemy column type.
+
+        Returns:
+            String name of the appropriate widget type.
+        """
         python_type = getattr(col_type, "python_type", None)
         if python_type is int:
             return "number"
@@ -127,10 +209,15 @@ class BaseModel(db.Model):
         return "text"
 
     @classmethod
-    def ui_schema(cls, instance=None) -> dict:
+    def ui_schema(cls, instance=None) -> Dict[str, List[Dict[str, Any]]]:
         """
         Generate a UI schema with sections containing form fields.
-        Returns a dictionary with section names as keys and lists of fields as values.
+
+        Args:
+            instance: Optional model instance to extract values from.
+
+        Returns:
+            Dictionary with section names as keys and lists of fields as values.
         """
         sections = OrderedDict()
         for col in cls.__table__.columns:
@@ -140,8 +227,8 @@ class BaseModel(db.Model):
                 sections[section_name] = []
 
             field = {
-                "name": col.name,  # Using "name" as expected by the form.html macros
-                "entry_name": col.name,  # Keeping entry_name for backward compatibility
+                "name": col.name,
+                "entry_name": col.name,
                 "label": info.get("label", col.name.replace("_", " ").title()),
                 "type": info.get("widget", cls._infer_widget(col.type)),
                 "value": getattr(instance, col.name) if instance is not None else None,
@@ -151,4 +238,4 @@ class BaseModel(db.Model):
             }
             sections[section_name].append(field)
 
-        return sections  # Return dictionary with section names as keys
+        return sections
