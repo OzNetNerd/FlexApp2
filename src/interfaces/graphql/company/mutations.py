@@ -7,7 +7,7 @@ that will be available in the GraphQL API.
 import strawberry
 from typing import Optional
 
-from application.company.commands import (
+from src.application.company.commands import (
     CreateCompanyCommand,
     UpdateCompanyCommand,
     DeleteCompanyCommand

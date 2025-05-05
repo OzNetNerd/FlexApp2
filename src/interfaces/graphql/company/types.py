@@ -8,7 +8,7 @@ import strawberry
 from typing import List, Optional
 from datetime import datetime
 
-from application.company.dto import CompanyDTO, CompanyDetailsDTO
+from src.application.company.dto import CompanyDTO, CompanyDetailsDTO
 from src.interfaces.graphql.customer.types import Customer
 
 
