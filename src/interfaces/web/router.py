@@ -4,7 +4,8 @@ from typing import Callable, List, Optional
 
 from flask import Flask
 
-from src.interfaces.web.route_registration import register_crud_routes
+
+from src.interfaces.web.routes.crud_routes import register_crud_routes
 from src.infrastructure.utils.router_utils import register_blueprint_routes
 
 

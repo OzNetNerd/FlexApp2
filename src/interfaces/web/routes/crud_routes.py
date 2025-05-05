@@ -1,3 +1,5 @@
+# src/interfaces/web/routes/crud_routes.py
+
 """CRUD route registration for web interfaces.
 
 This module provides utilities for registering standardized
@@ -14,7 +16,7 @@ from flask_login import login_required
 from src.infrastructure.flask.template_renderer import RenderSafelyConfig, render_safely
 from src.infrastructure.flask.template_config import TemplateConfig
 from src.infrastructure.logging import get_logger
-from interfaces.web.views.context import TableContext, WebContext
+from src.interfaces.web.views.context import TableContext, WebContext
 
 logger = get_logger(__name__)
 

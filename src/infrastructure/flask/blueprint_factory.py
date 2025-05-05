@@ -11,7 +11,7 @@ from flask import Blueprint
 
 from src.infrastructure.flask.template_config import TemplateConfig
 from src.infrastructure.logging import get_logger
-from interfaces.web.routes.crud_routes import register_crud_routes, CrudRouteConfig
+from src.interfaces.web.routes.crud_routes import register_crud_routes, CrudRouteConfig
 from domain.shared.interfaces.repository import BaseRepository
 
 logger = get_logger(__name__)
