@@ -156,7 +156,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">Pipeline Stages</h2>
-        <a href="{{ url_for('opportunities_bp.filtered_opportunities') }}" class=" transparent-button">View All Deals</a>
+        <a href="{{ url_for('opportunities_bp.filtered_opportunities') }}" class="transparent-button">View All Deals</a>
       </div>
       <div class="card-body">
         <div class="row">
@@ -193,7 +193,7 @@
                   <div class="progress-bar bg-primary" role="progressbar" style="width: {{ stages[1].percentage }}%;" aria-valuenow="{{ stages[1].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('opportunities_bp.filtered_opportunities', stage='negotiation') }}" class=" transparent-button">View Deals</a>
+                  <a href="{{ url_for('opportunities_bp.filtered_opportunities', stage='negotiation') }}" class="transparent-button">View Deals</a>
                 </div>
               </div>
             </div>

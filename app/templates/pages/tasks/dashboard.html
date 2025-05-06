@@ -156,7 +156,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">Task Status</h2>
-        <a href="{{ url_for('tasks_bp.filtered_tasks') }}" class=" transparent-button">View All Tasks</a>
+        <a href="{{ url_for('tasks_bp.filtered_tasks') }}" class="transparent-button">View All Tasks</a>
       </div>
       <div class="card-body">
         <div class="row">
@@ -212,7 +212,7 @@
                   <div class="progress-bar bg-primary" role="progressbar" style="width: {{ segments.not_started.percentage }}%;" aria-valuenow="{{ segments.not_started.percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('tasks_bp.filtered_tasks', status='not_started') }}" class=" transparent-button">View Tasks</a>
+                  <a href="{{ url_for('tasks_bp.filtered_tasks', status='not_started') }}" class="transparent-button">View Tasks</a>
                 </div>
               </div>
             </div>

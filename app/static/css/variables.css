@@ -137,3 +137,7 @@ These variables make it easier to maintain consistent colors, spacing, and styli
   display: flex;
   align-items: center;
 }
+
+.bg-warning-dark {
+  background-color: var(--color-warning) !important;
+}

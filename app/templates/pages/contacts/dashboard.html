@@ -156,7 +156,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">Skill Level Distribution</h2>
-        <a href="{{ url_for('contacts_bp.filtered_contacts') }}" class=" transparent-button">View All Contacts</a>
+        <a href="{{ url_for('contacts_bp.filtered_contacts') }}" class="transparent-button">View All Contacts</a>
       </div>
       <div class="card-body">
         <div class="row">
@@ -193,7 +193,7 @@
                   <div class="progress-bar bg-primary" role="progressbar" style="width: {{ skill_segments[1].percentage }}%;" aria-valuenow="{{ skill_segments[1].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('contacts_bp.filtered_contacts', skill_level='Advanced') }}" class=" transparent-button">View Contacts</a>
+                  <a href="{{ url_for('contacts_bp.filtered_contacts', skill_level='Advanced') }}" class="transparent-button">View Contacts</a>
                 </div>
               </div>
             </div>

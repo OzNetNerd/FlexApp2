@@ -156,7 +156,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">Card Categories</h2>
-        <a href="{{ url_for('srs_bp.filtered_cards') }}" class=" transparent-button">Browse All Cards</a>
+        <a href="{{ url_for('srs_bp.filtered_cards') }}" class="transparent-button">Browse All Cards</a>
       </div>
       <div class="card-body">
         <div class="row">
@@ -174,7 +174,7 @@
                   <div class="progress-bar bg-primary" role="progressbar" style="width: {{ categories[0].progress }}%;" aria-valuenow="{{ categories[0].progress }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('srs_bp.filtered_cards', category='company') }}" class=" transparent-button">View Cards</a>
+                  <a href="{{ url_for('srs_bp.filtered_cards', category='company') }}" class="transparent-button">View Cards</a>
                 </div>
               </div>
             </div>
