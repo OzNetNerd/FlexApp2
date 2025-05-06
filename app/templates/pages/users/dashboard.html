@@ -1,6 +1,8 @@
 <!-- dashboard.html for users -->
 {% extends "layouts/base.html" %}
-{% from "macros/buttons.html" import transparent_button %}
+{% import "macros/buttons.html" as buttons %}
+{% import "macros/sections.html" as sections %}
+
 
 {% block title %}CRM Dashboard - Users{% endblock %}
 
@@ -9,15 +11,11 @@
 {% endblock %}
 
 {% block content %}
-<!-- Page Header Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="bg-white p-4 rounded shadow-sm">
-      <h1 class="page-heading">User Management</h1>
-      <p class="page-heading-subtext">Track and manage your system users efficiently</p>
-    </div>
-  </div>
-</div>
+<!-- Heading & subtext section -->
+{{ sections.heading_section(
+  heading_text='User Management',
+  subtext='Track and manage your system users efficiently'
+) }}
 
 <!-- Progress Bar Cards -->
 <div class="row mb-4">
@@ -180,7 +178,7 @@
                   <div class="progress-bar bg-info" role="progressbar" style="width: {{ user_categories[0].percentage }}%;" aria-valuenow="{{ user_categories[0].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  {{ transparent_button(
+                  {{ buttons.transparent_button(
     href='#',
     label='Learn More',
     border_color='#0dcaf0',
