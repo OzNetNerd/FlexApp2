@@ -1,6 +1,7 @@
 {% extends "layouts/base.html" %}
 {% import "macros/widgets.html" as widgets %}
-{% import "macros/highlights.html" as highlight_macros %}
+{% import "macros/highlights.html" as highlights %}
+{% import "macros/recent_activity.html" as recent_activity %}
 
 {% block title %}CRM Dashboard - Home{% endblock %}
 
@@ -51,7 +52,7 @@
           {{ widgets.stat_card("$925K", "Pipeline", "text-info") }}
         </div>
 
-        {{ highlight_macros.highlights([
+        {{ highlights.highlights([
           {
             'content': '<span class="text-primary fw-bold">4</span> companies · <span class="text-success fw-bold">9</span> contacts · <span class="text-danger fw-bold">7</span> deals = <span class="text-info fw-bold">$925K</span> pipeline'
           },
@@ -83,49 +84,41 @@
 </div>
 
 <!-- Recent Activity Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="section-card-heading">Recent Activity</h2>
-        <button class="btn btn-sm btn-outline-primary">View All</button>
-      </div>
-      <div class="card-body pt-0">
-        <ul class="list-group list-group-flush">
-          {{ widgets.activity_item(
-            "bi bi-graph-up", "bg-warning",
-            "Deal progressed: <strong>GlobalTech - Moved to Negotiation</strong>",
-            "1 hour ago"
-          ) }}
-          
-          {{ widgets.activity_item(
-            "bi bi-person-plus", "bg-primary",
-            "New contact added: <strong>Sarah Johnson</strong>",
-            "3 hours ago"
-          ) }}
-          
-          {{ widgets.activity_item(
-            "bi bi-building-add", "bg-danger",
-            "New company added: <strong>Quantum Solutions</strong>",
-            "Yesterday"
-          ) }}
-          
-          {{ widgets.activity_item(
-            "bi bi-currency-dollar", "bg-success",
-            "Deal closed: <strong>Fusion Industries - $185,000</strong>",
-            "2 days ago"
-          ) }}
-          
-          {{ widgets.activity_item(
-            "bi bi-calendar-event", "bg-info",
-            "Meeting scheduled with <strong>NexGen Systems</strong>",
-            "March 27, 2025"
-          ) }}
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
+{% set recent_activities = [
+  {
+    "icon": "bi bi-graph-up",
+    "bg_color": "bg-warning",
+    "message": "Deal progressed: <strong>GlobalTech - Moved to Negotiation</strong>",
+    "time": "1 hour ago"
+  },
+  {
+    "icon": "bi bi-person-plus",
+    "bg_color": "bg-primary",
+    "message": "New contact added: <strong>Sarah Johnson</strong>",
+    "time": "3 hours ago"
+  },
+  {
+    "icon": "bi bi-building-add",
+    "bg_color": "bg-danger",
+    "message": "New company added: <strong>Quantum Solutions</strong>",
+    "time": "Yesterday"
+  },
+  {
+    "icon": "bi bi-currency-dollar",
+    "bg_color": "bg-success",
+    "message": "Deal closed: <strong>Fusion Industries - $185,000</strong>",
+    "time": "2 days ago"
+  },
+  {
+    "icon": "bi bi-calendar-event",
+    "bg_color": "bg-info",
+    "message": "Meeting scheduled with <strong>NexGen Systems</strong>",
+    "time": "March 27, 2025"
+  }
+] %}
+
+{# Use the recent_activity widget with your activities #}
+{{ recent_activity.recent_activity(recent_activities, "Recent Activity", "/all-activities") }}
 {% endblock %}
 
 {% block scripts_extra %}
@@ -133,4 +126,13 @@
 {% endblock %}
 
 {% block head_extra %}
+<style>
+  .activity-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
 {% endblock %}
