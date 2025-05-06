@@ -28,18 +28,6 @@
 </div>
 {% endmacro %}
 
-{% macro activity_item(icon, bg_color, text, timestamp) %}
-<li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
-  <div class="activity-icon {{ bg_color }} text-white d-flex align-items-center justify-content-center">
-    <i class="{{ icon }}"></i>
-  </div>
-  <div class="ms-3">
-    <p class="emphasised-text">{{ text | safe }}</p>
-    <span class="info-text-small">{{ timestamp }}</span>
-  </div>
-</li>
-{% endmacro %}
-
 
 {% macro progress_bar_card(
     title,

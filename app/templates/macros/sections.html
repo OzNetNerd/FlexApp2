@@ -1,6 +1,7 @@
 {% import "macros/cards.html" as cards %}
 {% import "macros/highlights.html" as highlights %}
 {% import "macros/buttons.html" as buttons %}
+{% import "macros/misc.html" as misc %}
 
 {% macro heading_section(heading_text, subtext) %}
 <div class="row mb-4">
@@ -49,19 +50,7 @@
 </div>
 {% endmacro %}
 
-{% macro activity_item(icon, bg_color, message, time) %}
-  <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
-    <div class="activity-icon {{ bg_color }} text-white d-flex align-items-center justify-content-center">
-      <i class="{{ icon }}"></i>
-    </div>
-    <div class="ms-3">
-      <p class="emphasised-text">{{ message | safe }}</p>
-      <span class="info-text-small">{{ time }}</span>
-    </div>
-  </li>
-{% endmacro %}
-
-{% macro recent_activity(activities, title="Recent Activity", view_all_url="#") %}
+{% macro recent_activity_section(activities, title="Recent Activity", view_all_url="#") %}
 <div class="row mb-4">
   <div class="col-12">
     <div class="card border-0 shadow-sm">
@@ -76,7 +65,7 @@
       <div class="card-body pt-0">
         <ul class="list-group">
           {% for activity in activities %}
-            {{ activity_item(
+            {{ misc.activity_item(
               activity.icon,
               activity.bg_color,
               activity.message,
