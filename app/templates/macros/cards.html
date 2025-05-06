@@ -39,8 +39,7 @@
 {% endmacro %}
 
 
-{# macros/cards.html #}
-{% macro progress_bar_card(value, label, color="primary", percentage=75) %}
+{% macro progress_bar_card(value, label, color, percentage) %}
 <div class="stats-card card border-0 bg-light h-100">
   <div class="card-body text-center">
     <div class="section-subcard-number-heading text-{{ color }}">{{ value }}</div>
