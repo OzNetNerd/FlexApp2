@@ -114,3 +114,8 @@ h6 { font-size: 0.875rem; }
   margin-bottom: 0;
   letter-spacing: -0.16px;
 }
+
+.highlights-icon {
+  margin-right: 0.25rem;
+  font-size: 13px;
+}

@@ -5,13 +5,14 @@
     <div class="highlight-item">
       <p class="highlights-scrolling-text">
         {% if item.icon %}
-        <i class="{{ item.icon }} {{ item.bg_color|replace('bg-', 'text-') }} me-1"></i>
+        <i class="highlights-icon {{ item.icon }} {{ item.icon_color }}"></i>
         {% endif %}
         {{ item.message|safe }}
       </p>
     </div>
     {% endfor %}
   </div>
+
 
   <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
     <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
