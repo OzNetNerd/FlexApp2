@@ -45,21 +45,19 @@
     title,
     count,
     activity_count,
-    activity_label="notes",
-    percentage=0,
-    icon="bi-person",
-    color_class="bg-info",
-    text_class="text-white",
-    button_label="Learn More",
-    button_url="#",
-    button_color="btn-info"
+    activity_label,
+    percentage,
+    icon,
+    color_class,
+    button_label,
+    button_url="#"
 ) %}
 <div class="col-md-4 mb-3">
   <div class="card border-0 shadow-sm h-100">
     <div class="card-body">
       <div class="d-flex align-items-center mb-3">
-        <div class="category-icon {{ color_class }} {{ text_class }} d-flex align-items-center justify-content-center me-3">
-          <i class="bi {{ icon }}"></i>
+        <div class="category-icon {{ color_class }} text-white d-flex align-items-center justify-content-center me-3">
+          <i class="bi {{ icon }} text-white"></i>
         </div>
         <h3 class="section-subcard-info-heading">{{ title }}</h3>
       </div>
@@ -71,7 +69,7 @@
       {{ buttons.transparent_button(
           href=button_url,
           label=button_label,
-          color_class=button_color
+          color_class=color_class.replace('bg-', 'btn-')
       ) }}
       </div>
     </div>

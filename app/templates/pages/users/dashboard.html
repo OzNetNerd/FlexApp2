@@ -157,35 +157,32 @@
               activity_label="notes",
               percentage=user_categories[0].percentage,
               icon="bi-person",
-              text_class="text-white",
+              color_class="bg-info",
               button_label="Learn More",
-              button_url="#",
-              button_color="btn-info"
+              button_url="#"
           ) }}
-          {{ cards.progress_bar_card(
-              title="Admin Users",
-              count=user_categories[1].count,
-              activity_count=user_categories[1].activity,
-              activity_label="notes",
-              percentage=user_categories[1].percentage,
-              icon="bi-shield-lock",
-              text_class="text-white",
-              button_label="View Admins",
-              button_url=url_for('users_bp.filtered_users', is_admin='true'),
-              button_color="btn-primary"
-          ) }}
-          {{ cards.progress_bar_card(
-              title="New Users",
-              count=user_categories[2].count,
-              activity_count=user_categories[2].activity,
-              activity_label="notes",
-              percentage=user_categories[2].percentage,
-              icon="bi-calendar-check",
-              text_class="text-white",
-              button_label="View New Users",
-              button_url=url_for('users_bp.filtered_users', period='month'),
-              button_color="btn-outline-warning"
-          ) }}
+            {{ cards.progress_bar_card(
+                title="Admin Users",
+                count=user_categories[1].count,
+                activity_count=user_categories[1].activity,
+                activity_label="notes",
+                percentage=user_categories[1].percentage,
+                icon="bi-shield-lock",
+                color_class="bg-primary",
+                button_label="View Admins",
+                button_url=url_for('users_bp.filtered_users', is_admin='true')
+            ) }}
+            {{ cards.progress_bar_card(
+                title="New Users",
+                count=user_categories[2].count,
+                activity_count=user_categories[2].activity,
+                activity_label="notes",
+                percentage=user_categories[2].percentage,
+                icon="bi-calendar-check",
+                color_class="bg-warning",
+                button_label="View New Users",
+                button_url=url_for('users_bp.filtered_users', period='month')
+            ) }}
         </div>
       </div>
     </div>
