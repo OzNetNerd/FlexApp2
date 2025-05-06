@@ -16,6 +16,25 @@ html {
   overflow-y: scroll; /* Prevents layout shift when content requires scrolling */
 }
 
+/* Badge styling */
+.nav-card .badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.8rem;
+}
+
+/* Activity Icons */
+.activity-icon,
+.category-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
 /* Container with consistent percentage margin - used for page layout containment */
 .container {
   max-width: 95% !important;

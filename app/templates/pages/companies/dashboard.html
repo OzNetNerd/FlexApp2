@@ -1,17 +1,20 @@
 {% extends "layouts/base.html" %}
+{% import "macros/buttons.html" as buttons %}
+{% import "macros/sections.html" as sections %}
+{% import "macros/cards.html" as cards %}
 
 {% block title %}CRM Dashboard - Companies{% endblock %}
 
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
 {% block content %}
-<!-- Page Header Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="bg-white p-4 rounded shadow-sm">
-      <h1 class="page-heading">Company Accounts</h1>
-      <p class="page-heading-subtext">Manage your customers and prospects efficiently</p>
-    </div>
-  </div>
-</div>
+<!-- Heading & subtext section -->
+{{ sections.heading_section(
+  heading_text='Company Accounts',
+  subtext='Manage your customers and prospects efficiently'
+) }}
 
 <!-- Quick Actions Cards -->
 <div class="row mb-4">
@@ -410,57 +413,4 @@
     });
   });
 </script>
-{% endblock %}
-
-{% block head_extra %}
-<style>
-/* Activity Icons */
-.activity-icon,
-.category-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.activity-icon:hover,
-.category-icon:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-/* Navigation cards hover effect */
-.nav-card {
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.nav-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-}
-
-/* Highlights container */
-.highlights-container {
-  display: flex;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-}
-
-.highlight-item {
-  min-width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Badge styling */
-.nav-card .badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 0.8rem;
-}
-</style>
 {% endblock %}
