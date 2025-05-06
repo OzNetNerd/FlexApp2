@@ -75,6 +75,42 @@
 ) }}
 
 <!-- User Categories Section -->
+{% set user_card_data = [
+    {
+        'title': 'Regular Users',
+        'count': user_categories[0].count,
+        'activity_count': user_categories[0].activity,
+        'activity_label': 'notes',
+        'percentage': user_categories[0].percentage,
+        'icon': 'fas fa-percentage',
+        'color_class': 'info',
+        'button_label': 'Learn More',
+        'button_url': '#'
+    },
+    {
+        'title': 'Admin Users',
+        'count': user_categories[1].count,
+        'activity_count': user_categories[1].activity,
+        'activity_label': 'notes',
+        'percentage': user_categories[1].percentage,
+        'icon': 'bi-shield-lock',
+        'color_class': 'primary',
+        'button_label': 'View Admins',
+        'button_url': url_for('users_bp.filtered_users', is_admin='true')
+    },
+    {
+        'title': 'New Users',
+        'count': user_categories[2].count,
+        'activity_count': user_categories[2].activity,
+        'activity_label': 'notes',
+        'percentage': user_categories[2].percentage,
+        'icon': 'bi-calendar-check',
+        'color_class': 'danger',
+        'button_label': 'View New Users',
+        'button_url': url_for('users_bp.filtered_users', period='month')
+    }
+] %}
+
 <div class="row mb-4">
   <div class="col-12">
     <div class="card border-0 shadow-sm">
@@ -84,39 +120,19 @@
       </div>
       <div class="card-body">
         <div class="row">
-          {{ cards.progress_bar_card(
-              title="Regular Users",
-              count=user_categories[0].count,
-              activity_count=user_categories[0].activity,
-              activity_label="notes",
-              percentage=user_categories[0].percentage,
-              icon="fas fa-percentage",
-              color_class="info",
-              button_label="Learn More",
-              button_url="#"
-          ) }}
+        {% for card in user_card_data %}
             {{ cards.progress_bar_card(
-                title="Admin Users",
-                count=user_categories[1].count,
-                activity_count=user_categories[1].activity,
-                activity_label="notes",
-                percentage=user_categories[1].percentage,
-                icon="bi-shield-lock",
-                color_class="primary",
-                button_label="View Admins",
-                button_url=url_for('users_bp.filtered_users', is_admin='true')
+                title=card.title,
+                count=card.count,
+                activity_count=card.activity_count,
+                activity_label=card.activity_label,
+                percentage=card.percentage,
+                icon=card.icon,
+                color_class=card.color_class,
+                button_label=card.button_label,
+                button_url=card.button_url
             ) }}
-            {{ cards.progress_bar_card(
-                title="New Users",
-                count=user_categories[2].count,
-                activity_count=user_categories[2].activity,
-                activity_label="notes",
-                percentage=user_categories[2].percentage,
-                icon="bi-calendar-check",
-                color_class="danger",
-                button_label="View New Users",
-                button_url=url_for('users_bp.filtered_users', period='month')
-            ) }}
+        {% endfor %}
         </div>
       </div>
     </div>
