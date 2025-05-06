@@ -6,38 +6,41 @@
 {% block title %}CRM Dashboard - Home{% endblock %}
 
 {% block content %}
-<!-- Welcome Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="bg-white p-4 rounded shadow-sm">
-      <h1 class="page-heading">Welcome to your CRM</h1>
-      <p class="page-heading-subtext">Manage your customer relationships efficiently</p>
-    </div>
-  </div>
-</div>
+<!-- Heading & subtext section -->
+{{ sections.heading_section(
+  heading_text='Welcome to your CRM',
+  subtext='Manage your customer relationships efficiently'
+) }}
 
-<div class="row mb-4">
-<!-- Navigation Cards -->
-  {{ cards.large_card(
-    "bi bi-building", "text-primary",
-    "Companies", "Manage all your client companies",
-    "/companies"
-  ) }}
+<!-- Large Cards: Data -->
+{% set large_card_configs = [
+  {
+    "icon": "bi bi-building",
+    "color": "text-primary",
+    "title": "Companies",
+    "description": "Manage all your client companies",
+    "url": "/companies"
+  },
+  {
+    "icon": "bi bi-people",
+    "color": "text-success",
+    "title": "Customers",
+    "description": "Manage individual customer contacts",
+    "url": "/customers"
+  },
+  {
+    "icon": "bi bi-graph-up-arrow",
+    "color": "text-danger",
+    "title": "Opportunities",
+    "description": "Track sales opportunities and deals",
+    "url": "/opportunities"
+  }
+] %}
 
-  {{ cards.large_card(
-    "bi bi-people", "text-success",
-    "Customers", "Manage individual customer contacts",
-    "/customers"
-  ) }}
+<!-- Large Cards: HTML  -->
+{{ sections.large_cards(large_card_configs) }}
 
-  {{ cards.large_card(
-    "bi bi-graph-up-arrow", "text-danger",
-    "Opportunities", "Track sales opportunities and deals",
-    "/opportunities"
-  ) }}
-</div>
-
-<!-- Summary Section -->
+<!-- Summary Section: Data -->
 {% set stats_data = [
   {"value": "4", "label": "Companies", "color": "text-primary"},
   {"value": "9", "label": "Contacts", "color": "text-success"},
@@ -73,7 +76,7 @@
   }
 ] %}
 
-{{ sections.summary(stats_data, highlights_data) }}
+{{ sections.highlights_section(stats_data, highlights_data) }}
 
 <!-- Recent Activity Section -->
 {% set recent_activities = [

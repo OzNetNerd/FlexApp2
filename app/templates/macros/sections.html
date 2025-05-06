@@ -1,7 +1,30 @@
 {% import "macros/cards.html" as cards %}
 {% import "macros/highlights.html" as highlights %}
 
-{% macro summary(stats_data, highlights_data, title="Summary") %}
+{% macro heading_section(heading_text, subtext) %}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <h1 class="page-heading">{{ heading_text }}</h1>
+      <p class="page-heading-subtext">{{ subtext }}</p>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro large_cards(card_configs) %}
+  <div class="row mb-4">
+    {% for config in card_configs %}
+      {{ cards.large_card(
+        config.icon, config.color,
+        config.title, config.description,
+        config.url
+      ) }}
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro highlights_section(stats_data, highlights_data, title="Summary") %}
 <div class="row mb-4">
   <div class="col-12">
     <div class="card border-0 shadow-sm">
