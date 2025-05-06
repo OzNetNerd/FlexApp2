@@ -33,6 +33,16 @@ html {
   font-size: 1.2rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hover emphasis effect */
+.activity-icon:hover,
+.category-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 /* Container with consistent percentage margin - used for page layout containment */
@@ -481,16 +491,6 @@ Used for user profiles, action buttons, and visual indicators.
   min-width: 36px;
   min-height: 36px;
   margin-right: 10px;
-}
-
-/* Activity icon - used in activity feeds and notifications */
-.activity-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* Avatar components - used for user profiles */
