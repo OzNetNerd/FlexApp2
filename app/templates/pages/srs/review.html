@@ -1,99 +1,146 @@
-# Add these sections to your existing view.html file
+{% extends "pages/srs/base.html" %}
+{% set mode = 'review' %}
+{% import "macros/srs/sections.html" as sections %}
+{% import 'macros/modals.html' as modals %}
+{% import 'macros/buttons.html' as buttons %}
 
-# Add this just below the card-header in the question card:
-{% if is_batch %}
-<div class="batch-review-status bg-light p-2 rounded mb-3">
-  <div class="d-flex justify-content-between align-items-center">
-    <span class="text-muted">
-      <i class="bi bi-layers"></i> Batch review: Card {{ remaining_count }} of {{ remaining_count + session.review_queue|length }}
-    </span>
-    <div>
-      <a href="{{ url_for('srs_bp.filtered_cards') }}" class="btn btn-sm btn-outline-secondary">
-        Exit Review
-      </a>
+{% block srs_content %}
+  <!-- Question Card -->
+  <div class="mb-4">
+    {{ sections.section('question-circle', 'Question', 'text-primary', 'bg-primary-subtle', entity.question) }}
+  </div>
+
+  <!-- Answer Card -->
+  <div class="mb-4">
+    {% call sections.section(
+        icon="pencil-square",
+        title="Your Answer",
+        text_color="text-success",
+        bg_color="bg-success-subtle"
+    ) %}
+      <form id="review-form" data-entity-id="{{ entity.id }}">
+        {{ csrf_input }}
+        <div class="mb-4">
+          <textarea
+            name="answer_given"
+            class="form-control"
+            rows="4"
+            placeholder="Type your answer here..."
+            autofocus></textarea>
+        </div>
+        <div class="d-flex justify-content-end">
+          <button type="submit" id="submit-btn" class="btn btn-primary">
+            <i class="bi bi-check-circle me-1"></i> Submit
+          </button>
+        </div>
+      </form>
+    {% endcall %}
+  </div>
+
+  <div class="d-none" id="rating-section">
+    <div class="col-md-6 d-flex align-items-end justify-content-end">
+      <div class="text-muted small me-3">
+        {% if entity.last_reviewed %}
+        <div>Last reviewed: {{ entity.last_reviewed.strftime('%Y-%m-%d') }}</div>
+        {% endif %}
+        {% if entity.due_date %}
+        <div>Next review: {{ entity.due_date.strftime('%Y-%m-%d') }}</div>
+        {% endif %}
+      </div>
     </div>
   </div>
-</div>
-{% endif %}
 
-# Add this after all existing script blocks:
-<script>
-  // Update the toggleAnswer function
-  function toggleAnswer() {
-    const answerContainer = document.getElementById('answer-container');
-    const showBtn = document.getElementById('show-answer-btn');
-    const visible = !answerContainer.classList.contains('d-none');
-    answerContainer.classList.toggle('d-none');
-    showBtn.textContent = visible ? 'Show Answer (Space)' : 'Hide Answer (Space)';
-  }
+  <div id="answer-container" class="d-none mb-4">
+    {% call sections.section("check-circle", "Correct Answer", "text-info", "bg-info-subtle") %}
+      {{ entity.answer }}
+    {% endcall %}
+  </div>
 
-  // Update the keyboard shortcuts section
-  document.addEventListener('keydown', function (event) {
-    // Add keys 0-5 for ratings
-    if (
-      document.activeElement.tagName !== 'TEXTAREA' &&
-      document.activeElement.tagName !== 'SELECT' &&
-      !isNaN(parseInt(event.key)) &&
-      parseInt(event.key) >= 0 &&
-      parseInt(event.key) <= 5
-    ) {
-      updateRating(event.key);
-      event.preventDefault();
-    }
-
-    // Add Enter key to submit when rating is selected
-    if (event.key === 'Enter' && !document.getElementById('submit-btn').disabled) {
-      document.getElementById('review-form').submit();
-      event.preventDefault();
-    }
-
-    // Update the show answer button to indicate space shortcut
-    document.getElementById('show-answer-btn').textContent =
-      document.getElementById('answer-container').classList.contains('d-none') ?
-      'Show Answer (Space)' : 'Hide Answer (Space)';
-  });
-</script>
-
-<!-- Add keyboard shortcuts help tooltip -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1030;">
-  <div class="toast align-items-center border-0 bg-dark text-white" role="alert" aria-live="assertive" aria-atomic="true" id="shortcuts-toast">
-    <div class="d-flex">
-      <div class="toast-body">
-        <strong>Keyboard Shortcuts</strong><br>
-        <div class="row mt-2">
-          <div class="col-6">
-            <small>Space: Show/Hide Answer<br>
-            0-5: Select Rating<br>
-            Enter: Submit Review</small>
+  <div id="rating-controls" class="d-none mb-4">
+    {% call sections.section("star-half", "Knowledge Rating", "text-success", "bg-success-light") %}
+      <div class="col-md-6">
+        <label class="form-label fs-6">How well did you know this?</label>
+        <div class="rating-container d-flex align-items-center gap-3">
+          <div>
+            <input type="range" class="form-range" id="rating-slider" min="0" max="5" value=""
+                  oninput="updateRating(this.value)" title="Drag to select rating">
           </div>
-          <div class="col-6">
-            <small>Shift+→: Next Card<br>
-            Shift+←: Previous Card<br>
-            H: Show This Help</small>
-          </div>
+          <select name="rating" id="rating-select" class="form-select fs-6" style="width: 220px"
+                  onchange="updateSlider(this.value)" required>
+            <option value="" selected disabled>-- Select rating --</option>
+            <option value="0">0 - No recall</option>
+            <option value="1">1 - Very Hard</option>
+            <option value="2">2 - Hard</option>
+            <option value="3">3 - Normal</option>
+            <option value="4">4 - Easy</option>
+            <option value="5">5 - Perfect</option>
+          </select>
         </div>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+
+      <div class="mt-3">
+        <div class="progress" style="height: 6px;">
+          <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%;"
+              aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+    {% endcall %}
+  </div>
+
+  <div id="next-button-container" class="d-flex justify-content-end mt-3 mb-4">
+    <!-- Using icon_button macro for the Next button, initially hidden -->
+    <div class="d-none" id="next-btn-wrapper">
+    {{ buttons.icon_button(
+        href="#",
+        class="btn btn-success",
+        icon_lib="fas",
+        icon="arrow-right",
+        text="Next",
+        onclick="submitReview()"
+    ) }}
     </div>
   </div>
+{% endblock %}
+
+{% block modals %}
+<!-- Delete Confirmation Modal -->
+{{ modals.delete_modal('srs_bp', entity.id) }}
+
+<!-- Finished review message modal -->
+{% set content %}
+<p>Congratulations! You've completed all your flashcards for this session.</p>
+<div class="text-center mt-3 mb-2">
+  <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
 </div>
+{% endset %}
 
+{% set footer %}
+{{ buttons.icon_button(href="/srs/dashboard", class="btn", colour="primary", icon="home", text="Go to Dashboard") }}
+{% endset %}
+
+{{ modals.notification('finishedModal', 'Review Complete!', content, footer) }}
+
+<!-- Rating Required Modal -->
+{% set required_content %}
+<p>Please select a rating before proceeding.</p>
+<div class="text-center mt-3 mb-2">
+  <i class="bi bi-exclamation-circle text-warning" style="font-size: 3rem;"></i>
+</div>
+{% endset %}
+
+{% set required_footer %}
+{{ buttons.icon_button(onclick="dismissRequiredModal()", class="btn", colour="primary", icon="check", text="OK") }}
+{% endset %}
+
+{{ modals.notification('ratingRequiredModal', 'Rating Required', required_content, required_footer) }}
+{% endblock %}
+
+{% block srs_scripts %}
 <script>
-  // Show keyboard shortcuts toast when H key is pressed
-  document.addEventListener('keydown', function(event) {
-    if (event.key === 'h' || event.key === 'H') {
-      const toast = new bootstrap.Toast(document.getElementById('shortcuts-toast'));
-      toast.show();
-    }
-  });
-
-  // Show toast briefly on page load to notify user of keyboard shortcuts
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-      const toast = new bootstrap.Toast(document.getElementById('shortcuts-toast'), {
-        delay: 3000
-      });
-      toast.show();
-    }, 1500);
-  });
+  // Pass template variables to external JS
+  const APP_CONFIG = {
+    nextItemId: "{{ next_item_id|default('') }}"
+  };
 </script>
+<script src="{{ url_for('static', filename='js/pages/srs/review.js') }}"></script>
+{% endblock %}

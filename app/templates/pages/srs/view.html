@@ -1,18 +1,18 @@
 {% extends "pages/srs/base.html" %}
 {% set mode = 'review' %}
-{% from "macros/cards.html" import section_card %}
+{% import "macros/srs/sections.html" as sections %}
 {% import 'macros/modals.html' as modals %}
 {% import 'macros/buttons.html' as buttons %}
 
 {% block srs_content %}
   <!-- Question Card -->
   <div class="mb-4">
-    {{ section_card('question-circle', 'Question', 'text-primary', 'bg-primary-subtle', entity.question) }}
+    {{ sections.section('question-circle', 'Question', 'text-primary', 'bg-primary-subtle', entity.question) }}
   </div>
 
   <!-- Answer Card -->
   <div class="mb-4">
-    {% call section_card(
+    {% call sections.section(
         icon="pencil-square",
         title="Your Answer",
         text_color="text-success",
@@ -51,13 +51,13 @@
   </div>
 
   <div id="answer-container" class="d-none mb-4">
-    {% call section_card("check-circle", "Correct Answer", "text-info", "bg-info-subtle") %}
+    {% call sections.section("check-circle", "Correct Answer", "text-info", "bg-info-subtle") %}
       {{ entity.answer }}
     {% endcall %}
   </div>
 
   <div id="rating-controls" class="d-none mb-4">
-    {% call section_card("star-half", "Knowledge Rating", "text-success", "bg-success-light") %}
+    {% call sections.section("star-half", "Knowledge Rating", "text-success", "bg-success-light") %}
       <div class="col-md-6">
         <label class="form-label fs-6">How well did you know this?</label>
         <div class="rating-container d-flex align-items-center gap-3">
