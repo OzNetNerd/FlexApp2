@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-{% import "macros/navigation_cards.html" as navigation_cards %}
+{% import "macros/cards.html" as cards %}
 {% import "macros/recent_activity.html" as recent_activity %}
 {% import "macros/sections.html" as sections %}
 
@@ -18,19 +18,19 @@
 
 <div class="row mb-4">
 <!-- Navigation Cards -->
-  {{ navigation_cards.navigation_card(
+  {{ cards.large_card(
     "bi bi-building", "text-primary",
     "Companies", "Manage all your client companies",
     "/companies"
   ) }}
 
-  {{ navigation_cards.navigation_card(
+  {{ cards.large_card(
     "bi bi-people", "text-success",
     "Customers", "Manage individual customer contacts",
     "/customers"
   ) }}
 
-  {{ navigation_cards.navigation_card(
+  {{ cards.large_card(
     "bi bi-graph-up-arrow", "text-danger",
     "Opportunities", "Track sales opportunities and deals",
     "/opportunities"

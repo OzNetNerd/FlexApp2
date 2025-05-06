@@ -1,4 +1,4 @@
-{% import "macros/navigation_cards.html" as navigation_cards %}
+{% import "macros/cards.html" as cards %}
 {% import "macros/highlights.html" as highlights %}
 
 {% macro summary(stats_data, highlights_data, title="Summary") %}
@@ -11,7 +11,7 @@
       <div class="card-body">
         <div class="row">
           {% for stat in stats_data %}
-            {{ navigation_cards.stats_card(stat.value, stat.label, stat.color) }}
+            {{ cards.stats_card(stat.value, stat.label, stat.color) }}
           {% endfor %}
         </div>
 
