@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, session
+from flask import request, redirect, url_for, flash, session
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -6,6 +6,8 @@ from app.models.pages.srs import SRS
 from app.services.srs_service import SRSService
 from app.routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
 from app.utils.app_logging import get_logger, log_message_and_variables
+from app.template_renderer import render_safely, RenderSafelyConfig
+from app.routes.web.utils.context import WebContext
 
 logger = get_logger()
 
@@ -23,6 +25,33 @@ srs_config = BlueprintConfig(model_class=SRS, service=srs_service)
 # Create the blueprint using the config
 logger.info("Creating SRS blueprint")
 srs_bp = create_crud_blueprint(srs_config)
+
+
+# Custom context classes for SRS pages
+class SRSContext(WebContext):
+    """Base context for SRS pages."""
+
+    def __init__(self, title="SRS", **kwargs):
+        super().__init__(title=title, **kwargs)
+
+
+class SRSCardListContext(SRSContext):
+    """Context for pages displaying card lists."""
+
+    def __init__(self, title, cards, **kwargs):
+        super().__init__(title=title, **kwargs)
+        self.cards = cards
+
+
+class SRSDashboardContext(SRSContext):
+    """Context for the SRS dashboard."""
+
+    def __init__(self, stats, categories, due_cards, progress_data, **kwargs):
+        super().__init__(title="SRS Dashboard", **kwargs)
+        self.stats = stats
+        self.categories = categories
+        self.due_cards = due_cards
+        self.progress_data = progress_data
 
 
 # Dashboard route
@@ -86,7 +115,21 @@ def dashboard():
     progress_data = srs_service.get_learning_progress_data(months=7)
 
     logger.info("Rendering SRS dashboard")
-    return render_template("pages/srs/dashboard.html", stats=stats, categories=categories, due_cards=due_cards, progress_data=progress_data)
+    context = SRSDashboardContext(
+        stats=stats,
+        categories=categories,
+        due_cards=due_cards,
+        progress_data=progress_data
+    )
+
+    config = RenderSafelyConfig(
+        template_path="pages/srs/dashboard.html",
+        context=context,
+        error_message="Failed to render SRS dashboard",
+        endpoint_name="srs_bp.dashboard"
+    )
+
+    return render_safely(config)
 
 
 # Due cards route
@@ -97,7 +140,20 @@ def due_cards():
     logger.info(f"User {current_user.id} viewing all due cards")
     cards = srs_service.get_due_cards()
     logger.info(f"Retrieved {len(cards)} due cards")
-    return render_template("pages/srs/due.html", cards=cards, title="Cards Due Today")
+
+    context = SRSCardListContext(
+        title="Cards Due Today",
+        cards=cards
+    )
+
+    config = RenderSafelyConfig(
+        template_path="pages/srs/due.html",
+        context=context,
+        error_message="Failed to render due cards page",
+        endpoint_name="srs_bp.due_cards"
+    )
+
+    return render_safely(config)
 
 
 @srs_bp.route("/<int:item_id>/review", methods=["GET", "POST"])
@@ -151,15 +207,32 @@ def review_item(item_id):
     remaining_count = len(session.get("review_queue", [])) + 1 if is_batch else 0
 
     logger.info(f"Rendering review page for card {item_id}")
-    return render_template(
-        "pages/srs/review.html",
+
+    class SRSReviewContext(SRSContext):
+        def __init__(self, card, next_item_id, prev_item_id, is_batch, remaining_count):
+            super().__init__(title="Review Card")
+            self.card = card
+            self.next_item_id = next_item_id
+            self.prev_item_id = prev_item_id
+            self.is_batch = is_batch
+            self.remaining_count = remaining_count
+
+    context = SRSReviewContext(
         card=item,
-        title="Review Card",
         next_item_id=next_item_id,
         prev_item_id=prev_item_id,
         is_batch=is_batch,
-        remaining_count=remaining_count,
+        remaining_count=remaining_count
     )
+
+    config = RenderSafelyConfig(
+        template_path="pages/srs/review.html",
+        context=context,
+        error_message="Failed to render review page",
+        endpoint_name="srs_bp.review_item"
+    )
+
+    return render_safely(config)
 
 
 # Category view route
@@ -180,14 +253,29 @@ def category_view(category_type):
     info = category_info.get(category_type, {"name": "Unknown", "color": "secondary"})
     logger.info(f"Rendering category view for {info['name']}")
 
-    return render_template(
-        "pages/srs/category.html",
+    class SRSCategoryContext(SRSContext):
+        def __init__(self, cards, category_type, category_name, category_color):
+            super().__init__(title=f"{category_name} Cards")
+            self.cards = cards
+            self.category_type = category_type
+            self.category_name = category_name
+            self.category_color = category_color
+
+    context = SRSCategoryContext(
         cards=cards,
         category_type=category_type,
         category_name=info["name"],
-        category_color=info["color"],
-        title=f"{info['name']} Cards",
+        category_color=info["color"]
     )
+
+    config = RenderSafelyConfig(
+        template_path="pages/srs/category.html",
+        context=context,
+        error_message=f"Failed to render category view for {category_type}",
+        endpoint_name="srs_bp.category_view"
+    )
+
+    return render_safely(config)
 
 
 # Statistics route
@@ -198,7 +286,18 @@ def statistics():
     logger.info(f"User {current_user.id} viewing detailed learning statistics")
     stats = srs_service.get_detailed_stats()
     logger.info("Retrieved detailed SRS statistics")
-    return render_template("pages/srs/stats.html", stats=stats, title="Learning Statistics")
+
+    context = SRSContext(title="Learning Statistics")
+    context.stats = stats
+
+    config = RenderSafelyConfig(
+        template_path="pages/srs/stats.html",
+        context=context,
+        error_message="Failed to render statistics page",
+        endpoint_name="srs_bp.statistics"
+    )
+
+    return render_safely(config)
 
 
 @srs_bp.route("/learning-stage/<stage>", methods=["GET"])
@@ -215,11 +314,24 @@ def cards_by_learning_stage(stage):
     cards = srs_service.get_cards_by_learning_stage(stage)
     logger.info(f"Retrieved {len(cards)} cards in learning stage {stage}")
 
-    stage_names = {"new": "New Cards", "learning": "Learning Cards", "reviewing": "Review Cards", "mastered": "Mastered Cards"}
+    stage_names = {"new": "New Cards", "learning": "Learning Cards", "reviewing": "Review Cards",
+                   "mastered": "Mastered Cards"}
 
     logger.info(f"Rendering filtered cards for learning stage: {stage_names[stage]}")
-    return render_template(
-        "pages/srs/filtered_cards.html",
+
+    class SRSFilteredCardsContext(SRSContext):
+        def __init__(self, cards, title, filters, category_counts, due_category_counts, due_today, total_cards,
+                     active_tab):
+            super().__init__(title=title)
+            self.cards = cards
+            self.filters = filters
+            self.category_counts = category_counts
+            self.due_category_counts = due_category_counts
+            self.due_today = due_today
+            self.total_cards = total_cards
+            self.active_tab = active_tab
+
+    context = SRSFilteredCardsContext(
         cards=cards,
         title=stage_names[stage],
         filters={"learning_stage": stage},
@@ -227,8 +339,17 @@ def cards_by_learning_stage(stage):
         due_category_counts=srs_service.count_due_by_type(),
         due_today=srs_service.count_due_today(),
         total_cards=srs_service.count_total(),
-        active_tab=stage,
+        active_tab=stage
     )
+
+    config = RenderSafelyConfig(
+        template_path="pages/srs/filtered_cards.html",
+        context=context,
+        error_message=f"Failed to render cards by learning stage: {stage}",
+        endpoint_name="srs_bp.cards_by_learning_stage"
+    )
+
+    return render_safely(config)
 
 
 @srs_bp.route("/difficulty/<difficulty>", methods=["GET"])
@@ -248,8 +369,8 @@ def cards_by_difficulty(difficulty):
     difficulty_names = {"hard": "Hard Cards", "medium": "Medium Difficulty Cards", "easy": "Easy Cards"}
 
     logger.info(f"Rendering filtered cards for difficulty: {difficulty_names[difficulty]}")
-    return render_template(
-        "pages/srs/filtered_cards.html",
+
+    context = SRSFilteredCardsContext(
         cards=cards,
         title=difficulty_names[difficulty],
         filters={"difficulty": difficulty},
@@ -257,8 +378,17 @@ def cards_by_difficulty(difficulty):
         due_category_counts=srs_service.count_due_by_type(),
         due_today=srs_service.count_due_today(),
         total_cards=srs_service.count_total(),
-        active_tab=f"difficulty_{difficulty}",
+        active_tab=f"difficulty_{difficulty}"
     )
+
+    config = RenderSafelyConfig(
+        template_path="pages/srs/filtered_cards.html",
+        context=context,
+        error_message=f"Failed to render cards by difficulty: {difficulty}",
+        endpoint_name="srs_bp.cards_by_difficulty"
+    )
+
+    return render_safely(config)
 
 
 @srs_bp.route("/performance/<performance>", methods=["GET"])
@@ -275,11 +405,12 @@ def cards_by_performance(performance):
     cards = srs_service.get_cards_by_performance(performance)
     logger.info(f"Retrieved {len(cards)} cards with performance {performance}")
 
-    performance_names = {"struggling": "Struggling Cards", "average": "Average Performance Cards", "strong": "Strong Performance Cards"}
+    performance_names = {"struggling": "Struggling Cards", "average": "Average Performance Cards",
+                         "strong": "Strong Performance Cards"}
 
     logger.info(f"Rendering filtered cards for performance: {performance_names[performance]}")
-    return render_template(
-        "pages/srs/filtered_cards.html",
+
+    context = SRSFilteredCardsContext(
         cards=cards,
         title=performance_names[performance],
         filters={"performance": performance},
@@ -287,8 +418,17 @@ def cards_by_performance(performance):
         due_category_counts=srs_service.count_due_by_type(),
         due_today=srs_service.count_due_today(),
         total_cards=srs_service.count_total(),
-        active_tab=f"performance_{performance}",
+        active_tab=f"performance_{performance}"
     )
+
+    config = RenderSafelyConfig(
+        template_path="pages/srs/filtered_cards.html",
+        context=context,
+        error_message=f"Failed to render cards by performance: {performance}",
+        endpoint_name="srs_bp.cards_by_performance"
+    )
+
+    return render_safely(config)
 
 
 @srs_bp.route("/strategy/<strategy>", methods=["GET"])
@@ -378,24 +518,35 @@ def filtered_cards():
     performance_counts = srs_service.get_performance_counts()
 
     # Prepare template data
-    template_data = {
-        "cards": cards,
-        "title": "Filtered Cards",
-        "filters": filters,
-        "category_counts": category_counts,
-        "due_category_counts": due_category_counts,
-        "due_today": srs_service.count_due_today(),
-        "total_cards": srs_service.count_total(),
-        "learning_stages": learning_stages,
-        "difficulty_counts": difficulty_counts,
-        "performance_counts": performance_counts,
-        "now": datetime.now(ZoneInfo("UTC")),
-    }
+    class SRSFilteredContext(SRSContext):
+        def __init__(self, **kwargs):
+            super().__init__(title="Filtered Cards", **kwargs)
+            for key, value in kwargs.items():
+                setattr(self, key, value)
 
-    template_name = "pages/srs/filtered_cards.html"
-    log_message_and_variables(f"📄 Vars being sent to template:", template_data)
-    logger.info(f"📄 Rendering template: {template_name}")
-    return render_template(template_name, **template_data)
+    context = SRSFilteredContext(
+        cards=cards,
+        filters=filters,
+        category_counts=category_counts,
+        due_category_counts=due_category_counts,
+        due_today=srs_service.count_due_today(),
+        total_cards=srs_service.count_total(),
+        learning_stages=learning_stages,
+        difficulty_counts=difficulty_counts,
+        performance_counts=performance_counts,
+        now=datetime.now(ZoneInfo("UTC"))
+    )
+
+    config = RenderSafelyConfig(
+        template_path="pages/srs/filtered_cards.html",
+        context=context,
+        error_message="Failed to render filtered cards",
+        endpoint_name="srs_bp.filtered_cards"
+    )
+
+    log_message_and_variables(f"📄 Vars being sent to template:", context.to_dict())
+    logger.info(f"📄 Rendering template: {config.template_path}")
+    return render_safely(config)
 
 
 @srs_bp.route("/batch-action", methods=["POST"])
@@ -516,7 +667,8 @@ def add_card():
         else:
             # Set review date to tomorrow by default
             logger.info("Setting card for review tomorrow")
-            new_card["next_review_at"] = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(
+            new_card["next_review_at"] = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0,
+                                                                               microsecond=0) + timedelta(
                 days=1
             )
 
@@ -546,7 +698,23 @@ def add_card():
     stats = srs_service.get_stats()
 
     logger.info("Rendering add card form")
-    return render_template("pages/srs/add_card.html", title="Add New Card", categories=categories, stats=stats)
+
+    class SRSAddCardContext(SRSContext):
+        def __init__(self, categories, stats):
+            super().__init__(title="Add New Card")
+            self.categories = categories
+            self.stats = stats
+
+    context = SRSAddCardContext(categories=categories, stats=stats)
+
+    config = RenderSafelyConfig(
+        template_path="pages/srs/add_card.html",
+        context=context,
+        error_message="Failed to render add card form",
+        endpoint_name="srs_bp.add_card"
+    )
+
+    return render_safely(config)
 
 
 @srs_bp.route("/categories/create", methods=["POST"])
