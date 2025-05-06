@@ -157,7 +157,7 @@
               activity_label="notes",
               percentage=user_categories[0].percentage,
               icon="bi-person",
-              color_class="bg-info",
+              color_class="info",
               button_label="Learn More",
               button_url="#"
           ) }}
@@ -168,7 +168,7 @@
                 activity_label="notes",
                 percentage=user_categories[1].percentage,
                 icon="bi-shield-lock",
-                color_class="bg-primary",
+                color_class="primary",
                 button_label="View Admins",
                 button_url=url_for('users_bp.filtered_users', is_admin='true')
             ) }}
@@ -179,7 +179,7 @@
                 activity_label="notes",
                 percentage=user_categories[2].percentage,
                 icon="bi-calendar-check",
-                color_class="bg-warning",
+                color_class="danger",
                 button_label="View New Users",
                 button_url=url_for('users_bp.filtered_users', period='month')
             ) }}
