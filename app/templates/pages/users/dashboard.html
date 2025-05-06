@@ -4,7 +4,6 @@
 {% import "macros/sections.html" as sections %}
 {% import "macros/cards.html" as cards %}
 
-
 {% block title %}CRM Dashboard - Users{% endblock %}
 
 {% block head_extra %}
@@ -53,92 +52,27 @@
 {{ sections.large_cards_section(large_card_data) }}
 
 <!-- Summary Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white">
-        <h2 class="section-card-heading">User Summary</h2>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-primary">{{ stats.total_users }}</div>
-                <div class="section-subcard-number-subtext">Total Users</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-danger">{{ stats.admin_count }}</div>
-                <div class="section-subcard-number-subtext">Admin Users</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-success">{{ stats.new_users_month }}</div>
-                <div class="section-subcard-number-subtext">New This Month</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-info">{{ stats.avg_notes }}</div>
-                <div class="section-subcard-number-subtext">Avg Notes/User</div>
-              </div>
-            </div>
-          </div>
-        </div>
+{% set user_summary = {
+  'title': 'User Summary',
+  'stats_data': [
+    {'value': stats.total_users, 'label': 'Total Users', 'color': 'primary'},
+    {'value': stats.admin_count, 'label': 'Admin Users', 'color': 'danger'},
+    {'value': stats.new_users_month, 'label': 'New This Month', 'color': 'success'},
+    {'value': stats.avg_notes, 'label': 'Avg Notes/User', 'color': 'info'}
+  ],
+  'highlights_data': [
+    {'icon': 'fas fa-user-check', 'icon_color': 'text-success', 'content': '<span class="fw-bold">'+stats.active_users|string+'</span> active users this week'},
+    {'icon': 'fas fa-trophy', 'icon_color': 'text-warning', 'content': '<span class="fw-bold">'+stats.top_user|string+'</span> created the most opportunities'},
+    {'icon': 'fas fa-chart-line', 'icon_color': 'text-primary', 'content': 'User activity increased by <span class="fw-bold">'+stats.activity_increase|string+'%</span> this month'},
+    {'icon': 'fas fa-hourglass-half', 'icon_color': 'text-danger', 'content': '<span class="fw-bold">'+stats.inactive_count|string+'</span> users with no activity for 14+ days'}
+  ]
+} %}
 
-        <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
-          <div class="highlights-container">
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-user-check text-success me-1"></i>
-                <span class="fw-bold">{{ stats.active_users }}</span> active users this week
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-trophy text-warning me-1"></i>
-                <span class="fw-bold">{{ stats.top_user }}</span> created the most opportunities
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-chart-line text-primary me-1"></i>
-                User activity increased by <span class="fw-bold">{{ stats.activity_increase }}%</span> this month
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-hourglass-half text-danger me-1"></i>
-                <span class="fw-bold">{{ stats.inactive_count }}</span> users with no activity for 14+ days
-              </p>
-            </div>
-          </div>
-
-          <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
-            <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+{{ sections.highlights_section(
+    title=user_summary.title,
+    stats_data=user_summary.stats_data,
+    highlights_data=user_summary.highlights_data
+) }}
 
 <!-- User Categories Section -->
 <div class="row mb-4">
