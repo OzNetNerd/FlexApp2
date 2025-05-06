@@ -164,14 +164,11 @@
                   <div class="progress-bar bg-info" role="progressbar" style="width: {{ user_categories[0].percentage }}%;" aria-valuenow="{{ user_categories[0].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  {{ buttons.transparent_button(
-    href='#',
-    label='Learn More',
-    border_color='#0dcaf0',
-    text_color='#0dcaf0',
-    hover_bg_color='#0dcaf0',
-    hover_text_color='#fff'
-) }}
+                {{ buttons.transparent_button(
+                    href='#',
+                    label='Learn More',
+                    color_class='btn-info'
+                ) }}
                 </div>
               </div>
             </div>

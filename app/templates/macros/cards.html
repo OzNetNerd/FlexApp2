@@ -37,3 +37,18 @@
   </div>
 </li>
 {% endmacro %}
+
+
+{# macros/cards.html #}
+{% macro progress_bar_card(value, label, color="primary", percentage=75) %}
+<div class="stats-card card border-0 bg-light h-100">
+  <div class="card-body text-center">
+    <div class="section-subcard-number-heading text-{{ color }}">{{ value }}</div>
+    <div class="section-subcard-number-subtext">{{ label }}</div>
+    <div class="progress mt-2">
+      <div class="progress-bar bg-{{ color }}" role="progressbar" style="width: {{ percentage }}%"
+           aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
