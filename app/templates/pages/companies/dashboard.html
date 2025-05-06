@@ -20,7 +20,7 @@
 {% set large_card_data = [
     {
         "icon": "bi bi-building",
-        "color": "primary",
+        "color": "text-primary",
         "title": "Active Accounts",
         "description": "With opportunities",
         "url": url_for('companies_bp.filtered_companies', has_opportunities='yes'),
@@ -28,7 +28,7 @@
     },
     {
         "icon": "bi bi-plus-circle",
-        "color": "success",
+        "color": "text-success",
         "title": "Add Company",
         "description": "Create new account",
         "url": url_for('companies_bp.create'),
@@ -36,7 +36,7 @@
     },
     {
         "icon": "bi bi-person-lines-fill",
-        "color": "warning",
+        "color": "text-warning",
         "title": "With Contacts",
         "description": "View companies with contacts",
         "url": url_for('companies_bp.filtered_companies', has_contacts='yes'),
