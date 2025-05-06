@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-{% import "macros/widgets.html" as widgets %}
+{% import "macros/navigation_cards.html" as navigation_cards %}
 {% import "macros/highlights.html" as highlights %}
 {% import "macros/recent_activity.html" as recent_activity %}
 
@@ -16,21 +16,21 @@
   </div>
 </div>
 
-<!-- Navigation Cards -->
 <div class="row mb-4">
-  {{ widgets.navigation_card(
+<!-- Navigation Cards -->
+  {{ navigation_cards.navigation_card(
     "bi bi-building", "text-primary",
     "Companies", "Manage all your client companies",
     "/companies"
   ) }}
 
-  {{ widgets.navigation_card(
+  {{ navigation_cards.navigation_card(
     "bi bi-people", "text-success",
     "Customers", "Manage individual customer contacts",
     "/customers"
   ) }}
 
-  {{ widgets.navigation_card(
+  {{ navigation_cards.navigation_card(
     "bi bi-graph-up-arrow", "text-danger",
     "Opportunities", "Track sales opportunities and deals",
     "/opportunities"
@@ -46,37 +46,46 @@
       </div>
       <div class="card-body">
         <div class="row">
-          {{ widgets.stat_card("4", "Companies", "text-primary") }}
-          {{ widgets.stat_card("9", "Contacts", "text-success") }}
-          {{ widgets.stat_card("7", "Deals", "text-danger") }}
-          {{ widgets.stat_card("$925K", "Pipeline", "text-info") }}
+          {{ navigation_cards.stat_card("4", "Companies", "text-primary") }}
+          {{ navigation_cards.stat_card("9", "Contacts", "text-success") }}
+          {{ navigation_cards.stat_card("7", "Deals", "text-danger") }}
+          {{ navigation_cards.stat_card("$925K", "Pipeline", "text-info") }}
         </div>
 
-        {{ highlights.highlights([
+        {% set highlights_data = [
           {
-            'content': '<span class="text-primary fw-bold">4</span> companies · <span class="text-success fw-bold">9</span> contacts · <span class="text-danger fw-bold">7</span> deals = <span class="text-info fw-bold">$925K</span> pipeline'
+            "icon": "bi bi-diagram-3",
+            "bg_color": "bg-primary",
+            "message": "<strong>4</strong> companies · <strong>9</strong> contacts · <strong>7</strong> deals = <strong>$925K</strong> pipeline",
+            "time": "Current"
           },
           {
-            'icon': 'fas fa-arrow-up',
-            'icon_class': 'text-success',
-            'content': '<span class="fw-bold">$125K</span> added to pipeline this week'
+            "icon": "bi bi-arrow-up",
+            "bg_color": "bg-success",
+            "message": "<strong>$125K</strong> added to pipeline this week",
+            "time": "This week"
           },
           {
-            'icon': 'fas fa-chart-line',
-            'icon_class': 'text-primary',
-            'content': '<span class="fw-bold">3</span> deals progressed to next stage'
+            "icon": "bi bi-graph-up",
+            "bg_color": "bg-primary",
+            "message": "<strong>3</strong> deals progressed to next stage",
+            "time": "This week"
           },
           {
-            'icon': 'fas fa-percentage',
-            'icon_class': 'text-warning',
-            'content': 'CRIP score increased by <span class="fw-bold">12%</span> this month'
+            "icon": "bi bi-percent",
+            "bg_color": "bg-warning",
+            "message": "CRIP score increased by <strong>12%</strong> this month",
+            "time": "This month"
           },
           {
-            'icon': 'fas fa-trophy',
-            'icon_class': 'text-danger',
-            'content': '<span class="fw-bold">2</span> net new logos added this quarter'
+            "icon": "bi bi-trophy",
+            "bg_color": "bg-danger",
+            "message": "<strong>2</strong> net new logos added this quarter",
+            "time": "This quarter"
           }
-        ]) }}
+        ] %}
+
+        {{ highlights.highlights(highlights_data) }}
 
       </div>
     </div>
