@@ -16,142 +16,46 @@
   subtext='Manage your customers and prospects efficiently'
 ) }}
 
-<!-- Quick Actions Cards -->
-<div class="row mb-4">
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('companies_bp.filtered_companies', has_opportunities='yes') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-building text-primary large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Active Accounts</h2>
-        <p class="large-card-title-subtext">With opportunities</p>
-        <div class="badge bg-danger">{{ stats.with_opportunities }}</div>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('companies_bp.create') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-plus-circle text-success large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Add Company</h2>
-        <p class="large-card-title-subtext">Create new account</p>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('companies_bp.filtered_companies', has_contacts='yes') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-person-lines-fill text-warning large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">With Contacts</h2>
-        <p class="large-card-title-subtext">View companies with contacts</p>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('companies_bp.statistics') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-bar-chart text-info large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Analytics</h2>
-        <p class="large-card-title-subtext">Company insights</p>
-      </div>
-    </a>
-  </div>
-</div>
+<!-- Summary Section: Data -->
+{% set large_card_data = [
+    {
+        "icon": "bi bi-building",
+        "color": "primary",
+        "title": "Active Accounts",
+        "description": "With opportunities",
+        "url": url_for('companies_bp.filtered_companies', has_opportunities='yes'),
+        "badge": stats.with_opportunities
+    },
+    {
+        "icon": "bi bi-plus-circle",
+        "color": "success",
+        "title": "Add Company",
+        "description": "Create new account",
+        "url": url_for('companies_bp.create'),
+        "badge": None
+    },
+    {
+        "icon": "bi bi-person-lines-fill",
+        "color": "warning",
+        "title": "With Contacts",
+        "description": "View companies with contacts",
+        "url": url_for('companies_bp.filtered_companies', has_contacts='yes'),
+        "badge": None
+    },
+    {
+        "icon": "bi bi-bar-chart",
+        "color": "info",
+        "title": "Analytics",
+        "description": "Company insights",
+        "url": url_for('companies_bp.statistics'),
+        "badge": None
+    }
+] %}
+
 
 <!-- Summary Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white">
-        <h2 class="section-card-heading">Companies Summary</h2>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-primary">{{ stats.total_companies }}</div>
-                <div class="section-subcard-number-subtext">Total Companies</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-danger">{{ stats.with_opportunities }}</div>
-                <div class="section-subcard-number-subtext">With Opportunities</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-success">{{ stats.with_contacts }}</div>
-                <div class="section-subcard-number-subtext">With Contacts</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-info">{{ stats.with_capabilities }}</div>
-                <div class="section-subcard-number-subtext">With Capabilities</div>
-              </div>
-            </div>
-          </div>
-        </div>
+{{ sections.large_cards_section(large_card_data) }}
 
-        <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
-          <div class="highlights-container">
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-building text-success me-1"></i>
-                <span class="fw-bold">{{ stats.with_opportunities }}</span> companies have active opportunities
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-address-book text-warning me-1"></i>
-                <span class="fw-bold">{{ stats.with_contacts }}</span> companies have contacts
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-chart-line text-primary me-1"></i>
-                <span class="fw-bold">{{ segments[0].count }}</span> companies have 3+ opportunities
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-exclamation-triangle text-danger me-1"></i>
-                <span class="fw-bold">{{ segments[2].count }}</span> companies have no opportunities
-              </p>
-            </div>
-          </div>
-
-          <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
-            <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Company Segments Section -->
 <div class="row mb-4">
