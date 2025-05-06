@@ -12,13 +12,16 @@
 </div>
 {% endmacro %}
 
-{% macro large_cards(card_data) %}
-  <div class="row mb-4">
+{% macro large_cards_section(card_data) %}
+  <div class="row d-flex flex-nowrap mb-4">
     {% for card in card_data %}
       {{ cards.large_card(
-        card.icon, card.color,
-        card.title, card.description,
-        card.url
+        card.icon,
+        card.color,
+        card.title,
+        card.description,
+        card.url,
+        card.badge
       ) }}
     {% endfor %}
   </div>
