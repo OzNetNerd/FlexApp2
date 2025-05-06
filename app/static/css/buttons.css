@@ -1,0 +1,20 @@
+.transparent-button {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 12.8px;
+  font-weight: 500;
+  color: #0d6efd;
+  background-color: transparent;
+  border: 1px solid #0d6efd;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  transition: all 0.15s ease-in-out;
+  font-size: var(--bs-btn-font-size);
+}
+
+.transparent-button:hover,
+.transparent-button:focus {
+  background-color: #0d6efd;
+  color: #fff;
+  text-decoration: none;
+}

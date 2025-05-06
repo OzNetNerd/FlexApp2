@@ -157,7 +157,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">User Categories</h2>
-        <a href="{{ url_for('users_bp.filtered_users') }}" class="btn btn-sm btn-outline-primary">View All Users</a>
+        <a href="{{ url_for('users_bp.filtered_users') }}" class=" transparent-button">View All Users</a>
       </div>
       <div class="card-body">
         <div class="row">
@@ -194,7 +194,7 @@
                   <div class="progress-bar bg-primary" role="progressbar" style="width: {{ user_categories[1].percentage }}%;" aria-valuenow="{{ user_categories[1].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('users_bp.filtered_users', is_admin='true') }}" class="btn btn-sm btn-outline-primary">View Admins</a>
+                  <a href="{{ url_for('users_bp.filtered_users', is_admin='true') }}" class=" transparent-button">View Admins</a>
                 </div>
               </div>
             </div>
@@ -231,7 +231,7 @@
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">Top Active Users</h2>
         <div>
-          <a href="{{ url_for('users_bp.filtered_users') }}" class="btn btn-sm btn-outline-primary me-2">
+          <a href="{{ url_for('users_bp.filtered_users') }}" class=" transparent-button me-2">
             <i class="bi bi-funnel"></i> Filter Users
           </a>
           <a href="{{ url_for('users_bp.create') }}" class="btn btn-sm btn-primary">Add User</a>
@@ -269,7 +269,7 @@
                 <td>{{ user.notes_count }}</td>
                 <td>{{ user.opportunities_count }}</td>
                 <td class="text-center">
-                  <a href="{{ url_for('users_bp.view', entity_id=user.id) }}" class="btn btn-sm btn-outline-primary me-1">View</a>
+                  <a href="{{ url_for('users_bp.view', entity_id=user.id) }}" class=" transparent-button me-1">View</a>
                   <a href="{{ url_for('users_bp.edit', entity_id=user.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
                 </td>
               </tr>
