@@ -6,7 +6,7 @@ from app.models.pages.srs import SRS
 from app.services.srs_service import SRSService
 from app.routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
 from app.utils.app_logging import get_logger, log_message_and_variables
-from app.template_renderer import render_safely, RenderSafelyConfig
+from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.web.utils.context import WebContext
 
 logger = get_logger()
