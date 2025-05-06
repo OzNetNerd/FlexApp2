@@ -1,5 +1,6 @@
 <!-- dashboard.html for users -->
 {% extends "layouts/base.html" %}
+{% from "macros/buttons.html" import transparent_button %}
 
 {% block title %}CRM Dashboard - Users{% endblock %}
 
@@ -175,7 +176,15 @@
                   <div class="progress-bar bg-info" role="progressbar" style="width: {{ user_categories[0].percentage }}%;" aria-valuenow="{{ user_categories[0].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('users_bp.filtered_users', is_admin='false') }}" class="transparent-button">View Users</a>
+                  {{ transparent_button(
+    href='#',
+    label='Learn More',
+    border_color='#0dcaf0',
+    text_color='#0dcaf0',
+    hover_bg_color='#0dcaf0',
+    hover_text_color='#fff'
+) }}
+
                 </div>
               </div>
             </div>
