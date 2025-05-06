@@ -55,10 +55,10 @@
 {% set user_summary = {
   'title': 'User Summary',
   'stats_data': [
-    {'value': stats.total_users, 'label': 'Total Users', 'color': 'primary'},
-    {'value': stats.admin_count, 'label': 'Admin Users', 'color': 'danger'},
-    {'value': stats.new_users_month, 'label': 'New This Month', 'color': 'success'},
-    {'value': stats.avg_notes, 'label': 'Avg Notes/User', 'color': 'info'}
+    {'value': stats.total_users, 'label': 'Total Users', 'color': 'text-primary'},
+    {'value': stats.admin_count, 'label': 'Admin Users', 'color': 'text-danger'},
+    {'value': stats.new_users_month, 'label': 'New This Month', 'color': 'text-success'},
+    {'value': stats.avg_notes, 'label': 'Avg Notes/User', 'color': 'text-info'}
   ],
   'highlights_data': [
     {'icon': 'fas fa-user-check', 'icon_color': 'text-success', 'content': '<span class="fw-bold">'+stats.active_users|string+'</span> active users this week'},
