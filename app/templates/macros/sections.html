@@ -1,0 +1,23 @@
+{% import "macros/navigation_cards.html" as navigation_cards %}
+{% import "macros/highlights.html" as highlights %}
+
+{% macro summary(stats_data, highlights_data, title="Summary") %}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h2 class="section-card-heading">{{ title }}</h2>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {% for stat in stats_data %}
+            {{ navigation_cards.stats_card(stat.value, stat.label, stat.color) }}
+          {% endfor %}
+        </div>
+
+        {{ highlights.highlights(highlights_data) }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}

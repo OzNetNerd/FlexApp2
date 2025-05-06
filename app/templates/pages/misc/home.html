@@ -1,7 +1,7 @@
 {% extends "layouts/base.html" %}
 {% import "macros/navigation_cards.html" as navigation_cards %}
-{% import "macros/highlights.html" as highlights %}
 {% import "macros/recent_activity.html" as recent_activity %}
+{% import "macros/sections.html" as sections %}
 
 {% block title %}CRM Dashboard - Home{% endblock %}
 
@@ -38,55 +38,42 @@
 </div>
 
 <!-- Summary Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white">
-        <h2 class="section-card-heading">Summary</h2>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          {{ navigation_cards.stat_card("4", "Companies", "text-primary") }}
-          {{ navigation_cards.stat_card("9", "Contacts", "text-success") }}
-          {{ navigation_cards.stat_card("7", "Deals", "text-danger") }}
-          {{ navigation_cards.stat_card("$925K", "Pipeline", "text-info") }}
-        </div>
+{% set stats_data = [
+  {"value": "4", "label": "Companies", "color": "text-primary"},
+  {"value": "9", "label": "Contacts", "color": "text-success"},
+  {"value": "7", "label": "Deals", "color": "text-danger"},
+  {"value": "$925K", "label": "Pipeline", "color": "text-info"}
+] %}
 
-        {% set highlights_data = [
-          {
-            "icon": "fas fa-project-diagram",
-            "icon_color": "text-primary",
-            "message": "<strong>4</strong> companies · <strong>9</strong> contacts · <strong>7</strong> deals = <strong>$925K</strong> pipeline",
-          },
-          {
-            "icon": "fas fa-arrow-up",
-            "icon_color": "text-success",
-            "message": "<strong>$125K</strong> added to pipeline this week",
-          },
-          {
-            "icon": "fas fa-chart-line",
-            "icon_color": "text-primary",
-            "message": "<strong>3</strong> deals progressed to next stage",
-          },
-          {
-            "icon": "fas fa-percentage",
-            "icon_color": "text-warning",
-            "message": "CRIP score increased by <strong>12%</strong> this month",
-          },
-          {
-            "icon": "fas fa-trophy",
-            "bg_color": "text-danger",
-            "message": "<strong>2</strong> net new logos added this quarter",
-          }
-        ] %}
+{% set highlights_data = [
+  {
+    "icon": "fas fa-project-diagram",
+    "icon_color": "text-primary",
+    "message": "<strong>4</strong> companies · <strong>9</strong> contacts · <strong>7</strong> deals = <strong>$925K</strong> pipeline",
+  },
+  {
+    "icon": "fas fa-arrow-up",
+    "icon_color": "text-success",
+    "message": "<strong>$125K</strong> added to pipeline this week",
+  },
+  {
+    "icon": "fas fa-chart-line",
+    "icon_color": "text-primary",
+    "message": "<strong>3</strong> deals progressed to next stage",
+  },
+  {
+    "icon": "fas fa-percentage",
+    "icon_color": "text-warning",
+    "message": "CRIP score increased by <strong>12%</strong> this month",
+  },
+  {
+    "icon": "fas fa-trophy",
+    "bg_color": "text-danger",
+    "message": "<strong>2</strong> net new logos added this quarter",
+  }
+] %}
 
-
-        {{ highlights.highlights(highlights_data) }}
-
-      </div>
-    </div>
-  </div>
-</div>
+{{ sections.summary(stats_data, highlights_data) }}
 
 <!-- Recent Activity Section -->
 {% set recent_activities = [
