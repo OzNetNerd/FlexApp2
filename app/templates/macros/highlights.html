@@ -5,9 +5,9 @@
     <div class="highlight-item">
       <p class="highlights-scrolling-text">
         {% if item.icon %}
-        <i class="{{ item.icon }} {{ item.icon_class }} me-1"></i>
+        <i class="{{ item.icon }} {{ item.bg_color|replace('bg-', 'text-') }} me-1"></i>
         {% endif %}
-        {{ item.content|safe }}
+        {{ item.message|safe }}
       </p>
     </div>
     {% endfor %}
