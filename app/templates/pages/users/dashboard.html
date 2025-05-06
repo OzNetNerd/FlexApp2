@@ -111,33 +111,12 @@
     }
 ] %}
 
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="section-card-heading">User Categories</h2>
-        <a href="{{ url_for('users_bp.filtered_users') }}" class="transparent-button">View All Users</a>
-      </div>
-      <div class="card-body">
-        <div class="row">
-        {% for card in user_card_data %}
-            {{ cards.progress_bar_card(
-                title=card.title,
-                count=card.count,
-                activity_count=card.activity_count,
-                activity_label=card.activity_label,
-                percentage=card.percentage,
-                icon=card.icon,
-                color_class=card.color_class,
-                button_label=card.button_label,
-                button_url=card.button_url
-            ) }}
-        {% endfor %}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+{{ sections.progress_bar_section(
+    heading='User Categories',
+    href=url_for('users_bp.filtered_users'),
+    button_text='View All Users',
+    card_data=user_card_data
+) }}
 
 <!-- Top Users Section -->
 <div class="row mb-4">

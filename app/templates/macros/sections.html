@@ -80,31 +80,29 @@
 {% endmacro %}
 
 
-{# macros/sections.html #}
-
-{% macro progress_card_section(category_data) %}
+{% macro progress_bar_section(heading, href, button_text, card_data) %}
 <div class="row mb-4">
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="section-card-heading">User Categories</h2>
-        <a href="{{ url_for('users_bp.filtered_users') }}" class="transparent-button">View All Users</a>
+        <h2 class="section-card-heading">{{ heading }}</h2>
+        <a href="{{ href }}" class="transparent-button">{{ button_text }}</a>
       </div>
       <div class="card-body">
         <div class="row">
-          {% for category in category_data %}
+        {% for card in card_data %}
             {{ cards.progress_bar_card(
-                title=category.title,
-                count=category.count,
-                activity_count=category.activity,
-                activity_label="notes",
-                percentage=category.percentage,
-                icon=category.icon,
-                color_class=category.color_class,
-                button_label=category.button_label,
-                button_url=category.button_url
+                title=card.title,
+                count=card.count,
+                activity_count=card.activity_count,
+                activity_label=card.activity_label,
+                percentage=card.percentage,
+                icon=card.icon,
+                color_class=card.color_class,
+                button_label=card.button_label,
+                button_url=card.button_url
             ) }}
-          {% endfor %}
+        {% endfor %}
         </div>
       </div>
     </div>
