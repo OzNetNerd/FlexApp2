@@ -1,14 +1,12 @@
 {# Define a reusable recent_activity widget in your widgets.html or macros file #}
 {% macro activity_item(icon, bg_color, message, time) %}
-  <li class="list-group-item border-0 px-0 py-3">
-    <div class="d-flex align-items-center">
-      <div class="activity-icon {{ bg_color }} text-white rounded-circle p-2 me-3">
-        <i class="{{ icon }}"></i>
-      </div>
-      <div class="flex-grow-1">
-        <p class="mb-0">{{ message | safe }}</p>
-        <small class="text-muted">{{ time }}</small>
-      </div>
+  <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
+    <div class="activity-icon {{ bg_color }} text-white d-flex align-items-center justify-content-center">
+      <i class="{{ icon }}"></i>
+    </div>
+    <div class="ms-3">
+      <p class="emphasised-text">{{ message | safe }}</p>
+      <span class="info-text-small">{{ time }}</span>
     </div>
   </li>
 {% endmacro %}
@@ -22,7 +20,7 @@
         <a href="{{ view_all_url }}" class="btn btn-sm btn-outline-primary">View All</a>
       </div>
       <div class="card-body pt-0">
-        <ul class="list-group list-group-flush">
+        <ul class="list-group">
           {% for activity in activities %}
             {{ activity_item(
               activity.icon,
