@@ -75,7 +75,53 @@
 ) }}
 
 <!-- User Categories Section -->
-
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="section-card-heading">User Categories</h2>
+        <a href="{{ url_for('users_bp.filtered_users') }}" class="transparent-button">View All Users</a>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {{ cards.progress_bar_card(
+              title="Regular Users",
+              count=user_categories[0].count,
+              activity_count=user_categories[0].activity,
+              activity_label="notes",
+              percentage=user_categories[0].percentage,
+              icon="fas fa-percentage",
+              color_class="info",
+              button_label="Learn More",
+              button_url="#"
+          ) }}
+            {{ cards.progress_bar_card(
+                title="Admin Users",
+                count=user_categories[1].count,
+                activity_count=user_categories[1].activity,
+                activity_label="notes",
+                percentage=user_categories[1].percentage,
+                icon="bi-shield-lock",
+                color_class="primary",
+                button_label="View Admins",
+                button_url=url_for('users_bp.filtered_users', is_admin='true')
+            ) }}
+            {{ cards.progress_bar_card(
+                title="New Users",
+                count=user_categories[2].count,
+                activity_count=user_categories[2].activity,
+                activity_label="notes",
+                percentage=user_categories[2].percentage,
+                icon="bi-calendar-check",
+                color_class="danger",
+                button_label="View New Users",
+                button_url=url_for('users_bp.filtered_users', period='month')
+            ) }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Top Users Section -->
 <div class="row mb-4">
