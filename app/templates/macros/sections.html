@@ -1,7 +1,7 @@
 {% import "macros/cards.html" as cards %}
 {% import "macros/highlights.html" as highlights %}
 {% import "macros/buttons.html" as buttons %}
-{% import "macros/misc.html" as misc %}
+{% import "macros/components.html" as components %}
 
 {% macro heading_section(heading_text, subtext) %}
 <div class="row mb-4">
@@ -65,7 +65,7 @@
       <div class="card-body pt-0">
         <ul class="list-group">
           {% for activity in activities %}
-            {{ misc.activity_item(
+            {{ components.activity_item(
               activity.icon,
               activity.bg_color,
               activity.message,
@@ -73,6 +73,39 @@
             ) }}
           {% endfor %}
         </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+
+{# macros/sections.html #}
+
+{% macro progress_card_section(category_data) %}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="section-card-heading">User Categories</h2>
+        <a href="{{ url_for('users_bp.filtered_users') }}" class="transparent-button">View All Users</a>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {% for category in category_data %}
+            {{ cards.progress_bar_card(
+                title=category.title,
+                count=category.count,
+                activity_count=category.activity,
+                activity_label="notes",
+                percentage=category.percentage,
+                icon=category.icon,
+                color_class=category.color_class,
+                button_label=category.button_label,
+                button_url=category.button_url
+            ) }}
+          {% endfor %}
+        </div>
       </div>
     </div>
   </div>
