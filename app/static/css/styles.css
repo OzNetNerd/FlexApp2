@@ -9,6 +9,18 @@
   transition: color 0.15s, background-color 0.15s;
 }
 
+/* Icon button style */
+.icon-btn {
+  display: inline-block;
+  padding: 0.25rem;
+  border: none;
+  background-color: transparent;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  transition: color 0.15s, background-color 0.15s;
+  margin-right: 0.15rem;
+}
+
 /* Primary color */
 .btn-primary {
   border-color: #0d6efd;
@@ -16,6 +28,15 @@
 }
 .btn-primary:hover {
   background-color: #0d6efd;
+  color: #fff;
+}
+.icon-primary i {
+  color: #0d6efd;
+}
+.icon-primary:hover {
+  background-color: #0d6efd;
+}
+.icon-primary:hover i {
   color: #fff;
 }
 
@@ -28,6 +49,15 @@
   background-color: #6c757d;
   color: #fff;
 }
+.icon-secondary i {
+  color: #6c757d;
+}
+.icon-secondary:hover {
+  background-color: #6c757d;
+}
+.icon-secondary:hover i {
+  color: #fff;
+}
 
 /* Success color */
 .btn-success {
@@ -36,6 +66,15 @@
 }
 .btn-success:hover {
   background-color: #198754;
+  color: #fff;
+}
+.icon-success i {
+  color: #198754;
+}
+.icon-success:hover {
+  background-color: #198754;
+}
+.icon-success:hover i {
   color: #fff;
 }
 
@@ -48,6 +87,15 @@
   background-color: #dc3545;
   color: #fff;
 }
+.icon-danger i {
+  color: #dc3545;
+}
+.icon-danger:hover {
+  background-color: #dc3545;
+}
+.icon-danger:hover i {
+  color: #fff;
+}
 
 /* Warning color */
 .btn-warning {
@@ -58,6 +106,15 @@
   background-color: #ffc107;
   color: #212529;
 }
+.icon-warning i {
+  color: #ffc107;
+}
+.icon-warning:hover {
+  background-color: #ffc107;
+}
+.icon-warning:hover i {
+  color: #212529;
+}
 
 /* Info color */
 .btn-info {
@@ -66,6 +123,15 @@
 }
 .btn-info:hover {
   background-color: #0dcaf0;
+  color: #fff;
+}
+.icon-info i {
+  color: #0dcaf0;
+}
+.icon-info:hover {
+  background-color: #0dcaf0;
+}
+.icon-info:hover i {
   color: #fff;
 }
 
@@ -89,6 +155,15 @@
   background-color: #f8f9fa;
   color: #212529;
 }
+.icon-light i {
+  color: #212529;
+}
+.icon-light:hover {
+  background-color: #f8f9fa;
+}
+.icon-light:hover i {
+  color: #212529;
+}
 
 /* Dark color */
 .btn-dark {
@@ -97,6 +172,15 @@
 }
 .btn-dark:hover {
   background-color: #212529;
+  color: #fff;
+}
+.icon-dark i {
+  color: #212529;
+}
+.icon-dark:hover {
+  background-color: #212529;
+}
+.icon-dark:hover i {
   color: #fff;
 }
 
@@ -109,6 +193,15 @@
   background-color: #6f42c1;
   color: #fff;
 }
+.icon-purple i {
+  color: #6f42c1;
+}
+.icon-purple:hover {
+  background-color: #6f42c1;
+}
+.icon-purple:hover i {
+  color: #fff;
+}
 
 /* Pink color */
 .btn-pink {
@@ -117,6 +210,15 @@
 }
 .btn-pink:hover {
   background-color: #d63384;
+  color: #fff;
+}
+.icon-pink i {
+  color: #d63384;
+}
+.icon-pink:hover {
+  background-color: #d63384;
+}
+.icon-pink:hover i {
   color: #fff;
 }
 
@@ -129,6 +231,15 @@
   background-color: #fd7e14;
   color: #fff;
 }
+.icon-orange i {
+  color: #fd7e14;
+}
+.icon-orange:hover {
+  background-color: #fd7e14;
+}
+.icon-orange:hover i {
+  color: #fff;
+}
 
 /* Teal color */
 .btn-teal {
@@ -137,6 +248,15 @@
 }
 .btn-teal:hover {
   background-color: #20c997;
+  color: #fff;
+}
+.icon-teal i {
+  color: #20c997;
+}
+.icon-teal:hover {
+  background-color: #20c997;
+}
+.icon-teal:hover i {
   color: #fff;
 }
 
@@ -149,6 +269,15 @@
   background-color: #0dcaf0;
   color: #fff;
 }
+.icon-cyan i {
+  color: #0dcaf0;
+}
+.icon-cyan:hover {
+  background-color: #0dcaf0;
+}
+.icon-cyan:hover i {
+  color: #fff;
+}
 
 /* Indigo color */
 .btn-indigo {
@@ -157,6 +286,15 @@
 }
 .btn-indigo:hover {
   background-color: #6610f2;
+  color: #fff;
+}
+.icon-indigo i {
+  color: #6610f2;
+}
+.icon-indigo:hover {
+  background-color: #6610f2;
+}
+.icon-indigo:hover i {
   color: #fff;
 }
 
@@ -169,6 +307,15 @@
   background-color: #64748b;
   color: #fff;
 }
+.icon-slate i {
+  color: #64748b;
+}
+.icon-slate:hover {
+  background-color: #64748b;
+}
+.icon-slate:hover i {
+  color: #fff;
+}
 
 /* Emerald color */
 .btn-emerald {
@@ -177,6 +324,15 @@
 }
 .btn-emerald:hover {
   background-color: #10b981;
+  color: #fff;
+}
+.icon-emerald i {
+  color: #10b981;
+}
+.icon-emerald:hover {
+  background-color: #10b981;
+}
+.icon-emerald:hover i {
   color: #fff;
 }
 
@@ -189,6 +345,15 @@
   background-color: #f59e0b;
   color: #fff;
 }
+.icon-amber i {
+  color: #f59e0b;
+}
+.icon-amber:hover {
+  background-color: #f59e0b;
+}
+.icon-amber:hover i {
+  color: #fff;
+}
 
 /* Rose color */
 .btn-rose {
@@ -199,6 +364,15 @@
   background-color: #e11d48;
   color: #fff;
 }
+.icon-rose i {
+  color: #e11d48;
+}
+.icon-rose:hover {
+  background-color: #e11d48;
+}
+.icon-rose:hover i {
+  color: #fff;
+}
 
 /* Sky color */
 .btn-sky {
@@ -207,5 +381,14 @@
 }
 .btn-sky:hover {
   background-color: #0ea5e9;
+  color: #fff;
+}
+.icon-sky i {
+  color: #0ea5e9;
+}
+.icon-sky:hover {
+  background-color: #0ea5e9;
+}
+.icon-sky:hover i {
   color: #fff;
 }

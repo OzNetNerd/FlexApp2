@@ -1,4 +1,4 @@
-{% macro highlights(items) %}
+{% macro highlights_scroller(items) %}
 <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
   <div class="highlights-container">
     {% for item in items %}
@@ -12,7 +12,6 @@
     </div>
     {% endfor %}
   </div>
-
 
   <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
     <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">

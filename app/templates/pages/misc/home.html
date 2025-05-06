@@ -1,6 +1,5 @@
 {% extends "layouts/base.html" %}
 {% import "macros/cards.html" as cards %}
-{% import "macros/recent_activity.html" as recent_activity %}
 {% import "macros/sections.html" as sections %}
 
 {% block title %}CRM Dashboard - Home{% endblock %}
@@ -76,7 +75,7 @@
   }
 ] %}
 
-{{ sections.highlights_section(stats_data, highlights_data) }}
+{{ sections.highlights_section("Summary", stats_data, highlights_data) }}
 
 <!-- Recent Activity Section -->
 {% set recent_activities = [
@@ -113,7 +112,7 @@
 ] %}
 
 {# Use the recent_activity widget with your activities #}
-{{ recent_activity.recent_activity(recent_activities, "Recent Activity", "/all-activities") }}
+{{ sections.recent_activity(recent_activities, "Recent Activity", "/all-activities") }}
 {% endblock %}
 
 {% block scripts_extra %}

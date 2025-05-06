@@ -1,5 +1,6 @@
 {% import "macros/cards.html" as cards %}
 {% import "macros/highlights.html" as highlights %}
+{% import "macros/buttons.html" as buttons %}
 
 {% macro heading_section(heading_text, subtext) %}
 <div class="row mb-4">
@@ -27,7 +28,7 @@
   </div>
 {% endmacro %}
 
-{% macro highlights_section(stats_data, highlights_data, title="Summary") %}
+{% macro highlights_section(title="Summary", stats_data="", highlights_data="") %}
 <div class="row mb-4">
   <div class="col-12">
     <div class="card border-0 shadow-sm">
@@ -41,7 +42,48 @@
           {% endfor %}
         </div>
 
-        {{ highlights.highlights(highlights_data) }}
+        {{ highlights.highlights_scroller(highlights_data) }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro activity_item(icon, bg_color, message, time) %}
+  <li class="list-group-item d-flex align-items-center border-0 border-bottom py-3">
+    <div class="activity-icon {{ bg_color }} text-white d-flex align-items-center justify-content-center">
+      <i class="{{ icon }}"></i>
+    </div>
+    <div class="ms-3">
+      <p class="emphasised-text">{{ message | safe }}</p>
+      <span class="info-text-small">{{ time }}</span>
+    </div>
+  </li>
+{% endmacro %}
+
+{% macro recent_activity(activities, title="Recent Activity", view_all_url="#") %}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="section-card-heading">{{ title }}</h2>
+        {{ buttons.transparent_button(
+          href=view_all_url,
+          label="View All",
+          color_class='btn-primary'
+        ) }}
+      </div>
+      <div class="card-body pt-0">
+        <ul class="list-group">
+          {% for activity in activities %}
+            {{ activity_item(
+              activity.icon,
+              activity.bg_color,
+              activity.message,
+              activity.time
+            ) }}
+          {% endfor %}
+        </ul>
       </div>
     </div>
   </div>
