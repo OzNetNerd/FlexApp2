@@ -13,7 +13,7 @@
 ) }}
 
 <!-- Large Cards: Data -->
-{% set large_card_configs = [
+{% set large_card_data = [
   {
     "icon": "bi bi-building",
     "color": "text-primary",
@@ -38,7 +38,7 @@
 ] %}
 
 <!-- Large Cards: HTML  -->
-{{ sections.large_cards(large_card_configs) }}
+{{ sections.large_cards(large_card_data) }}
 
 <!-- Summary Section: Data -->
 {% set stats_data = [

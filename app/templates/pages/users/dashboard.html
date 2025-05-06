@@ -2,6 +2,7 @@
 {% extends "layouts/base.html" %}
 {% import "macros/buttons.html" as buttons %}
 {% import "macros/sections.html" as sections %}
+{% import "macros/cards.html" as cards %}
 
 
 {% block title %}CRM Dashboard - Users{% endblock %}
@@ -17,54 +18,39 @@
   subtext='Track and manage your system users efficiently'
 ) }}
 
-<!-- Progress Bar Cards -->
-<div class="row mb-4">
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('users_bp.filtered_users', is_admin='false') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-people text-primary large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Regular Users</h2>
-        <p class="large-card-title-subtext">View standard users</p>
-        <div class="badge bg-danger">{{ stats.regular_count }}</div>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('users_bp.create') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-person-plus text-success large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Create User</h2>
-        <p class="large-card-title-subtext">Add new user</p>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('users_bp.filtered_users', is_admin='true') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-shield-lock text-warning large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Admin Users</h2>
-        <p class="large-card-title-subtext">View administrators</p>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('users_bp.statistics') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-bar-chart text-info large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Analytics</h2>
-        <p class="large-card-title-subtext">User insights</p>
-      </div>
-    </a>
-  </div>
-</div>
+<!-- Summary Section: Data -->
+{% set large_card_data = [
+  {
+    'icon': 'bi bi-people',
+    'color': 'text-primary',
+    'title': 'Regular Users',
+    'description': 'View standard users',
+    'url': url_for('users_bp.filtered_users', is_admin='false')
+  },
+  {
+    'icon': 'bi bi-person-plus',
+    'color': 'text-success',
+    'title': 'Create User',
+    'description': 'Add new user',
+    'url': url_for('users_bp.create')
+  },
+  {
+    'icon': 'bi bi-shield-lock',
+    'color': 'text-warning',
+    'title': 'Admin Users',
+    'description': 'View administrators',
+    'url': url_for('users_bp.filtered_users', is_admin='true')
+  },
+  {
+    'icon': 'bi bi-bar-chart',
+    'color': 'text-info',
+    'title': 'Analytics',
+    'description': 'User insights',
+    'url': url_for('users_bp.statistics')
+  }
+] %}
+
+{{ sections.large_cards(large_card_data) }}
 
 <!-- Summary Section -->
 <div class="row mb-4">
