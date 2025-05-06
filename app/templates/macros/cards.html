@@ -1,3 +1,5 @@
+{% import "macros/buttons.html" as buttons %}
+
 {% macro large_card(icon_class, icon_color, title, description, url, badge=None) %}
 <div class="col-md-4 mb-3">
   <a href="{{ url }}" class="nav-card card h-100 border-0 shadow-sm position-relative">
@@ -39,14 +41,39 @@
 {% endmacro %}
 
 
-{% macro progress_bar_card(value, label, color, percentage) %}
-<div class="stats-card card border-0 bg-light h-100">
-  <div class="card-body text-center">
-    <div class="section-subcard-number-heading text-{{ color }}">{{ value }}</div>
-    <div class="section-subcard-number-subtext">{{ label }}</div>
-    <div class="progress mt-2">
-      <div class="progress-bar bg-{{ color }}" role="progressbar" style="width: {{ percentage }}%"
-           aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+{% macro progress_bar_card(
+    title,
+    count,
+    activity_count,
+    activity_label="notes",
+    percentage=0,
+    icon="bi-person",
+    color_class="bg-info",
+    text_class="text-white",
+    button_label="Learn More",
+    button_url="#",
+    button_color="btn-info"
+) %}
+<div class="col-md-4 mb-3">
+  <div class="card border-0 shadow-sm h-100">
+    <div class="card-body">
+      <div class="d-flex align-items-center mb-3">
+        <div class="category-icon {{ color_class }} {{ text_class }} d-flex align-items-center justify-content-center me-3">
+          <i class="bi {{ icon }}"></i>
+        </div>
+        <h3 class="section-subcard-info-heading">{{ title }}</h3>
+      </div>
+      <p class="section-subcard-info-subtext">{{ count }} users · {{ activity_count }} {{ activity_label }}</p>
+      <div class="progress mb-3" style="height: 5px;">
+        <div class="progress-bar {{ color_class }}" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+      <div class="d-flex justify-content-end">
+      {{ buttons.transparent_button(
+          href=button_url,
+          label=button_label,
+          color_class=button_color
+      ) }}
+      </div>
     </div>
   </div>
 </div>

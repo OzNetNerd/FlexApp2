@@ -150,29 +150,19 @@
       </div>
       <div class="card-body">
         <div class="row">
-          <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <div class="category-icon bg-info text-white d-flex align-items-center justify-content-center me-3">
-                    <i class="bi bi-person"></i>
-                  </div>
-                  <h3 class="section-subcard-info-heading">Regular Users</h3>
-                </div>
-                <p class="section-subcard-info-subtext">{{ user_categories[0].count }} users · {{ user_categories[0].activity }} notes</p>
-                <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-info" role="progressbar" style="width: {{ user_categories[0].percentage }}%;" aria-valuenow="{{ user_categories[0].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="d-flex justify-content-end">
-                {{ buttons.transparent_button(
-                    href='#',
-                    label='Learn More',
-                    color_class='btn-info'
-                ) }}
-                </div>
-              </div>
-            </div>
-          </div>
+          {{ cards.progress_bar_card(
+              title="Regular Users",
+              count=user_categories[0].count,
+              activity_count=user_categories[0].activity,
+              activity_label="notes",
+              percentage=user_categories[0].percentage,
+              icon="bi-person",
+              color_class="bg-info",
+              text_class="text-white",
+              button_label="Learn More",
+              button_url="#",
+              button_color="btn-info"
+          ) }}
           <div class="col-md-4 mb-3">
             <div class="card border-0 shadow-sm h-100">
               <div class="card-body">
