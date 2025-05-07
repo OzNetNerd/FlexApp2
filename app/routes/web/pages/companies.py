@@ -10,7 +10,7 @@ from app.models.base import db
 companies_bp = create_crud_blueprint(BlueprintConfig(model_class=Company))
 
 
-@companies_bp.route("/", methods=["GET"])
+@companies_bp.route("/", methods=["GET"], endpoint="index")
 @login_required
 def companies_dashboard():
     # Get basic statistics
@@ -200,4 +200,32 @@ def statistics():
         with_opportunities=with_opportunities,
         with_contacts=with_contacts,
         no_engagement=no_engagement,
+    )
+
+
+@companies_bp.route("/view2", methods=["GET"])
+@login_required
+def view2():
+    return render_template(
+        "pages/companies/view.html",
+        id=0,  # Add id parameter
+        model_name="Company",  # These parameters are likely needed too
+        entity_name="Demo Company",
+        read_only=True,
+        submit_url="#",  # For the form action
+        csrf_input=""  # For CSRF protection
+    )
+
+@companies_bp.route("/index2", methods=["GET"])
+@login_required
+def index2():
+    return render_template(
+        "pages/companies/index.html",
+        id=0,  # Add id parameter
+        model_name="Company",  # These parameters are likely needed too
+        entity_name="Demo Company",
+        read_only=True,
+        submit_url="#",  # For the form action
+        csrf_input="",
+        entity_base_route=""
     )
