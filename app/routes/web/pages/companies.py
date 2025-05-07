@@ -227,5 +227,6 @@ def index2():
         read_only=True,
         submit_url="#",  # For the form action
         csrf_input="",
-        entity_base_route=""
+        entity_base_route="",
+        api_url = '/api/companies',
     )
