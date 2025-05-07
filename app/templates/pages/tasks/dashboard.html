@@ -6,7 +6,7 @@
 {% block title %}CRM Dashboard - Tasks{% endblock %}
 
 {% block head_extra %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Chart.js should only be included once, so removing from here -->
 {% endblock %}
 
 {% block content %}
@@ -236,92 +236,81 @@
 {% endblock %}
 
 {% block scripts_extra %}
+<!-- Include Chart.js only once -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module">
-  // Initialize the highlights slider
+  // Import the lineGraph module
+  import { createChart } from '/static/js/visuals/lineGraph.js';
+
+  // Initialize when DOM is fully loaded
   document.addEventListener('DOMContentLoaded', function() {
+    // Handle the highlights slider if it exists
     const container = document.querySelector('.highlights-container');
     const items = document.querySelectorAll('.highlight-item');
-    let currentIndex = 0;
 
-    document.querySelector('.btn-highlight-next').addEventListener('click', function() {
-      currentIndex = (currentIndex + 1) % items.length;
-      container.scrollTo({
-        left: currentIndex * container.offsetWidth,
-        behavior: 'smooth'
-      });
-    });
+    if (container && items.length > 0) {
+      let currentIndex = 0;
 
-    document.querySelector('.btn-highlight-prev').addEventListener('click', function() {
-      currentIndex = (currentIndex - 1 + items.length) % items.length;
-      container.scrollTo({
-        left: currentIndex * container.offsetWidth,
-        behavior: 'smooth'
-      });
-    });
+      const nextButton = document.querySelector('.btn-highlight-next');
+      const prevButton = document.querySelector('.btn-highlight-prev');
 
-    // Auto-scroll highlights
-    setInterval(() => {
-      document.querySelector('.btn-highlight-next').click();
-    }, 5000);
+      if (nextButton) {
+        nextButton.addEventListener('click', function() {
+          currentIndex = (currentIndex + 1) % items.length;
+          container.scrollTo({
+            left: currentIndex * container.offsetWidth,
+            behavior: 'smooth'
+          });
+        });
+      }
 
-    // Initialize task completion chart
-    const ctx = document.getElementById('taskCompletionChart').getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: {{ completion_data.labels|tojson }},
-        datasets: [
-          {
-            label: 'Completed Tasks',
-            backgroundColor: 'rgba(40, 167, 69, 0.2)',
-            borderColor: 'rgba(40, 167, 69, 1)',
-            borderWidth: 2,
-            pointBackgroundColor: 'rgba(40, 167, 69, 1)',
-            pointRadius: 4,
-            fill: true,
-            data: {{ completion_data.completed_tasks|tojson }}
-          },
-          {
-            label: 'New Tasks',
-            backgroundColor: 'rgba(0, 123, 255, 0.2)',
-            borderColor: 'rgba(0, 123, 255, 1)',
-            borderWidth: 2,
-            pointBackgroundColor: 'rgba(0, 123, 255, 1)',
-            pointRadius: 4,
-            fill: true,
-            data: {{ completion_data.new_tasks|tojson }}
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            grid: {
-              display: false
+      if (prevButton) {
+        prevButton.addEventListener('click', function() {
+          currentIndex = (currentIndex - 1 + items.length) % items.length;
+          container.scrollTo({
+            left: currentIndex * container.offsetWidth,
+            behavior: 'smooth'
+          });
+        });
+      }
+
+      // Auto-scroll highlights
+      if (nextButton && items.length > 1) {
+        setInterval(() => {
+          nextButton.click();
+        }, 5000);
+      }
+    }
+
+    // Format data for the chart
+    // Make sure these variables match what lineGraph.js expects for the 'data' chart type
+    const chartData = {
+      labels: {{ completion_data.labels|tojson }},
+      newItems: {{ completion_data.new_tasks|tojson }},
+      totalItems: {{ completion_data.completed_tasks|tojson }}
+    };
+
+    // Initialize task completion chart using lineGraph.js
+    try {
+      const chart = createChart({
+        canvasId: 'taskCompletionChart',
+        type: 'data',  // Using the 'data' chart type from lineGraph.js
+        data: chartData,
+        options: {
+          scales: {
+            y: {
+              title: {
+                text: 'Number of Tasks'
+              }
             }
-          },
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Number of Tasks'
-            }
-          }
-        },
-        plugins: {
-          tooltip: {
-            mode: 'index',
-            intersect: false
-          },
-          legend: {
-            position: 'top'
           }
         }
-      }
-    });
+      });
+
+      console.log('Chart initialized successfully:', chart ? 'yes' : 'no');
+    } catch (error) {
+      console.error('Error initializing chart:', error);
+    }
   });
 </script>
 {% endblock %}
