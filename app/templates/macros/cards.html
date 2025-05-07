@@ -1,7 +1,7 @@
 {% import "macros/buttons.html" as buttons %}
 
-{% macro large_card(icon_class, icon_color, title, description, url, badge=None) %}
-<div class="col-md-4 mb-3">
+{% macro large_card(icon_class, icon_color, title, description, url, badge=None, col_size=4) %}
+<div class="col-md-{{ col_size }} mb-3">
   <a href="{{ url }}" class="nav-card card h-100 border-0 shadow-sm position-relative">
     {% if badge %}
     <span class="position-absolute top-0 end-0 m-2 badge rounded-pill bg-primary">{{ badge }}</span>

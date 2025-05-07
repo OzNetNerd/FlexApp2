@@ -15,7 +15,9 @@
 {% endmacro %}
 
 {% macro large_cards_section(card_data) %}
-  <div class="row d-flex flex-nowrap mb-4">
+  {% set card_count = card_data|length %}
+  {% set col_size = 12 // card_count if card_count <= 4 else 3 %}
+  <div class="row d-flex mb-4">
     {% for card in card_data %}
       {{ cards.large_card(
         card.icon,
@@ -23,7 +25,8 @@
         card.title,
         card.description,
         card.url,
-        card.badge
+        card.badge,
+        col_size
       ) }}
     {% endfor %}
   </div>
