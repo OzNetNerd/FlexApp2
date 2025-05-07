@@ -55,93 +55,27 @@
 <!-- Summary Section -->
 {{ sections.large_cards_section(large_card_data) }}
 
-<!-- Summary Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white">
-        <h2 class="section-card-heading">Contacts Summary</h2>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-primary">{{ stats.total_contacts }}</div>
-                <div class="section-subcard-number-subtext">Total Contacts</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-danger">{{ stats.with_opportunities }}</div>
-                <div class="section-subcard-number-subtext">With Opportunities</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-success">{{ stats.with_skills }}</div>
-                <div class="section-subcard-number-subtext">With Skills</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-info">{{ stats.with_companies }}</div>
-                <div class="section-subcard-number-subtext">Company Associated</div>
-              </div>
-            </div>
-          </div>
-        </div>
+{% set contacts_summary = {
+  'title': 'Contacts Summary',
+  'stats_data': [
+    {'value': stats.total_contacts, 'label': 'Total Contacts', 'color': 'text-primary'},
+    {'value': stats.with_opportunities, 'label': 'With Opportunities', 'color': 'text-danger'},
+    {'value': stats.with_skills, 'label': 'With Skills', 'color': 'text-success'},
+    {'value': stats.with_companies, 'label': 'Company Associated', 'color': 'text-info'}
+  ],
+  'highlights_data': [
+    {'icon': 'fas fa-briefcase', 'icon_color': 'text-success', 'content': '<span class="fw-bold">'+stats.with_opportunities|string+'</span> contacts linked to opportunities'},
+    {'icon': 'fas fa-building', 'icon_color': 'text-warning', 'content': '<span class="fw-bold">'+stats.with_companies|string+'</span> contacts associated with companies'},
+    {'icon': 'fas fa-certificate', 'icon_color': 'text-primary', 'content': '<span class="fw-bold">'+skill_segments[0].count|string+'</span> expert-level contacts'},
+    {'icon': 'fas fa-exclamation-triangle', 'icon_color': 'text-danger', 'content': '<span class="fw-bold">'+(stats.total_contacts - stats.with_companies)|string+'</span> contacts without companies'}
+  ]
+} %}
 
-        <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
-          <div class="highlights-container">
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-briefcase text-success me-1"></i>
-                <span class="fw-bold">{{ stats.with_opportunities }}</span> contacts linked to opportunities
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-building text-warning me-1"></i>
-                <span class="fw-bold">{{ stats.with_companies }}</span> contacts associated with companies
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-certificate text-primary me-1"></i>
-                <span class="fw-bold">{{ skill_segments[0].count }}</span> expert-level contacts
-              </p>
-            </div>
-
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-exclamation-triangle text-danger me-1"></i>
-                <span class="fw-bold">{{ stats.total_contacts - stats.with_companies }}</span> contacts without companies
-              </p>
-            </div>
-          </div>
-
-          <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
-            <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+{{ sections.highlights_section(
+    title=contacts_summary.title,
+    stats_data=contacts_summary.stats_data,
+    highlights_data=contacts_summary.highlights_data
+) }}
 
 <!-- Contact Skill Segments Section -->
 <div class="row mb-4">
