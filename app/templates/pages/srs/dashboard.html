@@ -1,227 +1,137 @@
 {% extends "layouts/base.html" %}
+{% import "macros/buttons.html" as buttons %}
+{% import "macros/sections.html" as sections %}
+{% import "macros/cards.html" as cards %}
 
 {% block title %}CRM Dashboard - Flashcards{% endblock %}
 
+{% block head_extra %}
+{% endblock %}
+
 {% block content %}
-<!-- Page Header Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="bg-white p-4 rounded shadow-sm">
-      <h1 class="page-heading">Flashcard Dashboard</h1>
-      <p class="page-heading-subtext">Master your customer knowledge with spaced repetition</p>
-    </div>
-  </div>
-</div>
+<!-- Heading & subtext section -->
+{{ sections.heading_section(
+  heading_text='Flashcard Dashboard',
+  subtext='Master your customer knowledge with spaced repetition'
+) }}
 
 <!-- Quick Actions Cards -->
-<div class="row mb-4">
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('srs_bp.filtered_cards', due_only=1) }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-alarm text-primary large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Due Cards</h2>
-        <p class="large-card-title-subtext">Review cards due today</p>
-        <div class="badge bg-danger">{{ stats.due_today }}</div>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('srs_bp.create') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-plus-circle text-success large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Create Card</h2>
-        <p class="large-card-title-subtext">Add new flashcards</p>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('srs_bp.filtered_cards') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-collection text-info large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">All Cards</h2>
-        <p class="large-card-title-subtext">View your entire collection</p>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('srs_bp.statistics') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-bar-chart text-warning large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Statistics</h2>
-        <p class="large-card-title-subtext">Track your learning progress</p>
-      </div>
-    </a>
-  </div>
-</div>
+<!-- SRS Cards Section: Data -->
+{% set large_card_data = [
+  {
+    'icon': 'bi bi-alarm',
+    'color': 'text-primary',
+    'title': 'Due Cards',
+    'description': 'Review cards due today',
+    'url': url_for('srs_bp.filtered_cards', due_only=1),
+    'badge': stats.due_today
+  },
+  {
+    'icon': 'bi bi-plus-circle',
+    'color': 'text-success',
+    'title': 'Create Card',
+    'description': 'Add new flashcards',
+    'url': url_for('srs_bp.create')
+  },
+  {
+    'icon': 'bi bi-collection',
+    'color': 'text-info',
+    'title': 'All Cards',
+    'description': 'View your entire collection',
+    'url': url_for('srs_bp.filtered_cards')
+  },
+  {
+    'icon': 'bi bi-bar-chart',
+    'color': 'text-warning',
+    'title': 'Statistics',
+    'description': 'Track your learning progress',
+    'url': url_for('srs_bp.statistics')
+  }
+] %}
+
+{{ sections.large_cards_section(large_card_data) }}
 
 <!-- Summary Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white">
-        <h2 class="section-card-heading">Learning Summary</h2>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-primary">{{ stats.total_cards }}</div>
-                <div class="section-subcard-number-subtext">Total Cards</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-danger">{{ stats.due_today }}</div>
-                <div class="section-subcard-number-subtext">Due Today</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-success">{{ stats.success_rate }}%</div>
-                <div class="section-subcard-number-subtext">Success Rate</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6">
-            <div class="stats-card card border-0 bg-light h-100">
-              <div class="card-body text-center">
-                <div class="section-subcard-number-heading text-info">{{ stats.days_streak }}</div>
-                <div class="section-subcard-number-subtext">Days Streak</div>
-              </div>
-            </div>
-          </div>
-        </div>
+{% set stats_data = [
+  {"value": "4", "label": "Companies", "color": "text-primary"},
+  {"value": "9", "label": "Contacts", "color": "text-success"},
+  {"value": "7", "label": "Deals", "color": "text-danger"},
+  {"value": "$925K", "label": "Pipeline", "color": "text-info"}
+] %}
 
-        <div class="text-center mt-3 py-3 bg-light rounded position-relative overflow-hidden">
-          <div class="highlights-container">
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-check-circle text-success me-1"></i>
-                <span class="fw-bold">{{ stats.weekly_reviews }}</span> cards reviewed this week
-              </p>
-            </div>
+{% set highlights_data = [
+  {
+    "icon": "fas fa-project-diagram",
+    "icon_color": "text-primary",
+    "message": "<strong>4</strong> companies · <strong>9</strong> contacts · <strong>7</strong> deals = <strong>$925K</strong> pipeline",
+  },
+  {
+    "icon": "fas fa-arrow-up",
+    "icon_color": "text-success",
+    "message": "<strong>$125K</strong> added to pipeline this week",
+  },
+  {
+    "icon": "fas fa-chart-line",
+    "icon_color": "text-primary",
+    "message": "<strong>3</strong> deals progressed to next stage",
+  },
+  {
+    "icon": "fas fa-percentage",
+    "icon_color": "text-warning",
+    "message": "CRIP score increased by <strong>12%</strong> this month",
+  },
+  {
+    "icon": "fas fa-trophy",
+    "bg_color": "text-danger",
+    "message": "<strong>2</strong> net new logos added this quarter",
+  }
+] %}
 
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-trophy text-warning me-1"></i>
-                <span class="fw-bold">{{ stats.mastered_cards }}</span> new mastered cards this month
-              </p>
-            </div>
+{{ sections.highlights_section("Summary", stats_data, highlights_data) }}
 
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-chart-line text-primary me-1"></i>
-                Knowledge retention increased by <span class="fw-bold">{{ stats.retention_increase }}%</span>
-              </p>
-            </div>
+{% set card_categories = [
+    {
+        'title': 'Companies',
+        'count': categories[0].total,
+        'activity_count': categories[0].due,
+        'activity_label': 'due',
+        'percentage': categories[0].progress,
+        'icon': 'bi bi-building',
+        'color_class': 'primary',
+        'button_label': 'View Cards',
+        'button_url': url_for('srs_bp.filtered_cards', category='company')
+    },
+    {
+        'title': 'Contacts',
+        'count': categories[1].total,
+        'activity_count': categories[1].due,
+        'activity_label': 'due',
+        'percentage': categories[1].progress,
+        'icon': 'bi bi-people',
+        'color_class': 'success',
+        'button_label': 'View Cards',
+        'button_url': url_for('srs_bp.filtered_cards', category='contact')
+    },
+    {
+        'title': 'Opportunities',
+        'count': categories[2].total,
+        'activity_count': categories[2].due,
+        'activity_label': 'due',
+        'percentage': categories[2].progress,
+        'icon': 'bi bi-graph-up-arrow',
+        'color_class': 'danger',
+        'button_label': 'View Cards',
+        'button_url': url_for('srs_bp.filtered_cards', category='opportunity')
+    }
+] %}
 
-            <div class="highlight-item">
-              <p class="section-subcard-info-heading fw-normal">
-                <i class="fas fa-award text-danger me-1"></i>
-                <span class="fw-bold">{{ stats.perfect_reviews }}</span> consecutive perfect reviews
-              </p>
-            </div>
-          </div>
+{{ sections.progress_bar_section(
+    heading='Card Categories',
+    href=url_for('srs_bp.filtered_cards'),
+    button_text='Browse All Cards',
+    card_data=card_categories
+) }}
 
-          <div class="highlight-controls position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);">
-            <button class="btn btn-sm btn-outline-secondary btn-highlight-prev">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-secondary btn-highlight-next ms-1">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Card Categories Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="section-card-heading">Card Categories</h2>
-        <a href="{{ url_for('srs_bp.filtered_cards') }}" class="transparent-button">Browse All Cards</a>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-3">
-                    <i class="bi bi-building"></i>
-                  </div>
-                  <h3 class="section-subcard-info-heading">Companies</h3>
-                </div>
-                <p class="section-subcard-info-subtext">{{ categories[0].total }} cards total · {{ categories[0].due }} due</p>
-                <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ categories[0].progress }}%;" aria-valuenow="{{ categories[0].progress }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('srs_bp.filtered_cards', category='company') }}" class="transparent-button">View Cards</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <div class="category-icon bg-success text-white d-flex align-items-center justify-content-center me-3">
-                    <i class="bi bi-people"></i>
-                  </div>
-                  <h3 class="section-subcard-info-heading">Contacts</h3>
-                </div>
-                <p class="section-subcard-info-subtext">{{ categories[1].total }} cards total · {{ categories[1].due }} due</p>
-                <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-success" role="progressbar" style="width: {{ categories[1].progress }}%;" aria-valuenow="{{ categories[1].progress }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('srs_bp.filtered_cards', category='contact') }}" class="btn btn-sm btn-outline-success">View Cards</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <div class="category-icon bg-danger text-white d-flex align-items-center justify-content-center me-3">
-                    <i class="bi bi-graph-up-arrow"></i>
-                  </div>
-                  <h3 class="section-subcard-info-heading">Opportunities</h3>
-                </div>
-                <p class="section-subcard-info-subtext">{{ categories[2].total }} cards total · {{ categories[2].due }} due</p>
-                <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-danger" role="progressbar" style="width: {{ categories[2].progress }}%;" aria-valuenow="{{ categories[2].progress }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('srs_bp.filtered_cards', category='opportunity') }}" class="btn btn-sm btn-outline-danger">View Cards</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Due Cards Section -->
 <div class="row mb-4">
@@ -316,31 +226,6 @@
 <script type="module">
   // Initialize the highlights slider
   document.addEventListener('DOMContentLoaded', function() {
-    const container = document.querySelector('.highlights-container');
-    const items = document.querySelectorAll('.highlight-item');
-    let currentIndex = 0;
-
-    document.querySelector('.btn-highlight-next').addEventListener('click', function() {
-      currentIndex = (currentIndex + 1) % items.length;
-      container.scrollTo({
-        left: currentIndex * container.offsetWidth,
-        behavior: 'smooth'
-      });
-    });
-
-    document.querySelector('.btn-highlight-prev').addEventListener('click', function() {
-      currentIndex = (currentIndex - 1 + items.length) % items.length;
-      container.scrollTo({
-        left: currentIndex * container.offsetWidth,
-        behavior: 'smooth'
-      });
-    });
-
-    // Auto-scroll highlights
-    setInterval(() => {
-      document.querySelector('.btn-highlight-next').click();
-    }, 5000);
-
     // Initialize learning progress chart
     const ctx = document.getElementById('learningProgressChart').getContext('2d');
     const chart = new Chart(ctx, {
@@ -391,57 +276,4 @@
     });
   });
 </script>
-{% endblock %}
-
-{% block head_extra %}
-<style>
-/* Activity Icons */
-.activity-icon,
-.category-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.activity-icon:hover,
-.category-icon:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-/* Navigation cards hover effect */
-.nav-card {
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.nav-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-}
-
-/* Highlights container */
-.highlights-container {
-  display: flex;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-}
-
-.highlight-item {
-  min-width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Badge styling */
-.nav-card .badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 0.8rem;
-}
-</style>
 {% endblock %}
