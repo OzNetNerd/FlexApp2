@@ -17,8 +17,10 @@
 </div>
 {% endmacro %}
 
-{% macro stats_card(value, label, color) %}
-<div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+{% macro stats_card(value, label, color, columns=4) %}
+{# Convert number of cards to Bootstrap column width #}
+{% set col_width = 12 // columns %}
+<div class="col-md-{{ col_width }} col-sm-6 mb-3 mb-md-0">
   <div class="stats-card card border-0 bg-light h-100">
     <div class="card-body text-center">
       <div class="display-4 {{ color }} mb-2">{{ value }}</div>
