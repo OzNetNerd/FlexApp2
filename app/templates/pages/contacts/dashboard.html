@@ -232,22 +232,28 @@
 {% endblock %}
 
 {% block scripts_extra %}
+// Example usage in your HTML template
+{% block scripts_extra %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module">
   // Sample data for testing
-  const chartData = {
+  const forecastData = {
     labels: ['Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025'],
-    newItems: [3, 5, 8, 4, 7, 6],
-    totalItems: [3, 8, 16, 20, 27, 33]
+    closed_won: [15000, 22000, 18000, 25000, 30000, 28000],
+    forecast: [10000, 12000, 15000, 14000, 16000, 20000],
+    pipeline: [25000, 30000, 35000, 28000, 32000, 40000]
   };
 
   // Initialize the chart when DOM is loaded
   document.addEventListener('DOMContentLoaded', function() {
-    import('{{ url_for("static", filename="js/visuals/lineGraph.js") }}')
+    import('{{ url_for("static", filename="js/visuals/barGraph.js") }}')
       .then(module => {
-        module.initDataChart('contactGrowthChart', chartData);
+        module.initSalesForecastChart('salesForecastChart', forecastData, '€');
+
+        // You can also use the more generic function for any bar chart:
+        // module.initBarChart('anotherChartId', customData, customOptions);
       })
-      .catch(err => console.error('Failed to load lineGraph.js:', err));
+      .catch(err => console.error('Failed to load barGraph.js:', err));
   });
 </script>
 {% endblock %}
