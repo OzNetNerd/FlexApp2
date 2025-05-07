@@ -16,54 +16,44 @@
   subtext='Track and manage all of your professional contacts'
 ) }}
 
-<!-- Quick Actions Cards -->
-<div class="row mb-4">
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('contacts_bp.filtered_contacts', has_opportunities='yes') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-person-check text-primary large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Active Contacts</h2>
-        <p class="large-card-title-subtext">With opportunities</p>
-        <div class="badge bg-danger">{{ stats.with_opportunities }}</div>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('contacts_bp.create') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-person-plus text-success large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Add Contact</h2>
-        <p class="large-card-title-subtext">Create new contact</p>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('contacts_bp.filtered_contacts', has_company='yes') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-building text-warning large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Company Linked</h2>
-        <p class="large-card-title-subtext">View contacts with companies</p>
-      </div>
-    </a>
-  </div>
-  <div class="col-md-3 mb-3">
-    <a href="{{ url_for('contacts_bp.statistics') }}" class="nav-card card h-100 border-0 shadow-sm">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="bi bi-bar-chart text-info large-card-icon"></i>
-        </div>
-        <h2 class="large-card-title">Analytics</h2>
-        <p class="large-card-title-subtext">Contact insights</p>
-      </div>
-    </a>
-  </div>
-</div>
+<!-- Summary Section: Data -->
+{% set large_card_data = [
+    {
+        "icon": "bi bi-person-check",
+        "color": "text-primary",
+        "title": "Active Contacts",
+        "description": "With opportunities",
+        "url": url_for('contacts_bp.filtered_contacts', has_opportunities='yes'),
+        "badge": stats.with_opportunities
+    },
+    {
+        "icon": "bi bi-person-plus",
+        "color": "text-success",
+        "title": "Add Contact",
+        "description": "Create new contact",
+        "url": url_for('contacts_bp.create'),
+        "badge": None
+    },
+    {
+        "icon": "bi bi-building",
+        "color": "text-warning",
+        "title": "Company Linked",
+        "description": "View contacts with companies",
+        "url": url_for('contacts_bp.filtered_contacts', has_company='yes'),
+        "badge": None
+    },
+    {
+        "icon": "bi bi-bar-chart",
+        "color": "text-info",
+        "title": "Analytics",
+        "description": "Contact insights",
+        "url": url_for('contacts_bp.statistics'),
+        "badge": None
+    }
+] %}
+
+<!-- Summary Section -->
+{{ sections.large_cards_section(large_card_data) }}
 
 <!-- Summary Section -->
 <div class="row mb-4">
