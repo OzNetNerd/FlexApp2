@@ -394,30 +394,23 @@ body.sidebar-collapsed .submenu-link {
   margin-left: 0;
 }
 
-/* Style entire container when active */
-.sidebar-item.active,
-.sidebar-link-container.active,
-.has-submenu.active {
+/* Fix for menu items with arrows */
+.sidebar-link-container.active {
   background-color: var(--color-primary-light);
 }
 
-/* Remove individual backgrounds when container is active */
-.sidebar-item.active .sidebar-link,
-.sidebar-link-container.active .sidebar-link,
-.has-submenu.active .sidebar-link {
+.sidebar-link-container.active > .sidebar-link {
   background-color: transparent;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
 }
 
-/* Ensure dropdown arrow matches active state */
-.sidebar-item.active .submenu-toggle,
-.has-submenu.active .submenu-toggle {
+.sidebar-link-container.active > .submenu-toggle.btn {
   color: var(--color-primary);
 }
 
 /* Keep left indicator for active items */
-.sidebar-item.active .sidebar-link::before,
-.sidebar-link-container.active .sidebar-link::before,
-.has-submenu.active .sidebar-link::before {
+.sidebar-link-container.active > .sidebar-link::before {
   content: '';
   position: absolute;
   left: 0;
