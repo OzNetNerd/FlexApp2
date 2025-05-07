@@ -78,96 +78,60 @@
 ) }}
 
 <!-- Contact Skill Segments Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="section-card-heading">Skill Level Distribution</h2>
-        <a href="{{ url_for('contacts_bp.filtered_contacts') }}" class="transparent-button">View All Contacts</a>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <div class="category-icon bg-info text-white d-flex align-items-center justify-content-center me-3">
-                    <i class="bi bi-star-fill"></i>
-                  </div>
-                  <h3 class="section-subcard-info-heading">Expert</h3>
-                </div>
-                <p class="section-subcard-info-subtext">{{ skill_segments[0].count }} contacts · Master level skills</p>
-                <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-info" role="progressbar" style="width: {{ skill_segments[0].percentage }}%;" aria-valuenow="{{ skill_segments[0].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('contacts_bp.filtered_contacts', skill_level='Expert') }}" class="transparent-button">View Contacts</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-3">
-                    <i class="bi bi-star"></i>
-                  </div>
-                  <h3 class="section-subcard-info-heading">Advanced</h3>
-                </div>
-                <p class="section-subcard-info-subtext">{{ skill_segments[1].count }} contacts · High level skills</p>
-                <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ skill_segments[1].percentage }}%;" aria-valuenow="{{ skill_segments[1].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('contacts_bp.filtered_contacts', skill_level='Advanced') }}" class="transparent-button">View Contacts</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <div class="category-icon bg-success text-white d-flex align-items-center justify-content-center me-3">
-                    <i class="bi bi-person-check"></i>
-                  </div>
-                  <h3 class="section-subcard-info-heading">Intermediate</h3>
-                </div>
-                <p class="section-subcard-info-subtext">{{ skill_segments[2].count }} contacts · Solid skills</p>
-                <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-success" role="progressbar" style="width: {{ skill_segments[2].percentage }}%;" aria-valuenow="{{ skill_segments[2].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('contacts_bp.filtered_contacts', skill_level='Intermediate') }}" class="btn btn-sm btn-outline-success">View Contacts</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <div class="category-icon bg-warning text-white d-flex align-items-center justify-content-center me-3">
-                    <i class="bi bi-person"></i>
-                  </div>
-                  <h3 class="section-subcard-info-heading">Beginner</h3>
-                </div>
-                <p class="section-subcard-info-subtext">{{ skill_segments[3].count }} contacts · Entry level</p>
-                <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-warning" role="progressbar" style="width: {{ skill_segments[3].percentage }}%;" aria-valuenow="{{ skill_segments[3].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('contacts_bp.filtered_contacts', skill_level='Beginner') }}" class="btn btn-sm btn-outline-warning">View Contacts</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+{% set skill_level_data = [
+    {
+        'title': 'Expert',
+        'count': skill_segments[0].count,
+        'activity_count': null,
+        'activity_label': 'Master level skills',
+        'percentage': skill_segments[0].percentage,
+        'icon': 'bi bi-star-fill',
+        'color_class': 'info',
+        'button_label': 'View Contacts',
+        'button_url': url_for('contacts_bp.filtered_contacts', skill_level='Expert')
+    },
+    {
+        'title': 'Advanced',
+        'count': skill_segments[1].count,
+        'activity_count': null,
+        'activity_label': 'High level skills',
+        'percentage': skill_segments[1].percentage,
+        'icon': 'bi bi-star',
+        'color_class': 'primary',
+        'button_label': 'View Contacts',
+        'button_url': url_for('contacts_bp.filtered_contacts', skill_level='Advanced')
+    },
+    {
+        'title': 'Intermediate',
+        'count': skill_segments[2].count,
+        'activity_count': null,
+        'activity_label': 'Solid skills',
+        'percentage': skill_segments[2].percentage,
+        'icon': 'bi bi-person-check',
+        'color_class': 'success',
+        'button_label': 'View Contacts',
+        'button_url': url_for('contacts_bp.filtered_contacts', skill_level='Intermediate')
+    },
+    {
+        'title': 'Beginner',
+        'count': skill_segments[3].count,
+        'activity_count': null,
+        'activity_label': 'Entry level',
+        'percentage': skill_segments[3].percentage,
+        'icon': 'bi bi-person',
+        'color_class': 'warning',
+        'button_label': 'View Contacts',
+        'button_url': url_for('contacts_bp.filtered_contacts', skill_level='Beginner')
+    }
+] %}
+
+{{ sections.progress_bar_section(
+    heading='Skill Level Distribution',
+    href=url_for('contacts_bp.filtered_contacts'),
+    button_text='View All Contacts',
+    card_data=skill_level_data
+) }}
+
 
 <!-- Top Contacts Section -->
 <div class="row mb-4">
