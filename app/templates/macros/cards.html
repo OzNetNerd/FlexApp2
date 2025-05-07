@@ -38,9 +38,12 @@
     icon,
     color_class,
     button_label,
-    button_url="#"
+    button_url="#",
+    columns=3
 ) %}
-<div class="col-md-4 mb-3">
+{# Calculate column width based on card count, default to 3 cards (col-md-4) #}
+{% set col_width = 12 // (columns if columns <= 6 else 3) %}
+<div class="col-md-{{ col_width }} mb-3">
   <div class="card border-0 shadow-sm h-100">
     <div class="card-body">
       <div class="d-flex align-items-center mb-3">

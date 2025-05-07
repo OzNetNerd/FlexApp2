@@ -84,6 +84,8 @@
 
 
 {% macro progress_bar_section(heading, href, button_text, card_data) %}
+{# Calculate number of cards #}
+{% set card_count = card_data|length %}
 <div class="row mb-4">
   <div class="col-12">
     <div class="card border-0 shadow-sm">
@@ -103,7 +105,8 @@
                 icon=card.icon,
                 color_class=card.color_class,
                 button_label=card.button_label,
-                button_url=card.button_url
+                button_url=card.button_url,
+                columns=card_count
             ) }}
         {% endfor %}
         </div>
