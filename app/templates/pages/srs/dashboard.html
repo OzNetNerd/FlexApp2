@@ -6,6 +6,7 @@
 {% block title %}CRM Dashboard - Flashcards{% endblock %}
 
 {% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -222,58 +223,62 @@
 {% endblock %}
 
 {% block scripts_extra %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module">
-  // Initialize the highlights slider
+  // Define chart data
+  const progressData = {
+    labels: {{ progress_data.labels|tojson }},
+    datasets: {{ progress_data.datasets|tojson }}
+  };
+
+  // Initialize the chart when DOM is loaded
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize learning progress chart
-    const ctx = document.getElementById('learningProgressChart').getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: {{ progress_data.labels|tojson }},
-        datasets: {{ progress_data.datasets|tojson }}
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Number of Cards'
-            }
-          },
-          y1: {
-            beginAtZero: true,
-            position: 'right',
-            title: {
-              display: true,
-              text: 'Retention Score (%)'
+    import('{{ url_for("static", filename="js/visuals/lineGraph.js") }}')
+      .then(module => {
+        module.createChart({
+          canvasId: 'learningProgressChart',
+          type: 'generic',
+          data: progressData,
+          useGradients: true,
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Number of Cards'
+                }
+              },
+              y1: {
+                beginAtZero: true,
+                position: 'right',
+                title: {
+                  display: true,
+                  text: 'Retention Score (%)'
+                },
+                max: 100,
+                grid: {
+                  drawOnChartArea: false
+                }
+              },
+              x: {
+                grid: {
+                  display: false
+                }
+              }
             },
-            max: 100,
-            grid: {
-              drawOnChartArea: false
-            }
-          },
-          x: {
-            grid: {
-              display: false
+            plugins: {
+              tooltip: {
+                mode: 'index',
+                intersect: false
+              },
+              legend: {
+                position: 'top'
+              }
             }
           }
-        },
-        plugins: {
-          tooltip: {
-            mode: 'index',
-            intersect: false
-          },
-          legend: {
-            position: 'top'
-          }
-        }
-      }
-    });
+        });
+      })
+      .catch(err => console.error('Failed to load lineGraph.js:', err));
   });
 </script>
 {% endblock %}
