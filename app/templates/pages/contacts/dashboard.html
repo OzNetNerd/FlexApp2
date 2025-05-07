@@ -343,143 +343,20 @@
 {% block scripts_extra %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module">
-  // Initialize the highlights slider
+  // Export data for the chart component with fallbacks
+  window.chartData = {
+    labels: {{ growth_data.labels|default([])|tojson }},
+    newItems: {{ growth_data.new_companies|default([])|tojson }},
+    totalItems: {{ growth_data.total_companies|default([])|tojson }}
+  };
+
+  // Initialize the chart when DOM is loaded
   document.addEventListener('DOMContentLoaded', function() {
-    const container = document.querySelector('.highlights-container');
-    const items = document.querySelectorAll('.highlight-item');
-    let currentIndex = 0;
-
-    document.querySelector('.btn-highlight-next').addEventListener('click', function() {
-      currentIndex = (currentIndex + 1) % items.length;
-      container.scrollTo({
-        left: currentIndex * container.offsetWidth,
-        behavior: 'smooth'
-      });
-    });
-
-    document.querySelector('.btn-highlight-prev').addEventListener('click', function() {
-      currentIndex = (currentIndex - 1 + items.length) % items.length;
-      container.scrollTo({
-        left: currentIndex * container.offsetWidth,
-        behavior: 'smooth'
-      });
-    });
-
-    // Auto-scroll highlights
-    setInterval(() => {
-      document.querySelector('.btn-highlight-next').click();
-    }, 5000);
-
-    // Initialize contact growth chart
-    const ctx = document.getElementById('contactGrowthChart').getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: {{ growth_data.labels|tojson }},
-        datasets: [
-          {
-            label: 'New Contacts',
-            backgroundColor: 'rgba(40, 167, 69, 0.2)',
-            borderColor: 'rgba(40, 167, 69, 1)',
-            borderWidth: 2,
-            pointBackgroundColor: 'rgba(40, 167, 69, 1)',
-            pointRadius: 4,
-            fill: true,
-            data: {{ growth_data.new_contacts|tojson }}
-          },
-          {
-            label: 'Total Contacts',
-            backgroundColor: 'rgba(0, 123, 255, 0.2)',
-            borderColor: 'rgba(0, 123, 255, 1)',
-            borderWidth: 2,
-            pointBackgroundColor: 'rgba(0, 123, 255, 1)',
-            pointRadius: 4,
-            fill: true,
-            data: {{ growth_data.total_contacts|tojson }}
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            grid: {
-              display: false
-            }
-          },
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Number of Contacts'
-            }
-          }
-        },
-        plugins: {
-          tooltip: {
-            mode: 'index',
-            intersect: false
-          },
-          legend: {
-            position: 'top'
-          }
-        }
-      }
-    });
+    import('{{ url_for("static", filename="js/visuals/lineGraph.js") }}')
+      .then(module => {
+        module.initDataChart('contactGrowthChart', window.chartData);
+      })
+      .catch(err => console.error('Failed to load lineGraph.js:', err));
   });
 </script>
-{% endblock %}
-
-{% block head_extra %}
-<style>
-/* Activity Icons */
-.activity-icon,
-.category-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.activity-icon:hover,
-.category-icon:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-/* Navigation cards hover effect */
-.nav-card {
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.nav-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-}
-
-/* Highlights container */
-.highlights-container {
-  display: flex;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-}
-
-.highlight-item {
-  min-width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Badge styling */
-.nav-card .badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 0.8rem;
-}
-</style>
 {% endblock %}
