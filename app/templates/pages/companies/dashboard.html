@@ -7,6 +7,7 @@
 
 {% block head_extra %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -229,92 +230,138 @@
 {% endblock %}
 
 {% block scripts_extra %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script type="module">
-  // Initialize the highlights slider
+<script>
+  // Company Growth Chart - Isolated from other JavaScript
   document.addEventListener('DOMContentLoaded', function() {
-    const container = document.querySelector('.highlights-container');
-    const items = document.querySelectorAll('.highlight-item');
-    let currentIndex = 0;
+    try {
+      console.log("Initializing company growth chart...");
 
-    document.querySelector('.btn-highlight-next').addEventListener('click', function() {
-      currentIndex = (currentIndex + 1) % items.length;
-      container.scrollTo({
-        left: currentIndex * container.offsetWidth,
-        behavior: 'smooth'
-      });
-    });
+      // Check if Chart.js is loaded
+      if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded properly');
+        return;
+      }
 
-    document.querySelector('.btn-highlight-prev').addEventListener('click', function() {
-      currentIndex = (currentIndex - 1 + items.length) % items.length;
-      container.scrollTo({
-        left: currentIndex * container.offsetWidth,
-        behavior: 'smooth'
-      });
-    });
+      // Check if the canvas element exists
+      const chartCanvas = document.getElementById('companyGrowthChart');
+      if (!chartCanvas) {
+        console.error('Company growth chart canvas element not found');
+        return;
+      }
 
-    // Auto-scroll highlights
-    setInterval(() => {
-      document.querySelector('.btn-highlight-next').click();
-    }, 5000);
+      const ctx = chartCanvas.getContext('2d');
 
-    // Initialize company growth chart
-    const ctx = document.getElementById('companyGrowthChart').getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: {{ growth_data.labels|tojson }},
-        datasets: [
-          {
-            label: 'New Companies',
-            backgroundColor: 'rgba(40, 167, 69, 0.2)',
-            borderColor: 'rgba(40, 167, 69, 1)',
-            borderWidth: 2,
-            pointBackgroundColor: 'rgba(40, 167, 69, 1)',
-            pointRadius: 4,
-            fill: true,
-            data: {{ growth_data.new_companies|tojson }}
-          },
-          {
-            label: 'Total Companies',
-            backgroundColor: 'rgba(0, 123, 255, 0.2)',
-            borderColor: 'rgba(0, 123, 255, 1)',
-            borderWidth: 2,
-            pointBackgroundColor: 'rgba(0, 123, 255, 1)',
-            pointRadius: 4,
-            fill: true,
-            data: {{ growth_data.total_companies|tojson }}
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            grid: {
-              display: false
+      // Create gradient fills for better visualization
+      const newCompaniesGradient = ctx.createLinearGradient(0, 0, 0, 300);
+      newCompaniesGradient.addColorStop(0, 'rgba(40, 167, 69, 0.4)');
+      newCompaniesGradient.addColorStop(1, 'rgba(40, 167, 69, 0.05)');
+
+      const totalCompaniesGradient = ctx.createLinearGradient(0, 0, 0, 300);
+      totalCompaniesGradient.addColorStop(0, 'rgba(0, 123, 255, 0.4)');
+      totalCompaniesGradient.addColorStop(1, 'rgba(0, 123, 255, 0.05)');
+
+      // Get data from the server
+      const labels = {{ growth_data.labels|tojson }};
+      const newCompaniesData = {{ growth_data.new_companies|tojson }};
+      const totalCompaniesData = {{ growth_data.total_companies|tojson }};
+
+      console.log("Chart data:", {labels, newCompaniesData, totalCompaniesData});
+
+      // Create the chart
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'New Companies',
+              backgroundColor: newCompaniesGradient,
+              borderColor: 'rgba(40, 167, 69, 1)',
+              borderWidth: 2,
+              pointBackgroundColor: 'rgba(40, 167, 69, 1)',
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              fill: true,
+              tension: 0.3,
+              data: newCompaniesData
+            },
+            {
+              label: 'Total Companies',
+              backgroundColor: totalCompaniesGradient,
+              borderColor: 'rgba(0, 123, 255, 1)',
+              borderWidth: 2,
+              pointBackgroundColor: 'rgba(0, 123, 255, 1)',
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              fill: true,
+              tension: 0.3,
+              data: totalCompaniesData
             }
-          },
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Number of Companies'
-            }
-          }
+          ]
         },
-        plugins: {
-          tooltip: {
-            mode: 'index',
-            intersect: false
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 1000,
+            easing: 'easeOutQuart'
           },
-          legend: {
-            position: 'top'
+          scales: {
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                font: {
+                  size: 11
+                },
+                color: '#6c757d'
+              }
+            },
+            y: {
+              beginAtZero: true,
+              grace: '5%',
+              title: {
+                display: true,
+                text: 'Number of Companies',
+                font: {
+                  size: 13,
+                  weight: 'bold'
+                }
+              },
+              ticks: {
+                precision: 0,
+                font: {
+                  size: 11
+                },
+                color: '#6c757d'
+              }
+            }
+          },
+          plugins: {
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              padding: 10,
+              cornerRadius: 4
+            },
+            legend: {
+              position: 'top',
+              labels: {
+                padding: 20,
+                boxWidth: 15,
+                usePointStyle: true
+              }
+            }
           }
         }
-      }
-    });
+      });
+
+      console.log("Company growth chart initialized successfully");
+    } catch (error) {
+      console.error("Error initializing company growth chart:", error);
+    }
   });
 </script>
 {% endblock %}

@@ -1,5 +1,5 @@
 /**
- * js/logger.js
+ * js/core/logger.js
  * Logger Module – supports optional nested (file & function) grouping.
  */
 
