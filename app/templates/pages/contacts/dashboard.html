@@ -1,17 +1,20 @@
 {% extends "layouts/base.html" %}
+{% import "macros/buttons.html" as buttons %}
+{% import "macros/sections.html" as sections %}
+{% import "macros/cards.html" as cards %}
 
 {% block title %}CRM Dashboard - Contacts{% endblock %}
 
+{% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
 {% block content %}
-<!-- Page Header Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="bg-white p-4 rounded shadow-sm">
-      <h1 class="page-heading">Contact Management</h1>
-      <p class="page-heading-subtext">Track and manage all of your professional contacts</p>
-    </div>
-  </div>
-</div>
+<!-- Heading & subtext section -->
+{{ sections.heading_section(
+  heading_text='Contact Management',
+  subtext='Track and manage all of your professional contacts'
+) }}
 
 <!-- Quick Actions Cards -->
 <div class="row mb-4">
@@ -343,18 +346,18 @@
 {% block scripts_extra %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module">
-  // Export data for the chart component with fallbacks
-  window.chartData = {
-    labels: {{ growth_data.labels|default([])|tojson }},
-    newItems: {{ growth_data.new_companies|default([])|tojson }},
-    totalItems: {{ growth_data.total_companies|default([])|tojson }}
+  // Sample data for testing
+  const chartData = {
+    labels: ['Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025'],
+    newItems: [3, 5, 8, 4, 7, 6],
+    totalItems: [3, 8, 16, 20, 27, 33]
   };
 
   // Initialize the chart when DOM is loaded
   document.addEventListener('DOMContentLoaded', function() {
     import('{{ url_for("static", filename="js/visuals/lineGraph.js") }}')
       .then(module => {
-        module.initDataChart('contactGrowthChart', window.chartData);
+        module.initDataChart('contactGrowthChart', chartData);
       })
       .catch(err => console.error('Failed to load lineGraph.js:', err));
   });
