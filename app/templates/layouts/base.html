@@ -20,8 +20,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}CRM{% endblock %}</title>
 
+    <!-- Prevent FOUC and sidebar flicker -->
+    <style>
+      html.preload * {
+        transition: none !important;
+        animation: none !important;
+      }
+
+      html.preload .sidebar,
+      html.preload .main-content-wrapper {
+        transition: none !important;
+      }
+    </style>
+
+    <script>
+      // Apply preload class to block transitions during initial state setup
+      document.documentElement.classList.add('preload');
+
+      // Apply sidebar collapse state IMMEDIATELY from server-side data
+      // This ensures the page renders correctly the first time
+      const serverSideCollapsed = {% if sidebar_collapsed %}true{% else %}false{% endif %};
+
+      if (serverSideCollapsed) {
+        document.documentElement.classList.add('sidebar-collapsed');
+      }
+
+      // Remove preload class after everything has loaded
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          document.documentElement.classList.remove('preload');
+        }, 100);
+      });
+    </script>
+
+    <title>{% block title %}CRM{% endblock %}</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet" />

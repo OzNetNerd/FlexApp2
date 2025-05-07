@@ -2,6 +2,41 @@
 Sidebar styles - sidebar layout and components
 */
 
+/* Prevent transitions during page load */
+html.no-transition *,
+html.no-transition *:before,
+html.no-transition *:after {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Apply collapsed styles before DOM content loaded */
+html.sidebar-collapsed-preload .sidebar {
+  width: var(--sidebar-collapsed-width);
+}
+
+html.sidebar-collapsed-preload .main-content-wrapper {
+  margin-left: var(--sidebar-collapsed-width);
+  width: calc(100% - var(--sidebar-collapsed-width));
+}
+
+html.sidebar-collapsed-preload .brand-text,
+html.sidebar-collapsed-preload .sidebar-text {
+  display: none;
+}
+
+/* Mobile adjustments for preload state */
+@media (max-width: 991.98px) {
+  html.sidebar-collapsed-preload .sidebar {
+    transform: translateX(-100%);
+  }
+
+  html.sidebar-collapsed-preload .main-content-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
 .sidebar {
   position: fixed;
   top: 0;

@@ -160,11 +160,30 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     @app.context_processor
     def inject_globals():
         """Inject common variables into every template context."""
+        # Get sidebar collapsed state from cookie
+        sidebar_collapsed = request.cookies.get('sidebarCollapsed') == 'true'
+
+        # Try to get path-specific state if available
+        path_state_collapsed = None
+        try:
+            path_state_str = request.cookies.get('sidebarPathState')
+            if path_state_str:
+                import json
+                path_state = json.loads(path_state_str)
+                if path_state.get('path') == request.path:
+                    path_state_collapsed = path_state.get('state', {}).get('collapsed')
+        except:
+            pass
+
+        # Use path-specific state if available, otherwise use general state
+        final_collapsed_state = path_state_collapsed if path_state_collapsed is not None else sidebar_collapsed
+
         return {
             "now": datetime.now(ZoneInfo("UTC")),
             "logger": logger,
             "current_app": current_app,
             "is_debug_mode": app.debug,
+            "sidebar_collapsed": final_collapsed_state,
         }
 
     @app.before_request

@@ -1,4 +1,5 @@
-// Updated sidebar.js with localStorage for state persistence
+// Improved sidebar.js with flicker prevention
+
 document.addEventListener('DOMContentLoaded', function() {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
@@ -7,10 +8,32 @@ document.addEventListener('DOMContentLoaded', function() {
   const body = document.body;
   const submenuToggles = document.querySelectorAll('.submenu-toggle');
 
-  // Restore sidebar collapsed state
-  if (localStorage.getItem('sidebarCollapsed') === 'true') {
-    body.classList.add('sidebar-collapsed');
-  }
+  // We no longer need to set the initial state here as it's now handled
+  // by the inline script in the head of base.html
+
+  // Assign unique identifiers to submenus for tracking
+  document.querySelectorAll('.has-submenu').forEach((submenu, index) => {
+    const linkText = submenu.querySelector('.sidebar-link')?.textContent.trim() || `submenu-${index}`;
+    submenu.dataset.submenuId = linkText.replace(/\s+/g, '-').toLowerCase();
+  });
+
+  // Auto-open submenu if a child is active
+  document.querySelectorAll('.submenu-item.active').forEach(item => {
+    const parentSubmenu = item.closest('.has-submenu');
+    if (parentSubmenu) {
+      parentSubmenu.classList.add('open');
+      const submenuId = parentSubmenu.dataset.submenuId;
+      localStorage.setItem('submenu_' + submenuId, 'open');
+    }
+  });
+
+  // Restore open submenus from localStorage
+  document.querySelectorAll('.has-submenu').forEach(submenu => {
+    const submenuId = submenu.dataset.submenuId;
+    if (localStorage.getItem('submenu_' + submenuId) === 'open') {
+      submenu.classList.add('open');
+    }
+  });
 
   // Toggle mobile sidebar
   toggleBtn?.addEventListener('click', function() {
@@ -20,9 +43,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Collapse sidebar (desktop) and save state
   collapseBtn?.addEventListener('click', function() {
+    document.documentElement.classList.toggle('sidebar-collapsed');
     body.classList.toggle('sidebar-collapsed');
+
     // Save sidebar collapsed state
-    localStorage.setItem('sidebarCollapsed', body.classList.contains('sidebar-collapsed'));
+    const isCollapsed = document.documentElement.classList.contains('sidebar-collapsed');
+    localStorage.setItem('sidebarCollapsed', isCollapsed);
+
+    // Set cookie for server-side rendering
+    document.cookie = `sidebarCollapsed=${isCollapsed}; path=/; max-age=31536000; SameSite=Lax`;
   });
 
   // Close sidebar when clicking overlay
@@ -31,28 +60,13 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.classList.remove('show');
   });
 
-  // Assign unique identifiers to submenus for tracking
-  document.querySelectorAll('.has-submenu').forEach((submenu, index) => {
-    // Try to get text from first link or use index as fallback
-    const linkText = submenu.querySelector('.sidebar-link')?.textContent.trim() || `submenu-${index}`;
-    submenu.dataset.submenuId = linkText.replace(/\s+/g, '-').toLowerCase();
-  });
-
-  // Restore open submenus
-  document.querySelectorAll('.has-submenu').forEach(submenu => {
-    const submenuId = submenu.dataset.submenuId;
-    if (localStorage.getItem('submenu_' + submenuId) === 'open') {
-      submenu.classList.add('open');
-    }
-  });
-
   // Toggle submenus and save state
   submenuToggles.forEach(toggle => {
     toggle.addEventListener('click', function(e) {
       e.stopPropagation(); // Prevent event bubbling
 
       // Skip toggle behavior when sidebar is collapsed on desktop
-      if (body.classList.contains('sidebar-collapsed') && window.innerWidth >= 992) {
+      if (document.documentElement.classList.contains('sidebar-collapsed') && window.innerWidth >= 992) {
         return;
       }
 
@@ -65,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
           const otherParent = otherToggle.closest('.has-submenu');
           if (otherParent !== parent && otherParent.classList.contains('open')) {
             otherParent.classList.remove('open');
-
             // Save closed state for other submenu
             const otherId = otherParent.dataset.submenuId;
             localStorage.removeItem('submenu_' + otherId);
@@ -85,26 +98,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Close sidebar when clicking links on mobile
+  // Handle link clicks - preserve state during navigation
   const sidebarLinks = document.querySelectorAll('.sidebar-link:not(.submenu-toggle), .submenu-link');
-  if (window.innerWidth < 992) {
-    sidebarLinks.forEach(link => {
-      link.addEventListener('click', function() {
+  sidebarLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      // Close sidebar on mobile
+      if (window.innerWidth < 992) {
         sidebar.classList.remove('show');
         overlay.classList.remove('show');
+      }
+
+      // Store current sidebar state for the next page
+      const currentState = {
+        collapsed: document.documentElement.classList.contains('sidebar-collapsed'),
+        openSubmenus: Array.from(document.querySelectorAll('.has-submenu.open'))
+          .map(el => el.dataset.submenuId)
+      };
+
+      // Store path-specific state in cookie for server-side access
+      const pathStateStr = JSON.stringify({
+        path: link.getAttribute('href'),
+        state: currentState
       });
+
+      document.cookie = `sidebarPathState=${encodeURIComponent(pathStateStr)}; path=/; max-age=31536000; SameSite=Lax`;
+      sessionStorage.setItem('sidebarPathState', pathStateStr);
     });
-  }
-
-  // Auto-open submenu if a child is active (and save that state)
-  document.querySelectorAll('.submenu-item.active').forEach(item => {
-    const parentSubmenu = item.closest('.has-submenu');
-    if (parentSubmenu) {
-      parentSubmenu.classList.add('open');
-
-      // Save this submenu as open
-      const submenuId = parentSubmenu.dataset.submenuId;
-      localStorage.setItem('submenu_' + submenuId, 'open');
-    }
   });
 });
