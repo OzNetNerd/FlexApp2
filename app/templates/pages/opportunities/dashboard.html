@@ -215,87 +215,24 @@
 {% block scripts_extra %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module">
-  // Initialize the highlights slider
+  // Sample data for testing
+  const forecastData = {
+    labels: ['Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025'],
+    closed_won: [15000, 22000, 18000, 25000, 30000, 28000],
+    forecast: [10000, 12000, 15000, 14000, 16000, 20000],
+    pipeline: [25000, 30000, 35000, 28000, 32000, 40000]
+  };
+
+  // Initialize the chart when DOM is loaded
   document.addEventListener('DOMContentLoaded', function() {
-    const container = document.querySelector('.highlights-container');
-    const items = document.querySelectorAll('.highlight-item');
-    let currentIndex = 0;
+    import('{{ url_for("static", filename="js/visuals/barGraph.js") }}')
+      .then(module => {
+        module.initSalesForecastChart('salesForecastChart', forecastData, '€');
 
-    document.querySelector('.btn-highlight-next').addEventListener('click', function() {
-      currentIndex = (currentIndex + 1) % items.length;
-      container.scrollTo({
-        left: currentIndex * container.offsetWidth,
-        behavior: 'smooth'
-      });
-    });
-
-    document.querySelector('.btn-highlight-prev').addEventListener('click', function() {
-      currentIndex = (currentIndex - 1 + items.length) % items.length;
-      container.scrollTo({
-        left: currentIndex * container.offsetWidth,
-        behavior: 'smooth'
-      });
-    });
-
-    // Auto-scroll highlights
-    setInterval(() => {
-      document.querySelector('.btn-highlight-next').click();
-    }, 5000);
-
-    // Initialize sales forecast chart
-    const ctx = document.getElementById('salesForecastChart').getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: {{ forecast_data.labels|tojson }},
-        datasets: [
-          {
-            label: 'Closed Won',
-            backgroundColor: 'rgba(40, 167, 69, 0.8)',
-            data: {{ forecast_data.closed_won|tojson }}
-          },
-          {
-            label: 'Forecast',
-            backgroundColor: 'rgba(0, 123, 255, 0.8)',
-            data: {{ forecast_data.forecast|tojson }}
-          },
-          {
-            label: 'Pipeline',
-            backgroundColor: 'rgba(108, 117, 125, 0.8)',
-            data: {{ forecast_data.pipeline|tojson }}
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            stacked: true,
-            grid: {
-              display: false
-            }
-          },
-          y: {
-            stacked: true,
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Amount ({{ currency_symbol }})'
-            }
-          }
-        },
-        plugins: {
-          tooltip: {
-            mode: 'index',
-            intersect: false
-          },
-          legend: {
-            position: 'top'
-          }
-        }
-      }
-    });
+        // You can also use the more generic function for any bar chart:
+        // module.initBarChart('anotherChartId', customData, customOptions);
+      })
+      .catch(err => console.error('Failed to load barGraph.js:', err));
   });
 </script>
 {% endblock %}
