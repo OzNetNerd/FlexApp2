@@ -6,7 +6,6 @@
 {% block title %}CRM Dashboard - Companies{% endblock %}
 
 {% block head_extra %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
@@ -212,16 +211,16 @@
   </div>
 </div>
 
-<!-- Company Growth Chart -->
+<!-- Data Trends Chart -->
 <div class="row mb-4">
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white">
-        <h2 class="section-card-heading">Company Growth</h2>
+        <h2 class="section-card-heading">Data Trends</h2>
       </div>
       <div class="card-body">
         <div style="height: 300px; position: relative;">
-          <canvas id="companyGrowthChart"></canvas>
+          <canvas id="dataChart"></canvas>
         </div>
       </div>
     </div>
@@ -230,138 +229,13 @@
 {% endblock %}
 
 {% block scripts_extra %}
-<script>
-  // Company Growth Chart - Isolated from other JavaScript
-  document.addEventListener('DOMContentLoaded', function() {
-    try {
-      console.log("Initializing company growth chart...");
-
-      // Check if Chart.js is loaded
-      if (typeof Chart === 'undefined') {
-        console.error('Chart.js is not loaded properly');
-        return;
-      }
-
-      // Check if the canvas element exists
-      const chartCanvas = document.getElementById('companyGrowthChart');
-      if (!chartCanvas) {
-        console.error('Company growth chart canvas element not found');
-        return;
-      }
-
-      const ctx = chartCanvas.getContext('2d');
-
-      // Create gradient fills for better visualization
-      const newCompaniesGradient = ctx.createLinearGradient(0, 0, 0, 300);
-      newCompaniesGradient.addColorStop(0, 'rgba(40, 167, 69, 0.4)');
-      newCompaniesGradient.addColorStop(1, 'rgba(40, 167, 69, 0.05)');
-
-      const totalCompaniesGradient = ctx.createLinearGradient(0, 0, 0, 300);
-      totalCompaniesGradient.addColorStop(0, 'rgba(0, 123, 255, 0.4)');
-      totalCompaniesGradient.addColorStop(1, 'rgba(0, 123, 255, 0.05)');
-
-      // Get data from the server
-      const labels = {{ growth_data.labels|tojson }};
-      const newCompaniesData = {{ growth_data.new_companies|tojson }};
-      const totalCompaniesData = {{ growth_data.total_companies|tojson }};
-
-      console.log("Chart data:", {labels, newCompaniesData, totalCompaniesData});
-
-      // Create the chart
-      const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'New Companies',
-              backgroundColor: newCompaniesGradient,
-              borderColor: 'rgba(40, 167, 69, 1)',
-              borderWidth: 2,
-              pointBackgroundColor: 'rgba(40, 167, 69, 1)',
-              pointRadius: 4,
-              pointHoverRadius: 6,
-              fill: true,
-              tension: 0.3,
-              data: newCompaniesData
-            },
-            {
-              label: 'Total Companies',
-              backgroundColor: totalCompaniesGradient,
-              borderColor: 'rgba(0, 123, 255, 1)',
-              borderWidth: 2,
-              pointBackgroundColor: 'rgba(0, 123, 255, 1)',
-              pointRadius: 4,
-              pointHoverRadius: 6,
-              fill: true,
-              tension: 0.3,
-              data: totalCompaniesData
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: {
-            duration: 1000,
-            easing: 'easeOutQuart'
-          },
-          scales: {
-            x: {
-              grid: {
-                display: false
-              },
-              ticks: {
-                font: {
-                  size: 11
-                },
-                color: '#6c757d'
-              }
-            },
-            y: {
-              beginAtZero: true,
-              grace: '5%',
-              title: {
-                display: true,
-                text: 'Number of Companies',
-                font: {
-                  size: 13,
-                  weight: 'bold'
-                }
-              },
-              ticks: {
-                precision: 0,
-                font: {
-                  size: 11
-                },
-                color: '#6c757d'
-              }
-            }
-          },
-          plugins: {
-            tooltip: {
-              mode: 'index',
-              intersect: false,
-              backgroundColor: 'rgba(0, 0, 0, 0.7)',
-              padding: 10,
-              cornerRadius: 4
-            },
-            legend: {
-              position: 'top',
-              labels: {
-                padding: 20,
-                boxWidth: 15,
-                usePointStyle: true
-              }
-            }
-          }
-        }
-      });
-
-      console.log("Company growth chart initialized successfully");
-    } catch (error) {
-      console.error("Error initializing company growth chart:", error);
-    }
-  });
+<script type="module">
+  // Export data for the chart component
+  window.chartData = {
+    labels: {{ growth_data.labels|tojson }},
+    newItems: {{ growth_data.new_companies|tojson }},
+    totalItems: {{ growth_data.total_companies|tojson }}
+  };
 </script>
+<script type="module" src="{{ url_for('static', filename='js/visuals/lineGraph.js') }}"></script>
 {% endblock %}
