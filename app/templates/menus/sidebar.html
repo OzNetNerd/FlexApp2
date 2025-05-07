@@ -39,13 +39,20 @@
        "children": [
          {"name": "Opportunities", "url": "/sales/opportunities", "icon": "lightbulb"},
          {"name": "Deals", "url": "/sales/deals", "icon": "handshake"},
-         {"name": "Invoices", "url": "/sales/invoices", "icon": "file-invoice-dollar"}
+         {"name": "Invoices", "url": "/sales/invoices", "icon": "file-invoice-dollar"},
+         {"name": "Quotes", "url": "/sales/quotes", "icon": "file-contract"},
+         {"name": "Forecasts", "url": "/sales/forecasts", "icon": "chart-line"}
        ]
      },
      {
        "name": "Reports",
-       "url": "/reports",
-       "icon": "chart-bar"
+       "icon": "chart-bar",
+       "children": [
+         {"name": "Sales Reports", "url": "/reports/sales", "icon": "chart-pie"},
+         {"name": "Customer Analytics", "url": "/reports/customers", "icon": "users-cog"},
+         {"name": "Performance", "url": "/reports/performance", "icon": "chart-line"},
+         {"name": "Export Data", "url": "/reports/export", "icon": "file-export"}
+       ]
      },
      {
        "name": "Settings",
@@ -58,6 +65,63 @@
      }
    ]
 #}
+
+
+{% set navbar_entries = [
+  {
+    "name": "Dashboard",
+    "url": "/dashboard",
+    "icon": "tachometer-alt"
+  },
+  {
+    "name": "Users",
+    "icon": "users",
+    "children": [
+      {"name": "All Users", "url": "/users", "icon": "list"},
+      {"name": "New User", "url": "/users/new", "icon": "user-plus"},
+      {"name": "User Groups", "url": "/users/groups", "icon": "user-tag"}
+    ]
+  },
+  {
+    "name": "Customers",
+    "icon": "handshake",
+    "children": [
+      {"name": "All Customers", "url": "/customers", "icon": "users"},
+      {"name": "New Customer", "url": "/customers/new", "icon": "user-plus"},
+      {"name": "Leads", "url": "/customers/leads", "icon": "user-check"}
+    ]
+  },
+  {
+    "name": "Sales",
+    "icon": "chart-line",
+    "children": [
+      {"name": "Opportunities", "url": "/sales/opportunities", "icon": "lightbulb"},
+      {"name": "Deals", "url": "/sales/deals", "icon": "handshake"},
+      {"name": "Invoices", "url": "/sales/invoices", "icon": "file-invoice-dollar"},
+      {"name": "Quotes", "url": "/sales/quotes", "icon": "file-contract"},
+      {"name": "Forecasts", "url": "/sales/forecasts", "icon": "chart-line"}
+    ]
+  },
+  {
+    "name": "Reports",
+    "icon": "chart-bar",
+    "children": [
+      {"name": "Sales Reports", "url": "/reports/sales", "icon": "chart-pie"},
+      {"name": "Customer Analytics", "url": "/reports/customers", "icon": "users-cog"},
+      {"name": "Performance", "url": "/reports/performance", "icon": "chart-line"},
+      {"name": "Export Data", "url": "/reports/export", "icon": "file-export"}
+    ]
+  },
+  {
+    "name": "Settings",
+    "icon": "cog",
+    "children": [
+      {"name": "Profile", "url": "/settings/profile", "icon": "user-cog"},
+      {"name": "Company", "url": "/settings/company", "icon": "building"},
+      {"name": "Preferences", "url": "/settings/preferences", "icon": "sliders-h"}
+    ]
+  }
+] %}
 
 <div id="sidebar" class="sidebar">
   <div class="sidebar-header">
