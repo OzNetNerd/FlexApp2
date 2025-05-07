@@ -95,7 +95,7 @@
               {% endfor %}
             </ul>
           {% else %}
-            <a href="{{ item.url }}" class="sidebar-link" {% if is_active_item %}aria-current="page"{% endif %}>
+            <a href="{{ item.url }}" class="sidebar-link {% if is_active_item %}active{% endif %}" {% if is_active_item %}aria-current="page"{% endif %}>
               <i class="fas fa-{{ item.icon|default('circle') }} sidebar-icon"></i>
               <span class="sidebar-text">{{ item.name }}</span>
               {% if is_active_item %}<span class="active-indicator"></span>{% endif %}

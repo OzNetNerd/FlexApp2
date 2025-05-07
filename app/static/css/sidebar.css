@@ -146,7 +146,7 @@ body.sidebar-collapsed .sidebar-toggle {
   font-weight: var(--font-weight-medium);
   text-decoration: none;
   transition: all var(--transition-fast);
-  border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) 0;
+  border-radius: 0;
   position: relative;
 }
 
@@ -276,7 +276,7 @@ body.sidebar-collapsed .sidebar-icon {
   font-weight: var(--font-weight-normal);
   text-decoration: none;
   transition: all var(--transition-fast);
-  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  border-radius: 0;
   position: relative;
   font-size: 0.9rem;
 }
@@ -326,7 +326,7 @@ body.sidebar-collapsed .submenu {
   top: 0;
   min-width: 200px;
   background-color: var(--sidebar-bg);
-  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  border-radius: 0;
   box-shadow: var(--shadow-md);
   max-height: 0;
   overflow: hidden;
