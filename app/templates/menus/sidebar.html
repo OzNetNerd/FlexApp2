@@ -8,73 +8,15 @@
     - Toggle button for expanding/collapsing
 ------------------------------------------------------------------------------ #}
 
-{# Example of how your navbar_entries data structure should look:
-   navbar_entries = [
-     {
-       "name": "Dashboard",
-       "url": "/dashboard",
-       "icon": "tachometer-alt"
-     },
-     {
-       "name": "Users",
-       "icon": "users",
-       "children": [
-         {"name": "All Users", "url": "/users", "icon": "list"},
-         {"name": "New User", "url": "/users/new", "icon": "user-plus"},
-         {"name": "User Groups", "url": "/users/groups", "icon": "user-tag"}
-       ]
-     },
-     {
-       "name": "Customers",
-       "icon": "handshake",
-       "children": [
-         {"name": "All Customers", "url": "/customers", "icon": "users"},
-         {"name": "New Customer", "url": "/customers/new", "icon": "user-plus"},
-         {"name": "Leads", "url": "/customers/leads", "icon": "user-check"}
-       ]
-     },
-     {
-       "name": "Sales",
-       "icon": "chart-line",
-       "children": [
-         {"name": "Opportunities", "url": "/sales/opportunities", "icon": "lightbulb"},
-         {"name": "Deals", "url": "/sales/deals", "icon": "handshake"},
-         {"name": "Invoices", "url": "/sales/invoices", "icon": "file-invoice-dollar"},
-         {"name": "Quotes", "url": "/sales/quotes", "icon": "file-contract"},
-         {"name": "Forecasts", "url": "/sales/forecasts", "icon": "chart-line"}
-       ]
-     },
-     {
-       "name": "Reports",
-       "icon": "chart-bar",
-       "children": [
-         {"name": "Sales Reports", "url": "/reports/sales", "icon": "chart-pie"},
-         {"name": "Customer Analytics", "url": "/reports/customers", "icon": "users-cog"},
-         {"name": "Performance", "url": "/reports/performance", "icon": "chart-line"},
-         {"name": "Export Data", "url": "/reports/export", "icon": "file-export"}
-       ]
-     },
-     {
-       "name": "Settings",
-       "icon": "cog",
-       "children": [
-         {"name": "Profile", "url": "/settings/profile", "icon": "user-cog"},
-         {"name": "Company", "url": "/settings/company", "icon": "building"},
-         {"name": "Preferences", "url": "/settings/preferences", "icon": "sliders-h"}
-       ]
-     }
-   ]
-#}
-
-
 {% set navbar_entries = [
   {
-    "name": "Dashboard",
-    "url": "/dashboard",
-    "icon": "tachometer-alt"
+    "name": "Home",
+    "url": "/",
+    "icon": "home"
   },
   {
     "name": "Users",
+    "url": "/users",
     "icon": "users",
     "children": [
       {"name": "All Users", "url": "/users", "icon": "list"},
@@ -84,6 +26,7 @@
   },
   {
     "name": "Customers",
+    "url": "/customers",
     "icon": "handshake",
     "children": [
       {"name": "All Customers", "url": "/customers", "icon": "users"},
@@ -93,6 +36,7 @@
   },
   {
     "name": "Sales",
+    "url": "/sales",
     "icon": "chart-line",
     "children": [
       {"name": "Opportunities", "url": "/sales/opportunities", "icon": "lightbulb"},
@@ -104,6 +48,7 @@
   },
   {
     "name": "Reports",
+    "url": "/reports",
     "icon": "chart-bar",
     "children": [
       {"name": "Sales Reports", "url": "/reports/sales", "icon": "chart-pie"},
@@ -114,6 +59,7 @@
   },
   {
     "name": "Settings",
+    "url": "/settings",
     "icon": "cog",
     "children": [
       {"name": "Profile", "url": "/settings/profile", "icon": "user-cog"},
@@ -142,11 +88,18 @@
 
         <li class="sidebar-item {% if is_active_item %}active{% endif %} {% if has_children %}has-submenu{% endif %}">
           {% if has_children %}
-            <a href="#" class="sidebar-link submenu-toggle">
-              <i class="fas fa-{{ item.icon|default('circle') }} sidebar-icon"></i>
-              <span class="sidebar-text">{{ item.name }}</span>
-              <i class="fas fa-chevron-down submenu-indicator"></i>
-            </a>
+            <div class="sidebar-link-container">
+              <!-- Link to the parent URL (icon and text) -->
+              <a href="{{ item.url }}" class="sidebar-link main-link {% if is_active_item %}active{% endif %}" {% if is_active_item %}aria-current="page"{% endif %}>
+                <i class="fas fa-{{ item.icon|default('circle') }} sidebar-icon"></i>
+                <span class="sidebar-text">{{ item.name }}</span>
+                {% if is_active_item %}<span class="active-indicator"></span>{% endif %}
+              </a>
+              <!-- Separate toggle button for submenu -->
+              <button class="submenu-toggle btn">
+                <i class="fas fa-chevron-down submenu-indicator"></i>
+              </button>
+            </div>
             <ul class="submenu">
               {% for child in item.children %}
                 {% set is_active_child = request.path == child.url %}

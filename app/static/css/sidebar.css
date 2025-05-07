@@ -136,6 +136,7 @@ body.sidebar-collapsed .sidebar-toggle {
 
 .sidebar-item {
   margin-bottom: var(--spacing-xs);
+  width: 100%; /* Make sure items span full width */
 }
 
 .sidebar-link {
@@ -235,6 +236,7 @@ body.sidebar-collapsed .sidebar-icon {
 /* Submenu styles */
 .has-submenu {
   position: relative;
+  width: 100%; /* Make sure submenu container spans full width */
 }
 
 .submenu-toggle {
@@ -249,7 +251,7 @@ body.sidebar-collapsed .sidebar-icon {
 }
 
 .has-submenu.open .submenu-indicator {
-  transform: rotate(-180deg);
+  /* Remove rotation animation */
 }
 
 .submenu {
@@ -345,5 +347,97 @@ body.sidebar-collapsed .submenu-link {
   body.sidebar-collapsed .submenu {
     position: static;
     box-shadow: none;
+  }
+}
+
+/* Container to hold both link and toggle button */
+.sidebar-link-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%; /* Make container full width */
+  margin: 0;
+  padding: 0;
+}
+
+/* Style for the main link (icon and text) */
+.sidebar-link.main-link {
+  flex: 1;
+  padding-right: var(--spacing-xs); /* Reduced padding to make room for button */
+}
+
+/* Style for the submenu toggle button */
+.submenu-toggle.btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0 var(--spacing-xs);
+  color: var(--color-text-secondary);
+  display: inline;
+  cursor: pointer;
+  box-shadow: none;
+  outline: none;
+}
+
+.submenu-toggle.btn:hover,
+.submenu-toggle.btn:focus,
+.submenu-toggle.btn:active {
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Adjust indicator positioning */
+.submenu-toggle .submenu-indicator {
+  position: static;
+  margin-left: 0;
+}
+
+/* Style entire container when active */
+.sidebar-item.active,
+.sidebar-link-container.active,
+.has-submenu.active {
+  background-color: var(--color-primary-light);
+}
+
+/* Remove individual backgrounds when container is active */
+.sidebar-item.active .sidebar-link,
+.sidebar-link-container.active .sidebar-link,
+.has-submenu.active .sidebar-link {
+  background-color: transparent;
+}
+
+/* Ensure dropdown arrow matches active state */
+.sidebar-item.active .submenu-toggle,
+.has-submenu.active .submenu-toggle {
+  color: var(--color-primary);
+}
+
+/* Keep left indicator for active items */
+.sidebar-item.active .sidebar-link::before,
+.sidebar-link-container.active .sidebar-link::before,
+.has-submenu.active .sidebar-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--color-primary);
+}
+
+/* Collapsed sidebar adjustments */
+body.sidebar-collapsed .sidebar-link-container {
+  justify-content: center;
+}
+
+body.sidebar-collapsed .submenu-toggle.btn {
+  display: none; /* Hide toggle in collapsed state */
+}
+
+@media (max-width: 991.98px) {
+  .sidebar-link-container {
+    padding-right: var(--spacing-sm);
   }
 }

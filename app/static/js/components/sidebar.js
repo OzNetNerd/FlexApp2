@@ -1,4 +1,4 @@
-// Update to sidebar.js
+// Updated sidebar.js
 document.addEventListener('DOMContentLoaded', function() {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
@@ -24,22 +24,22 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.classList.remove('show');
   });
 
-  // Toggle submenus
+  // Toggle submenus - Updated to target only the toggle buttons
   submenuToggles.forEach(toggle => {
     toggle.addEventListener('click', function(e) {
-      e.preventDefault();
+      e.stopPropagation(); // Prevent event bubbling
 
       // Skip toggle behavior when sidebar is collapsed on desktop
       if (body.classList.contains('sidebar-collapsed') && window.innerWidth >= 992) {
         return;
       }
 
-      const parent = this.parentElement;
+      const parent = this.closest('.has-submenu');
 
       // Close other open submenus on mobile
       if (window.innerWidth < 992) {
         submenuToggles.forEach(otherToggle => {
-          const otherParent = otherToggle.parentElement;
+          const otherParent = otherToggle.closest('.has-submenu');
           if (otherParent !== parent && otherParent.classList.contains('open')) {
             otherParent.classList.remove('open');
           }
