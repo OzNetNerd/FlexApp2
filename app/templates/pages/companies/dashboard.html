@@ -201,12 +201,28 @@
 
 {% block scripts_extra %}
 <script type="module">
-  // Export data for the chart component
-  window.chartData = {
+  // Define chart data
+  const chartData = {
     labels: {{ growth_data.labels|tojson }},
     newItems: {{ growth_data.new_companies|tojson }},
     totalItems: {{ growth_data.total_companies|tojson }}
   };
+
+  // Initialize the chart when DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    import('{{ url_for("static", filename="js/visuals/lineGraph.js") }}')
+      .then(module => {
+        // Use the initDataChart function for backward compatibility
+        module.initDataChart('dataChart', chartData);
+
+        // Alternatively, use the more generic createChart function:
+        // module.createChart({
+        //   canvasId: 'dataChart',
+        //   type: 'data',
+        //   data: chartData
+        // });
+      })
+      .catch(err => console.error('Failed to load lineGraph.js:', err));
+  });
 </script>
-<script type="module" src="{{ url_for('static', filename='js/visuals/lineGraph.js') }}"></script>
 {% endblock %}

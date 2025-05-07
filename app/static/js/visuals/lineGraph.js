@@ -10,16 +10,16 @@ const scriptName = 'line-graph.js';
 import log from '/static/js/core/logger.js';
 
 /**
- * Creates a gradient fill for chart datasets
+ * Creates a flat color or gradient fill for chart datasets
  * @param {CanvasRenderingContext2D} ctx - The canvas context
  * @param {string} color - The base color in rgba format
  * @param {number} alpha1 - The alpha value for the first color stop (0-1)
  * @param {number} alpha2 - The alpha value for the second color stop (0-1)
  * @param {number} height - The height of the gradient
- * @returns {CanvasGradient} The created gradient
+ * @returns {string|CanvasGradient} The color or gradient
  */
-function createGradient(ctx, color, alpha1 = 0.4, alpha2 = 0.05, height = 300) {
-  log('debug', scriptName, 'createGradient', 'Creating gradient fill');
+function createGradient(ctx, color, alpha1 = 0.2, alpha2 = 0.2, height = 300) {
+  log('debug', scriptName, 'createGradient', 'Creating color fill');
 
   // Extract color components from rgba
   const colorBase = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
@@ -31,11 +31,8 @@ function createGradient(ctx, color, alpha1 = 0.4, alpha2 = 0.05, height = 300) {
 
   const [_, r, g, b] = colorBase;
 
-  const gradient = ctx.createLinearGradient(0, 0, 0, height);
-  gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha1})`);
-  gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, ${alpha2})`);
-
-  return gradient;
+  // Return flat color with standard transparency
+  return `rgba(${r}, ${g}, ${b}, ${alpha1})`;
 }
 
 /**
@@ -154,16 +151,22 @@ function getChartTypeConfig(chartType) {
           datasets: [
             {
               label: 'New Items',
-              backgroundColor: 'rgba(40, 167, 69, 0.4)',
+              backgroundColor: 'rgba(40, 167, 69, 0.2)',
               borderColor: 'rgba(40, 167, 69, 1)',
+              borderWidth: 2,
               pointBackgroundColor: 'rgba(40, 167, 69, 1)',
+              pointRadius: 4,
+              fill: true,
               data: newItems
             },
             {
               label: 'Total Items',
-              backgroundColor: 'rgba(0, 123, 255, 0.4)',
+              backgroundColor: 'rgba(0, 123, 255, 0.2)',
               borderColor: 'rgba(0, 123, 255, 1)',
+              borderWidth: 2,
               pointBackgroundColor: 'rgba(0, 123, 255, 1)',
+              pointRadius: 4,
+              fill: true,
               data: totalItems
             }
           ]
@@ -191,14 +194,20 @@ function getChartTypeConfig(chartType) {
               label: 'New Contacts',
               backgroundColor: 'rgba(40, 167, 69, 0.2)',
               borderColor: 'rgba(40, 167, 69, 1)',
+              borderWidth: 2,
               pointBackgroundColor: 'rgba(40, 167, 69, 1)',
+              pointRadius: 4,
+              fill: true,
               data: newContacts
             },
             {
               label: 'Total Contacts',
               backgroundColor: 'rgba(0, 123, 255, 0.2)',
               borderColor: 'rgba(0, 123, 255, 1)',
+              borderWidth: 2,
               pointBackgroundColor: 'rgba(0, 123, 255, 1)',
+              pointRadius: 4,
+              fill: true,
               data: totalContacts
             }
           ]
@@ -224,16 +233,22 @@ function getChartTypeConfig(chartType) {
           datasets: [
             {
               label: 'Actual Revenue',
-              backgroundColor: 'rgba(255, 193, 7, 0.3)',
+              backgroundColor: 'rgba(255, 193, 7, 0.2)',
               borderColor: 'rgba(255, 193, 7, 1)',
+              borderWidth: 2,
               pointBackgroundColor: 'rgba(255, 193, 7, 1)',
+              pointRadius: 4,
+              fill: true,
               data: actual
             },
             {
               label: 'Target Revenue',
-              backgroundColor: 'rgba(220, 53, 69, 0.3)',
+              backgroundColor: 'rgba(220, 53, 69, 0.2)',
               borderColor: 'rgba(220, 53, 69, 1)',
+              borderWidth: 2,
               pointBackgroundColor: 'rgba(220, 53, 69, 1)',
+              pointRadius: 4,
+              fill: true,
               data: target
             }
           ]
@@ -307,7 +322,7 @@ function createChart(config) {
   // Apply the data mapping function to get the chart-ready data structure
   const mappedData = typeConfig.dataMapping(data);
 
-  // Apply gradients if requested
+  // Apply flat colors if requested
   if (useGradients) {
     if (mappedData.datasets) {
       mappedData.datasets = mappedData.datasets.map(dataset => {
