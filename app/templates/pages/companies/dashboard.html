@@ -58,77 +58,48 @@
 
 
 <!-- Company Segments Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="section-card-heading">Engagement Segments</h2>
-        <a href="{{ url_for('companies_bp.filtered_companies') }}" class="transparent-button">View All Companies</a>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <div class="category-icon bg-info text-white d-flex align-items-center justify-content-center me-3">
-                    <i class="bi bi-star"></i>
-                  </div>
-                  <h3 class="section-subcard-info-heading">High Engagement</h3>
-                </div>
-                <p class="section-subcard-info-subtext">{{ segments[0].count }} companies · 3+ opportunities</p>
-                <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-info" role="progressbar" style="width: {{ segments[0].percentage }}%;" aria-valuenow="{{ segments[0].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('companies_bp.filtered_companies', has_opportunities='yes') }}" class="transparent-button">View Companies</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <div class="category-icon bg-primary text-white d-flex align-items-center justify-content-center me-3">
-                    <i class="bi bi-briefcase"></i>
-                  </div>
-                  <h3 class="section-subcard-info-heading">Medium Engagement</h3>
-                </div>
-                <p class="section-subcard-info-subtext">{{ segments[1].count }} companies · 1-2 opportunities</p>
-                <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ segments[1].percentage }}%;" aria-valuenow="{{ segments[1].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('companies_bp.filtered_companies', has_opportunities='yes') }}" class="transparent-button">View Companies</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <div class="category-icon bg-warning text-white d-flex align-items-center justify-content-center me-3">
-                    <i class="bi bi-shop"></i>
-                  </div>
-                  <h3 class="section-subcard-info-heading">No Opportunities</h3>
-                </div>
-                <p class="section-subcard-info-subtext">{{ segments[2].count }} companies · 0 opportunities</p>
-                <div class="progress mb-3" style="height: 5px;">
-                  <div class="progress-bar bg-warning" role="progressbar" style="width: {{ segments[2].percentage }}%;" aria-valuenow="{{ segments[2].percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="d-flex justify-content-end">
-                  <a href="{{ url_for('companies_bp.filtered_companies', has_opportunities='no') }}" class="btn btn-sm btn-outline-warning">View Companies</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+{% set company_card_data = [
+    {
+        'title': 'High Engagement',
+        'count': segments[0].count,
+        'activity_count': '3+',
+        'activity_label': 'opportunities',
+        'percentage': segments[0].percentage,
+        'icon': 'bi-star',
+        'color_class': 'info',
+        'button_label': 'View Companies',
+        'button_url': url_for('companies_bp.filtered_companies', has_opportunities='yes')
+    },
+    {
+        'title': 'Medium Engagement',
+        'count': segments[1].count,
+        'activity_count': '1-2',
+        'activity_label': 'opportunities',
+        'percentage': segments[1].percentage,
+        'icon': 'bi-briefcase',
+        'color_class': 'primary',
+        'button_label': 'View Companies',
+        'button_url': url_for('companies_bp.filtered_companies', has_opportunities='yes')
+    },
+    {
+        'title': 'No Opportunities',
+        'count': segments[2].count,
+        'activity_count': '0',
+        'activity_label': 'opportunities',
+        'percentage': segments[2].percentage,
+        'icon': 'bi-shop',
+        'color_class': 'warning',
+        'button_label': 'View Companies',
+        'button_url': url_for('companies_bp.filtered_companies', has_opportunities='no')
+    }
+] %}
+
+{{ sections.progress_bar_section(
+    heading='Engagement Segments',
+    href=url_for('companies_bp.filtered_companies'),
+    button_text='View All Companies',
+    card_data=company_card_data
+) }}
 
 <!-- Top Companies Section -->
 <div class="row mb-4">
