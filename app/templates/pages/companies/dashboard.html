@@ -7,6 +7,7 @@
 
 {% block head_extra %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -52,10 +53,8 @@
     }
 ] %}
 
-
 <!-- Summary Section -->
 {{ sections.large_cards_section(large_card_data) }}
-
 
 <!-- Company Segments Section -->
 {% set company_card_data = [
@@ -107,70 +106,42 @@
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">Top Companies</h2>
-        <div>
-          <a href="{{ url_for('companies_bp.filtered_companies', has_opportunities='yes') }}" class=" transparent-button me-2">
-            <i class="bi bi-funnel"></i> Filter Companies
-          </a>
+        <div class="d-flex align-items-center">
+          <!-- Global Search -->
+          <div class="input-group me-3" style="width: 250px;">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input type="text" id="globalSearch" class="form-control" placeholder="Search...">
+          </div>
+
+          <!-- Column Selector -->
+          <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="columnSelectorBtn" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-columns me-1"></i> Columns
+            </button>
+            <div class="dropdown-menu p-3" style="width: 16rem;" aria-labelledby="columnSelectorBtn">
+              <div class="d-flex justify-content-between mb-2">
+                <button id="selectAllColumns" class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-check-square me-1"></i> Select All
+                </button>
+                <button id="clearAllColumns" class="btn btn-sm btn-outline-secondary">
+                  <i class="fas fa-square me-1"></i> Clear All
+                </button>
+              </div>
+              <div id="columnSelectorItems" class="mt-2">
+                <!-- Column checkboxes will be added here dynamically -->
+              </div>
+            </div>
+          </div>
+
           <a href="{{ url_for('companies_bp.create') }}" class="btn btn-sm btn-primary">Add Company</a>
         </div>
       </div>
       <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover emphasised-text">
-            <thead class="table-light">
-              <tr>
-                <th scope="col" class="ps-4">Company Name</th>
-                <th scope="col">Description</th>
-                <th scope="col">Opportunities</th>
-                <th scope="col">Contacts</th>
-                <th scope="col">Notes</th>
-                <th scope="col">Capabilities</th>
-                <th scope="col" class="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for company, opportunity_count in top_companies %}
-              <tr>
-                <td class="ps-4">{{ company.name }}</td>
-                <td>{{ company.description|truncate(50) if company.description else "" }}</td>
-                <td>
-                  <span class="badge bg-primary">{{ opportunity_count }}</span>
-                </td>
-                <td>
-                  <span class="badge bg-info">{{ company.contacts|default([])|length }}</span>
-                </td>
-                <td>
-                  {% if company.notes is defined and company.notes is not none %}
-                    {% if company.notes is iterable and not company.notes is string %}
-                      <span class="badge bg-secondary">{{ company.notes|length }}</span>
-                    {% else %}
-                      <span class="badge bg-secondary">1</span>
-                    {% endif %}
-                  {% else %}
-                    <span class="badge bg-secondary">0</span>
-                  {% endif %}
-                </td>
-                <td>
-                  <span class="badge bg-success">{{ company.company_capabilities.count() }}</span>
-                </td>
-                <td class="text-center">
-                  <a href="{{ url_for('companies_bp.view', entity_id=company.id) }}" class=" transparent-button me-1">View</a>
-                  <a href="{{ url_for('companies_bp.edit', entity_id=company.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                </td>
-              </tr>
-              {% endfor %}
-              {% if not top_companies %}
-              <tr>
-                <td colspan="7" class="text-center py-4">
-                  <div class="text-muted">
-                    <i class="bi bi-info-circle-fill fs-4 mb-2"></i>
-                    <p>No companies with opportunities yet. Add a company?</p>
-                  </div>
-                </td>
-              </tr>
-              {% endif %}
-            </tbody>
-          </table>
+        <!-- AG Grid Table Container -->
+        <div id="table-container"
+             class="ag-theme-alpine"
+             style="height: 400px;"
+             data-api-url="{{ url_for('companies_api.get_all') }}">
         </div>
       </div>
       <div class="card-footer bg-white text-center">
@@ -200,6 +171,10 @@
 {% endblock %}
 
 {% block scripts_extra %}
+<!-- AG Grid and Table.js -->
+<script type="module" src="{{ url_for('static', filename='js/components/table.js') }}"></script>
+
+<!-- Chart.js Initialization -->
 <script type="module">
   // Define chart data
   const chartData = {
@@ -214,13 +189,6 @@
       .then(module => {
         // Use the initDataChart function for backward compatibility
         module.initDataChart('dataChart', chartData);
-
-        // Alternatively, use the more generic createChart function:
-        // module.createChart({
-        //   canvasId: 'dataChart',
-        //   type: 'data',
-        //   data: chartData
-        // });
       })
       .catch(err => console.error('Failed to load lineGraph.js:', err));
   });
