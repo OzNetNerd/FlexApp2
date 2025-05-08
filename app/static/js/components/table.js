@@ -461,6 +461,47 @@ async function initializeTable() {
   return Promise.resolve(gridOptions);
 }
 
+/**
+ * Function to ensure proper spacing between sections
+ */
+function fixLayoutSpacing() {
+  // Add a resize observer to table container
+  const tableContainer = document.getElementById('table-container');
+  const chartSection = document.querySelector('.dashboard-section:last-child');
+
+  if (!tableContainer || !chartSection) return;
+
+  // Determine if we need additional spacing
+  function adjustSpacing() {
+    const tableRect = tableContainer.getBoundingClientRect();
+    const tableBottom = tableRect.bottom;
+
+    // Add more spacing if needed
+    const sections = document.querySelectorAll('.dashboard-section');
+    sections.forEach(section => {
+      section.style.marginBottom = '3rem';
+      section.style.overflow = 'visible';
+    });
+
+    // Ensure chart section has enough space
+    chartSection.style.paddingTop = '1rem';
+    chartSection.style.marginTop = '2rem';
+  }
+
+  // Run adjustment once on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(adjustSpacing, 500); // Wait for grid to render
+  });
+
+  // Run adjustment after grid is ready
+  if (typeof gridApiReference !== 'undefined') {
+    gridApiReference?.addEventListener('gridSizeChanged', adjustSpacing);
+  }
+
+  // Run adjustment on window resize
+  window.addEventListener('resize', adjustSpacing);
+}
+
 // Export public functions
 export function getGridApi() {
   return gridApiReference;
@@ -482,6 +523,7 @@ if (!window.__tableInitialized) {
     initializeTable()
       .then(() => {
         log("info", scriptName, "DOMContentLoaded", "Table initialization completed successfully");
+        fixLayoutSpacing(); // Call layout spacing fix after table init
       })
       .catch(error => {
         log("error", scriptName, "DOMContentLoaded", "Table initialization failed:", error);

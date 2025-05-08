@@ -192,8 +192,11 @@ Table styles - AG Grid theme and custom table styling
 /* Table container height */
 #table-container {
   min-height: 420px; /* Ensures the container has a minimum height */
+  max-height: 420px; /* Add a max height to prevent overflow */
+  overflow: auto; /* Add scrolling if content exceeds height */
   padding-top: 10px; /* Adds a slight gap above the table content */
   padding-bottom: 20px; /* Adds a slight gap below the table content */
+  margin-bottom: 2rem; /* Add additional bottom margin */
 }
 
 /* Optional: Add padding to the table itself to create space inside */
@@ -253,4 +256,46 @@ table {
 .table-bordered th,
 .table-bordered td {
   border: 1px solid var(--color-border-light);
+}
+
+/* Fix section spacing to prevent overlap */
+.section-divider {
+  clear: both;
+  height: 3rem !important; /* Increased from 2rem */
+  margin-bottom: 1rem;
+  visibility: visible !important; /* Make it visible for debugging */
+  border-bottom: 1px dashed #eee; /* Optional: visual indicator */
+}
+
+/* Ensure dashboard sections don't overflow */
+.dashboard-section {
+  position: relative;
+  overflow: visible;
+  margin-bottom: 3rem !important; /* Ensure consistent spacing between sections */
+  clear: both; /* Prevent floating elements from affecting layout */
+}
+
+/* Add specific fix for Data Trends section */
+#dataChart {
+  position: relative;
+  z-index: 10; /* Ensure chart is above other elements */
+}
+
+/* Ensure chart container is properly separated */
+.data-trends-section {
+  position: relative;
+  z-index: 1;
+  padding-top: 1rem;
+}
+
+.chart-container {
+  position: relative;
+  z-index: 5;
+}
+
+.clearfix {
+  clear: both;
+  display: block;
+  height: 1px;
+  overflow: hidden;
 }
