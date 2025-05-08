@@ -152,6 +152,49 @@ const debouncedSaveColumnState = debounce(() => {
 }, 300);
 
 /**
+ * Custom cell renderer for badges
+ */
+function badgeCellRenderer(params) {
+  if (params.value == null) return '';
+
+  // Determine badge type based on column
+  let badgeClass = 'ag-badge ag-badge-primary';
+
+  if (params.column.colId.includes('contact')) {
+    badgeClass = 'ag-badge ag-badge-info';
+  } else if (params.column.colId.includes('note')) {
+    badgeClass = 'ag-badge ag-badge-secondary';
+  } else if (params.column.colId.includes('capabilit')) {
+    badgeClass = 'ag-badge ag-badge-success';
+  }
+
+  return `<span class="${badgeClass}">${params.value}</span>`;
+}
+
+/**
+ * Custom cell renderer for action buttons with icons
+ */
+function actionCellRenderer(params) {
+  const id = params.data?.id || '';
+  const basePath = window.location.pathname.split('/')[1] || '';
+
+  return `
+    <div class="ag-action-cell">
+      <a href="/${basePath}/${id}" class="ag-icon-btn ag-icon-primary" title="View">
+        <i class="fas fa-eye"></i>
+      </a>
+      <a href="/${basePath}/edit/${id}" class="ag-icon-btn ag-icon-info" title="Edit">
+        <i class="fas fa-edit"></i>
+      </a>
+      <a href="/${basePath}/delete/${id}" class="ag-icon-btn ag-icon-danger" title="Delete" 
+         onclick="return confirm('Are you sure you want to delete this item?')">
+        <i class="fas fa-trash"></i>
+      </a>
+    </div>
+  `;
+}
+
+/**
  * Default grid options factory
  */
 export function getGridOptions() {
@@ -163,7 +206,15 @@ export function getGridOptions() {
     rowSelection: 'single', paginationPageSize: 20,
     domLayout: 'autoHeight', suppressColumnVirtualisation: false,
     animateRows: true,
-    defaultColDef: { flex: 1, minWidth: 100, resizable: true, wrapText: true, autoHeight: true },
+    defaultColDef: {
+      flex: 1,
+      minWidth: 100,
+      resizable: true,
+      wrapText: true,
+      autoHeight: true,
+      sortable: true,
+      filter: true
+    },
     onRowClicked: event => {
       if (event.event.ctrlKey || event.event.metaKey || event.event.shiftKey || event.event.button !== 0) return;
       const id = event.data?.id;
@@ -402,15 +453,47 @@ function generateColumnDefs(data) {
     log("warn", scriptName, fn, "No data to generate columns");
     return [];
   }
+
   const keys = Object.keys(data[0]);
   log("debug", scriptName, fn, "Columns found:", keys);
-  return keys.map(key => {
-    const def = { field: key, headerName: formatDisplayText(key), sortable: true, filter: true };
+
+  const columnDefs = keys.map(key => {
+    const def = {
+      field: key,
+      headerName: formatDisplayText(key),
+      sortable: true,
+      filter: true
+    };
+
+    // Add badge renderer for numeric counters
+    if (key.toLowerCase().includes('count') ||
+        key.toLowerCase().includes('opportunit') ||
+        key.toLowerCase().includes('contact') ||
+        key.toLowerCase().includes('note') ||
+        key.toLowerCase().includes('capabilit')) {
+      def.cellRenderer = badgeCellRenderer;
+    }
+
     if (data[0][key] != null && typeof data[0][key] === 'object') {
       def.valueFormatter = objectValueFormatter;
     }
+
     return def;
   });
+
+  // Add actions column as the last column
+  columnDefs.push({
+    headerName: 'Actions',
+    field: 'actions',
+    cellRenderer: actionCellRenderer,
+    sortable: false,
+    filter: false,
+    flex: 0.8,
+    minWidth: 150,
+    cellClass: 'text-center'
+  });
+
+  return columnDefs;
 }
 
 /**
