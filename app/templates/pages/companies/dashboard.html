@@ -8,14 +8,29 @@
 {% block head_extra %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.min.js"></script>
+<style>
+  /* Add consistent section spacing */
+  .dashboard-section {
+    margin-bottom: 2rem;
+  }
+
+  /* Clear any floats and ensure proper spacing */
+  .section-divider {
+    clear: both;
+    height: 2rem;
+    visibility: hidden;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
 <!-- Heading & subtext section -->
-{{ sections.heading_section(
-  heading_text='Company Accounts',
-  subtext='Manage your customers and prospects efficiently'
-) }}
+<div class="dashboard-section">
+  {{ sections.heading_section(
+    heading_text='Company Accounts',
+    subtext='Manage your customers and prospects efficiently'
+  ) }}
+</div>
 
 <!-- Summary Section: Data -->
 {% set large_card_data = [
@@ -54,7 +69,11 @@
 ] %}
 
 <!-- Summary Section -->
-{{ sections.large_cards_section(large_card_data) }}
+<div class="dashboard-section">
+  {{ sections.large_cards_section(large_card_data) }}
+</div>
+
+<div class="section-divider"></div>
 
 <!-- Company Segments Section -->
 {% set company_card_data = [
@@ -93,76 +112,85 @@
     }
 ] %}
 
-{{ sections.progress_bar_section(
+<div class="dashboard-section">
+  {{ sections.progress_bar_section(
     heading='Engagement Segments',
     href=url_for('companies_bp.filtered_companies'),
     button_text='View All Companies',
     card_data=company_card_data
-) }}
+  ) }}
+</div>
+
+
+<div class="section-divider"></div>
 
 <!-- Top Companies Section -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="section-card-heading">Top Companies</h2>
-        <div class="d-flex align-items-center">
-          <!-- Global Search -->
-          <div class="input-group me-3" style="width: 250px;">
-            <span class="input-group-text"><i class="fas fa-search"></i></span>
-            <input type="text" id="globalSearch" class="form-control" placeholder="Search...">
-          </div>
+<div class="dashboard-section">
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h2 class="section-card-heading">Top Companies</h2>
+          <div class="d-flex align-items-center">
+            <!-- Global Search -->
+            <div class="input-group me-3" style="width: 250px;">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+              <input type="text" id="globalSearch" class="form-control" placeholder="Search...">
+            </div>
 
-          <!-- Column Selector -->
-          <div class="dropdown me-2">
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="columnSelectorBtn" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="fas fa-columns me-1"></i> Columns
-            </button>
-            <div class="dropdown-menu p-3" style="width: 16rem;" aria-labelledby="columnSelectorBtn">
-              <div class="d-flex justify-content-between mb-2">
-                <button id="selectAllColumns" class="btn btn-sm btn-outline-primary">
-                  <i class="fas fa-check-square me-1"></i> Select All
-                </button>
-                <button id="clearAllColumns" class="btn btn-sm btn-outline-secondary">
-                  <i class="fas fa-square me-1"></i> Clear All
-                </button>
-              </div>
-              <div id="columnSelectorItems" class="mt-2">
-                <!-- Column checkboxes will be added here dynamically -->
+            <!-- Column Selector -->
+            <div class="dropdown me-2">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="columnSelectorBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-columns me-1"></i> Columns
+              </button>
+              <div class="dropdown-menu p-3" style="width: 16rem;" aria-labelledby="columnSelectorBtn">
+                <div class="d-flex justify-content-between mb-2">
+                  <button id="selectAllColumns" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-check-square me-1"></i> Select All
+                  </button>
+                  <button id="clearAllColumns" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-square me-1"></i> Clear All
+                  </button>
+                </div>
+                <div id="columnSelectorItems" class="mt-2">
+                  <!-- Column checkboxes will be added here dynamically -->
+                </div>
               </div>
             </div>
-          </div>
 
-          <a href="{{ url_for('companies_bp.create') }}" class="btn btn-sm btn-primary">Add Company</a>
+            <a href="{{ url_for('companies_bp.create') }}" class="btn btn-sm btn-primary">Add Company</a>
+          </div>
         </div>
-      </div>
-      <div class="card-body p-0">
-        <!-- AG Grid Table Container -->
-        <div id="table-container"
-             class="ag-theme-alpine"
-             style="height: 400px;"
-             data-api-url="{{ url_for('companies_api.get_all') }}">
+        <div class="card-body p-0">
+          <!-- AG Grid Table Container -->
+          <div id="table-container"
+               class="ag-theme-alpine"
+               style="height: 400px;"
+               data-api-url="{{ url_for('companies_api.get_all') }}">
+          </div>
         </div>
-      </div>
-      <div class="card-footer bg-white text-center">
-        <a href="{{ url_for('companies_bp.filtered_companies') }}" class="text-decoration-none">
-          View all {{ stats.total_companies }} companies
-        </a>
+        <div class="card-footer bg-white text-center">
+          <a href="{{ url_for('companies_bp.filtered_companies') }}" class="text-decoration-none">
+            View all {{ stats.total_companies }} companies
+          </a>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Data Trends Chart -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white">
-        <h2 class="section-card-heading">Data Trends</h2>
-      </div>
-      <div class="card-body">
-        <div style="height: 300px; position: relative;">
-          <canvas id="dataChart"></canvas>
+<div class="dashboard-section">
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h2 class="section-card-heading">Data Trends</h2>
+        </div>
+        <div class="card-body">
+          <div style="height: 300px; position: relative;">
+            <canvas id="dataChart"></canvas>
+          </div>
         </div>
       </div>
     </div>

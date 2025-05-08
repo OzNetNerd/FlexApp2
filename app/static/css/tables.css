@@ -1,597 +1,256 @@
-/**
- * table.js
- * Combined module: configuration, utilities, initialization, and bootstrap.
- * Merges tableConfig.js, tableInit.js, tableUtils.js, and original table.js into one file.
- */
+/*
+Table styles - AG Grid theme and custom table styling
+*/
 
-import log from '/static/js/core/logger.js';
-const scriptName = "table.js";
-log("info", scriptName, "setGridApi", "Grid APIs externally set");
-
-import { fetchApiDataFromContainer, normalizeData, formatDisplayText } from '/static/js/services/apiService.js';
-import { createGrid, ModuleRegistry } from 'https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.esm.min.js';
-import { ClientSideRowModelModule } from 'https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.esm.min.js';
-
-
-// --- Configuration (from tableConfig.js) ---
-
-let gridApiReference = null;
-let columnApiReference = null;
-let columnStateInitialized = false;
-
-/**
- * Set the AG Grid and Column APIs, register events, and restore state.
- * @param {Object} api
- * @param {Object} columnApi
- */
-export function setGridApi(api, columnApi) {
-  gridApiReference = api;
-  columnApiReference = columnApi;
-  log("info", scriptName, "setGridApi", "Grid APIs externally set");
-  registerEvents();
-  restoreColumnState();
+/* ===== AG Grid Theme Overrides ===== */
+.ag-theme-alpine {
+  --ag-font-family: var(--font-family);
+  --ag-font-size: 0.88rem;
+  --ag-header-foreground-color: var(--color-text-primary);
+  --ag-foreground-color: var(--color-text-primary);
+  --ag-header-background-color: #f8f9fa; /* Match Bootstrap's table-light */
+  --ag-odd-row-background-color: var(--color-bg-lighter);
+  --ag-row-hover-color: rgba(0, 0, 0, 0.075); /* Match Bootstrap hover */
+  --ag-selected-row-background-color: rgba(var(--color-primary-rgb), 0.16);
+  --ag-border-color: var(--color-border-light);
+  --ag-secondary-border-color: var(--color-border-lighter);
+  --ag-header-column-separator-display: block;
+  --ag-header-column-separator-color: var(--color-border-light);
+  --ag-header-column-resize-handle-color: var(--color-text-light);
+  --ag-row-border-color: var(--color-border-lighter);
+  --ag-checkbox-checked-color: var(--color-primary);
+  --ag-checkbox-unchecked-color: var(--color-text-light);
+  --ag-checkbox-indeterminate-color: var(--color-primary);
+  --ag-cell-horizontal-padding: 1.5rem; /* Increased for Bootstrap match */
+  --ag-header-height: 48px;
+  --ag-row-height: 48px; /* Match Bootstrap table row height */
+  --ag-header-column-separator-height: 50%;
+  --ag-header-column-separator-width: 1px;
+  --ag-range-selection-border-color: var(--color-primary);
+  --ag-input-focus-border-color: var(--color-primary);
+  --ag-alpine-active-color: var(--color-primary);
+  --ag-border-radius: var(--border-radius-md);
 }
 
-/**
- * @returns {Object|null}
- */
-export function getGridApi() {
-  return gridApiReference;
+/* Card-like styling for the grid container */
+.ag-theme-alpine .ag-root-wrapper {
+  border: none !important;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
-/**
- * @returns {Object|null}
- */
-export function getColumnApi() {
-  return columnApiReference;
+/* Header styles */
+.ag-theme-alpine .ag-header {
+  font-weight: var(--font-weight-medium);
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid var(--ag-border-color);
 }
 
-/**
- * Debounce helper
- */
-function debounce(func, wait) {
-  let timeout;
-  return function(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
+/* Row hover animation */
+.ag-theme-alpine .ag-row {
+  transition: background-color var(--transition-fast);
 }
 
-/**
- * Register grid events to auto-save column state
- */
-function registerEvents() {
-  if (!gridApiReference) {
-    log("warn", scriptName, "registerEvents", "Cannot register events - API not available");
-    return false;
-  }
-  try {
-    const events = [
-      'columnMoved', 'columnResized', 'columnVisible', 'columnPinned',
-      'sortChanged', 'filterChanged', 'columnRowGroupChanged',
-      'columnValueChanged', 'dragStopped'
-    ];
-    events.forEach(eventName => {
-      gridApiReference.addEventListener(eventName, () => {
-        log("debug", scriptName, "eventHandler", `Event triggered: ${eventName}`);
-        debouncedSaveColumnState();
-      });
-    });
-    log("info", scriptName, "registerEvents", "Column event listeners registered successfully");
-    return true;
-  } catch (e) {
-    log("error", scriptName, "registerEvents", "Error registering event listeners:", e);
-    return false;
-  }
+/* Cell styling */
+.ag-theme-alpine .ag-cell {
+  display: flex;
+  align-items: center;            /* Vertically center */
+  white-space: normal !important; /* Allows wrapping */
+  line-height: 1.3;               /* Controls line spacing */
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-weight: 500; /* Medium weight for emphasized text */
 }
 
-/**
- * Restore column state from localStorage
- */
-function restoreColumnState() {
-  if (!gridApiReference) {
-    log("warn", scriptName, "restoreColumnState", "Cannot restore state - API not available");
-    return false;
-  }
-  try {
-    const saved = localStorage.getItem("agGridColumnState");
-    if (saved) {
-      const columnState = JSON.parse(saved);
-      if (Array.isArray(columnState) && columnState.length > 0) {
-        log("info", scriptName, "restoreColumnState", `Restoring state with ${columnState.length} columns`);
-        gridApiReference.applyColumnState({ state: columnState, applyOrder: true });
-        columnStateInitialized = true;
-        log("info", scriptName, "restoreColumnState", "Column state successfully restored");
-        return true;
-      } else {
-        log("warn", scriptName, "restoreColumnState", "Invalid saved column state format");
-      }
-    } else {
-      log("info", scriptName, "restoreColumnState", "No saved column state found");
-    }
-  } catch (e) {
-    log("error", scriptName, "restoreColumnState", "Error restoring column state:", e);
-  }
-  return false;
+/* First column with extra padding (ps-4 equivalent) */
+.ag-theme-alpine .ag-cell:first-child {
+  padding-left: 1.5rem !important;
 }
 
-/**
- * Manually trigger save
- */
-export function manualSaveColumnState() {
-  return saveColumnState();
+/* Badge styling for AG Grid */
+.ag-badge {
+  display: inline-block;
+  padding: 0.25em 0.6em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  color: #fff;
 }
 
-/**
- * Save current column state to localStorage
- */
-function saveColumnState() {
-  if (!gridApiReference) {
-    log("warn", scriptName, "saveColumnState", "Grid API not initialized, cannot save column state");
-    return false;
-  }
-  try {
-    const state = gridApiReference.getColumnState();
-    if (Array.isArray(state) && state.length > 0) {
-      localStorage.setItem("agGridColumnState", JSON.stringify(state));
-      log("info", scriptName, "saveColumnState", `💾 Saved column state with ${state.length} columns`);
-      return true;
-    } else {
-      log("warn", scriptName, "saveColumnState", "No valid column state to save");
-      return false;
-    }
-  } catch (e) {
-    log("error", scriptName, "saveColumnState", "Error saving column state:", e);
-    return false;
-  }
+.ag-badge-primary { background-color: #0d6efd; }
+.ag-badge-secondary { background-color: #6c757d; }
+.ag-badge-success { background-color: #198754; }
+.ag-badge-info { background-color: #0dcaf0; }
+.ag-badge-warning { background-color: #ffc107; color: #212529; }
+
+/* Pagination styling */
+.ag-theme-alpine .ag-paging-panel {
+  padding: var(--spacing-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  border-top: 1px solid var(--ag-border-color);
 }
 
-const debouncedSaveColumnState = debounce(() => {
-  log("debug", scriptName, "debouncedSaveColumnState", "Executing debounced save");
-  saveColumnState();
-}, 300);
-
-/**
- * Custom cell renderer for badges
- */
-function badgeCellRenderer(params) {
-  if (params.value == null) return '';
-
-  // Determine badge type based on column
-  let badgeClass = 'ag-badge ag-badge-primary';
-
-  if (params.column.colId.includes('contact')) {
-    badgeClass = 'ag-badge ag-badge-info';
-  } else if (params.column.colId.includes('note')) {
-    badgeClass = 'ag-badge ag-badge-secondary';
-  } else if (params.column.colId.includes('capabilit')) {
-    badgeClass = 'ag-badge ag-badge-success';
-  }
-
-  return `<span class="${badgeClass}">${params.value}</span>`;
+.ag-theme-alpine .ag-paging-button {
+  border-radius: var(--border-radius-sm);
+  color: var(--color-primary);
 }
 
-/**
- * Custom cell renderer for action buttons with icons
- */
-function actionCellRenderer(params) {
-  const id = params.data?.id || '';
-  const basePath = window.location.pathname.split('/')[1] || '';
-
-  return `
-    <div class="ag-action-cell">
-      <a href="/${basePath}/${id}" class="ag-icon-btn ag-icon-primary" title="View">
-        <i class="fas fa-eye"></i>
-      </a>
-      <a href="/${basePath}/edit/${id}" class="ag-icon-btn ag-icon-info" title="Edit">
-        <i class="fas fa-edit"></i>
-      </a>
-      <a href="/${basePath}/delete/${id}" class="ag-icon-btn ag-icon-danger" title="Delete"
-         onclick="return confirm('Are you sure you want to delete this item?')">
-        <i class="fas fa-trash"></i>
-      </a>
-    </div>
-  `;
+.ag-theme-alpine .ag-paging-button-wrapper {
+  height: 32px;
 }
 
-/**
- * Default grid options factory
- */
-export function getGridOptions() {
-  return {
-    columnDefs: [], rowData: [], maintainColumnOrder: true,
-    pagination: true, enableCellTextSelection: true,
-    enableBrowserTooltips: true, suppressCopyRowsToClipboard: false,
-    suppressCellFocus: true, suppressRowClickSelection: false,
-    rowSelection: 'single', paginationPageSize: 20,
-    domLayout: 'autoHeight', suppressColumnVirtualisation: false,
-    animateRows: true,
-    defaultColDef: {
-      flex: 1,
-      minWidth: 100,
-      resizable: true,
-      wrapText: true,
-      autoHeight: true,
-      sortable: true,
-      filter: true
-    },
-    onRowClicked: event => {
-      if (event.event.ctrlKey || event.event.metaKey || event.event.shiftKey || event.event.button !== 0) return;
-      const id = event.data?.id;
-      if (!id) return;
-      const basePath = window.location.pathname.split('/')[1];
-      if (basePath) window.location.href = `/${basePath}/${id}`;
-    },
-    onGridReady: params => {
-      gridApiReference = params.api;
-      columnApiReference = params.columnApi;
-      log("info", scriptName, "onGridReady", "Grid API initialized in tableConfig");
-    },
-    onFirstDataRendered: params => {
-      if (!gridApiReference) {
-        log("info", scriptName, "onFirstDataRendered", "Fallback API init");
-        gridApiReference = params.api;
-        columnApiReference = params.columnApi;
-        registerEvents(); restoreColumnState();
-        setTimeout(() => {
-          const ok = saveColumnState();
-          log("info", scriptName, "onFirstDataRendered", `Fallback save: ${ok ? 'SUCCESS':'FAILED'}`);
-        }, 200);
-      }
-    },
-    onColumnMoved: () => debouncedSaveColumnState(),
-    onColumnResized: () => debouncedSaveColumnState(),
-    onColumnVisible: () => debouncedSaveColumnState(),
-    onColumnPinned: () => debouncedSaveColumnState(),
-    onSortChanged: () => debouncedSaveColumnState(),
-    onFilterChanged: () => debouncedSaveColumnState(),
-    onColumnRowGroupChanged: () => debouncedSaveColumnState(),
-    onColumnValueChanged: () => debouncedSaveColumnState(),
-    onDragStopped: () => debouncedSaveColumnState()
-  };
+.ag-theme-alpine .ag-paging-button:hover {
+  background-color: var(--color-primary-lighter);
 }
 
-// --- Utilities (from tableUtils.js) ---
-
-/**
- * Wait for AG Grid to load
- */
-export function waitForAgGrid() {
-  const functionName = "waitForAgGrid";
-  return new Promise((resolve, reject) => {
-    try {
-      if (typeof Grid !== "undefined") {
-        log("info", scriptName, functionName, "AG Grid loaded");
-        return resolve(Grid);
-      }
-      log("info", scriptName, functionName, "⏳ Waiting for AG Grid...");
-      const interval = setInterval(() => {
-        if (typeof Grid !== "undefined") {
-          clearInterval(interval);
-          log("info", scriptName, functionName, "AG Grid has loaded.");
-          resolve(Grid);
-        }
-      }, 100);
-      setTimeout(() => {
-        clearInterval(interval);
-        log("error", scriptName, functionName, "❌ AG Grid failed to load after timeout.");
-        reject(new Error("AG Grid failed to load"));
-      }, 5000);
-    } catch (error) {
-      log("error", scriptName, functionName, `❌ Error checking AG Grid: ${error.message}`);
-      reject(error);
-    }
-  });
+.ag-theme-alpine .ag-paging-page-summary-panel {
+  font-size: var(--font-size-sm);
 }
 
-/**
- * Load data into the table via AG Grid API
- */
-export function loadTableData(data) {
-  const functionName = 'loadTableData';
-  if (!data || data.length === 0) {
-    const error = new Error("❌ No data available for the table.");
-    log("error", scriptName, functionName, error.message);
-    throw error;
-  }
-  log("info", scriptName, functionName, `📊 Initializing table with data:`, data);
-  try {
-    if (gridApiReference) {
-      // Updated: Replace deprecated setRowData with updateGridOptions
-      gridApiReference.updateGridOptions({ rowData: data });
-      log("info", scriptName, functionName, "📊 Table initialized with data", data);
-      return true;
-    } else {
-      const error = new Error("❌ AG Grid API not available.");
-      log("error", scriptName, functionName, error.message);
-      throw error;
-    }
-  } catch (error) {
-    log("error", scriptName, functionName, `❌ Error displaying AG Grid table: ${error.message}`);
-    throw error;  // Re-throw to propagate to caller
-  }
+/* Column headers */
+.ag-theme-alpine .ag-header-cell-label {
+  font-weight: var(--font-weight-semibold);
 }
 
-// --- Initialization (from tableInit.js) ---
-
-log("info", scriptName, "module", "Starting table initialization module");
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
-log("info", scriptName, "module", "AG Grid modules registered successfully");
-
-const tableContainerId = "table-container";
-window.gridApi = null;
-
-// Style element for column selector (created once)
-const columnSelectorStyle = document.createElement('style');
-columnSelectorStyle.textContent = `
-  .column-selector-item { display:flex; align-items:center; margin:8px 0; padding:4px; background:white; border-radius:4px; }
-  .column-selector-checkbox { margin-right:10px; }
-  .column-selector-label { cursor:pointer; user-select:none; }
-`;
-document.head.appendChild(columnSelectorStyle);
-
-/**
- * Global search setup
- */
-function setupGlobalSearch(api) {
-  const fn = "setupGlobalSearch";
-  log("info", scriptName, fn, "Setting up global search");
-  const input = document.getElementById('globalSearch');
-  if (input) {
-    log("info", scriptName, fn, "Search input found");
-    input.addEventListener('input', () => {
-      const val = input.value;
-      log("debug", scriptName, fn, `Filter: "${val}"`);
-      api.setQuickFilter(val);
-    });
-    log("info", scriptName, fn, "Global search complete");
-  } else {
-    log("warn", scriptName, fn, "🔍 #globalSearch not found.");
-  }
+/* Sort icons */
+.ag-theme-alpine .ag-header-cell-sorted-asc .ag-header-cell-label,
+.ag-theme-alpine .ag-header-cell-sorted-desc .ag-header-cell-label {
+  color: var(--color-primary);
 }
 
-/**
- * Formatter for object/array values
- */
-function objectValueFormatter(params) {
-  if (params.value == null) return '';
-  if (Array.isArray(params.value)) {
-    return params.value.length ? `${params.value.length} item${params.value.length > 1 ? 's':''}` : '';
-  }
-  if (typeof params.value === 'object') {
-    return `Ref #${params.value}`;
-  }
-  return params.value;
+/* Cell Renderers */
+.ag-theme-alpine .ag-cell-value {
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
-/**
- * Column selector toggle UI
- */
-function setupColumnSelector(api) {
-  const fn = "setupColumnSelector";
-  log("info", scriptName, fn, "Setting up column selector");
-  const container = document.getElementById('columnSelectorItems');
-  const selectAll = document.getElementById('selectAllColumns');
-  const clearAll = document.getElementById('clearAllColumns');
-  if (!container || !api) {
-    log("warn", scriptName, fn, "Selector elements or API missing");
-    return;
-  }
-  container.innerHTML = '';
-  container.style.maxHeight='300px'; container.style.overflowY='auto'; container.style.padding='0 10px';
-
-  const cols = api.getColumns ? api.getColumns() : [];
-  if (!Array.isArray(cols)) {
-    log("warn", scriptName, fn, "No columns available from API");
-    return;
-  }
-
-  cols.forEach(col => {
-    if (!col) return;
-
-    const colId = typeof col.getColId === 'function' ? col.getColId() :
-                 typeof col.getId === 'function' ? col.getId() : null;
-
-    if (!colId) {
-      log("warn", scriptName, fn, "Column without ID found, skipping");
-      return;
-    }
-
-    const def = typeof col.getColDef === 'function' ? col.getColDef() : {};
-    const name = (def.headerName || colId).replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase()+txt.substr(1).toLowerCase());
-
-    const columnState = typeof api.getColumnState === 'function' ? api.getColumnState() : [];
-    const visible = !(Array.isArray(columnState) && columnState.find(c => c.colId === colId)?.hide);
-
-    const div = document.createElement('div'); div.className='column-selector-item';
-    const chk = document.createElement('input'); chk.type='checkbox'; chk.className='column-selector-checkbox'; chk.id=`chk-${colId}`; chk.checked=visible;
-    const lbl = document.createElement('label'); lbl.className='column-selector-label'; lbl.htmlFor=`chk-${colId}`; lbl.textContent=name;
-
-    chk.addEventListener('change', e => {
-      if (typeof api.setColumnVisible === 'function') {
-        api.setColumnVisible(colId, e.target.checked);
-      }
-    });
-
-    div.append(chk, lbl); container.appendChild(div);
-  });
-
-  if (selectAll) {
-    selectAll.addEventListener('click', () => {
-      cols.forEach(c => {
-        const colId = typeof c.getColId === 'function' ? c.getColId() : null;
-        if (colId && typeof api.setColumnVisible === 'function') {
-          api.setColumnVisible(colId, true);
-          const checkbox = document.getElementById(`chk-${colId}`);
-          if (checkbox) checkbox.checked = true;
-        }
-      });
-    });
-  }
-
-  if (clearAll) {
-    clearAll.addEventListener('click', () => {
-      cols.forEach(c => {
-        const colId = typeof c.getColId === 'function' ? c.getColId() : null;
-        if (colId && typeof api.setColumnVisible === 'function') {
-          api.setColumnVisible(colId, false);
-          const checkbox = document.getElementById(`chk-${colId}`);
-          if (checkbox) checkbox.checked = false;
-        }
-      });
-    });
-  }
+/* Action buttons in cells */
+.ag-theme-alpine .cell-action-buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 
-/**
- * Generate column definitions based on data
- */
-function generateColumnDefs(data) {
-  const fn = "generateColumnDefs";
-  log("info", scriptName, fn, "Generating columns");
-  if (!data || !data.length) {
-    log("warn", scriptName, fn, "No data to generate columns");
-    return [];
-  }
-
-  const keys = Object.keys(data[0]);
-  log("debug", scriptName, fn, "Columns found:", keys);
-
-  const columnDefs = keys.map(key => {
-    const def = {
-      field: key,
-      headerName: formatDisplayText(key),
-      sortable: true,
-      filter: true
-    };
-
-    // Add badge renderer for numeric counters
-    if (key.toLowerCase().includes('count') ||
-        key.toLowerCase().includes('opportunit') ||
-        key.toLowerCase().includes('contact') ||
-        key.toLowerCase().includes('note') ||
-        key.toLowerCase().includes('capabilit')) {
-      def.cellRenderer = badgeCellRenderer;
-    }
-
-    if (data[0][key] != null && typeof data[0][key] === 'object') {
-      def.valueFormatter = objectValueFormatter;
-    }
-
-    return def;
-  });
-
-  // Add actions column as the last column
-  columnDefs.push({
-    headerName: 'Actions',
-    field: 'actions',
-    cellRenderer: actionCellRenderer,
-    sortable: false,
-    filter: false,
-    flex: 0.8,
-    minWidth: 150,
-    cellClass: 'text-center'
-  });
-
-  return columnDefs;
+.ag-theme-alpine .cell-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-fast);
 }
 
-/**
- * Main initialization
- */
-async function initializeTable() {
-  const fn = "initTable";
-  log("info", scriptName, fn, "🚀 Starting table init");
-
-  // Get container element
-  const gridDiv = document.querySelector(`#${tableContainerId}`);
-  if (!gridDiv) {
-    const error = new Error(`⚠️ Container #${tableContainerId} not found`);
-    log("error", scriptName, fn, error.message);
-    return Promise.reject(error);
-  }
-
-  if (!gridDiv.style.height && !gridDiv.classList.contains('ag-theme-alpine')) {
-    log("info", scriptName, fn, "Applying default height/theme");
-    gridDiv.style.height = '500px';
-    gridDiv.classList.add('ag-theme-alpine');
-  }
-
-  let actualData;
-  try {
-    const raw = await fetchApiDataFromContainer(tableContainerId);
-    log("debug", scriptName, fn, "Raw data:", raw);
-    const arr = Array.isArray(raw?.data?.data) ? raw.data.data :
-               Array.isArray(raw?.data) ? raw.data : [];
-    log("debug", scriptName, fn, `Rows extracted: ${arr.length}`);
-    actualData = normalizeData(arr);
-    log("info", scriptName, fn, `Normalized rows: ${actualData.length}`);
-  } catch (err) {
-    log("error", scriptName, fn, "❌ Fetch/process failed", err);
-    return Promise.reject(err);
-  }
-
-  const gridOptions = getGridOptions();
-
-  if (actualData && actualData.length) {
-    gridOptions.columnDefs = generateColumnDefs(actualData);
-    window.columnDefs = gridOptions.columnDefs;
-  } else {
-    log("warn", scriptName, fn, "No data for columns");
-  }
-
-  const orig = gridOptions.onGridReady;
-  gridOptions.onGridReady = params => {
-    if (typeof orig === 'function') {
-      orig(params);
-    }
-    setGridApi(params.api, params.columnApi);
-    window.gridApi = params.api;
-
-    // Updated: Replace deprecated setRowData with updateGridOptions
-    params.api.updateGridOptions({ rowData: actualData });
-
-    setupGlobalSearch(params.api);
-    setupColumnSelector(params.api);
-    params.api.addEventListener('gridColumnsChanged', () => setupColumnSelector(params.api));
-    params.api.refreshHeader();
-    log("info", scriptName, fn, "Table data ready");
-  };
-
-  try {
-    const grid = new createGrid(gridDiv, gridOptions);
-    log("info", scriptName, fn, "AG Grid created");
-  } catch (err) {
-    log("error", scriptName, fn, "Grid creation failed", err);
-    return Promise.reject(err);
-  }
-
-  log("info", scriptName, fn, "Table init completed");
-  return Promise.resolve(gridOptions);
+.ag-theme-alpine .cell-action-btn:hover {
+  background-color: var(--color-primary-lighter);
+  color: var(--color-primary);
 }
 
-// --- Bootstrap (from original table.js) ---
-if (!window.__tableInitialized) {
-  window.__tableInitialized = true;
-  document.addEventListener('DOMContentLoaded', () => {
-    const fn = "DOMContentLoaded";
-    log("info", scriptName, fn, "Initializing table and column selector...");
-    initializeTable()
-      .then(gridOptions => {
-        log("info", scriptName, fn, "Table initialization completed successfully");
-      })
-      .catch(error => {
-        log("error", scriptName, fn, "Table initialization failed:", error);
-      });
-  });
+/* Custom action buttons matching dashboard.html */
+.ag-theme-alpine .ag-action-cell {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-export default initializeTable;
+.ag-theme-alpine .transparent-button {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
 
-window.addEventListener('error', function(e) {
-  log("error", "global", "uncaught", `Script error: ${e.message} in ${e.filename} line ${e.lineno}`);
-  const container = document.querySelector('#table-container');
-  if (container) {
-    container.innerHTML = `<div class="alert alert-danger m-3">Error loading table: ${e.message}</div>`;
-  }
-});
+.ag-theme-alpine .btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.2rem;
+}
+
+.ag-theme-alpine .btn-outline-secondary {
+  color: #6c757d;
+  border-color: #6c757d;
+  background-color: transparent;
+}
+
+/* Empty state styling */
+.ag-theme-alpine .ag-overlay-no-rows-center {
+  padding: 2rem;
+  color: var(--color-text-light);
+}
+
+/* Table container height */
+#table-container {
+  min-height: 420px; /* Ensures the container has a minimum height */
+  padding-top: 10px; /* Adds a slight gap above the table content */
+  padding-bottom: 20px; /* Adds a slight gap below the table content */
+}
+
+/* Optional: Add padding to the table itself to create space inside */
+table {
+  padding: 10px; /* Adjust as needed */
+}
+
+/* Responsive table wrapper */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Standard table styles for non-AG Grid tables */
+.table {
+  width: 100%;
+  margin-bottom: var(--spacing-base);
+  color: var(--color-text-primary);
+  border-collapse: collapse;
+}
+
+.table th {
+  font-weight: var(--font-weight-semibold);
+  background-color: var(--color-bg-light);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-base);
+  text-align: left;
+}
+
+.table td {
+  padding: var(--spacing-base);
+  border-bottom: 1px solid var(--color-border-lighter);
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(var(--color-primary-rgb), 0.05);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: var(--color-bg-lighter);
+}
+
+.table-striped tbody tr:nth-of-type(odd):hover {
+  background-color: rgba(var(--color-primary-rgb), 0.05);
+}
+
+.table-bordered {
+  border: 1px solid var(--color-border-light);
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid var(--color-border-light);
+}
