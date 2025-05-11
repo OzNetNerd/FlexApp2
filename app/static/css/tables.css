@@ -4,8 +4,8 @@ Table styles - AG Grid theme and custom table styling
 
 /* ===== AG Grid Theme Overrides ===== */
 .ag-theme-alpine {
-  --ag-font-family: var(--font-family);
-  --ag-font-size: 0.88rem;
+  --ag-font-family: var(--font-family-table);
+  --ag-font-size: var(--font-size-table);
   --ag-header-foreground-color: var(--color-text-primary);
   --ag-foreground-color: var(--color-text-primary);
   --ag-header-background-color: #f8f9fa; /* Match Bootstrap's table-light */
@@ -56,10 +56,11 @@ Table styles - AG Grid theme and custom table styling
   display: flex;
   align-items: center;            /* Vertically center */
   white-space: normal !important; /* Allows wrapping */
-  line-height: 1.3;               /* Controls line spacing */
+  line-height: 1.4;               /* Controls line spacing */
   padding-top: 4px;
   padding-bottom: 4px;
-  font-weight: 500; /* Medium weight for emphasized text */
+  font-weight: var(--font-weight-table); /* Medium weight for emphasized text */
+  letter-spacing: normal;
 }
 
 /* First column with extra padding (ps-4 equivalent) */
@@ -114,7 +115,8 @@ Table styles - AG Grid theme and custom table styling
 
 /* Column headers */
 .ag-theme-alpine .ag-header-cell-label {
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-table-header);
+  letter-spacing: 0;
 }
 
 /* Sort icons */
