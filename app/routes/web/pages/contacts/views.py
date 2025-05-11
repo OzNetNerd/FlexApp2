@@ -18,9 +18,9 @@ def records():
 
     # Configure the render_safely call
     config = RenderSafelyConfig(
-        template_path="pages/opportunities/records.html",
+        template_path="pages/contacts/records.html",
         context=context,
-        error_message="An error occurred while rendering the opportunities records page",
+        error_message="An error occurred while rendering the contacts records page",
         endpoint_name=request.endpoint
     )
 
