@@ -5,8 +5,8 @@ Navbar styles - navigation elements and related components
 /* ===== Navbar Base Styles ===== */
 .navbar {
   background-color: var(--color-bg-secondary);
-  border-bottom: 1px solid rgba(var(--color-black-rgb), 0.08);
-  padding: 0.75rem 0;
+  border-bottom: var(--border-width-standard) solid rgba(var(--color-black-rgb), 0.08);
+  padding: var(--spacing-md) 0;
   transition: all var(--transition-base);
   height: var(--navbar-height);
   min-height: var(--navbar-height);
@@ -15,7 +15,7 @@ Navbar styles - navigation elements and related components
 
 /* ===== Brand Styles ===== */
 .navbar-brand {
-  font-size: 1.3rem;
+  font-size: var(--font-size-lg);
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
   display: flex;
@@ -27,18 +27,18 @@ Navbar styles - navigation elements and related components
 
 /* ===== Nav Item Styles ===== */
 .navbar-nav {
-  margin-left: 1.5rem;
+  margin-left: var(--spacing-xl);
 }
 
 .nav-item {
   position: relative;
-  margin: 0 0.2rem;
+  margin: 0 var(--spacing-xs);
 }
 
 .nav-link {
   color: var(--color-text-muted);
   font-weight: var(--font-weight-medium);
-  padding: 0.8rem 1rem;
+  padding: var(--spacing-md) var(--spacing-base);
   border-radius: var(--border-radius-lg);
   transition: all var(--transition-fast);
   display: flex;
@@ -70,16 +70,16 @@ Navbar styles - navigation elements and related components
 }
 
 .nav-icon {
-  margin-right: 0.5rem;
-  font-size: 0.9rem;
-  width: 20px;
+  margin-right: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  width: var(--spacing-xl);
   text-align: center;
 }
 
 /* ===== Notification Icon ===== */
 .notification-icon a {
   color: var(--color-text-muted);
-  font-size: 1.2rem;
+  font-size: var(--font-size-lg);
   transition: color var(--transition-fast);
 }
 
@@ -89,17 +89,17 @@ Navbar styles - navigation elements and related components
 
 .notification-badge {
   background-color: var(--color-danger);
-  height: 8px;
-  width: 8px;
+  height: 0.5rem;
+  width: 0.5rem;
   top: 12%;
-  right: -2px;
-  border: 2px solid var(--color-bg-secondary);
+  right: -0.125rem;
+  border: var(--border-width-thick) solid var(--color-bg-secondary);
 }
 
 /* ===== Mobile Styles ===== */
 .navbar-toggler {
   border: none;
-  padding: 0.6rem;
+  padding: var(--spacing-sm);
   color: var(--color-text-secondary);
   background-color: var(--color-bg-light);
   border-radius: var(--border-radius-lg);
@@ -112,23 +112,22 @@ Navbar styles - navigation elements and related components
 @media (max-width: 991.98px) {
   .navbar-collapse {
     background-color: var(--color-bg-secondary);
-    padding: 1rem;
+    padding: var(--spacing-base);
     border-radius: var(--border-radius-xl);
     box-shadow: var(--shadow-lg);
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
-    margin: 0.5rem 1rem;
-    z-index: 1000;
+    margin: var(--spacing-sm) var(--spacing-base);
+    z-index: var(--z-index-dropdown);
   }
 
   .nav-link {
-    padding: 0.8rem 1rem;
+    padding: var(--spacing-md) var(--spacing-base);
   }
 
   .nav-item {
-    margin: 0.2rem 0;
+    margin: var(--spacing-xs) 0;
   }
 }
-

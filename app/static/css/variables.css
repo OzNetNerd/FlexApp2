@@ -72,6 +72,23 @@ These variables make it easier to maintain consistent colors, spacing, and styli
   /* Z-index scale */
   --z-index-dropdown: 9999;
 
+  /* Additional spacing */
+  --spacing-xxs: 0.2rem;    /* For the smallest spacing needs */
+
+  /* Border width */
+  --border-width-standard: 1px;
+  --border-width-thick: 2px;
+  --border-width-indicator: 4px;
+
+  /* Z-index scale additions */
+  --z-index-overlay: 1030;
+  --z-index-sidebar: 1040;
+  --z-index-submenu: 1050;
+
+  /* Additional sidebar variables */
+  --color-primary-lightest: rgba(79, 70, 229, 0.03);
+  --submenu-width: 200px;
+
   /* Colors - Primary palette */
   --color-primary: #4f46e5;
   --color-primary-hover: #4338ca;
