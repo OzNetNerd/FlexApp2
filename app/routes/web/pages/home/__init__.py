@@ -1,2 +1,4 @@
-# Import and re-export the blueprint
-from app.routes.web.pages.home.home import home_bp
+from flask import Blueprint
+
+# Create the blueprint
+home_bp = Blueprint("home_bp", __name__, url_prefix="/")
