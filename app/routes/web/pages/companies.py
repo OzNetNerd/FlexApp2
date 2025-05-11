@@ -5,6 +5,8 @@ import random
 from app.models.pages.company import Company
 from app.routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
 from app.models.base import db
+from app.routes.web.utils.context import TableContext
+from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
 
 # Create the blueprint with the Company model
 companies_bp = create_crud_blueprint(BlueprintConfig(model_class=Company))
@@ -219,14 +221,21 @@ def view2():
 @companies_bp.route("/records", methods=["GET"])
 @login_required
 def records():
-    return render_template(
-        "pages/companies/records.html",
-        id=0,  # Add id parameter
-        model_name="Company",  # These parameters are likely needed too
-        entity_name="Demo Company",
+    # Create appropriate context for the records view
+    context = TableContext(
+        model_class=Company,
         read_only=True,
-        submit_url="#",  # For the form action
-        csrf_input="",
-        entity_base_route="",
-        api_url = '/api/companies',
+        action="view",
+        show_heading=True
     )
+
+    # Configure the render_safely call
+    config = RenderSafelyConfig(
+        template_path="pages/companies/records.html",
+        context=context,
+        error_message="An error occurred while rendering the companies records page",
+        endpoint_name=request.endpoint
+    )
+
+    # Return the safely rendered template
+    return render_safely(config)
