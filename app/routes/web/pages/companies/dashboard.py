@@ -1,7 +1,9 @@
-from flask import render_template
+from flask import request
 from flask_login import login_required
 from app.services.company_service import CompanyService
 from app.routes.web.pages.companies import companies_bp
+from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
+from app.routes.web.utils.context import WebContext
 
 company_service = CompanyService()
 
@@ -14,10 +16,23 @@ def companies_dashboard():
     segments = company_service.get_engagement_segments()
     growth_data = company_service.prepare_growth_data()
 
-    return render_template(
-        "pages/companies/dashboard.html",
+    # Create context for the dashboard view
+    context = WebContext(
+        title="Companies Dashboard",
+        read_only=True,
         stats=stats,
         segments=segments,
         top_companies=top_companies,
         growth_data=growth_data
     )
+
+    # Configure the render_safely call
+    config = RenderSafelyConfig(
+        template_path="pages/companies/dashboard.html",
+        context=context,
+        error_message="An error occurred while rendering the companies dashboard",
+        endpoint_name=request.endpoint
+    )
+
+    # Return the safely rendered template
+    return render_safely(config)

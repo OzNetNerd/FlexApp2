@@ -1,22 +1,34 @@
-from flask import render_template, request
+from flask import request
 from flask_login import login_required
 from app.models.pages.company import Company
-from app.routes.web.utils.context import TableContext
+from app.routes.web.utils.context import TableContext, WebContext
 from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.web.pages.companies import companies_bp
 
 @companies_bp.route("/view2", methods=["GET"])
 @login_required
 def view2():
-    return render_template(
-        "pages/companies/view.html",
+    # Create context for the view
+    context = WebContext(
+        title="Company View",
+        read_only=True,
         id=0,
         model_name="Company",
         entity_name="Demo Company",
-        read_only=True,
         submit_url="#",
         csrf_input=""
     )
+
+    # Configure the render_safely call
+    config = RenderSafelyConfig(
+        template_path="pages/companies/view.html",
+        context=context,
+        error_message="An error occurred while rendering the company view page",
+        endpoint_name=request.endpoint
+    )
+
+    # Return the safely rendered template
+    return render_safely(config)
 
 @companies_bp.route("/records", methods=["GET"])
 @login_required
