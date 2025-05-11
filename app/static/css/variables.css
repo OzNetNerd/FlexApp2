@@ -4,25 +4,36 @@ These variables make it easier to maintain consistent colors, spacing, and styli
 */
 
 :root {
-  /* Typography */
+  /* Typography - Core fonts */
   --font-family: 'Poppins', sans-serif;
-  --font-size-base: 0.93rem;
-  --font-size-sm: 0.85rem;
-  --font-size-xs: 0.8rem;
-  --font-size-lg: 1.1rem;
-  --font-size-xl: 1.35rem;
+  --font-family-table: 'Poppins', sans-serif;
+
+  /* Typography scales */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --letter-spacing-tight: -0.01em;
+
+  /* Systematic font size scale (1.2 ratio) */
+  --font-size-base: 1rem;        /* 16px */
+  --font-size-sm: 0.833rem;      /* 13.33px */
+  --font-size-xs: 0.694rem;      /* 11.11px */
+  --font-size-lg: 1.2rem;        /* 19.2px */
+  --font-size-xl: 1.44rem;       /* 23.04px */
+
+  /* Font weights */
+  --font-weight-light: 300;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
-  /* Table-specific fonts */
-  --font-family: 'Poppins', sans-serif;
-  --font-size-table: 0.875rem; /* 14px */
+  /* Table-specific typography */
+  --font-size-table: 0.875rem;   /* 14px */
   --font-weight-table: 400;
   --font-weight-table-header: 600;
 
-  /* Button size */
-  --bs-btn-font-size: 12.8px;
+  /* Button typography */
+  --bs-btn-font-size: 0.8rem;    /* Standardized to rem from 12.8px */
 
   /* Colors - Primary palette */
   --color-primary: #4f46e5;

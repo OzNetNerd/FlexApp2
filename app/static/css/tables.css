@@ -73,7 +73,7 @@ Table styles - AG Grid theme and custom table styling
   display: inline-block;
   padding: 0.25em 0.6em;
   font-size: 75%;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   line-height: 1;
   text-align: center;
   white-space: nowrap;
@@ -175,7 +175,7 @@ Table styles - AG Grid theme and custom table styling
 
 .ag-theme-alpine .btn-sm {
   padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm); /* Changed from 0.875rem to use variable */
   border-radius: 0.2rem;
 }
 

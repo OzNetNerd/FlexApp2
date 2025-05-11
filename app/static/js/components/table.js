@@ -26,7 +26,13 @@ document.head.appendChild(Object.assign(document.createElement('style'), {
   textContent: `
     .column-selector-item { display:flex; align-items:center; margin:8px 0; padding:4px; background:white; border-radius:4px; }
     .column-selector-checkbox { margin-right:10px; }
-    .column-selector-label { cursor:pointer; user-select:none; }
+    .column-selector-label { 
+      font-family: var(--font-family); 
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-normal);
+      cursor: pointer; 
+      user-select: none; 
+    }
   `
 }));
 
