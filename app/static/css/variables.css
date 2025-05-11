@@ -16,7 +16,7 @@ These variables make it easier to maintain consistent colors, spacing, and styli
   --font-weight-semibold: 600;
 
   /* Table-specific fonts */
-  --font-family-table: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family: 'Poppins', sans-serif;
   --font-size-table: 0.875rem; /* 14px */
   --font-weight-table: 400;
   --font-weight-table-header: 600;
