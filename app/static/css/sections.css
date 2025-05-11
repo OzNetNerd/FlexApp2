@@ -1,0 +1,17 @@
+/* Section-specific styling */
+/* Headers */
+.section-companies .page-heading {
+  border-left: 4px solid var(--color-section-companies);
+  padding-left: 10px;
+}
+
+.section-companies .card-header {
+  border-top: 3px solid var(--color-section-companies);
+}
+
+/* Apply similar patterns for all sections */
+
+/* Page icons */
+.section-companies .section-icon {
+  color: var(--color-section-companies);
+}

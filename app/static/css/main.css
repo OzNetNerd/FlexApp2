@@ -14,3 +14,5 @@ This is the only CSS file you need to include in your HTML
 @import url("themes.css");
 @import url("buttons.css");
 @import url("styles.css");
+@import url("sections.css");
+@import url("pages.css");

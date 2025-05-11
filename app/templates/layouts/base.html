@@ -15,8 +15,11 @@
     - scripts_extra: Additional scripts to load at the end
 ------------------------------------------------------------------------------ #}
 
+{% set current_section = request.path.split('/')[1] %}
+{% if current_section == '' %}{% set current_section = 'home' %}{% endif %}
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="section-{{ current_section }}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

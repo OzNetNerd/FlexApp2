@@ -469,3 +469,21 @@ body.sidebar-collapsed .submenu-toggle.btn {
     padding-right: var(--spacing-sm);
   }
 }
+
+/* Section-specific sidebar active states */
+.section-companies .sidebar-link.active,
+.section-companies .sidebar-link-container.active > .sidebar-link {
+  color: var(--color-section-companies);
+}
+
+.section-companies .sidebar-link.active::before,
+.section-companies .sidebar-link-container.active > .sidebar-link::before {
+  background-color: var(--color-section-companies);
+}
+
+/* Repeat for other sections */
+.section-contacts .sidebar-link.active::before,
+.section-contacts .sidebar-link-container.active > .sidebar-link::before {
+  background-color: var(--color-section-contacts);
+}
+/* Add similar styles for all other sections */

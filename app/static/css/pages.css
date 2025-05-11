@@ -1,0 +1,48 @@
+/* Define section-specific styles using a common pattern */
+:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
+       .section-tasks, .section-srs, .section-customers, .section-sales,
+       .section-reports, .section-settings) {
+  --section-color: var(--color-primary);
+  --section-bg-light: rgba(var(--color-primary-rgb), 0.05);
+}
+
+/* Set specific colors for each section */
+.section-companies { --section-color: var(--color-section-companies); }
+.section-contacts { --section-color: var(--color-section-contacts); }
+.section-users { --section-color: var(--color-section-users); }
+.section-opportunities { --section-color: var(--color-section-opportunities); }
+.section-tasks { --section-color: var(--color-section-tasks); }
+.section-srs { --section-color: var(--color-section-srs); }
+.section-customers { --section-color: var(--color-section-customers); }
+.section-sales { --section-color: var(--color-section-sales); }
+.section-reports { --section-color: var(--color-section-reports); }
+.section-settings { --section-color: var(--color-section-settings); }
+
+/* Apply common styles using the section-specific variables */
+:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
+       .section-tasks, .section-srs, .section-customers, .section-sales,
+       .section-reports, .section-settings) .page-heading {
+  border-left: 4px solid var(--section-color);
+  padding-left: 10px;
+}
+
+:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
+       .section-tasks, .section-srs, .section-customers, .section-sales,
+       .section-reports, .section-settings) .card-header {
+  border-top: 3px solid var(--section-color);
+}
+
+:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
+       .section-tasks, .section-srs, .section-customers, .section-sales,
+       .section-reports, .section-settings) .heading-section {
+  background-color: rgba(var(--section-color), 0.05);
+}
+
+:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
+       .section-tasks, .section-srs, .section-customers, .section-sales,
+       .section-reports, .section-settings) .section-icon,
+:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
+       .section-tasks, .section-srs, .section-customers, .section-sales,
+       .section-reports, .section-settings) .large-card-icon {
+  color: var(--section-color);
+}
