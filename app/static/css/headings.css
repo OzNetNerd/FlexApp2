@@ -21,7 +21,7 @@ h6 { font-size: var(--font-size-sm); }
    Used for improved readability in HTML
 ======================================== */
 .page-heading {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-page-heading);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-tight);
   margin-bottom: var(--spacing-sm);

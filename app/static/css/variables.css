@@ -13,6 +13,13 @@ These variables make it easier to maintain consistent colors, spacing, and styli
   --line-height-normal: 1.5;
   --letter-spacing-tight: -0.01em;
 
+  /* Heading font sizes */
+  --font-size-page-heading: 1.75rem;  /* For page headings */
+  --font-size-2xl: 1.875rem;     /* 30px */
+  --font-size-3xl: 2.25rem;      /* 36px */
+  --font-size-4xl: 2.5rem;       /* 40px */
+  --font-size-5xl: 3.5rem;       /* 56px */
+
   /* Systematic font size scale (1.2 ratio) */
   --font-size-base: 1rem;        /* 16px */
   --font-size-sm: 0.833rem;      /* 13.33px */
