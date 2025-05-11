@@ -3,9 +3,9 @@ from flask_login import login_required
 from app.models import Opportunity
 from app.routes.web.utils.context import TableContext
 from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
-from app.routes.web.pages.opportunities import opportunities_bp
+from app.routes.web.pages.contacts import contacts_bp
 
-@opportunities_bp.route("/records", methods=["GET"])
+@contacts_bp.route("/records", methods=["GET"])
 @login_required
 def records():
     # Create appropriate context for the records view

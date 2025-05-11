@@ -6,6 +6,6 @@ from app.routes.web.utils.blueprint_factory import BlueprintConfig, create_crud_
 companies_bp = create_crud_blueprint(BlueprintConfig(model_class=Company))
 
 # Import and register routes from submodules
-from . import dashboard, filters, statistics, views
+from . import dashboard, filters, statistics
 
 # Blueprint is already created and routes registered via decorators
