@@ -42,6 +42,36 @@ These variables make it easier to maintain consistent colors, spacing, and styli
   /* Button typography */
   --bs-btn-font-size: 0.8rem;    /* Standardized to rem from 12.8px */
 
+  /* Icon sizes */
+  --icon-size-sm: 32px;
+  --icon-size-md: 40px;
+  --icon-size-lg: 48px;
+
+  /* Section colors */
+  --color-section-companies: #4285f4;
+  --color-section-contacts: #34a853;
+  --color-section-users: #673ab7;
+  --color-section-opportunities: #ff9800;
+  --color-section-tasks: #00acc1;
+  --color-section-srs: #e91e63;
+  --color-section-customers: #ffc107;
+  --color-section-sales: #ff5722;
+  --color-section-reports: #795548;
+  --color-section-settings: #607d8b;
+
+  /* Avatar sizes */
+  --avatar-size-default: 36px;
+  --avatar-size-sm: 32px;
+
+  /* Fixed widths */
+  --dropdown-min-width: 220px;
+  --highlights-container-height: 24px;
+  --transform-hover-lift: -5px;
+  --transform-button-lift: -2px;
+
+  /* Z-index scale */
+  --z-index-dropdown: 9999;
+
   /* Colors - Primary palette */
   --color-primary: #4f46e5;
   --color-primary-hover: #4338ca;
@@ -164,19 +194,4 @@ These variables make it easier to maintain consistent colors, spacing, and styli
 
 .bg-warning-dark {
   background-color: var(--color-warning) !important;
-}
-
-/* Section-specific colors */
-:root {
-  /* Section colors */
-  --color-section-companies: #4285f4;
-  --color-section-contacts: #34a853;
-  --color-section-users: #673ab7;
-  --color-section-opportunities: #ff9800;
-  --color-section-tasks: #00acc1;
-  --color-section-srs: #e91e63;
-  --color-section-customers: #ffc107;
-  --color-section-sales: #ff5722;
-  --color-section-reports: #795548;
-  --color-section-settings: #607d8b;
 }

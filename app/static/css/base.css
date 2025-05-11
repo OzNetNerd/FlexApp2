@@ -20,17 +20,17 @@ html {
 .section-divider {
   clear: both;
   /*height: 3rem !important; !* Increased from 2rem *!*/
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--spacing-xl);
   visibility: visible !important; /* Make it visible for debugging */
-  border-bottom: 1px dashed #eee; /* Optional: visual indicator */
+  border-bottom: 1px dashed var(--color-border-lighter); /* Optional: visual indicator */
 }
 
 /* Badge styling */
 .nav-card .badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 0.8rem;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  font-size: var(--font-size-xs);
 }
 
 /* Activity Icons */
@@ -38,20 +38,25 @@ html {
 .category-icon {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Force white color for icons inside category-icon elements */
+.category-icon[class*="bg-"] .bi {
+  color: var(--color-text-white);
 }
 
 /* Hover emphasis effect */
 .activity-icon:hover,
 .category-icon:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-md);
 }
 
 /* Container with consistent percentage margin - used for page layout containment */
@@ -108,7 +113,7 @@ Cards are the primary content containers used throughout the application for gro
 .card-header h3 {
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--letter-spacing-tight);
   font-size: var(--font-size-xl);
   margin: 0;
 }
@@ -116,7 +121,7 @@ Cards are the primary content containers used throughout the application for gro
 .card-body {
   padding: var(--spacing-xl);
   overflow-x: visible; /* Ensure dropdowns are visible */
-  font-size: 1rem;
+  font-size: var(--font-size-base);
 }
 
 /* Navigation Card - used for main navigation elements and feature highlights */
@@ -148,7 +153,7 @@ Buttons are used for all interactive controls that trigger actions throughout th
   border-radius: var(--border-radius-md);
   box-shadow: var(--shadow-sm);
   letter-spacing: 0.01em;
-  font-size: var(--font-size-sm);
+  font-size: var(--bs-btn-font-size);
   transition: var(--transition-properties-hover) var(--transition-fast);
 }
 
@@ -271,10 +276,10 @@ Used for tagging, status indicators, and compact information display.
 */
 
 .badge {
-  background-color: #e1f0fe;
+  background-color: var(--color-info-light);
   border-radius: var(--border-radius-full);
-  padding: 4px 8px;
-  margin: 3px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  margin: var(--spacing-xs);
   display: inline-flex;
   align-items: center;
   font-size: var(--font-size-xs);
@@ -283,7 +288,7 @@ Used for tagging, status indicators, and compact information display.
 }
 
 .badge-remove {
-  margin-left: 6px;
+  margin-left: var(--spacing-xs);
   cursor: pointer;
   font-weight: bold;
   color: var(--color-text-secondary);
@@ -295,7 +300,7 @@ Used for tagging, status indicators, and compact information display.
 
 /* Status badges - used to indicate item status throughout the application */
 .status-badge {
-  padding: 0.25rem 0.75rem;
+  padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--border-radius-full);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
@@ -330,7 +335,7 @@ Used for menus, selection controls, and contextual actions.
 .dropdown-toggle {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--spacing-xs);
   background-color: var(--color-secondary);
   color: var(--color-text-white);
   border: none;
@@ -366,20 +371,20 @@ Used for menus, selection controls, and contextual actions.
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
   border: none;
-  padding: 0.75rem 0;
+  padding: var(--spacing-md) 0;
   margin-top: 0;
   transform-origin: top;
   background-color: var(--color-bg-secondary);
 }
 
 .dropdown-menu h6 {
-  font-size: 0.95rem;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
 
 .dropdown-divider {
-  margin: 0.5rem 0;
+  margin: var(--spacing-xs) 0;
   opacity: 0.1;
   border-color: var(--color-border);
 }
@@ -388,14 +393,14 @@ Used for menus, selection controls, and contextual actions.
   border: none;
   box-shadow: var(--shadow-lg);
   border-radius: var(--border-radius-xl);
-  padding: 0.5rem 0;
+  padding: var(--spacing-xs) 0;
   min-width: 220px;
 }
 
 .dropdown-item {
-  padding: 0.6rem 1.2rem;
+  padding: var(--spacing-xs) var(--spacing-lg);
   color: var(--color-text-secondary);
-  font-size: 0.95rem;
+  font-size: var(--font-size-sm);
 }
 
 .dropdown-item:hover {
@@ -441,19 +446,19 @@ Used for user profiles, action buttons, and visual indicators.
 .icon-container-sm {
   width: 32px;
   height: 32px;
-  font-size: 0.8rem;
+  font-size: var(--font-size-xs);
 }
 
 .icon-container-md {
   width: 40px;
   height: 40px;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
 }
 
 .icon-container-lg {
   width: 48px;
   height: 48px;
-  font-size: 1.2rem;
+  font-size: var(--font-size-lg);
 }
 
 .icon-container-primary {
@@ -496,10 +501,10 @@ Used for user profiles, action buttons, and visual indicators.
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   border-radius: var(--border-radius-xl);
   color: var(--color-text-white);
-  font-size: 1.1rem;
+  font-size: var(--font-size-base);
   min-width: 36px;
   min-height: 36px;
-  margin-right: 10px;
+  margin-right: var(--spacing-sm);
 }
 
 /* Avatar components - used for user profiles */
@@ -513,7 +518,7 @@ Used for user profiles, action buttons, and visual indicators.
   justify-content: center;
   background-color: var(--color-bg-light);
   color: var(--color-text-secondary);
-  font-size: 1.5rem;
+  font-size: var(--font-size-xl);
 }
 
 .avatar-circle {
@@ -528,7 +533,7 @@ Used for user profiles, action buttons, and visual indicators.
 .avatar-sm {
   width: 32px;
   height: 32px;
-  font-size: 0.8rem;
+  font-size: var(--font-size-xs);
 }
 
 .user-avatar {
@@ -553,14 +558,14 @@ Used for user profiles, action buttons, and visual indicators.
 }
 
 .user-info {
-  margin-left: 0.6rem;
+  margin-left: var(--spacing-xs);
   display: flex;
   align-items: center;
 }
 
 .user-name {
   font-weight: var(--font-weight-medium);
-  font-size: 0.95rem;
+  font-size: var(--font-size-sm);
 }
 
 /*
@@ -618,8 +623,8 @@ Used for data visualization and metrics display.
 }
 
 .stat-number {
-  font-size: 2.5rem;
-  font-weight: bold;
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
   margin: var(--spacing-base) 0;
   color: var(--color-primary);
 }
@@ -679,7 +684,7 @@ Used for dynamic UI elements and transitions.
   left: 0;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
 .highlight-item.active {
@@ -698,7 +703,7 @@ Used for 404 and other error pages.
 */
 
 .error-page h1 {
-  font-size: 3rem;
+  font-size: var(--font-size-5xl);
   color: var(--color-danger);
   margin-bottom: var(--spacing-base);
 }
