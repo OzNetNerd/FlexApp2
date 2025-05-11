@@ -5,5 +5,4 @@ from app.routes.web.utils.blueprint_factory import BlueprintConfig, create_crud_
 # Create the blueprint
 users_bp = create_crud_blueprint(BlueprintConfig(model_class=User))
 
-# Import and register routes
-from . import dashboard, filters, statistics, views
+# Routes will be automatically discovered
