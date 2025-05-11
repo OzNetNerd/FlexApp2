@@ -5,7 +5,7 @@ from datetime import datetime
 import random
 
 
-class ContactService(CrudService):
+class ContactService(CRUDService):
     def __init__(self):
         super().__init__(Contact)
 
