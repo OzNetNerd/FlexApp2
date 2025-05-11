@@ -1,48 +1,55 @@
-/* Define section-specific styles using a common pattern */
-:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
-       .section-tasks, .section-srs, .section-customers, .section-sales,
-       .section-reports, .section-settings) {
-  --section-color: var(--color-primary);
-  --section-bg-light: rgba(var(--color-primary-rgb), 0.05);
-}
+/* sections.css - Combined section styling */
 
-/* Set specific colors for each section */
+/* Define color variables for each section */
+:root {
+  --color-section-home: #3b82f6;      /* Blue */
+  --color-section-srs: #e91e63;       /* Pink/Magenta */
+  --color-section-companies: #4285f4;  /* Google Blue */
+  --color-section-contacts: #34a853;   /* Green */
+  --color-section-users: #673ab7;      /* Deep Purple */
+  --color-section-opportunities: #ff9800; /* Orange */
+  --color-section-tasks: #00acc1;      /* Cyan */
+  --color-section-customers: #ffc107;  /* Amber */
+  --color-section-sales: #ff5722;      /* Deep Orange */
+  --color-section-reports: #795548;    /* Brown */
+  --color-section-settings: #607d8b;   /* Blue Gray */
+}
+/* Apply section-specific color to each section */
+.section-home { --section-color: var(--color-section-home); }
+.section-srs { --section-color: var(--color-section-srs); }
 .section-companies { --section-color: var(--color-section-companies); }
 .section-contacts { --section-color: var(--color-section-contacts); }
 .section-users { --section-color: var(--color-section-users); }
 .section-opportunities { --section-color: var(--color-section-opportunities); }
 .section-tasks { --section-color: var(--color-section-tasks); }
-.section-srs { --section-color: var(--color-section-srs); }
 .section-customers { --section-color: var(--color-section-customers); }
 .section-sales { --section-color: var(--color-section-sales); }
 .section-reports { --section-color: var(--color-section-reports); }
 .section-settings { --section-color: var(--color-section-settings); }
 
-/* Apply common styles using the section-specific variables */
-:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
-       .section-tasks, .section-srs, .section-customers, .section-sales,
-       .section-reports, .section-settings) .page-heading {
+/* Common styling applied to all sections */
+[class*="section-"] .page-heading {
   border-left: 4px solid var(--section-color);
   padding-left: 10px;
 }
 
-:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
-       .section-tasks, .section-srs, .section-customers, .section-sales,
-       .section-reports, .section-settings) .card-header {
-  border-top: 3px solid var(--section-color);
-}
-
-:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
-       .section-tasks, .section-srs, .section-customers, .section-sales,
-       .section-reports, .section-settings) .heading-section {
+[class*="section-"] .heading-section {
   background-color: rgba(var(--section-color), 0.05);
 }
 
-:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
-       .section-tasks, .section-srs, .section-customers, .section-sales,
-       .section-reports, .section-settings) .section-icon,
-:where(.section-companies, .section-contacts, .section-users, .section-opportunities,
-       .section-tasks, .section-srs, .section-customers, .section-sales,
-       .section-reports, .section-settings) .large-card-icon {
+[class*="section-"] .section-icon,
+[class*="section-"] .large-card-icon,
+[class*="section-"] .bi {
   color: var(--section-color);
+}
+
+/* Sidebar active state styling */
+[class*="section-"] .sidebar-link.active,
+[class*="section-"] .sidebar-link-container.active > .sidebar-link {
+  color: var(--section-color);
+}
+
+[class*="section-"] .sidebar-link.active::before,
+[class*="section-"] .sidebar-link-container.active > .sidebar-link::before {
+  background-color: var(--section-color);
 }

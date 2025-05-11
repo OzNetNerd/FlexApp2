@@ -18,7 +18,7 @@ logger = get_logger()
 @srs_bp.route("/add", methods=["GET", "POST"])
 @login_required
 def add_card():
-    """Add a new flashcard.
+    """Add a new flash card.
 
     GET: Display the form for adding a new card
     POST: Process the form submission and create a new card

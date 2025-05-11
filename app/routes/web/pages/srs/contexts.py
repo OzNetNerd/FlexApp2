@@ -30,7 +30,7 @@ class SRSContext(WebContext):
 class SRSCardListContext(SRSContext):
     """Context for pages displaying card lists.
 
-    This context is used for pages that display lists of flashcards.
+    This context is used for pages that display lists of flash cards.
 
     Attributes:
         title (str): The page title.

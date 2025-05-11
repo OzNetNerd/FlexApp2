@@ -16,7 +16,7 @@ logger = get_logger()
 @srs_bp.route("/", methods=["GET"])
 @login_required
 def dashboard():
-    """Render the flashcard dashboard.
+    """Render the flash card dashboard.
 
     The dashboard provides an overview of the user's SRS system, including:
     - Summary statistics (total cards, due today, success rate, etc.)
