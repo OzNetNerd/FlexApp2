@@ -8,52 +8,7 @@
 {% block head_extra %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.min.js"></script>
-<style>
-  /* Add consistent section spacing */
-  .dashboard-section {
-    margin-bottom: 2.5rem;
-    position: relative;
-    overflow: visible;
-    clear: both;
-  }
 
-  /* Clear any floats and ensure proper spacing */
-  .section-divider {
-    clear: both;
-    height: 3rem !important;
-    margin-bottom: 1rem;
-    visibility: visible !important;
-    border-bottom: 1px dashed #eee;
-  }
-
-  /* Fix for table container */
-  #table-container {
-    min-height: 420px;
-    max-height: 420px;
-    overflow: auto;
-    margin-bottom: 2rem;
-  }
-
-  /* Fix for chart container */
-  .data-trends-section {
-    position: relative;
-    z-index: 1;
-    padding-top: 1rem;
-    margin-top: 3rem;
-  }
-
-  .chart-container {
-    position: relative;
-    z-index: 5;
-  }
-
-  .clearfix {
-    clear: both;
-    display: block;
-    height: 1px;
-    overflow: hidden;
-  }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -106,8 +61,6 @@
   {{ sections.large_cards_section(large_card_data) }}
 </div>
 
-<div class="section-divider"></div>
-
 <!-- Company Segments Section -->
 {% set company_card_data = [
     {
@@ -153,9 +106,6 @@
     card_data=company_card_data
   ) }}
 </div>
-
-<div class="section-divider"></div>
-<div class="clearfix"></div>
 
 <!-- Top Companies Section -->
 <div class="dashboard-section">
@@ -212,10 +162,8 @@
   </div>
 </div>
 
-<div class="section-divider"></div>
-<div class="clearfix"></div>
-
 <!-- Data Trends Chart -->
+<div class="section-divider"></div>
 <div class="dashboard-section data-trends-section">
   <div class="row">
     <div class="col-12">

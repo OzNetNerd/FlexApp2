@@ -16,6 +16,15 @@ html {
   overflow-y: scroll; /* Prevents layout shift when content requires scrolling */
 }
 
+/* Fix section spacing to prevent overlap */
+.section-divider {
+  clear: both;
+  /*height: 3rem !important; !* Increased from 2rem *!*/
+  margin-bottom: 1.5rem;
+  visibility: visible !important; /* Make it visible for debugging */
+  border-bottom: 1px dashed #eee; /* Optional: visual indicator */
+}
+
 /* Badge styling */
 .nav-card .badge {
   position: absolute;

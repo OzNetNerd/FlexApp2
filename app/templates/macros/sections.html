@@ -4,7 +4,7 @@
 {% import "macros/components.html" as components %}
 
 {% macro heading_section(heading_text, subtext) %}
-<div class="row mb-4">
+<div class="heading-section">
   <div class="col-12">
     <div class="bg-white p-4 rounded shadow-sm">
       <h1 class="page-heading">{{ heading_text }}</h1>
@@ -12,12 +12,13 @@
     </div>
   </div>
 </div>
+<div class="section-divider"></div>
 {% endmacro %}
 
 {% macro large_cards_section(card_data) %}
   {% set card_count = card_data|length %}
   {% set col_size = 12 // card_count if card_count <= 4 else 3 %}
-  <div class="row d-flex mb-4">
+  <div class="row d-flex">
     {% for card in card_data %}
       {{ cards.large_card(
         card.icon,

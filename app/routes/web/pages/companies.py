@@ -216,11 +216,11 @@ def view2():
         csrf_input=""  # For CSRF protection
     )
 
-@companies_bp.route("/index2", methods=["GET"])
+@companies_bp.route("/records", methods=["GET"])
 @login_required
-def index2():
+def records():
     return render_template(
-        "pages/companies/index.html",
+        "pages/companies/records.html",
         id=0,  # Add id parameter
         model_name="Company",  # These parameters are likely needed too
         entity_name="Demo Company",

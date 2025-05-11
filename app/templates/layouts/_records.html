@@ -83,6 +83,7 @@
 
     <div id="table-container"
          class="ag-theme-alpine px-3"
+         style="height: auto; min-height: 500px; flex: 1 1 auto; overflow: visible;"
          data-api-url="{{ api_url|default('') }}"
          data-entity-name="{{ entity_name|default('item') }}">
     </div>
@@ -91,5 +92,22 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.min.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/components/table.js') }}"></script>
+
+<script>
+  // Additional script to ensure the grid resizes properly
+  document.addEventListener('DOMContentLoaded', function() {
+    // If you're using the AG Grid API directly, you can also add this:
+    const resizeObserver = new ResizeObserver(() => {
+      if (window.gridApi) {
+        window.gridApi.sizeColumnsToFit();
+      }
+    });
+
+    const tableContainer = document.getElementById('table-container');
+    if (tableContainer) {
+      resizeObserver.observe(tableContainer);
+    }
+  });
+</script>
 {% endblock %}
 <!-- END TEMPLATE: layouts/table_index.html -->
