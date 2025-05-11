@@ -1,8 +1,8 @@
-# app/routes/routers/router_utils.py
+# app/utils/router_utils.py
 
 import importlib
 import pkgutil
-from typing import Any, Callable, Iterator, List, Optional
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
 
 from flask import Blueprint, Flask
 
@@ -22,15 +22,30 @@ def discover_modules(package_path: str, exclusions: Optional[List[str]] = None) 
 
 
 def register_blueprint_routes(
-    app: Flask,
-    package_path: str,
-    config_suffix: str,
-    register_func: Callable,
-    blueprint_suffix: str = "_bp",
-    exclusions: Optional[List[str]] = None,
-) -> None:
-    """Generic blueprint registration with customizable behavior."""
+        app: Flask,
+        package_path: str,
+        config_suffix: str,
+        register_func: Callable,
+        blueprint_suffix: str = "_bp",
+        exclusions: Optional[List[str]] = None,
+        return_blueprints: bool = False,
+) -> Optional[Dict[str, Blueprint]]:
+    """Generic blueprint registration with customizable behavior.
+
+    Args:
+        app: The Flask application instance
+        package_path: Dot-notation path to the package containing blueprints
+        config_suffix: Suffix for configuration objects
+        register_func: Function to register routes with a blueprint
+        blueprint_suffix: Suffix for blueprint objects
+        exclusions: List of module names to exclude
+        return_blueprints: If True, return a dictionary of {name: blueprint}
+
+    Returns:
+        Dictionary of discovered blueprints if return_blueprints is True, otherwise None
+    """
     modules = list(discover_modules(package_path, exclusions))
+    discovered_blueprints = {}
 
     # Phase 1: Configure routes
     for module in modules:
@@ -48,3 +63,84 @@ def register_blueprint_routes(
                 if isinstance(bp, Blueprint):
                     logger.debug(f"Registering blueprint: {bp.name} @ {bp.url_prefix}")
                     app.register_blueprint(bp)
+                    discovered_blueprints[attr] = bp
+
+    return discovered_blueprints if return_blueprints else None
+
+
+def auto_discover_routes(package_path: str, recursive: bool = False) -> None:
+    """Auto-import all modules in a package to register their route decorators.
+
+    This function imports all modules in a package, which causes any route
+    decorators (@blueprint.route) to be executed, registering the routes
+    with their respective blueprints.
+
+    Args:
+        package_path: Dot-notation path to the package containing route modules
+        recursive: If True, recursively discover modules in subpackages
+    """
+    package = importlib.import_module(package_path)
+    logger.debug(f"Auto-discovering routes in package: {package_path}")
+
+    if recursive:
+        # Recursively walk through all submodules
+        for _, name, is_pkg in pkgutil.walk_packages(package.__path__, package.__name__ + '.'):
+            try:
+                logger.debug(f"Importing module: {name}")
+                importlib.import_module(name)
+            except ImportError as e:
+                logger.error(f"Error importing {name}: {e}")
+    else:
+        # Only discover modules in the immediate package
+        for _, name, is_pkg in pkgutil.iter_modules(package.__path__, package.__name__ + '.'):
+            if not is_pkg:  # Only import modules, not subpackages
+                try:
+                    logger.debug(f"Importing module: {name}")
+                    importlib.import_module(name)
+                except ImportError as e:
+                    logger.error(f"Error importing {name}: {e}")
+
+
+def recursive_discover_routes(package_path: str, bp_suffix: str = "_bp") -> None:
+    """Recursively discover and import all route modules in a package hierarchy.
+
+    This function first imports the package itself, then finds all blueprint modules
+    and their corresponding route modules, ensuring all routes are registered.
+
+    Args:
+        package_path: Dot-notation path to the base package
+        bp_suffix: Suffix used for blueprint variables
+    """
+    logger.info(f"Recursively discovering routes in: {package_path}")
+
+    # First, import the package itself
+    package = importlib.import_module(package_path)
+
+    # Look for blueprint modules
+    for _, module_name, is_pkg in pkgutil.iter_modules(package.__path__, package.__name__ + '.'):
+        try:
+            # Import the module/package
+            module = importlib.import_module(module_name)
+
+            # If it's a package, recurse into it to find routes
+            if is_pkg:
+                recursive_discover_routes(module_name, bp_suffix)
+
+            # Look for blueprint objects in the module
+            for attr_name in dir(module):
+                if attr_name.endswith(bp_suffix) and isinstance(getattr(module, attr_name), Blueprint):
+                    # Found a blueprint, now import all Python files in its directory
+                    if is_pkg:
+                        # If the blueprint is in a package, import all modules in that package
+                        for _, route_module_name, _ in pkgutil.iter_modules(module.__path__, module.__name__ + '.'):
+                            try:
+                                logger.debug(f"Importing route module: {route_module_name}")
+                                importlib.import_module(route_module_name)
+                            except ImportError as e:
+                                logger.error(f"Error importing route module {route_module_name}: {e}")
+
+                    # Blueprint found in the module itself, it's already imported
+                    logger.debug(f"Found blueprint: {attr_name} in {module_name}")
+
+        except ImportError as e:
+            logger.error(f"Error importing {module_name}: {e}")

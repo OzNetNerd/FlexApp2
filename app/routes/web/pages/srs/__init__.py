@@ -16,14 +16,7 @@ from app.routes.web.pages.srs.contexts import (
     SRSAddCardContext,
 )
 
-# Import all routes to ensure they're registered with the blueprint
-from app.routes.web.pages.srs import (
-    dashboard,
-    cards,
-    review,
-    filters,
-    batch,
-)
+# Route modules are automatically discovered by the auto-discovery system
 
 __all__ = [
     "srs_bp",
