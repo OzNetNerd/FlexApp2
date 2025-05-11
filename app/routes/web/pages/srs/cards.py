@@ -7,7 +7,7 @@ from flask import request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-from app.routes.web.pages.srs.blueprint import srs_bp, srs_service, DEFAULT_EASE_FACTOR
+from app.routes.web.pages.srs import srs_bp, srs_service, DEFAULT_EASE_FACTOR
 from app.routes.web.pages.srs.contexts import SRSAddCardContext
 from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
 from app.utils.app_logging import get_logger, log_message_and_variables

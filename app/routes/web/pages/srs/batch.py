@@ -8,7 +8,7 @@ from flask import request, redirect, url_for, flash, session
 from flask_login import login_required, current_user
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from app.routes.web.pages.srs.blueprint import srs_bp, srs_service, DEFAULT_EASE_FACTOR
+from app.routes.web.pages.srs import srs_bp, srs_service, DEFAULT_EASE_FACTOR
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
