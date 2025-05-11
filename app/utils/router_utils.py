@@ -144,3 +144,43 @@ def recursive_discover_routes(package_path: str, bp_suffix: str = "_bp") -> None
 
         except ImportError as e:
             logger.error(f"Error importing {module_name}: {e}")
+
+
+# app/utils/router_utils.py - updated recursive_discover_routes function
+
+def discover_blueprint_packages(package_path: str, bp_suffix: str = "_bp", exclusions: Optional[List[str]] = None) -> \
+Dict[str, tuple]:
+    """Discover all blueprint packages and their modules.
+
+    Returns a dictionary of blueprint names and their modules.
+    """
+    exclusions = exclusions or []
+    blueprints = {}
+    package = importlib.import_module(package_path)
+
+    # Look for blueprint modules
+    for _, module_name, is_pkg in pkgutil.iter_modules(package.__path__, package.__name__ + '.'):
+        # Skip excluded modules
+        if any(excl in module_name for excl in exclusions):
+            continue
+
+        try:
+            # Import the module/package
+            module = importlib.import_module(module_name)
+
+            # If it's a package, recurse
+            if is_pkg:
+                sub_blueprints = discover_blueprint_packages(module_name, bp_suffix, exclusions)
+                blueprints.update(sub_blueprints)
+
+            # Look for blueprint objects in the module
+            for attr_name in dir(module):
+                if attr_name.endswith(bp_suffix) and isinstance(getattr(module, attr_name), Blueprint):
+                    bp = getattr(module, attr_name)
+                    blueprints[attr_name] = (bp, module_name if is_pkg else None)
+                    logger.debug(f"Found blueprint: {attr_name} in {module_name}")
+
+        except ImportError as e:
+            logger.error(f"Error importing {module_name}: {e}")
+
+    return blueprints

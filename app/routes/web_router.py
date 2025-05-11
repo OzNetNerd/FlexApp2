@@ -1,49 +1,45 @@
 # app/routes/web_router.py
 
 from flask import Flask
-
-from app.routes.web.utils.route_registration import register_crud_routes
-from app.utils.router_utils import register_blueprint_routes, recursive_discover_routes
+from app.utils.router_utils import discover_blueprint_packages
 from app.utils.app_logging import get_logger
+import pkgutil
+import importlib
 
 logger = get_logger()
 
 
+# app/routes/web_router.py - updated register_web_blueprints function
+
 def register_web_blueprints(app: Flask) -> None:
-    """Auto-discover and register all web blueprints with the Flask application.
-
-    This function uses a convention-based approach to automatically find and register
-    Flask blueprints throughout the application:
-
-    1. It recursively scans all Python modules in the 'app.routes.web' package
-    2. For each module, it looks for module-level variables ending with '_bp'
-       (e.g., 'contacts_bp', 'users_bp', etc.)
-    3. When found, these blueprints are automatically registered with the Flask app
-    4. It also automatically imports and registers all route modules in blueprint packages
-
-    Args:
-        app: The Flask application instance where blueprints will be registered
-
-    Note:
-        Modules in the 'components' directory are excluded from auto-registration.
-    """
+    """Auto-discover and register all web blueprints with the Flask application."""
     logger.info("Auto-discovering web blueprints")
 
-    # Register all blueprints first
-    blueprints = register_blueprint_routes(
-        app=app,
+    # First discover all blueprints and their packages
+    blueprints = discover_blueprint_packages(
         package_path="app.routes.web.pages",
-        config_suffix="_crud_config",
-        register_func=register_crud_routes,
-        blueprint_suffix="_bp",
-        exclusions=["components"],
-        return_blueprints=True
+        exclusions=["components"]
     )
 
     logger.info(f"Discovered {len(blueprints)} blueprints")
 
-    # Then auto-discover all routes in the web.pages package
-    logger.info("Auto-discovering route modules")
-    recursive_discover_routes("app.routes.web.pages")
+    # Import all route modules before registering blueprints
+    for bp_name, (_, package_path) in blueprints.items():
+        if package_path:
+            # Import all modules in the blueprint's package to register routes
+            for _, route_module_name, _ in pkgutil.iter_modules(
+                    importlib.import_module(package_path).__path__,
+                    package_path + '.'
+            ):
+                try:
+                    logger.debug(f"Importing route module: {route_module_name}")
+                    importlib.import_module(route_module_name)
+                except ImportError as e:
+                    logger.error(f"Error importing route module {route_module_name}: {e}")
+
+    # Now register the blueprints after their routes are defined
+    for bp_name, (blueprint, _) in blueprints.items():
+        logger.debug(f"Registering blueprint: {blueprint.name} @ {blueprint.url_prefix}")
+        app.register_blueprint(blueprint)
 
     logger.info("Web blueprints and routes registered successfully")
