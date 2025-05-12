@@ -242,6 +242,14 @@ export function addTableStyles() {
       border: 1px dashed #99c2ff;
       cursor: cell;
     }
+    
+    /* Prevent word breaking across lines */
+    .ag-cell {
+      word-break: normal;
+      overflow-wrap: break-word;
+      hyphens: none;
+      white-space: normal;
+    }
   `;
   document.head.appendChild(cellStylesElement);
 }
