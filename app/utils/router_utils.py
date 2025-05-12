@@ -146,8 +146,6 @@ def recursive_discover_routes(package_path: str, bp_suffix: str = "_bp") -> None
             logger.error(f"Error importing {module_name}: {e}")
 
 
-# app/utils/router_utils.py - updated recursive_discover_routes function
-
 def discover_blueprint_packages(package_path: str, bp_suffix: str = "_bp", exclusions: Optional[List[str]] = None) -> \
 Dict[str, tuple]:
     """Discover all blueprint packages and their modules.
@@ -184,3 +182,76 @@ Dict[str, tuple]:
             logger.error(f"Error importing {module_name}: {e}")
 
     return blueprints
+
+
+def register_application_blueprints(
+        app: Flask,
+        package_path: str,
+        root_blueprint: Optional[Blueprint] = None,
+        config_suffix: Optional[str] = None,
+        register_func: Optional[Callable] = None,
+        blueprint_suffix: str = "_bp",
+        exclusions: Optional[List[str]] = None,
+) -> None:
+    """Unified blueprint registration for both API and web endpoints.
+
+    Args:
+        app: The Flask application instance
+        package_path: Dot-notation path to the package containing blueprints
+        root_blueprint: Optional root blueprint to nest all discovered blueprints under
+        config_suffix: Optional suffix for configuration objects (for API CRUD routes)
+        register_func: Optional function to register routes with a blueprint
+        blueprint_suffix: Suffix for blueprint objects
+        exclusions: List of module names to exclude
+    """
+    logger.info(f"Discovering blueprints in: {package_path}")
+
+    # First discover all blueprints and their packages
+    blueprints = discover_blueprint_packages(
+        package_path=package_path,
+        bp_suffix=blueprint_suffix,
+        exclusions=exclusions
+    )
+
+    logger.info(f"Discovered {len(blueprints)} blueprints")
+
+    # Configure routes if needed (for API CRUD routes)
+    if config_suffix and register_func:
+        for bp_name, (_, module_path) in blueprints.items():
+            if module_path:
+                module = importlib.import_module(module_path)
+                for attr in dir(module):
+                    if attr.endswith(config_suffix):
+                        config = getattr(module, attr)
+                        logger.debug(f"Wiring routes for {getattr(config, 'entity_table_name', attr)}")
+                        register_func(config)
+
+    # Import all route modules before registering blueprints
+    for bp_name, (_, module_path) in blueprints.items():
+        if module_path:
+            # Import all modules in the blueprint's package to register routes
+            for _, route_module_name, _ in pkgutil.iter_modules(
+                    importlib.import_module(module_path).__path__,
+                    module_path + '.'
+            ):
+                try:
+                    logger.debug(f"Importing route module: {route_module_name}")
+                    importlib.import_module(route_module_name)
+                except ImportError as e:
+                    logger.error(f"Error importing route module {route_module_name}: {e}")
+
+    # Now register the blueprints after their routes are defined
+    for bp_name, (blueprint, _) in blueprints.items():
+        if root_blueprint:
+            logger.debug(f"Registering nested blueprint: {blueprint.name} @ {blueprint.url_prefix}")
+            root_blueprint.register_blueprint(blueprint)
+        else:
+            logger.debug(f"Registering blueprint: {blueprint.name} @ {blueprint.url_prefix}")
+            app.register_blueprint(blueprint)
+
+    # Register the root blueprint with the app if provided
+    if root_blueprint:
+        logger.debug(f"Registering root blueprint: {root_blueprint.name} @ {root_blueprint.url_prefix}")
+        app.register_blueprint(root_blueprint)
+
+    logger.info(f"Blueprints and routes registered successfully for {package_path}")
