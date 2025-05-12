@@ -57,6 +57,9 @@ export const cellRenderers = {
   }
 };
 
+// Store column editability separately instead of using custom property
+export const editableColumns = new Map();
+
 /**
  * Generate column definitions based on data
  */
@@ -107,8 +110,10 @@ export function generateColumnDefs(data, isEditModeActive, cellRenderers) {
       canBeEdited = false;
     }
 
-    // Store original editability and set based on current mode
-    def.originalEditable = canBeEdited;
+    // Store editability in the separate map instead of on the column def
+    editableColumns.set(key, canBeEdited);
+
+    // Set editable based on current mode
     def.editable = isEditModeActive && canBeEdited;
 
     return def;
