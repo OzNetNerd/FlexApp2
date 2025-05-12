@@ -1,0 +1,30 @@
+/*
+Animation Effects
+Used for dynamic UI elements and transitions.
+*/
+
+.highlights-container {
+  position: relative;
+  height: 24px;
+  overflow: hidden;
+}
+
+.highlight-item {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.highlight-item.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

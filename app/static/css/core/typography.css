@@ -1,0 +1,123 @@
+/* ========================================
+   Typography Styles - Global Defaults
+   Used for all text elements and headings
+======================================== */
+
+/* Heading defaults */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+  margin-bottom: var(--spacing-sm);
+}
+
+h1 { font-size: var(--font-size-3xl); }
+h2 { font-size: var(--font-size-2xl); }
+h3 { font-size: var(--font-size-xl); }
+h4 { font-size: var(--font-size-lg); }
+h5 { font-size: var(--font-size-base); }
+h6 { font-size: var(--font-size-sm); }
+
+/* ========================================
+   Semantic Heading Classes
+   Used for improved readability in HTML
+======================================== */
+.page-heading {
+  font-size: var(--font-size-page-heading);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text-primary);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.page-heading-subtext {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  margin-bottom: var(--spacing-base);
+}
+
+.large-card-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--bs-card-title-spacer-y);
+  color: var(--color-text-primary);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.large-card-icon {
+  font-size: var(--font-size-4xl);
+}
+
+.large-card-title-subtext {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-base);
+  line-height: var(--line-height-normal);
+}
+
+.section-card-heading {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  margin-bottom: 0;
+  color: var(--color-text-primary);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.section-subcard-number-heading {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--spacing-sm);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.section-subcard-number-subtext {
+  text-transform: uppercase !important;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.section-subcard-info-heading {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  margin-bottom: 0;
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.section-subcard-info-subtext {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+  margin-bottom: var(--spacing-sm);
+}
+
+.emphasised-text {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  margin-bottom: 0;
+}
+
+.info-text-small {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+}
+
+.highlights-scrolling-text {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-tight);
+  margin-bottom: 0;
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.highlights-icon {
+  margin-right: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+}

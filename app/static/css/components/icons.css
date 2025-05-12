@@ -1,0 +1,102 @@
+/*
+Icon & Avatar Components
+Used for user profiles, action buttons, and visual indicators.
+*/
+
+/* Activity Icons */
+.activity-icon,
+.category-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Force white color for icons inside category-icon elements */
+.category-icon[class*="bg-"] .bi {
+  color: var(--color-text-white);
+}
+
+/* Hover emphasis effect */
+.activity-icon:hover,
+.category-icon:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--color-bg-light);
+}
+
+.icon-container-sm {
+  width: 32px;
+  height: 32px;
+  font-size: var(--font-size-xs);
+}
+
+.icon-container-md {
+  width: 40px;
+  height: 40px;
+  font-size: var(--font-size-base);
+}
+
+.icon-container-lg {
+  width: 48px;
+  height: 48px;
+  font-size: var(--font-size-lg);
+}
+
+.icon-container-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: var(--color-text-white);
+}
+
+.icon-container-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-text-white);
+}
+
+.icon-container-success {
+  background-color: var(--color-success);
+  color: var(--color-text-white);
+}
+
+.icon-container-warning {
+  background-color: var(--color-warning);
+  color: var(--color-text-white);
+}
+
+.icon-container-info {
+  background-color: var(--color-info);
+  color: var(--color-text-white);
+}
+
+.icon-container-danger {
+  background-color: var(--color-danger);
+  color: var(--color-text-white);
+}
+
+/* Brand icon container - used for logo and branding elements */
+.brand-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  border-radius: var(--border-radius-xl);
+  color: var(--color-text-white);
+  font-size: var(--font-size-base);
+  min-width: 36px;
+  min-height: 36px;
+  margin-right: var(--spacing-sm);
+}

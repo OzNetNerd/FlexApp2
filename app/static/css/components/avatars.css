@@ -1,0 +1,65 @@
+/*
+Avatar Components
+Used for user profiles and user representation.
+*/
+
+/* Avatar components - used for user profiles */
+.avatar-container {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-light);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xl);
+}
+
+.avatar-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  font-size: var(--font-size-xs);
+}
+
+.user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* User menu dropdown - used for user account navigation */
+.user-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-lg);
+  transition: all var(--transition-fast);
+}
+
+.user-dropdown-toggle:hover {
+  background-color: rgba(var(--color-black-rgb), 0.03);
+}
+
+.user-info {
+  margin-left: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+}
+
+.user-name {
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+}

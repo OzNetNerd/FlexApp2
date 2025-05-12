@@ -1,0 +1,482 @@
+/*
+Button Styles
+Buttons are used for all interactive controls that trigger actions throughout the application.
+*/
+
+/* Base button style */
+.btn {
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-xs) var(--spacing-base);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  letter-spacing: 0.01em;
+  font-size: var(--bs-btn-font-size);
+  transition: var(--transition-properties-hover) var(--transition-fast);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-white);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: var(--color-text-white);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-secondary-hover);
+  border-color: var(--color-secondary-hover);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-hover) 100%);
+  border: none;
+  color: var(--color-text-white);
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, var(--color-success-hover) 0%, var(--color-success-hover) 100%);
+}
+
+.btn-outline-secondary {
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--color-bg-light);
+  color: var(--color-text-primary);
+  border-color: var(--color-text-light);
+}
+
+.btn-outline-primary {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-primary-lighter);
+  color: var(--color-primary-hover);
+}
+
+.btn-outline-danger {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--color-danger-lighter);
+  color: var(--color-danger-hover);
+}
+
+.btn-sm {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+/* Transparent button */
+.transparent-button {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--bs-btn-font-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  background-color: transparent;
+  border: var(--border-width-standard) solid var(--color-primary);
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.transparent-button:hover,
+.transparent-button:focus {
+  background-color: var(--color-primary);
+  color: var(--color-text-white);
+  text-decoration: none;
+}
+
+/* Icon button style */
+.icon-btn {
+  display: inline-block;
+  padding: 0.25rem;
+  border: none;
+  background-color: transparent;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  transition: color 0.15s, background-color 0.15s;
+  margin-right: 0.15rem;
+}
+
+/* Color variations for buttons */
+.btn-primary {
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+.btn-primary:hover {
+  background-color: #0d6efd;
+  color: #fff;
+}
+.icon-primary i {
+  color: #0d6efd;
+}
+.icon-primary:hover {
+  background-color: #0d6efd;
+}
+.icon-primary:hover i {
+  color: #fff;
+}
+
+.btn-secondary {
+  border-color: #6c757d;
+  color: #6c757d;
+}
+.btn-secondary:hover {
+  background-color: #6c757d;
+  color: #fff;
+}
+.icon-secondary i {
+  color: #6c757d;
+}
+.icon-secondary:hover {
+  background-color: #6c757d;
+}
+.icon-secondary:hover i {
+  color: #fff;
+}
+
+.btn-success {
+  border-color: #198754;
+  color: #198754;
+}
+.btn-success:hover {
+  background-color: #198754;
+  color: #fff;
+}
+.icon-success i {
+  color: #198754;
+}
+.icon-success:hover {
+  background-color: #198754;
+}
+.icon-success:hover i {
+  color: #fff;
+}
+
+.btn-danger {
+  border-color: #dc3545;
+  color: #dc3545;
+}
+.btn-danger:hover {
+  background-color: #dc3545;
+  color: #fff;
+}
+.icon-danger i {
+  color: #dc3545;
+}
+.icon-danger:hover {
+  background-color: #dc3545;
+}
+.icon-danger:hover i {
+  color: #fff;
+}
+
+.btn-warning {
+  border-color: #ffc107;
+  color: #ffc107;
+}
+.btn-warning:hover {
+  background-color: #ffc107;
+  color: #212529;
+}
+.icon-warning i {
+  color: #ffc107;
+}
+.icon-warning:hover {
+  background-color: #ffc107;
+}
+.icon-warning:hover i {
+  color: #212529;
+}
+
+.btn-info {
+  border-color: #0dcaf0;
+  color: #0dcaf0;
+}
+.btn-info:hover {
+  background-color: #0dcaf0;
+  color: #fff;
+}
+.icon-info i {
+  color: #0dcaf0;
+}
+.icon-info:hover {
+  background-color: #0dcaf0;
+}
+.icon-info:hover i {
+  color: #fff;
+}
+
+/* Info background variant */
+.bg-info {
+  background-color: #0dcaf0;
+  border-color: #0dcaf0;
+  color: #fff;
+}
+.bg-info:hover {
+  background-color: transparent;
+  color: #0dcaf0;
+}
+
+/* Light color */
+.btn-light {
+  border-color: #f8f9fa;
+  color: #212529;
+}
+.btn-light:hover {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+.icon-light i {
+  color: #212529;
+}
+.icon-light:hover {
+  background-color: #f8f9fa;
+}
+.icon-light:hover i {
+  color: #212529;
+}
+
+/* Dark color */
+.btn-dark {
+  border-color: #212529;
+  color: #212529;
+}
+.btn-dark:hover {
+  background-color: #212529;
+  color: #fff;
+}
+.icon-dark i {
+  color: #212529;
+}
+.icon-dark:hover {
+  background-color: #212529;
+}
+.icon-dark:hover i {
+  color: #fff;
+}
+
+/* Additional button colors */
+.btn-purple {
+  border-color: #6f42c1;
+  color: #6f42c1;
+}
+.btn-purple:hover {
+  background-color: #6f42c1;
+  color: #fff;
+}
+.icon-purple i {
+  color: #6f42c1;
+}
+.icon-purple:hover {
+  background-color: #6f42c1;
+}
+.icon-purple:hover i {
+  color: #fff;
+}
+
+.btn-pink {
+  border-color: #d63384;
+  color: #d63384;
+}
+.btn-pink:hover {
+  background-color: #d63384;
+  color: #fff;
+}
+.icon-pink i {
+  color: #d63384;
+}
+.icon-pink:hover {
+  background-color: #d63384;
+}
+.icon-pink:hover i {
+  color: #fff;
+}
+
+.btn-orange {
+  border-color: #fd7e14;
+  color: #fd7e14;
+}
+.btn-orange:hover {
+  background-color: #fd7e14;
+  color: #fff;
+}
+.icon-orange i {
+  color: #fd7e14;
+}
+.icon-orange:hover {
+  background-color: #fd7e14;
+}
+.icon-orange:hover i {
+  color: #fff;
+}
+
+.btn-teal {
+  border-color: #20c997;
+  color: #20c997;
+}
+.btn-teal:hover {
+  background-color: #20c997;
+  color: #fff;
+}
+.icon-teal i {
+  color: #20c997;
+}
+.icon-teal:hover {
+  background-color: #20c997;
+}
+.icon-teal:hover i {
+  color: #fff;
+}
+
+.btn-cyan {
+  border-color: #0dcaf0;
+  color: #0dcaf0;
+}
+.btn-cyan:hover {
+  background-color: #0dcaf0;
+  color: #fff;
+}
+.icon-cyan i {
+  color: #0dcaf0;
+}
+.icon-cyan:hover {
+  background-color: #0dcaf0;
+}
+.icon-cyan:hover i {
+  color: #fff;
+}
+
+.btn-indigo {
+  border-color: #6610f2;
+  color: #6610f2;
+}
+.btn-indigo:hover {
+  background-color: #6610f2;
+  color: #fff;
+}
+.icon-indigo i {
+  color: #6610f2;
+}
+.icon-indigo:hover {
+  background-color: #6610f2;
+}
+.icon-indigo:hover i {
+  color: #fff;
+}
+
+.btn-slate {
+  border-color: #64748b;
+  color: #64748b;
+}
+.btn-slate:hover {
+  background-color: #64748b;
+  color: #fff;
+}
+.icon-slate i {
+  color: #64748b;
+}
+.icon-slate:hover {
+  background-color: #64748b;
+}
+.icon-slate:hover i {
+  color: #fff;
+}
+
+.btn-emerald {
+  border-color: #10b981;
+  color: #10b981;
+}
+.btn-emerald:hover {
+  background-color: #10b981;
+  color: #fff;
+}
+.icon-emerald i {
+  color: #10b981;
+}
+.icon-emerald:hover {
+  background-color: #10b981;
+}
+.icon-emerald:hover i {
+  color: #fff;
+}
+
+.btn-amber {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+.btn-amber:hover {
+  background-color: #f59e0b;
+  color: #fff;
+}
+.icon-amber i {
+  color: #f59e0b;
+}
+.icon-amber:hover {
+  background-color: #f59e0b;
+}
+.icon-amber:hover i {
+  color: #fff;
+}
+
+.btn-rose {
+  border-color: #e11d48;
+  color: #e11d48;
+}
+.btn-rose:hover {
+  background-color: #e11d48;
+  color: #fff;
+}
+.icon-rose i {
+  color: #e11d48;
+}
+.icon-rose:hover {
+  background-color: #e11d48;
+}
+.icon-rose:hover i {
+  color: #fff;
+}
+
+.btn-sky {
+  border-color: #0ea5e9;
+  color: #0ea5e9;
+}
+.btn-sky:hover {
+  background-color: #0ea5e9;
+  color: #fff;
+}
+.icon-sky i {
+  color: #0ea5e9;
+}
+.icon-sky:hover {
+  background-color: #0ea5e9;
+}
+.icon-sky:hover i {
+  color: #fff;
+}

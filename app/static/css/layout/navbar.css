@@ -1,0 +1,131 @@
+/*
+Navbar styles - navigation elements and related components
+*/
+
+/* ===== Navbar Base Styles ===== */
+.navbar {
+  background-color: var(--color-bg-secondary);
+  border-bottom: var(--border-width-standard) solid rgba(var(--color-black-rgb), 0.08);
+  padding: var(--spacing-md) 0;
+  transition: all var(--transition-base);
+  height: var(--navbar-height);
+  min-height: var(--navbar-height);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ===== Brand Styles ===== */
+.navbar-brand {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* ===== Nav Item Styles ===== */
+.navbar-nav {
+  margin-left: var(--spacing-xl);
+}
+
+.nav-item {
+  position: relative;
+  margin: 0 var(--spacing-xs);
+}
+
+.nav-link {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-md) var(--spacing-base);
+  border-radius: var(--border-radius-lg);
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+}
+
+.nav-link:hover {
+  color: var(--color-primary);
+  background-color: var(--color-primary-lighter);
+}
+
+.nav-link.active {
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Consolidated active page link */
+.active-link {
+  background-color: var(--color-primary);
+  color: var(--color-text-white);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Consolidated hover effect */
+.hover-effect:hover {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.nav-icon {
+  margin-right: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  width: var(--spacing-xl);
+  text-align: center;
+}
+
+/* ===== Notification Icon ===== */
+.notification-icon a {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+  transition: color var(--transition-fast);
+}
+
+.notification-icon a:hover {
+  color: var(--color-primary);
+}
+
+.notification-badge {
+  background-color: var(--color-danger);
+  height: 0.5rem;
+  width: 0.5rem;
+  top: 12%;
+  right: -0.125rem;
+  border: var(--border-width-thick) solid var(--color-bg-secondary);
+}
+
+/* ===== Mobile Styles ===== */
+.navbar-toggler {
+  border: none;
+  padding: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-light);
+  border-radius: var(--border-radius-lg);
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+}
+
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    background-color: var(--color-bg-secondary);
+    padding: var(--spacing-base);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: var(--spacing-sm) var(--spacing-base);
+    z-index: var(--z-index-dropdown);
+  }
+
+  .nav-link {
+    padding: var(--spacing-md) var(--spacing-base);
+  }
+
+  .nav-item {
+    margin: var(--spacing-xs) 0;
+  }
+}

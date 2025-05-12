@@ -1,0 +1,92 @@
+/*
+Core base styles
+These foundational styles apply to the entire application and establish the base visual hierarchy.
+*/
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  background-color: var(--color-bg-primary);
+  margin: 0;
+  color: var(--color-text-primary);
+  transition: var(--transition-properties-base) var(--transition-base);
+}
+
+html {
+  overflow-y: scroll; /* Prevents layout shift when content requires scrolling */
+}
+
+/* Links - used for all clickable text elements */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* Common transitions - applied to interactive elements throughout the application */
+body,
+.card,
+.navbar,
+.form-control,
+.btn,
+.section-heading {
+  transition: var(--transition-properties-base) var(--transition-base);
+}
+
+/* Fix section spacing to prevent overlap */
+.section-divider {
+  clear: both;
+  margin-bottom: var(--spacing-xl);
+  visibility: visible !important; /* Make it visible for debugging */
+  border-bottom: 1px dashed var(--color-border-lighter); /* Optional: visual indicator */
+}
+
+/* Background Color Utilities */
+.bg-primary-soft {
+  background-color: var(--color-primary-light);
+}
+
+.bg-success-soft {
+  background-color: var(--color-success-light);
+}
+
+.bg-warning-soft {
+  background-color: var(--color-warning-light);
+}
+
+.bg-danger-soft {
+  background-color: var(--color-danger-light);
+}
+
+.bg-info-soft {
+  background-color: var(--color-info-light);
+}
+
+.bg-secondary-soft {
+  background-color: rgba(var(--color-secondary-rgb), 0.15);
+}
+
+/* Error Page Styling */
+.error-page h1 {
+  font-size: var(--font-size-5xl);
+  color: var(--color-danger);
+  margin-bottom: var(--spacing-base);
+}
+
+.error-page p {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Clearfix utility */
+.clearfix {
+  clear: both;
+  display: block;
+  height: 1px;
+  overflow: hidden;
+}

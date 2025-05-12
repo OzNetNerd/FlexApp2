@@ -1,0 +1,43 @@
+/*
+Section styles for page-specific areas
+*/
+
+/* Apply section-specific color to each section */
+[class*="section-"] .page-heading {
+  border-left: 4px solid var(--section-color);
+  padding-left: 10px;
+}
+
+[class*="section-"] .heading-section {
+  background-color: rgba(var(--section-color), 0.05);
+}
+
+[class*="section-"] .section-icon,
+[class*="section-"] .large-card-icon,
+[class*="section-"] .bi {
+  color: var(--section-color);
+}
+
+/* Sidebar active state styling */
+[class*="section-"] .sidebar-link.active,
+[class*="section-"] .sidebar-link-container.active > .sidebar-link {
+  color: var(--section-color);
+}
+
+[class*="section-"] .sidebar-link.active::before,
+[class*="section-"] .sidebar-link-container.active > .sidebar-link::before {
+  background-color: var(--section-color);
+}
+
+/* Section-specific classes */
+.section-home { --section-color: var(--color-section-home); }
+.section-srs { --section-color: var(--color-section-srs); }
+.section-companies { --section-color: var(--color-section-companies); }
+.section-contacts { --section-color: var(--color-section-contacts); }
+.section-users { --section-color: var(--color-section-users); }
+.section-opportunities { --section-color: var(--color-section-opportunities); }
+.section-tasks { --section-color: var(--color-section-tasks); }
+.section-customers { --section-color: var(--color-section-customers); }
+.section-sales { --section-color: var(--color-section-sales); }
+.section-reports { --section-color: var(--color-section-reports); }
+.section-settings { --section-color: var(--color-section-settings); }

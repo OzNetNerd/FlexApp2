@@ -1,0 +1,279 @@
+/*
+Table styles - AG Grid theme and custom table styling
+*/
+
+/* ===== AG Grid Theme Overrides ===== */
+.ag-theme-alpine {
+  --ag-font-family: var(--font-family-table);
+  --ag-font-size: var(--font-size-table);
+  --ag-header-foreground-color: var(--color-text-primary);
+  --ag-foreground-color: var(--color-text-primary);
+  --ag-header-background-color: #f8f9fa; /* Match Bootstrap's table-light */
+  --ag-odd-row-background-color: var(--color-bg-lighter);
+  --ag-row-hover-color: rgba(0, 0, 0, 0.075); /* Match Bootstrap hover */
+  --ag-selected-row-background-color: rgba(var(--color-primary-rgb), 0.16);
+  --ag-border-color: var(--color-border-light);
+  --ag-secondary-border-color: var(--color-border-lighter);
+  --ag-header-column-separator-display: block;
+  --ag-header-column-separator-color: var(--color-border-light);
+  --ag-header-column-resize-handle-color: var(--color-text-light);
+  --ag-row-border-color: var(--color-border-lighter);
+  --ag-checkbox-checked-color: var(--color-primary);
+  --ag-checkbox-unchecked-color: var(--color-text-light);
+  --ag-checkbox-indeterminate-color: var(--color-primary);
+  --ag-cell-horizontal-padding: 1.5rem; /* Increased for Bootstrap match */
+  --ag-header-height: 48px;
+  --ag-row-height: 48px; /* Match Bootstrap table row height */
+  --ag-header-column-separator-height: 50%;
+  --ag-header-column-separator-width: 1px;
+  --ag-range-selection-border-color: var(--color-primary);
+  --ag-input-focus-border-color: var(--color-primary);
+  --ag-alpine-active-color: var(--color-primary);
+  --ag-border-radius: var(--border-radius-md);
+}
+
+/* Card-like styling for the grid container */
+.ag-theme-alpine .ag-root-wrapper {
+  border: none !important;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Header styles */
+.ag-theme-alpine .ag-header {
+  font-weight: var(--font-weight-medium);
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid var(--ag-border-color);
+}
+
+/* Row hover animation */
+.ag-theme-alpine .ag-row {
+  transition: background-color var(--transition-fast);
+}
+
+/* Cell styling */
+.ag-theme-alpine .ag-cell {
+  display: flex;
+  align-items: center;            /* Vertically center */
+  white-space: normal !important; /* Allows wrapping */
+  line-height: 1.4;               /* Controls line spacing */
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-weight: var(--font-weight-table); /* Medium weight for emphasized text */
+  letter-spacing: normal;
+}
+
+/* First column with extra padding (ps-4 equivalent) */
+.ag-theme-alpine .ag-cell:first-child {
+  padding-left: 1.5rem !important;
+}
+
+/* Badge styling for AG Grid */
+.ag-badge {
+  display: inline-block;
+  padding: 0.25em 0.6em;
+  font-size: 75%;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  color: #fff;
+}
+
+.ag-badge-primary { background-color: #0d6efd; }
+.ag-badge-secondary { background-color: #6c757d; }
+.ag-badge-success { background-color: #198754; }
+.ag-badge-info { background-color: #0dcaf0; }
+.ag-badge-warning { background-color: #ffc107; color: #212529; }
+
+/* Pagination styling */
+.ag-theme-alpine .ag-paging-panel {
+  padding: var(--spacing-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  border-top: 1px solid var(--ag-border-color);
+}
+
+.ag-theme-alpine .ag-paging-button {
+  border-radius: var(--border-radius-sm);
+  color: var(--color-primary);
+}
+
+.ag-theme-alpine .ag-paging-button-wrapper {
+  height: 32px;
+}
+
+.ag-theme-alpine .ag-paging-button:hover {
+  background-color: var(--color-primary-lighter);
+}
+
+.ag-theme-alpine .ag-paging-page-summary-panel {
+  font-size: var(--font-size-sm);
+}
+
+/* Column headers */
+.ag-theme-alpine .ag-header-cell-label {
+  font-weight: var(--font-weight-table-header);
+  letter-spacing: 0;
+}
+
+/* Sort icons */
+.ag-theme-alpine .ag-header-cell-sorted-asc .ag-header-cell-label,
+.ag-theme-alpine .ag-header-cell-sorted-desc .ag-header-cell-label {
+  color: var(--color-primary);
+}
+
+/* Cell Renderers */
+.ag-theme-alpine .ag-cell-value {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Action buttons in cells */
+.ag-theme-alpine .cell-action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ag-theme-alpine .cell-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-fast);
+}
+
+.ag-theme-alpine .cell-action-btn:hover {
+  background-color: var(--color-primary-lighter);
+  color: var(--color-primary);
+}
+
+/* Custom action buttons matching dashboard.html */
+.ag-theme-alpine .ag-action-cell {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.ag-theme-alpine .transparent-button {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.ag-theme-alpine .btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: var(--font-size-sm); /* Changed from 0.875rem to use variable */
+  border-radius: 0.2rem;
+}
+
+.ag-theme-alpine .btn-outline-secondary {
+  color: #6c757d;
+  border-color: #6c757d;
+  background-color: transparent;
+}
+
+/* Empty state styling */
+.ag-theme-alpine .ag-overlay-no-rows-center {
+  padding: 2rem;
+  color: var(--color-text-light);
+}
+
+/* Table container height */
+#table-container {
+  min-height: 420px; /* Ensures the container has a minimum height */
+  height: auto !important; /* Allow the container to grow */
+  max-height: none; /* Remove the max height restriction */
+  overflow: visible; /* Don't add scrollbars */
+  padding-top: 10px;
+  padding-bottom: 20px;
+  margin-bottom: 2rem;
+}
+
+/* Optional: Add padding to the table itself to create space inside */
+table {
+  padding: 10px; /* Adjust as needed */
+}
+
+/* Responsive table wrapper */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Standard table styles for non-AG Grid tables */
+.table {
+  width: 100%;
+  margin-bottom: var(--spacing-base);
+  color: var(--color-text-primary);
+  border-collapse: collapse;
+}
+
+.table th {
+  font-weight: var(--font-weight-semibold);
+  background-color: var(--color-bg-light);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-base);
+  text-align: left;
+}
+
+.table td {
+  padding: var(--spacing-base);
+  border-bottom: 1px solid var(--color-border-lighter);
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(var(--color-primary-rgb), 0.05);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: var(--color-bg-lighter);
+}
+
+.table-striped tbody tr:nth-of-type(odd):hover {
+  background-color: rgba(var(--color-primary-rgb), 0.05);
+}
+
+.table-bordered {
+  border: 1px solid var(--color-border-light);
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid var(--color-border-light);
+}
+
+/* Add specific fix for Data Trends section */
+#dataChart {
+  position: relative;
+  z-index: 10; /* Ensure chart is above other elements */
+}
+
+/* Ensure chart container is properly separated */
+.data-trends-section {
+  position: relative;
+  z-index: 1;
+}
+
+.chart-container {
+  position: relative;
+  z-index: 5;
+}

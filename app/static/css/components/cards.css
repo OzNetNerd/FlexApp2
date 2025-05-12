@@ -1,0 +1,119 @@
+/*
+Card Components
+Cards are the primary content containers used throughout the application for grouping related information.
+*/
+
+.card {
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(var(--color-black-rgb), 0.05);
+  background-color: var(--color-bg-secondary);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-base), transform var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(var(--color-black-rgb), 0.05);
+  padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.card-header h3 {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  letter-spacing: var(--letter-spacing-tight);
+  font-size: var(--font-size-xl);
+  margin: 0;
+}
+
+.card-body {
+  padding: var(--spacing-xl);
+  overflow-x: visible; /* Ensure dropdowns are visible */
+  font-size: var(--font-size-base);
+}
+
+/* Navigation Card - used for main navigation elements and feature highlights */
+.nav-card {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  text-align: center;
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text-primary);
+}
+
+.nav-card .badge {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  font-size: var(--font-size-xs);
+}
+
+/* Section card for organizing content */
+.section-card {
+  box-shadow: var(--shadow-sm);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-header {
+  border-bottom: none;
+  padding: 0;
+}
+
+.section-heading {
+  background-color: var(--bg-section-heading);
+  color: var(--text-section-heading);
+  padding: var(--padding-section);
+  border-left: 4px solid var(--border-section-heading);
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+  font-size: var(--font-size-lg);
+  margin: 0;
+}
+
+.section-body {
+  padding: var(--spacing-base);
+  overflow-x: visible; /* Ensure dropdowns are visible */
+}
+
+.section-content {
+  padding: 0 var(--spacing-base);
+}
+
+/* Dashboard statistics cards */
+.stat-card {
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg);
+  text-align: center;
+  transition: transform var(--transition-base);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-number {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  margin: var(--spacing-base) 0;
+  color: var(--color-primary);
+}
+
+.stat-label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}

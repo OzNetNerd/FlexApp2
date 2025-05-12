@@ -1,0 +1,102 @@
+/*
+Dropdown Components
+Used for menus, selection controls, and contextual actions.
+*/
+
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background-color: var(--color-secondary);
+  color: var(--color-text-white);
+  border: none;
+}
+
+.dropdown-toggle:hover,
+.dropdown-toggle:focus {
+  background-color: var(--color-secondary-hover);
+  color: var(--color-text-white);
+}
+
+.dropdown-toggle::after {
+  transition: transform var(--transition-fast);
+}
+
+.dropdown-toggle[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+.dropdown-container {
+  position: relative;
+  overflow-x: visible !important; /* Force visible overflow for dropdowns */
+}
+
+.dropdown-menu,
+.autocomplete-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  overflow: visible !important;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: none;
+  padding: var(--spacing-md) 0;
+  margin-top: 0;
+  transform-origin: top;
+  background-color: var(--color-bg-secondary);
+}
+
+.dropdown-menu h6 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.dropdown-divider {
+  margin: var(--spacing-xs) 0;
+  opacity: 0.1;
+  border-color: var(--color-border);
+}
+
+.custom-dropdown {
+  border: none;
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-xs) 0;
+  min-width: 220px;
+}
+
+.dropdown-item {
+  padding: var(--spacing-xs) var(--spacing-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-primary-lighter);
+  color: var(--color-primary);
+}
+
+.dropdown-item i {
+  width: 20px;
+  color: var(--color-text-muted);
+}
+
+.dropdown-item:hover i {
+  color: var(--color-primary);
+}
+
+.logout-item {
+  color: var(--color-danger);
+}
+
+.logout-item:hover {
+  background-color: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.logout-item i {
+  color: var(--color-danger);
+}
