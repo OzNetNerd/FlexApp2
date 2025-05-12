@@ -47,22 +47,26 @@ class TableContext(WebContext):
 
             self.model_class = get_model_by_name(entity_table_name)
 
+
+        title = title or entity_table_name
+
         # Determine plural name
-        entity_plural = self.model_class.__entity_plural__
+        # entity_plural = self.model_class.__entity_plural__
 
         # Set page title
-        if title:
-            page_title = title
-        else:
-            page_title = f"{action.capitalize()} {entity_table_name}" if action else entity_plural.capitalize()
+        # if title:
+        #     page_title = title
+        # else:
+        #     page_title = f"{action.capitalize()} {entity_table_name}"
+            # page_title = f"{action.capitalize()} {entity_table_name}" if action else entity_plural.capitalize()
 
         # Call parent with processed values
-        super().__init__(title=page_title, show_navbar=True, read_only=read_only, entity_table_name=entity_table_name, **kwargs)
+        super().__init__(title=title, show_navbar=True, read_only=read_only, entity_table_name=entity_table_name, **kwargs)
 
         # Setup variables needed by templates
-        self.page_title = page_title  # For templates
+        self.page_title = title  # For templates
         self.entity_name = self.model_class.__entity_name__
-        self.entity_title = self.model_class.__entity_plural__.capitalize()
+        self.entity_title = title
         self.entity_base_route = f"{self.model_class.__tablename__}_bp"
         self.api_url = f"/api/{self.model_class.__tablename__}"
         self.table_id = f"{entity_table_name}_table"
