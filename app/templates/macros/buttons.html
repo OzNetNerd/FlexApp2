@@ -5,11 +5,11 @@
     {% set button_class = button_class + " btn-" + colour %}
   {% endif %}
   {% if href %}
-    <a href="{{ href }}" class="{{ button_class }}" {% if onclick %}onclick="{{ onclick }}"{% endif %}>
+    <a href="{{ href }}" class="transparent-button" {% if onclick %}onclick="{{ onclick }}"{% endif %}>
       {% if icon %}<i class="{{ icon_lib }} fa-{{ icon }} me-1"></i>{% endif %} {{ text }}
     </a>
   {% else %}
-    <button type="{{ type or 'button' }}" class="{{ button_class }}"
+    <button type="{{ type or 'button' }}" class="transparent-button"
       {% if form %}form="{{ form }}"{% endif %}
       {% if onclick %}onclick="{{ onclick }}"{% endif %}>
       {% if icon %}<i class="{{ icon_lib }} {{ icon_lib }}-{{ icon }} me-1"></i>{% endif %} {{ text }}
@@ -19,7 +19,7 @@
 
 {% macro add(endpoint, entity_type="Item", class="btn btn-primary", icon_lib="fas") %}
   {{ icon_button(href=url_for(endpoint + '.create'),
-                class=class,
+                class="transparent-button",
                 icon_lib=icon_lib,
                 icon="plus",
                 text="Add " + entity_type) }}
@@ -30,37 +30,37 @@
   <div class="d-flex gap-2">
     {% if read_only %}
       {{ icon_button(href=url_for(endpoint_prefix + '.create'),
-                class="btn btn-primary",
+                class="transparent-button",
                 icon_lib=icon_lib, icon="plus", text="Add") }}
 
       {% if id %}
         {{ icon_button(href=url_for(endpoint_prefix + '.edit', entity_id=id),
-                  class="btn btn-warning text-dark",
+                  class="transparent-button",
                   icon_lib=icon_lib, icon="edit", text="Edit") }}
 
-        {{ icon_button(type="button", class="btn btn-danger",
+        {{ icon_button(type="button", class="transparent-button",
                   icon_lib=icon_lib, icon="trash", text="Delete",
                   onclick="openDeleteModal()") }}
       {% endif %}
 
       {{ icon_button(href=url_for(endpoint_prefix + '.index'),
-                class="btn btn-secondary",
+                class="transparent-button",
                 icon_lib=icon_lib, icon="arrow-left", text="Back") }}
     {% else %}
       {% if id %}
         {{ icon_button(href=url_for(endpoint_prefix + '.view', entity_id=id),
-                  class="btn btn-secondary",
+                  class="transparent-button",
                   icon_lib=icon_lib, icon="times", text="Cancel") }}
 
-        {{ icon_button(type="submit", class="btn btn-primary",
+        {{ icon_button(type="submit", class="transparent-button",
                   icon_lib=icon_lib, icon="save", text="Update",
                   form=form_id) }}
       {% else %}
         {{ icon_button(href=url_for(endpoint_prefix + '.index'),
-                  class="btn btn-secondary",
+                  class="transparent-button",
                   icon_lib=icon_lib, icon="times", text="Cancel") }}
 
-        {{ icon_button(type="submit", class="btn btn-primary",
+        {{ icon_button(type="submit", class="transparent-button",
                   icon_lib=icon_lib, icon="save", text="Save",
                   form=form_id) }}
       {% endif %}
@@ -69,6 +69,42 @@
 {% endmacro %}
 
 
-{% macro transparent_button(href, label, color_class='btn-primary') %}
-<a href="{{ href }}" class="transparent-button {{ color_class }} me-1">{{ label }}</a>
+{% macro transparent_button(href=None, label, color_class='btn-primary', is_dropdown=False, dropdown_id=None, aria_expanded=None, data_bs_toggle=None) %}
+  {% set classes = "transparent-button " + color_class + " me-1" %}
+  {% if is_dropdown %}
+    {% set classes = classes + " dropdown-toggle" %}
+  {% endif %}
+
+  {% if href %}
+    <a href="{{ href }}" class="{{ classes }}"
+      {% if is_dropdown %}
+        data-bs-toggle="{{ data_bs_toggle }}"
+        aria-expanded="{{ aria_expanded }}"
+        id="{{ dropdown_id }}"
+      {% endif %}
+    >
+      {{ label }}
+    </a>
+  {% else %}
+    <button type="button" class="{{ classes }}"
+      {% if is_dropdown %}
+        data-bs-toggle="{{ data_bs_toggle }}"
+        aria-expanded="{{ aria_expanded }}"
+        id="{{ dropdown_id }}"
+      {% endif %}
+    >
+      {{ label }}
+    </button>
+  {% endif %}
+{% endmacro %}
+
+{% macro dropdown_column_selector_button(label="Columns", icon_lib="fas", icon="columns", dropdown_id="columnSelectorBtn") %}
+  {{ transparent_button(
+    label='<i class="' + icon_lib + ' fa-' + icon + ' me-1"></i> ' + label,
+    color_class="btn-outline-secondary",
+    is_dropdown=True,
+    dropdown_id=dropdown_id,
+    aria_expanded="false",
+    data_bs_toggle="dropdown"
+  ) }}
 {% endmacro %}
