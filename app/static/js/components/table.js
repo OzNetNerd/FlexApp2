@@ -35,6 +35,26 @@ document.head.appendChild(Object.assign(document.createElement('style'), {
   `
 }));
 
+document.head.appendChild(Object.assign(document.createElement('style'), {
+  textContent: `
+    /* Add styling for editable cells */
+    .editable-cell {
+      background-color: #fcfcfc;
+      border: 1px solid transparent;
+    }
+    .editable-cell:hover {
+      background-color: #f0f7ff;
+      border: 1px dashed #ccc;
+    }
+    
+    /* Context menu styling */
+    .ag-menu {
+      font-family: var(--font-family);
+      font-size: var(--font-size-sm);
+    }
+  `
+}));
+
 /**
  * Save/restore column state utilities
  */
@@ -390,11 +410,18 @@ function generateColumnDefs(data) {
     // Add badge renderer for certain columns
     if (/count|opportunit|contact|note|capabilit/i.test(key)) {
       def.cellRenderer = cellRenderers.badge;
+      def.editable = false; // Badge columns are not editable
     }
 
     // Format objects/arrays
     if (data[0][key] != null && typeof data[0][key] === 'object') {
       def.valueFormatter = cellRenderers.objectValue;
+      def.editable = false; // Object columns are not editable
+    }
+
+    // Make ID column not editable
+    if (key === 'id') {
+      def.editable = false;
     }
 
     return def;
@@ -409,7 +436,8 @@ function generateColumnDefs(data) {
     filter: false,
     flex: 0.8,
     minWidth: 150,
-    cellClass: 'text-center'
+    cellClass: 'text-center',
+    editable: false // Actions column is not editable
   });
 
   return columnDefs;
@@ -442,10 +470,15 @@ function getGridOptions() {
       autoHeight: true,
       sortable: true,
       filter: true,
-      suppressSizeToFit: false
+      suppressSizeToFit: false,
+      editable: true, // Enable editing for all cells by default
+      // Add double-click to edit functionality
+      cellClassRules: {
+        'editable-cell': () => true
+      }
     },
 
-    // Replace single click with double click handler
+    // Row double-click handler for navigation
     onRowDoubleClicked: event => {
       if (event.event.ctrlKey || event.event.metaKey ||
           event.event.shiftKey || event.event.button !== 0) return;
@@ -455,6 +488,69 @@ function getGridOptions() {
 
       const basePath = window.location.pathname.split('/')[1];
       if (basePath) window.location.href = `/${basePath}/${id}`;
+    },
+
+    // Add context menu (right-click) options
+    getContextMenuItems: params => {
+      const id = params.node?.data?.id;
+      if (!id) return [];
+
+      const basePath = window.location.pathname.split('/')[1] || '';
+      return [
+        {
+          name: 'View Details',
+          action: () => {
+            window.location.href = `/${basePath}/${id}`;
+          }
+        },
+        {
+          name: 'Edit',
+          action: () => {
+            window.location.href = `/${basePath}/edit/${id}`;
+          }
+        },
+        'separator',
+        {
+          name: 'Delete',
+          action: () => {
+            if (confirm('Are you sure you want to delete this item?')) {
+              window.location.href = `/${basePath}/delete/${id}`;
+            }
+          }
+        },
+        'separator',
+        'copy',
+        'export'
+      ];
+    },
+
+    // Add cell value changed handler to save updates
+    onCellValueChanged: params => {
+      log("info", scriptName, "onCellValueChanged", `Value changed: ${params.oldValue} -> ${params.newValue}`);
+
+      // Here you would typically send an API request to update the data
+      // For example:
+      const id = params.data?.id;
+      const field = params.column.getColId();
+      const value = params.newValue;
+
+      if (id && field) {
+        // Example API call (you'd need to implement this)
+        fetch(`/api/${basePath}/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ [field]: value })
+        })
+        .then(response => response.json())
+        .then(data => {
+          log("info", scriptName, "onCellValueChanged", "Update successful");
+        })
+        .catch(error => {
+          log("error", scriptName, "onCellValueChanged", "Update failed", error);
+          // Optionally revert the change in the grid
+          params.node.setDataValue(field, params.oldValue);
+        });
+      }
     },
 
     // Grid ready handler - single point for API initialization
@@ -478,6 +574,7 @@ function getGridOptions() {
     }
   };
 }
+
 
 /**
  * Handle grid resize when columns are toggled
