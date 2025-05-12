@@ -29,7 +29,7 @@
           </p>
         </div>
         <div>
-          <a href="{{ url_for('companies_bp.companies_dashboard') }}" class="btn btn-outline-primary me-2">
+          <a href="{{ url_for('companies_bp.index') }}" class="btn btn-outline-primary me-2">
             <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
           </a>
           <a href="{{ url_for('companies_bp.create') }}" class="btn btn-primary">
@@ -136,7 +136,7 @@
                   <span class="badge bg-info">{{ company.contacts|default([])|length }}</span>
                 </td>
                 <td class="text-center">
-                  <span class="badge bg-secondary">{{ company.notes|default([])|length }}</span>
+                  <span class="badge bg-secondary">{{ company.notes|count }}</span>
                 </td>
                 <td class="text-center">
                   <span class="badge bg-success">{{ company.company_capabilities.count() }}</span>
