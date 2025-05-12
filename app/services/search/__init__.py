@@ -1,29 +1,30 @@
-# app/services/search_service.py
-
+# app/services/search/__init__.py
 import traceback
 from typing import Any, Dict, List, Type
 
 from sqlalchemy import or_
 
+from app.services.service_base import ServiceBase
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
 
-class SearchService:
+class SearchService(ServiceBase):
     """
     Generic search service that performs simple text and equality filtering
     on a given SQLAlchemy model.
     """
 
-    def __init__(self, model_class: Type, search_fields: List[str]):
+    def __init__(self, model_class: Type = None, search_fields: List[str] = None):
         """
         Args:
             model_class (Type): SQLAlchemy model to search.
             search_fields (List[str]): Columns to apply ilike(text) searches.
         """
+        super().__init__()
         self.model_class = model_class
-        self.search_fields = search_fields
+        self.search_fields = search_fields or []
 
     def search(self, term: str, filters: Dict[str, Any] = None) -> List[Any]:
         """
@@ -40,7 +41,8 @@ class SearchService:
             query = self.model_class.query
             if term:
                 pattern = f"%{term}%"
-                clauses = [getattr(self.model_class, f).ilike(pattern) for f in self.search_fields if hasattr(self.model_class, f)]
+                clauses = [getattr(self.model_class, f).ilike(pattern) for f in self.search_fields
+                          if hasattr(self.model_class, f)]
                 if clauses:
                     query = query.filter(or_(*clauses))
 

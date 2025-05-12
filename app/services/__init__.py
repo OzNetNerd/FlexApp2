@@ -1,18 +1,21 @@
 """Service registry and initialization module for the application."""
 
+# Base service imports
+from app.services.service_base import ServiceRegistry
+
 # Service imports
 from app.services.srs import SRSService
 from app.services.auth import AuthService
-from app.services.category_service import CategoryService
-from app.services.company_service import CompanyService
-from app.services.contact_service import ContactService
-from app.services.crud_service import CRUDService
-from app.services.note_service import NoteService
-from app.services.opportunity_service import OpportunityService
-from app.services.relationship_service import RelationshipService
-from app.services.search_service import SearchService
-from app.services.task_service import TaskService
-from app.services.user_service import UserService
+from app.services.category import CategoryService
+from app.services.company import CompanyService
+from app.services.contact import ContactService
+# from app.services.crud import CRUDService
+from app.services.note import NoteService
+from app.services.opportunity import OpportunityService
+from app.services.relationship import RelationshipService
+from app.services.search import SearchService
+from app.services.task import TaskService
+from app.services.user import UserService
 
 # Utility imports
 from app.utils.app_logging import get_logger
@@ -23,31 +26,27 @@ logger.info("Initializing services module.")
 
 # Create a registry of services for easy access
 service_registry = {
-    'srs': SRSService(),
-    'auth': AuthService(),
-    'category': CategoryService(),
-    'company': CompanyService(),
-    'contact': ContactService(),
-    'crud': CRUDService(),
-    'note': NoteService(),
-    'opportunity': OpportunityService(),
-    'relationship': RelationshipService(),
-    'search': SearchService(),
-    'task': TaskService(),
-    'user': UserService(),
+    'srs': ServiceRegistry.get(SRSService),
+    'auth': ServiceRegistry.get(AuthService),
+    'category': ServiceRegistry.get(CategoryService),
+    'company': ServiceRegistry.get(CompanyService),
+    'contact': ServiceRegistry.get(ContactService),
+    'crud': ServiceRegistry.get(CRUDService),
+    'note': ServiceRegistry.get(NoteService),
+    'opportunity': ServiceRegistry.get(OpportunityService),
+    'relationship': ServiceRegistry.get(RelationshipService),
+    'search': ServiceRegistry.get(SearchService),
+    'task': ServiceRegistry.get(TaskService),
+    'user': ServiceRegistry.get(UserService),
 }
 
 
 def init_db(app):
     """Initialize the database with the Flask app"""
-    # Import here to avoid circular imports
     from create_db import init_db as setup_db
-
-    # Call the actual setup function
     setup_db(app)
 
 
-# Helper function to get service instances
 def get_service(service_name):
     """
     Get a service instance by name.

@@ -1,16 +1,24 @@
+# app/services/company/analytics.py
 from datetime import datetime
 from sqlalchemy import func
 from app.models.pages.company import Company
 from app.models.base import db
+from app.services.service_base import ServiceBase
 
 
-class CompanyService:
+class CompanyAnalyticsService(ServiceBase):
+    """Service for company analytics and statistics."""
+
+    def __init__(self):
+        """Initialize the Company analytics service."""
+        super().__init__()
+
     def get_total_companies(self):
-        """Get the total number of companies"""
+        """Get the total number of companies."""
         return Company.query.count()
 
     def get_dashboard_stats(self):
-        """Get statistics for the companies dashboard"""
+        """Get statistics for the companies dashboard."""
         total_companies = self.get_total_companies()
 
         return {
@@ -21,7 +29,7 @@ class CompanyService:
         }
 
     def get_top_companies(self, limit=5):
-        """Get top companies by opportunity count"""
+        """Get top companies by opportunity count."""
         return (
             db.session.query(Company, func.count(Company.opportunities).label("opportunity_count"))
             .outerjoin(Company.opportunities)
@@ -32,7 +40,7 @@ class CompanyService:
         )
 
     def get_engagement_segments(self):
-        """Get company segments by engagement level"""
+        """Get company segments by engagement level."""
         total_companies = self.get_total_companies()
 
         # High engagement (>2 opportunities)
@@ -81,7 +89,7 @@ class CompanyService:
         ]
 
     def prepare_growth_data(self, months_back=6):
-        """Prepare growth data for the chart"""
+        """Prepare growth data for the chart."""
         months = []
         new_companies = []
         total_companies = []
@@ -105,13 +113,6 @@ class CompanyService:
             next_month = month + 1 if month < 12 else 1
             next_year = year if month < 12 else year + 1
             end_date = datetime(next_year, next_month, 1)
-
-            # Previous month end for calculating cumulative
-            if i < months_back - 1:
-                prev_end = start_date
-            else:
-                # For the oldest month, just use a reasonable past date
-                prev_end = datetime(year - 1, month, 1)
 
             # New companies in this month
             new_in_month = (
@@ -142,32 +143,8 @@ class CompanyService:
             "total_companies": total_companies
         }
 
-    def get_filtered_companies(self, filters):
-        """Get companies based on filter criteria"""
-        query = Company.query
-
-        # Filter by opportunities
-        if filters.get("has_opportunities") == "yes":
-            query = query.filter(Company.opportunities.any())
-        elif filters.get("has_opportunities") == "no":
-            query = query.filter(~Company.opportunities.any())
-
-        # Filter by contacts
-        if filters.get("has_contacts") == "yes":
-            query = query.filter(Company.contacts.any())
-        elif filters.get("has_contacts") == "no":
-            query = query.filter(~Company.contacts.any())
-
-        # Filter by capabilities
-        if filters.get("has_capabilities") == "yes":
-            query = query.filter(Company.company_capabilities.any())
-        elif filters.get("has_capabilities") == "no":
-            query = query.filter(~Company.company_capabilities.any())
-
-        return query.order_by(Company.name.asc()).all()
-
     def get_statistics(self):
-        """Get comprehensive statistics for the statistics page"""
+        """Get comprehensive statistics for the statistics page."""
         total_companies = self.get_total_companies()
 
         # Companies with opportunities
@@ -193,12 +170,8 @@ class CompanyService:
             "no_engagement": no_engagement,
         }
 
-    def get_company_by_id(self, company_id):
-        """Get a company by ID"""
-        return Company.query.get(company_id)
-
     def _calculate_percentage(self, count, total):
-        """Calculate percentage with safety check for division by zero"""
+        """Calculate percentage with safety check for division by zero."""
         if total == 0:
             return 0
         return round((count / total) * 100)
