@@ -54,14 +54,18 @@ class SRSService:
         logger.info(f"SRSService: Retrieved {len(items)} SRS items")
         return items
 
-    def update(self, item, update_data):
+    def update(self, item_id_or_obj, update_data):
         """Update an SRS item."""
-        logger.info(f"SRSService: Updating SRS item {item.id}")
-        logger.info(f"SRSService: Update data: {update_data}")
+        if isinstance(item_id_or_obj, int):
+            item = self.get_by_id(item_id_or_obj)
+            if not item:
+                raise ValueError(f"SRS item with ID {item_id_or_obj} not found")
+        else:
+            item = item_id_or_obj
+
         for key, value in update_data.items():
             setattr(item, key, value)
         item.save()
-        logger.info(f"SRSService: SRS item {item.id} updated successfully")
         return item
 
     def preview_ratings(self, item_id: int) -> dict:
