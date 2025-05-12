@@ -1,7 +1,7 @@
 import log from '/static/js/core/logger.js';
 import moduleSystem from '/static/js/core/module.js';
 import eventSystem from '/static/js/core/events.js';
-import tableComponent from '/static/js/components/table.js';
+import tableComponent from '/static/js/components/table/table.js';
 
 /**
  * Entity list page functionality

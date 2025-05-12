@@ -15,6 +15,9 @@ const tableContainerId = "table-container";
 window.__tableInitialized = window.__tableInitialized || false;
 window.gridApi = null;
 
+// Edit mode state
+let isEditModeActive = false;
+
 // Initialize module registry
 log("info", scriptName, "module", "Starting table initialization module");
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
@@ -35,25 +38,130 @@ document.head.appendChild(Object.assign(document.createElement('style'), {
   `
 }));
 
-document.head.appendChild(Object.assign(document.createElement('style'), {
-  textContent: `
-    /* Add styling for editable cells */
-    .editable-cell {
-      background-color: #fcfcfc;
-      border: 1px solid transparent;
+// Add cell styling
+const cellStylesElement = document.createElement('style');
+cellStylesElement.id = 'editable-cell-styles';
+cellStylesElement.textContent = `
+  /* Add styling for editable cells */
+  .editable-cell {
+    background-color: #fcfcfc;
+    border: 1px solid transparent;
+  }
+  .editable-cell:hover {
+    background-color: #f0f7ff;
+    border: 1px dashed #ccc;
+  }
+  
+  /* Context menu styling */
+  .ag-menu {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+  }
+
+  /* View mode styling (no edit indicators) */
+  .view-mode .editable-cell {
+    background-color: transparent;
+    border: 1px solid transparent;
+  }
+  .view-mode .editable-cell:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid transparent;
+  }
+
+  /* Edit mode styling (clear indicators) */
+  .edit-mode .editable-cell {
+    background-color: #fcfcfc;
+    border: 1px solid transparent;
+  }
+  .edit-mode .editable-cell:hover {
+    background-color: #e6f3ff;
+    border: 1px dashed #99c2ff;
+    cursor: cell;
+  }
+`;
+document.head.appendChild(cellStylesElement);
+
+/**
+ * Function to toggle between edit and view modes
+ */
+function toggleEditMode(mode) {
+  isEditModeActive = mode === 'edit';
+  log("info", scriptName, "toggleEditMode", `Edit mode ${isEditModeActive ? 'enabled' : 'disabled'}`);
+
+  // Update container class for styling
+  const container = document.getElementById(tableContainerId);
+  if (container) {
+    container.classList.remove('edit-mode', 'view-mode');
+    container.classList.add(isEditModeActive ? 'edit-mode' : 'view-mode');
+  }
+
+  // Update UI buttons
+  const viewBtn = document.getElementById('viewModeBtn');
+  const editBtn = document.getElementById('editModeBtn');
+
+  if (viewBtn && editBtn) {
+    // Toggle active classes
+    if (isEditModeActive) {
+      viewBtn.classList.remove('btn-primary');
+      viewBtn.classList.add('btn-outline-primary');
+      editBtn.classList.remove('btn-outline-primary');
+      editBtn.classList.add('btn-primary');
+    } else {
+      viewBtn.classList.remove('btn-outline-primary');
+      viewBtn.classList.add('btn-primary');
+      editBtn.classList.remove('btn-primary');
+      editBtn.classList.add('btn-outline-primary');
     }
-    .editable-cell:hover {
-      background-color: #f0f7ff;
-      border: 1px dashed #ccc;
+  }
+
+  // Update grid if available
+  if (gridApiReference) {
+    // Update column definitions to reflect the new edit state
+    const columns = gridApiReference.getColumns();
+    if (columns) {
+      columns.forEach(column => {
+        const colDef = column.getColDef();
+        // Skip special columns
+        if (colDef.field !== 'actions' && colDef.field !== 'id') {
+          // Get original value or determine if it should be editable
+          const canEdit = colDef.hasOwnProperty('originalEditable') ?
+            colDef.originalEditable :
+            (typeof colDef.cellRenderer !== 'function' &&
+             typeof colDef.valueFormatter !== 'function');
+
+          // Store original value if not already stored
+          if (!colDef.hasOwnProperty('originalEditable')) {
+            colDef.originalEditable = canEdit;
+          }
+
+          // Set editable based on mode
+          colDef.editable = isEditModeActive && canEdit;
+        }
+      });
     }
-    
-    /* Context menu styling */
-    .ag-menu {
-      font-family: var(--font-family);
-      font-size: var(--font-size-sm);
-    }
-  `
-}));
+
+    // Refresh the grid
+    gridApiReference.refreshCells({ force: true });
+  }
+}
+
+/**
+ * Setup the mode toggle buttons
+ */
+function setupModeToggleButtons() {
+  const viewBtn = document.getElementById('viewModeBtn');
+  const editBtn = document.getElementById('editModeBtn');
+
+  if (viewBtn && editBtn) {
+    viewBtn.addEventListener('click', () => toggleEditMode('view'));
+    editBtn.addEventListener('click', () => toggleEditMode('edit'));
+
+    // Initialize in view mode
+    toggleEditMode('view');
+  } else {
+    log("warn", scriptName, "setupModeToggleButtons", "Toggle buttons not found in the DOM");
+  }
+}
 
 /**
  * Save/restore column state utilities
@@ -206,6 +314,9 @@ function setUpApis(api, columnApi) {
 
   log("info", scriptName, "setUpApis", "Event listeners registered");
   columnStateHelpers.restore();
+
+  // Setup mode toggle buttons after API is initialized
+  setupModeToggleButtons();
 }
 
 /**
@@ -407,22 +518,29 @@ function generateColumnDefs(data) {
       filter: true
     };
 
+    // Track if this column can be edited by default
+    let canBeEdited = true;
+
     // Add badge renderer for certain columns
     if (/count|opportunit|contact|note|capabilit/i.test(key)) {
       def.cellRenderer = cellRenderers.badge;
-      def.editable = false; // Badge columns are not editable
+      canBeEdited = false; // Badge columns are not editable
     }
 
     // Format objects/arrays
     if (data[0][key] != null && typeof data[0][key] === 'object') {
       def.valueFormatter = cellRenderers.objectValue;
-      def.editable = false; // Object columns are not editable
+      canBeEdited = false; // Object columns are not editable
     }
 
     // Make ID column not editable
     if (key === 'id') {
-      def.editable = false;
+      canBeEdited = false;
     }
+
+    // Store original editability and set based on current mode
+    def.originalEditable = canBeEdited;
+    def.editable = isEditModeActive && canBeEdited;
 
     return def;
   });
@@ -471,7 +589,7 @@ function getGridOptions() {
       sortable: true,
       filter: true,
       suppressSizeToFit: false,
-      editable: true, // Enable editing for all cells by default
+      editable: false, // Start in view mode by default
       // Add double-click to edit functionality
       cellClassRules: {
         'editable-cell': () => true
@@ -480,6 +598,9 @@ function getGridOptions() {
 
     // Row double-click handler for navigation
     onRowDoubleClicked: event => {
+      // If in edit mode, don't navigate
+      if (isEditModeActive) return;
+
       if (event.event.ctrlKey || event.event.metaKey ||
           event.event.shiftKey || event.event.button !== 0) return;
 
@@ -496,7 +617,8 @@ function getGridOptions() {
       if (!id) return [];
 
       const basePath = window.location.pathname.split('/')[1] || '';
-      return [
+
+      const menuItems = [
         {
           name: 'View Details',
           action: () => {
@@ -522,6 +644,25 @@ function getGridOptions() {
         'copy',
         'export'
       ];
+
+      // Add toggle edit option if in cell edit mode
+      if (isEditModeActive) {
+        menuItems.unshift('separator');
+        menuItems.unshift({
+          name: 'Edit Cell',
+          action: () => {
+            // Start cell editing programmatically
+            if (params.column && params.column.getColDef().editable) {
+              params.api.startEditingCell({
+                rowIndex: params.node.rowIndex,
+                colKey: params.column.getColId()
+              });
+            }
+          }
+        });
+      }
+
+      return menuItems;
     },
 
     // Add cell value changed handler to save updates
@@ -533,6 +674,7 @@ function getGridOptions() {
       const id = params.data?.id;
       const field = params.column.getColId();
       const value = params.newValue;
+      const basePath = window.location.pathname.split('/')[1];
 
       if (id && field) {
         // Example API call (you'd need to implement this)
@@ -564,6 +706,9 @@ function getGridOptions() {
       if (params.api) {
         setTimeout(() => params.api.sizeColumnsToFit(), 0);
       }
+
+      // Initialize in view mode
+      setTimeout(() => toggleEditMode('view'), 0);
     },
 
     // After data is loaded, resize columns
@@ -725,6 +870,11 @@ export function getColumnApi() {
 
 export function manualSaveColumnState() {
   return columnStateHelpers.save();
+}
+
+// Export mode toggle function
+export function setEditMode(enabled) {
+  toggleEditMode(enabled ? 'edit' : 'view');
 }
 
 // Bootstrap code - run once
