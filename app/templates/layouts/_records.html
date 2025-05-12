@@ -23,9 +23,7 @@
 
       <div style="width: 20%" class="d-flex flex-wrap align-items-center justify-content-end">
         <div class="dropdown me-2">
-          <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="columnSelectorBtn" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-columns me-1"></i> Columns
-          </button>
+          {{ buttons.dropdown_column_selector_button(label="Columns", icon="columns", dropdown_id="columnSelectorBtn") }}
           <div class="dropdown-menu p-3" style="width: 16rem;" aria-labelledby="columnSelectorBtn">
             <div class="d-flex justify-content-between mb-2">
               {{ buttons.icon_button(type="button", class="btn btn-sm", colour="outline-primary", icon="check-square", text="Select All", onclick="", form="selectAllColumns") }}
