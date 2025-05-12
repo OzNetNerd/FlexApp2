@@ -69,7 +69,7 @@
 {% endmacro %}
 
 
-{% macro transparent_button(href=None, label, color_class='btn-primary', is_dropdown=False, dropdown_id=None, aria_expanded=None, data_bs_toggle=None) %}
+{% macro transparent_button(href=None, label=None, color_class='btn-primary', is_dropdown=False, dropdown_id=None, aria_expanded=None, data_bs_toggle=None) %}
   {% set classes = "transparent-button " + color_class + " me-1" %}
   {% if is_dropdown %}
     {% set classes = classes + " dropdown-toggle" %}
