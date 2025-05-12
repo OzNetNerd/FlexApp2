@@ -1,4 +1,4 @@
-# app/routes/api/companies.py
+# app/routes/api/pages/companies.py
 
 from flask import Blueprint
 

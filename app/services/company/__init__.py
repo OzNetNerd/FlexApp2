@@ -1,4 +1,5 @@
 # app/services/company/__init__.py
+
 from app.services.service_base import ServiceBase, ServiceRegistry
 from app.services.company.core import CompanyCoreService
 from app.services.company.analytics import CompanyAnalyticsService

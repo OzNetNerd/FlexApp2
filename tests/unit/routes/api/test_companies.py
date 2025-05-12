@@ -1,7 +1,6 @@
 # Tests for app.routes.api.companies
 # Created: 2025-05-03
 import pytest
-from app.routes.api.companies import *
 
 
 def test_module_imports():

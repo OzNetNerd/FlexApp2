@@ -1,4 +1,5 @@
 # app/services/company/core.py
+
 from app.models.pages.company import Company
 from app.services.service_base import CRUDService
 from app.services.validator_mixin import ValidatorMixin

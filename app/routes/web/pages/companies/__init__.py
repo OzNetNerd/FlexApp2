@@ -1,3 +1,5 @@
+# app/routes/web/pages/companies/__init__.py
+
 from app.models.pages.company import Company
 from app.routes.web.utils.blueprint_factory import BlueprintConfig, create_crud_blueprint
 

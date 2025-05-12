@@ -1,3 +1,5 @@
+# app/routes/web/pages/companies/views.py
+
 from flask import request
 from flask_login import login_required
 from app.models.pages.company import Company

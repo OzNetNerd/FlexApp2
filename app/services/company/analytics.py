@@ -1,4 +1,5 @@
 # app/services/company/analytics.py
+
 from datetime import datetime
 from sqlalchemy import func
 from app.models.pages.company import Company

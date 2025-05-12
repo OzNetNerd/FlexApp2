@@ -2,6 +2,272 @@ CRISP PROJECTION - OUR PLAN TO GET TO STRONGER CRISP
 SALES TRAINING
 LMS/Training system?
 
+
+
+----
+```
+I have a Flask app. I want my 'web' code to pull data from the 'api' endpoints instead of the 'services' directly.
+
+This is my tree:
+
+```
+app
+├── __init__.py
+├── app.py
+├── graphql
+│   ├── __init__.py
+│   ├── dataloaders
+│   │   ├── __init__.py
+│   │   └── loaders.py
+│   ├── resolvers
+│   │   ├── __init__.py
+│   │   ├── capability.py
+│   │   ├── capability_category.py
+│   │   ├── company.py
+│   │   ├── company_capability.py
+│   │   ├── contact.py
+│   │   ├── crisp.py
+│   │   ├── note.py
+│   │   ├── opportunity.py
+│   │   ├── setting.py
+│   │   ├── srs.py
+│   │   ├── task.py
+│   │   └── user.py
+│   ├── schema.py
+│   └── types
+│       ├── __init__.py
+│       ├── capability.py
+│       ├── capability_category.py
+│       ├── company.py
+│       ├── company_capability.py
+│       ├── contact.py
+│       ├── crisp.py
+│       ├── note.py
+│       ├── opportunity.py
+│       ├── setting.py
+│       ├── srs.py
+│       ├── task.py
+│       └── user.py
+├── models
+│   ├── __init__.py
+│   ├── base.py
+│   ├── capability.py
+│   ├── capability_category.py
+│   ├── company_capability.py
+│   ├── mixins.py
+│   ├── pages
+│   │   ├── __init__.py
+│   │   ├── company.py
+│   │   ├── contact.py
+│   │   ├── crisp.py
+│   │   ├── note.py
+│   │   ├── opportunity.py
+│   │   ├── setting.py
+│   │   ├── srs.py
+│   │   ├── task.py
+│   │   └── user.py
+│   ├── relationship.py
+│   └── table_config.py
+├── routes
+│   ├── __init__.py
+│   ├── api
+│   │   ├── __init__.py
+│   │   ├── companies.py
+│   │   ├── contacts.py
+│   │   ├── context.py
+│   │   ├── json_utils.py
+│   │   ├── notes.py
+│   │   ├── opportunities.py
+│   │   ├── relationships.py
+│   │   ├── route_registration.py
+│   │   ├── search.py
+│   │   ├── srs.py
+│   │   ├── tasks.py
+│   │   └── users.py
+│   ├── api_router.py
+│   ├── base_context.py
+│   ├── web
+│   │   ├── __init__.py
+│   │   ├── pages
+│   │   │   ├── __init__.py
+│   │   │   ├── auth.py
+│   │   │   ├── companies
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── dashboard.py
+│   │   │   │   ├── filters.py
+│   │   │   │   ├── statistics.py
+│   │   │   │   └── views.py
+│   │   │   ├── contacts
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── dashboard.py
+│   │   │   │   ├── filters.py
+│   │   │   │   ├── statistics.py
+│   │   │   │   └── views.py
+│   │   │   ├── crisp.py
+│   │   │   ├── home
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── home.py
+│   │   │   ├── opportunities
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── dashboard.py
+│   │   │   │   ├── filters.py
+│   │   │   │   ├── statistics.py
+│   │   │   │   └── views.py
+│   │   │   ├── settings.py
+│   │   │   ├── srs
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── batch.py
+│   │   │   │   ├── blueprint.py
+│   │   │   │   ├── cards.py
+│   │   │   │   ├── contexts.py
+│   │   │   │   ├── dashboard.py
+│   │   │   │   ├── filters.py
+│   │   │   │   ├── review.py
+│   │   │   │   └── views.py
+│   │   │   ├── tasks
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── dashboard.py
+│   │   │   │   ├── filters.py
+│   │   │   │   ├── statistics.py
+│   │   │   │   └── views.py
+│   │   │   ├── users
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── dashboard.py
+│   │   │   │   ├── filters.py
+│   │   │   │   ├── statistics.py
+│   │   │   │   └── views.py
+│   │   │   └── users.py
+│   │   └── utils
+│   │       ├── __init__.py
+│   │       ├── autocomplete.py
+│   │       ├── blueprint_factory.py
+│   │       ├── context.py
+│   │       ├── json_validator.py
+│   │       ├── relationships.py
+│   │       ├── route_registration.py
+│   │       ├── template_config.py
+│   │       └── template_renderer.py
+│   └── web_router.py
+├── services
+│   ├── __init__.py
+│   ├── auth
+│   │   ├── __init__.py
+│   │   ├── core.py
+│   │   ├── password.py
+│   │   ├── session.py
+│   │   └── view.py
+│   ├── company
+│   │   ├── __init__.py
+│   │   ├── analytics.py
+│   │   └── core.py
+│   ├── contact
+│   │   ├── __init__.py
+│   │   ├── analytics.py
+│   │   └── core.py
+│   ├── crud_service.py
+│   ├── note
+│   │   ├── __init__.py
+│   │   ├── core.py
+│   │   └── search.py
+│   ├── opportunity
+│   │   ├── __init__.py
+│   │   ├── analytics.py
+│   │   ├── core.py
+│   │   └── forecast.py
+│   ├── relationship
+│   │   ├── __init__.py
+│   │   ├── core.py
+│   │   ├── query.py
+│   │   └── types.py
+│   ├── search
+│   │   └── __init__.py
+│   ├── service_base.py
+│   ├── srs
+│   │   ├── __init__.py
+│   │   ├── algorithm.py
+│   │   ├── analytics.py
+│   │   ├── categories.py
+│   │   ├── constants.py
+│   │   ├── core.py
+│   │   ├── filters.py
+│   │   └── navigation.py
+│   ├── task
+│   │   ├── __init__.py
+│   │   ├── analytics.py
+│   │   └── core.py
+│   ├── user
+│   │   ├── __init__.py
+│   │   ├── analytics.py
+│   │   └── core.py
+│   └── validator_mixin.py
+└── utils
+    ├── app_logging.py
+    ├── model_registry.py
+    └── router_utils.py
+
+31 directories, 162 files
+```
+
+```
+
+
+
+```
+Route Audit Plan
+Step 1: Examine API Routes First
+Check these files to understand available API endpoints:
+
+/app/routes/api/companies.py
+/app/routes/api/contacts.py
+/app/routes/api/opportunities.py
+/app/routes/api/tasks.py
+/app/routes/api/notes.py
+/app/routes/api/users.py
+/app/routes/api/srs.py
+
+For each file, note:
+
+Available endpoints
+Parameters they accept
+Return formats
+
+Step 2: Check Web Route Implementations
+Examine corresponding web route files:
+
+/app/routes/web/pages/companies/views.py
+/app/routes/web/pages/contacts/views.py
+/app/routes/web/pages/opportunities/views.py
+/app/routes/web/pages/tasks/views.py
+/app/routes/web/pages/srs/views.py
+/app/routes/web/pages/users.py
+
+Look for:
+
+Direct imports from /app/services/ (indicates potential issue)
+API calls using patterns like requests, fetch, or internal HTTP clients
+Proper error handling for API responses
+
+Step 3: Fix Problematic Routes
+For each route using services directly:
+
+Find the matching API endpoint or create one
+Replace direct service calls with API calls
+Update error handling
+Test thoroughly
+
+Step 4: Create Helper Methods
+Add utility methods in /app/routes/web/utils/ to standardize API calls.
+Step 5: Verify Dashboard/Statistics Routes
+Check special cases:
+
+/app/routes/web/pages/*/dashboard.py
+/app/routes/web/pages/*/statistics.py
+
+These often need aggregated data and may need special handling.
+```
+
+
+
 # Harness
 
 ```
