@@ -154,6 +154,7 @@ const cellRenderers = {
   }
 };
 
+
 /**
  * Set up the APIs and register events
  */
@@ -174,16 +175,20 @@ function setUpApis(api, columnApi) {
     api.addEventListener(eventName, () => {
       if (eventName === 'gridColumnsChanged') {
         setupColumnSelector(api);
+      } else if (eventName === 'columnVisible') {
+        // Handle resize explicitly when column visibility changes
+        handleGridResize();
       } else {
         log("debug", scriptName, "eventHandler", `Event triggered: ${eventName}`);
-        debouncedSaveColumnState();
       }
+      debouncedSaveColumnState();
     });
   });
 
   log("info", scriptName, "setUpApis", "Event listeners registered");
   columnStateHelpers.restore();
 }
+
 
 /**
  * Set up global search functionality
@@ -208,10 +213,20 @@ function setupColumnSelector(api) {
   const container = document.getElementById('columnSelectorItems');
   const selectAll = document.getElementById('selectAllColumns');
   const clearAll = document.getElementById('clearAllColumns');
+  // Find the dropdown parent container
+  const dropdownContainer = container?.closest('.dropdown-menu') || container?.parentElement;
 
   if (!container || !api) {
     log("warn", scriptName, "setupColumnSelector", "Selector elements or API missing");
     return;
+  }
+
+  // Prevent dropdown from closing when clicking inside
+  if (dropdownContainer) {
+    dropdownContainer.addEventListener('click', function(event) {
+      event.stopPropagation();
+    });
+    log("info", scriptName, "setupColumnSelector", "Added dropdown click prevention");
   }
 
   // Clear and style container
@@ -263,10 +278,11 @@ function setupColumnSelector(api) {
     lbl.htmlFor = `chk-${colId}`;
     lbl.textContent = name;
 
-    // Add change handler
+    // Add change handler with resize
     chk.addEventListener('change', e => {
       if (typeof api.setColumnVisible === 'function') {
         api.setColumnVisible(colId, e.target.checked);
+        handleGridResize(); // Add grid resize handler
       }
     });
 
@@ -285,6 +301,7 @@ function setupColumnSelector(api) {
           if (checkbox) checkbox.checked = true;
         }
       });
+      handleGridResize(); // Add grid resize after all columns are shown
     });
   }
 
@@ -298,11 +315,13 @@ function setupColumnSelector(api) {
           if (checkbox) checkbox.checked = false;
         }
       });
+      handleGridResize(); // Add grid resize after all columns are hidden
     });
   }
 
   log("info", scriptName, "setupColumnSelector", "Column selector configured");
 }
+
 
 /**
  * Generate column definitions based on data
@@ -354,6 +373,7 @@ function generateColumnDefs(data) {
   return columnDefs;
 }
 
+
 /**
  * Get grid options with all necessary configurations
  */
@@ -380,7 +400,8 @@ function getGridOptions() {
       wrapText: true,
       autoHeight: true,
       sortable: true,
-      filter: true
+      filter: true,
+      suppressSizeToFit: false
     },
 
     // Row click handler
@@ -401,9 +422,51 @@ function getGridOptions() {
       setUpApis(params.api, params.columnApi);
       setupGlobalSearch(params.api);
       setupColumnSelector(params.api);
+
+      // Ensure grid fits all columns initially
+      if (params.api) {
+        setTimeout(() => params.api.sizeColumnsToFit(), 0);
+      }
+    },
+
+    // After data is loaded, resize columns
+    onFirstDataRendered: params => {
+      if (params.api) {
+        params.api.sizeColumnsToFit();
+      }
     }
   };
 }
+
+/**
+ * Handle grid resize when columns are toggled
+ */
+function handleGridResize() {
+  if (!gridApiReference) {
+    log("warn", scriptName, "handleGridResize", "Grid API not available");
+    return;
+  }
+
+  log("info", scriptName, "handleGridResize", "Triggering grid resize");
+
+  // Use setTimeout to ensure this runs after the DOM has updated
+  setTimeout(() => {
+    try {
+      // Size columns to fit available width
+      gridApiReference.sizeColumnsToFit();
+
+      // Manually trigger redraw
+      gridApiReference.refreshCells({ force: true });
+      gridApiReference.redrawRows();
+
+      // FIX: Don't manually dispatch gridSizeChanged event
+      // Let AG Grid handle this internally
+    } catch (err) {
+      log("error", scriptName, "handleGridResize", "Error during grid resize:", err);
+    }
+  }, 0);
+}
+
 
 /**
  * Main table initialization function
@@ -498,9 +561,15 @@ function fixLayoutSpacing() {
     setTimeout(adjustSpacing, 500); // Wait for grid to render
   });
 
-  // Run adjustment after grid is ready
-  if (typeof gridApiReference !== 'undefined') {
-    gridApiReference?.addEventListener('gridSizeChanged', adjustSpacing);
+  // Run adjustment after grid is ready - safer way to add event listener
+  if (typeof gridApiReference !== 'undefined' && gridApiReference) {
+    try {
+      gridApiReference.addEventListener('gridSizeChanged', adjustSpacing);
+    } catch (e) {
+      log("warn", scriptName, "fixLayoutSpacing", "Could not add gridSizeChanged listener", e);
+      // Alternative fallback for layout adjustments if event listener fails
+      setTimeout(adjustSpacing, 1000);
+    }
   }
 
   // Run adjustment on window resize
@@ -532,6 +601,11 @@ if (!window.__tableInitialized) {
       })
       .catch(error => {
         log("error", scriptName, "DOMContentLoaded", "Table initialization failed:", error);
+        // Display error to user
+        const container = document.querySelector('#table-container');
+        if (container) {
+          container.innerHTML = `<div class="alert alert-danger m-3">Error loading table: ${error.message}</div>`;
+        }
       });
   });
 }
@@ -544,5 +618,6 @@ window.addEventListener('error', function(e) {
     container.innerHTML = `<div class="alert alert-danger m-3">Error loading table: ${e.message}</div>`;
   }
 });
+
 
 export default initializeTable;
