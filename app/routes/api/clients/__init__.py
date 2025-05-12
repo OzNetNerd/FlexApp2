@@ -33,7 +33,16 @@ class ApiClient:
         url = urljoin(self._get_base_url(), endpoint)
         response = requests.request(method, url, params=params, json=data)
         response.raise_for_status()
-        return response.json()
+
+        # Handle empty responses
+        if not response.text:
+            return {}
+
+        # Try to parse as JSON, return empty dict if it fails
+        try:
+            return response.json()
+        except requests.exceptions.JSONDecodeError:
+            return {}
 
     def get(self, endpoint, params=None):
         """Make a GET request to the API."""
