@@ -16,13 +16,13 @@ company_api_crud_config = ApiCrudRouteConfig(
 
 # You can add additional CRUD-related endpoints here if needed
 @companies_api_bp.route("/", methods=["GET"])
-def list_companies():
+def get_all():
     """Get all companies."""
     companies = company_service.get_all()
     return jsonify([company.to_dict() for company in companies])
 
 @companies_api_bp.route("/<int:company_id>", methods=["GET"])
-def get_company(company_id):
+def get(company_id):
     """Get a company by ID."""
     company = company_service.get_by_id(company_id)
     if not company:
