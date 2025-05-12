@@ -154,7 +154,6 @@ const cellRenderers = {
   }
 };
 
-
 /**
  * Set up the APIs and register events
  */
@@ -188,7 +187,6 @@ function setUpApis(api, columnApi) {
   log("info", scriptName, "setUpApis", "Event listeners registered");
   columnStateHelpers.restore();
 }
-
 
 /**
  * Set up global search functionality
@@ -269,6 +267,13 @@ function setupColumnSelector(api) {
     return;
   }
 
+  // Sort columns alphabetically by header name
+  cols.sort((a, b) => {
+    const aName = a.getColDef?.()?.headerName || a.getColId?.() || '';
+    const bName = b.getColDef?.()?.headerName || b.getColId?.() || '';
+    return aName.localeCompare(bName);
+  });
+
   const columnState = typeof api.getColumnState === 'function' ? api.getColumnState() : [];
 
   // Create checkbox for each column
@@ -311,6 +316,15 @@ function setupColumnSelector(api) {
       }
     });
 
+    // Add click handler to entire div
+    div.addEventListener('click', e => {
+      if (e.target !== chk) {
+        chk.checked = !chk.checked;
+        const changeEvent = new Event('change', { bubbles: true });
+        chk.dispatchEvent(changeEvent);
+      }
+    });
+
     div.append(chk, lbl);
     container.appendChild(div);
   });
@@ -350,7 +364,6 @@ function setupColumnSelector(api) {
 
   log("info", scriptName, "setupColumnSelector", "Column selector configured");
 }
-
 
 /**
  * Generate column definitions based on data
@@ -401,7 +414,6 @@ function generateColumnDefs(data) {
 
   return columnDefs;
 }
-
 
 /**
  * Get grid options with all necessary configurations
