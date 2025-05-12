@@ -6,8 +6,8 @@ Used for user profiles, action buttons, and visual indicators.
 /* Activity Icons */
 .activity-icon,
 .category-icon {
-  width: 40px;
-  height: 40px;
+  width: var(--icon-size-md);
+  height: var(--icon-size-md);
   border-radius: var(--border-radius-full);
   font-size: var(--font-size-lg);
   box-shadow: var(--shadow-sm);
@@ -38,20 +38,20 @@ Used for user profiles, action buttons, and visual indicators.
 }
 
 .icon-container-sm {
-  width: 32px;
-  height: 32px;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
   font-size: var(--font-size-xs);
 }
 
 .icon-container-md {
-  width: 40px;
-  height: 40px;
+  width: var(--icon-size-md);
+  height: var(--icon-size-md);
   font-size: var(--font-size-base);
 }
 
 .icon-container-lg {
-  width: 48px;
-  height: 48px;
+  width: var(--icon-size-lg);
+  height: var(--icon-size-lg);
   font-size: var(--font-size-lg);
 }
 
@@ -90,13 +90,13 @@ Used for user profiles, action buttons, and visual indicators.
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: var(--icon-size-md);
+  height: var(--icon-size-md);
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   border-radius: var(--border-radius-xl);
   color: var(--color-text-white);
   font-size: var(--font-size-base);
-  min-width: 36px;
-  min-height: 36px;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
   margin-right: var(--spacing-sm);
 }

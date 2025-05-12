@@ -190,6 +190,26 @@ These variables make it easier to maintain consistent colors, spacing, and styli
 
   /* Navigation */
   --navbar-height: 3.75rem;
+
+  /* Animation distances */
+  --transform-animation-distance-sm: 0.625rem;
+  --transform-animation-distance-md: 1.25rem;
+  --transform-animation-distance-lg: 1.875rem;
+
+  /* Profile avatar sizes */
+  --avatar-size-lg: 7.5rem;
+
+  /* Auth card widths */
+  --auth-card-width: 25rem;
+
+  /* Error image max width */
+  --error-image-max-width: 25rem;
+
+  /* Custom activity feed height */
+  --activity-feed-max-height: 31.25rem;
+
+  /* Color variable for badge text */
+  --color-text-light-dark: #212529;
 }
 
 .nav-link {

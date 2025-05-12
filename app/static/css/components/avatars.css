@@ -5,8 +5,8 @@ Used for user profiles and user representation.
 
 /* Avatar components - used for user profiles */
 .avatar-container {
-  width: 36px;
-  height: 36px;
+  width: var(--avatar-size-default);
+  height: var(--avatar-size-default);
   border-radius: 50%;
   overflow: hidden;
   display: flex;
@@ -21,14 +21,14 @@ Used for user profiles and user representation.
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: var(--avatar-size-default);
+  height: var(--avatar-size-default);
   border-radius: 50%;
 }
 
 .avatar-sm {
-  width: 32px;
-  height: 32px;
+  width: var(--avatar-size-sm);
+  height: var(--avatar-size-sm);
   font-size: var(--font-size-xs);
 }
 

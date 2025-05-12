@@ -22,10 +22,10 @@ Table styles - AG Grid theme and custom table styling
   --ag-checkbox-unchecked-color: var(--color-text-light);
   --ag-checkbox-indeterminate-color: var(--color-primary);
   --ag-cell-horizontal-padding: 1.5rem; /* Increased for Bootstrap match */
-  --ag-header-height: 48px;
-  --ag-row-height: 48px; /* Match Bootstrap table row height */
+  --ag-header-height: 3rem;
+  --ag-row-height: 3rem; /* Match Bootstrap table row height */
   --ag-header-column-separator-height: 50%;
-  --ag-header-column-separator-width: 1px;
+  --ag-header-column-separator-width: 0.0625rem;
   --ag-range-selection-border-color: var(--color-primary);
   --ag-input-focus-border-color: var(--color-primary);
   --ag-alpine-active-color: var(--color-primary);
@@ -43,7 +43,7 @@ Table styles - AG Grid theme and custom table styling
 .ag-theme-alpine .ag-header {
   font-weight: var(--font-weight-medium);
   letter-spacing: -0.01em;
-  border-bottom: 1px solid var(--ag-border-color);
+  border-bottom: 0.0625rem solid var(--ag-border-color);
 }
 
 /* Row hover animation */
@@ -57,8 +57,8 @@ Table styles - AG Grid theme and custom table styling
   align-items: center;            /* Vertically center */
   white-space: normal !important; /* Allows wrapping */
   line-height: 1.4;               /* Controls line spacing */
-  padding-top: 4px;
-  padding-bottom: 4px;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
   font-weight: var(--font-weight-table); /* Medium weight for emphasized text */
   letter-spacing: normal;
 }
@@ -93,7 +93,7 @@ Table styles - AG Grid theme and custom table styling
   padding: var(--spacing-base);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
-  border-top: 1px solid var(--ag-border-color);
+  border-top: 0.0625rem solid var(--ag-border-color);
 }
 
 .ag-theme-alpine .ag-paging-button {
@@ -102,7 +102,7 @@ Table styles - AG Grid theme and custom table styling
 }
 
 .ag-theme-alpine .ag-paging-button-wrapper {
-  height: 32px;
+  height: 2rem;
 }
 
 .ag-theme-alpine .ag-paging-button:hover {
@@ -143,8 +143,8 @@ Table styles - AG Grid theme and custom table styling
   border: none;
   color: var(--color-text-secondary);
   cursor: pointer;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -193,18 +193,18 @@ Table styles - AG Grid theme and custom table styling
 
 /* Table container height */
 #table-container {
-  min-height: 420px; /* Ensures the container has a minimum height */
+  min-height: 26.25rem; /* Ensures the container has a minimum height */
   height: auto !important; /* Allow the container to grow */
   max-height: none; /* Remove the max height restriction */
   overflow: visible; /* Don't add scrollbars */
-  padding-top: 10px;
-  padding-bottom: 20px;
+  padding-top: 0.625rem;
+  padding-bottom: 1.25rem;
   margin-bottom: 2rem;
 }
 
 /* Optional: Add padding to the table itself to create space inside */
 table {
-  padding: 10px; /* Adjust as needed */
+  padding: 0.625rem; /* Adjust as needed */
 }
 
 /* Responsive table wrapper */
@@ -225,14 +225,14 @@ table {
 .table th {
   font-weight: var(--font-weight-semibold);
   background-color: var(--color-bg-light);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 0.0625rem solid var(--color-border);
   padding: var(--spacing-base);
   text-align: left;
 }
 
 .table td {
   padding: var(--spacing-base);
-  border-bottom: 1px solid var(--color-border-lighter);
+  border-bottom: 0.0625rem solid var(--color-border-lighter);
   vertical-align: middle;
 }
 
@@ -253,12 +253,12 @@ table {
 }
 
 .table-bordered {
-  border: 1px solid var(--color-border-light);
+  border: 0.0625rem solid var(--color-border-light);
 }
 
 .table-bordered th,
 .table-bordered td {
-  border: 1px solid var(--color-border-light);
+  border: 0.0625rem solid var(--color-border-light);
 }
 
 /* Add specific fix for Data Trends section */

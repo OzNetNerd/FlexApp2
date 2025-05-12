@@ -15,7 +15,7 @@ Buttons are used for all interactive controls that trigger actions throughout th
 }
 
 .btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(var(--transform-button-lift));
   box-shadow: var(--shadow-md);
 }
 

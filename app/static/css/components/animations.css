@@ -5,7 +5,7 @@ Used for dynamic UI elements and transitions.
 
 .highlights-container {
   position: relative;
-  height: 24px;
+  height: var(--highlights-container-height);
   overflow: hidden;
 }
 
@@ -15,7 +15,7 @@ Used for dynamic UI elements and transitions.
   top: 0;
   left: 0;
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(1.25rem);
   transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
@@ -25,6 +25,6 @@ Used for dynamic UI elements and transitions.
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(1.25rem); }
   to { opacity: 1; transform: translateY(0); }
 }

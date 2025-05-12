@@ -37,7 +37,7 @@ Used for menus, selection controls, and contextual actions.
   top: 100%;
   left: 0;
   right: 0;
-  z-index: 9999;
+  z-index: var(--z-index-dropdown);
   overflow: visible !important;
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
@@ -65,7 +65,7 @@ Used for menus, selection controls, and contextual actions.
   box-shadow: var(--shadow-lg);
   border-radius: var(--border-radius-xl);
   padding: var(--spacing-xs) 0;
-  min-width: 220px;
+  min-width: var(--dropdown-min-width);
 }
 
 .dropdown-item {
@@ -80,7 +80,7 @@ Used for menus, selection controls, and contextual actions.
 }
 
 .dropdown-item i {
-  width: 20px;
+  width: 1.25rem;
   color: var(--color-text-muted);
 }
 
