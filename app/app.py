@@ -13,7 +13,8 @@ from flask_migrate import Migrate
 from werkzeug.routing import Rule
 
 
-from app.models import Setting, User
+from app.models.pages.user import User
+from app.models.pages.setting import Setting
 from app.models.base import db
 from app.routes.api_router import register_api_blueprints
 from app.routes.web.utils.template_renderer import handle_template_error

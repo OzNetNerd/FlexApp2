@@ -13,15 +13,14 @@ class ServiceBase:
     """Foundation for all services with common functionality."""
 
     def __init__(self, model_class=None):
-        """
-        Initialize service with optional model class.
-
-        Args:
-            model_class: The SQLAlchemy model class this service operates on
-        """
-        self.model_class = model_class
+        """Initialize service with optional model class."""
+        self._model_class = model_class
         self.logger = get_logger()
         self.logger.info(f"{self.__class__.__name__}: Initializing service")
+
+    @property
+    def model_class(self):
+        return self._model_class
 
 
 class CRUDService(ServiceBase):

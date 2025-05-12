@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 import random
 from sqlalchemy import func, extract
-from app.models import User, Note, Opportunity
+from app.models.pages.opportunity import Opportunity
 from app.services.service_base import ServiceBase
 from app.models.base import db
 
@@ -16,6 +16,10 @@ class UserAnalyticsService(ServiceBase):
 
     def get_dashboard_stats(self):
         """Get statistics for the dashboard."""
+
+        from app.models.pages.user import User
+        from app.models.pages.note import Note
+
         return {
             "total_users": User.query.count(),
             "admin_count": User.query.filter_by(is_admin=True).count(),

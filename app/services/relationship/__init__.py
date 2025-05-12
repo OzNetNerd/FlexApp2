@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional, Tuple
 from app.models.pages.company import Company
 from app.models.pages.contact import Contact
 from app.models.relationship import Relationship
-from app.models.pages.user import User
 from app.services.service_base import ServiceBase, ServiceRegistry
 from app.services.relationship.core import RelationshipCoreService
 from app.services.relationship.query import RelationshipQueryService
@@ -14,7 +13,12 @@ from app.services.relationship.types import RelationshipTypeService
 class RelationshipService(ServiceBase):
     """Service class to manage entity relationships and helper mappings."""
 
-    ENTITY_MODELS = {"user": User, "contact": Contact, "company": Company}
+    @property
+    def ENTITY_MODELS(self):
+        """Lazy-loaded entity models to avoid circular imports."""
+        from app.models.pages.user import User
+        return {"user": User, "contact": Contact, "company": Company}
+
     RELATIONSHIP_TYPES = RelationshipTypeService.RELATIONSHIP_TYPES
 
     def __init__(self):
@@ -27,6 +31,7 @@ class RelationshipService(ServiceBase):
     # Core methods
     def get_entity(self, entity_type: str, entity_id: int) -> Any:
         """Get an entity by type and ID."""
+
         return self.core.get_entity(entity_type, entity_id, self.ENTITY_MODELS)
 
     def create_relationship(

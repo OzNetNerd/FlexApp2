@@ -23,8 +23,18 @@ class SearchService(ServiceBase):
             search_fields (List[str]): Columns to apply ilike(text) searches.
         """
         super().__init__()
-        self.model_class = model_class
+        self._model_class = model_class  # Use backing field
         self.search_fields = search_fields or []
+
+    @property
+    def model_class(self):
+        """Get the model class this service operates on."""
+        return self._model_class
+
+    @model_class.setter
+    def model_class(self, value):
+        """Set the model class this service operates on."""
+        self._model_class = value
 
     def search(self, term: str, filters: Dict[str, Any] = None) -> List[Any]:
         """
@@ -42,7 +52,7 @@ class SearchService(ServiceBase):
             if term:
                 pattern = f"%{term}%"
                 clauses = [getattr(self.model_class, f).ilike(pattern) for f in self.search_fields
-                          if hasattr(self.model_class, f)]
+                           if hasattr(self.model_class, f)]
                 if clauses:
                     query = query.filter(or_(*clauses))
 

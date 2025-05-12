@@ -1,6 +1,5 @@
 # app/services/user/core.py
 from datetime import datetime, timedelta
-from app.models import User, Note
 from app.services.service_base import CRUDService
 from app.services.validator_mixin import ValidatorMixin
 from app.models.base import db
@@ -11,10 +10,19 @@ class UserCoreService(CRUDService, ValidatorMixin):
 
     def __init__(self):
         """Initialize the User core service."""
-        super().__init__(model_class=User)
+        # Don't import or reference User during initialization
+        super().__init__(model_class=None)
+
+    @property
+    def model_class(self):
+        """Late-binding property to get User model."""
+        from app.models.pages.user import User
+        return User
 
     def get_filtered_users(self, filters):
         """Get filtered users based on criteria."""
+        from app.models import Note
+
         query = self.model_class.query
         is_admin = filters.get("is_admin")
         period = filters.get("period")
