@@ -28,7 +28,7 @@ document.head.appendChild(Object.assign(document.createElement('style'), {
     .column-selector-checkbox { margin-right:10px; }
     .column-selector-label { 
       font-family: var(--font-family); 
-      font-size: var(--font-size-base);
+      font-size: var(--font-size-sm);
       font-weight: var(--font-weight-normal);
       cursor: pointer; 
       user-select: none; 
