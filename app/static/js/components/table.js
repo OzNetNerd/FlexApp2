@@ -445,8 +445,8 @@ function getGridOptions() {
       suppressSizeToFit: false
     },
 
-    // Row click handler
-    onRowClicked: event => {
+    // Replace single click with double click handler
+    onRowDoubleClicked: event => {
       if (event.event.ctrlKey || event.event.metaKey ||
           event.event.shiftKey || event.event.button !== 0) return;
 
