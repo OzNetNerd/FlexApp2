@@ -22,6 +22,7 @@ class Company(BaseModel):
     notes = db.relationship(
         "Note",
         primaryjoin=("and_(Note.notable_id == foreign(Company.id), " "Note.notable_type == 'Company')"),
+        uselist=True  # This ensures the relationship always returns a collection
     )
 
     company_capabilities = db.relationship(
