@@ -6,7 +6,6 @@ from app.services.service_base import ServiceRegistry
 # Service imports
 from app.services.srs import SRSService
 from app.services.auth import AuthService
-from app.services.category import CategoryService
 from app.services.company import CompanyService
 from app.services.contact import ContactService
 # from app.services.crud import CRUDService
@@ -28,10 +27,10 @@ logger.info("Initializing services module.")
 service_registry = {
     'srs': ServiceRegistry.get(SRSService),
     'auth': ServiceRegistry.get(AuthService),
-    'category': ServiceRegistry.get(CategoryService),
+    # 'category': ServiceRegistry.get(CategoryService),
     'company': ServiceRegistry.get(CompanyService),
     'contact': ServiceRegistry.get(ContactService),
-    'crud': ServiceRegistry.get(CRUDService),
+    # 'crud': ServiceRegistry.get(CRUDService),
     'note': ServiceRegistry.get(NoteService),
     'opportunity': ServiceRegistry.get(OpportunityService),
     'relationship': ServiceRegistry.get(RelationshipService),
