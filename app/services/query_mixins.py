@@ -10,6 +10,16 @@ logger = get_logger()
 class QueryBuilderMixin:
     """Mixin class providing common query builder methods."""
 
+    def __init__(self, model_class=None):
+        """
+        Initialize with optional model class to allow standalone usage.
+
+        Args:
+            model_class: The SQLAlchemy model class this mixin operates on
+        """
+        self.model_class = model_class
+        self.logger = logger
+
     def apply_text_search(self, query: Query, search_term: str, *fields) -> Query:
         """
         Apply a text search filter across multiple fields.
@@ -86,14 +96,14 @@ class QueryBuilderMixin:
 
         return query
 
-    def apply_sort(self, query: Query, model_class: Type[Any], sort_by: Optional[str] = None,
-                   sort_order: str = 'asc') -> Query:
+    def apply_sort(self, query: Query, model_class: Optional[Type[Any]] = None,
+                  sort_by: Optional[str] = None, sort_order: str = 'asc') -> Query:
         """
         Apply sorting to a query.
 
         Args:
             query: The base SQLAlchemy query
-            model_class: The SQLAlchemy model class
+            model_class: The SQLAlchemy model class (optional if set during init)
             sort_by: Field name to sort by
             sort_order: Sort direction ('asc' or 'desc')
 
@@ -101,6 +111,11 @@ class QueryBuilderMixin:
             Modified query with sorting applied
         """
         if not sort_by:
+            return query
+
+        model_class = model_class or self.model_class
+        if not model_class:
+            logger.warning("No model class provided for sorting")
             return query
 
         logger.info(f"Applying sort by {sort_by} in {sort_order} order")
@@ -119,20 +134,25 @@ class QueryBuilderMixin:
             logger.warning(f"Sort field '{sort_by}' not found on model {model_class.__name__}")
             return query
 
-    def apply_filters(self, query: Query, model_class: Type[Any],
-                      filters: Optional[Dict[str, Any]] = None) -> Query:
+    def apply_filters(self, query: Query, filters: Optional[Dict[str, Any]] = None,
+                     model_class: Optional[Type[Any]] = None) -> Query:
         """
         Apply multiple filters to a query based on a filters dictionary.
 
         Args:
             query: The base SQLAlchemy query
-            model_class: The SQLAlchemy model class
             filters: Dictionary of filter conditions
+            model_class: The SQLAlchemy model class (optional if set during init)
 
         Returns:
             Modified query with all filters applied
         """
         if not filters:
+            return query
+
+        model_class = model_class or self.model_class
+        if not model_class:
+            logger.warning("No model class provided for filtering")
             return query
 
         logger.info(f"Applying multiple filters: {filters}")

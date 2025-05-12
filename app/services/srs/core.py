@@ -4,20 +4,14 @@ from typing import Dict, Any, Optional, List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS, ReviewHistory
-from app.services.base_service import BaseService
-from app.utils.app_logging import get_logger
+from app.services.service_base import CRUDService
 
-logger = get_logger()
-
-
-class SRSCoreService(BaseService):
+class SRSCoreService(CRUDService):
     """Service providing core CRUD operations for SRS items."""
 
     def __init__(self):
         """Initialize the SRS core service."""
         super().__init__(SRS)
-        self.logger = logger
-        self.logger.info("SRSCoreService: Initializing SRS core service")
 
     def log_review(self, srs_item_id: int, rating: int, interval: float, ease_factor: float) -> ReviewHistory:
         """
@@ -102,8 +96,4 @@ class SRSCoreService(BaseService):
             return
 
         self.logger.info(f"SRSCoreService: Recording answer for item {srs_item_id}")
-
-        # This is a placeholder for future functionality
-        # Could store answers in a separate table or in review history
-        # For now, just log that an answer was provided
         self.logger.info(f"SRSCoreService: Recorded answer of length {len(answer_given)} for item {srs_item_id}")

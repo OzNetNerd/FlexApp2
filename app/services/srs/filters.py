@@ -5,23 +5,18 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from sqlalchemy import func
 from app.models.pages.srs import SRS, ReviewHistory
-from app.services.query_mixins import QueryBuilderMixin
+from app.services.service_base import QueryService
 from app.services.srs.constants import (
     LEARNING_THRESHOLD, REVIEWING_THRESHOLD, HARD_THRESHOLD,
     MEDIUM_THRESHOLD, STRUGGLING_THRESHOLD, AVERAGE_THRESHOLD
 )
-from app.utils.app_logging import get_logger
 
-logger = get_logger()
-
-
-class SRSFilterService(QueryBuilderMixin):
+class SRSFilterService(QueryService):
     """Service for filtering and retrieving SRS items based on various criteria."""
 
     def __init__(self):
         """Initialize the SRS filter service."""
-        self.logger = logger
-        self.logger.info("SRSFilterService: Initializing SRS filter service")
+        super().__init__(SRS)
 
     def get_filtered_cards(self, filters: Optional[Dict[str, Any]] = None) -> List[SRS]:
         """
@@ -86,7 +81,6 @@ class SRSFilterService(QueryBuilderMixin):
             # Sort order
             query = self.apply_sort(
                 query,
-                SRS,
                 filters.get("sort_by", "next_review_at"),
                 filters.get("sort_order", "asc")
             )

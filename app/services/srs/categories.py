@@ -2,18 +2,15 @@
 
 from typing import Dict, List, Any
 from app.models.pages.srs import SRS
+from app.services.service_base import ServiceBase
 from app.models import db
-from app.utils.app_logging import get_logger
 
-logger = get_logger()
-
-
-class SRSCategoryService:
+class SRSCategoryService(ServiceBase):
     """Service for managing SRS categories/decks."""
 
     def __init__(self):
         """Initialize the SRS category service."""
-        self.logger = logger
+        super().__init__(SRS)
         self.logger.info("SRSCategoryService: Initializing SRS category service")
 
     def get_categories(self) -> List[Dict[str, Any]]:

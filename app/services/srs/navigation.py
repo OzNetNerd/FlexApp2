@@ -4,17 +4,14 @@ from typing import Optional
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS
-from app.utils.app_logging import get_logger
+from app.services.service_base import ServiceBase
 
-logger = get_logger()
-
-
-class SRSNavigationService:
+class SRSNavigationService(ServiceBase):
     """Service for navigating between SRS items during review sessions."""
 
     def __init__(self):
         """Initialize the SRS navigation service."""
-        self.logger = logger
+        super().__init__(SRS)
         self.logger.info("SRSNavigationService: Initializing SRS navigation service")
 
     def get_next_due_item_id(self, current_item_id: Optional[int] = None) -> Optional[int]:

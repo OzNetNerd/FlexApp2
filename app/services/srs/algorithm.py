@@ -4,6 +4,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS
+from app.services.service_base import ServiceBase
 from app.services.srs.constants import (
     MIN_INTERVAL, SHORT_INTERVAL, MEDIUM_INTERVAL, DAY_INTERVAL,
     GOOD_INITIAL_INTERVAL, EASY_MULTIPLIER, GOOD_MULTIPLIER, HARD_MULTIPLIER,
@@ -11,18 +12,9 @@ from app.services.srs.constants import (
     FAIL_EASE_PENALTY, HARD_EASE_PENALTY, EASY_EASE_BONUS, MAX_INTERVAL,
     UI_TO_FSRS_RATING
 )
-from app.utils.app_logging import get_logger
 
-logger = get_logger()
-
-
-class SRSAlgorithmService:
+class SRSAlgorithmService(ServiceBase):
     """Service for spaced repetition algorithm calculations."""
-
-    def __init__(self):
-        """Initialize the SRS algorithm service."""
-        self.logger = logger
-        self.logger.info("SRSAlgorithmService: Initializing SRS algorithm service")
 
     def calculate_next_interval(self, item: SRS, ui_rating: int) -> float:
         """

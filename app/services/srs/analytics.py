@@ -4,21 +4,18 @@ from typing import Dict, List, Any, Optional, Union
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS, ReviewHistory
+from app.services.service_base import ServiceBase
 from app.services.srs.constants import (
     DEFAULT_EASE_FACTOR, MASTERY_THRESHOLD,
 )
 from app.models import db
-from app.utils.app_logging import get_logger
 
-logger = get_logger()
-
-
-class SRSAnalyticsService:
+class SRSAnalyticsService(ServiceBase):
     """Service for SRS metrics, analytics, and statistical calculations."""
 
     def __init__(self):
         """Initialize the SRS analytics service."""
-        self.logger = logger
+        super().__init__(SRS)
         self.logger.info("SRSAnalyticsService: Initializing SRS analytics service")
 
     def count_total(self) -> int:
