@@ -58,7 +58,11 @@
 
         <div class="col-12 mt-3">
           <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-filter me-1"></i> Apply Filters</button>
-          <a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-undo me-1"></i> Reset Filters</a>
+          {{ buttons.transparent_button(
+            href=request.path,
+            label='<i class="fas fa-undo me-1"></i> Reset Filters',
+            color_class='secondary'
+          ) }}
         </div>
       </form>
     </div>

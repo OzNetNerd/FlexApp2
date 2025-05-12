@@ -128,10 +128,15 @@
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">Upcoming Tasks</h2>
         <div>
-          <a href="{{ url_for('tasks_bp.filtered_tasks') }}" class=" transparent-button me-2">
-            <i class="bi bi-funnel"></i> Filter Tasks
-          </a>
-          <a href="{{ url_for('tasks_bp.create') }}" class="btn btn-sm btn-primary">Add Task</a>
+          {{ buttons.transparent_button(
+            href=url_for('tasks_bp.filtered_tasks'),
+            label='<i class="bi bi-funnel"></i> Filter Tasks'
+          ) }}
+          {{ buttons.transparent_button(
+            href=url_for('tasks_bp.create'),
+            label='Add Task',
+            color_class='primary'
+          ) }}
         </div>
       </div>
       <div class="card-body p-0">
