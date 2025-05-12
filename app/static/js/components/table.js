@@ -6,8 +6,7 @@ import log from '/static/js/core/logger.js';
 const scriptName = "table.js";
 
 import { fetchApiDataFromContainer, normalizeData, formatDisplayText } from '/static/js/services/apiService.js';
-import { createGrid, ModuleRegistry } from 'https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.esm.min.js';
-import { ClientSideRowModelModule } from 'https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.esm.min.js';
+import { createGrid, ModuleRegistry, ClientSideRowModelModule } from 'https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.esm.min.js';
 
 // Global variables
 let gridApiReference = null;
