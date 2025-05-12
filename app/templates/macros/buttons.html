@@ -5,14 +5,14 @@
     {% set button_class = button_class + " btn-" + colour %}
   {% endif %}
   {% if href %}
-    <a href="{{ href }}" class="transparent-button" {% if onclick %}onclick="{{ onclick }}"{% endif %}>
+    <a href="{{ href }}" class="{{ button_class }}" {% if onclick %}onclick="{{ onclick }}"{% endif %}>
       {% if icon %}<i class="{{ icon_lib }} fa-{{ icon }} me-1"></i>{% endif %} {{ text }}
     </a>
   {% else %}
-    <button type="{{ type or 'button' }}" class="transparent-button"
+    <button type="{{ type or 'button' }}" class="{{ button_class }}"
       {% if form %}form="{{ form }}"{% endif %}
       {% if onclick %}onclick="{{ onclick }}"{% endif %}>
-      {% if icon %}<i class="{{ icon_lib }} {{ icon_lib }}-{{ icon }} me-1"></i>{% endif %} {{ text }}
+      {% if icon %}<i class="{{ icon_lib }} fa-{{ icon }} me-1"></i>{% endif %} {{ text }}
     </button>
   {% endif %}
 {% endmacro %}
@@ -98,12 +98,10 @@
 {% endmacro %}
 
 {% macro dropdown_column_selector_button(label="Columns", icon_lib="fas", icon="columns", dropdown_id="columnSelectorBtn") %}
-  {{ transparent_button(
-    label='<i class="' + icon_lib + ' fa-' + icon + ' me-1"></i> ' + label,
-    color_class="btn-outline-secondary",
-    is_dropdown=True,
-    dropdown_id=dropdown_id,
-    aria_expanded="false",
-    data_bs_toggle="dropdown"
-  ) }}
+  <button type="button" class="transparent-button dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    id="{{ dropdown_id }}">
+    <i class="{{ icon_lib }} fa-{{ icon }} me-1"></i> {{ label }}
+  </button>
 {% endmacro %}

@@ -7,14 +7,15 @@ Used for menus, selection controls, and contextual actions.
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  background-color: var(--color-secondary);
-  color: var(--color-text-white);
-  border: none;
+  background-color: transparent;
+  color: var(--color-secondary);
+  border: var(--border-width-standard) solid var(--color-secondary);
+  border-radius: var(--border-radius-sm);
 }
 
 .dropdown-toggle:hover,
 .dropdown-toggle:focus {
-  background-color: var(--color-secondary-hover);
+  background-color: var(--color-secondary);
   color: var(--color-text-white);
 }
 
@@ -99,4 +100,73 @@ Used for menus, selection controls, and contextual actions.
 
 .logout-item i {
   color: var(--color-danger);
+}
+
+/* ===== Column Selector ===== */
+.column-list {
+  max-height: 18.75rem;
+  overflow-y: auto;
+}
+
+.column-list .form-check {
+  padding: var(--spacing-sm) var(--spacing-base);
+  transition: background-color var(--transition-fast);
+}
+
+.column-list .form-check:hover {
+  background-color: var(--color-bg-light);
+}
+
+.column-list .form-check-input:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Column selector checkbox styling */
+#columnSelectorItems .form-check-label {
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-primary);
+  padding-left: var(--spacing-sm);
+}
+
+#columnSelectorItems .form-check {
+  padding: var(--spacing-xs) var(--spacing-md);
+  position: relative;
+}
+
+#columnSelectorItems .form-check-input {
+  width: 1rem;
+  height: 1rem;
+  margin-top: var(--spacing-xxs);
+  border-width: 1.5px;
+  cursor: pointer;
+}
+
+#columnSelectorItems .form-check-input:checked + .form-check-label {
+  color: var(--color-primary);
+}
+
+#columnSelectorItems .form-check-input:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+#columnSelectorItems .form-check-input:checked ~ .form-check-label::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--border-width-thick);
+  background-color: var(--color-primary);
+  border-radius: var(--border-width-thick);
+}
+
+/* Column selector buttons */
+#selectAllColumns, #clearAllColumns {
+  font-family: var(--font-family);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
 }
