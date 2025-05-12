@@ -277,3 +277,19 @@ table {
   position: relative;
   z-index: 5;
 }
+
+.column-selector-item {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.column-selector-item:hover {
+  background-color: var(--color-primary-lighter);
+  color: var(--color-primary);
+  cursor: pointer;
+}

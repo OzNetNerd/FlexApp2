@@ -211,8 +211,9 @@ function setupGlobalSearch(api) {
  */
 function setupColumnSelector(api) {
   const container = document.getElementById('columnSelectorItems');
-  const selectAll = document.getElementById('selectAllColumns');
-  const clearAll = document.getElementById('clearAllColumns');
+  // Fix: Select buttons by their attributes instead of IDs
+  const selectAll = document.querySelector('[form="selectAllColumns"]');
+  const clearAll = document.querySelector('[form="clearAllColumns"]');
   // Find the dropdown parent container
   const dropdownContainer = container?.closest('.dropdown-menu') || container?.parentElement;
 
@@ -236,6 +237,30 @@ function setupColumnSelector(api) {
     overflowY: 'auto',
     padding: '0 10px'
   });
+
+  // Add custom scrollbar styles
+  const styleElement = document.createElement('style');
+  styleElement.textContent = `
+    #columnSelectorItems::-webkit-scrollbar {
+      width: 6px;
+    }
+    #columnSelectorItems::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    #columnSelectorItems::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    #columnSelectorItems::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    #columnSelectorItems {
+      scrollbar-width: thin;
+      scrollbar-color: #888 #f1f1f1;
+    }
+  `;
+  document.head.appendChild(styleElement);
 
   // Get columns and column state
   const cols = api.getColumns ? api.getColumns() : [];
@@ -303,6 +328,8 @@ function setupColumnSelector(api) {
       });
       handleGridResize(); // Add grid resize after all columns are shown
     });
+  } else {
+    log("warn", scriptName, "setupColumnSelector", "Select All button not found");
   }
 
   if (clearAll) {
@@ -317,6 +344,8 @@ function setupColumnSelector(api) {
       });
       handleGridResize(); // Add grid resize after all columns are hidden
     });
+  } else {
+    log("warn", scriptName, "setupColumnSelector", "Clear All button not found");
   }
 
   log("info", scriptName, "setupColumnSelector", "Column selector configured");
