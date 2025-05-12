@@ -6,26 +6,26 @@ Table styles - AG Grid theme and custom table styling
 .ag-theme-alpine {
   --ag-font-family: var(--font-family-table);
   --ag-font-size: var(--font-size-table);
-  --ag-header-foreground-color: var(--color-text-primary);
+  --ag-header-foreground-color: var(--color-table-header-text);
   --ag-foreground-color: var(--color-text-primary);
-  --ag-header-background-color: #f8f9fa; /* Match Bootstrap's table-light */
+  --ag-header-background-color: var(--color-table-header-bg);
   --ag-odd-row-background-color: var(--color-bg-lighter);
-  --ag-row-hover-color: rgba(0, 0, 0, 0.075); /* Match Bootstrap hover */
-  --ag-selected-row-background-color: rgba(var(--color-primary-rgb), 0.16);
-  --ag-border-color: var(--color-border-light);
+  --ag-row-hover-color: var(--color-table-row-hover);
+  --ag-selected-row-background-color: var(--color-bg-selected);
+  --ag-border-color: var(--color-table-border);
   --ag-secondary-border-color: var(--color-border-lighter);
   --ag-header-column-separator-display: block;
-  --ag-header-column-separator-color: var(--color-border-light);
+  --ag-header-column-separator-color: var(--color-table-border);
   --ag-header-column-resize-handle-color: var(--color-text-light);
   --ag-row-border-color: var(--color-border-lighter);
   --ag-checkbox-checked-color: var(--color-primary);
   --ag-checkbox-unchecked-color: var(--color-text-light);
   --ag-checkbox-indeterminate-color: var(--color-primary);
-  --ag-cell-horizontal-padding: 1.5rem; /* Increased for Bootstrap match */
+  --ag-cell-horizontal-padding: var(--spacing-xl);
   --ag-header-height: 3rem;
-  --ag-row-height: 3rem; /* Match Bootstrap table row height */
+  --ag-row-height: 3rem;
   --ag-header-column-separator-height: 50%;
-  --ag-header-column-separator-width: 0.0625rem;
+  --ag-header-column-separator-width: var(--border-width-standard);
   --ag-range-selection-border-color: var(--color-primary);
   --ag-input-focus-border-color: var(--color-primary);
   --ag-alpine-active-color: var(--color-primary);
@@ -42,8 +42,8 @@ Table styles - AG Grid theme and custom table styling
 /* Header styles */
 .ag-theme-alpine .ag-header {
   font-weight: var(--font-weight-medium);
-  letter-spacing: -0.01em;
-  border-bottom: 0.0625rem solid var(--ag-border-color);
+  letter-spacing: var(--letter-spacing-tight);
+  border-bottom: var(--border-width-standard) solid var(--ag-border-color);
 }
 
 /* Row hover animation */
@@ -54,46 +54,46 @@ Table styles - AG Grid theme and custom table styling
 /* Cell styling */
 .ag-theme-alpine .ag-cell {
   display: flex;
-  align-items: center;            /* Vertically center */
-  white-space: normal !important; /* Allows wrapping */
-  line-height: 1.4;               /* Controls line spacing */
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-  font-weight: var(--font-weight-table); /* Medium weight for emphasized text */
+  align-items: center;
+  white-space: normal !important;
+  line-height: var(--line-height-normal);
+  padding-top: var(--spacing-xxs);
+  padding-bottom: var(--spacing-xxs);
+  font-weight: var(--font-weight-table);
   letter-spacing: normal;
 }
 
-/* First column with extra padding (ps-4 equivalent) */
+/* First column with extra padding */
 .ag-theme-alpine .ag-cell:first-child {
-  padding-left: 1.5rem !important;
+  padding-left: var(--spacing-xl) !important;
 }
 
 /* Badge styling for AG Grid */
 .ag-badge {
   display: inline-block;
-  padding: 0.25em 0.6em;
+  padding: var(--spacing-xxs) var(--spacing-xs);
   font-size: 75%;
   font-weight: var(--font-weight-bold);
   line-height: 1;
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
-  border-radius: 0.25rem;
-  color: #fff;
+  border-radius: var(--border-radius-sm);
+  color: var(--color-white);
 }
 
-.ag-badge-primary { background-color: #0d6efd; }
-.ag-badge-secondary { background-color: #6c757d; }
-.ag-badge-success { background-color: #198754; }
-.ag-badge-info { background-color: #0dcaf0; }
-.ag-badge-warning { background-color: #ffc107; color: #212529; }
+.ag-badge-primary { background-color: var(--bs-blue); }
+.ag-badge-secondary { background-color: var(--bs-gray); }
+.ag-badge-success { background-color: var(--bs-green); }
+.ag-badge-info { background-color: var(--bs-cyan); }
+.ag-badge-warning { background-color: var(--bs-yellow); color: var(--bs-gray-900); }
 
 /* Pagination styling */
 .ag-theme-alpine .ag-paging-panel {
   padding: var(--spacing-base);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
-  border-top: 0.0625rem solid var(--ag-border-color);
+  border-top: var(--border-width-standard) solid var(--ag-border-color);
 }
 
 .ag-theme-alpine .ag-paging-button {
@@ -135,7 +135,7 @@ Table styles - AG Grid theme and custom table styling
 /* Action buttons in cells */
 .ag-theme-alpine .cell-action-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
 }
 
 .ag-theme-alpine .cell-action-btn {
@@ -161,7 +161,7 @@ Table styles - AG Grid theme and custom table styling
 .ag-theme-alpine .ag-action-cell {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
 }
 
 .ag-theme-alpine .transparent-button {
@@ -169,42 +169,42 @@ Table styles - AG Grid theme and custom table styling
   border: none;
   color: var(--color-text-secondary);
   text-decoration: none;
-  padding: 0.25rem 0.5rem;
+  padding: var(--spacing-xxs) var(--spacing-sm);
   cursor: pointer;
 }
 
 .ag-theme-alpine .btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: var(--font-size-sm); /* Changed from 0.875rem to use variable */
-  border-radius: 0.2rem;
+  padding: var(--spacing-xxs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  border-radius: var(--border-radius-sm);
 }
 
 .ag-theme-alpine .btn-outline-secondary {
-  color: #6c757d;
-  border-color: #6c757d;
+  color: var(--bs-gray);
+  border-color: var(--bs-gray);
   background-color: transparent;
 }
 
 /* Empty state styling */
 .ag-theme-alpine .ag-overlay-no-rows-center {
-  padding: 2rem;
+  padding: var(--spacing-2xl);
   color: var(--color-text-light);
 }
 
 /* Table container height */
 #table-container {
-  min-height: 26.25rem; /* Ensures the container has a minimum height */
-  height: auto !important; /* Allow the container to grow */
-  max-height: none; /* Remove the max height restriction */
-  overflow: visible; /* Don't add scrollbars */
-  padding-top: 0.625rem;
-  padding-bottom: 1.25rem;
-  margin-bottom: 2rem;
+  min-height: 26.25rem;
+  height: auto !important;
+  max-height: none;
+  overflow: visible;
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
 }
 
 /* Optional: Add padding to the table itself to create space inside */
 table {
-  padding: 0.625rem; /* Adjust as needed */
+  padding: var(--spacing-md);
 }
 
 /* Responsive table wrapper */
@@ -225,14 +225,14 @@ table {
 .table th {
   font-weight: var(--font-weight-semibold);
   background-color: var(--color-bg-light);
-  border-bottom: 0.0625rem solid var(--color-border);
+  border-bottom: var(--border-width-standard) solid var(--color-border);
   padding: var(--spacing-base);
   text-align: left;
 }
 
 .table td {
   padding: var(--spacing-base);
-  border-bottom: 0.0625rem solid var(--color-border-lighter);
+  border-bottom: var(--border-width-standard) solid var(--color-border-lighter);
   vertical-align: middle;
 }
 
@@ -241,7 +241,7 @@ table {
 }
 
 .table tbody tr:hover {
-  background-color: rgba(var(--color-primary-rgb), 0.05);
+  background-color: var(--color-bg-hover);
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
@@ -249,22 +249,22 @@ table {
 }
 
 .table-striped tbody tr:nth-of-type(odd):hover {
-  background-color: rgba(var(--color-primary-rgb), 0.05);
+  background-color: var(--color-bg-hover);
 }
 
 .table-bordered {
-  border: 0.0625rem solid var(--color-border-light);
+  border: var(--border-width-standard) solid var(--color-border-light);
 }
 
 .table-bordered th,
 .table-bordered td {
-  border: 0.0625rem solid var(--color-border-light);
+  border: var(--border-width-standard) solid var(--color-border-light);
 }
 
 /* Add specific fix for Data Trends section */
 #dataChart {
   position: relative;
-  z-index: 10; /* Ensure chart is above other elements */
+  z-index: 10;
 }
 
 /* Ensure chart container is properly separated */

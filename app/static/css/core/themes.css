@@ -13,6 +13,8 @@ Contains dark theme variables and style overrides
   --color-bg-secondary: #1e1e1e;
   --color-bg-light: #252525;
   --color-bg-lighter: #1e1e1e;
+  --color-bg-hover: var(--color-bg-hover-dark);
+  --color-bg-selected: var(--color-bg-dark-selected);
 
   /* Text colors */
   --color-text-primary: #e1e1e1;
@@ -25,6 +27,7 @@ Contains dark theme variables and style overrides
   --color-border: #444444;
   --color-border-light: #444444;
   --color-border-lighter: #333333;
+  --color-table-border: #444444;
 
   /* Primary colors */
   --color-primary: #7d75ff;
@@ -64,6 +67,35 @@ Contains dark theme variables and style overrides
   --color-info-light: rgba(99, 179, 237, 0.15);
   --color-info-lighter: rgba(99, 179, 237, 0.08);
   --color-info-rgb: 99, 179, 237;
+
+  /* Bootstrap color overrides */
+  --bs-blue: #63b3ed;
+  --bs-indigo: #8da2fb;
+  --bs-purple: #9f7aea;
+  --bs-pink: #ed64a6;
+  --bs-red: #fc8181;
+  --bs-orange: #f6ad55;
+  --bs-yellow: #fbd38d;
+  --bs-green: #4fd1c5;
+  --bs-teal: #4fd1c5;
+  --bs-cyan: #63b3ed;
+  --bs-white: #e1e1e1;
+  --bs-gray: #a0aec0;
+  --bs-gray-dark: #4a5568;
+  --bs-gray-100: #2d3748;
+  --bs-gray-900: #e1e1e1;
+
+  /* Extended colors */
+  --color-slate: #a0aec0;
+  --color-emerald: #4fd1c5;
+  --color-amber: #fbd38d;
+  --color-rose: #fc8181;
+  --color-sky: #63b3ed;
+
+  /* Table specific */
+  --color-table-header-bg: #252525;
+  --color-table-header-text: #e1e1e1;
+  --color-table-row-hover: rgba(125, 117, 255, 0.1);
 
   /* Section Components */
   --bg-section-heading: #252525;
@@ -237,8 +269,8 @@ Contains dark theme variables and style overrides
   --ag-border-color: var(--color-border);
   --ag-secondary-border-color: var(--color-border-lighter);
   --ag-row-border-color: var(--color-border-lighter);
-  --ag-row-hover-color: rgba(var(--color-primary-rgb), 0.1);
-  --ag-selected-row-background-color: rgba(var(--color-primary-rgb), 0.2);
+  --ag-row-hover-color: var(--color-bg-hover-dark);
+  --ag-selected-row-background-color: var(--color-bg-dark-selected);
   --ag-checkbox-unchecked-color: var(--color-text-muted);
   --ag-checkbox-indeterminate-color: var(--color-text-muted);
 }
@@ -347,5 +379,5 @@ Contains dark theme variables and style overrides
 
 [data-theme="dark"] .table-striped tbody tr:hover,
 [data-theme="dark"] .table tbody tr:hover {
-  background-color: rgba(var(--color-primary-rgb), 0.1);
+  background-color: var(--color-bg-hover-dark);
 }

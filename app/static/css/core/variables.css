@@ -210,6 +210,56 @@ These variables make it easier to maintain consistent colors, spacing, and styli
 
   /* Color variable for badge text */
   --color-text-light-dark: #212529;
+
+  /* Bootstrap color system alignment */
+  --bs-blue: #0d6efd;
+  --bs-indigo: #6610f2;
+  --bs-purple: #6f42c1;
+  --bs-pink: #d63384;
+  --bs-red: #dc3545;
+  --bs-orange: #fd7e14;
+  --bs-yellow: #ffc107;
+  --bs-green: #198754;
+  --bs-teal: #20c997;
+  --bs-cyan: #0dcaf0;
+  --bs-white: #ffffff;
+  --bs-gray: #6c757d;
+  --bs-gray-dark: #343a40;
+  --bs-gray-100: #f8f9fa;
+  --bs-gray-200: #e9ecef;
+  --bs-gray-300: #dee2e6;
+  --bs-gray-400: #ced4da;
+  --bs-gray-500: #adb5bd;
+  --bs-gray-600: #6c757d;
+  --bs-gray-700: #495057;
+  --bs-gray-800: #343a40;
+  --bs-gray-900: #212529;
+
+  /* Extended color palette */
+  --color-slate: #64748b;
+  --color-emerald: #10b981;
+  --color-amber: #f59e0b;
+  --color-rose: #e11d48;
+  --color-sky: #0ea5e9;
+
+  /* Background variations */
+  --color-bg-hover: rgba(0, 0, 0, 0.075);
+  --color-bg-selected: rgba(var(--color-primary-rgb), 0.16);
+  --color-bg-dark-selected: rgba(var(--color-primary-rgb), 0.2);
+  --color-bg-hover-dark: rgba(var(--color-primary-rgb), 0.1);
+
+  /* Table-specific colors */
+  --color-table-header-bg: #f8f9fa;
+  --color-table-header-text: var(--color-text-primary);
+  --color-table-border: var(--color-border-light);
+  --color-table-row-hover: var(--color-bg-hover);
+
+  /* Button-specific variables */
+  --btn-transition: var(--transition-properties-hover) var(--transition-fast);
+  --btn-border-width: var(--border-width-standard);
+  --btn-focus-width: 0.25rem;
+  --btn-icon-size: 1rem;
+  --btn-icon-spacing: 0.25rem;
 }
 
 .nav-link {
