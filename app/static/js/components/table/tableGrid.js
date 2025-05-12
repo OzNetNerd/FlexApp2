@@ -10,7 +10,7 @@ import { handleGridResize } from './tableUtils.js';
 /**
  * Get grid options with all necessary configurations
  */
-export function getGridOptions(isEditModeActive) {
+export function getGridOptions() {
   return {
     columnDefs: [],
     rowData: [],
@@ -44,8 +44,11 @@ export function getGridOptions(isEditModeActive) {
 
     // Row double-click handler for navigation
     onRowDoubleClicked: event => {
-      // If in edit mode, don't navigate
-      if (isEditModeActive) return;
+      // Check current edit mode state dynamically - this is the fix
+      if (getEditModeState()) {
+        log("info", scriptName, "onRowDoubleClicked", "In edit mode, skipping navigation");
+        return;
+      }
 
       if (event.event.ctrlKey || event.event.metaKey ||
           event.event.shiftKey || event.event.button !== 0) return;
@@ -55,60 +58,6 @@ export function getGridOptions(isEditModeActive) {
 
       const basePath = window.location.pathname.split('/')[1];
       if (basePath) window.location.href = `/${basePath}/${id}`;
-    },
-
-    // Add context menu (right-click) options
-    getContextMenuItems: params => {
-      const id = params.node?.data?.id;
-      if (!id) return [];
-
-      const basePath = window.location.pathname.split('/')[1] || '';
-
-      const menuItems = [
-        {
-          name: 'View Details',
-          action: () => {
-            window.location.href = `/${basePath}/${id}`;
-          }
-        },
-        {
-          name: 'Edit',
-          action: () => {
-            window.location.href = `/${basePath}/edit/${id}`;
-          }
-        },
-        'separator',
-        {
-          name: 'Delete',
-          action: () => {
-            if (confirm('Are you sure you want to delete this item?')) {
-              window.location.href = `/${basePath}/delete/${id}`;
-            }
-          }
-        },
-        'separator',
-        'copy',
-        'export'
-      ];
-
-      // Add toggle edit option if in cell edit mode
-      if (getEditModeState()) {
-        menuItems.unshift('separator');
-        menuItems.unshift({
-          name: 'Edit Cell',
-          action: () => {
-            // Start cell editing programmatically
-            if (params.column && params.column.getColDef().editable) {
-              params.api.startEditingCell({
-                rowIndex: params.node.rowIndex,
-                colKey: params.column.getColId()
-              });
-            }
-          }
-        });
-      }
-
-      return menuItems;
     },
 
     // Add cell value changed handler to save updates

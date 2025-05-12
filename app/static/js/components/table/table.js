@@ -112,7 +112,7 @@ async function initializeTable() {
   }
 
   // Create grid options with data
-  const gridOptions = getGridOptions(getEditModeState());
+  const gridOptions = getGridOptions();
 
   // Set up onGridReady handler
   gridOptions.onGridReady = params => {

@@ -5,6 +5,7 @@
 import log from '/static/js/core/logger.js';
 const scriptName = "tableState.js";
 import { handleGridResize } from './tableUtils.js';
+import { editableColumnTracker } from './tableRenderers.js';
 
 // Global state
 let isEditModeActive = false;
@@ -49,18 +50,14 @@ export function toggleEditMode(mode, gridApiReference) {
     if (columns) {
       columns.forEach(column => {
         const colDef = column.getColDef();
-        // Skip special columns
-        if (colDef.field !== 'actions' && colDef.field !== 'id') {
-          // Get original value or determine if it should be editable
-          const canEdit = colDef.hasOwnProperty('originalEditable') ?
-            colDef.originalEditable :
-            (typeof colDef.cellRenderer !== 'function' &&
-             typeof colDef.valueFormatter !== 'function');
+        const field = colDef.field;
 
-          // Store original value if not already stored
-          if (!colDef.hasOwnProperty('originalEditable')) {
-            colDef.originalEditable = canEdit;
-          }
+        // Skip special columns
+        if (field !== 'actions' && field !== 'id') {
+          // Get editability from our tracker
+          const canEdit = editableColumnTracker.has(field)
+            ? editableColumnTracker.get(field)
+            : false;
 
           // Set editable based on mode
           colDef.editable = isEditModeActive && canEdit;

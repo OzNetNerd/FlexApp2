@@ -57,8 +57,8 @@ export const cellRenderers = {
   }
 };
 
-// Store column editability separately instead of using custom property
-export const editableColumns = new Map();
+// Store editable state for columns separately instead of on colDef
+export const editableColumnTracker = new Map();
 
 /**
  * Generate column definitions based on data
@@ -110,8 +110,8 @@ export function generateColumnDefs(data, isEditModeActive, cellRenderers) {
       canBeEdited = false;
     }
 
-    // Store editability in the separate map instead of on the column def
-    editableColumns.set(key, canBeEdited);
+    // Store editability in our tracker instead of on the colDef
+    editableColumnTracker.set(key, canBeEdited);
 
     // Set editable based on current mode
     def.editable = isEditModeActive && canBeEdited;
