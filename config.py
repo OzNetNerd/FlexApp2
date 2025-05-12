@@ -36,6 +36,9 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev_key_for_development")
     logger.debug(f"SECRET_KEY set to: {SECRET_KEY}")
 
+    SERVER_NAME = "localhost:5000"
+    PREFERRED_URL_SCHEME = "http"
+
     LOG_HTTP_REQUESTS = False
 
     SESSION_TYPE = "filesystem"
