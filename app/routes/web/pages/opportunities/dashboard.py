@@ -1,6 +1,6 @@
 from flask import request
 from flask_login import login_required
-from app.services.opportunity_service import OpportunityService
+from app.services.opportunity import OpportunityService
 from . import opportunities_bp
 from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.web.utils.context import WebContext

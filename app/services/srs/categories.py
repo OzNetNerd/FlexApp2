@@ -4,6 +4,8 @@ from typing import Dict, List, Any
 from app.models.pages.srs import SRS
 from app.services.service_base import ServiceBase
 from app.models import db
+from app.services.srs.constants import DEFAULT_EASE_FACTOR
+
 
 class SRSCategoryService(ServiceBase):
     """Service for managing SRS categories/decks."""
@@ -290,7 +292,6 @@ class SRSCategoryService(ServiceBase):
         reviewed_items = total_items - new_items
 
         # Calculate average ease factor
-        from app.services.srs.constants import DEFAULT_EASE_FACTOR
         avg_ease = sum(item.ease_factor or DEFAULT_EASE_FACTOR for item in items) / total_items if total_items else 0
 
         # Calculate mastery

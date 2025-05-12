@@ -1,6 +1,6 @@
 from flask import request
 from flask_login import login_required
-from app.services.user_service import UserService
+from app.services.user import UserService
 from app.routes.web.pages.users import users_bp
 from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.web.utils.context import WebContext

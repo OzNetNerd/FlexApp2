@@ -1,6 +1,6 @@
 from flask import request
 from flask_login import login_required
-from app.services.task_service import TaskService
+from app.services.task import TaskService
 from app.routes.web.pages.tasks import tasks_bp
 from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.web.utils.context import WebContext

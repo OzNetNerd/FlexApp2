@@ -1,6 +1,6 @@
 from flask import request
 from flask_login import login_required
-from app.services.company_service import CompanyService
+from app.services.company import CompanyService
 from app.routes.web.pages.companies import companies_bp
 from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.web.utils.context import WebContext

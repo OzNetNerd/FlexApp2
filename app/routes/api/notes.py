@@ -5,7 +5,7 @@ from flask import Blueprint, request
 
 from app.models import Note
 from app.routes.api.route_registration import ApiCrudRouteConfig
-from app.services.note_service import NoteService
+from app.services.note import NoteService
 from app.utils.app_logging import get_logger
 
 logger = get_logger()

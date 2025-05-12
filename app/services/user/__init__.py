@@ -1,4 +1,3 @@
-# app/services/user/__init__.py
 from app.services.service_base import ServiceBase, ServiceRegistry
 from app.services.user.core import UserCoreService
 from app.services.user.analytics import UserAnalyticsService
@@ -7,9 +6,9 @@ from app.services.user.analytics import UserAnalyticsService
 class UserService(ServiceBase):
     """Main service for managing users."""
 
-    def __init__(self):
+    def __init__(self, model_class=None):
         """Initialize the User service with sub-services."""
-        super().__init__()
+        super().__init__(model_class)
         self.core = ServiceRegistry.get(UserCoreService)
         self.analytics = ServiceRegistry.get(UserAnalyticsService)
 

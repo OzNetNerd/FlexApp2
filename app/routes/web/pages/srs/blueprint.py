@@ -4,16 +4,12 @@ SRS blueprint configuration module.
 This module initializes the SRS service and creates the blueprint
 for SRS-related routes in the web application.
 """
-from flask import Flask
-from app.services.srs_service import SRSService
+from app.services.srs import SRSService
 from app.models.pages.srs import SRS
 from app.routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
 from app.utils.app_logging import get_logger
 
 logger = get_logger()
-
-# Define missing constant
-DEFAULT_EASE_FACTOR = 2.5
 
 # Create the service instance
 logger.info("Initializing SRS service")

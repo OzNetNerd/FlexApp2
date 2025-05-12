@@ -1,4 +1,4 @@
-from app.services.relationship_service import RelationshipService
+from app.services.relationship import RelationshipService
 from app.utils.app_logging import get_logger
 
 logger = get_logger()

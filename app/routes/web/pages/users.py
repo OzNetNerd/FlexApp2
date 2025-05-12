@@ -6,7 +6,7 @@
 # from flask_login import login_required
 # from app.models import User, Note, Opportunity
 # from app.routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig
-# from app.services.user_service import UserService
+# from app.services.user import UserService
 # from app.models.base import db
 #
 # # Create the blueprint with the factory

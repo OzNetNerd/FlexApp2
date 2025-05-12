@@ -2,7 +2,7 @@ from flask import Blueprint
 
 from app.models import User
 from app.routes.api.route_registration import ApiCrudRouteConfig
-from app.services.user_service import UserService
+from app.services.user import UserService
 from app.utils.app_logging import get_logger
 
 logger = get_logger()

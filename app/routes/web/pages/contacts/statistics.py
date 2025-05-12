@@ -1,6 +1,6 @@
 from flask import request
 from flask_login import login_required
-from app.services.contact_service import ContactService
+from app.services.contact import ContactService
 from . import contacts_bp
 from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
 from app.routes.web.utils.context import WebContext

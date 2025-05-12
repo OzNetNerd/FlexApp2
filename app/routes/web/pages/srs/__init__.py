@@ -5,7 +5,8 @@ This package contains all the routes and context classes related to
 the Spaced Repetition System functionality of the application.
 """
 # Import from blueprint.py instead of duplicating
-from app.routes.web.pages.srs.blueprint import srs_bp, srs_service, DEFAULT_EASE_FACTOR
+from app.routes.web.pages.srs.blueprint import srs_bp, srs_service
+from app.services.srs.constants import DEFAULT_EASE_FACTOR
 
 # Export context classes for use in route modules
 from app.routes.web.pages.srs.contexts import (
@@ -22,7 +23,6 @@ from app.routes.web.pages.srs.contexts import (
 __all__ = [
     "srs_bp",
     "srs_service",
-    "DEFAULT_EASE_FACTOR",
     "SRSContext",
     "SRSCardListContext",
     "SRSDashboardContext",

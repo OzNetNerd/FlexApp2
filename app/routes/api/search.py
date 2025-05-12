@@ -9,7 +9,7 @@ from app.models.pages.opportunity import Opportunity
 from app.models.pages.srs import SRS
 from app.models.pages.task import Task
 from app.models.pages.user import User
-from app.services.search_service import SearchService
+from app.services.search import SearchService
 from app.utils.app_logging import get_logger
 
 from .json_utils import json_endpoint

@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify, Response
 
 from app.routes.api.route_registration import ApiCrudRouteConfig
 from app.utils.app_logging import get_logger
-from app.services.srs_service import SRSService, DEFAULT_EASE_FACTOR
+from app.services.srs import SRSService
 
 
 logger = get_logger()

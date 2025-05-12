@@ -1,12 +1,12 @@
 """Algorithm service for SRS spacing calculations."""
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS
 from app.services.service_base import ServiceBase
 from app.services.srs.constants import (
-    MIN_INTERVAL, SHORT_INTERVAL, MEDIUM_INTERVAL, DAY_INTERVAL,
+    MIN_INTERVAL, SHORT_INTERVAL, MEDIUM_INTERVAL,
     GOOD_INITIAL_INTERVAL, EASY_MULTIPLIER, GOOD_MULTIPLIER, HARD_MULTIPLIER,
     DEFAULT_EASE_FACTOR, MIN_EASE_FACTOR, MAX_EASE_FACTOR,
     FAIL_EASE_PENALTY, HARD_EASE_PENALTY, EASY_EASE_BONUS, MAX_INTERVAL,
