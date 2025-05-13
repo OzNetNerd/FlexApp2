@@ -1,130 +1,47 @@
-<!-- START TEMPLATE: macros/forms.html -->
-
-{#
-  Template: forms.html
-
-  Provides a reusable Jinja2 macro to render form fields with full read/write and read-only support.
-
-  • render_field(entry, read_only=false, column_class="col-md-6")
-      – entry          : dict or object with attributes:
-          • id or name     : used to set the input’s id and name
-          • label          : visible label text
-          • type           : one of "text", "textarea", "select", "checkbox",
-                              "date", "number", "autocomplete", or "readonly"
-          • value          : current field value
-          • options        : for "select" and "autocomplete" types (list of strings or {value,label/text} maps)
-          • required       : boolean, marks input as required and shows asterisk
-          • help_text      : optional help string shown below the field
-      – read_only      : if true, renders all inputs as disabled/read-only
-      – column_class   : Bootstrap column class for field container
-
-  Behavior:
-    • Chooses the correct HTML control (input, textarea, select, checkbox)
-      based on entry.type.
-    • Handles read-only rendering by disabling inputs or showing plain display.
-    • Automatically applies Bootstrap form-control/form-check classes.
-    • Renders a help-text block when provided and not in read-only mode.
-
-  Usage:
-    {% import 'partials/forms.html' as forms %}
-    {{ forms.render_field(field_entry, read_only=is_view_mode) }}
-#}
-
-
-{% macro render_field(entry, read_only=false, column_class="col-md-6") %}
+{% macro render_field(field, read_only=false, column_class="col-md-6") %}
   <div class="{{ column_class }} mb-3">
-    {# Use the provided entry.id or entry.name as the field identifier #}
-    {% set field_id = entry.id if (entry.id is defined and entry.id) else (entry.name if (entry.name is defined and entry.name) else '') %}
-
-    <label for="{{ field_id }}" class="form-label fw-semibold">
-      {{ entry.label }}
-      {% if entry.required and not read_only %}
+    <label for="{{ field.id }}" class="form-label fw-semibold">
+      {{ field.label.text }}
+      {% if field.flags.required and not read_only %}
         <span class="text-danger">*</span>
       {% endif %}
     </label>
 
-    {% if read_only or entry.type == 'readonly' or field_id == 'id' %}
-      {# Read-only display - show as disabled input for all types except checkboxes, selects, and dates #}
-      {% if entry.type == 'checkbox' %}
+    {% if read_only %}
+      {% if field.type == 'BooleanField' %}
         <div class="form-check">
-          <input type="checkbox" class="form-check-input" id="{{ field_id }}" name="{{ field_id }}"
-                 {% if entry.value %}checked{% endif %} disabled>
-          <label class="form-check-label" for="{{ field_id }}">{{ entry.label }}</label>
+          <input type="checkbox" class="form-check-input" disabled {% if field.data %}checked{% endif %}>
+          <label class="form-check-label">{{ field.label.text }}</label>
         </div>
-      {% elif entry.type == 'select' and entry.options %}
-        <select class="form-select" id="{{ field_id }}" name="{{ field_id }}" disabled>
-          {% for option in entry.options %}
-            {% if option is string %}
-              <option value="{{ option }}" {% if entry.value == option %}selected{% endif %}>
-                {{ option }}
-              </option>
-            {% elif option is mapping %}
-              <option value="{{ option.value }}" {% if entry.value == option.value %}selected{% endif %}>
-                {{ option.text or option.label }}
-              </option>
-            {% endif %}
+      {% elif field.type == 'SelectField' %}
+        <select class="form-select" disabled>
+          {% for choice in field.choices %}
+            <option {% if field.data == choice[0] %}selected{% endif %}>
+              {{ choice[1] }}
+            </option>
           {% endfor %}
         </select>
-      {% elif entry.type == 'textarea' %}
-        <textarea class="form-control" id="{{ field_id }}" name="{{ field_id }}" disabled>{{ entry.value or '' }}</textarea>
-      {% elif entry.type == 'date' %}
-        <input type="date" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
-               value="{{ entry.value }}" disabled>
-      {% elif entry.type == 'number' %}
-        <input type="number" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
-               value="{{ entry.value or '' }}" disabled>
+      {% elif field.type == 'TextAreaField' %}
+        <textarea class="form-control" disabled>{{ field.data or '' }}</textarea>
+      {% elif field.type == 'DateTimeField' or field.type == 'DateField' %}
+        <input type="text" class="form-control" value="{{ field.data }}" disabled>
       {% else %}
-        <input type="text" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
-               value="{{ entry.value or '' }}" disabled>
+        <input type="text" class="form-control" value="{{ field.data or '' }}" disabled>
       {% endif %}
-    {% elif entry.type == 'textarea' %}
-      <textarea class="form-control" id="{{ field_id }}" name="{{ field_id }}"
-                {% if entry.required %}required{% endif %}>{{ entry.value or '' }}</textarea>
-    {% elif entry.type == 'select' and entry.options %}
-      <select class="form-select" id="{{ field_id }}" name="{{ field_id }}"
-              {% if entry.required %}required{% endif %}>
-        <option value="">-- Select {{ entry.label }} --</option>
-        {% for option in entry.options %}
-          {% if option is string %}
-            <option value="{{ option }}" {% if entry.value == option %}selected{% endif %}>
-              {{ option }}
-            </option>
-          {% elif option is mapping %}
-            <option value="{{ option.value }}" {% if entry.value == option.value %}selected{% endif %}>
-              {{ option.text or option.label }}
-            </option>
-          {% endif %}
-        {% endfor %}
-      </select>
-    {% elif entry.type == 'checkbox' %}
-      <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="{{ field_id }}" name="{{ field_id }}"
-               {% if entry.value %}checked{% endif %}>
-        <label class="form-check-label" for="{{ field_id }}">{{ entry.label }}</label>
-      </div>
-    {% elif entry.type == 'date' %}
-      <input type="date" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
-             value="{{ entry.value }}"
-             {% if entry.required %}required{% endif %}>
-    {% elif entry.type == 'number' %}
-      <input type="number" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
-             value="{{ entry.value or '' }}"
-             {% if entry.required %}required{% endif %}>
-    {% elif entry.type == 'autocomplete' %}
-      <input type="text" class="form-control autocomplete-input" id="{{ field_id }}" name="{{ field_id }}"
-             value="{{ entry.value or '' }}"
-             {% if entry.required %}required{% endif %}
-             data-options="{{ entry.options|tojson if entry.options else '[]' }}">
     {% else %}
-      <input type="text" class="form-control" id="{{ field_id }}" name="{{ field_id }}"
-             value="{{ entry.value or '' }}"
-             {% if entry.required %}required{% endif %}>
+      {{ field(class="form-control" if field.type != 'BooleanField' else "form-check-input") }}
+      
+      {% if field.errors %}
+        <div class="invalid-feedback d-block">
+          {% for error in field.errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+      {% endif %}
     {% endif %}
 
-    {% if entry.help_text and not read_only %}
-      <div class="form-text text-muted">{{ entry.help_text }}</div>
+    {% if field.description and not read_only %}
+      <div class="form-text text-muted">{{ field.description }}</div>
     {% endif %}
   </div>
 {% endmacro %}
-
-<!-- END TEMPLATE: macros/forms.html -->

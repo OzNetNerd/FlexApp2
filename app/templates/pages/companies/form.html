@@ -1,0 +1,14 @@
+{% extends "layouts/crud_base_view.html" %}
+
+{% block form_content %}
+  <div class="row">
+    <div class="col-md-6">
+      {{ forms.render_field(form.name) }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      {{ forms.render_field(form.description, rows=5) }}
+    </div>
+  </div>
+{% endblock %}
