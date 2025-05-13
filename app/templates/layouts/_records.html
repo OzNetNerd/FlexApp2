@@ -39,8 +39,7 @@
               {{ buttons.icon_button(type="button", class="btn btn-sm", colour="outline-success", icon="check-square", text="Select All", onclick="", form="selectAllColumns") }}
               {{ buttons.icon_button(type="button", class="btn btn-sm", colour="outline-danger", icon="square", text="Clear All", onclick="", form="clearAllColumns") }}
             </div>
-            <div id="columnSelectorItems" class="mt-2">
-              </div>
+            <div id="columnSelectorItems" class="mt-2"></div>
           </div>
         </div>
 
@@ -91,8 +90,8 @@
     <div id="table-container"
          class="ag-theme-alpine px-3 view-mode"
          style="height: auto; min-height: 500px; flex: 1 1 auto; overflow: visible;"
-         data-api-url="{{ api_url|default('') }}"
-         data-entity-name="{{ entity_name|default('item') }}">
+         data-entity-name="{{ entity_name|default('item') }}"
+         data-table-data="{{ table_data|tojson }}">
     </div>
   </div>
 </div>
@@ -101,9 +100,8 @@
 <script type="module" src="{{ url_for('static', filename='js/components/table/table.js') }}"></script>
 
 <script>
-  // Additional script to ensure the grid resizes properly
   document.addEventListener('DOMContentLoaded', function() {
-    // If you're using the AG Grid API directly, you can also add this:
+    // Handle grid resizing
     const resizeObserver = new ResizeObserver(() => {
       if (window.gridApi) {
         window.gridApi.sizeColumnsToFit();

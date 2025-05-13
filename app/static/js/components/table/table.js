@@ -1,11 +1,11 @@
 /**
- * table.js - Consolidated AG Grid table implementation.
+ * table.js - Consolidated AG Grid table implementation for server-rendered data.
  */
 
 import log from '/static/js/core/logger.js';
 const scriptName = "table.js";
 
-import { fetchApiDataFromContainer, normalizeData } from '/static/js/services/apiService.js';
+import { normalizeData } from '/static/js/services/apiService.js';
 import { createGrid, ModuleRegistry, ClientSideRowModelModule } from 'https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.1/ag-grid-community.esm.min.js';
 
 // Import modules
@@ -74,7 +74,7 @@ function setUpApis(api, columnApi) {
 }
 
 /**
- * Main table initialization function
+ * Main table initialization function optimized for server-rendered data
  */
 async function initializeTable() {
   log("info", scriptName, "initTable", "🚀 Starting table init");
@@ -94,24 +94,29 @@ async function initializeTable() {
     gridDiv.classList.add('ag-theme-alpine');
   }
 
-  // Fetch and process data
-  let actualData;
+  // Get data from the data attribute set by Jinja template
+  let tableData = [];
   try {
-    const raw = await fetchApiDataFromContainer(tableContainerId);
-    log("debug", scriptName, "initTable", "Raw data received");
+    // Extract data from the data-table-data attribute
+    const rawData = gridDiv.dataset.tableData;
+    if (rawData) {
+      tableData = JSON.parse(rawData);
+      log("info", scriptName, "initTable", `Loaded server-side data: ${tableData.length} rows`);
 
-    const arr = Array.isArray(raw?.data?.data) ? raw.data.data :
-               Array.isArray(raw?.data) ? raw.data : [];
-
-    log("debug", scriptName, "initTable", `Rows extracted: ${arr.length}`);
-    actualData = normalizeData(arr);
-    log("info", scriptName, "initTable", `Normalized rows: ${actualData.length}`);
+      // Normalize the data if needed
+      if (tableData.length > 0) {
+        tableData = normalizeData(tableData);
+        log("info", scriptName, "initTable", "Data normalized successfully");
+      }
+    } else {
+      log("warn", scriptName, "initTable", "No table data found in data-table-data attribute");
+    }
   } catch (err) {
-    log("error", scriptName, "initTable", "❌ Fetch/process failed", err);
-    return Promise.reject(err);
+    log("error", scriptName, "initTable", "Failed to parse server-side data", err);
+    return Promise.reject(new Error(`Failed to parse table data: ${err.message}`));
   }
 
-  // Create grid options with data
+  // Create grid options with the data
   const gridOptions = getGridOptions();
 
   // Set up onGridReady handler
@@ -130,24 +135,27 @@ async function initializeTable() {
     setTimeout(() => toggleEditMode('view', gridApiReference), 0);
   };
 
-  if (actualData && actualData.length) {
-    gridOptions.columnDefs = generateColumnDefs(actualData, getEditModeState(), cellRenderers);
+  // Set column definitions and row data if we have data
+  if (tableData && tableData.length) {
+    gridOptions.columnDefs = generateColumnDefs(tableData, getEditModeState(), cellRenderers);
     window.columnDefs = gridOptions.columnDefs;
-    gridOptions.rowData = actualData;
+    gridOptions.rowData = tableData;
   } else {
-    log("warn", scriptName, "initTable", "No data for columns");
+    log("warn", scriptName, "initTable", "No data available for column generation");
+    gridOptions.columnDefs = [];
+    gridOptions.rowData = [];
   }
 
   // Create grid
   try {
     const grid = new createGrid(gridDiv, gridOptions);
-    log("info", scriptName, "initTable", "AG Grid created");
+    log("info", scriptName, "initTable", "AG Grid created successfully");
   } catch (err) {
     log("error", scriptName, "initTable", "Grid creation failed", err);
     return Promise.reject(err);
   }
 
-  log("info", scriptName, "initTable", "Table init completed");
+  log("info", scriptName, "initTable", "Table initialization completed");
   return Promise.resolve(gridOptions);
 }
 
