@@ -90,8 +90,8 @@
     <div id="table-container"
          class="ag-theme-alpine px-3 view-mode"
          style="height: auto; min-height: 500px; flex: 1 1 auto; overflow: visible;"
-         data-entity-name="{{ entity_name|default('item') }}"
-         data-table-data="{{ table_data|tojson }}">
+         data-entity-name="{{ entity_name|default('item') }}">
+      <script type="application/json" id="table-data">{{ table_data|safe }}</script>
     </div>
   </div>
 </div>

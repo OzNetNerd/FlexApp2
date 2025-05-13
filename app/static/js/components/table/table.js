@@ -74,6 +74,30 @@ function setUpApis(api, columnApi) {
 }
 
 /**
+ * Get table data from the embedded JSON script element
+ */
+function getServerRenderedData() {
+  const dataElement = document.getElementById('table-data');
+  if (!dataElement) {
+    log("warn", scriptName, "getServerRenderedData", "No table-data element found");
+    return [];
+  }
+
+  try {
+    // Try to parse the content directly
+    return JSON.parse(dataElement.textContent || dataElement.innerText);
+  } catch (err) {
+    log("error", scriptName, "getServerRenderedData", `JSON parse error: ${err.message}`);
+
+    // If parsing fails, log the first 100 chars to help debugging
+    const content = dataElement.textContent || dataElement.innerText;
+    log("debug", scriptName, "getServerRenderedData", `Raw content start: ${content.substring(0, 100)}`);
+
+    return [];
+  }
+}
+
+/**
  * Main table initialization function optimized for server-rendered data
  */
 async function initializeTable() {
@@ -94,26 +118,17 @@ async function initializeTable() {
     gridDiv.classList.add('ag-theme-alpine');
   }
 
-  // Get data from the data attribute set by Jinja template
-  let tableData = [];
-  try {
-    // Extract data from the data-table-data attribute
-    const rawData = gridDiv.dataset.tableData;
-    if (rawData) {
-      tableData = JSON.parse(rawData);
-      log("info", scriptName, "initTable", `Loaded server-side data: ${tableData.length} rows`);
+  // Get data from the embedded script element with JSON
+  let tableData = getServerRenderedData();
 
-      // Normalize the data if needed
-      if (tableData.length > 0) {
-        tableData = normalizeData(tableData);
-        log("info", scriptName, "initTable", "Data normalized successfully");
-      }
-    } else {
-      log("warn", scriptName, "initTable", "No table data found in data-table-data attribute");
-    }
-  } catch (err) {
-    log("error", scriptName, "initTable", "Failed to parse server-side data", err);
-    return Promise.reject(new Error(`Failed to parse table data: ${err.message}`));
+  if (tableData && tableData.length > 0) {
+    log("info", scriptName, "initTable", `Loaded server-side data: ${tableData.length} rows`);
+
+    // Normalize the data if needed
+    tableData = normalizeData(tableData);
+    log("info", scriptName, "initTable", "Data normalized successfully");
+  } else {
+    log("warn", scriptName, "initTable", "No table data found or empty data array");
   }
 
   // Create grid options with the data
