@@ -63,16 +63,14 @@ class UserCoreService(CRUDService, ValidatorMixin):
                 elif activity == 'low':
                     filtered_users = [user for user in filtered_users if user_notes.get(user.id, 0) < medium_threshold]
 
-        result = []
+        # Attach counts as attributes rather than converting to dictionaries
         for user in filtered_users:
-            user_dict = user.__dict__.copy()
-            user_dict['notes_count'] = Note.query.filter_by(user_id=user.id).count()
-            user_dict['opportunities_count'] = db.session.query(db.func.count(self._get_opportunity_model().id)).filter(
+            user.notes_count = Note.query.filter_by(user_id=user.id).count()
+            user.opportunities_count = db.session.query(db.func.count(self._get_opportunity_model().id)).filter(
                 self._get_opportunity_model().created_by_id == user.id
             ).scalar() or 0
-            result.append(user_dict)
 
-        return result
+        return filtered_users
 
     def _get_opportunity_model(self):
         from app.models import Opportunity
