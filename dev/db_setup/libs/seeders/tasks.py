@@ -1,7 +1,7 @@
 # seeders/tasks.py - Task seeder
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from libs.path_utils import setup_paths
@@ -105,7 +105,7 @@ def seed_tasks():
 
         # Set due date to 30 days from now in UTC
         due_date = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0, microsecond=0)
-        due_date = due_date.replace(day=due_date.day + 30)
+        due_date = due_date + timedelta(days=30)
 
         # Set completed_at timestamp if the task is completed
         completed_at = None
