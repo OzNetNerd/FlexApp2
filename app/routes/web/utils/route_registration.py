@@ -16,8 +16,8 @@ from app.routes.web.utils.template_config import TemplateConfig
 logger = get_logger()
 
 # Type aliases
-ContextType = TypeVar('ContextType', bound=Union[TableContext, WebContext])
-EntityType = TypeVar('EntityType')
+ContextType = TypeVar("ContextType", bound=Union[TableContext, WebContext])
+EntityType = TypeVar("EntityType")
 
 
 class CRUDEndpoint(Enum):
@@ -62,11 +62,7 @@ class CrudRouteConfig:
 
 
 def handle_crud_operation(
-        endpoint: str,
-        service: Any,
-        blueprint_name: str,
-        entity_id: Optional[int],
-        form_data: Dict[str, Any]
+    endpoint: str, service: Any, blueprint_name: str, entity_id: Optional[int], form_data: Dict[str, Any]
 ) -> Optional[Response]:
     """Handle CRUD operations for POST requests.
 
@@ -93,11 +89,7 @@ def handle_crud_operation(
     return None
 
 
-def load_entity(
-        endpoint: str,
-        service: Any,
-        entity_id: Optional[int]
-) -> Optional[Any]:
+def load_entity(endpoint: str, service: Any, entity_id: Optional[int]) -> Optional[Any]:
     """Load an entity from the database for view/edit operations.
 
     Args:
@@ -130,7 +122,7 @@ def build_create_context(config: CrudRouteConfig, form=None) -> TableContext:
         action="create",
         read_only=False,
         title=f"Create {config.entity_table_name}",
-        submit_url=url_for(f"{config.blueprint.name}.create")
+        submit_url=url_for(f"{config.blueprint.name}.create"),
     )
 
     if form:
@@ -140,11 +132,11 @@ def build_create_context(config: CrudRouteConfig, form=None) -> TableContext:
 
 
 def build_view_edit_context(
-        config: CrudRouteConfig,
-        endpoint: str,
-        entity: Any,
-        entity_id: int,
-        form=None,
+    config: CrudRouteConfig,
+    endpoint: str,
+    entity: Any,
+    entity_id: int,
+    form=None,
 ) -> TableContext:
     """Build context for view/edit endpoints.
 
@@ -161,12 +153,7 @@ def build_view_edit_context(
     title = f"{'View' if read_only else 'Edit'} {config.entity_table_name}"
 
     context = TableContext(
-        entity=entity,
-        entity_table_name=config.entity_table_name,
-        action=endpoint,
-        entity_id=entity_id,
-        read_only=read_only,
-        title=title
+        entity=entity, entity_table_name=config.entity_table_name, action=endpoint, entity_id=entity_id, read_only=read_only, title=title
     )
 
     # Add form to context if available
@@ -264,7 +251,9 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
                     elif endpoint == CRUDEndpoint.edit.value:
                         # Update existing entity from form
                         form.populate_obj(entity)
-                        updated_entity = config.service.update(entity)
+                        # Get form data and pass it to the update method
+                        form_data = request.form.to_dict()
+                        updated_entity = config.service.update(entity, form_data)
                         return redirect(url_for(f"{config.blueprint.name}.view", entity_id=updated_entity.id))
         elif request.method == "POST" and CRUDEndpoint.is_valid(endpoint):
             # Fall back to existing behavior if no form_class
@@ -288,13 +277,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         if endpoint == CRUDEndpoint.create.value:
             context = build_create_context(config, form)
         elif endpoint in (CRUDEndpoint.view.value, CRUDEndpoint.edit.value):
-            context = build_view_edit_context(
-                config,
-                endpoint,
-                entity,
-                entity_id,
-                form
-            )
+            context = build_view_edit_context(config, endpoint, entity, entity_id, form)
         else:
             context = WebContext(title=config.entity_table_name)
 
@@ -333,8 +316,7 @@ def register_crud_routes(config: CrudRouteConfig) -> None:
         config: The configuration for CRUD routes
     """
     bp = config.blueprint
-    bp.add_url_rule(rule="/create", endpoint="create", view_func=route_handler("create", config),
-                    methods=["GET", "POST"])
+    bp.add_url_rule(rule="/create", endpoint="create", view_func=route_handler("create", config), methods=["GET", "POST"])
     bp.add_url_rule(rule="/<int:entity_id>", endpoint="view", view_func=route_handler("view", config), methods=["GET"])
     bp.add_url_rule(
         rule="/<int:entity_id>/edit",
@@ -356,13 +338,7 @@ def register_crud_routes(config: CrudRouteConfig) -> None:
     )
 
 
-def register_auth_route(
-        blueprint: Blueprint,
-        url: str,
-        handler: Callable,
-        endpoint_name: str,
-        methods: Optional[List[str]] = None
-) -> None:
+def register_auth_route(blueprint: Blueprint, url: str, handler: Callable, endpoint_name: str, methods: Optional[List[str]] = None) -> None:
     """Register an authentication route with a Flask blueprint.
 
     Args:
