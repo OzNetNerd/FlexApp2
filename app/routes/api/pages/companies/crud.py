@@ -6,6 +6,10 @@ from app.services.crud_service import CRUDService
 from app.routes.api.pages.companies import companies_api_bp
 from app.routes.api.route_registration import ApiCrudRouteConfig
 
+from app.utils.app_logging import get_logger
+
+logger = get_logger()
+
 # Register CRUD service and config
 company_service = CRUDService(Company)
 company_api_crud_config = ApiCrudRouteConfig(blueprint=companies_api_bp, entity_table_name="Company", service=company_service)
