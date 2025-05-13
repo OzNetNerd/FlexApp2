@@ -1,3 +1,5 @@
+# app/routes/api/pages/tasks.py
+
 from flask import Blueprint
 
 from app.models import Task
@@ -10,7 +12,7 @@ logger = get_logger()
 ENTITY_NAME = "Task"
 ENTITY_PLURAL_NAME = "Tasks"
 
-tasks_api_bp = Blueprint(f"{ENTITY_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
+tasks_api_bp = Blueprint(f"{ENTITY_PLURAL_NAME.lower()}_api", __name__, url_prefix=f"/api/{ENTITY_PLURAL_NAME.lower()}")
 
 task_service = CRUDService(Task)
 
