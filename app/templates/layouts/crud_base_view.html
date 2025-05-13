@@ -57,7 +57,9 @@
 </div>
 
 <!-- Delete Confirmation Modal - Rendered using crud macro -->
-{{ modals.delete_modal(request.endpoint.rsplit('.',1)[0], id) }}
+{% if id is defined and id %}
+  {{ modals.delete_modal(request.endpoint.rsplit('.',1)[0], id) }}
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}

@@ -17,10 +17,14 @@
         {{ buttons.icon_button(type="button", class="btn btn-secondary",
                  text="Cancel", onclick="closeDeleteModal()") }}
 
+        {% if id is not none %}
         <form action="{{ url_for(endpoint_prefix + '.delete', entity_id=id) }}" method="POST">
           {{ csrf_input }}
           {{ buttons.icon_button(type="submit", class="btn btn-danger", text="Confirm") }}
         </form>
+        {% else %}
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        {% endif %}
       </div>
     </div>
   </div>
