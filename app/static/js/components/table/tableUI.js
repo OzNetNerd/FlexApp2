@@ -105,8 +105,9 @@ export function setupColumnSelector(api) {
     }
 
     const def = col.getColDef?.() || {};
-    const name = (def.headerName || colId).replace(/\w\S*/g, txt =>
-      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    const name = def.headerName || colId.split('_').map(word =>
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
 
     const visible = !(Array.isArray(columnState) &&
       columnState.find(c => c.colId === colId)?.hide);

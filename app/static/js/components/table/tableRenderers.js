@@ -76,9 +76,9 @@ export function generateColumnDefs(data, isEditModeActive, cellRenderers) {
   // Import formatDisplayText
   const formatDisplayText = text => {
     return text
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase())
-      .trim();
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
 
   // Map data keys to column definitions
