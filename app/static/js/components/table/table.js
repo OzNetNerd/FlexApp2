@@ -18,6 +18,7 @@ import { getGridOptions } from './tableGrid.js';
 // Global variables
 let gridApiReference = null;
 let columnApiReference = null;
+const tableContainerId = "table-container";
 window.__tableInitialized = window.__tableInitialized || false;
 window.gridApi = null;
 
@@ -73,39 +74,15 @@ function setUpApis(api, columnApi) {
 }
 
 /**
- * Ensures the container has a valid API URL
- */
-function ensureContainerHasApiUrl(container) {
-  if (!container) return false;
-
-  // Check if API URL is already set
-  const apiUrl = container.dataset.apiUrl || container.getAttribute('data-api-url');
-
-  if (!apiUrl) {
-    log("error", scriptName, "ensureContainerHasApiUrl", "No API URL found on container");
-    return false;
-  }
-
-  return true;
-}
-
-/**
  * Main table initialization function
  */
-async function initializeTable(containerId = 'table-container') {
-  log("info", scriptName, "initTable", `🚀 Starting table init for ${containerId}`);
+async function initializeTable() {
+  log("info", scriptName, "initTable", "🚀 Starting table init");
 
   // Get and prepare container
-  const gridDiv = document.querySelector(`#${containerId}`);
+  const gridDiv = document.querySelector(`#${tableContainerId}`);
   if (!gridDiv) {
-    const error = new Error(`⚠️ Container #${containerId} not found`);
-    log("error", scriptName, "initTable", error.message);
-    return Promise.reject(error);
-  }
-
-  // Ensure container has API URL
-  if (!ensureContainerHasApiUrl(gridDiv)) {
-    const error = new Error(`⚠️ No API URL found for #${containerId}`);
+    const error = new Error(`⚠️ Container #${tableContainerId} not found`);
     log("error", scriptName, "initTable", error.message);
     return Promise.reject(error);
   }
@@ -120,12 +97,11 @@ async function initializeTable(containerId = 'table-container') {
   // Fetch and process data
   let actualData;
   try {
-    const raw = await fetchApiDataFromContainer(containerId);
+    const raw = await fetchApiDataFromContainer(tableContainerId);
     log("debug", scriptName, "initTable", "Raw data received");
 
     const arr = Array.isArray(raw?.data?.data) ? raw.data.data :
-               Array.isArray(raw?.data) ? raw.data :
-               Array.isArray(raw) ? raw : [];
+               Array.isArray(raw?.data) ? raw.data : [];
 
     log("debug", scriptName, "initTable", `Rows extracted: ${arr.length}`);
     actualData = normalizeData(arr);
@@ -198,23 +174,19 @@ if (!window.__tableInitialized) {
   window.__tableInitialized = true;
   document.addEventListener('DOMContentLoaded', () => {
     log("info", scriptName, "DOMContentLoaded", "Initializing table...");
-
-    // Add a small delay to ensure DOM is fully loaded and processed
-    setTimeout(() => {
-      initializeTable()
-        .then(() => {
-          log("info", scriptName, "DOMContentLoaded", "Table initialization completed successfully");
-          fixLayoutSpacing(gridApiReference); // Call layout spacing fix after table init
-        })
-        .catch(error => {
-          log("error", scriptName, "DOMContentLoaded", "Table initialization failed:", error);
-          // Display error to user
-          const container = document.querySelector('#table-container');
-          if (container) {
-            container.innerHTML = `<div class="alert alert-danger m-3">Error loading table: ${error.message}</div>`;
-          }
-        });
-    }, 50); // Small timeout to ensure DOM is fully processed
+    initializeTable()
+      .then(() => {
+        log("info", scriptName, "DOMContentLoaded", "Table initialization completed successfully");
+        fixLayoutSpacing(gridApiReference); // Call layout spacing fix after table init
+      })
+      .catch(error => {
+        log("error", scriptName, "DOMContentLoaded", "Table initialization failed:", error);
+        // Display error to user
+        const container = document.querySelector('#table-container');
+        if (container) {
+          container.innerHTML = `<div class="alert alert-danger m-3">Error loading table: ${error.message}</div>`;
+        }
+      });
   });
 }
 
