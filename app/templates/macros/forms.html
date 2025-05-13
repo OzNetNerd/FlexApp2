@@ -1,47 +1,106 @@
 {% macro render_field(field, read_only=false, column_class="col-md-6") %}
   <div class="{{ column_class }} mb-3">
-    <label for="{{ field.id }}" class="form-label fw-semibold">
-      {{ field.label.text }}
-      {% if field.flags.required and not read_only %}
-        <span class="text-danger">*</span>
-      {% endif %}
-    </label>
+    {% if field is mapping %}
+      {# Handle dictionary inputs #}
+      <label for="{{ field.name|default('') }}" class="form-label fw-semibold">
+        {{ field.label }}
+        {% if field.required and not read_only %}
+          <span class="text-danger">*</span>
+        {% endif %}
+      </label>
 
-    {% if read_only %}
-      {% if field.type == 'BooleanField' %}
-        <div class="form-check">
-          <input type="checkbox" class="form-check-input" disabled {% if field.data %}checked{% endif %}>
-          <label class="form-check-label">{{ field.label.text }}</label>
-        </div>
-      {% elif field.type == 'SelectField' %}
-        <select class="form-select" disabled>
-          {% for choice in field.choices %}
-            <option {% if field.data == choice[0] %}selected{% endif %}>
-              {{ choice[1] }}
-            </option>
-          {% endfor %}
-        </select>
-      {% elif field.type == 'TextAreaField' %}
-        <textarea class="form-control" disabled>{{ field.data or '' }}</textarea>
-      {% elif field.type == 'DateTimeField' or field.type == 'DateField' %}
-        <input type="text" class="form-control" value="{{ field.data }}" disabled>
+      {% if read_only %}
+        {% if field.type == 'BooleanField' %}
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" disabled {% if field.value %}checked{% endif %}>
+            <label class="form-check-label">{{ field.label }}</label>
+          </div>
+        {% elif field.type == 'SelectField' %}
+          <select class="form-select" disabled>
+            {% for choice in field.choices|default([]) %}
+              <option {% if field.value == choice[0] %}selected{% endif %}>
+                {{ choice[1] }}
+              </option>
+            {% endfor %}
+          </select>
+        {% elif field.type == 'textarea' or field.type == 'TextAreaField' %}
+          <textarea class="form-control" disabled>{{ field.value or '' }}</textarea>
+        {% elif field.type == 'DateTimeField' or field.type == 'DateField' %}
+          <input type="text" class="form-control" value="{{ field.value }}" disabled>
+        {% else %}
+          <input type="text" class="form-control" value="{{ field.value or '' }}" disabled>
+        {% endif %}
       {% else %}
-        <input type="text" class="form-control" value="{{ field.data or '' }}" disabled>
+        {% if field.type == 'BooleanField' %}
+          <input type="checkbox" class="form-check-input" name="{{ field.name }}"
+                 {% if field.value %}checked{% endif %}
+                 {% if field.required %}required{% endif %}>
+        {% elif field.type == 'textarea' or field.type == 'TextAreaField' %}
+          <textarea class="form-control" name="{{ field.name }}"
+                    {% if field.required %}required{% endif %}>{{ field.value or '' }}</textarea>
+        {% elif field.type == 'SelectField' %}
+          <select class="form-select" name="{{ field.name }}"
+                  {% if field.required %}required{% endif %}>
+            {% for choice in field.choices|default([]) %}
+              <option value="{{ choice[0] }}" {% if field.value == choice[0] %}selected{% endif %}>
+                {{ choice[1] }}
+              </option>
+            {% endfor %}
+          </select>
+        {% else %}
+          <input type="text" class="form-control" name="{{ field.name }}" value="{{ field.value or '' }}"
+                 {% if field.required %}required{% endif %}>
+        {% endif %}
+      {% endif %}
+
+      {% if field.description and not read_only %}
+        <div class="form-text text-muted">{{ field.description }}</div>
       {% endif %}
     {% else %}
-      {{ field(class="form-control" if field.type != 'BooleanField' else "form-check-input") }}
-      
-      {% if field.errors %}
-        <div class="invalid-feedback d-block">
-          {% for error in field.errors %}
-            {{ error }}
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endif %}
+      {# Handle WTForms field objects #}
+      <label for="{{ field.id }}" class="form-label fw-semibold">
+        {{ field.label.text }}
+        {% if field.flags.required and not read_only %}
+          <span class="text-danger">*</span>
+        {% endif %}
+      </label>
 
-    {% if field.description and not read_only %}
-      <div class="form-text text-muted">{{ field.description }}</div>
+      {% if read_only %}
+        {% if field.type == 'BooleanField' %}
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" disabled {% if field.data %}checked{% endif %}>
+            <label class="form-check-label">{{ field.label.text }}</label>
+          </div>
+        {% elif field.type == 'SelectField' %}
+          <select class="form-select" disabled>
+            {% for choice in field.choices %}
+              <option {% if field.data == choice[0] %}selected{% endif %}>
+                {{ choice[1] }}
+              </option>
+            {% endfor %}
+          </select>
+        {% elif field.type == 'TextAreaField' %}
+          <textarea class="form-control" disabled>{{ field.data or '' }}</textarea>
+        {% elif field.type == 'DateTimeField' or field.type == 'DateField' %}
+          <input type="text" class="form-control" value="{{ field.data }}" disabled>
+        {% else %}
+          <input type="text" class="form-control" value="{{ field.data or '' }}" disabled>
+        {% endif %}
+      {% else %}
+        {{ field(class="form-control" if field.type != 'BooleanField' else "form-check-input") }}
+
+        {% if field.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in field.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endif %}
+
+      {% if field.description and not read_only %}
+        <div class="form-text text-muted">{{ field.description }}</div>
+      {% endif %}
     {% endif %}
   </div>
 {% endmacro %}
