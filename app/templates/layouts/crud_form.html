@@ -1,48 +1,43 @@
 {% extends "layouts/base.html" %}
+{% import "macros/sections.html" as sections %}
+{% import "macros/buttons.html" as buttons %}
+{% import "macros/forms.html" as forms %}
+
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="card">
-    <div class="card-header">
-      <h2>{{ title }}</h2>
-    </div>
-    <div class="card-body">
-      <form method="POST" action="{{ submit_url }}">
-        {{ form.csrf_token }}
+<!-- Heading Section -->
+{{ sections.heading_section(
+  heading_text=title,
+  subtext='Enter the required information below'
+) }}
 
-        <div class="form-group mb-3">
-          {{ form.name.label(class="form-label") }}
-          {{ form.name(class="form-control") }}
-          {% if form.name.errors %}
-            <div class="text-danger">
-              {% for error in form.name.errors %}
-                <span>{{ error }}</span>
-              {% endfor %}
-            </div>
-          {% endif %}
-        </div>
+<!-- Form Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="section-card-heading">{{ title }}</h2>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ submit_url }}" id="entity-form">
+          {{ form.csrf_token }}
 
-        <div class="form-group mb-3">
-          {{ form.description.label(class="form-label") }}
-          {{ form.description(class="form-control", rows=5) }}
-          {% if form.description.errors %}
-            <div class="text-danger">
-              {% for error in form.description.errors %}
-                <span>{{ error }}</span>
-              {% endfor %}
-            </div>
-          {% endif %}
-        </div>
+          <div class="row">
+            {% for field in form if field.name != 'csrf_token' %}
+              {{ forms.render_field(field) }}
+            {% endfor %}
+          </div>
 
-        <div class="form-group">
-          <button type="submit" class="btn btn-primary">Save</button>
-          <a href="{{ url_for(entity_base_route + '.index') }}" class="btn btn-secondary">Cancel</a>
-          {% if id %}
-            <a href="{{ url_for(entity_base_route + '.view', entity_id=id) }}" class="btn btn-info">View</a>
-          {% endif %}
-        </div>
-      </form>
+          <div class="mt-4">
+            {{ buttons.icon_button(type="submit", class="btn btn-primary", icon="save", text="Save", form="entity-form") }}
+            {{ buttons.icon_button(href=url_for(entity_base_route + '.index'), class="btn btn-secondary", icon="arrow-left", text="Cancel") }}
+            {% if id %}
+              {{ buttons.icon_button(href=url_for(entity_base_route + '.view', entity_id=id), class="btn btn-info", icon="eye", text="View") }}
+            {% endif %}
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
