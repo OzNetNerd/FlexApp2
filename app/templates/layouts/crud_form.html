@@ -32,7 +32,7 @@
                                class="transparent-button", icon="arrow-left", text="Back to List") }}
           {{ buttons.icon_button(type="button", class="transparent-button btn-danger",
                                icon="trash", text="Delete",
-                               onclick="document.getElementById('deleteModal').classList.add('show'); document.getElementById('deleteModal').style.display = 'block';") }}
+                               onclick="new bootstrap.Modal(document.getElementById('deleteConfirmationModal')).show()") }}
         </div>
         {% endif %}
       </div>
@@ -77,4 +77,10 @@
 
 {% block scripts_extra %}
 {{ buttons.crud_buttons(mode, id, entity_base_route, entity_type_name) }}
+<script>
+function closeDeleteModal() {
+  const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
+  if (modal) modal.hide();
+}
+</script>
 {% endblock %}
