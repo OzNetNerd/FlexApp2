@@ -1,45 +1,50 @@
-<!-- START TEMPLATE: pages/companies/view.html -->
-{% extends 'layouts/crud_base_view.html' %}
-{% import 'macros/layout.html' as layout %}
-{% import 'macros/forms.html' as forms %}
-{% import 'macros/entity.html' as entity %}
+{% extends "layouts/base.html" %}
+{% block title %}View {{ entity_name }}{% endblock %}
 
-{% block form_content %}
-  {% set tabs = [
-    {'name': 'General', 'id': 'general', 'icon': 'info-circle', 'active': action != 'view', 'template': 'pages/companies/tabs/general.html'},
-    {'name': 'Contacts', 'id': 'contacts', 'icon': 'address-book', 'template': 'pages/companies/tabs/contacts.html'},
-    {'name': 'Opportunities', 'id': 'opportunities', 'icon': 'chart-line', 'template': 'pages/companies/tabs/opportunities.html'},
-    {'name': 'Capabilities', 'id': 'capabilities', 'icon': 'tools', 'template': 'pages/companies/tabs/capabilities.html'}
-  ] %}
-
-  {% if action == 'view' %}
-    {% set tabs = [
-      {'name': 'Notes', 'id': 'notes', 'icon': 'info-circle', 'active': true, 'template': 'shared_tabs/notes.html'}
-    ] + tabs %}
-  {% endif %}
-
-  {% if not read_only %}
-    {% if csrf_input %}
-      {{ csrf_input }}
-    {% else %}
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    {% endif %}
-  {% endif %}
-
-  {{ layout.tabs_navigation(tabs) }}
-
-  {% call layout.tabs_content() %}
-    {% for tab in tabs %}
-      {% include tab.template %}
-    {% endfor %}
-  {% endcall %}
-
-  {% if not read_only %}
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">{{ 'Save' if action == 'edit' else 'Create' }}</button>
-      <a href="#" class="btn btn-secondary">Cancel</a>
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between">
+      <h2>{{ model_name }}: {{ entity_name }}</h2>
+      <div>
+        <a href="{{ url_for(entity_base_route + '.edit', entity_id=id) }}" class="btn btn-primary">Edit</a>
+        <a href="{{ url_for(entity_base_route + '.index') }}" class="btn btn-secondary">Back to List</a>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+          Delete
+        </button>
+      </div>
     </div>
-  {% endif %}
+    <div class="card-body">
+      <dl class="row">
+        <dt class="col-sm-3">Name</dt>
+        <dd class="col-sm-9">{{ entity.name }}</dd>
+        
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">{{ entity.description or "No description provided" }}</dd>
+      </dl>
+    </div>
+  </div>
+</div>
 
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete {{ entity_name }}? This action cannot be undone.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form action="{{ url_for(entity_base_route + '.delete', entity_id=id) }}" method="POST">
+          {{ csrf_input|safe }}
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
-<!-- END TEMPLATE: pages/companies/view.html -->
