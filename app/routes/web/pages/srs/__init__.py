@@ -4,6 +4,7 @@ SRS (Spaced Repetition System) package.
 This package contains all the routes and context classes related to
 the Spaced Repetition System functionality of the application.
 """
+
 # Import from blueprint.py instead of duplicating
 from app.routes.web.pages.srs.blueprint import srs_bp, srs_service
 from app.services.srs.constants import DEFAULT_EASE_FACTOR

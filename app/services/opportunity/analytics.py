@@ -40,20 +40,17 @@ class OpportunityAnalyticsService(ServiceBase):
         return [
             {
                 "count": Opportunity.query.filter_by(stage="qualification", status="active").count(),
-                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="qualification",
-                                                                              status="active").scalar() or 0,
+                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="qualification", status="active").scalar() or 0,
                 "percentage": self.calculate_stage_percentage("qualification"),
             },
             {
                 "count": Opportunity.query.filter_by(stage="negotiation", status="active").count(),
-                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="negotiation",
-                                                                              status="active").scalar() or 0,
+                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="negotiation", status="active").scalar() or 0,
                 "percentage": self.calculate_stage_percentage("negotiation"),
             },
             {
                 "count": Opportunity.query.filter_by(stage="closing", status="active").count(),
-                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="closing",
-                                                                              status="active").scalar() or 0,
+                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="closing", status="active").scalar() or 0,
                 "percentage": self.calculate_stage_percentage("closing"),
             },
         ]
@@ -93,7 +90,7 @@ class OpportunityAnalyticsService(ServiceBase):
             won_count = Opportunity.query.filter(
                 Opportunity.status == "won",
                 extract("month", Opportunity.close_date) == month,
-                extract("year", Opportunity.close_date) == year
+                extract("year", Opportunity.close_date) == year,
             ).count()
 
             won_value = (
@@ -103,7 +100,8 @@ class OpportunityAnalyticsService(ServiceBase):
                     extract("month", Opportunity.close_date) == month,
                     extract("year", Opportunity.close_date) == year,
                 )
-                .scalar() or 0
+                .scalar()
+                or 0
             )
 
             monthly_data.append({"month": month_name, "won_count": won_count, "won_value": won_value})
@@ -131,8 +129,7 @@ class OpportunityAnalyticsService(ServiceBase):
     def calculate_stale_opportunities(self):
         """Calculate the number of stale opportunities."""
         two_weeks_ago = datetime.now() - timedelta(days=14)
-        return Opportunity.query.filter(Opportunity.status == "active",
-                                      Opportunity.last_activity_date <= two_weeks_ago).count()
+        return Opportunity.query.filter(Opportunity.status == "active", Opportunity.last_activity_date <= two_weeks_ago).count()
 
     def calculate_stage_percentage(self, stage):
         """Calculate the percentage of opportunities in a given stage."""

@@ -14,7 +14,7 @@ def get_filtered_companies():
     filters = {
         "has_opportunities": request.args.get("has_opportunities"),
         "has_contacts": request.args.get("has_contacts"),
-        "has_capabilities": request.args.get("has_capabilities")
+        "has_capabilities": request.args.get("has_capabilities"),
     }
     companies = company_service.get_filtered_companies(filters)
 

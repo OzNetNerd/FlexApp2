@@ -17,6 +17,7 @@ class RelationshipService(ServiceBase):
     def ENTITY_MODELS(self):
         """Lazy-loaded entity models to avoid circular imports."""
         from app.models.pages.user import User
+
         return {"user": User, "contact": Contact, "company": Company}
 
     RELATIONSHIP_TYPES = RelationshipTypeService.RELATIONSHIP_TYPES
@@ -38,9 +39,7 @@ class RelationshipService(ServiceBase):
         self, entity1_type: str, entity1_id: int, entity2_type: str, entity2_id: int, relationship_type: str
     ) -> Tuple[bool, Optional[Relationship], str]:
         """Create a relationship between two entities."""
-        return self.core.create_relationship(
-            entity1_type, entity1_id, entity2_type, entity2_id, relationship_type, self.ENTITY_MODELS
-        )
+        return self.core.create_relationship(entity1_type, entity1_id, entity2_type, entity2_id, relationship_type, self.ENTITY_MODELS)
 
     def delete_relationship(self, relationship_id: int) -> Tuple[bool, str]:
         """Delete a relationship."""

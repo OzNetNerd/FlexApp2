@@ -26,8 +26,7 @@ class SRSCategoryService(ServiceBase):
         # First get all distinct notable_types from the database
         query = db.session.query(SRS.notable_type).distinct()
         db_categories = [row[0] for row in query.all() if row[0]]
-        self.logger.info(
-            f"SRSCategoryService: Found {len(db_categories)} distinct categories in database: {db_categories}")
+        self.logger.info(f"SRSCategoryService: Found {len(db_categories)} distinct categories in database: {db_categories}")
 
         # Get category counts
         category_counts = {}
@@ -50,26 +49,22 @@ class SRSCategoryService(ServiceBase):
         # Add predefined categories first
         for category_id, info in predefined.items():
             count = category_counts.get(category_id, 0)
-            result.append({
-                "id": category_id,
-                "name": info["name"],
-                "color": info["color"],
-                "icon": info["icon"],
-                "count": count
-            })
+            result.append({"id": category_id, "name": info["name"], "color": info["color"], "icon": info["icon"], "count": count})
             self.logger.info(f"SRSCategoryService: Added predefined category: {category_id} with count {count}")
 
         # Add custom categories from database that aren't in predefined list
         for category_id in db_categories:
             if category_id not in predefined:
                 count = category_counts.get(category_id, 0)
-                result.append({
-                    "id": category_id,
-                    "name": category_id.capitalize(),  # Default name is capitalized ID
-                    "color": "secondary",  # Default color
-                    "icon": "folder",  # Default icon
-                    "count": count,
-                })
+                result.append(
+                    {
+                        "id": category_id,
+                        "name": category_id.capitalize(),  # Default name is capitalized ID
+                        "color": "secondary",  # Default color
+                        "icon": "folder",  # Default icon
+                        "count": count,
+                    }
+                )
                 self.logger.info(f"SRSCategoryService: Added custom category: {category_id} with count {count}")
 
         self.logger.info(f"SRSCategoryService: Returning {len(result)} total categories")
@@ -98,13 +93,7 @@ class SRSCategoryService(ServiceBase):
         self.logger.info(f"SRSCategoryService: Normalized category ID: {category_id}")
 
         # Return a category object
-        result = {
-            "id": category_id,
-            "name": name,
-            "color": color,
-            "icon": icon,
-            "count": 0
-        }
+        result = {"id": category_id, "name": name, "color": color, "icon": icon, "count": 0}
 
         self.logger.info(f"SRSCategoryService: Created category object: {result}")
         return result
@@ -145,19 +134,9 @@ class SRSCategoryService(ServiceBase):
             "opportunity": {"name": "Opportunities", "color": "danger", "icon": "graph-up-arrow"},
         }
 
-        info = predefined.get(category_id, {
-            "name": category_id.capitalize(),
-            "color": "secondary",
-            "icon": "folder"
-        })
+        info = predefined.get(category_id, {"name": category_id.capitalize(), "color": "secondary", "icon": "folder"})
 
-        result = {
-            "id": category_id,
-            "name": info["name"],
-            "color": info["color"],
-            "icon": info["icon"],
-            "count": count
-        }
+        result = {"id": category_id, "name": info["name"], "color": info["color"], "icon": info["icon"], "count": count}
 
         self.logger.info(f"SRSCategoryService: Returning category details: {result}")
         return result
@@ -284,8 +263,8 @@ class SRSCategoryService(ServiceBase):
         # Calculate due items
         from datetime import datetime
         from zoneinfo import ZoneInfo
-        due_items = sum(1 for item in items
-                        if item.next_review_at and item.next_review_at <= datetime.now(ZoneInfo("UTC")))
+
+        due_items = sum(1 for item in items if item.next_review_at and item.next_review_at <= datetime.now(ZoneInfo("UTC")))
 
         # Calculate new vs reviewed
         new_items = sum(1 for item in items if item.review_count == 0)
@@ -304,7 +283,7 @@ class SRSCategoryService(ServiceBase):
             "reviewed_items": reviewed_items,
             "mastered_items": mastered_items,
             "avg_ease_factor": round(avg_ease, 2),
-            "mastery_percentage": round((mastered_items / total_items) * 100 if total_items else 0, 1)
+            "mastery_percentage": round((mastered_items / total_items) * 100 if total_items else 0, 1),
         }
 
         self.logger.info(f"SRSCategoryService: Category statistics: {stats}")

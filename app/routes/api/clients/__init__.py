@@ -46,20 +46,20 @@ class ApiClient:
 
     def get(self, endpoint, params=None):
         """Make a GET request to the API."""
-        return self._make_request('GET', endpoint, params=params)
+        return self._make_request("GET", endpoint, params=params)
 
     def post(self, endpoint, data):
         """Make a POST request to the API."""
-        return self._make_request('POST', endpoint, data=data)
+        return self._make_request("POST", endpoint, data=data)
 
     def put(self, endpoint, data):
         """Make a PUT request to the API."""
-        return self._make_request('PUT', endpoint, data=data)
+        return self._make_request("PUT", endpoint, data=data)
 
     def delete(self, endpoint):
         """Make a DELETE request to the API."""
-        return self._make_request('DELETE', endpoint)
+        return self._make_request("DELETE", endpoint)
 
     def patch(self, endpoint, data):
         """Make a PATCH request to the API."""
-        return self._make_request('PATCH', endpoint, data=data)
+        return self._make_request("PATCH", endpoint, data=data)

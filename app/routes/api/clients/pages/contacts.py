@@ -7,7 +7,7 @@ class ContactApiClient(ApiClient):
     """Client for interacting with the Contact API."""
 
     def __init__(self):
-        super().__init__('/api/contacts')
+        super().__init__("/api/contacts")
 
     # CRUD operations
     def get_all(self):

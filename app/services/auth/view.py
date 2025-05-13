@@ -3,6 +3,7 @@ from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
+
 class AuthViewService:
     def render_login_template(self):
         """Render the login template."""

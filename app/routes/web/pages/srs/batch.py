@@ -4,6 +4,7 @@ Batch operations for the SRS system.
 This module contains routes for performing batch operations on cards,
 such as batch review, reset, or deletion.
 """
+
 from flask import request, redirect, url_for, flash, session
 from flask_login import login_required, current_user
 from datetime import datetime

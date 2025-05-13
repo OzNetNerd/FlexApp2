@@ -7,6 +7,7 @@ from app.routes.web.utils.context import WebContext
 
 contact_service = ContactService()
 
+
 @contacts_bp.route("/statistics", methods=["GET"])
 @login_required
 def statistics():
@@ -24,7 +25,7 @@ def statistics():
         with_skills=stats["with_skills"],
         without_company=len(without_company),
         skill_distribution=skill_distribution,
-        skill_area_distribution=skill_area_distribution
+        skill_area_distribution=skill_area_distribution,
     )
 
     # Configure the render_safely call
@@ -32,7 +33,7 @@ def statistics():
         template_path="pages/contacts/statistics.html",
         context=context,
         error_message="An error occurred while rendering the contact statistics page",
-        endpoint_name=request.endpoint
+        endpoint_name=request.endpoint,
     )
 
     # Return the safely rendered template

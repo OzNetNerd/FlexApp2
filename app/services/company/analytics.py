@@ -46,11 +46,7 @@ class CompanyAnalyticsService(ServiceBase):
 
         # High engagement (>2 opportunities)
         high_engagement_count = (
-            db.session.query(Company)
-            .join(Company.opportunities)
-            .group_by(Company.id)
-            .having(func.count(Company.opportunities) > 2)
-            .count()
+            db.session.query(Company).join(Company.opportunities).group_by(Company.id).having(func.count(Company.opportunities) > 2).count()
         )
 
         # Medium engagement (1-2 opportunities)
@@ -116,18 +112,10 @@ class CompanyAnalyticsService(ServiceBase):
             end_date = datetime(next_year, next_month, 1)
 
             # New companies in this month
-            new_in_month = (
-                Company.query
-                .filter(Company.created_at >= start_date, Company.created_at < end_date)
-                .count()
-            )
+            new_in_month = Company.query.filter(Company.created_at >= start_date, Company.created_at < end_date).count()
 
             # Total companies at end of month
-            total_at_month_end = (
-                Company.query
-                .filter(Company.created_at < end_date)
-                .count()
-            )
+            total_at_month_end = Company.query.filter(Company.created_at < end_date).count()
 
             months.append(month_name)
             new_companies.append(new_in_month)
@@ -138,11 +126,7 @@ class CompanyAnalyticsService(ServiceBase):
         new_companies.reverse()
         total_companies.reverse()
 
-        return {
-            "labels": months,
-            "new_companies": new_companies,
-            "total_companies": total_companies
-        }
+        return {"labels": months, "new_companies": new_companies, "total_companies": total_companies}
 
     def get_statistics(self):
         """Get comprehensive statistics for the statistics page."""

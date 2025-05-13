@@ -7,6 +7,7 @@ from app.routes.api.pages.tasks import tasks_api_bp
 # Initialize specialized service
 task_service = TaskService()
 
+
 @tasks_api_bp.route("/statistics", methods=["GET"])
 def get_statistics():
     """Get comprehensive statistics for the statistics page."""

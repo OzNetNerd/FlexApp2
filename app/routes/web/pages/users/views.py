@@ -31,11 +31,7 @@ def records():
 
     # Create appropriate context for the records view
     context = TableContext(
-        model_class=User,
-        read_only=True,
-        action="view",
-        show_heading=True,
-        table_data=json_data  # Now sending pre-serialized JSON string
+        model_class=User, read_only=True, action="view", show_heading=True, table_data=json_data  # Now sending pre-serialized JSON string
     )
 
     # Configure the render_safely call
@@ -43,7 +39,7 @@ def records():
         template_path="pages/users/records.html",
         context=context,
         error_message="An error occurred while rendering the users records page",
-        endpoint_name=request.endpoint
+        endpoint_name=request.endpoint,
     )
 
     # Return the safely rendered template

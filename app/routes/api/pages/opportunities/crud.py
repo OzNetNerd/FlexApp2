@@ -9,10 +9,9 @@ from app.routes.api.route_registration import ApiCrudRouteConfig
 # Register CRUD service and config
 opportunity_service = CRUDService(Opportunity)
 opportunity_api_crud_config = ApiCrudRouteConfig(
-    blueprint=opportunities_api_bp,
-    entity_table_name="Opportunity",
-    service=opportunity_service
+    blueprint=opportunities_api_bp, entity_table_name="Opportunity", service=opportunity_service
 )
+
 
 # You can add additional CRUD-related endpoints here if needed
 @opportunities_api_bp.route("/", methods=["GET"])
@@ -20,6 +19,7 @@ def get_all():
     """Get all opportunities."""
     opportunities = opportunity_service.get_all()
     return jsonify([opportunity.to_dict() for opportunity in opportunities])
+
 
 @opportunities_api_bp.route("/<int:opportunity_id>", methods=["GET"])
 def get(opportunity_id):

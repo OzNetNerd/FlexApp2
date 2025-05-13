@@ -7,6 +7,7 @@ from app.routes.web.utils.context import WebContext
 
 contact_service = ContactService()
 
+
 @contacts_bp.route("/", methods=["GET"])
 @login_required
 def contacts_dashboard():
@@ -22,7 +23,7 @@ def contacts_dashboard():
         stats=stats,
         skill_segments=skill_segments,
         top_contacts=top_contacts,
-        growth_data=growth_data
+        growth_data=growth_data,
     )
 
     # Configure the render_safely call
@@ -30,7 +31,7 @@ def contacts_dashboard():
         template_path="pages/contacts/dashboard.html",
         context=context,
         error_message="An error occurred while rendering the contacts dashboard",
-        endpoint_name=request.endpoint
+        endpoint_name=request.endpoint,
     )
 
     # Return the safely rendered template

@@ -9,6 +9,7 @@ from app.routes.web.utils.context import WebContext
 
 company_service = CompanyService()
 
+
 @companies_bp.route("/statistics", methods=["GET"])
 @login_required
 def statistics():
@@ -22,7 +23,7 @@ def statistics():
         total_companies=stats["total_companies"],
         with_opportunities=stats["with_opportunities"],
         with_contacts=stats["with_contacts"],
-        no_engagement=stats["no_engagement"]
+        no_engagement=stats["no_engagement"],
     )
 
     # Configure the render_safely call
@@ -30,7 +31,7 @@ def statistics():
         template_path="pages/companies/statistics.html",
         context=context,
         error_message="An error occurred while rendering the company statistics page",
-        endpoint_name=request.endpoint
+        endpoint_name=request.endpoint,
     )
 
     # Return the safely rendered template

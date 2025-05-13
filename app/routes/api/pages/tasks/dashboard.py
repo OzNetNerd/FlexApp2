@@ -7,11 +7,13 @@ from app.routes.api.pages.tasks import tasks_api_bp
 # Initialize specialized service
 task_service = TaskService()
 
+
 @tasks_api_bp.route("/dashboard/stats", methods=["GET"])
 def get_dashboard_stats():
     """Get statistics for the tasks dashboard."""
     stats = task_service.get_dashboard_stats()
     return jsonify(stats)
+
 
 @tasks_api_bp.route("/dashboard/top", methods=["GET"])
 def get_top_tasks():
@@ -20,11 +22,13 @@ def get_top_tasks():
     top_tasks = task_service.get_top_tasks(limit)
     return jsonify([task.to_dict() for task in top_tasks])
 
+
 @tasks_api_bp.route("/dashboard/status", methods=["GET"])
 def get_status_breakdown():
     """Get tasks breakdown by status."""
     status_data = task_service.get_status_breakdown()
     return jsonify(status_data)
+
 
 @tasks_api_bp.route("/dashboard/overdue", methods=["GET"])
 def get_overdue_tasks():

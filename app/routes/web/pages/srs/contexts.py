@@ -5,6 +5,7 @@ This module defines all the context classes used for rendering SRS templates.
 Each context class extends the base WebContext and adds specific attributes
 needed for various SRS page templates.
 """
+
 from app.routes.web.utils.context import WebContext
 
 

@@ -7,6 +7,7 @@ from app.routes.web.utils.context import WebContext
 
 opportunity_service = OpportunityService()
 
+
 @opportunities_bp.route("/", methods=["GET"])
 @login_required
 def opportunities_dashboard():
@@ -23,7 +24,7 @@ def opportunities_dashboard():
         stages=stages,
         hot_opportunities=hot_opportunities,
         forecast_data=forecast_data,
-        currency_symbol="$"
+        currency_symbol="$",
     )
 
     # Configure the render_safely call
@@ -31,7 +32,7 @@ def opportunities_dashboard():
         template_path="pages/opportunities/dashboard.html",
         context=context,
         error_message="An error occurred while rendering the opportunities dashboard",
-        endpoint_name=request.endpoint
+        endpoint_name=request.endpoint,
     )
 
     # Return the safely rendered template

@@ -14,7 +14,7 @@ def get_filtered_contacts():
     filters = {
         "has_opportunities": request.args.get("has_opportunities"),
         "has_companies": request.args.get("has_companies"),
-        "has_roles": request.args.get("has_roles")
+        "has_roles": request.args.get("has_roles"),
     }
     contacts = contact_service.get_filtered_contacts(filters)
 

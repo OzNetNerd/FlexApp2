@@ -7,7 +7,7 @@ class OpportunityApiClient(ApiClient):
     """Client for interacting with the Opportunity API."""
 
     def __init__(self):
-        super().__init__('/api/opportunities')
+        super().__init__("/api/opportunities")
 
     # CRUD operations
     def get_all(self):

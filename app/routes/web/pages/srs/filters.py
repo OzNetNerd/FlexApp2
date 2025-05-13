@@ -5,17 +5,13 @@ This module contains routes for filtering and categorizing cards
 in various ways, including by due date, category, learning stage,
 difficulty, and performance.
 """
+
 from flask import request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from app.routes.web.pages.srs.blueprint import srs_bp, srs_service
-from app.routes.web.pages.srs.contexts import (
-    SRSCardListContext,
-    SRSCategoryContext,
-    SRSFilteredCardsContext,
-    SRSFilteredContext
-)
+from app.routes.web.pages.srs.contexts import SRSCardListContext, SRSCategoryContext, SRSFilteredCardsContext, SRSFilteredContext
 from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
 from app.utils.app_logging import get_logger, log_message_and_variables
 
@@ -34,16 +30,13 @@ def due_cards():
     cards = srs_service.get_due_cards()
     logger.info(f"Retrieved {len(cards)} due cards")
 
-    context = SRSCardListContext(
-        title="Cards Due Today",
-        cards=cards
-    )
+    context = SRSCardListContext(title="Cards Due Today", cards=cards)
 
     config = RenderSafelyConfig(
         template_path="pages/srs/due.html",
         context=context,
         error_message="Failed to render due cards page",
-        endpoint_name="srs_bp.due_cards"
+        endpoint_name="srs_bp.due_cards",
     )
 
     return render_safely(config)
@@ -75,18 +68,13 @@ def category_view(category_type):
     info = category_info.get(category_type, {"name": "Unknown", "color": "secondary"})
     logger.info(f"Rendering category view for {info['name']}")
 
-    context = SRSCategoryContext(
-        cards=cards,
-        category_type=category_type,
-        category_name=info["name"],
-        category_color=info["color"]
-    )
+    context = SRSCategoryContext(cards=cards, category_type=category_type, category_name=info["name"], category_color=info["color"])
 
     config = RenderSafelyConfig(
         template_path="pages/srs/category.html",
         context=context,
         error_message=f"Failed to render category view for {category_type}",
-        endpoint_name="srs_bp.category_view"
+        endpoint_name="srs_bp.category_view",
     )
 
     return render_safely(config)
@@ -115,8 +103,7 @@ def cards_by_learning_stage(stage):
     cards = srs_service.get_cards_by_learning_stage(stage)
     logger.info(f"Retrieved {len(cards)} cards in learning stage {stage}")
 
-    stage_names = {"new": "New Cards", "learning": "Learning Cards", "reviewing": "Review Cards",
-                   "mastered": "Mastered Cards"}
+    stage_names = {"new": "New Cards", "learning": "Learning Cards", "reviewing": "Review Cards", "mastered": "Mastered Cards"}
 
     logger.info(f"Rendering filtered cards for learning stage: {stage_names[stage]}")
 
@@ -128,14 +115,14 @@ def cards_by_learning_stage(stage):
         due_category_counts=srs_service.count_due_by_type(),
         due_today=srs_service.count_due_today(),
         total_cards=srs_service.count_total(),
-        active_tab=stage
+        active_tab=stage,
     )
 
     config = RenderSafelyConfig(
         template_path="pages/srs/filtered_cards.html",
         context=context,
         error_message=f"Failed to render cards by learning stage: {stage}",
-        endpoint_name="srs_bp.cards_by_learning_stage"
+        endpoint_name="srs_bp.cards_by_learning_stage",
     )
 
     return render_safely(config)
@@ -176,14 +163,14 @@ def cards_by_difficulty(difficulty):
         due_category_counts=srs_service.count_due_by_type(),
         due_today=srs_service.count_due_today(),
         total_cards=srs_service.count_total(),
-        active_tab=f"difficulty_{difficulty}"
+        active_tab=f"difficulty_{difficulty}",
     )
 
     config = RenderSafelyConfig(
         template_path="pages/srs/filtered_cards.html",
         context=context,
         error_message=f"Failed to render cards by difficulty: {difficulty}",
-        endpoint_name="srs_bp.cards_by_difficulty"
+        endpoint_name="srs_bp.cards_by_difficulty",
     )
 
     return render_safely(config)
@@ -212,8 +199,7 @@ def cards_by_performance(performance):
     cards = srs_service.get_cards_by_performance(performance)
     logger.info(f"Retrieved {len(cards)} cards with performance {performance}")
 
-    performance_names = {"struggling": "Struggling Cards", "average": "Average Performance Cards",
-                         "strong": "Strong Performance Cards"}
+    performance_names = {"struggling": "Struggling Cards", "average": "Average Performance Cards", "strong": "Strong Performance Cards"}
 
     logger.info(f"Rendering filtered cards for performance: {performance_names[performance]}")
 
@@ -225,14 +211,14 @@ def cards_by_performance(performance):
         due_category_counts=srs_service.count_due_by_type(),
         due_today=srs_service.count_due_today(),
         total_cards=srs_service.count_total(),
-        active_tab=f"performance_{performance}"
+        active_tab=f"performance_{performance}",
     )
 
     config = RenderSafelyConfig(
         template_path="pages/srs/filtered_cards.html",
         context=context,
         error_message=f"Failed to render cards by performance: {performance}",
-        endpoint_name="srs_bp.cards_by_performance"
+        endpoint_name="srs_bp.cards_by_performance",
     )
 
     return render_safely(config)
@@ -300,14 +286,14 @@ def filtered_cards():
         learning_stages=learning_stages,
         difficulty_counts=difficulty_counts,
         performance_counts=performance_counts,
-        now=datetime.now(ZoneInfo("UTC"))
+        now=datetime.now(ZoneInfo("UTC")),
     )
 
     config = RenderSafelyConfig(
         template_path="pages/srs/filtered_cards.html",
         context=context,
         error_message="Failed to render filtered cards",
-        endpoint_name="srs_bp.filtered_cards"
+        endpoint_name="srs_bp.filtered_cards",
     )
 
     log_message_and_variables(f"📄 Vars being sent to template:", context.to_dict())

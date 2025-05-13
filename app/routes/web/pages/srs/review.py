@@ -4,6 +4,7 @@ Review routes for the SRS system.
 This module contains routes for reviewing cards in the SRS system,
 including individual and batch review functionality.
 """
+
 from flask import request, redirect, url_for, flash, session
 from flask_login import login_required, current_user
 from app.routes.web.pages.srs.blueprint import srs_bp, srs_service
@@ -78,18 +79,14 @@ def review_item(item_id):
     logger.info(f"Rendering review page for card {item_id}")
 
     context = SRSReviewContext(
-        card=item,
-        next_item_id=next_item_id,
-        prev_item_id=prev_item_id,
-        is_batch=is_batch,
-        remaining_count=remaining_count
+        card=item, next_item_id=next_item_id, prev_item_id=prev_item_id, is_batch=is_batch, remaining_count=remaining_count
     )
 
     config = RenderSafelyConfig(
         template_path="pages/srs/review.html",
         context=context,
         error_message="Failed to render review page",
-        endpoint_name="srs_bp.review_item"
+        endpoint_name="srs_bp.review_item",
     )
 
     return render_safely(config)

@@ -53,6 +53,7 @@ class NotableMixin:
         """
         # Lazy import models to avoid circular references
         from app.models import Company, Contact, Opportunity, User
+
         # from app.models import Company, Contact, Opportunity, User
 
         mapping = {"Company": Company, "Contact": Contact, "Opportunity": Opportunity, "User": User}

@@ -2,11 +2,12 @@
 
 from app.routes.api.clients import ApiClient
 
+
 class UserApiClient(ApiClient):
     """Client for interacting with the User API."""
 
     def __init__(self):
-        super().__init__('/api/users')
+        super().__init__("/api/users")
 
     # CRUD operations
     def get_all(self):

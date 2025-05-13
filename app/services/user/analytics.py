@@ -24,9 +24,7 @@ class UserAnalyticsService(ServiceBase):
             "total_users": User.query.count(),
             "admin_count": User.query.filter_by(is_admin=True).count(),
             "regular_count": User.query.filter_by(is_admin=False).count(),
-            "new_users_month": User.query.filter(
-                User.created_at >= (datetime.now() - timedelta(days=30))
-            ).count(),
+            "new_users_month": User.query.filter(User.created_at >= (datetime.now() - timedelta(days=30))).count(),
             "avg_notes": self.calculate_avg_notes_per_user(),
             "active_users": self.calculate_active_users(),
             "top_user": self.get_top_user_name(),
@@ -36,22 +34,22 @@ class UserAnalyticsService(ServiceBase):
 
     def get_top_users(self, limit=5):
         """Get top users based on activity."""
-        users_with_counts = db.session.query(
-            User,
-            func.count(Note.id).label('notes_count')
-        ).outerjoin(User.notes).group_by(User.id).order_by(
-            func.count(Note.id).desc()
-        ).limit(limit).all()
+        users_with_counts = (
+            db.session.query(User, func.count(Note.id).label("notes_count"))
+            .outerjoin(User.notes)
+            .group_by(User.id)
+            .order_by(func.count(Note.id).desc())
+            .limit(limit)
+            .all()
+        )
 
         result = []
         for user, notes_count in users_with_counts:
-            opportunities_count = db.session.query(func.count(Opportunity.id)).filter(
-                Opportunity.created_by_id == user.id
-            ).scalar() or 0
+            opportunities_count = db.session.query(func.count(Opportunity.id)).filter(Opportunity.created_by_id == user.id).scalar() or 0
 
             user_dict = user.__dict__.copy()
-            user_dict['notes_count'] = notes_count
-            user_dict['opportunities_count'] = opportunities_count
+            user_dict["notes_count"] = notes_count
+            user_dict["opportunities_count"] = opportunities_count
             result.append(user_dict)
 
         return result
@@ -70,12 +68,12 @@ class UserAnalyticsService(ServiceBase):
                 "percentage": self.calculate_user_percentage(True),
             },
             {
-                "count": User.query.filter(
-                    User.created_at >= (datetime.now() - timedelta(days=30))
-                ).count(),
-                "activity": db.session.query(func.count(Note.id)).join(User).filter(
-                    User.created_at >= (datetime.now() - timedelta(days=30))
-                ).scalar() or 0,
+                "count": User.query.filter(User.created_at >= (datetime.now() - timedelta(days=30))).count(),
+                "activity": db.session.query(func.count(Note.id))
+                .join(User)
+                .filter(User.created_at >= (datetime.now() - timedelta(days=30)))
+                .scalar()
+                or 0,
                 "percentage": self.calculate_new_user_percentage(),
             },
         ]
@@ -99,16 +97,20 @@ class UserAnalyticsService(ServiceBase):
             month_name = datetime(year, month, 1).strftime("%b %Y")
             labels.append(month_name)
 
-            notes_count = db.session.query(func.count(Note.id)).filter(
-                extract('month', Note.created_at) == month,
-                extract('year', Note.created_at) == year
-            ).scalar() or 0
+            notes_count = (
+                db.session.query(func.count(Note.id))
+                .filter(extract("month", Note.created_at) == month, extract("year", Note.created_at) == year)
+                .scalar()
+                or 0
+            )
             notes.append(notes_count)
 
-            opportunities_count = db.session.query(func.count(Opportunity.id)).filter(
-                extract('month', Opportunity.created_at) == month,
-                extract('year', Opportunity.created_at) == year
-            ).scalar() or 0
+            opportunities_count = (
+                db.session.query(func.count(Opportunity.id))
+                .filter(extract("month", Opportunity.created_at) == month, extract("year", Opportunity.created_at) == year)
+                .scalar()
+                or 0
+            )
             opportunities.append(opportunities_count)
 
             logins.append(random.randint(20, 100))
@@ -127,9 +129,7 @@ class UserAnalyticsService(ServiceBase):
         admin_users = User.query.filter_by(is_admin=True).count()
 
         two_weeks_ago = datetime.now() - timedelta(days=14)
-        active_user_ids = db.session.query(Note.user_id).filter(
-            Note.created_at >= two_weeks_ago
-        ).distinct().all()
+        active_user_ids = db.session.query(Note.user_id).filter(Note.created_at >= two_weeks_ago).distinct().all()
         active_user_ids = [user_id for (user_id,) in active_user_ids]
         inactive_users = User.query.filter(~User.id.in_(active_user_ids)).count() if active_user_ids else User.query.count()
 
@@ -140,28 +140,28 @@ class UserAnalyticsService(ServiceBase):
         user_activity_by_role = []
 
         admin_notes = db.session.query(func.count(Note.id)).join(User).filter(User.is_admin == True).scalar() or 0
-        admin_opportunities = db.session.query(func.count(Opportunity.id)).join(
-            User, Opportunity.created_by_id == User.id
-        ).filter(User.is_admin == True).scalar() or 0
+        admin_opportunities = (
+            db.session.query(func.count(Opportunity.id))
+            .join(User, Opportunity.created_by_id == User.id)
+            .filter(User.is_admin == True)
+            .scalar()
+            or 0
+        )
 
-        user_activity_by_role.append({
-            "role": "admin",
-            "count": admin_users,
-            "notes": admin_notes,
-            "opportunities": admin_opportunities
-        })
+        user_activity_by_role.append({"role": "admin", "count": admin_users, "notes": admin_notes, "opportunities": admin_opportunities})
 
         regular_notes = db.session.query(func.count(Note.id)).join(User).filter(User.is_admin == False).scalar() or 0
-        regular_opportunities = db.session.query(func.count(Opportunity.id)).join(
-            User, Opportunity.created_by_id == User.id
-        ).filter(User.is_admin == False).scalar() or 0
+        regular_opportunities = (
+            db.session.query(func.count(Opportunity.id))
+            .join(User, Opportunity.created_by_id == User.id)
+            .filter(User.is_admin == False)
+            .scalar()
+            or 0
+        )
 
-        user_activity_by_role.append({
-            "role": "regular",
-            "count": regular_users,
-            "notes": regular_notes,
-            "opportunities": regular_opportunities
-        })
+        user_activity_by_role.append(
+            {"role": "regular", "count": regular_users, "notes": regular_notes, "opportunities": regular_opportunities}
+        )
 
         monthly_data = []
         current_month = datetime.now().month
@@ -175,27 +175,23 @@ class UserAnalyticsService(ServiceBase):
 
             month_name = datetime(year, month, 1).strftime("%b %Y")
 
-            new_users = User.query.filter(
-                extract('month', User.created_at) == month,
-                extract('year', User.created_at) == year
-            ).count()
+            new_users = User.query.filter(extract("month", User.created_at) == month, extract("year", User.created_at) == year).count()
 
-            notes = db.session.query(func.count(Note.id)).filter(
-                extract('month', Note.created_at) == month,
-                extract('year', Note.created_at) == year
-            ).scalar() or 0
+            notes = (
+                db.session.query(func.count(Note.id))
+                .filter(extract("month", Note.created_at) == month, extract("year", Note.created_at) == year)
+                .scalar()
+                or 0
+            )
 
-            opportunities = db.session.query(func.count(Opportunity.id)).filter(
-                extract('month', Opportunity.created_at) == month,
-                extract('year', Opportunity.created_at) == year
-            ).scalar() or 0
+            opportunities = (
+                db.session.query(func.count(Opportunity.id))
+                .filter(extract("month", Opportunity.created_at) == month, extract("year", Opportunity.created_at) == year)
+                .scalar()
+                or 0
+            )
 
-            monthly_data.append({
-                "month": month_name,
-                "new_users": new_users,
-                "notes": notes,
-                "opportunities": opportunities
-            })
+            monthly_data.append({"month": month_name, "new_users": new_users, "notes": notes, "opportunities": opportunities})
 
         monthly_data.reverse()
 
@@ -221,18 +217,17 @@ class UserAnalyticsService(ServiceBase):
     def calculate_active_users(self):
         """Calculate number of active users in the past week."""
         one_week_ago = datetime.now() - timedelta(days=7)
-        return db.session.query(func.count(func.distinct(Note.user_id))).filter(
-            Note.created_at >= one_week_ago
-        ).scalar() or 0
+        return db.session.query(func.count(func.distinct(Note.user_id))).filter(Note.created_at >= one_week_ago).scalar() or 0
 
     def get_top_user_name(self):
         """Get the name of the most active user."""
-        result = db.session.query(
-            User.name,
-            func.count(Note.id).label('notes_count')
-        ).join(User.notes).group_by(User.id).order_by(
-            func.count(Note.id).desc()
-        ).first()
+        result = (
+            db.session.query(User.name, func.count(Note.id).label("notes_count"))
+            .join(User.notes)
+            .group_by(User.id)
+            .order_by(func.count(Note.id).desc())
+            .first()
+        )
 
         return result.name if result else "N/A"
 
@@ -243,9 +238,7 @@ class UserAnalyticsService(ServiceBase):
     def calculate_inactive_users(self):
         """Calculate number of inactive users."""
         two_weeks_ago = datetime.now() - timedelta(days=14)
-        active_user_ids = db.session.query(Note.user_id).filter(
-            Note.created_at >= two_weeks_ago
-        ).distinct().all()
+        active_user_ids = db.session.query(Note.user_id).filter(Note.created_at >= two_weeks_ago).distinct().all()
         active_user_ids = [user_id for (user_id,) in active_user_ids]
         return User.query.filter(~User.id.in_(active_user_ids)).count() if active_user_ids else User.query.count()
 
@@ -262,7 +255,5 @@ class UserAnalyticsService(ServiceBase):
         total_count = User.query.count()
         if total_count == 0:
             return 0
-        new_user_count = User.query.filter(
-            User.created_at >= (datetime.now() - timedelta(days=30))
-        ).count()
+        new_user_count = User.query.filter(User.created_at >= (datetime.now() - timedelta(days=30))).count()
         return round((new_user_count / total_count) * 100)

@@ -7,9 +7,14 @@ from sqlalchemy import func
 from app.models.pages.srs import SRS, ReviewHistory
 from app.services.service_base import QueryService
 from app.services.srs.constants import (
-    LEARNING_THRESHOLD, REVIEWING_THRESHOLD, HARD_THRESHOLD,
-    MEDIUM_THRESHOLD, STRUGGLING_THRESHOLD, AVERAGE_THRESHOLD
+    LEARNING_THRESHOLD,
+    REVIEWING_THRESHOLD,
+    HARD_THRESHOLD,
+    MEDIUM_THRESHOLD,
+    STRUGGLING_THRESHOLD,
+    AVERAGE_THRESHOLD,
 )
+
 
 class SRSFilterService(QueryService):
     """Service for filtering and retrieving SRS items based on various criteria."""
@@ -44,10 +49,7 @@ class SRSFilterService(QueryService):
             # Due cards filter
             if filters.get("due_only"):
                 self.logger.info("SRSFilterService: Applying due_only filter")
-                query = query.filter(
-                    SRS.next_review_at.isnot(None),
-                    SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))
-                )
+                query = query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")))
 
             # Category filter
             if filters.get("category"):
@@ -58,32 +60,16 @@ class SRSFilterService(QueryService):
             if filters.get("search"):
                 search_term = f"%{filters['search']}%"
                 self.logger.info(f"SRSFilterService: Applying search filter: {filters['search']}")
-                query = query.filter(
-                    (SRS.question.ilike(search_term)) | (SRS.answer.ilike(search_term))
-                )
+                query = query.filter((SRS.question.ilike(search_term)) | (SRS.answer.ilike(search_term)))
 
             # Interval range
-            query = self.apply_numeric_range(
-                query,
-                SRS.interval,
-                filters.get("min_interval"),
-                filters.get("max_interval")
-            )
+            query = self.apply_numeric_range(query, SRS.interval, filters.get("min_interval"), filters.get("max_interval"))
 
             # Ease factor range
-            query = self.apply_numeric_range(
-                query,
-                SRS.ease_factor,
-                filters.get("min_ease"),
-                filters.get("max_ease")
-            )
+            query = self.apply_numeric_range(query, SRS.ease_factor, filters.get("min_ease"), filters.get("max_ease"))
 
             # Sort order
-            query = self.apply_sort(
-                query,
-                filters.get("sort_by", "next_review_at"),
-                filters.get("sort_order", "asc")
-            )
+            query = self.apply_sort(query, filters.get("sort_by", "next_review_at"), filters.get("sort_order", "asc"))
 
         # Execute query
         result = query.all()
@@ -98,10 +84,7 @@ class SRSFilterService(QueryService):
             List of all due SRS items
         """
         self.logger.info("SRSFilterService: Retrieving all due SRS items")
-        items = SRS.query.filter(
-            SRS.next_review_at.isnot(None),
-            SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))
-        ).all()
+        items = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))).all()
 
         self.logger.info(f"SRSFilterService: Found {len(items)} due items")
         return items
@@ -131,12 +114,8 @@ class SRSFilterService(QueryService):
             cards = SRS.query.filter(SRS.review_count > 0, SRS.interval <= LEARNING_THRESHOLD).all()
         elif stage == "reviewing":
             # Cards in review phase (interval between 1 and 21 days)
-            self.logger.info(
-                f"SRSFilterService: Querying for reviewing cards (1.0 < interval <= {REVIEWING_THRESHOLD})")
-            cards = SRS.query.filter(
-                SRS.interval > LEARNING_THRESHOLD,
-                SRS.interval <= REVIEWING_THRESHOLD
-            ).all()
+            self.logger.info(f"SRSFilterService: Querying for reviewing cards (1.0 < interval <= {REVIEWING_THRESHOLD})")
+            cards = SRS.query.filter(SRS.interval > LEARNING_THRESHOLD, SRS.interval <= REVIEWING_THRESHOLD).all()
         elif stage == "mastered":
             # Cards considered mastered (interval > 21 days)
             self.logger.info(f"SRSFilterService: Querying for mastered cards (interval > {REVIEWING_THRESHOLD})")
@@ -166,26 +145,15 @@ class SRSFilterService(QueryService):
         if difficulty == "hard":
             # Hard cards (low ease factor)
             self.logger.info(f"SRSFilterService: Querying for hard cards (ease_factor <= {HARD_THRESHOLD})")
-            cards = SRS.query.filter(
-                SRS.ease_factor <= HARD_THRESHOLD,
-                SRS.review_count > 0
-            ).all()  # Only include reviewed cards
+            cards = SRS.query.filter(SRS.ease_factor <= HARD_THRESHOLD, SRS.review_count > 0).all()  # Only include reviewed cards
         elif difficulty == "medium":
             # Medium difficulty cards
-            self.logger.info(
-                f"SRSFilterService: Querying for medium cards ({HARD_THRESHOLD} < ease_factor < {MEDIUM_THRESHOLD})")
-            cards = SRS.query.filter(
-                SRS.ease_factor > HARD_THRESHOLD,
-                SRS.ease_factor < MEDIUM_THRESHOLD,
-                SRS.review_count > 0
-            ).all()
+            self.logger.info(f"SRSFilterService: Querying for medium cards ({HARD_THRESHOLD} < ease_factor < {MEDIUM_THRESHOLD})")
+            cards = SRS.query.filter(SRS.ease_factor > HARD_THRESHOLD, SRS.ease_factor < MEDIUM_THRESHOLD, SRS.review_count > 0).all()
         elif difficulty == "easy":
             # Easy cards (high ease factor)
             self.logger.info(f"SRSFilterService: Querying for easy cards (ease_factor >= {MEDIUM_THRESHOLD})")
-            cards = SRS.query.filter(
-                SRS.ease_factor >= MEDIUM_THRESHOLD,
-                SRS.review_count > 0
-            ).all()
+            cards = SRS.query.filter(SRS.ease_factor >= MEDIUM_THRESHOLD, SRS.review_count > 0).all()
         else:
             self.logger.error(f"SRSFilterService: Unknown difficulty: {difficulty}")
             raise ValueError(f"Unknown difficulty: {difficulty}")
@@ -211,16 +179,15 @@ class SRSFilterService(QueryService):
         # Join with review history to calculate statistics
         if performance == "struggling":
             # Cards with low success rate (< 60% correct)
-            self.logger.info(
-                f"SRSFilterService: Querying for struggling cards (success rate < {STRUGGLING_THRESHOLD}%)")
+            self.logger.info(f"SRSFilterService: Querying for struggling cards (success rate < {STRUGGLING_THRESHOLD}%)")
             cards = SRS.query.filter(
-                SRS.review_count > 2,
-                (SRS.successful_reps * 100 / SRS.review_count) < STRUGGLING_THRESHOLD
+                SRS.review_count > 2, (SRS.successful_reps * 100 / SRS.review_count) < STRUGGLING_THRESHOLD
             ).all()  # At least 3 reviews
         elif performance == "average":
             # Cards with average success rate (60-85%)
             self.logger.info(
-                f"SRSFilterService: Querying for average performance cards ({STRUGGLING_THRESHOLD}% <= success rate <= {AVERAGE_THRESHOLD}%)")
+                f"SRSFilterService: Querying for average performance cards ({STRUGGLING_THRESHOLD}% <= success rate <= {AVERAGE_THRESHOLD}%)"
+            )
             cards = SRS.query.filter(
                 SRS.review_count > 2,
                 (SRS.successful_reps * 100 / SRS.review_count) >= STRUGGLING_THRESHOLD,
@@ -228,12 +195,8 @@ class SRSFilterService(QueryService):
             ).all()
         elif performance == "strong":
             # Cards with high success rate (> 85%)
-            self.logger.info(
-                f"SRSFilterService: Querying for strong performance cards (success rate > {AVERAGE_THRESHOLD}%)")
-            cards = SRS.query.filter(
-                SRS.review_count > 2,
-                (SRS.successful_reps * 100 / SRS.review_count) > AVERAGE_THRESHOLD
-            ).all()
+            self.logger.info(f"SRSFilterService: Querying for strong performance cards (success rate > {AVERAGE_THRESHOLD}%)")
+            cards = SRS.query.filter(SRS.review_count > 2, (SRS.successful_reps * 100 / SRS.review_count) > AVERAGE_THRESHOLD).all()
         else:
             self.logger.error(f"SRSFilterService: Unknown performance level: {performance}")
             raise ValueError(f"Unknown performance level: {performance}")
@@ -286,8 +249,7 @@ class SRSFilterService(QueryService):
                     categories[card.notable_type] = []
                 categories[card.notable_type].append(card)
 
-            self.logger.info(
-                f"SRSFilterService: Found cards in {len(categories)} categories: {list(categories.keys())}")
+            self.logger.info(f"SRSFilterService: Found cards in {len(categories)} categories: {list(categories.keys())}")
 
             # Get a mix of cards from each category
             for category, category_cards in categories.items():
@@ -300,10 +262,7 @@ class SRSFilterService(QueryService):
             # Cards that are most overdue first
             self.logger.info("SRSFilterService: Applying 'priority_first' strategy (most overdue first)")
             cards = (
-                SRS.query.filter(
-                    SRS.next_review_at.isnot(None),
-                    SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))
-                )
+                SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")))
                 .order_by(SRS.next_review_at)
                 .all()
             )
@@ -313,9 +272,7 @@ class SRSFilterService(QueryService):
             self.logger.info("SRSFilterService: Applying 'hard_cards_first' strategy (ease_factor <= 1.7)")
             cards = (
                 SRS.query.filter(
-                    SRS.next_review_at.isnot(None),
-                    SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
-                    SRS.ease_factor <= 1.7
+                    SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")), SRS.ease_factor <= 1.7
                 )
                 .order_by(SRS.ease_factor)
                 .all()
@@ -356,11 +313,7 @@ class SRSFilterService(QueryService):
             self.logger.info(f"SRSFilterService: Found {len(new_cards)} new cards")
 
             due_cards = (
-                SRS.query.filter(
-                    SRS.next_review_at.isnot(None),
-                    SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
-                    SRS.review_count > 0
-                )
+                SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")), SRS.review_count > 0)
                 .limit(10)
                 .all()
             )

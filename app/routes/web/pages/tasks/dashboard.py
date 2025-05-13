@@ -7,6 +7,7 @@ from app.routes.web.utils.context import WebContext
 
 task_service = TaskService()
 
+
 @tasks_bp.route("/", methods=["GET"], endpoint="index")
 @login_required
 def tasks_dashboard():
@@ -24,7 +25,7 @@ def tasks_dashboard():
         stats=stats,
         segments=segments,
         upcoming_tasks=upcoming_tasks,
-        completion_data=completion_data
+        completion_data=completion_data,
     )
 
     # Configure the render_safely call
@@ -32,7 +33,7 @@ def tasks_dashboard():
         template_path="pages/tasks/dashboard.html",
         context=context,
         error_message="An error occurred while rendering the tasks dashboard",
-        endpoint_name=request.endpoint
+        endpoint_name=request.endpoint,
     )
 
     # Return the safely rendered template

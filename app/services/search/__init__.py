@@ -51,8 +51,7 @@ class SearchService(ServiceBase):
             query = self.model_class.query
             if term:
                 pattern = f"%{term}%"
-                clauses = [getattr(self.model_class, f).ilike(pattern) for f in self.search_fields
-                           if hasattr(self.model_class, f)]
+                clauses = [getattr(self.model_class, f).ilike(pattern) for f in self.search_fields if hasattr(self.model_class, f)]
                 if clauses:
                     query = query.filter(or_(*clauses))
 

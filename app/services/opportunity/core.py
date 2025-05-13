@@ -28,5 +28,9 @@ class OpportunityCoreService(CRUDService, ValidatorMixin):
 
     def get_hot_opportunities(self, limit=5):
         """Get hot opportunities with high priority."""
-        return self.model_class.query.filter_by(status="active", priority="high").order_by(
-            self.model_class.close_date.asc()).limit(limit).all()
+        return (
+            self.model_class.query.filter_by(status="active", priority="high")
+            .order_by(self.model_class.close_date.asc())
+            .limit(limit)
+            .all()
+        )

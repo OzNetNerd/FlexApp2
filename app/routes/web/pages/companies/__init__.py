@@ -5,7 +5,4 @@ from app.routes.web.utils.blueprint_factory import BlueprintConfig, create_crud_
 from app.forms.company import CompanyForm
 
 # Create the main company blueprint
-companies_bp = create_crud_blueprint(BlueprintConfig(
-    model_class=Company,
-    form_class=CompanyForm
-))
+companies_bp = create_crud_blueprint(BlueprintConfig(model_class=Company, form_class=CompanyForm))

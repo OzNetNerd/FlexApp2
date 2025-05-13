@@ -8,11 +8,8 @@ from app.routes.api.route_registration import ApiCrudRouteConfig
 
 # Register CRUD service and config
 task_service = CRUDService(Task)
-task_api_crud_config = ApiCrudRouteConfig(
-    blueprint=tasks_api_bp,
-    entity_table_name="Task",
-    service=task_service
-)
+task_api_crud_config = ApiCrudRouteConfig(blueprint=tasks_api_bp, entity_table_name="Task", service=task_service)
+
 
 # You can add additional CRUD-related endpoints here if needed
 @tasks_api_bp.route("/", methods=["GET"])
@@ -20,6 +17,7 @@ def get_all():
     """Get all tasks."""
     tasks = task_service.get_all()
     return jsonify([task.to_dict() for task in tasks])
+
 
 @tasks_api_bp.route("/<int:task_id>", methods=["GET"])
 def get(task_id):

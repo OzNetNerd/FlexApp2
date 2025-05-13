@@ -15,8 +15,7 @@ class RelationshipQueryService(ServiceBase):
     def __init__(self):
         super().__init__()
 
-    def get_relationships_for_entity(self, entity_type: str, entity_id: int, entity_models: dict) -> List[
-        Dict[str, Any]]:
+    def get_relationships_for_entity(self, entity_type: str, entity_id: int, entity_models: dict) -> List[Dict[str, Any]]:
         """Get all relationships for an entity with related data."""
         relationships = Relationship.query.filter(
             or_(
@@ -45,13 +44,15 @@ class RelationshipQueryService(ServiceBase):
 
             display_name = getattr(related_entity, "name", str(related_entity))
 
-            result.append({
-                "id": rel.id,
-                "entity_type": related_type,
-                "entity_id": related_id,
-                "entity_name": display_name,
-                "relationship_type": rel.relationship_type,
-            })
+            result.append(
+                {
+                    "id": rel.id,
+                    "entity_type": related_type,
+                    "entity_id": related_id,
+                    "entity_name": display_name,
+                    "relationship_type": rel.relationship_type,
+                }
+            )
 
         return result
 
@@ -62,4 +63,5 @@ class RelationshipQueryService(ServiceBase):
 
     def _get_relationship_service(self):
         from app.services import get_service
-        return get_service('relationship')
+
+        return get_service("relationship")

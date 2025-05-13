@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS
 from app.services.service_base import ServiceBase
 
+
 class SRSNavigationService(ServiceBase):
     """Service for navigating between SRS items during review sessions."""
 
@@ -25,10 +26,7 @@ class SRSNavigationService(ServiceBase):
             ID of the next due item, or the current item ID if no next item found
         """
         self.logger.info(f"SRSNavigationService: Finding next due item after item ID {current_item_id}")
-        query = SRS.query.filter(
-            SRS.next_review_at.isnot(None),
-            SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))
-        )
+        query = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC")))
 
         if current_item_id:
             # Try to find the next item in sequence
@@ -78,10 +76,7 @@ class SRSNavigationService(ServiceBase):
             return 1
 
         # Count items before this one
-        position = SRS.query.filter(
-            SRS.next_review_at <= item.next_review_at,
-            SRS.id <= item_id
-        ).count()
+        position = SRS.query.filter(SRS.next_review_at <= item.next_review_at, SRS.id <= item_id).count()
 
         self.logger.info(f"SRSNavigationService: Item {item_id} is at position {position} in review queue")
         return position
@@ -98,10 +93,7 @@ class SRSNavigationService(ServiceBase):
             ID of the next item in the category, or None if not found
         """
         self.logger.info(f"SRSNavigationService: Finding next item in category '{category}' after item {item_id}")
-        next_item = SRS.query.filter(
-            SRS.notable_type == category,
-            SRS.id > item_id
-        ).order_by(SRS.id).first()
+        next_item = SRS.query.filter(SRS.notable_type == category, SRS.id > item_id).order_by(SRS.id).first()
 
         if next_item:
             self.logger.info(f"SRSNavigationService: Found next item {next_item.id} in category '{category}'")
@@ -121,9 +113,7 @@ class SRSNavigationService(ServiceBase):
             ID of the first item in the category, or None if category empty
         """
         self.logger.info(f"SRSNavigationService: Finding first item in category '{category}'")
-        first_item = SRS.query.filter(
-            SRS.notable_type == category
-        ).order_by(SRS.id).first()
+        first_item = SRS.query.filter(SRS.notable_type == category).order_by(SRS.id).first()
 
         if first_item:
             self.logger.info(f"SRSNavigationService: Found first item {first_item.id} in category '{category}'")
@@ -140,10 +130,7 @@ class SRSNavigationService(ServiceBase):
             Number of items in the current review queue
         """
         self.logger.info("SRSNavigationService: Getting total number of items due for review")
-        count = SRS.query.filter(
-            SRS.next_review_at.isnot(None),
-            SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))
-        ).count()
+        count = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))).count()
 
         self.logger.info(f"SRSNavigationService: Found {count} items due for review")
         return count
@@ -169,14 +156,11 @@ class SRSNavigationService(ServiceBase):
         count = SRS.query.filter(
             SRS.next_review_at.isnot(None),
             SRS.next_review_at <= datetime.now(ZoneInfo("UTC")),
-            SRS.next_review_at > current_item.next_review_at
+            SRS.next_review_at > current_item.next_review_at,
         ).count()
 
         # Add items with same due date but higher ID
-        count += SRS.query.filter(
-            SRS.next_review_at == current_item.next_review_at,
-            SRS.id > current_item_id
-        ).count()
+        count += SRS.query.filter(SRS.next_review_at == current_item.next_review_at, SRS.id > current_item_id).count()
 
         self.logger.info(f"SRSNavigationService: {count} items remaining after item {current_item_id}")
         return count

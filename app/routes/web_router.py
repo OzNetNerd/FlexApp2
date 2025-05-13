@@ -11,9 +11,4 @@ def register_web_blueprints(app: Flask) -> None:
     """Auto-discover and register all web blueprints with the Flask application."""
     logger.info("Registering web blueprints")
 
-    register_application_blueprints(
-        app=app,
-        package_path="app.routes.web.pages",
-        blueprint_suffix="_bp",
-        exclusions=["components"]
-    )
+    register_application_blueprints(app=app, package_path="app.routes.web.pages", blueprint_suffix="_bp", exclusions=["components"])

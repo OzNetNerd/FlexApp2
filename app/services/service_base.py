@@ -6,7 +6,7 @@ from app.utils.app_logging import get_logger
 from app.models.base import db
 
 # Generic type for model
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class ServiceBase:
@@ -183,8 +183,7 @@ class QueryService(ServiceBase):
         # Apply OR conditions to query
         return query.filter(*(conditions))
 
-    def apply_date_range(self, query: Query, field, start_date: Optional[Any] = None,
-                         end_date: Optional[Any] = None) -> Query:
+    def apply_date_range(self, query: Query, field, start_date: Optional[Any] = None, end_date: Optional[Any] = None) -> Query:
         """
         Apply a date range filter to a query.
 
@@ -207,8 +206,9 @@ class QueryService(ServiceBase):
 
         return query
 
-    def apply_numeric_range(self, query: Query, field, min_value: Optional[Union[int, float]] = None,
-                            max_value: Optional[Union[int, float]] = None) -> Query:
+    def apply_numeric_range(
+        self, query: Query, field, min_value: Optional[Union[int, float]] = None, max_value: Optional[Union[int, float]] = None
+    ) -> Query:
         """
         Apply a numeric range filter to a query.
 
@@ -231,8 +231,7 @@ class QueryService(ServiceBase):
 
         return query
 
-    def apply_sort(self, query: Query, sort_by: Optional[str] = None,
-                   sort_order: str = 'asc') -> Query:
+    def apply_sort(self, query: Query, sort_by: Optional[str] = None, sort_order: str = "asc") -> Query:
         """
         Apply sorting to a query.
 
@@ -254,7 +253,7 @@ class QueryService(ServiceBase):
             sort_field = getattr(self.model_class, sort_by)
 
             # Apply descending order if requested
-            if sort_order.lower() == 'desc':
+            if sort_order.lower() == "desc":
                 sort_field = sort_field.desc()
 
             return query.order_by(sort_field)
@@ -282,8 +281,7 @@ class QueryService(ServiceBase):
         # Apply standard equality filters
         for key, value in filters.items():
             # Skip special filter keys
-            if key in ('sort_by', 'sort_order', 'search', 'min_value', 'max_value',
-                       'start_date', 'end_date'):
+            if key in ("sort_by", "sort_order", "search", "min_value", "max_value", "start_date", "end_date"):
                 continue
 
             try:
@@ -294,18 +292,13 @@ class QueryService(ServiceBase):
                 self.logger.warning(f"Filter field '{key}' not found on model {self.model_class.__name__}")
 
         # Apply text search if specified
-        if 'search' in filters and hasattr(self.model_class, 'searchable_fields'):
-            fields = [getattr(self.model_class, field) for field in self.model_class.searchable_fields
-                      if hasattr(self.model_class, field)]
-            query = self.apply_text_search(query, filters['search'], *fields)
+        if "search" in filters and hasattr(self.model_class, "searchable_fields"):
+            fields = [getattr(self.model_class, field) for field in self.model_class.searchable_fields if hasattr(self.model_class, field)]
+            query = self.apply_text_search(query, filters["search"], *fields)
 
         # Apply sorting if specified
-        if 'sort_by' in filters:
-            query = self.apply_sort(
-                query,
-                filters.get('sort_by'),
-                filters.get('sort_order', 'asc')
-            )
+        if "sort_by" in filters:
+            query = self.apply_sort(query, filters.get("sort_by"), filters.get("sort_order", "asc"))
 
         return query
 

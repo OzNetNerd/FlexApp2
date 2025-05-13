@@ -8,17 +8,15 @@ from app.routes.api.route_registration import ApiCrudRouteConfig
 
 # Register CRUD service and config - using specialized UserService
 user_service = UserService(User)
-user_api_crud_config = ApiCrudRouteConfig(
-    blueprint=users_api_bp,
-    entity_table_name="User",
-    service=user_service
-)
+user_api_crud_config = ApiCrudRouteConfig(blueprint=users_api_bp, entity_table_name="User", service=user_service)
+
 
 @users_api_bp.route("/", methods=["GET"])
 def get_all():
     """Get all users."""
     users = user_service.get_all()
     return jsonify([user.to_dict() for user in users])
+
 
 @users_api_bp.route("/<int:user_id>", methods=["GET"])
 def get(user_id):

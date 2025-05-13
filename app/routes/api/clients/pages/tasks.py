@@ -2,11 +2,12 @@
 
 from app.routes.api.clients import ApiClient
 
+
 class TaskApiClient(ApiClient):
     """Client for interacting with the Task API."""
 
     def __init__(self):
-        super().__init__('/api/tasks')
+        super().__init__("/api/tasks")
 
     # CRUD operations
     def get_all(self):

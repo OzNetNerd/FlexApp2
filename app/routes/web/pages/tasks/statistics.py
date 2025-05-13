@@ -7,6 +7,7 @@ from app.routes.web.utils.context import WebContext
 
 task_service = TaskService()
 
+
 @tasks_bp.route("/statistics", methods=["GET"])
 @login_required
 def statistics():
@@ -24,7 +25,7 @@ def statistics():
         high_priority=stats["high_priority"],
         medium_priority=stats["medium_priority"],
         low_priority=stats["low_priority"],
-        overdue_tasks=stats["overdue_tasks"]
+        overdue_tasks=stats["overdue_tasks"],
     )
 
     # Configure the render_safely call
@@ -32,7 +33,7 @@ def statistics():
         template_path="pages/tasks/statistics.html",
         context=context,
         error_message="An error occurred while rendering the task statistics page",
-        endpoint_name=request.endpoint
+        endpoint_name=request.endpoint,
     )
 
     # Return the safely rendered template

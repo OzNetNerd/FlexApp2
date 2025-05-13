@@ -7,6 +7,7 @@ from app.routes.api.pages.users import users_api_bp
 # Initialize specialized service
 user_service = UserService()
 
+
 @users_api_bp.route("/statistics", methods=["GET"])
 def get_statistics():
     """Get comprehensive statistics for the statistics page."""

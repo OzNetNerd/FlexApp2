@@ -5,18 +5,19 @@
 {% import "macros/modals.html" as modals %}
 
 {% block title %}
-  {% if mode == 'view' %}View{% elif mode == 'edit' %}Edit{% else %}Create{% endif %} {{ entity_type_name }}
+  {% if action == 'view' %}View{% elif action == 'edit' %}Edit{% else %}Create{% endif %} {{ entity_table_name }}
 {% endblock %}
 
 {% block content %}
 <!-- Heading Section -->
-{% set heading = 'View ' if mode == 'view' else 'Edit ' if mode == 'edit' else 'Create ' %}
+{% set heading = 'View ' if action == 'view' else 'Edit ' if action == 'edit' else 'Create ' %}
+{% set subtext_content = "Detailed information for " if action == "view" else "Update information for" if action == "edit" else "Enter details for new" %}
 {{ sections.heading_section(
-  heading_text=heading + entity_type_name,
-  subtext='{% if mode == "view" %}Detailed information for{% elif mode == "edit" %}Update information for{% else %}Enter details for new{% endif %} ' + (entity_name if entity_name else entity_type_name)
+  heading_text=heading + entity_table_name,
+  subtext=subtext_content + " " + (entity_name if entity_name else entity_table_name)
 ) }}
 
-<!-- Form Section -->
+<!-- Entity Details Section -->
 <div class="row mb-4">
   <div class="col-12">
     <div class="card border-0 shadow-sm">
@@ -24,7 +25,7 @@
         <h2 class="section-card-heading">
           {{ model_name }}{% if entity_name %}: {{ entity_name }}{% endif %}
         </h2>
-        {% if mode == 'view' %}
+        {% if action == 'view' %}
         <div class="d-flex justify-content-end align-items-center gap-2">
           {{ buttons.icon_button(href=url_for(entity_base_route + '.edit', entity_id=id),
                                class="transparent-button", icon="edit", text="Edit") }}
@@ -37,7 +38,7 @@
         {% endif %}
       </div>
       <div class="card-body">
-        {% if mode == 'view' %}
+        {% if action == 'view' %}
           <dl class="row emphasised-text">
             {% for field in form if field.name != 'csrf_token' %}
               <dt class="col-sm-3">{{ field.label.text }}</dt>
@@ -55,7 +56,7 @@
             </div>
 
             <div class="mt-4 footer-buttons-container">
-              {% if mode == 'edit' %}
+              {% if action == 'edit' %}
                 {{ buttons.icon_button(type="submit", class="btn btn-primary", icon="save", text="Update", form="entity-form") }}
                 {{ buttons.icon_button(href=url_for(entity_base_route + '.view', entity_id=id), class="btn btn-secondary", icon="x", text="Cancel") }}
               {% else %}
@@ -70,13 +71,13 @@
   </div>
 </div>
 
-{% if mode == 'view' %}
+{% if action == 'view' %}
   {{ modals.delete_modal(entity_base_route, id, csrf_input) }}
 {% endif %}
 {% endblock %}
 
 {% block scripts_extra %}
-{{ buttons.crud_buttons(mode, id, entity_base_route, entity_type_name) }}
+{{ buttons.crud_buttons(action, id, entity_base_route, entity_table_name) }}
 <script>
 function closeDeleteModal() {
   const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));

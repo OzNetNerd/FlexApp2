@@ -7,6 +7,7 @@ from app.routes.web.utils.context import WebContext
 
 opportunity_service = OpportunityService()
 
+
 @opportunities_bp.route("/filtered", methods=["GET"])
 @login_required
 def filtered_opportunities():
@@ -14,18 +15,14 @@ def filtered_opportunities():
     stage = request.args.get("stage")
     priority = request.args.get("priority")
 
-    opportunities = opportunity_service.get_filtered_opportunities(
-        status=status,
-        stage=stage,
-        priority=priority
-    )
+    opportunities = opportunity_service.get_filtered_opportunities(status=status, stage=stage, priority=priority)
 
     # Create context for the filtered view
     context = WebContext(
         title="Filtered Opportunities",
         read_only=True,
         opportunities=opportunities,
-        filters={"status": status, "stage": stage, "priority": priority}
+        filters={"status": status, "stage": stage, "priority": priority},
     )
 
     # Configure the render_safely call
@@ -33,7 +30,7 @@ def filtered_opportunities():
         template_path="pages/opportunities/filtered.html",
         context=context,
         error_message="An error occurred while rendering the filtered opportunities page",
-        endpoint_name=request.endpoint
+        endpoint_name=request.endpoint,
     )
 
     # Return the safely rendered template

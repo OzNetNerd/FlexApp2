@@ -4,6 +4,7 @@ SRS blueprint configuration module.
 This module initializes the SRS service and creates the blueprint
 for SRS-related routes in the web application.
 """
+
 from app.services.srs import SRSService
 from app.models.pages.srs import SRS
 from app.routes.web.utils.blueprint_factory import create_crud_blueprint, BlueprintConfig

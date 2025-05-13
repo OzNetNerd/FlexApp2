@@ -15,7 +15,7 @@ def get_filtered_opportunities():
         "stage": request.args.get("stage"),
         "has_company": request.args.get("has_company"),
         "has_contacts": request.args.get("has_contacts"),
-        "min_value": request.args.get("min_value")
+        "min_value": request.args.get("min_value"),
     }
     opportunities = opportunity_service.get_filtered_opportunities(filters)
 

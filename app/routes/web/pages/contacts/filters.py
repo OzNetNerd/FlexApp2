@@ -8,6 +8,7 @@ from app.routes.web.utils.context import WebContext
 
 contact_service = ContactService()
 
+
 @contacts_bp.route("/filtered", methods=["GET"])
 @login_required
 def filtered_contacts():
@@ -15,11 +16,7 @@ def filtered_contacts():
     has_company = request.args.get("has_company")
     skill_level = request.args.get("skill_level")
 
-    contacts = contact_service.get_filtered_contacts(
-        has_opportunities=has_opportunities,
-        has_company=has_company,
-        skill_level=skill_level
-    )
+    contacts = contact_service.get_filtered_contacts(has_opportunities=has_opportunities, has_company=has_company, skill_level=skill_level)
 
     companies = Company.query.order_by(Company.name.asc()).all()
 
@@ -29,7 +26,7 @@ def filtered_contacts():
         read_only=True,
         contacts=contacts,
         companies=companies,
-        filters={"has_opportunities": has_opportunities, "has_company": has_company, "skill_level": skill_level}
+        filters={"has_opportunities": has_opportunities, "has_company": has_company, "skill_level": skill_level},
     )
 
     # Configure the render_safely call
@@ -37,7 +34,7 @@ def filtered_contacts():
         template_path="pages/contacts/filtered.html",
         context=context,
         error_message="An error occurred while rendering the filtered contacts page",
-        endpoint_name=request.endpoint
+        endpoint_name=request.endpoint,
     )
 
     # Return the safely rendered template

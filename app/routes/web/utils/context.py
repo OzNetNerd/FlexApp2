@@ -28,8 +28,7 @@ class WebContext(BaseContext):
 class TableContext(WebContext):
     """Context class for rendering table views with table-specific attributes."""
 
-    def __init__(self, entity_table_name=None, title="", read_only=True, action=None,
-                table_data=None, **kwargs):
+    def __init__(self, entity_table_name=None, title="", read_only=True, action=None, table_data=None, **kwargs):
         # Initialize model_class
         self.model_class = kwargs.pop("model_class", None)
 
@@ -46,6 +45,7 @@ class TableContext(WebContext):
         # Load model class if not already provided
         if not self.model_class:
             from app.utils.model_registry import get_model_by_name
+
             self.model_class = get_model_by_name(entity_table_name)
 
         title = title or entity_table_name

@@ -19,10 +19,7 @@ class TaskAnalyticsService(ServiceBase):
         completed_count = db.session.query(Task).filter(Task.status == "completed").count()
         in_progress_count = db.session.query(Task).filter(Task.status == "in_progress").count()
         not_started_count = db.session.query(Task).filter(Task.status == "pending").count()
-        overdue_tasks = db.session.query(Task).filter(
-            Task.due_date < datetime.now().date(),
-            Task.status != "completed"
-        ).count()
+        overdue_tasks = db.session.query(Task).filter(Task.due_date < datetime.now().date(), Task.status != "completed").count()
         due_today = db.session.query(Task).filter(Task.due_date == datetime.now().date()).count()
 
         return {
@@ -42,18 +39,9 @@ class TaskAnalyticsService(ServiceBase):
         not_started_count = db.session.query(Task).filter(Task.status == "pending").count()
 
         return {
-            "completed": {
-                "count": completed_count,
-                "percentage": self._calculate_percentage(completed_count, total_tasks)
-            },
-            "in_progress": {
-                "count": in_progress_count,
-                "percentage": self._calculate_percentage(in_progress_count, total_tasks)
-            },
-            "not_started": {
-                "count": not_started_count,
-                "percentage": self._calculate_percentage(not_started_count, total_tasks)
-            },
+            "completed": {"count": completed_count, "percentage": self._calculate_percentage(completed_count, total_tasks)},
+            "in_progress": {"count": in_progress_count, "percentage": self._calculate_percentage(in_progress_count, total_tasks)},
+            "not_started": {"count": not_started_count, "percentage": self._calculate_percentage(not_started_count, total_tasks)},
         }
 
     def prepare_completion_data(self):
@@ -87,10 +75,7 @@ class TaskAnalyticsService(ServiceBase):
         high_priority = db.session.query(Task).filter(Task.priority == "high").count()
         medium_priority = db.session.query(Task).filter(Task.priority == "medium").count()
         low_priority = db.session.query(Task).filter(Task.priority == "low").count()
-        overdue_tasks = db.session.query(Task).filter(
-            Task.due_date < datetime.now().date(),
-            Task.status != "completed"
-        ).count()
+        overdue_tasks = db.session.query(Task).filter(Task.due_date < datetime.now().date(), Task.status != "completed").count()
 
         return {
             "total_tasks": total_tasks,

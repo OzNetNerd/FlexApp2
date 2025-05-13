@@ -11,6 +11,7 @@ from app.services.srs.analytics import SRSAnalyticsService
 from app.services.srs.navigation import SRSNavigationService
 from app.services.srs.categories import SRSCategoryService
 
+
 class SRSService(ServiceBase):
     """
     Service for managing SRS items and scheduling reviews based on spaced repetition principles.
@@ -107,12 +108,7 @@ class SRSService(ServiceBase):
         updated_item = self.core.update(item, update_data)
 
         # Record review history
-        self.core.log_review(
-            item.id,
-            rating,
-            update_data["interval"],
-            update_data["ease_factor"]
-        )
+        self.core.log_review(item.id, rating, update_data["interval"], update_data["ease_factor"])
 
         # Record answer if provided
         if answer_given:

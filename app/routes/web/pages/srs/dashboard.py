@@ -3,6 +3,7 @@ Dashboard and statistics routes for the SRS system.
 
 This module contains routes for the SRS dashboard and statistics pages.
 """
+
 from flask import url_for
 from flask_login import login_required, current_user
 from app.routes.web.pages.srs.blueprint import srs_bp, srs_service
@@ -83,18 +84,13 @@ def dashboard():
     progress_data = srs_service.get_learning_progress_data(months=7)
 
     logger.info("Rendering SRS dashboard")
-    context = SRSDashboardContext(
-        stats=stats,
-        categories=categories,
-        due_cards=due_cards,
-        progress_data=progress_data
-    )
+    context = SRSDashboardContext(stats=stats, categories=categories, due_cards=due_cards, progress_data=progress_data)
 
     config = RenderSafelyConfig(
         template_path="pages/srs/dashboard.html",
         context=context,
         error_message="Failed to render SRS dashboard",
-        endpoint_name="srs_bp.dashboard"
+        endpoint_name="srs_bp.dashboard",
     )
 
     return render_safely(config)
@@ -122,7 +118,7 @@ def statistics():
         template_path="pages/srs/stats.html",
         context=context,
         error_message="Failed to render statistics page",
-        endpoint_name="srs_bp.statistics"
+        endpoint_name="srs_bp.statistics",
     )
 
     return render_safely(config)

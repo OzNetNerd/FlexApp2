@@ -14,10 +14,7 @@ def register_api_blueprints(app: Flask) -> None:
     logger.info("Registering API blueprints")
 
     # Discover and register API CRUD routes first (if needed)
-    blueprints = discover_blueprint_packages(
-        package_path="app.routes.api",
-        bp_suffix="_api_bp"
-    )
+    blueprints = discover_blueprint_packages(package_path="app.routes.api", bp_suffix="_api_bp")
 
     # Configure routes if needed
     for bp_name, (_, module_path) in blueprints.items():

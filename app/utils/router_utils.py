@@ -22,13 +22,13 @@ def discover_modules(package_path: str, exclusions: Optional[List[str]] = None) 
 
 
 def register_blueprint_routes(
-        app: Flask,
-        package_path: str,
-        config_suffix: str,
-        register_func: Callable,
-        blueprint_suffix: str = "_bp",
-        exclusions: Optional[List[str]] = None,
-        return_blueprints: bool = False,
+    app: Flask,
+    package_path: str,
+    config_suffix: str,
+    register_func: Callable,
+    blueprint_suffix: str = "_bp",
+    exclusions: Optional[List[str]] = None,
+    return_blueprints: bool = False,
 ) -> Optional[Dict[str, Blueprint]]:
     """Generic blueprint registration with customizable behavior.
 
@@ -84,7 +84,7 @@ def auto_discover_routes(package_path: str, recursive: bool = False) -> None:
 
     if recursive:
         # Recursively walk through all submodules
-        for _, name, is_pkg in pkgutil.walk_packages(package.__path__, package.__name__ + '.'):
+        for _, name, is_pkg in pkgutil.walk_packages(package.__path__, package.__name__ + "."):
             try:
                 logger.debug(f"Importing module: {name}")
                 importlib.import_module(name)
@@ -92,7 +92,7 @@ def auto_discover_routes(package_path: str, recursive: bool = False) -> None:
                 logger.error(f"Error importing {name}: {e}")
     else:
         # Only discover modules in the immediate package
-        for _, name, is_pkg in pkgutil.iter_modules(package.__path__, package.__name__ + '.'):
+        for _, name, is_pkg in pkgutil.iter_modules(package.__path__, package.__name__ + "."):
             if not is_pkg:  # Only import modules, not subpackages
                 try:
                     logger.debug(f"Importing module: {name}")
@@ -117,7 +117,7 @@ def recursive_discover_routes(package_path: str, bp_suffix: str = "_bp") -> None
     package = importlib.import_module(package_path)
 
     # Look for blueprint modules
-    for _, module_name, is_pkg in pkgutil.iter_modules(package.__path__, package.__name__ + '.'):
+    for _, module_name, is_pkg in pkgutil.iter_modules(package.__path__, package.__name__ + "."):
         try:
             # Import the module/package
             module = importlib.import_module(module_name)
@@ -132,7 +132,7 @@ def recursive_discover_routes(package_path: str, bp_suffix: str = "_bp") -> None
                     # Found a blueprint, now import all Python files in its directory
                     if is_pkg:
                         # If the blueprint is in a package, import all modules in that package
-                        for _, route_module_name, _ in pkgutil.iter_modules(module.__path__, module.__name__ + '.'):
+                        for _, route_module_name, _ in pkgutil.iter_modules(module.__path__, module.__name__ + "."):
                             try:
                                 logger.debug(f"Importing route module: {route_module_name}")
                                 importlib.import_module(route_module_name)
@@ -146,8 +146,7 @@ def recursive_discover_routes(package_path: str, bp_suffix: str = "_bp") -> None
             logger.error(f"Error importing {module_name}: {e}")
 
 
-def discover_blueprint_packages(package_path: str, bp_suffix: str = "_bp", exclusions: Optional[List[str]] = None) -> \
-Dict[str, tuple]:
+def discover_blueprint_packages(package_path: str, bp_suffix: str = "_bp", exclusions: Optional[List[str]] = None) -> Dict[str, tuple]:
     """Discover all blueprint packages and their modules.
 
     Returns a dictionary of blueprint names and their modules.
@@ -157,7 +156,7 @@ Dict[str, tuple]:
     package = importlib.import_module(package_path)
 
     # Look for blueprint modules
-    for _, module_name, is_pkg in pkgutil.iter_modules(package.__path__, package.__name__ + '.'):
+    for _, module_name, is_pkg in pkgutil.iter_modules(package.__path__, package.__name__ + "."):
         # Skip excluded modules
         if any(excl in module_name for excl in exclusions):
             continue
@@ -185,13 +184,13 @@ Dict[str, tuple]:
 
 
 def register_application_blueprints(
-        app: Flask,
-        package_path: str,
-        root_blueprint: Optional[Blueprint] = None,
-        config_suffix: Optional[str] = None,
-        register_func: Optional[Callable] = None,
-        blueprint_suffix: str = "_bp",
-        exclusions: Optional[List[str]] = None,
+    app: Flask,
+    package_path: str,
+    root_blueprint: Optional[Blueprint] = None,
+    config_suffix: Optional[str] = None,
+    register_func: Optional[Callable] = None,
+    blueprint_suffix: str = "_bp",
+    exclusions: Optional[List[str]] = None,
 ) -> None:
     """Unified blueprint registration for both API and web endpoints.
 
@@ -207,11 +206,7 @@ def register_application_blueprints(
     logger.info(f"Discovering blueprints in: {package_path}")
 
     # First discover all blueprints and their packages
-    blueprints = discover_blueprint_packages(
-        package_path=package_path,
-        bp_suffix=blueprint_suffix,
-        exclusions=exclusions
-    )
+    blueprints = discover_blueprint_packages(package_path=package_path, bp_suffix=blueprint_suffix, exclusions=exclusions)
 
     logger.info(f"Discovered {len(blueprints)} blueprints")
 
@@ -230,10 +225,7 @@ def register_application_blueprints(
     for bp_name, (_, module_path) in blueprints.items():
         if module_path:
             # Import all modules in the blueprint's package to register routes
-            for _, route_module_name, _ in pkgutil.iter_modules(
-                    importlib.import_module(module_path).__path__,
-                    module_path + '.'
-            ):
+            for _, route_module_name, _ in pkgutil.iter_modules(importlib.import_module(module_path).__path__, module_path + "."):
                 try:
                     logger.debug(f"Importing route module: {route_module_name}")
                     importlib.import_module(route_module_name)

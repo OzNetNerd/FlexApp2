@@ -5,6 +5,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from logging import INFO, Formatter, StreamHandler
 from typing import Type
+
 # from app.graphql import init_graphql
 
 from flask import Flask, current_app, make_response, redirect, request, url_for
@@ -162,17 +163,18 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     def inject_globals():
         """Inject common variables into every template context."""
         # Get sidebar collapsed state from cookie
-        sidebar_collapsed = request.cookies.get('sidebarCollapsed') == 'true'
+        sidebar_collapsed = request.cookies.get("sidebarCollapsed") == "true"
 
         # Try to get path-specific state if available
         path_state_collapsed = None
         try:
-            path_state_str = request.cookies.get('sidebarPathState')
+            path_state_str = request.cookies.get("sidebarPathState")
             if path_state_str:
                 import json
+
                 path_state = json.loads(path_state_str)
-                if path_state.get('path') == request.path:
-                    path_state_collapsed = path_state.get('state', {}).get('collapsed')
+                if path_state.get("path") == request.path:
+                    path_state_collapsed = path_state.get("state", {}).get("collapsed")
         except:
             pass
 

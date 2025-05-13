@@ -7,7 +7,7 @@ class SRSApiClient(ApiClient):
     """Client for interacting with the SRS API."""
 
     def __init__(self):
-        super().__init__('/api/srs')
+        super().__init__("/api/srs")
 
     # CRUD operations
     def get_all(self):

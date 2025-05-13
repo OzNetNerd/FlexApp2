@@ -7,6 +7,7 @@ from app.routes.web.utils.context import WebContext
 
 user_service = UserService()
 
+
 @users_bp.route("/statistics", methods=["GET"])
 @login_required
 def statistics():
@@ -21,14 +22,14 @@ def statistics():
         inactive_users=stats["inactive_users"],
         avg_activity_per_user=stats["avg_activity_per_user"],
         user_activity_by_role=stats["user_activity_by_role"],
-        monthly_data=stats["monthly_data"]
+        monthly_data=stats["monthly_data"],
     )
 
     config = RenderSafelyConfig(
         template_path="pages/users/statistics.html",
         context=context,
         error_message="An error occurred while rendering the user statistics page",
-        endpoint_name=request.endpoint
+        endpoint_name=request.endpoint,
     )
 
     return render_safely(config)

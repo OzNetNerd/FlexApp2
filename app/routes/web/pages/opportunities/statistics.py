@@ -7,6 +7,7 @@ from app.routes.web.utils.context import WebContext
 
 opportunity_service = OpportunityService()
 
+
 @opportunities_bp.route("/statistics", methods=["GET"])
 @login_required
 def statistics():
@@ -24,7 +25,7 @@ def statistics():
         lost_opportunities=overall_stats["lost"],
         pipeline_by_stage=pipeline_by_stage,
         monthly_data=monthly_data,
-        currency_symbol="$"
+        currency_symbol="$",
     )
 
     # Configure the render_safely call
@@ -32,7 +33,7 @@ def statistics():
         template_path="pages/opportunities/statistics.html",
         context=context,
         error_message="An error occurred while rendering the opportunity statistics page",
-        endpoint_name=request.endpoint
+        endpoint_name=request.endpoint,
     )
 
     # Return the safely rendered template

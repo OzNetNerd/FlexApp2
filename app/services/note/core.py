@@ -20,8 +20,11 @@ class NoteCoreService(CRUDService, ValidatorMixin):
     def get_by_notable(self, notable_type: str, notable_id: int) -> List[Note]:
         """Fetch notes for a given entity, newest first."""
         try:
-            return self.model_class.query.filter_by(notable_type=notable_type, notable_id=notable_id).order_by(
-                self.model_class.created_at.desc()).all()
+            return (
+                self.model_class.query.filter_by(notable_type=notable_type, notable_id=notable_id)
+                .order_by(self.model_class.created_at.desc())
+                .all()
+            )
         except Exception as e:
             logger.error(f"❌ Error getting notes for {notable_type} id={notable_id}: {e}")
             raise

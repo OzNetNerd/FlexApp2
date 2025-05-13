@@ -6,9 +6,11 @@ from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS, ReviewHistory
 from app.services.service_base import ServiceBase
 from app.services.srs.constants import (
-    DEFAULT_EASE_FACTOR, MASTERY_THRESHOLD,
+    DEFAULT_EASE_FACTOR,
+    MASTERY_THRESHOLD,
 )
 from app.models import db
+
 
 class SRSAnalyticsService(ServiceBase):
     """Service for SRS metrics, analytics, and statistical calculations."""
@@ -38,10 +40,7 @@ class SRSAnalyticsService(ServiceBase):
             Number of SRS items due today
         """
         self.logger.info("SRSAnalyticsService: Counting SRS items due today")
-        count = SRS.query.filter(
-            SRS.next_review_at.isnot(None),
-            SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))
-        ).count()
+        count = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))).count()
 
         self.logger.info(f"SRSAnalyticsService: SRS items due today: {count}")
         return count
@@ -60,13 +59,9 @@ class SRSAnalyticsService(ServiceBase):
             self.logger.info("SRSAnalyticsService: No items found, success rate is 0")
             return 0
 
-        successful_items = sum(
-            1 for item in all_items
-            if item.successful_reps and item.review_count and item.review_count > 0
-        )
+        successful_items = sum(1 for item in all_items if item.successful_reps and item.review_count and item.review_count > 0)
 
-        self.logger.info(
-            f"SRSAnalyticsService: Found {successful_items} successful items out of {len(all_items)} total")
+        self.logger.info(f"SRSAnalyticsService: Found {successful_items} successful items out of {len(all_items)} total")
 
         success_rate = int((successful_items / len(all_items)) * 100) if len(all_items) > 0 else 0
         self.logger.info(f"SRSAnalyticsService: Success rate: {success_rate}%")
@@ -84,10 +79,7 @@ class SRSAnalyticsService(ServiceBase):
         week_ago = now - timedelta(days=7)
         self.logger.info(f"SRSAnalyticsService: Counting reviews between {week_ago.isoformat()} and {now.isoformat()}")
 
-        count = ReviewHistory.query.filter(
-            ReviewHistory.created_at >= week_ago,
-            ReviewHistory.created_at <= now
-        ).count()
+        count = ReviewHistory.query.filter(ReviewHistory.created_at >= week_ago, ReviewHistory.created_at <= now).count()
 
         self.logger.info(f"SRSAnalyticsService: Found {count} reviews in the past 7 days")
         return count
@@ -115,14 +107,12 @@ class SRSAnalyticsService(ServiceBase):
 
         # Get reviews for current and previous months
         current_month_reviews = ReviewHistory.query.filter(
-            ReviewHistory.created_at >= current_month_start,
-            ReviewHistory.created_at < now
+            ReviewHistory.created_at >= current_month_start, ReviewHistory.created_at < now
         ).all()
         self.logger.info(f"SRSAnalyticsService: Found {len(current_month_reviews)} reviews in current month")
 
         prev_month_reviews = ReviewHistory.query.filter(
-            ReviewHistory.created_at >= prev_month_start,
-            ReviewHistory.created_at < current_month_start
+            ReviewHistory.created_at >= prev_month_start, ReviewHistory.created_at < current_month_start
         ).all()
         self.logger.info(f"SRSAnalyticsService: Found {len(prev_month_reviews)} reviews in previous month")
 
@@ -168,8 +158,7 @@ class SRSAnalyticsService(ServiceBase):
                 self.logger.info(f"SRSAnalyticsService: Review {review.id} was perfect (rating {review.rating})")
             else:
                 # Stop counting as soon as we hit a non-perfect review
-                self.logger.info(
-                    f"SRSAnalyticsService: Found non-perfect review {review.id} (rating {review.rating}), stopping count")
+                self.logger.info(f"SRSAnalyticsService: Found non-perfect review {review.id} (rating {review.rating}), stopping count")
                 break
 
         self.logger.info(f"SRSAnalyticsService: Total consecutive perfect reviews: {consecutive_count}")
@@ -250,14 +239,10 @@ class SRSAnalyticsService(ServiceBase):
         mastered_card_ids = set()
         for review in month_reviews:
             if review.interval >= mastery_threshold:
-                self.logger.info(
-                    f"SRSAnalyticsService: Found review with interval {review.interval} for item {review.srs_item_id}")
+                self.logger.info(f"SRSAnalyticsService: Found review with interval {review.interval} for item {review.srs_item_id}")
                 # Check if this is the first time the card crossed the threshold
                 prev_reviews = (
-                    ReviewHistory.query.filter(
-                        ReviewHistory.srs_item_id == review.srs_item_id,
-                        ReviewHistory.timestamp < review.timestamp
-                    )
+                    ReviewHistory.query.filter(ReviewHistory.srs_item_id == review.srs_item_id, ReviewHistory.timestamp < review.timestamp)
                     .order_by(ReviewHistory.timestamp.desc())
                     .first()
                 )
@@ -289,11 +274,7 @@ class SRSAnalyticsService(ServiceBase):
         reviewed_today = ReviewHistory.query.filter(ReviewHistory.created_at >= today_start).count()
         self.logger.info(f"SRSAnalyticsService: Cards reviewed today: {reviewed_today}")
 
-        stats = {
-            "total_cards": total,
-            "cards_due": due_today,
-            "cards_reviewed_today": reviewed_today
-        }
+        stats = {"total_cards": total, "cards_due": due_today, "cards_reviewed_today": reviewed_today}
 
         self.logger.info(f"SRSAnalyticsService: Returning statistics: {stats}")
         return stats
@@ -325,18 +306,17 @@ class SRSAnalyticsService(ServiceBase):
         self.logger.info(f"SRSAnalyticsService: Performance counts: {performance_counts}")
 
         self.logger.info("SRSAnalyticsService: Calculating average values")
-        avg_ease = sum(card.ease_factor or DEFAULT_EASE_FACTOR for card in all_cards) / len(
-            all_cards) if all_cards else DEFAULT_EASE_FACTOR
+        avg_ease = sum(card.ease_factor or DEFAULT_EASE_FACTOR for card in all_cards) / len(all_cards) if all_cards else DEFAULT_EASE_FACTOR
         avg_interval = sum(card.interval or 0 for card in all_cards) / len(all_cards) if all_cards else 0
-        self.logger.info(
-            f"SRSAnalyticsService: Average ease factor: {avg_ease:.2f}, average interval: {avg_interval:.2f}")
+        self.logger.info(f"SRSAnalyticsService: Average ease factor: {avg_ease:.2f}, average interval: {avg_interval:.2f}")
 
         streak_days = self.get_streak_days()
         weekly_reviews = self.count_weekly_reviews()
         mastered_this_month = self.count_mastered_cards_this_month()
 
         self.logger.info(
-            f"SRSAnalyticsService: Streak days: {streak_days}, weekly reviews: {weekly_reviews}, mastered this month: {mastered_this_month}")
+            f"SRSAnalyticsService: Streak days: {streak_days}, weekly reviews: {weekly_reviews}, mastered this month: {mastered_this_month}"
+        )
 
         stats = {
             **basic_stats,
@@ -412,17 +392,10 @@ class SRSAnalyticsService(ServiceBase):
         hard_count = SRS.query.filter(SRS.ease_factor <= 1.5, SRS.review_count > 0).count()
 
         # Medium difficulty cards
-        medium_count = SRS.query.filter(
-            SRS.ease_factor > 1.5,
-            SRS.ease_factor < 2.0,
-            SRS.review_count > 0
-        ).count()
+        medium_count = SRS.query.filter(SRS.ease_factor > 1.5, SRS.ease_factor < 2.0, SRS.review_count > 0).count()
 
         # Easy cards (high ease factor)
-        easy_count = SRS.query.filter(
-            SRS.ease_factor >= 2.0,
-            SRS.review_count > 0
-        ).count()
+        easy_count = SRS.query.filter(SRS.ease_factor >= 2.0, SRS.review_count > 0).count()
 
         counts = {
             "hard": hard_count,
@@ -443,10 +416,7 @@ class SRSAnalyticsService(ServiceBase):
         self.logger.info("SRSAnalyticsService: Getting counts by performance level")
 
         # Cards with low success rate (< 60% correct)
-        struggling_count = SRS.query.filter(
-            SRS.review_count > 2,
-            (SRS.successful_reps * 100 / SRS.review_count) < 60
-        ).count()
+        struggling_count = SRS.query.filter(SRS.review_count > 2, (SRS.successful_reps * 100 / SRS.review_count) < 60).count()
 
         # Cards with average success rate (60-85%)
         average_count = SRS.query.filter(
@@ -456,10 +426,7 @@ class SRSAnalyticsService(ServiceBase):
         ).count()
 
         # Cards with high success rate (> 85%)
-        strong_count = SRS.query.filter(
-            SRS.review_count > 2,
-            (SRS.successful_reps * 100 / SRS.review_count) > 85
-        ).count()
+        strong_count = SRS.query.filter(SRS.review_count > 2, (SRS.successful_reps * 100 / SRS.review_count) > 85).count()
 
         counts = {
             "struggling": struggling_count,
@@ -540,10 +507,7 @@ class SRSAnalyticsService(ServiceBase):
         def calculate_progress(cards):
             if not cards:
                 return 0
-            total_progress = sum(
-                (item.successful_reps or 0) / max(item.review_count or 1, 1) * 100
-                for item in cards
-            )
+            total_progress = sum((item.successful_reps or 0) / max(item.review_count or 1, 1) * 100 for item in cards)
             return int(total_progress / len(cards)) if cards else 0
 
         if type_name:
@@ -586,10 +550,7 @@ class SRSAnalyticsService(ServiceBase):
         """
         # Get all due items
         self.logger.info("SRSAnalyticsService: Counting due items by type")
-        due_items = SRS.query.filter(
-            SRS.next_review_at.isnot(None),
-            SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))
-        ).all()
+        due_items = SRS.query.filter(SRS.next_review_at.isnot(None), SRS.next_review_at <= datetime.now(ZoneInfo("UTC"))).all()
 
         self.logger.info(f"SRSAnalyticsService: Found {len(due_items)} total due items")
 
@@ -641,9 +602,7 @@ class SRSAnalyticsService(ServiceBase):
                 counts[type_name] = SRS.query.filter(SRS.notable_type == type_name).count()
 
             # Count any other types
-            other_count = SRS.query.filter(
-                ~SRS.notable_type.in_(["company", "contact", "opportunity"])
-            ).count()
+            other_count = SRS.query.filter(~SRS.notable_type.in_(["company", "contact", "opportunity"])).count()
             counts["other"] = other_count
 
             self.logger.info(f"SRSAnalyticsService: Items by type: {counts}")

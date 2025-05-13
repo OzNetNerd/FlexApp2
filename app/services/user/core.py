@@ -17,6 +17,7 @@ class UserCoreService(CRUDService, ValidatorMixin):
     def model_class(self):
         """Late-binding property to get User model."""
         from app.models.pages.user import User
+
         return User
 
     def get_filtered_users(self, filters):
@@ -29,15 +30,15 @@ class UserCoreService(CRUDService, ValidatorMixin):
         activity = filters.get("activity")
 
         if is_admin:
-            is_admin_bool = is_admin.lower() == 'true'
+            is_admin_bool = is_admin.lower() == "true"
             query = query.filter_by(is_admin=is_admin_bool)
 
         if period:
-            if period == 'month':
+            if period == "month":
                 query = query.filter(self.model_class.created_at >= (datetime.now() - timedelta(days=30)))
-            elif period == 'quarter':
+            elif period == "quarter":
                 query = query.filter(self.model_class.created_at >= (datetime.now() - timedelta(days=90)))
-            elif period == 'year':
+            elif period == "year":
                 query = query.filter(self.model_class.created_at >= (datetime.now() - timedelta(days=365)))
 
         filtered_users = query.order_by(self.model_class.created_at.desc()).all()
@@ -55,23 +56,26 @@ class UserCoreService(CRUDService, ValidatorMixin):
                 high_threshold = max_notes * 0.7
                 medium_threshold = max_notes * 0.3
 
-                if activity == 'high':
+                if activity == "high":
                     filtered_users = [user for user in filtered_users if user_notes.get(user.id, 0) >= high_threshold]
-                elif activity == 'medium':
-                    filtered_users = [user for user in filtered_users
-                                      if medium_threshold <= user_notes.get(user.id, 0) < high_threshold]
-                elif activity == 'low':
+                elif activity == "medium":
+                    filtered_users = [user for user in filtered_users if medium_threshold <= user_notes.get(user.id, 0) < high_threshold]
+                elif activity == "low":
                     filtered_users = [user for user in filtered_users if user_notes.get(user.id, 0) < medium_threshold]
 
         # Attach counts as attributes rather than converting to dictionaries
         for user in filtered_users:
             user.notes_count = Note.query.filter_by(user_id=user.id).count()
-            user.opportunities_count = db.session.query(db.func.count(self._get_opportunity_model().id)).filter(
-                self._get_opportunity_model().created_by_id == user.id
-            ).scalar() or 0
+            user.opportunities_count = (
+                db.session.query(db.func.count(self._get_opportunity_model().id))
+                .filter(self._get_opportunity_model().created_by_id == user.id)
+                .scalar()
+                or 0
+            )
 
         return filtered_users
 
     def _get_opportunity_model(self):
         from app.models import Opportunity
+
         return Opportunity

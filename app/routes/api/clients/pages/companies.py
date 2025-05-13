@@ -7,7 +7,7 @@ class CompanyApiClient(ApiClient):
     """Client for interacting with the Company API."""
 
     def __init__(self):
-        super().__init__('/api/companies')
+        super().__init__("/api/companies")
 
     # CRUD operations
     def get_all(self):

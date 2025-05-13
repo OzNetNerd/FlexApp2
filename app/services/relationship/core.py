@@ -25,8 +25,7 @@ class RelationshipCoreService(ServiceBase):
         return model.query.get(entity_id)
 
     def create_relationship(
-            self, entity1_type: str, entity1_id: int, entity2_type: str, entity2_id: int,
-            relationship_type: str, entity_models: dict
+        self, entity1_type: str, entity1_id: int, entity2_type: str, entity2_id: int, relationship_type: str, entity_models: dict
     ) -> Tuple[bool, Optional[Relationship], str]:
         """Create a relationship between two entities."""
         # Validate entities exist
@@ -68,8 +67,7 @@ class RelationshipCoreService(ServiceBase):
             db.session.add(relationship)
             db.session.commit()
 
-            logger.info(
-                f"Created relationship: {entity1_type}={entity1_id} {relationship_type} {entity2_type}={entity2_id}")
+            logger.info(f"Created relationship: {entity1_type}={entity1_id} {relationship_type} {entity2_type}={entity2_id}")
             return True, relationship, "Relationship created successfully"
 
         except Exception as e:

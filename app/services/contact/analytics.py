@@ -19,8 +19,7 @@ class ContactAnalyticsService(ServiceBase):
 
         return {
             "total_contacts": total_contacts,
-            "with_opportunities": db.session.query(Contact).filter(
-                Contact.opportunity_relationships.any()).distinct().count(),
+            "with_opportunities": db.session.query(Contact).filter(Contact.opportunity_relationships.any()).distinct().count(),
             "with_skills": db.session.query(Contact).filter(Contact.skill_level.isnot(None)).count(),
             "with_companies": db.session.query(Contact).filter(Contact.company_id.isnot(None)).count(),
         }
@@ -45,13 +44,15 @@ class ContactAnalyticsService(ServiceBase):
                 "name": "Expert",
                 "count": db.session.query(Contact).filter(Contact.skill_level == "Expert").count(),
                 "percentage": self._calculate_percentage(
-                    db.session.query(Contact).filter(Contact.skill_level == "Expert").count(), total_contacts),
+                    db.session.query(Contact).filter(Contact.skill_level == "Expert").count(), total_contacts
+                ),
             },
             {
                 "name": "Advanced",
                 "count": db.session.query(Contact).filter(Contact.skill_level == "Advanced").count(),
                 "percentage": self._calculate_percentage(
-                    db.session.query(Contact).filter(Contact.skill_level == "Advanced").count(), total_contacts),
+                    db.session.query(Contact).filter(Contact.skill_level == "Advanced").count(), total_contacts
+                ),
             },
             {
                 "name": "Intermediate",
@@ -64,7 +65,8 @@ class ContactAnalyticsService(ServiceBase):
                 "name": "Beginner",
                 "count": db.session.query(Contact).filter(Contact.skill_level == "Beginner").count(),
                 "percentage": self._calculate_percentage(
-                    db.session.query(Contact).filter(Contact.skill_level == "Beginner").count(), total_contacts),
+                    db.session.query(Contact).filter(Contact.skill_level == "Beginner").count(), total_contacts
+                ),
             },
         ]
 
@@ -97,8 +99,7 @@ class ContactAnalyticsService(ServiceBase):
 
     def get_skill_distribution(self):
         """Get distribution of contacts by skill level."""
-        return db.session.query(Contact.skill_level, db.func.count(Contact.id).label("count")).group_by(
-            Contact.skill_level).all()
+        return db.session.query(Contact.skill_level, db.func.count(Contact.id).label("count")).group_by(Contact.skill_level).all()
 
     def get_skill_area_distribution(self):
         """Get distribution of contacts by skill area."""

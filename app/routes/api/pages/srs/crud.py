@@ -13,17 +13,15 @@ logger = get_logger()
 # Register CRUD service and config
 srs_crud_service = CRUDService(SRS)
 srs_service = SRSService()
-srs_api_crud_config = ApiCrudRouteConfig(
-    blueprint=srs_api_bp,
-    entity_table_name="SRS",
-    service=srs_crud_service
-)
+srs_api_crud_config = ApiCrudRouteConfig(blueprint=srs_api_bp, entity_table_name="SRS", service=srs_crud_service)
+
 
 @srs_api_bp.route("/", methods=["GET"])
 def get_all():
     """Get all SRS items."""
     items = srs_crud_service.get_all()
     return jsonify([item.to_dict() for item in items])
+
 
 @srs_api_bp.route("/<int:item_id>", methods=["GET"])
 def get(item_id):
@@ -32,6 +30,7 @@ def get(item_id):
     if not item:
         return jsonify({"error": "SRS item not found"}), 404
     return jsonify(item.to_dict())
+
 
 @srs_api_bp.route("/<int:item_id>", methods=["PATCH"])
 def update_item_field(item_id):

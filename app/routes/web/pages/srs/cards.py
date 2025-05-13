@@ -3,6 +3,7 @@ Card management routes for the SRS system.
 
 This module contains routes for adding, editing, and managing SRS cards.
 """
+
 from flask import request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
@@ -67,8 +68,7 @@ def add_card():
         else:
             # Set review date to tomorrow by default
             logger.info("Setting card for review tomorrow")
-            new_card["next_review_at"] = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0,
-                                                                               microsecond=0) + timedelta(
+            new_card["next_review_at"] = datetime.now(ZoneInfo("UTC")).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(
                 days=1
             )
 
@@ -105,7 +105,7 @@ def add_card():
         template_path="pages/srs/add_card.html",
         context=context,
         error_message="Failed to render add card form",
-        endpoint_name="srs_bp.add_card"
+        endpoint_name="srs_bp.add_card",
     )
 
     return render_safely(config)

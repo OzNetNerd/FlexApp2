@@ -7,6 +7,7 @@ from app.routes.api.pages.opportunities import opportunities_api_bp
 # Initialize specialized service
 opportunity_service = OpportunityService()
 
+
 @opportunities_api_bp.route("/statistics", methods=["GET"])
 def get_statistics():
     """Get comprehensive statistics for the statistics page."""

@@ -39,8 +39,7 @@ class NoteSearchService(ServiceBase):
         """
         try:
             pattern = f"%{term}%"
-            return Note.query.filter(or_(Note.content.ilike(pattern), Note.user_id == term)).order_by(
-                Note.created_at.desc()).all()
+            return Note.query.filter(or_(Note.content.ilike(pattern), Note.user_id == term)).order_by(Note.created_at.desc()).all()
         except Exception as e:
             logger.error(f"❌ Error searching notes for '{term}': {e}")
             raise

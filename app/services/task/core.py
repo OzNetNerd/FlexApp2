@@ -32,8 +32,7 @@ class TaskCoreService(CRUDService, ValidatorMixin):
             end_of_week = today + timedelta(days=(6 - today.weekday()))
             query = query.filter(self.model_class.due_date.between(today, end_of_week))
         elif due_date == "overdue":
-            query = query.filter(self.model_class.due_date < datetime.now().date(),
-                                self.model_class.status != "completed")
+            query = query.filter(self.model_class.due_date < datetime.now().date(), self.model_class.status != "completed")
 
         return query.order_by(self.model_class.due_date.asc()).all()
 
@@ -43,6 +42,9 @@ class TaskCoreService(CRUDService, ValidatorMixin):
 
     def get_upcoming_tasks(self, limit=5):
         """Get upcoming tasks."""
-        return self.model_class.query.filter(
-            self.model_class.due_date >= datetime.now().date()
-        ).order_by(self.model_class.due_date.asc()).limit(limit).all()
+        return (
+            self.model_class.query.filter(self.model_class.due_date >= datetime.now().date())
+            .order_by(self.model_class.due_date.asc())
+            .limit(limit)
+            .all()
+        )

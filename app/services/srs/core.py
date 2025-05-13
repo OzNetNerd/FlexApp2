@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 from app.models.pages.srs import SRS, ReviewHistory
 from app.services.service_base import CRUDService
 
+
 class SRSCoreService(CRUDService):
     """Service providing core CRUD operations for SRS items."""
 
@@ -73,9 +74,7 @@ class SRSCoreService(CRUDService):
         """
         self.logger.info(f"SRSCoreService: Getting last review for item {srs_item_id}")
 
-        last_review = ReviewHistory.query.filter(
-            ReviewHistory.srs_item_id == srs_item_id
-        ).order_by(ReviewHistory.created_at.desc()).first()
+        last_review = ReviewHistory.query.filter(ReviewHistory.srs_item_id == srs_item_id).order_by(ReviewHistory.created_at.desc()).first()
 
         if last_review:
             self.logger.info(f"SRSCoreService: Found last review {last_review.id} from {last_review.created_at}")

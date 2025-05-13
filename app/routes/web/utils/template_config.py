@@ -24,7 +24,8 @@ class TemplateConfig:
                 if attr == "index_template":
                     setattr(self, attr, f"pages/{plural}/index.html")
                 else:
-                    setattr(self, attr, f"pages/{plural}/view.html")
+                    setattr(self, attr, f"layouts/crud_form.html")
+                    # setattr(self, attr, f"pages/{plural}/view.html")
 
     def get_template(self, route_type: str, default: str) -> str:
         """Get template path with fallback to default."""

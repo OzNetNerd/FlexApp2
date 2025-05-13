@@ -9,6 +9,7 @@ from . import home_bp  # Import from the package
 
 logger = get_logger()
 
+
 @home_bp.route("/", methods=["GET"])
 @login_required
 def index():
