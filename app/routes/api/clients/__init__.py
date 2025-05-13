@@ -59,3 +59,7 @@ class ApiClient:
     def delete(self, endpoint):
         """Make a DELETE request to the API."""
         return self._make_request('DELETE', endpoint)
+
+    def patch(self, endpoint, data):
+        """Make a PATCH request to the API."""
+        return self._make_request('PATCH', endpoint, data=data)
