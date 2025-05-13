@@ -21,7 +21,6 @@ EntityType = TypeVar('EntityType')
 
 
 class CRUDEndpoint(Enum):
-    index = "index"
     create = "create"
     view = "view"
     edit = "edit"
@@ -89,7 +88,8 @@ def handle_crud_operation(
         return redirect(url_for(f"{blueprint_name}.view", entity_id=entity.id))
     if endpoint == CRUDEndpoint.delete.value:
         service.delete(entity_id)
-        return redirect(url_for(f"{blueprint_name}.index"))
+        # Redirect to dashboard instead of index since index is removed
+        return redirect(url_for(f"{blueprint_name.split('_')[0]}.dashboard"))
     return None
 
 
@@ -113,18 +113,6 @@ def load_entity(
         logger.info(f"Loaded entity for {endpoint}: ID={entity_id}, entity={entity}")
         return entity
     return None
-
-
-def build_index_context(config: CrudRouteConfig) -> TableContext:
-    """Build context for index endpoint.
-
-    Args:
-        config: The CRUD route configuration
-
-    Returns:
-        TableContext: The context for rendering the index template
-    """
-    return TableContext(entity_table_name=config.entity_table_name)
 
 
 def build_create_context(config: CrudRouteConfig, form=None) -> TableContext:
@@ -233,7 +221,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
     and renders templates with the correct data.
 
     Args:
-        endpoint: The CRUD endpoint type (index, create, view, edit, delete)
+        endpoint: The CRUD endpoint type (create, view, edit, delete)
         config: The configuration for CRUD routes
 
     Returns:
@@ -293,12 +281,11 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         # Handle DELETE requests
         if endpoint == CRUDEndpoint.delete.value and request.method == "POST":
             config.service.delete(entity_id)
-            return redirect(url_for(f"{config.blueprint.name}.index"))
+            # Redirect to dashboard instead of index since index is removed
+            return redirect(url_for(f"{config.blueprint.name.split('_')[0]}.dashboard"))
 
         # Build context with form
-        if endpoint == CRUDEndpoint.index.value:
-            context = build_index_context(config)
-        elif endpoint == CRUDEndpoint.create.value:
+        if endpoint == CRUDEndpoint.create.value:
             context = build_create_context(config, form)
         elif endpoint in (CRUDEndpoint.view.value, CRUDEndpoint.edit.value):
             context = build_view_edit_context(
