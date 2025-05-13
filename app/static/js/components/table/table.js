@@ -18,7 +18,6 @@ import { getGridOptions } from './tableGrid.js';
 // Global variables
 let gridApiReference = null;
 let columnApiReference = null;
-const tableContainerId = "table-container";
 window.__tableInitialized = window.__tableInitialized || false;
 window.gridApi = null;
 
@@ -83,15 +82,7 @@ function ensureContainerHasApiUrl(container) {
   const apiUrl = container.dataset.apiUrl || container.getAttribute('data-api-url');
 
   if (!apiUrl) {
-    log("warn", scriptName, "ensureContainerHasApiUrl", "No API URL found on container");
-
-    // For dashboard company view, set default URL
-    if (window.location.href.includes('dashboard')) {
-      container.setAttribute('data-api-url', '/api/companies');
-      log("info", scriptName, "ensureContainerHasApiUrl", "Set default company API URL");
-      return true;
-    }
-
+    log("error", scriptName, "ensureContainerHasApiUrl", "No API URL found on container");
     return false;
   }
 
@@ -101,26 +92,20 @@ function ensureContainerHasApiUrl(container) {
 /**
  * Main table initialization function
  */
-async function initializeTable() {
-  log("info", scriptName, "initTable", "🚀 Starting table init");
+async function initializeTable(containerId = 'table-container') {
+  log("info", scriptName, "initTable", `🚀 Starting table init for ${containerId}`);
 
   // Get and prepare container
-  const gridDiv = document.querySelector(`#${tableContainerId}`);
+  const gridDiv = document.querySelector(`#${containerId}`);
   if (!gridDiv) {
-    const error = new Error(`⚠️ Container #${tableContainerId} not found`);
+    const error = new Error(`⚠️ Container #${containerId} not found`);
     log("error", scriptName, "initTable", error.message);
     return Promise.reject(error);
   }
 
-  // Force set API URL if it doesn't exist
-  if (!gridDiv.getAttribute('data-api-url')) {
-    gridDiv.setAttribute('data-api-url', '/api/companies');
-    log("warn", scriptName, "initTable", "Force set API URL to /api/companies");
-  }
-
   // Ensure container has API URL
   if (!ensureContainerHasApiUrl(gridDiv)) {
-    const error = new Error(`⚠️ No API URL found for #${tableContainerId}`);
+    const error = new Error(`⚠️ No API URL found for #${containerId}`);
     log("error", scriptName, "initTable", error.message);
     return Promise.reject(error);
   }
@@ -135,7 +120,7 @@ async function initializeTable() {
   // Fetch and process data
   let actualData;
   try {
-    const raw = await fetchApiDataFromContainer(tableContainerId);
+    const raw = await fetchApiDataFromContainer(containerId);
     log("debug", scriptName, "initTable", "Raw data received");
 
     const arr = Array.isArray(raw?.data?.data) ? raw.data.data :

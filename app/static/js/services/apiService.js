@@ -232,12 +232,6 @@ export async function fetchApiDataFromContainer(containerId) {
     throw new Error(`Container with ID '${containerId}' not found`);
   }
 
-  // Force set API URL for table-container regardless of page
-  if (containerId === 'table-container' && !container.getAttribute('data-api-url')) {
-    container.setAttribute('data-api-url', '/api/companies');
-    log("warn", "apiService.js", functionName, "Forced API URL to /api/companies");
-  }
-
   const apiUrl = container.dataset.apiUrl || container.getAttribute('data-api-url');
 
   if (!apiUrl) {
