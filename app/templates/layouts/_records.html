@@ -1,6 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% import 'macros/table.html' as table %}
 {% import 'macros/buttons.html' as buttons %}
+{% import 'macros/headings.html' as headings %}
 
 {% block title %}{{ page_title }} Records{% endblock %}
 
@@ -9,9 +10,7 @@
   <div class="card-header bg-white py-3" style="border: none;">
     <div class="d-flex flex-wrap align-items-center">
       <div style="width: 20%">
-        {% if show_heading|default(true) %}
-          <h1 class="page-heading">{{ entity_title }} Records</h1>
-        {% endif %}
+          {{ headings.h1_heading(entity_title ~ " Records") }}
       </div>
 
       <div style="width: 60%">

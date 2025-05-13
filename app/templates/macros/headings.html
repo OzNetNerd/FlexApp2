@@ -1,3 +1,7 @@
+{% macro h1_heading(heading, icon='') %}
+<h1 class="page-heading">{% if icon %}<i class="{{ icon }}"></i> {% endif %}{{ heading }}</h1>
+{% endmacro %}
+
 {% macro page_heading(icon, title, message='') %}
 <h3 class="h4 emphasised-text text-primary me-3">
     <i class="{{ icon }}"></i>
