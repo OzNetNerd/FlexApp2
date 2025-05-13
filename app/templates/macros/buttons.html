@@ -105,3 +105,37 @@
     <i class="{{ icon_lib }} fa-{{ icon }} me-1"></i> {{ label }}
   </button>
 {% endmacro %}
+
+
+{% macro crud_buttons(mode, id, entity_base_route, entity_type_name) %}
+<script type="module">
+  import buttonsComponent from '/static/js/components/buttons.js';
+  import '/static/js/components/deleteModal.js';
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the header buttons if in view mode
+    {% if mode == 'view' %}
+    buttonsComponent.initHeaderButtons({
+      hasId: {% if id %}true{% else %}false{% endif %},
+      readOnly: true,
+      endpoint: '{{ entity_base_route }}',
+      entityName: '{{ entity_type_name|lower }}',
+      deleteUrl: '{{ url_for(entity_base_route + ".delete", entity_id=id) if id else "" }}'
+    });
+    {% endif %}
+
+    // Initialize the footer buttons if in edit or create mode
+    {% if mode != 'view' %}
+    buttonsComponent.initFooterButtons({
+      hasId: {% if id %}true{% else %}false{% endif %},
+      endpoint: '{{ entity_base_route }}',
+      baseRoute: '{{ entity_base_route }}',
+      viewUrl: '{{ url_for(entity_base_route + ".view", entity_id=id) if id else "" }}',
+      indexUrl: '{{ url_for(entity_base_route + ".index") }}',
+      submitLabel: '{% if mode == "edit" %}Update{% else %}Save{% endif %}',
+      cancelLabel: 'Cancel'
+    });
+    {% endif %}
+  });
+</script>
+{% endmacro %}

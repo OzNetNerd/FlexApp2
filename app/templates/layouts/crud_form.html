@@ -2,14 +2,19 @@
 {% import "macros/sections.html" as sections %}
 {% import "macros/buttons.html" as buttons %}
 {% import "macros/forms.html" as forms %}
+{% import "macros/modals.html" as modals %}
+{% import "macros/scripts.html" as scripts %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}
+  {% if mode == 'view' %}View{% elif mode == 'edit' %}Edit{% else %}Create{% endif %} {{ entity_type_name }}
+{% endblock %}
 
 {% block content %}
 <!-- Heading Section -->
+{% set heading = 'View ' if mode == 'view' else 'Edit ' if mode == 'edit' else 'Create ' %}
 {{ sections.heading_section(
-  heading_text=title,
-  subtext='Enter the required information below'
+  heading_text=heading + entity_type_name,
+  subtext='{% if mode == "view" %}Detailed information for{% elif mode == "edit" %}Update information for{% else %}Enter details for new{% endif %} ' + (entity_name if entity_name else entity_type_name)
 ) }}
 
 <!-- Form Section -->
@@ -17,28 +22,60 @@
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="section-card-heading">{{ title }}</h2>
+        <h2 class="section-card-heading">
+          {{ model_name }}{% if entity_name %}: {{ entity_name }}{% endif %}
+        </h2>
+        {% if mode == 'view' %}
+        <div class="d-flex justify-content-end align-items-center gap-2">
+          {{ buttons.icon_button(href=url_for(entity_base_route + '.edit', entity_id=id),
+                               class="transparent-button", icon="edit", text="Edit") }}
+          {{ buttons.icon_button(href=url_for(entity_base_route + '.index'),
+                               class="transparent-button", icon="arrow-left", text="Back") }}
+          {{ buttons.icon_button(type="button", class="transparent-button btn-danger",
+                               icon="trash", text="Delete",
+                               id="delete-button") }}
+        </div>
+        {% endif %}
       </div>
       <div class="card-body">
-        <form method="POST" action="{{ submit_url }}" id="entity-form">
-          {{ form.csrf_token }}
-
-          <div class="row">
+        {% if mode == 'view' %}
+          <dl class="row emphasised-text">
             {% for field in form if field.name != 'csrf_token' %}
-              {{ forms.render_field(field) }}
+              <dt class="col-sm-3">{{ field.label.text }}</dt>
+              <dd class="col-sm-9">{{ field.data or "Not provided" }}</dd>
             {% endfor %}
-          </div>
+          </dl>
+        {% else %}
+          <form method="POST" action="{{ submit_url }}" id="entity-form">
+            {{ form.csrf_token }}
 
-          <div class="mt-4">
-            {{ buttons.icon_button(type="submit", class="btn btn-primary", icon="save", text="Save", form="entity-form") }}
-            {{ buttons.icon_button(href=url_for(entity_base_route + '.index'), class="btn btn-secondary", icon="arrow-left", text="Cancel") }}
-            {% if id %}
-              {{ buttons.icon_button(href=url_for(entity_base_route + '.view', entity_id=id), class="btn btn-info", icon="eye", text="View") }}
-            {% endif %}
-          </div>
-        </form>
+            <div class="row">
+              {% for field in form if field.name != 'csrf_token' %}
+                {{ forms.render_field(field, read_only=false) }}
+              {% endfor %}
+            </div>
+
+            <div class="mt-4 footer-buttons-container">
+              {% if mode == 'edit' %}
+                {{ buttons.icon_button(type="submit", class="btn btn-primary", icon="save", text="Update", form="entity-form") }}
+                {{ buttons.icon_button(href=url_for(entity_base_route + '.view', entity_id=id), class="btn btn-secondary", icon="x", text="Cancel") }}
+              {% else %}
+                {{ buttons.icon_button(type="submit", class="btn btn-primary", icon="save", text="Save", form="entity-form") }}
+                {{ buttons.icon_button(href=url_for(entity_base_route + '.index'), class="btn btn-secondary", icon="x", text="Cancel") }}
+              {% endif %}
+            </div>
+          </form>
+        {% endif %}
       </div>
     </div>
   </div>
 </div>
+
+{% if mode == 'view' %}
+  {{ modals.delete_modal(entity_base_route, id, csrf_input) }}
+{% endif %}
+{% endblock %}
+
+{% block scripts_extra %}
+{{ scripts.button_initialization_scripts(mode, id, entity_base_route, entity_type_name) }}
 {% endblock %}
