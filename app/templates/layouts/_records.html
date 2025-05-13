@@ -91,7 +91,7 @@
     <div id="table-container"
          class="ag-theme-alpine px-3 view-mode"
          style="height: auto; min-height: 500px; flex: 1 1 auto; overflow: visible;"
-         data-api-url="{{ api_url|default('') }}"
+         data-apiUrl="{{ api_url|default('') }}"
          data-entity-name="{{ entity_name|default('item') }}">
     </div>
   </div>
@@ -127,5 +127,12 @@
       editModeBtn.setAttribute('title', 'Double-click to edit cell values');
     }
   });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('API URL in context:', '{{ api_url|default("none") }}');
+  console.log('Container data attribute:', document.getElementById('table-container').getAttribute('data-api-url'));
+});
 </script>
 {% endblock %}

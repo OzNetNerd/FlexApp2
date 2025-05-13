@@ -226,13 +226,28 @@ export default apiService;
  */
 export async function fetchApiDataFromContainer(containerId) {
   const functionName = "fetchApiDataFromContainer";
+  const container = document.getElementById(containerId);
 
-  const datasetVariables = getDatasetVariables(containerId);
-  const apiUrl = getDatasetValue("apiService.js", datasetVariables, "apiUrl");
+  if (!container) {
+    throw new Error(`Container with ID '${containerId}' not found`);
+  }
+
+  // Force set API URL for table-container regardless of page
+  if (containerId === 'table-container' && !container.getAttribute('data-api-url')) {
+    container.setAttribute('data-api-url', '/api/companies');
+    log("warn", "apiService.js", functionName, "Forced API URL to /api/companies");
+  }
+
+  const apiUrl = container.dataset.apiUrl || container.getAttribute('data-api-url');
+
+  if (!apiUrl) {
+    log("error", "apiService.js", functionName, "API URL is null or empty");
+    throw new Error("Missing API URL. Check data-api-url attribute on container.");
+  }
+
   log("info", "apiService.js", functionName, `API URL Retrieved: ${apiUrl}`);
 
   try {
-    // Use the singleton instance to fetch data
     return await apiService.get(apiUrl);
   } catch (error) {
     log("error", "apiService.js", functionName, "Failed to fetch data from API", error);

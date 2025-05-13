@@ -74,6 +74,31 @@ function setUpApis(api, columnApi) {
 }
 
 /**
+ * Ensures the container has a valid API URL
+ */
+function ensureContainerHasApiUrl(container) {
+  if (!container) return false;
+
+  // Check if API URL is already set
+  const apiUrl = container.dataset.apiUrl || container.getAttribute('data-api-url');
+
+  if (!apiUrl) {
+    log("warn", scriptName, "ensureContainerHasApiUrl", "No API URL found on container");
+
+    // For dashboard company view, set default URL
+    if (window.location.href.includes('dashboard')) {
+      container.setAttribute('data-api-url', '/api/companies');
+      log("info", scriptName, "ensureContainerHasApiUrl", "Set default company API URL");
+      return true;
+    }
+
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Main table initialization function
  */
 async function initializeTable() {
@@ -83,6 +108,19 @@ async function initializeTable() {
   const gridDiv = document.querySelector(`#${tableContainerId}`);
   if (!gridDiv) {
     const error = new Error(`⚠️ Container #${tableContainerId} not found`);
+    log("error", scriptName, "initTable", error.message);
+    return Promise.reject(error);
+  }
+
+  // Force set API URL if it doesn't exist
+  if (!gridDiv.getAttribute('data-api-url')) {
+    gridDiv.setAttribute('data-api-url', '/api/companies');
+    log("warn", scriptName, "initTable", "Force set API URL to /api/companies");
+  }
+
+  // Ensure container has API URL
+  if (!ensureContainerHasApiUrl(gridDiv)) {
+    const error = new Error(`⚠️ No API URL found for #${tableContainerId}`);
     log("error", scriptName, "initTable", error.message);
     return Promise.reject(error);
   }
@@ -101,7 +139,8 @@ async function initializeTable() {
     log("debug", scriptName, "initTable", "Raw data received");
 
     const arr = Array.isArray(raw?.data?.data) ? raw.data.data :
-               Array.isArray(raw?.data) ? raw.data : [];
+               Array.isArray(raw?.data) ? raw.data :
+               Array.isArray(raw) ? raw : [];
 
     log("debug", scriptName, "initTable", `Rows extracted: ${arr.length}`);
     actualData = normalizeData(arr);
@@ -174,19 +213,23 @@ if (!window.__tableInitialized) {
   window.__tableInitialized = true;
   document.addEventListener('DOMContentLoaded', () => {
     log("info", scriptName, "DOMContentLoaded", "Initializing table...");
-    initializeTable()
-      .then(() => {
-        log("info", scriptName, "DOMContentLoaded", "Table initialization completed successfully");
-        fixLayoutSpacing(gridApiReference); // Call layout spacing fix after table init
-      })
-      .catch(error => {
-        log("error", scriptName, "DOMContentLoaded", "Table initialization failed:", error);
-        // Display error to user
-        const container = document.querySelector('#table-container');
-        if (container) {
-          container.innerHTML = `<div class="alert alert-danger m-3">Error loading table: ${error.message}</div>`;
-        }
-      });
+
+    // Add a small delay to ensure DOM is fully loaded and processed
+    setTimeout(() => {
+      initializeTable()
+        .then(() => {
+          log("info", scriptName, "DOMContentLoaded", "Table initialization completed successfully");
+          fixLayoutSpacing(gridApiReference); // Call layout spacing fix after table init
+        })
+        .catch(error => {
+          log("error", scriptName, "DOMContentLoaded", "Table initialization failed:", error);
+          // Display error to user
+          const container = document.querySelector('#table-container');
+          if (container) {
+            container.innerHTML = `<div class="alert alert-danger m-3">Error loading table: ${error.message}</div>`;
+          }
+        });
+    }, 50); // Small timeout to ensure DOM is fully processed
   });
 }
 
