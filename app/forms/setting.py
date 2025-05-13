@@ -1,12 +1,7 @@
-from wtforms import StringField, TextAreaField, DateField, SelectField, BooleanField, IntegerField, DecimalField
-from wtforms.validators import DataRequired, Optional, Email, Length
 from .base import BaseModelForm
+from wtforms import StringField, TextAreaField
+from wtforms.validators import DataRequired, Length
 
 class SettingForm(BaseModelForm):
-    """Form for Setting"""
-    # Add fields based on your Setting model
-    # Example fields:
-    name = StringField('Name', validators=[DataRequired(), Length(max=255)])
-    description = TextAreaField('Description', validators=[Optional()])
-    
-    # Add other fields specific to Setting
+    key = StringField('Key', validators=[DataRequired(), Length(max=100)])
+    value = TextAreaField('Value')

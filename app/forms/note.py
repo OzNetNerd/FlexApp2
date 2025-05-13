@@ -1,12 +1,14 @@
-from wtforms import StringField, TextAreaField, DateField, SelectField, BooleanField, IntegerField, DecimalField
-from wtforms.validators import DataRequired, Optional, Email, Length
 from .base import BaseModelForm
+from wtforms import TextAreaField, HiddenField, SelectField
+from wtforms.validators import DataRequired
 
 class NoteForm(BaseModelForm):
-    """Form for Note"""
-    # Add fields based on your Note model
-    # Example fields:
-    name = StringField('Name', validators=[DataRequired(), Length(max=255)])
-    description = TextAreaField('Description', validators=[Optional()])
-    
-    # Add other fields specific to Note
+    content = TextAreaField('Content', validators=[DataRequired()])
+    notable_type = SelectField('Type', choices=[
+        ('User', 'User'),
+        ('Company', 'Company'),
+        ('Contact', 'Contact'),
+        ('Opportunity', 'Opportunity')
+    ], validators=[DataRequired()])
+    notable_id = HiddenField('ID', validators=[DataRequired()])
+    user_id = HiddenField('User ID')

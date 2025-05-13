@@ -1,12 +1,7 @@
-from wtforms import StringField, TextAreaField, DateField, SelectField, BooleanField, IntegerField, DecimalField
-from wtforms.validators import DataRequired, Optional, Email, Length
 from .base import BaseModelForm
+from wtforms import StringField, TextAreaField
+from wtforms.validators import DataRequired, Length
 
 class CompanyForm(BaseModelForm):
-    """Form for Company"""
-    # Add fields based on your Company model
-    # Example fields:
-    name = StringField('Name', validators=[DataRequired(), Length(max=255)])
-    description = TextAreaField('Description', validators=[Optional()])
-    
-    # Add other fields specific to Company
+    name = StringField('Company Name', validators=[DataRequired(), Length(max=100)])
+    description = TextAreaField('Description')
