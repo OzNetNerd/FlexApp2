@@ -26,6 +26,11 @@ class ServiceBase:
 class CRUDService(ServiceBase):
     """Service class providing common CRUD operations for models."""
 
+    def __init__(self, model_class=None, required_fields: Optional[List[str]] = None):
+        """Initialize service with model class and optional required fields for validation."""
+        super().__init__(model_class)
+        self.required_fields = required_fields or []
+
     def get_by_id(self, item_id: int) -> Optional[T]:
         """
         Get an item by ID.
@@ -46,17 +51,44 @@ class CRUDService(ServiceBase):
 
         return item
 
-    def get_all(self) -> List[T]:
+    def get_all(
+        self,
+        page: int = 1,
+        per_page: int = 15,
+        sort_column: str = "id",
+        sort_direction: str = "asc",
+        filters: Optional[Dict[str, Any]] = None,
+    ):
         """
-        Get all items.
+        Get all items with pagination, sorting and filtering.
+
+        Args:
+            page: Page number (starting from 1)
+            per_page: Number of items per page
+            sort_column: Column to sort by
+            sort_direction: Sort direction ('asc' or 'desc')
+            filters: Dictionary of filter conditions
 
         Returns:
-            List of all items
+            Paginated results
         """
-        self.logger.info(f"{self.__class__.__name__}: Retrieving all items")
-        items = self.model_class.query.all()
-        self.logger.info(f"{self.__class__.__name__}: Retrieved {len(items)} items")
-        return items
+        self.logger.info(f"{self.__class__.__name__}: Retrieving items (page={page}, per_page={per_page})")
+        query = self.model_class.query
+
+        # Apply any exact‐match filters
+        if filters:
+            for attr, val in filters.items():
+                if hasattr(self.model_class, attr):
+                    query = query.filter(getattr(self.model_class, attr) == val)
+
+        # Apply sorting
+        if hasattr(self.model_class, sort_column):
+            col = getattr(self.model_class, sort_column)
+            query = query.order_by(col.desc() if sort_direction.lower() == "desc" else col.asc())
+
+        result = query.paginate(page=page, per_page=per_page)
+        self.logger.info(f"{self.__class__.__name__}: Retrieved {len(result.items)} items (total: {result.total})")
+        return result
 
     def create(self, data: Dict[str, Any]) -> T:
         """
@@ -67,14 +99,19 @@ class CRUDService(ServiceBase):
 
         Returns:
             The newly created item
+
+        Raises:
+            ValueError: If required fields are missing
         """
         self.logger.info(f"{self.__class__.__name__}: Creating new item with data: {data}")
-        item = self.model_class()
+        self._validate_required_fields(data)
 
+        item = self.model_class()
         for key, value in data.items():
             setattr(item, key, value)
 
-        item.save()
+        db.session.add(item)
+        db.session.commit()
         self.logger.info(f"{self.__class__.__name__}: Created new item with ID {item.id}")
         return item
 
@@ -105,7 +142,7 @@ class CRUDService(ServiceBase):
         for key, value in update_data.items():
             setattr(item, key, value)
 
-        item.save()
+        db.session.commit()
         self.logger.info(f"{self.__class__.__name__}: Successfully updated item {getattr(item, 'id', None)}")
         return item
 
@@ -150,6 +187,12 @@ class CRUDService(ServiceBase):
         count = self.model_class.query.count()
         self.logger.info(f"{self.__class__.__name__}: Total items: {count}")
         return count
+
+    def _validate_required_fields(self, data: dict):
+        """Validate that all required fields are present in the data."""
+        missing = [field for field in self.required_fields if field not in data]
+        if missing:
+            raise ValueError(f"Missing required fields: {', '.join(missing)}")
 
 
 class QueryService(ServiceBase):

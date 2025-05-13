@@ -12,6 +12,7 @@ from app.models.base import db
 from app.routes.api.context import EntityApiContext, ErrorApiContext, ListApiContext
 from app.routes.api.json_utils import json_endpoint
 from app.utils.app_logging import get_logger
+from app.services.service_base import CRUDService  # Import the CRUDService from service_base
 
 logger = get_logger()
 
@@ -32,71 +33,12 @@ class ApiCrudRouteConfig:
     include_routes: Optional[List[str]] = None
 
 
-class CRUDService:
-    def __init__(self, model: Type[db.Model], required_fields: Optional[List[str]] = None):
-        self.model = model
-        self.required_fields = required_fields or []
-
-    def get_all(
-        self,
-        page: int = 1,
-        per_page: int = 15,
-        sort_column: str = "id",
-        sort_direction: str = "asc",
-        filters: Optional[Dict[str, Any]] = None,
-    ):
-        """
-        Retrieve a paginated, sorted, and optionally filtered list of entities.
-        """
-        query = self.model.query
-
-        # Apply any exact‐match filters
-        if filters:
-            for attr, val in filters.items():
-                if hasattr(self.model, attr):
-                    query = query.filter(getattr(self.model, attr) == val)
-
-        # Apply sorting
-        if hasattr(self.model, sort_column):
-            col = getattr(self.model, sort_column)
-            query = query.order_by(col.desc() if sort_direction.lower() == "desc" else col.asc())
-
-        return query.paginate(page=page, per_page=per_page)
-
-    def get_by_id(self, entity_id: int):
-        return self.model.query.get(entity_id)
-
-    def create(self, data: dict):
-        self._validate_required_fields(data)
-        entity = self.model(**data)
-        db.session.add(entity)
-        db.session.commit()
-        return entity
-
-    def update(self, entity, data: dict):
-        for key, value in data.items():
-            setattr(entity, key, value)
-        db.session.commit()
-        return entity
-
-    def delete(self, entity_id: int):
-        entity = self.get_by_id(entity_id)
-        if entity:
-            db.session.delete(entity)
-            db.session.commit()
-
-    def _validate_required_fields(self, data: dict):
-        missing = [field for field in self.required_fields if field not in data]
-        if missing:
-            raise ValueError(f"Missing required fields: {', '.join(missing)}")
-
-
 def handle_api_crud_operation(
-    endpoint: str,
-    service: Any,
-    entity_table_name: str,
-    entity_id: Optional[Union[int, str]] = None,
-    data: Optional[Dict[str, Any]] = None,
+        endpoint: str,
+        service: Any,
+        entity_table_name: str,
+        entity_id: Optional[Union[int, str]] = None,
+        data: Optional[Dict[str, Any]] = None,
 ) -> Any:
     try:
         if endpoint == CRUDEndpoint.GET_ALL.value:
@@ -112,7 +54,8 @@ def handle_api_crud_operation(
                     logger.warning(f"Failed to parse filters parameter: {e}")
             result = service.get_all(page, per_page, sort_column, sort_direction, filters)
             if hasattr(result, "items"):
-                return ListApiContext(entity_table_name=entity_table_name, items=result.items, total_count=getattr(result, "total", None))
+                return ListApiContext(entity_table_name=entity_table_name, items=result.items,
+                                      total_count=getattr(result, "total", None))
             return ListApiContext(entity_table_name=entity_table_name, items=result)
 
         if endpoint == CRUDEndpoint.GET_BY_ID.value and entity_id is not None:
@@ -154,42 +97,38 @@ def handle_api_crud_operation(
 
 
 def register_api_route(
-    blueprint: Blueprint, url: str, handler: Callable[..., ResponseReturnValue], endpoint: str, methods: Optional[List[str]] = None
+        blueprint: Blueprint, url: str, handler: Callable[..., ResponseReturnValue], endpoint: str,
+        methods: Optional[List[str]] = None
 ) -> None:
     blueprint.add_url_rule(rule=url, endpoint=endpoint, view_func=handler, methods=methods or ["GET"])
 
 
 def make_func(action: str, svc: Any, entity: str) -> tuple[str, list[str], Callable]:
     if action == CRUDEndpoint.GET_ALL.value:
-
         def get_all():
             return handle_api_crud_operation(action, svc, entity)
 
         return "/", ["GET"], get_all
 
     if action == CRUDEndpoint.GET_BY_ID.value:
-
         def get_by_id(entity_id):
             return handle_api_crud_operation(action, svc, entity, entity_id)
 
         return "/<int:entity_id>", ["GET"], get_by_id
 
     if action == CRUDEndpoint.CREATE.value:
-
         def create():
             return handle_api_crud_operation(action, svc, entity, data=request.get_json())
 
         return "/", ["POST"], create
 
     if action == CRUDEndpoint.UPDATE.value:
-
         def update(entity_id):
             return handle_api_crud_operation(action, svc, entity, entity_id, data=request.get_json())
 
         return "/<int:entity_id>", ["PUT"], update
 
     if action == CRUDEndpoint.DELETE.value:
-
         def delete(entity_id):
             return handle_api_crud_operation(action, svc, entity, entity_id)
 
@@ -220,3 +159,17 @@ def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:
         logger.info(f"Registered API route {action!r} @ {url!r}")
 
     return bp
+
+
+def create_crud_service(model: Type[db.Model], required_fields: Optional[List[str]] = None) -> CRUDService:
+    """
+    Factory function to create a CRUDService instance for a model.
+
+    Args:
+        model: The SQLAlchemy model class
+        required_fields: Optional list of field names that are required when creating entities
+
+    Returns:
+        An instance of CRUDService for the model
+    """
+    return CRUDService(model_class=model, required_fields=required_fields)
