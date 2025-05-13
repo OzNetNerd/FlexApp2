@@ -243,10 +243,9 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
                 form = config.form_class(formdata=request.form, obj=entity)
                 if form.validate():
                     if endpoint == CRUDEndpoint.create.value:
-                        # Create new entity from form
-                        new_entity = config.model_class()
-                        form.populate_obj(new_entity)
-                        created_entity = config.service.create(new_entity)
+                        # Get form data directly and pass it to the create method
+                        form_data = request.form.to_dict()
+                        created_entity = config.service.create(form_data)
                         return redirect(url_for(f"{config.blueprint.name}.view", entity_id=created_entity.id))
                     elif endpoint == CRUDEndpoint.edit.value:
                         # Update existing entity from form

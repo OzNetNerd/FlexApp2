@@ -26,3 +26,25 @@ def get(contact_id):
     if not contact:
         return jsonify({"error": "Contact not found"}), 404
     return jsonify(contact.to_dict())
+
+@contacts_api_bp.route("/<int:contact_id>", methods=["PATCH"])
+def update_contact_field(contact_id):
+    """Update a single field of a contact."""
+    try:
+        data = request.get_json() or {}
+        if not data:
+            return jsonify({"error": "No update data provided"}), 400
+
+        logger.info(f"Updating contact {contact_id} with data: {data}")
+
+        # Get current contact to validate it exists
+        contact = contact_service.get_by_id(contact_id)
+        if not contact:
+            return jsonify({"error": f"Contact with ID {contact_id} not found"}), 404
+
+        # Update only provided fields
+        updated_contact = contact_service.update(contact, data)
+        return jsonify(updated_contact.to_dict())
+    except Exception as e:
+        logger.error(f"Error updating contact {contact_id}: {str(e)}")
+        return jsonify({"error": f"Failed to update: {str(e)}"}), 500
