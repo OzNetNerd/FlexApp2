@@ -8,7 +8,7 @@ from app.routes.web.utils.context import WebContext
 opportunity_service = OpportunityService()
 
 
-@opportunities_bp.route("/", methods=["GET"])
+@opportunities_bp.route("/", methods=["GET"], endpoint="dashboard")
 @login_required
 def opportunities_dashboard():
     stats = opportunity_service.get_dashboard_statistics()
