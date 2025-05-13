@@ -3,6 +3,17 @@ SALES TRAINING
 LMS/Training system?
 
 
+----
+
+Create specialized service modules for common operations (data fetching, UI updates)
+**Use event-based communication instead of direct DOM manipulation**
+Consider using data attributes to decouple the JS from specific element IDs
+
+Event systems:
+Data fetching doesn't need to know about DOM structure
+Multiple UI components can react to the same data update
+Components can be added/removed without changing data code
+Easier to test both layers independently
 
 ----
 ```

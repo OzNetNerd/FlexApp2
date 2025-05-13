@@ -1,40 +1,31 @@
 import apiService from '/static/js/services/apiService.js';
 import uiService from '/static/js/services/uiService.js';
+import eventSystem from '/static/js/core/events.js';
+import log from '/static/js/core/logger.js';
 
 /**
- * Companies Dashboard Controller
+ * Companies Dashboard Controller - Responsible for data operations only
  */
 class CompaniesDashboardController {
   constructor() {
-    // Get container element
     this.container = document.getElementById('companies-dashboard-container');
-
-    // Get API URLs from data attributes
     this.apiUrls = {
       stats: this.container.dataset.statsUrl,
       segments: this.container.dataset.segmentsUrl,
       topCompanies: this.container.dataset.topCompaniesUrl,
       growth: this.container.dataset.growthUrl
     };
-
     this.initialized = false;
   }
 
-  /**
-   * Initialize the dashboard
-   */
   init() {
     if (this.initialized) return;
-
     this.loadDashboardData();
     this.initialized = true;
   }
 
-  /**
-   * Load all dashboard data
-   */
   loadDashboardData() {
-    const loadingIndicator = uiService.showLoading(null, 'Loading dashboard data...');
+    eventSystem.publish('dashboard:loading:start', { message: 'Loading dashboard data...' });
 
     Promise.all([
       this.fetchStats(),
@@ -42,22 +33,20 @@ class CompaniesDashboardController {
       this.fetchGrowthData()
     ])
     .then(() => {
-      loadingIndicator.hide();
+      eventSystem.publish('dashboard:loading:complete');
     })
     .catch(error => {
       console.error('Error loading dashboard data:', error);
-      uiService.showError('Failed to load dashboard data. Please try again later.');
-      loadingIndicator.hide();
+      eventSystem.publish('dashboard:loading:error', {
+        message: 'Failed to load dashboard data. Please try again later.'
+      });
     });
   }
 
-  /**
-   * Fetch dashboard statistics
-   */
   fetchStats() {
     return apiService.get(this.apiUrls.stats)
       .then(stats => {
-        this.updateStats(stats);
+        eventSystem.publish('dashboard:stats:updated', stats);
         return stats;
       })
       .catch(error => {
@@ -66,11 +55,65 @@ class CompaniesDashboardController {
       });
   }
 
-  /**
-   * Update statistics on the page
-   */
+  fetchSegments() {
+    return apiService.get(this.apiUrls.segments)
+      .then(segments => {
+        eventSystem.publish('dashboard:segments:updated', segments);
+        return segments;
+      })
+      .catch(error => {
+        console.error('Error fetching segments:', error);
+        throw error;
+      });
+  }
+
+  fetchGrowthData() {
+    return apiService.get(this.apiUrls.growth)
+      .then(data => {
+        eventSystem.publish('dashboard:growth:updated', data);
+        return data;
+      })
+      .catch(error => {
+        console.error('Error fetching growth data:', error);
+        throw error;
+      });
+  }
+}
+
+// UI Updates Module - Handles all UI updates based on events
+const DashboardUIUpdates = {
+  init() {
+    eventSystem.subscribe('dashboard:loading:start', this.handleLoadingStart);
+    eventSystem.subscribe('dashboard:loading:complete', this.handleLoadingComplete);
+    eventSystem.subscribe('dashboard:loading:error', this.handleLoadingError);
+
+    eventSystem.subscribe('dashboard:stats:updated', this.updateStats);
+    eventSystem.subscribe('dashboard:segments:updated', this.updateSegments);
+    eventSystem.subscribe('dashboard:growth:updated', this.initializeChart);
+
+    log('info', 'dashboard.js', 'DashboardUIUpdates.init', 'UI update event listeners initialized');
+  },
+
+  handleLoadingStart(data) {
+    window.currentLoadingIndicator = uiService.showLoading(null, data.message);
+  },
+
+  handleLoadingComplete() {
+    if (window.currentLoadingIndicator) {
+      window.currentLoadingIndicator.hide();
+      window.currentLoadingIndicator = null;
+    }
+  },
+
+  handleLoadingError(data) {
+    if (window.currentLoadingIndicator) {
+      window.currentLoadingIndicator.hide();
+      window.currentLoadingIndicator = null;
+    }
+    uiService.showError(data.message);
+  },
+
   updateStats(stats) {
-    // Update badge values for the large cards
     if (stats.with_opportunities) {
       const badge = document.getElementById('with-opportunities-badge');
       if (badge) badge.textContent = stats.with_opportunities;
@@ -81,63 +124,32 @@ class CompaniesDashboardController {
       if (badge) badge.textContent = stats.with_contacts;
     }
 
-    // Update total companies count
     const totalCompaniesElement = document.querySelector('.total-companies-count');
     if (totalCompaniesElement && stats.total_companies) {
       totalCompaniesElement.textContent = stats.total_companies;
     }
-  }
 
-  /**
-   * Fetch segments data
-   */
-  fetchSegments() {
-    return apiService.get(this.apiUrls.segments)
-      .then(segments => {
-        this.updateSegments(segments);
-        return segments;
-      })
-      .catch(error => {
-        console.error('Error fetching segments:', error);
-        throw error;
-      });
-  }
+    log('debug', 'dashboard.js', 'updateStats', 'Statistics updated');
+  },
 
-  /**
-   * Update segments on the page
-   */
   updateSegments(segments) {
-    if (!segments || Object.keys(segments).length === 0) {
-      // Hide segments section if no data
-      const segmentsSection = document.querySelector('.engagement-segments-section');
-      if (segmentsSection) {
-        segmentsSection.style.display = 'none';
-      }
-      return;
-    }
+    if (!segments || Object.keys(segments).length === 0) return;
 
-    // Convert segments object to array
     const segmentsArray = Object.values(segments);
+    if (segmentsArray.length < 3) return;
 
-    if (segmentsArray.length < 3) {
-      return;
-    }
+    DashboardUIUpdates.updateSegmentCard('high-engagement', segmentsArray[0]);
+    DashboardUIUpdates.updateSegmentCard('medium-engagement', segmentsArray[1]);
+    DashboardUIUpdates.updateSegmentCard('no-opportunities', segmentsArray[2]);
 
-    // Update each segment card
-    this.updateSegmentCard('high-engagement', segmentsArray[0]);
-    this.updateSegmentCard('medium-engagement', segmentsArray[1]);
-    this.updateSegmentCard('no-opportunities', segmentsArray[2]);
-
-    // Show segments section
     const segmentsSection = document.querySelector('.engagement-segments-section');
     if (segmentsSection) {
       segmentsSection.style.display = 'block';
     }
-  }
 
-  /**
-   * Update a single segment card
-   */
+    log('debug', 'dashboard.js', 'updateSegments', 'Segment cards updated');
+  },
+
   updateSegmentCard(id, segmentData) {
     const card = document.getElementById(id);
     if (!card) return;
@@ -157,29 +169,11 @@ class CompaniesDashboardController {
       progressBar.style.width = `${segmentData.percentage}%`;
       progressBar.setAttribute('aria-valuenow', segmentData.percentage);
     }
-  }
+  },
 
-  /**
-   * Fetch growth data for the chart
-   */
-  fetchGrowthData() {
-    return apiService.get(this.apiUrls.growth)
-      .then(data => {
-        this.initializeChart(data);
-        return data;
-      })
-      .catch(error => {
-        console.error('Error fetching growth data:', error);
-        throw error;
-      });
-  }
-
-  /**
-   * Initialize the data chart
-   */
   initializeChart(growthData) {
     if (!growthData || !growthData.labels || !growthData.new_companies || !growthData.total_companies) {
-      console.warn('Growth data not available for chart initialization');
+      log('warn', 'dashboard.js', 'initializeChart', 'Growth data not available');
       return;
     }
 
@@ -189,18 +183,21 @@ class CompaniesDashboardController {
       totalItems: growthData.total_companies
     };
 
-    // Import and use the lineGraph module
     import('/static/js/visuals/lineGraph.js')
       .then(module => {
-        // Call the initDataChart function from the imported module
         module.initDataChart('dataChart', chartData);
+        log('info', 'dashboard.js', 'initializeChart', 'Data chart initialized');
       })
-      .catch(err => console.error('Failed to load lineGraph.js:', err));
+      .catch(err => {
+        log('error', 'dashboard.js', 'initializeChart', 'Failed to load lineGraph.js', err);
+      });
   }
-}
+};
 
 // Initialize dashboard on DOM load
 document.addEventListener('DOMContentLoaded', () => {
+  log('info', 'dashboard.js', 'DOMContentLoaded', 'Initializing dashboard');
+  DashboardUIUpdates.init();
   const dashboard = new CompaniesDashboardController();
   dashboard.init();
 });

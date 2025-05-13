@@ -11,223 +11,219 @@
 {% endblock %}
 
 {% block content %}
-<!-- Main dashboard container with data attributes for API endpoints -->
-<div id="companies-dashboard-container"
-     data-stats-url="{{ url_for('companies_api.get_dashboard_stats') }}"
-     data-segments-url="{{ url_for('companies_api.get_engagement_segments') }}"
-     data-top-companies-url="{{ url_for('companies_api.get_top_companies') }}"
-     data-growth-url="{{ url_for('companies_api.get_growth_data') }}">
+<!-- Heading & subtext section -->
+<div class="dashboard-section">
+  {{ sections.heading_section(
+    heading_text='Company Accounts',
+    subtext='Manage your customers and prospects efficiently'
+  ) }}
+</div>
 
-  <!-- Heading & subtext section -->
-  <div class="dashboard-section">
-    {{ sections.heading_section(
-      heading_text='Company Accounts',
-      subtext='Manage your customers and prospects efficiently'
-    ) }}
-  </div>
+<!-- Summary Section: Data -->
+{% set large_card_data = [
+    {
+        "icon": "bi bi-building",
+        "color": "text-primary",
+        "title": "Active Accounts",
+        "description": "With opportunities",
+        "url": url_for('companies_bp.filtered_companies', has_opportunities='yes'),
+        "badge": None
+    },
+    {
+        "icon": "bi bi-plus-circle",
+        "color": "text-success",
+        "title": "Add Company",
+        "description": "Create new account",
+        "url": url_for('companies_bp.create'),
+        "badge": None
+    },
+    {
+        "icon": "bi bi-person-lines-fill",
+        "color": "text-warning",
+        "title": "With Contacts",
+        "description": "View companies with contacts",
+        "url": url_for('companies_bp.filtered_companies', has_contacts='yes'),
+        "badge": None
+    },
+    {
+        "icon": "bi bi-bar-chart",
+        "color": "info",
+        "title": "Analytics",
+        "description": "Company insights",
+        "url": url_for('companies_bp.statistics'),
+        "badge": None
+    }
+] %}
 
-  <!-- Summary Section: Data -->
-  {% set large_card_data = [
-      {
-          "icon": "bi bi-building",
-          "color": "text-primary",
-          "title": "Active Accounts",
-          "description": "With opportunities",
-          "url": url_for('companies_bp.filtered_companies', has_opportunities='yes'),
-          "badge": 0,
-          "id": "with-opportunities-badge"
-      },
-      {
-          "icon": "bi bi-plus-circle",
-          "color": "text-success",
-          "title": "Add Company",
-          "description": "Create new account",
-          "url": url_for('companies_bp.create'),
-          "badge": None
-      },
-      {
-          "icon": "bi bi-person-lines-fill",
-          "color": "text-warning",
-          "title": "With Contacts",
-          "description": "View companies with contacts",
-          "url": url_for('companies_bp.filtered_companies', has_contacts='yes'),
-          "badge": 0,
-          "id": "with-contacts-badge"
-      },
-      {
-          "icon": "bi bi-bar-chart",
-          "color": "text-info",
-          "title": "Analytics",
-          "description": "Company insights",
-          "url": url_for('companies_bp.statistics'),
-          "badge": None
-      }
-  ] %}
+<!-- Summary Section -->
+<div class="dashboard-section">
+  {{ sections.large_cards_section(large_card_data) }}
+</div>
 
-  <!-- Summary Section -->
-  <div class="dashboard-section">
-    {{ sections.large_cards_section(large_card_data) }}
-  </div>
+<!-- Company Segments Section -->
+{% set company_card_data = [
+    {
+        'title': 'High Engagement',
+        'count': 24,
+        'activity_count': '3+',
+        'activity_label': 'opportunities',
+        'percentage': 30,
+        'icon': 'bi-star',
+        'color_class': 'info',
+        'button_label': 'View Companies',
+        'button_url': url_for('companies_bp.filtered_companies', has_opportunities='yes')
+    },
+    {
+        'title': 'Medium Engagement',
+        'count': 35,
+        'activity_count': '1-2',
+        'activity_label': 'opportunities',
+        'percentage': 45,
+        'icon': 'bi-briefcase',
+        'color_class': 'primary',
+        'button_label': 'View Companies',
+        'button_url': url_for('companies_bp.filtered_companies', has_opportunities='yes')
+    },
+    {
+        'title': 'No Opportunities',
+        'count': 20,
+        'activity_count': '0',
+        'activity_label': 'opportunities',
+        'percentage': 25,
+        'icon': 'bi-shop',
+        'color_class': 'warning',
+        'button_label': 'View Companies',
+        'button_url': url_for('companies_bp.filtered_companies', has_opportunities='no')
+    }
+] %}
 
-  <!-- Company Segments Section -->
-  <div class="dashboard-section engagement-segments-section" style="display: none;">
-    <div class="row">
-      <div class="col-12">
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h2 class="section-card-heading">Engagement Segments</h2>
-            <a href="{{ url_for('companies_bp.filtered_companies') }}" class="btn btn-sm btn-outline-primary">
-              View All Companies
-            </a>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <!-- High Engagement Card -->
-              <div class="col-md-4" id="high-engagement">
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <h5 class="card-title mb-0">
-                        <i class="bi bi-star text-info me-2"></i>
-                        High Engagement
-                      </h5>
-                      <span class="badge bg-info segment-count">0</span>
-                    </div>
-                    <p class="card-text text-muted small">3+ opportunities</p>
-                    <div class="progress mb-3">
-                      <div class="progress-bar bg-info" role="progressbar"
-                           style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                        <span class="segment-percentage">0%</span>
-                      </div>
-                    </div>
-                    <a href="{{ url_for('companies_bp.filtered_companies', engagement_level='high') }}"
-                       class="btn btn-sm btn-outline-info w-100">View Companies</a>
-                  </div>
+<div class="dashboard-section">
+  {{ sections.progress_bar_section(
+    heading='Engagement Segments',
+    href=url_for('companies_bp.filtered_companies'),
+    button_text='View All Companies',
+    card_data=company_card_data
+  ) }}
+</div>
+
+<!-- Top Companies Section -->
+<div class="dashboard-section">
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h2 class="section-card-heading">Top Companies</h2>
+          <div class="d-flex align-items-center">
+            <!-- Global Search -->
+            <div class="input-group me-3" style="width: 250px;">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+              <input type="text" id="globalSearch" class="form-control" placeholder="Search...">
+            </div>
+
+            <!-- Column Selector -->
+            <div class="dropdown me-2">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="columnSelectorBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-columns me-1"></i> Columns
+              </button>
+              <div class="dropdown-menu p-3" style="width: 16rem;" aria-labelledby="columnSelectorBtn">
+                <div class="d-flex justify-content-between mb-2">
+                  <button id="selectAllColumns" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-check-square me-1"></i> Select All
+                  </button>
+                  <button id="clearAllColumns" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-square me-1"></i> Clear All
+                  </button>
                 </div>
-              </div>
-
-              <!-- Medium Engagement Card -->
-              <div class="col-md-4" id="medium-engagement">
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <h5 class="card-title mb-0">
-                        <i class="bi bi-briefcase text-primary me-2"></i>
-                        Medium Engagement
-                      </h5>
-                      <span class="badge bg-primary segment-count">0</span>
-                    </div>
-                    <p class="card-text text-muted small">1-2 opportunities</p>
-                    <div class="progress mb-3">
-                      <div class="progress-bar bg-primary" role="progressbar"
-                           style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                        <span class="segment-percentage">0%</span>
-                      </div>
-                    </div>
-                    <a href="{{ url_for('companies_bp.filtered_companies', engagement_level='medium') }}"
-                       class="btn btn-sm btn-outline-primary w-100">View Companies</a>
-                  </div>
-                </div>
-              </div>
-
-              <!-- No Opportunities Card -->
-              <div class="col-md-4" id="no-opportunities">
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <h5 class="card-title mb-0">
-                        <i class="bi bi-shop text-warning me-2"></i>
-                        No Opportunities
-                      </h5>
-                      <span class="badge bg-warning segment-count">0</span>
-                    </div>
-                    <p class="card-text text-muted small">0 opportunities</p>
-                    <div class="progress mb-3">
-                      <div class="progress-bar bg-warning" role="progressbar"
-                           style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                        <span class="segment-percentage">0%</span>
-                      </div>
-                    </div>
-                    <a href="{{ url_for('companies_bp.filtered_companies', has_opportunities='no') }}"
-                       class="btn btn-sm btn-outline-warning w-100">View Companies</a>
-                  </div>
+                <div id="columnSelectorItems" class="mt-2">
+                  <!-- Column checkboxes will be added here dynamically -->
                 </div>
               </div>
             </div>
+
+            <a href="{{ url_for('companies_bp.create') }}" class="btn btn-sm btn-primary">Add Company</a>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <!-- AG Grid Table Container -->
+          <div id="table-container"
+               class="ag-theme-alpine"
+               style="height: 400px;"
+               data-api-url="{{ url_for('companies_api.get_all') }}">
+          </div>
+        </div>
+        <div class="card-footer bg-white text-center">
+          <a href="{{ url_for('companies_bp.filtered_companies') }}" class="text-decoration-none">
+            View all companies
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Companies Table -->
+<div class="dashboard-section">
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h2 class="section-card-heading">Recently Added Companies</h2>
+          <div>
+            {{ buttons.transparent_button(
+              href=url_for('companies_bp.filtered_companies'),
+              label='<i class="bi bi-funnel"></i> Filter Companies'
+            ) }}
+            {{ buttons.transparent_button(
+              href=url_for('companies_bp.create'),
+              label='Add Company',
+              color_class='primary'
+            ) }}
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover emphasised-text">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col" class="ps-4">Name</th>
+                  <th scope="col">Industry</th>
+                  <th scope="col">Size</th>
+                  <th scope="col">Engagement</th>
+                  <th scope="col">Opportunities</th>
+                  <th scope="col">Website</th>
+                  <th scope="col" class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="7" class="text-center py-4">
+                    <div class="text-muted">
+                      <i class="bi bi-info-circle-fill fs-4 mb-2"></i>
+                      <p>No companies added recently. Add a company?</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Top Companies Section -->
-  <div class="dashboard-section">
-    <div class="row">
-      <div class="col-12">
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h2 class="section-card-heading">Top Companies</h2>
-            <div class="d-flex align-items-center">
-              <!-- Global Search -->
-              <div class="input-group me-3" style="width: 250px;">
-                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" id="globalSearch" class="form-control" placeholder="Search...">
-              </div>
-
-              <!-- Column Selector -->
-              <div class="dropdown me-2">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="columnSelectorBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fas fa-columns me-1"></i> Columns
-                </button>
-                <div class="dropdown-menu p-3" style="width: 16rem;" aria-labelledby="columnSelectorBtn">
-                  <div class="d-flex justify-content-between mb-2">
-                    <button id="selectAllColumns" class="btn btn-sm btn-outline-primary">
-                      <i class="fas fa-check-square me-1"></i> Select All
-                    </button>
-                    <button id="clearAllColumns" class="btn btn-sm btn-outline-secondary">
-                      <i class="fas fa-square me-1"></i> Clear All
-                    </button>
-                  </div>
-                  <div id="columnSelectorItems" class="mt-2">
-                    <!-- Column checkboxes will be added here dynamically -->
-                  </div>
-                </div>
-              </div>
-
-              <a href="{{ url_for('companies_bp.create') }}" class="btn btn-sm btn-primary">Add Company</a>
-            </div>
-          </div>
-          <div class="card-body p-0">
-            <!-- AG Grid Table Container -->
-            <div id="table-container"
-                 class="ag-theme-alpine"
-                 style="height: 400px;"
-                 data-api-url="{{ url_for('companies_api.get_all') }}">
-            </div>
-          </div>
-          <div class="card-footer bg-white text-center">
-            <a href="{{ url_for('companies_bp.filtered_companies') }}" class="text-decoration-none">
-              View all <span class="total-companies-count">0</span> companies
-            </a>
-          </div>
+<!-- Data Trends Chart -->
+<div class="section-divider"></div>
+<div class="dashboard-section data-trends-section">
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h2 class="section-card-heading">Data Trends</h2>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Data Trends Chart -->
-  <div class="section-divider"></div>
-  <div class="dashboard-section data-trends-section">
-    <div class="row">
-      <div class="col-12">
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white">
-            <h2 class="section-card-heading">Data Trends</h2>
-          </div>
-          <div class="card-body chart-container">
-            <div style="height: 300px; position: relative; z-index: 5;">
-              <canvas id="dataChart"></canvas>
-            </div>
+        <div class="card-body chart-container">
+          <div style="height: 300px; position: relative; z-index: 5;">
+            <canvas id="dataChart"></canvas>
           </div>
         </div>
       </div>
@@ -240,6 +236,23 @@
 <!-- AG Grid and Table.js -->
 <script type="module" src="{{ url_for('static', filename='js/components/table/table.js') }}"></script>
 
-<!-- New Dashboard JavaScript -->
-<script type="module" src="{{ url_for('static', filename='js/pages/companies/dashboard.js') }}"></script>
+<!-- Chart.js Initialization -->
+<script type="module">
+  // Define chart data
+  const chartData = {
+    labels: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'],
+    newItems: [5, 7, 10, 8, 12, 9],
+    totalItems: [20, 27, 37, 45, 57, 66]
+  };
+
+  // Initialize the chart when DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    import('{{ url_for("static", filename="js/visuals/lineGraph.js") }}')
+      .then(module => {
+        // Use the initDataChart function for backward compatibility
+        module.initDataChart('dataChart', chartData);
+      })
+      .catch(err => console.error('Failed to load lineGraph.js:', err));
+  });
+</script>
 {% endblock %}
