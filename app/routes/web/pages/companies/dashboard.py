@@ -9,7 +9,6 @@ from app.routes.web.utils.context import WebContext
 @companies_bp.route("/", methods=["GET"], endpoint="index")
 @login_required
 def companies_dashboard():
-    # Simplified - no API calls, just render the template
     context = WebContext(
         title="Companies Dashboard",
         read_only=True
