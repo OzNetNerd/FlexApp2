@@ -47,6 +47,7 @@ class CrudRouteConfig:
     service: Any
     model_class: Any
     template_config: TemplateConfig
+    form_class: Optional[Any] = None
 
     def get_template(self, route_type: str, default: str) -> str:
         """Get the template path for a specific route type.
@@ -126,7 +127,7 @@ def build_index_context(config: CrudRouteConfig) -> TableContext:
     return TableContext(entity_table_name=config.entity_table_name)
 
 
-def build_create_context(config: CrudRouteConfig) -> TableContext:
+def build_create_context(config: CrudRouteConfig, form=None) -> TableContext:
     """Build context for create endpoint.
 
     Args:
@@ -135,18 +136,8 @@ def build_create_context(config: CrudRouteConfig) -> TableContext:
     Returns:
         TableContext: The context for rendering the create template
     """
-    # Initialize with default empty values for required fields
-    default_entity = {
-        "id": "",
-        "question": "",
-        "answer": "",
-        "category": "",
-        "last_reviewed": None,
-        "due_date": None
-    }
-
-    return TableContext(
-        entity=default_entity,
+    context = TableContext(
+        entity={},
         entity_table_name=config.entity_table_name,
         action="create",
         read_only=False,
@@ -154,12 +145,18 @@ def build_create_context(config: CrudRouteConfig) -> TableContext:
         submit_url=url_for(f"{config.blueprint.name}.create")
     )
 
+    if form:
+        context.form = form
+
+    return context
+
 
 def build_view_edit_context(
         config: CrudRouteConfig,
         endpoint: str,
         entity: Any,
-        entity_id: int
+        entity_id: int,
+        form=None,
 ) -> TableContext:
     """Build context for view/edit endpoints.
 
@@ -184,9 +181,13 @@ def build_view_edit_context(
         title=title
     )
 
-    # Add missing variables required by the template
-    context.id = entity_id  # Template uses "id" but context has "entity_id"
-    context.model_name = config.model_class.__name__  # Set model name from class
+    # Add form to context if available
+    if form:
+        context.form = form
+
+    # Add other context variables...
+    context.id = entity_id
+    context.model_name = config.model_class.__name__
 
     # Get entity name for display
     if hasattr(entity, "name"):
@@ -196,10 +197,8 @@ def build_view_edit_context(
     else:
         context.entity_name = f"{config.model_class.__name__} #{entity_id}"
 
-    # Set submit_url for proper form structure
-    if endpoint == CRUDEndpoint.view.value:
-        context.submit_url = url_for(f"{config.blueprint.name}.update", entity_id=entity_id)
-    else:  # edit endpoint
+    # Set submit URL
+    if endpoint == CRUDEndpoint.edit.value:
         context.submit_url = url_for(f"{config.blueprint.name}.update", entity_id=entity_id)
 
     return context
@@ -253,40 +252,73 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         """
         logger.info(f"Handling {request.method} {endpoint} with args={args}, kwargs={kwargs}")
 
-        # Handle form submissions for create/edit/delete
-        if request.method == "POST" and CRUDEndpoint.is_valid(endpoint):
+        entity_id = kwargs.get("entity_id")
+        entity = load_entity(endpoint, config.service, entity_id)
+        form = None
+
+        # Create form if form_class is provided
+        if config.form_class:
+            if endpoint in (CRUDEndpoint.edit.value, CRUDEndpoint.view.value) and entity:
+                form = config.form_class(obj=entity)
+            else:
+                form = config.form_class()
+
+            # Process form on POST
+            if request.method == "POST":
+                form = config.form_class(formdata=request.form, obj=entity)
+                if form.validate():
+                    if endpoint == CRUDEndpoint.create.value:
+                        # Create new entity from form
+                        new_entity = config.model_class()
+                        form.populate_obj(new_entity)
+                        created_entity = config.service.create(new_entity)
+                        return redirect(url_for(f"{config.blueprint.name}.view", entity_id=created_entity.id))
+                    elif endpoint == CRUDEndpoint.edit.value:
+                        # Update existing entity from form
+                        form.populate_obj(entity)
+                        updated_entity = config.service.update(entity)
+                        return redirect(url_for(f"{config.blueprint.name}.view", entity_id=updated_entity.id))
+        elif request.method == "POST" and CRUDEndpoint.is_valid(endpoint):
+            # Fall back to existing behavior if no form_class
             result = handle_crud_operation(
                 endpoint,
                 config.service,
                 config.blueprint.name,
-                kwargs.get("entity_id"),
+                entity_id,
                 request.form.to_dict(),
             )
             if result:
                 return result
 
-        # Load entity if needed for view/edit
-        entity = load_entity(endpoint, config.service, kwargs.get("entity_id"))
+        # Handle DELETE requests
+        if endpoint == CRUDEndpoint.delete.value and request.method == "POST":
+            config.service.delete(entity_id)
+            return redirect(url_for(f"{config.blueprint.name}.index"))
 
-        # Build appropriate context based on endpoint type
+        # Build context with form
         if endpoint == CRUDEndpoint.index.value:
             context = build_index_context(config)
         elif endpoint == CRUDEndpoint.create.value:
-            context = build_create_context(config)
+            context = build_create_context(config, form)
         elif endpoint in (CRUDEndpoint.view.value, CRUDEndpoint.edit.value):
             context = build_view_edit_context(
                 config,
                 endpoint,
                 entity,
-                kwargs.get("entity_id")
+                entity_id,
+                form
             )
         else:
             context = WebContext(title=config.entity_table_name)
 
-        # Add CSRF token if available
+        # Add form to context if available
+        if form:
+            context.form = form
+
+        # Add CSRF token
         context = add_csrf_to_context(context)
 
-        # Render the template
+        # Render template
         template_path = config.get_template(
             endpoint,
             f"pages/crud/{endpoint}_{config.entity_table_name.lower()}.html",

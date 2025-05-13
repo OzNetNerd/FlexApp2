@@ -21,6 +21,7 @@ class BlueprintConfig:
     service: Optional[Any] = None
     url_prefix: Optional[str] = None
     template_config: Optional[TemplateConfig] = None
+    form_class: Optional[Any] = None
 
     def __post_init__(self):
         if self.template_config is None:
@@ -45,6 +46,7 @@ def create_crud_blueprint(config: BlueprintConfig) -> Blueprint:
         service=service,
         model_class=model_class,
         template_config=config.template_config,
+        form_class=config.form_class,
     )
 
     register_crud_routes(route_config)

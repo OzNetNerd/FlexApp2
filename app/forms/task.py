@@ -1,5 +1,5 @@
 from .base import BaseModelForm
-from wtforms import StringField, TextAreaField, DateTimeField, SelectField
+from wtforms import StringField, TextAreaField, DateTimeField, SelectField, HiddenField
 from wtforms.validators import DataRequired, Optional, Length
 
 class TaskForm(BaseModelForm):
