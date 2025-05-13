@@ -19,3 +19,6 @@ requests
 fsrs
 strawberry-graphql[flask]
 sqlalchemy-utils
+flask-wtf
+wtforms
+email-validator
