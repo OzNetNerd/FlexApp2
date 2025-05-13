@@ -1,9 +1,9 @@
 {% extends "layouts/base.html" %}
 {% import "macros/sections.html" as sections %}
 {% import "macros/buttons.html" as buttons %}
-{% import "macros/headings.html" as headings %}
+{% import "macros/modals.html" as modals %}
 
-{% block title %}View {{ entity_name }}{% endblock %}
+{% block title %}View {{ entity_type_name }}{% endblock %}
 
 {% block content %}
 <!-- Heading Section -->
@@ -18,7 +18,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">{{ model_name }}: {{ entity_name }}</h2>
-        <div>
+        <div class="d-flex justify-content-end align-items-center gap-2">
           {{ buttons.icon_button(href=url_for(entity_base_route + '.edit', entity_id=id),
                                class="transparent-button", icon="edit", text="Edit") }}
           {{ buttons.icon_button(href=url_for(entity_base_route + '.index'),
@@ -30,36 +30,19 @@
       </div>
       <div class="card-body">
         <dl class="row emphasised-text">
-          <dt class="col-sm-3">Name</dt>
-          <dd class="col-sm-9">{{ entity.name }}</dd>
-
-          <dt class="col-sm-3">Description</dt>
-          <dd class="col-sm-9">{{ entity.description or "No description provided" }}</dd>
+          {% for field in form if field.name != 'csrf_token' %}
+            <dt class="col-sm-3">{{ field.label.text }}</dt>
+            <dd class="col-sm-9">{{ field.data or "Not provided" }}</dd>
+          {% endfor %}
         </dl>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Are you sure you want to delete {{ entity_name }}? This action cannot be undone.
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <form action="{{ url_for(entity_base_route + '.delete', entity_id=id) }}" method="POST">
-          {{ csrf_input|safe }}
-          <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+{{ modals.delete_modal(entity_base_route, id, csrf_input) }}
+{% endblock %}
+
+{% block scripts_extra %}
+{{ buttons.crud_buttons('view', id, entity_base_route, entity_type_name) }}
 {% endblock %}
