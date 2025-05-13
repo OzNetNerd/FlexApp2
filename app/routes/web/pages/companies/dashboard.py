@@ -7,7 +7,7 @@ from app.routes.web.utils.template_renderer import render_safely, RenderSafelyCo
 from app.routes.web.utils.context import WebContext
 
 
-@companies_bp.route("/", methods=["GET"], endpoint="index")
+@companies_bp.route("/", methods=["GET"], endpoint="dashboard")
 @login_required
 def companies_dashboard():
     context = WebContext(title="Companies Dashboard", read_only=True)

@@ -8,7 +8,7 @@ from app.routes.web.utils.context import WebContext
 task_service = TaskService()
 
 
-@tasks_bp.route("/", methods=["GET"], endpoint="index")
+@tasks_bp.route("/", methods=["GET"], endpoint="dashboard")
 @login_required
 def tasks_dashboard():
     # Get statistics and data from service

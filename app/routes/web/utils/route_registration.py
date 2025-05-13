@@ -271,7 +271,7 @@ def route_handler(endpoint: str, config: CrudRouteConfig) -> Callable:
         if endpoint == CRUDEndpoint.delete.value and request.method == "POST":
             config.service.delete(entity_id)
             # Redirect to dashboard instead of index since index is removed
-            return redirect(url_for(f"{config.blueprint.name.split('_')[0]}.dashboard"))
+            return redirect(url_for(f"{config.blueprint.name.split('_')[0]}_bp.dashboard"))
 
         # Build context with form
         if endpoint == CRUDEndpoint.create.value:

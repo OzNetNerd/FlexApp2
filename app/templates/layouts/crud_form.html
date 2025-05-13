@@ -29,7 +29,7 @@
         <div class="d-flex justify-content-end align-items-center gap-2">
           {{ buttons.icon_button(href=url_for(entity_base_route + '.edit', entity_id=id),
                                class="transparent-button", icon="edit", text="Edit") }}
-          {{ buttons.icon_button(href=url_for(entity_base_route + '.index'),
+          {{ buttons.icon_button(href=url_for(entity_base_route + '.dashboard'),
                                class="transparent-button", icon="arrow-left", text="Back to List") }}
           {{ buttons.icon_button(type="button", class="transparent-button btn-danger",
                                icon="trash", text="Delete",
@@ -61,7 +61,7 @@
                 {{ buttons.icon_button(href=url_for(entity_base_route + '.view', entity_id=id), class="btn btn-secondary", icon="x", text="Cancel") }}
               {% else %}
                 {{ buttons.icon_button(type="submit", class="btn btn-primary", icon="save", text="Save", form="entity-form") }}
-                {{ buttons.icon_button(href=url_for(entity_base_route + '.index'), class="btn btn-secondary", icon="x", text="Cancel") }}
+                {{ buttons.icon_button(href=url_for(entity_base_route + '.dashboard'), class="btn btn-secondary", icon="x", text="Cancel") }}
               {% endif %}
             </div>
           </form>

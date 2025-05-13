@@ -8,7 +8,7 @@ from app.routes.web.utils.context import WebContext
 user_service = UserService()
 
 
-@users_bp.route("/", methods=["GET"], endpoint="index")
+@users_bp.route("/", methods=["GET"], endpoint="dashboard")
 @login_required
 def users_dashboard():
     stats = user_service.get_dashboard_stats()
