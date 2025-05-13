@@ -15,6 +15,7 @@
     - scripts_extra: Additional scripts to load at the end
 ------------------------------------------------------------------------------ #}
 
+{% import 'macros/toasts.html' as toasts %}
 {% set current_section = request.path.split('/')[1] %}
 {% if current_section == '' %}{% set current_section = 'home' %}{% endif %}
 
@@ -75,6 +76,8 @@
   </head>
 
   <body>
+    {{ toasts.toast_container() }}
+
     {%- with messages = get_flashed_messages(with_categories=true) %}
       {%- if messages %}
         <script type="module" src="{{ url_for('static', filename='js/core/flashHandler.js') }}"
