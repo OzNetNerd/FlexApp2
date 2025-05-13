@@ -3,7 +3,6 @@
 {% import "macros/buttons.html" as buttons %}
 {% import "macros/forms.html" as forms %}
 {% import "macros/modals.html" as modals %}
-{% import "macros/scripts.html" as scripts %}
 
 {% block title %}
   {% if mode == 'view' %}View{% elif mode == 'edit' %}Edit{% else %}Create{% endif %} {{ entity_type_name }}
@@ -77,5 +76,5 @@
 {% endblock %}
 
 {% block scripts_extra %}
-{{ scripts.button_initialization_scripts(mode, id, entity_base_route, entity_type_name) }}
+{{ buttons.crud_buttons(mode, id, entity_base_route, entity_type_name) }}
 {% endblock %}
