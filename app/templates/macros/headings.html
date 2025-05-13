@@ -9,7 +9,7 @@
 </h3>
 {% endmacro %}
 
-{% macro model_heading(model_name, entity_name='', read_only=false) %}
+{% macro model_heading(model_name, entity_name='', read_only=true) %}
   {% if read_only %}
     {{ page_heading('fas fa-eye me-2', 'View ' ~ model_name, entity_name) }}
   {% else %}
