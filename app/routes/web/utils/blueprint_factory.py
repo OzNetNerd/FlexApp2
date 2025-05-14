@@ -4,6 +4,7 @@ from flask import Blueprint
 
 from app.routes.web.utils.route_registration import register_crud_routes, CrudRouteConfig
 from app.services.service_base import CRUDService
+
 from app.routes.web.utils.template_config import TemplateConfig
 from app.utils.app_logging import get_logger
 
@@ -59,5 +60,15 @@ def create_crud_blueprint(config):
             endpoint=endpoint_name,
             kwargs=kwargs
         )
+
+    crud_config = CrudRouteConfig(
+        blueprint=blueprint,
+        entity_table_name=config.model_class.__tablename__,
+        service=config.service,
+        model_class=config.model_class,
+        template_config=config.template_config,
+        form_class=config.form_class
+    )
+    register_crud_routes(crud_config)
 
     return blueprint
