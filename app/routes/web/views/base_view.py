@@ -6,6 +6,9 @@ can inherit from. These classes provide common functionality and structure
 for handling HTTP requests.
 """
 
+
+import json
+
 from flask import request, render_template
 from flask.views import MethodView
 from flask_login import login_required
@@ -211,7 +214,7 @@ class RecordsView(BaseView):
             read_only=True,
             action="view",
             show_heading=True,
-            table_data=table_data
+            table_data=json.dumps(table_data)
         )
 
         # Configure the render_safely call
