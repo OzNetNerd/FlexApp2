@@ -1,37 +1,38 @@
-# app/services/company/core.py
-
+from app.services.service_base import BaseFeatureService
 from app.models.pages.company import Company
-from app.services.service_base import CRUDService
-from app.services.validator_mixin import ValidatorMixin
 
 
-class CompanyCoreService(CRUDService, ValidatorMixin):
-    """Core service for Company CRUD operations."""
-
+class CompanyService(BaseFeatureService):
     def __init__(self):
-        """Initialize the Company core service."""
-        super().__init__(model_class=Company)
+        super().__init__(Company)
 
-    def get_filtered_companies(self, filters):
-        """Get companies based on filter criteria."""
-        query = self.model_class.query
+    def get_dashboard_statistics(self):
+        """Get company dashboard statistics."""
+        stats = super().get_dashboard_statistics()
+        stats.update({
+            "total_companies": Company.query.count(),
+            "with_opportunities": self.count_with_opportunities(),
+            "with_contacts": self.count_with_contacts()
+        })
+        return stats
 
-        # Filter by opportunities
-        if filters.get("has_opportunities") == "yes":
-            query = query.filter(self.model_class.opportunities.any())
-        elif filters.get("has_opportunities") == "no":
-            query = query.filter(~self.model_class.opportunities.any())
+    def count_with_opportunities(self):
+        """Count companies with opportunities."""
+        return Company.query.filter(Company.opportunities.any()).count()
 
-        # Filter by contacts
-        if filters.get("has_contacts") == "yes":
-            query = query.filter(self.model_class.contacts.any())
-        elif filters.get("has_contacts") == "no":
-            query = query.filter(~self.model_class.contacts.any())
+    def count_with_contacts(self):
+        """Count companies with contacts."""
+        return Company.query.filter(Company.contacts.any()).count()
 
-        # Filter by capabilities
-        if filters.get("has_capabilities") == "yes":
-            query = query.filter(self.model_class.company_capabilities.any())
-        elif filters.get("has_capabilities") == "no":
-            query = query.filter(~self.model_class.company_capabilities.any())
+    def get_statistics(self):
+        """Get company statistics."""
+        return {
+            "total_companies": Company.query.count(),
+            "with_opportunities": self.count_with_opportunities(),
+            "with_contacts": self.count_with_contacts(),
+            "no_engagement": self.count_no_engagement()
+        }
 
-        return query.order_by(self.model_class.name.asc()).all()
+    def count_no_engagement(self):
+        """Count companies with no engagement."""
+        return Company.query.filter(~Company.opportunities.any(), ~Company.contacts.any()).count()

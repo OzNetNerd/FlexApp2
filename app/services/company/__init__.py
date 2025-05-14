@@ -1,49 +1,61 @@
-# app/services/company/__init__.py
+from app.models.pages.company import Company
+from app.forms.company import CompanyForm
+from app.services.company import CompanyService
+from app.routes.web.utils.blueprint_factory import BlueprintConfig, ViewConfig, create_crud_blueprint
+from app.routes.web.views.base_views import DashboardView, FilteredView, StatisticsView, RecordsView
 
-from app.services.service_base import ServiceBase, ServiceRegistry
-from app.services.company.core import CompanyCoreService
-from app.services.company.analytics import CompanyAnalyticsService
+# Create service
+company_service = CompanyService()
 
+# Configure views
+dashboard_view = ViewConfig(
+    view_class=DashboardView,
+    kwargs={
+        "template_path": "pages/companies/dashboard.html",
+        "title": "Companies Dashboard"
+    },
+    endpoint="dashboard"
+)
 
-class CompanyService(ServiceBase):
-    """Main service for managing companies."""
+filtered_view = ViewConfig(
+    view_class=FilteredView,
+    kwargs={
+        "template_path": "pages/companies/filtered.html",
+        "title": "Filtered Companies"
+    },
+    url="/filtered"
+)
 
-    def __init__(self):
-        """Initialize the Company service with sub-services."""
-        super().__init__()
-        self.core = ServiceRegistry.get(CompanyCoreService)
-        self.analytics = ServiceRegistry.get(CompanyAnalyticsService)
+statistics_view = ViewConfig(
+    view_class=StatisticsView,
+    kwargs={
+        "template_path": "pages/companies/statistics.html",
+        "title": "Company Statistics"
+    },
+    url="/statistics"
+)
 
-    # Core operations - delegate to core service
-    def get_company_by_id(self, company_id):
-        """Get a company by ID."""
-        return self.core.get_by_id(company_id)
+records_view = ViewConfig(
+    view_class=RecordsView,
+    kwargs={
+        "model_class": Company,
+        "template_path": "pages/companies/records.html",
+        "title": "Company Records"
+    },
+    url="/records"
+)
 
-    def get_filtered_companies(self, filters):
-        """Get companies based on filter criteria."""
-        return self.core.get_filtered_companies(filters)
-
-    # Analytics operations - delegate to analytics service
-    def get_total_companies(self):
-        """Get the total number of companies."""
-        return self.analytics.get_total_companies()
-
-    def get_dashboard_stats(self):
-        """Get statistics for the companies dashboard."""
-        return self.analytics.get_dashboard_stats()
-
-    def get_top_companies(self, limit=5):
-        """Get top companies by opportunity count."""
-        return self.analytics.get_top_companies(limit)
-
-    def get_engagement_segments(self):
-        """Get company segments by engagement level."""
-        return self.analytics.get_engagement_segments()
-
-    def prepare_growth_data(self, months_back=6):
-        """Prepare growth data for the chart."""
-        return self.analytics.prepare_growth_data(months_back)
-
-    def get_statistics(self):
-        """Get comprehensive statistics for the statistics page."""
-        return self.analytics.get_statistics()
+# Create blueprint with all views
+companies_bp = create_crud_blueprint(
+    BlueprintConfig(
+        model_class=Company,
+        form_class=CompanyForm,
+        service=company_service,
+        views={
+            "dashboard": dashboard_view,
+            "filtered": filtered_view,
+            "statistics": statistics_view,
+            "records": records_view
+        }
+    )
+)

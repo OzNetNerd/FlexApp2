@@ -365,3 +365,39 @@ class ServiceRegistry:
         if service_class not in cls._instances:
             cls._instances[service_class] = service_class()
         return cls._instances[service_class]
+
+
+# Add this class to the end of your existing service_base.py file
+
+class BaseFeatureService(CRUDService):
+    """Base service with common feature functionality for dashboard, filters, and statistics."""
+
+    def get_dashboard_statistics(self):
+        """Get common dashboard statistics."""
+        return {
+            "total_count": self.count()
+        }
+
+    def get_filtered_entities(self, filters):
+        """Get entities based on filters."""
+        query = self.model_class.query
+
+        # Apply common filters
+        for key, value in filters.items():
+            if not value or not hasattr(self.model_class, key):
+                continue
+
+            if value.lower() in ("true", "yes"):
+                query = query.filter(getattr(self.model_class, key).is_(True))
+            elif value.lower() in ("false", "no"):
+                query = query.filter(getattr(self.model_class, key).is_(False))
+            else:
+                query = query.filter(getattr(self.model_class, key) == value)
+
+        return query.all()
+
+    def get_statistics(self):
+        """Get common statistics for the entity."""
+        return {
+            "total_count": self.count()
+        }
