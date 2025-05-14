@@ -21,7 +21,7 @@
     'color': 'text-primary',
     'title': 'Active Deals',
     'description': 'View your pipeline',
-    'url': url_for('opportunities_bp.filtered_opportunities', status='active')
+    'url': url_for('opportunities_bp.filtered', status='active')
   },
   {
     'icon': 'bi bi-plus-circle',
@@ -35,7 +35,7 @@
     'color': 'text-warning',
     'title': 'Won Deals',
     'description': 'View closed-won deals',
-    'url': url_for('opportunities_bp.filtered_opportunities', status='won')
+    'url': url_for('opportunities_bp.filtered', status='won')
   },
   {
     'icon': 'bi bi-bar-chart',
@@ -82,7 +82,7 @@
         'icon': 'bi bi-shuffle',
         'color_class': 'info',
         'button_label': 'View Deals',
-        'button_url': url_for('opportunities_bp.filtered_opportunities', stage='qualification')
+        'button_url': url_for('opportunities_bp.filtered', stage='qualification')
     },
     {
         'title': 'Negotiation',
@@ -93,7 +93,7 @@
         'icon': 'bi bi-chat-dots',
         'color_class': 'primary',
         'button_label': 'View Deals',
-        'button_url': url_for('opportunities_bp.filtered_opportunities', stage='negotiation')
+        'button_url': url_for('opportunities_bp.filtered', stage='negotiation')
     },
     {
         'title': 'Closing',
@@ -104,13 +104,13 @@
         'icon': 'bi bi-hand-thumbs-up',
         'color_class': 'warning',
         'button_label': 'View Deals',
-        'button_url': url_for('opportunities_bp.filtered_opportunities', stage='closing')
+        'button_url': url_for('opportunities_bp.filtered', stage='closing')
     }
 ] %}
 
 {{ sections.progress_bar_section(
     heading='Pipeline Stages',
-    href=url_for('opportunities_bp.filtered_opportunities'),
+    href=url_for('opportunities_bp.filtered'),
     button_text='View All Deals',
     card_data=pipeline_stages
 ) }}
@@ -122,7 +122,7 @@
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">Hot Opportunities</h2>
         <div>
-          <a href="{{ url_for('opportunities_bp.filtered_opportunities', priority='high') }}" class=" transparent-button me-2">
+          <a href="{{ url_for('opportunities_bp.filtered', priority='high') }}" class=" transparent-button me-2">
             <i class="bi bi-funnel"></i> Filter Deals
           </a>
           <a href="{{ url_for('opportunities_bp.create') }}" class="btn btn-sm btn-primary">Add Deal</a>
@@ -187,7 +187,7 @@
         </div>
       </div>
       <div class="card-footer bg-white text-center">
-        <a href="{{ url_for('opportunities_bp.filtered_opportunities', priority='high') }}" class="text-decoration-none">
+        <a href="{{ url_for('opportunities_bp.filtered', priority='high') }}" class="text-decoration-none">
           View all {{ stats.hot_opportunities_count }} hot opportunities
         </a>
       </div>

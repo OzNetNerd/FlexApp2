@@ -51,7 +51,7 @@
         <h2 class="section-card-heading">Filter Options</h2>
       </div>
       <div class="card-body">
-        <form action="{{ url_for('opportunities_bp.filtered_opportunities') }}" method="get" class="row g-3">
+        <form action="{{ url_for('opportunities_bp.filtered') }}" method="get" class="row g-3">
           <div class="col-md-3">
             <label for="status" class="form-label">Status</label>
             <select class="form-select" id="status" name="status">
@@ -84,7 +84,7 @@
 
           <div class="col-md-3 d-flex align-items-end">
             <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
-            <a href="{{ url_for('opportunities_bp.filtered_opportunities') }}" class="btn btn-outline-secondary">Reset</a>
+            <a href="{{ url_for('opportunities_bp.filtered') }}" class="btn btn-outline-secondary">Reset</a>
           </div>
         </form>
       </div>
@@ -162,7 +162,7 @@
                   <div class="text-muted">
                     <i class="bi bi-info-circle-fill fs-4 mb-2 d-block"></i>
                     <p class="mb-2">No opportunities match your filter criteria.</p>
-                    <a href="{{ url_for('opportunities_bp.filtered_opportunities') }}" class="btn btn-outline-primary btn-sm">Clear Filters</a>
+                    <a href="{{ url_for('opportunities_bp.filtered') }}" class="btn btn-outline-primary btn-sm">Clear Filters</a>
                   </div>
                 </td>
               </tr>
