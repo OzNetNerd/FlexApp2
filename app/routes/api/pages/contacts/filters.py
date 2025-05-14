@@ -16,7 +16,7 @@ def get_filtered_contacts():
         "has_companies": request.args.get("has_companies"),
         "has_roles": request.args.get("has_roles"),
     }
-    contacts = contact_service.get_filtered_contacts(filters)
+    contacts = contact_service.get_filtered_entities(filters)
 
     # Convert SQLAlchemy objects to dict for JSON serialization
     result = [contact.to_dict() for contact in contacts]
