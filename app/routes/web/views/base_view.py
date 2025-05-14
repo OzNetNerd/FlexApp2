@@ -8,7 +8,7 @@ for handling HTTP requests.
 
 
 import json
-
+from datetime import datetime, date
 from flask import request, render_template
 from flask.views import MethodView
 from flask_login import login_required
@@ -19,6 +19,12 @@ from app.utils.app_logging import get_logger
 
 logger = get_logger()
 
+
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        return super().default(obj)
 
 class BaseView(MethodView):
     """Base view class for all web views.
@@ -207,6 +213,7 @@ class RecordsView(BaseView):
 
         # Convert to dict format for table
         table_data = [item.to_dict() for item in items.items]
+        serialized_data = json.dumps(table_data, cls=CustomJSONEncoder)
 
         # Create table context
         context = TableContext(
@@ -214,7 +221,7 @@ class RecordsView(BaseView):
             read_only=True,
             action="view",
             show_heading=True,
-            table_data=json.dumps(table_data)
+            table_data=serialized_data
         )
 
         # Configure the render_safely call
