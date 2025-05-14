@@ -1,10 +1,14 @@
+# app/routes/api/route_registration.py
+
+import json
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 from flask import Blueprint, request
 from flask.typing import ResponseReturnValue
 
+from app.models.base import db
 from app.routes.api.context import EntityApiContext, ErrorApiContext, ListApiContext
 from app.routes.api.json_utils import json_endpoint
 from app.utils.app_logging import get_logger
@@ -13,6 +17,7 @@ logger = get_logger()
 
 
 class CRUDEndpoint(Enum):
+    """Enumeration of standard CRUD endpoints."""
     GET_ALL = "get_all"
     GET_BY_ID = "get_by_id"
     CREATE = "create"
@@ -23,7 +28,6 @@ class CRUDEndpoint(Enum):
 @dataclass
 class ApiCrudRouteConfig:
     """Configuration for API CRUD routes."""
-
     blueprint: Blueprint
     entity_table_name: str
     service: Any
@@ -40,9 +44,20 @@ def handle_api_crud_operation(
     """Handle CRUD operations based on endpoint type and return a Context object."""
     try:
         if endpoint == CRUDEndpoint.GET_ALL.value:
-            result = service.get_all()
+            page = request.args.get("page", 1, type=int)
+            per_page = request.args.get("per_page", 15, type=int)
+            sort_column = request.args.get("sort_column", "id", type=str)
+            sort_direction = request.args.get("sort_direction", "asc", type=str)
+            filters = None
+            if request.args.get("filters"):
+                try:
+                    filters = json.loads(request.args.get("filters"))
+                except Exception as e:
+                    logger.warning(f"Failed to parse filters parameter: {e}")
+            result = service.get_all(page, per_page, sort_column, sort_direction, filters)
             if hasattr(result, "items"):
-                return ListApiContext(entity_table_name=entity_table_name, items=result.items, total_count=getattr(result, "total", None))
+                return ListApiContext(entity_table_name=entity_table_name, items=result.items,
+                                      total_count=getattr(result, "total", None))
             return ListApiContext(entity_table_name=entity_table_name, items=result)
 
         if endpoint == CRUDEndpoint.GET_BY_ID.value and entity_id is not None:
@@ -53,14 +68,22 @@ def handle_api_crud_operation(
 
         if endpoint == CRUDEndpoint.CREATE.value and data is not None:
             entity = service.create(data)
-            return EntityApiContext(entity_table_name=entity_table_name, entity=entity, message=f"{entity_table_name} created successfully")
+            return EntityApiContext(
+                entity_table_name=entity_table_name,
+                entity=entity,
+                message=f"{entity_table_name} created successfully",
+            )
 
         if endpoint == CRUDEndpoint.UPDATE.value and entity_id is not None and data is not None:
             existing = service.get_by_id(entity_id)
             if not existing:
                 return ErrorApiContext(message=f"{entity_table_name} not found", status_code=404)
             entity = service.update(existing, data)
-            return EntityApiContext(entity_table_name=entity_table_name, entity=entity, message=f"{entity_table_name} updated successfully")
+            return EntityApiContext(
+                entity_table_name=entity_table_name,
+                entity=entity,
+                message=f"{entity_table_name} updated successfully",
+            )
 
         if endpoint == CRUDEndpoint.DELETE.value and entity_id is not None:
             existing = service.get_by_id(entity_id)
@@ -76,65 +99,63 @@ def handle_api_crud_operation(
 
 
 def register_api_route(
-    blueprint: Blueprint, url: str, handler: Callable[..., ResponseReturnValue], endpoint: str, methods: Optional[List[str]] = None
+    blueprint: Blueprint, url: str, handler: Callable[..., ResponseReturnValue], endpoint: str,
+    methods: Optional[List[str]] = None
 ) -> None:
     """Register a single route on an API blueprint."""
     blueprint.add_url_rule(rule=url, endpoint=endpoint, view_func=handler, methods=methods or ["GET"])
 
 
+def make_func(action: str, svc: Any, entity: str) -> tuple[str, list[str], Callable]:
+    """Create handler functions for each CRUD operation."""
+    if action == CRUDEndpoint.GET_ALL.value:
+        def get_all():
+            return handle_api_crud_operation(action, svc, entity)
+
+        return "/", ["GET"], get_all
+
+    if action == CRUDEndpoint.GET_BY_ID.value:
+        def get_by_id(entity_id):
+            return handle_api_crud_operation(action, svc, entity, entity_id)
+
+        return "/<int:entity_id>", ["GET"], get_by_id
+
+    if action == CRUDEndpoint.CREATE.value:
+        def create():
+            return handle_api_crud_operation(action, svc, entity, data=request.get_json())
+
+        return "/", ["POST"], create
+
+    if action == CRUDEndpoint.UPDATE.value:
+        def update(entity_id):
+            return handle_api_crud_operation(action, svc, entity, entity_id, data=request.get_json())
+
+        return "/<int:entity_id>", ["PUT"], update
+
+    if action == CRUDEndpoint.DELETE.value:
+        def delete(entity_id):
+            return handle_api_crud_operation(action, svc, entity, entity_id)
+
+        return "/<int:entity_id>", ["DELETE"], delete
+
+    return "", [], None
+
+
 def register_api_crud_routes(config: ApiCrudRouteConfig) -> Blueprint:
     """Register CRUD API routes based on configuration, all wrapped with @json_endpoint."""
-    logger.info(f"Registering CRUD routes for {config.entity_table_name}")
+    logger.info(f"Registering CRUD routes for {config.entity_table_name!r}")
 
     bp = config.blueprint
     entity = config.entity_table_name
     svc = config.service
     include = config.include_routes or [e.value for e in CRUDEndpoint]
 
-    def make_func(action: str):
-        if action == CRUDEndpoint.GET_ALL.value:
-
-            def func_get_all():
-                return handle_api_crud_operation(action, svc, entity)
-
-            return "/", ["GET"], func_get_all
-
-        if action == CRUDEndpoint.GET_BY_ID.value:
-
-            def func_get_by_id(entity_id):
-                return handle_api_crud_operation(action, svc, entity, entity_id)
-
-            return "/<int:entity_id>", ["GET"], func_get_by_id
-
-        if action == CRUDEndpoint.CREATE.value:
-
-            def func_create():
-                return handle_api_crud_operation(action, svc, entity, data=request.get_json())
-
-            return "/", ["POST"], func_create
-
-        if action == CRUDEndpoint.UPDATE.value:
-
-            def func_update(entity_id):
-                return handle_api_crud_operation(action, svc, entity, entity_id, data=request.get_json())
-
-            return "/<int:entity_id>", ["PUT"], func_update
-
-        if action == CRUDEndpoint.DELETE.value:
-
-            def func_delete(entity_id):
-                return handle_api_crud_operation(action, svc, entity, entity_id)
-
-            return "/<int:entity_id>", ["DELETE"], func_delete
-
-        return None, None, None
-
     for action in include:
         if action not in [e.value for e in CRUDEndpoint]:
             continue
 
-        url, methods, func = make_func(action)
-        if not func:
+        url, methods, func = make_func(action, svc, entity)
+        if func is None:
             continue
 
         handler = json_endpoint(func)
