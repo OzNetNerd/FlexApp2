@@ -8,7 +8,6 @@ logger = get_logger()
 
 
 class Opportunity(BaseModel):
-    __modelname__ = "Opportunity"
     __tablename__ = "opportunities"
 
     name = db.Column(db.String(100), nullable=False)

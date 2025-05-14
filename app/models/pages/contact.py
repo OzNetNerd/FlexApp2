@@ -8,7 +8,6 @@ logger = get_logger()
 
 
 class Contact(BaseModel):
-    __modelname__ = "Contact"
     __tablename__ = "contacts"
 
     # --- Contact Information ---

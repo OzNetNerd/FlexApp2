@@ -9,7 +9,6 @@ logger = get_logger()
 
 
 class Setting(BaseModel):
-    __modelname__ = "Setting"
     __tablename__ = "settings"
 
     key = db.Column(db.String(100), unique=True, nullable=False)

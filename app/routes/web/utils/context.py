@@ -62,17 +62,23 @@ class TableContext(WebContext):
         if not self.model_class:
             logger.info(f"TableContext: loading model_class for entity: {entity_table_name}")
             from app.utils.model_registry import get_model_by_name
+
+            # Try with original case first
             self.model_class = get_model_by_name(entity_table_name)
+
+            # If not found, try with capitalized name (for models like SRS)
+            if not self.model_class:
+                capitalized_name = entity_table_name.capitalize()
+                logger.info(f"TableContext: trying with capitalized name: {capitalized_name}")
+                self.model_class = get_model_by_name(capitalized_name)
+
+            # As a last resort, try with uppercase (for models like SRS)
+            if not self.model_class:
+                uppercase_name = entity_table_name.upper()
+                logger.info(f"TableContext: trying with uppercase name: {uppercase_name}")
+                self.model_class = get_model_by_name(uppercase_name)
+
             logger.info(f"TableContext: loaded model_class: {self.model_class.__name__ if self.model_class else None}")
-
-        title = title or entity_table_name
-        logger.info(f"TableContext: final title set to: {title!r}")
-
-        # Call parent with processed values
-        logger.info(
-            f"TableContext: calling WebContext.__init__ with title={title!r}, entity_table_name={entity_table_name!r}")
-        super().__init__(title=title, show_navbar=True, read_only=read_only, entity_table_name=entity_table_name,
-                         **kwargs)
 
         # Setup variables needed by templates
         self.page_title = title  # For templates

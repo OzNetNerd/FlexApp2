@@ -7,7 +7,6 @@ logger = get_logger()
 
 
 class Company(BaseModel):
-    __modelname__ = "Company"
     __tablename__ = "companies"
     name = db.Column(
         db.String(100),

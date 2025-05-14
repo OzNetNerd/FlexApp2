@@ -7,7 +7,6 @@ logger = get_logger()
 
 
 class Crisp(BaseModel):
-    __modelname__ = "Crisp"
     __tablename__ = "crisp"
 
     relationship_id = db.Column(db.Integer, db.ForeignKey("relationships.id"), nullable=False)

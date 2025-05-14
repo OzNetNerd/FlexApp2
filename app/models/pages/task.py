@@ -8,7 +8,6 @@ logger = get_logger()
 
 
 class Task(BaseModel, NotableMixin):
-    __modelname__ = "Task"
     __tablename__ = "tasks"
 
     title = db.Column(db.String(100), nullable=False)

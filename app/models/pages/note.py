@@ -8,7 +8,6 @@ logger = get_logger()
 
 
 class Note(BaseModel, NotableMixin):
-    __modelname__ = "Note"
     __tablename__ = "notes"
 
     content = db.Column(db.Text, nullable=False)

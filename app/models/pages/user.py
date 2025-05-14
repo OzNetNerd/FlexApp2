@@ -11,7 +11,6 @@ logger = get_logger()
 
 
 class User(BaseModel, UserMixin):
-    __modelname__ = "User"
     __tablename__ = "users"
 
     username = db.Column(db.String(50), unique=True, nullable=False)
