@@ -1,259 +1,111 @@
-# app/services/user/analytics.py
-from datetime import datetime, timedelta
-import random
-from sqlalchemy import func, extract
-from app.models.pages.opportunity import Opportunity
-from app.services.service_base import ServiceBase
-from app.models.base import db
+# app/services/user/core.py
+from app.services.service_base import BaseFeatureService
+from app.models.pages.user import User
 
 
-class UserAnalyticsService(ServiceBase):
-    """Service for user analytics and statistics."""
-
+class UserService(BaseFeatureService):
     def __init__(self):
-        """Initialize the User analytics service."""
-        super().__init__()
+        super().__init__(User)
 
     def get_dashboard_statistics(self):
-        """Get statistics for the dashboard."""
-
-        from app.models.pages.user import User
-        from app.models.pages.note import Note
-
-        return {
+        """Get user dashboard statistics."""
+        stats = super().get_dashboard_statistics()
+        stats.update({
             "total_users": User.query.count(),
-            "admin_count": User.query.filter_by(is_admin=True).count(),
-            "regular_count": User.query.filter_by(is_admin=False).count(),
-            "new_users_month": User.query.filter(User.created_at >= (datetime.now() - timedelta(days=30))).count(),
-            "avg_notes": self.calculate_avg_notes_per_user(),
-            "active_users": self.calculate_active_users(),
-            "top_user": self.get_top_user_name(),
-            "activity_increase": self.calculate_activity_increase(),
-            "inactive_count": self.calculate_inactive_users(),
-        }
+            "admin_count": self.count_admin_users(),
+            "regular_count": self.count_regular_users(),
+            "new_users_month": self.count_new_users_month()
+        })
+        return stats
 
-    def get_top_users(self, limit=5):
-        """Get top users based on activity."""
-        users_with_counts = (
-            db.session.query(User, func.count(Note.id).label("notes_count"))
-            .outerjoin(User.notes)
-            .group_by(User.id)
-            .order_by(func.count(Note.id).desc())
-            .limit(limit)
-            .all()
-        )
+    def count_admin_users(self):
+        """Count users with admin privileges."""
+        return User.query.filter_by(is_admin=True).count()
 
-        result = []
-        for user, notes_count in users_with_counts:
-            opportunities_count = db.session.query(func.count(Opportunity.id)).filter(Opportunity.created_by_id == user.id).scalar() or 0
+    def count_regular_users(self):
+        """Count regular users."""
+        return User.query.filter_by(is_admin=False).count()
 
-            user_dict = user.__dict__.copy()
-            user_dict["notes_count"] = notes_count
-            user_dict["opportunities_count"] = opportunities_count
-            result.append(user_dict)
-
-        return result
-
-    def get_user_categories(self):
-        """Get user categories with statistics."""
-        return [
-            {
-                "count": User.query.filter_by(is_admin=False).count(),
-                "activity": db.session.query(func.count(Note.id)).join(User).filter(User.is_admin == False).scalar() or 0,
-                "percentage": self.calculate_user_percentage(False),
-            },
-            {
-                "count": User.query.filter_by(is_admin=True).count(),
-                "activity": db.session.query(func.count(Note.id)).join(User).filter(User.is_admin == True).scalar() or 0,
-                "percentage": self.calculate_user_percentage(True),
-            },
-            {
-                "count": User.query.filter(User.created_at >= (datetime.now() - timedelta(days=30))).count(),
-                "activity": db.session.query(func.count(Note.id))
-                .join(User)
-                .filter(User.created_at >= (datetime.now() - timedelta(days=30)))
-                .scalar()
-                or 0,
-                "percentage": self.calculate_new_user_percentage(),
-            },
-        ]
-
-    def prepare_activity_data(self):
-        """Generate activity data for the chart."""
-        labels = []
-        notes = []
-        opportunities = []
-        logins = []
-
-        current_month = datetime.now().month
-        current_year = datetime.now().year
-
-        for i in range(6):
-            month = (current_month - i) % 12
-            if month == 0:
-                month = 12
-            year = current_year - ((current_month - i) // 12)
-
-            month_name = datetime(year, month, 1).strftime("%b %Y")
-            labels.append(month_name)
-
-            notes_count = (
-                db.session.query(func.count(Note.id))
-                .filter(extract("month", Note.created_at) == month, extract("year", Note.created_at) == year)
-                .scalar()
-                or 0
-            )
-            notes.append(notes_count)
-
-            opportunities_count = (
-                db.session.query(func.count(Opportunity.id))
-                .filter(extract("month", Opportunity.created_at) == month, extract("year", Opportunity.created_at) == year)
-                .scalar()
-                or 0
-            )
-            opportunities.append(opportunities_count)
-
-            logins.append(random.randint(20, 100))
-
-        labels.reverse()
-        notes.reverse()
-        opportunities.reverse()
-        logins.reverse()
-
-        return {"labels": labels, "notes": notes, "opportunities": opportunities, "logins": logins}
+    def count_new_users_month(self):
+        """Count new users in the last 30 days."""
+        from datetime import datetime, timedelta
+        return User.query.filter(User.created_at >= (datetime.now() - timedelta(days=30))).count()
 
     def get_statistics(self):
-        """Get comprehensive statistics about users."""
-        total_users = User.query.count()
-        regular_users = User.query.filter_by(is_admin=False).count()
-        admin_users = User.query.filter_by(is_admin=True).count()
-
-        two_weeks_ago = datetime.now() - timedelta(days=14)
-        active_user_ids = db.session.query(Note.user_id).filter(Note.created_at >= two_weeks_ago).distinct().all()
-        active_user_ids = [user_id for (user_id,) in active_user_ids]
-        inactive_users = User.query.filter(~User.id.in_(active_user_ids)).count() if active_user_ids else User.query.count()
-
-        total_notes = db.session.query(func.count(Note.id)).scalar() or 0
-        total_opportunities = db.session.query(func.count(Opportunity.id)).scalar() or 0
-        avg_activity_per_user = (total_notes + total_opportunities) / total_users if total_users > 0 else 0
-
-        user_activity_by_role = []
-
-        admin_notes = db.session.query(func.count(Note.id)).join(User).filter(User.is_admin == True).scalar() or 0
-        admin_opportunities = (
-            db.session.query(func.count(Opportunity.id))
-            .join(User, Opportunity.created_by_id == User.id)
-            .filter(User.is_admin == True)
-            .scalar()
-            or 0
-        )
-
-        user_activity_by_role.append({"role": "admin", "count": admin_users, "notes": admin_notes, "opportunities": admin_opportunities})
-
-        regular_notes = db.session.query(func.count(Note.id)).join(User).filter(User.is_admin == False).scalar() or 0
-        regular_opportunities = (
-            db.session.query(func.count(Opportunity.id))
-            .join(User, Opportunity.created_by_id == User.id)
-            .filter(User.is_admin == False)
-            .scalar()
-            or 0
-        )
-
-        user_activity_by_role.append(
-            {"role": "regular", "count": regular_users, "notes": regular_notes, "opportunities": regular_opportunities}
-        )
-
-        monthly_data = []
-        current_month = datetime.now().month
-        current_year = datetime.now().year
-
-        for i in range(12):
-            month = (current_month - i) % 12
-            if month == 0:
-                month = 12
-            year = current_year - ((current_month - i) // 12)
-
-            month_name = datetime(year, month, 1).strftime("%b %Y")
-
-            new_users = User.query.filter(extract("month", User.created_at) == month, extract("year", User.created_at) == year).count()
-
-            notes = (
-                db.session.query(func.count(Note.id))
-                .filter(extract("month", Note.created_at) == month, extract("year", Note.created_at) == year)
-                .scalar()
-                or 0
-            )
-
-            opportunities = (
-                db.session.query(func.count(Opportunity.id))
-                .filter(extract("month", Opportunity.created_at) == month, extract("year", Opportunity.created_at) == year)
-                .scalar()
-                or 0
-            )
-
-            monthly_data.append({"month": month_name, "new_users": new_users, "notes": notes, "opportunities": opportunities})
-
-        monthly_data.reverse()
-
+        """Get user statistics."""
         return {
-            "total_users": total_users,
-            "regular_users": regular_users,
-            "admin_users": admin_users,
-            "inactive_users": inactive_users,
-            "avg_activity_per_user": avg_activity_per_user,
-            "user_activity_by_role": user_activity_by_role,
-            "monthly_data": monthly_data,
+            "total_users": User.query.count(),
+            "admin_users": self.count_admin_users(),
+            "regular_users": self.count_regular_users(),
+            "inactive_users": self.count_inactive_users()
         }
 
-    # Helper methods
-    def calculate_avg_notes_per_user(self):
-        """Calculate average notes per user."""
-        total_users = User.query.count()
-        if total_users == 0:
-            return 0
-        total_notes = db.session.query(func.count(Note.id)).scalar() or 0
-        return round(total_notes / total_users, 1)
+    def count_inactive_users(self):
+        """Count users with no activity."""
+        from datetime import datetime, timedelta
+        from app.models.pages.note import Note
 
-    def calculate_active_users(self):
-        """Calculate number of active users in the past week."""
-        one_week_ago = datetime.now() - timedelta(days=7)
-        return db.session.query(func.count(func.distinct(Note.user_id))).filter(Note.created_at >= one_week_ago).scalar() or 0
-
-    def get_top_user_name(self):
-        """Get the name of the most active user."""
-        result = (
-            db.session.query(User.name, func.count(Note.id).label("notes_count"))
-            .join(User.notes)
-            .group_by(User.id)
-            .order_by(func.count(Note.id).desc())
-            .first()
-        )
-
-        return result.name if result else "N/A"
-
-    def calculate_activity_increase(self):
-        """Calculate activity increase."""
-        return 8  # Placeholder value
-
-    def calculate_inactive_users(self):
-        """Calculate number of inactive users."""
         two_weeks_ago = datetime.now() - timedelta(days=14)
-        active_user_ids = db.session.query(Note.user_id).filter(Note.created_at >= two_weeks_ago).distinct().all()
+        active_user_ids = User.query.join(Note).filter(Note.created_at >= two_weeks_ago).with_entities(
+            User.id).distinct().all()
         active_user_ids = [user_id for (user_id,) in active_user_ids]
         return User.query.filter(~User.id.in_(active_user_ids)).count() if active_user_ids else User.query.count()
 
-    def calculate_user_percentage(self, is_admin):
-        """Calculate percentage of users by admin status."""
-        total_count = User.query.count()
-        if total_count == 0:
-            return 0
-        admin_count = User.query.filter_by(is_admin=is_admin).count()
-        return round((admin_count / total_count) * 100)
+    def get_filtered_users(self, filters):
+        """Get filtered users based on criteria."""
+        from datetime import datetime, timedelta
+        from app.models.pages.note import Note
+        from app.models.base import db
 
-    def calculate_new_user_percentage(self):
-        """Calculate percentage of new users."""
-        total_count = User.query.count()
-        if total_count == 0:
-            return 0
-        new_user_count = User.query.filter(User.created_at >= (datetime.now() - timedelta(days=30))).count()
-        return round((new_user_count / total_count) * 100)
+        query = User.query
+        is_admin = filters.get("is_admin")
+        period = filters.get("period")
+        activity = filters.get("activity")
+
+        if is_admin:
+            is_admin_bool = is_admin.lower() == "true"
+            query = query.filter_by(is_admin=is_admin_bool)
+
+        if period:
+            if period == "month":
+                query = query.filter(User.created_at >= (datetime.now() - timedelta(days=30)))
+            elif period == "quarter":
+                query = query.filter(User.created_at >= (datetime.now() - timedelta(days=90)))
+            elif period == "year":
+                query = query.filter(User.created_at >= (datetime.now() - timedelta(days=365)))
+
+        filtered_users = query.order_by(User.created_at.desc()).all()
+
+        if activity:
+            user_notes = {}
+            for user in filtered_users:
+                note_count = Note.query.filter_by(user_id=user.id).count()
+                user_notes[user.id] = note_count
+
+            all_note_counts = sorted(user_notes.values())
+
+            if all_note_counts:
+                max_notes = max(all_note_counts)
+                high_threshold = max_notes * 0.7
+                medium_threshold = max_notes * 0.3
+
+                if activity == "high":
+                    filtered_users = [user for user in filtered_users if user_notes.get(user.id, 0) >= high_threshold]
+                elif activity == "medium":
+                    filtered_users = [user for user in filtered_users if
+                                      medium_threshold <= user_notes.get(user.id, 0) < high_threshold]
+                elif activity == "low":
+                    filtered_users = [user for user in filtered_users if user_notes.get(user.id, 0) < medium_threshold]
+
+        # Attach counts as attributes
+        from app.models.pages.opportunity import Opportunity
+        for user in filtered_users:
+            user.notes_count = Note.query.filter_by(user_id=user.id).count()
+            user.opportunities_count = (
+                    db.session.query(db.func.count(Opportunity.id))
+                    .filter(Opportunity.created_by_id == user.id)
+                    .scalar()
+                    or 0
+            )
+
+        return filtered_users
