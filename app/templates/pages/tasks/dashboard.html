@@ -24,7 +24,7 @@
         "title": "Pending Tasks",
         "description": "Tasks awaiting action",
         "url": url_for('tasks_bp.filtered', status='pending'),
-        "badge": stats.pending_tasks
+        "badge": stats.get('pending_tasks', 0) if stats is defined else 0
     },
     {
         "icon": "bi bi-plus-circle",
@@ -54,14 +54,20 @@
 
 {{ sections.large_cards_section(tasks_large_card_data) }}
 
+{% if stats is defined %}
+{% set total_tasks = stats.get('total_tasks', 0) %}
+{% set completed_tasks = stats.get('completed_tasks', 0) %}
+{% set pending_tasks = stats.get('pending_tasks', 0) %}
+{% set overdue_tasks = stats.get('overdue_tasks', 0) %}
+{% set due_today = stats.get('due_today', 0) %}
 
 {% set tasks_card_data = [
     {
         'title': 'Total Tasks',
-        'count': stats.total_tasks,
-        'activity_count': stats.total_tasks,
+        'count': total_tasks,
+        'activity_count': total_tasks,
         'activity_label': 'tasks',
-        'percentage': '100%' if stats.total_tasks > 0 else '0%',
+        'percentage': '100%' if total_tasks > 0 else '0%',
         'icon': 'fas fa-tasks',
         'color_class': 'primary',
         'button_label': 'View All Tasks',
@@ -69,10 +75,10 @@
     },
     {
         'title': 'Completed Tasks',
-        'count': stats.completed_tasks,
-        'activity_count': stats.completed_tasks,
+        'count': completed_tasks,
+        'activity_count': completed_tasks,
         'activity_label': 'completed',
-        'percentage': ((stats.completed_tasks / stats.total_tasks) * 100)|round|string + '%' if stats.total_tasks > 0 else '0%',
+        'percentage': ((completed_tasks / total_tasks) * 100)|round|string + '%' if total_tasks > 0 else '0%',
         'icon': 'fas fa-check-circle',
         'color_class': 'success',
         'button_label': 'View Completed',
@@ -80,10 +86,10 @@
     },
     {
         'title': 'Pending Tasks',
-        'count': stats.pending_tasks,
-        'activity_count': stats.pending_tasks,
+        'count': pending_tasks,
+        'activity_count': pending_tasks,
         'activity_label': 'pending',
-        'percentage': ((stats.pending_tasks / stats.total_tasks) * 100)|round|string + '%' if stats.total_tasks > 0 else '0%',
+        'percentage': ((pending_tasks / total_tasks) * 100)|round|string + '%' if total_tasks > 0 else '0%',
         'icon': 'fas fa-hourglass-half',
         'color_class': 'warning',
         'button_label': 'View Pending',
@@ -91,10 +97,10 @@
     },
     {
         'title': 'Overdue Tasks',
-        'count': stats.overdue_tasks,
-        'activity_count': stats.overdue_tasks,
+        'count': overdue_tasks,
+        'activity_count': overdue_tasks,
         'activity_label': 'overdue',
-        'percentage': ((stats.overdue_tasks / stats.total_tasks) * 100)|round|string + '%' if stats.total_tasks > 0 else '0%',
+        'percentage': ((overdue_tasks / total_tasks) * 100)|round|string + '%' if total_tasks > 0 else '0%',
         'icon': 'fas fa-exclamation-circle',
         'color_class': 'danger',
         'button_label': 'View Overdue',
@@ -102,10 +108,10 @@
     },
     {
         'title': 'Due Today',
-        'count': stats.due_today,
-        'activity_count': stats.due_today,
+        'count': due_today,
+        'activity_count': due_today,
         'activity_label': 'due today',
-        'percentage': ((stats.due_today / stats.total_tasks) * 100)|round|string + '%' if stats.total_tasks > 0 else '0%',
+        'percentage': ((due_today / total_tasks) * 100)|round|string + '%' if total_tasks > 0 else '0%',
         'icon': 'fas fa-calendar-day',
         'color_class': 'primary',
         'button_label': 'View Today\'s Tasks',
@@ -113,13 +119,17 @@
     }
 ] %}
 
-
 {{ sections.progress_bar_section(
     heading='Tasks Summary',
     href=url_for('tasks_bp.filtered'),
     button_text='View All Tasks',
     card_data=tasks_card_data
 ) }}
+{% else %}
+<div class="alert alert-info">
+  No task statistics available.
+</div>
+{% endif %}
 
 <!-- Upcoming Tasks Section -->
 <div class="row mb-4">
@@ -154,7 +164,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for task in upcoming_tasks %}
+              {% for task in upcoming_tasks if upcoming_tasks is defined %}
               <tr>
                 <td class="ps-4">{{ task.title }}</td>
                 <td>{{ task.description|truncate(50) if task.description else "" }}</td>
@@ -200,7 +210,7 @@
                 </td>
               </tr>
               {% endfor %}
-              {% if not upcoming_tasks %}
+              {% if not upcoming_tasks or upcoming_tasks is not defined %}
               <tr>
                 <td colspan="7" class="text-center py-4">
                   <div class="text-muted">
@@ -216,7 +226,7 @@
       </div>
       <div class="card-footer bg-white text-center">
         <a href="{{ url_for('tasks_bp.filtered') }}" class="text-decoration-none">
-          View all {{ stats.total_tasks }} tasks
+          View all {{ stats.get('total_tasks', 0) if stats is defined else 0 }} tasks
         </a>
       </div>
     </div>
@@ -290,9 +300,9 @@
     // Format data for the chart
     // Make sure these variables match what lineGraph.js expects for the 'data' chart type
     const chartData = {
-      labels: {{ completion_data.labels|tojson }},
-      newItems: {{ completion_data.new_tasks|tojson }},
-      totalItems: {{ completion_data.completed_tasks|tojson }}
+      labels: {{ completion_data.labels|tojson if completion_data is defined and completion_data.labels is defined else '[]'|safe }},
+      newItems: {{ completion_data.new_tasks|tojson if completion_data is defined and completion_data.new_tasks is defined else '[]'|safe }},
+      totalItems: {{ completion_data.completed_tasks|tojson if completion_data is defined and completion_data.completed_tasks is defined else '[]'|safe }}
     };
 
     // Initialize task completion chart using lineGraph.js
