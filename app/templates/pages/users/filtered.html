@@ -52,7 +52,7 @@
         <h2 class="section-card-heading">Filter Options</h2>
       </div>
       <div class="card-body">
-        <form action="{{ url_for('users_bp.filtered_users') }}" method="get" class="row g-3">
+        <form action="{{ url_for('users_bp.filtered') }}" method="get" class="row g-3">
           <div class="col-md-3">
             <label for="is_admin" class="form-label">Role</label>
             <select class="form-select" id="is_admin" name="is_admin">
@@ -84,7 +84,7 @@
 
           <div class="col-md-3 d-flex align-items-end">
             <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
-            <a href="{{ url_for('users_bp.filtered_users') }}" class="btn btn-outline-secondary">Reset</a>
+            <a href="{{ url_for('users_bp.filtered') }}" class="btn btn-outline-secondary">Reset</a>
           </div>
         </form>
       </div>
@@ -143,7 +143,7 @@
                   <div class="text-muted">
                     <i class="bi bi-info-circle-fill fs-4 mb-2 d-block"></i>
                     <p class="mb-2">No users match your filter criteria.</p>
-                    <a href="{{ url_for('users_bp.filtered_users') }}" class="btn btn-outline-primary btn-sm">Clear Filters</a>
+                    <a href="{{ url_for('users_bp.filtered') }}" class="btn btn-outline-primary btn-sm">Clear Filters</a>
                   </div>
                 </td>
               </tr>

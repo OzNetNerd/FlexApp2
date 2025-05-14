@@ -23,7 +23,7 @@
     'color': 'text-primary',
     'title': 'Regular Users',
     'description': 'View standard users',
-    'url': url_for('users_bp.filtered_users', is_admin='false')
+    'url': url_for('users_bp.filtered', is_admin='false')
   },
   {
     'icon': 'bi bi-person-plus',
@@ -37,7 +37,7 @@
     'color': 'text-warning',
     'title': 'Admin Users',
     'description': 'View administrators',
-    'url': url_for('users_bp.filtered_users', is_admin='true')
+    'url': url_for('users_bp.filtered', is_admin='true')
   },
   {
     'icon': 'bi bi-bar-chart',
@@ -50,6 +50,13 @@
 
 {{ sections.large_cards_section(large_card_data) }}
 
+<!-- Calculate avg_notes if not present -->
+{% if stats.get('avg_notes') is none %}
+    {% set avg_notes = 0 %}
+{% else %}
+    {% set avg_notes = stats.get('avg_notes', 0) %}
+{% endif %}
+
 <!-- Summary Section -->
 {% set user_summary = {
   'title': 'User Summary',
@@ -57,7 +64,7 @@
     {'value': stats.total_users, 'label': 'Total Users', 'color': 'text-primary'},
     {'value': stats.admin_count, 'label': 'Admin Users', 'color': 'text-danger'},
     {'value': stats.new_users_month, 'label': 'New This Month', 'color': 'text-success'},
-    {'value': stats.avg_notes, 'label': 'Avg Notes/User', 'color': 'text-info'}
+    {'value': avg_notes, 'label': 'Avg Notes/User', 'color': 'text-info'}
   ],
   'highlights_data': [
     {'icon': 'fas fa-user-check', 'icon_color': 'text-success', 'content': '<span class="fw-bold">'+stats.active_users|string+'</span> active users this week'},
@@ -74,6 +81,26 @@
 ) }}
 
 <!-- User Categories Section -->
+{% if user_categories is not defined %}
+    {% set user_categories = [
+        {
+            'count': stats.total_users - stats.admin_count,
+            'activity': avg_notes * (stats.total_users - stats.admin_count)|round|int,
+            'percentage': ((stats.total_users - stats.admin_count) / stats.total_users * 100)|round|int if stats.total_users > 0 else 0
+        },
+        {
+            'count': stats.admin_count,
+            'activity': avg_notes * stats.admin_count|round|int,
+            'percentage': (stats.admin_count / stats.total_users * 100)|round|int if stats.total_users > 0 else 0
+        },
+        {
+            'count': stats.new_users_month,
+            'activity': avg_notes * stats.new_users_month|round|int,
+            'percentage': (stats.new_users_month / stats.total_users * 100)|round|int if stats.total_users > 0 else 0
+        }
+    ] %}
+{% endif %}
+
 {% set user_card_data = [
     {
         'title': 'Regular Users',
@@ -95,7 +122,7 @@
         'icon': 'bi-shield-lock',
         'color_class': 'primary',
         'button_label': 'View Admins',
-        'button_url': url_for('users_bp.filtered_users', is_admin='true')
+        'button_url': url_for('users_bp.filtered', is_admin='true')
     },
     {
         'title': 'New Users',
@@ -106,13 +133,13 @@
         'icon': 'bi-calendar-check',
         'color_class': 'danger',
         'button_label': 'View New Users',
-        'button_url': url_for('users_bp.filtered_users', period='month')
+        'button_url': url_for('users_bp.filtered', period='month')
     }
 ] %}
 
 {{ sections.progress_bar_section(
     heading='User Categories',
-    href=url_for('users_bp.filtered_users'),
+    href=url_for('users_bp.filtered'),
     button_text='View All Users',
     card_data=user_card_data
 ) }}
@@ -124,7 +151,7 @@
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">Top Active Users</h2>
         <div>
-          <a href="{{ url_for('users_bp.filtered_users') }}" class=" transparent-button me-2">
+          <a href="{{ url_for('users_bp.filtered') }}" class=" transparent-button me-2">
             <i class="bi bi-funnel"></i> Filter Users
           </a>
           <a href="{{ url_for('users_bp.create') }}" class="transparent-button btn-primary">Add User</a>
@@ -190,7 +217,7 @@
         </div>
       </div>
       <div class="card-footer bg-white text-center">
-        <a href="{{ url_for('users_bp.filtered_users') }}" class="text-decoration-none">
+        <a href="{{ url_for('users_bp.filtered') }}" class="text-decoration-none">
           View all {{ stats.total_users }} users
         </a>
       </div>
