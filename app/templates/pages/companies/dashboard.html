@@ -42,7 +42,7 @@
         "color": "text-warning",
         "title": "With Contacts",
         "description": "View companies with contacts",
-        "url": url_for('companies_bp.filtered_companies', has_contacts='yes'),
+        "url": url_for('companies_bp.filtered', has_contacts='yes'),
         "badge": None
     },
     {
@@ -71,7 +71,7 @@
         'icon': 'bi-star',
         'color_class': 'info',
         'button_label': 'View Companies',
-        'button_url': url_for('companies_bp.filtered_companies', has_opportunities='yes')
+        'button_url': url_for('companies_bp.filtered', has_opportunities='yes')
     },
     {
         'title': 'Medium Engagement',
@@ -82,7 +82,7 @@
         'icon': 'bi-briefcase',
         'color_class': 'primary',
         'button_label': 'View Companies',
-        'button_url': url_for('companies_bp.filtered_companies', has_opportunities='yes')
+        'button_url': url_for('companies_bp.filtered', has_opportunities='yes')
     },
     {
         'title': 'No Opportunities',
@@ -93,14 +93,14 @@
         'icon': 'bi-shop',
         'color_class': 'warning',
         'button_label': 'View Companies',
-        'button_url': url_for('companies_bp.filtered_companies', has_opportunities='no')
+        'button_url': url_for('companies_bp.filtered', has_opportunities='no')
     }
 ] %}
 
 <div class="dashboard-section">
   {{ sections.progress_bar_section(
     heading='Engagement Segments',
-    href=url_for('companies_bp.filtered_companies'),
+    href=url_for('companies_bp.filtered'),
     button_text='View All Companies',
     card_data=company_card_data
   ) }}
@@ -152,7 +152,7 @@
           </div>
         </div>
         <div class="card-footer bg-white text-center">
-          <a href="{{ url_for('companies_bp.filtered_companies') }}" class="text-decoration-none">
+          <a href="{{ url_for('companies_bp.filtered') }}" class="text-decoration-none">
             View all companies
           </a>
         </div>
