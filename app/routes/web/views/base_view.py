@@ -56,7 +56,8 @@ class DashboardView(BaseView):
     def dispatch(self):
         """Handle dashboard requests."""
         stats = self.service.get_dashboard_statistics()
-        completion_data = self.get_completion_data()
+        # Use the service method instead of trying to query directly
+        completion_data = self.service.prepare_completion_data()
         context = self.get_context(stats=stats, completion_data=completion_data)
         return self.render(context)
 
