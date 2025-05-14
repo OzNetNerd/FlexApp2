@@ -163,7 +163,7 @@ srs_bp = create_crud_blueprint(
             "batch_action": batch_action_view,
             "category_view": category_view,
             "learning_stage": learning_stage_view,
-            "view": view_item_view,
+            "view_item": view_item_view,
             "difficulty": difficulty_view,
             "performance": performance_view,
             "review_strategy": review_strategy_view,
