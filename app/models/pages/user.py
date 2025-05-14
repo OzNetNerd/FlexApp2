@@ -6,7 +6,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from app.models.base import BaseModel, db
 from app.models.relationship import Relationship
 from app.utils.app_logging import get_logger
-from app.services.relationship import RelationshipService
 
 logger = get_logger()
 
@@ -51,6 +50,8 @@ class User(BaseModel, UserMixin):
         return check_password_hash(self.password_hash, password)
 
     def to_dict(self):
+        from app.services.relationship import RelationshipService
+
         base_dict = super().to_dict()
 
         entity1_relationships = Relationship.query.filter_by(entity1_type="user", entity1_id=self.id).all()

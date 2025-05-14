@@ -4,7 +4,8 @@ from app.models.pages.user import User
 
 
 class UserService(BaseFeatureService):
-    def __init__(self):
+    def __init__(self, model):
+        self.model = model
         super().__init__(User)
 
     def get_dashboard_statistics(self):
