@@ -5,7 +5,7 @@ from app.routes.web.utils.blueprint_factory import BlueprintConfig, ViewConfig, 
 from app.routes.web.views.base_view import DashboardView, FilteredView, StatisticsView, RecordsView
 from app.routes.web.pages.srs.views import (
     SRSReviewView, SRSBatchActionView, SRSAddCardView, SRSCategoryView,
-    SRSLearningStageView, SRSDifficultyView, SRSPerformanceView, SRSReviewStrategyView
+    SRSLearningStageView, SRSDifficultyView, SRSPerformanceView, SRSReviewStrategyView, SRSItemView
 )
 from app.services.srs.constants import DEFAULT_EASE_FACTOR
 
@@ -134,6 +134,17 @@ create_category_view = ViewConfig(
     url="/categories/create"
 )
 
+
+view_item_view = ViewConfig(
+    view_class=SRSItemView,  # Your custom view class
+    kwargs={
+        "template_path": "layouts/crud_form.html",
+        "title": "View SRS Card"
+    },
+    url="/<int:entity_id>"  # This matches the standard CRUD URL pattern
+)
+
+
 # Create blueprint with all views
 srs_bp = create_crud_blueprint(
     BlueprintConfig(
@@ -152,6 +163,7 @@ srs_bp = create_crud_blueprint(
             "batch_action": batch_action_view,
             "category_view": category_view,
             "learning_stage": learning_stage_view,
+            "view": view_item_view,
             "difficulty": difficulty_view,
             "performance": performance_view,
             "review_strategy": review_strategy_view,

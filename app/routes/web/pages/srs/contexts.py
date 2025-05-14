@@ -6,7 +6,9 @@ Each context class extends the base WebContext and adds specific attributes
 needed for various SRS page templates.
 """
 
+from flask import url_for
 from app.routes.web.utils.context import WebContext
+from app.routes.base_context import BaseContext
 
 
 class SRSContext(WebContext):
@@ -221,3 +223,21 @@ class SRSAddCardContext(SRSContext):
         super().__init__(title="Add New Card")
         self.categories = categories
         self.stats = stats
+
+
+class SRSViewContext(BaseContext):
+    """Context for SRS item view."""
+
+    def __init__(self, srs_item, form, action="view"):
+        super().__init__(
+            entity_table_name="SRS Card",
+            entity_name=srs_item.question[:30] + "..." if len(srs_item.question) > 30 else srs_item.question,
+            entity_base_route="srs_bp",
+            model_name="SRS",
+            id=srs_item.id,
+            form=form,
+            action=action,
+            submit_url=url_for("srs_bp.edit", entity_id=srs_item.id) if action == "view" else
+            url_for("srs_bp.update", entity_id=srs_item.id) if action == "edit" else
+            url_for("srs_bp.create")
+        )

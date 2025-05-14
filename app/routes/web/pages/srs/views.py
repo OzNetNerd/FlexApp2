@@ -21,6 +21,7 @@ from app.routes.web.pages.srs.contexts import (
 from app.utils.app_logging import get_logger, log_message_and_variables
 from app.services.srs.constants import DEFAULT_EASE_FACTOR
 from app.models.pages.srs import SRS
+from app.routes.base_context import BaseContext
 
 logger = get_logger()
 
@@ -596,3 +597,45 @@ class SRSReviewStrategyView(BaseView):
         logger.info(f"Starting batch review with card {card_id}, {len(review_queue) - 1} remaining")
 
         return redirect(url_for("srs_bp.review_item", item_id=card_id, batch=True))
+
+
+# Add this to app/routes/web/pages/srs/views.py
+
+class SRSItemView(BaseView):
+    """View class for individual SRS items."""
+
+    @login_required
+    def get(self, entity_id):
+        """Handle GET request for viewing an SRS item."""
+        logger.info(f"User {current_user.id} viewing SRS item {entity_id}")
+        item = self.service.get_by_id(entity_id)
+
+        if not item:
+            logger.warning(f"SRS item {entity_id} not found")
+            flash("SRS item not found", "error")
+            return redirect(url_for("srs_bp.dashboard"))
+
+        # Create a form instance for displaying the data
+        from app.forms.srs import SRSForm
+        form = SRSForm(obj=item)
+
+        # Create a proper BaseContext object
+        context = BaseContext(
+            entity_table_name="SRS Card",
+            entity_name=item.question[:30] + "..." if len(item.question) > 30 else item.question,
+            entity_base_route="srs_bp",
+            model_name="SRS",
+            id=entity_id,
+            form=form,
+            action="view",
+            submit_url=url_for("srs_bp.edit", entity_id=entity_id)
+        )
+
+        config = RenderSafelyConfig(
+            template_path="layouts/crud_form.html",
+            context=context,
+            error_message="Failed to render SRS item view",
+            endpoint_name=request.endpoint,
+        )
+
+        return render_safely(config)
