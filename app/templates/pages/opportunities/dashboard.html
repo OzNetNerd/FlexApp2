@@ -6,6 +6,9 @@
 {% block title %}CRM Dashboard - Opportunities{% endblock %}
 
 {% block content %}
+<!-- Define default empty stats if stats is not provided -->
+{% set stats = stats|default({}) %}
+
 <!-- Heading & subtext section -->
 {{ sections.heading_section(
   heading_text='Sales Opportunities',
@@ -13,8 +16,6 @@
 ) }}
 
 <!-- Quick Actions Cards -->
-
-<!-- Summary Section: Data -->
 {% set large_card_data = [
   {
     'icon': 'bi bi-funnel',
@@ -48,20 +49,20 @@
 
 {{ sections.large_cards_section(large_card_data) }}
 
-<!-- Summary Section -->
+<!-- Summary Section with safe access -->
 {% set pipeline_summary = {
   'title': 'Pipeline Summary',
   'stats_data': [
-    {'value': stats.total_value|currencyfmt, 'label': 'Pipeline Value', 'color': 'text-primary'},
-    {'value': stats.deal_count, 'label': 'Open Deals', 'color': 'text-danger'},
-    {'value': stats.win_rate, 'label': 'Win Rate', 'color': 'text-success'},
-    {'value': stats.avg_deal_size|currencyfmt, 'label': 'Avg Deal Size', 'color': 'text-info'}
+    {'value': (stats.total_value if stats is defined and stats.total_value is defined else 0)|currencyfmt, 'label': 'Pipeline Value', 'color': 'text-primary'},
+    {'value': stats.deal_count if stats is defined and stats.deal_count is defined else 0, 'label': 'Open Deals', 'color': 'text-danger'},
+    {'value': stats.win_rate if stats is defined and stats.win_rate is defined else '0%', 'label': 'Win Rate', 'color': 'text-success'},
+    {'value': (stats.avg_deal_size if stats is defined and stats.avg_deal_size is defined else 0)|currencyfmt, 'label': 'Avg Deal Size', 'color': 'text-info'}
   ],
   'highlights_data': [
-    {'icon': 'fas fa-check-circle', 'icon_color': 'text-success', 'content': '<span class="fw-bold">'+stats.closing_soon|string+'</span> deals closing within 30 days'},
-    {'icon': 'fas fa-trophy', 'icon_color': 'text-warning', 'content': '<span class="fw-bold">'+stats.won_this_month|string+'</span> deals won this month'},
-    {'icon': 'fas fa-chart-line', 'icon_color': 'text-primary', 'content': 'Win rate improved by <span class="fw-bold">'+stats.win_rate_change|string+'%</span> this quarter'},
-    {'icon': 'fas fa-hourglass-half', 'icon_color': 'text-danger', 'content': '<span class="fw-bold">'+stats.stale_count|string+'</span> deals with no activity for 14+ days'}
+    {'icon': 'fas fa-check-circle', 'icon_color': 'text-success', 'content': '<span class="fw-bold">'+(stats.closing_soon|string if stats is defined and stats.closing_soon is defined else '0')+'</span> deals closing within 30 days'},
+    {'icon': 'fas fa-trophy', 'icon_color': 'text-warning', 'content': '<span class="fw-bold">'+(stats.won_this_month|string if stats is defined and stats.won_this_month is defined else '0')+'</span> deals won this month'},
+    {'icon': 'fas fa-chart-line', 'icon_color': 'text-primary', 'content': 'Win rate improved by <span class="fw-bold">'+(stats.win_rate_change|string if stats is defined and stats.win_rate_change is defined else '0')+'%</span> this quarter'},
+    {'icon': 'fas fa-hourglass-half', 'icon_color': 'text-danger', 'content': '<span class="fw-bold">'+(stats.stale_count|string if stats is defined and stats.stale_count is defined else '0')+'</span> deals with no activity for 14+ days'}
   ]
 } %}
 
@@ -71,14 +72,21 @@
     highlights_data=pipeline_summary.highlights_data
 ) }}
 
+<!-- Define default empty stages if not provided -->
+{% set stages = stages|default([
+  {'count': 0, 'value': 0, 'percentage': 0},
+  {'count': 0, 'value': 0, 'percentage': 0},
+  {'count': 0, 'value': 0, 'percentage': 0}
+]) %}
+
 <!-- Pipeline Stages Section -->
 {% set pipeline_stages = [
     {
         'title': 'Qualification',
-        'count': stages[0].count,
-        'activity_count': stages[0].value,
+        'count': stages[0].count if stages|length > 0 and stages[0] is defined and stages[0].count is defined else 0,
+        'activity_count': stages[0].value if stages|length > 0 and stages[0] is defined and stages[0].value is defined else 0,
         'activity_label': 'value',
-        'percentage': stages[0].percentage,
+        'percentage': stages[0].percentage if stages|length > 0 and stages[0] is defined and stages[0].percentage is defined else 0,
         'icon': 'bi bi-shuffle',
         'color_class': 'info',
         'button_label': 'View Deals',
@@ -86,10 +94,10 @@
     },
     {
         'title': 'Negotiation',
-        'count': stages[1].count,
-        'activity_count': stages[1].value,
+        'count': stages[1].count if stages|length > 1 and stages[1] is defined and stages[1].count is defined else 0,
+        'activity_count': stages[1].value if stages|length > 1 and stages[1] is defined and stages[1].value is defined else 0,
         'activity_label': 'value',
-        'percentage': stages[1].percentage,
+        'percentage': stages[1].percentage if stages|length > 1 and stages[1] is defined and stages[1].percentage is defined else 0,
         'icon': 'bi bi-chat-dots',
         'color_class': 'primary',
         'button_label': 'View Deals',
@@ -97,10 +105,10 @@
     },
     {
         'title': 'Closing',
-        'count': stages[2].count,
-        'activity_count': stages[2].value,
+        'count': stages[2].count if stages|length > 2 and stages[2] is defined and stages[2].count is defined else 0,
+        'activity_count': stages[2].value if stages|length > 2 and stages[2] is defined and stages[2].value is defined else 0,
         'activity_label': 'value',
-        'percentage': stages[2].percentage,
+        'percentage': stages[2].percentage if stages|length > 2 and stages[2] is defined and stages[2].percentage is defined else 0,
         'icon': 'bi bi-hand-thumbs-up',
         'color_class': 'warning',
         'button_label': 'View Deals',
@@ -122,7 +130,7 @@
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h2 class="section-card-heading">Hot Opportunities</h2>
         <div>
-          <a href="{{ url_for('opportunities_bp.filtered', priority='high') }}" class=" transparent-button me-2">
+          <a href="{{ url_for('opportunities_bp.filtered', priority='high') }}" class="transparent-button me-2">
             <i class="bi bi-funnel"></i> Filter Deals
           </a>
           <a href="{{ url_for('opportunities_bp.create') }}" class="btn btn-sm btn-primary">Add Deal</a>
@@ -143,7 +151,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for opportunity in hot_opportunities %}
+              {% for opportunity in hot_opportunities|default([]) %}
               <tr>
                 <td class="ps-4">{{ opportunity.name }}</td>
                 <td>{{ opportunity.company_name }}</td>
@@ -159,20 +167,20 @@
                   {% endif %}
                 </td>
                 <td>{{ opportunity.value|currencyfmt }}</td>
-                <td>{{ opportunity.close_date.strftime('%Y-%m-%d') }}</td>
+                <td>{{ opportunity.close_date.strftime('%Y-%m-%d') if opportunity.close_date else 'N/A' }}</td>
                 <td>
                   <div class="progress" style="height: 6px;">
                     <div class="progress-bar bg-success" role="progressbar" style="width: {{ opportunity.probability }}%;" aria-valuenow="{{ opportunity.probability }}" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
-                  <span class="info-text-small">{ opportunity.probability }}%</span>
+                  <span class="info-text-small">{{ opportunity.probability }}%</span>
                 </td>
                 <td class="text-center">
-                  <a href="{{ url_for('opportunities_bp.view', opportunity_id=opportunity.id) }}" class=" transparent-button me-1">View</a>
+                  <a href="{{ url_for('opportunities_bp.view', opportunity_id=opportunity.id) }}" class="transparent-button me-1">View</a>
                   <a href="{{ url_for('opportunities_bp.edit', opportunity_id=opportunity.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
                 </td>
               </tr>
               {% endfor %}
-              {% if not hot_opportunities %}
+              {% if not hot_opportunities|default([]) %}
               <tr>
                 <td colspan="7" class="text-center py-4">
                   <div class="text-muted">
@@ -188,7 +196,7 @@
       </div>
       <div class="card-footer bg-white text-center">
         <a href="{{ url_for('opportunities_bp.filtered', priority='high') }}" class="text-decoration-none">
-          View all {{ stats.hot_opportunities_count }} hot opportunities
+          View all {{ stats.hot_opportunities_count if stats is defined and stats.hot_opportunities_count is defined else 0 }} hot opportunities
         </a>
       </div>
     </div>
@@ -228,9 +236,6 @@
     import('{{ url_for("static", filename="js/visuals/barGraph.js") }}')
       .then(module => {
         module.initSalesForecastChart('salesForecastChart', forecastData, '€');
-
-        // You can also use the more generic function for any bar chart:
-        // module.initBarChart('anotherChartId', customData, customOptions);
       })
       .catch(err => console.error('Failed to load barGraph.js:', err));
   });

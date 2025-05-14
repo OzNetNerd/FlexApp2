@@ -1,7 +1,6 @@
 # app/services/opportunity/analytics.py
 from datetime import datetime, timedelta
 from sqlalchemy import func, extract
-
 from app.models import Opportunity
 from app.models.base import db
 from app.services.service_base import ServiceBase
@@ -14,7 +13,11 @@ class OpportunityAnalyticsService(ServiceBase):
         """Initialize the Opportunity analytics service."""
         super().__init__()
 
-    def get_dashboard_statistics(self):
+    def get_total_opportunities(self):
+        """Get the total number of opportunities."""
+        return Opportunity.query.count()
+
+    def get_dashboard_stats(self):
         """Get statistics for the opportunities dashboard."""
         return {
             "active_count": Opportunity.query.filter_by(status="active").count(),
@@ -39,29 +42,39 @@ class OpportunityAnalyticsService(ServiceBase):
         """Get data for pipeline stages visualization."""
         return [
             {
+                "name": "Qualification",
                 "count": Opportunity.query.filter_by(stage="qualification", status="active").count(),
-                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="qualification", status="active").scalar() or 0,
+                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="qualification",
+                                                                                 status="active").scalar() or 0,
                 "percentage": self.calculate_stage_percentage("qualification"),
             },
             {
+                "name": "Negotiation",
                 "count": Opportunity.query.filter_by(stage="negotiation", status="active").count(),
-                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="negotiation", status="active").scalar() or 0,
+                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="negotiation",
+                                                                                 status="active").scalar() or 0,
                 "percentage": self.calculate_stage_percentage("negotiation"),
             },
             {
+                "name": "Closing",
                 "count": Opportunity.query.filter_by(stage="closing", status="active").count(),
-                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="closing", status="active").scalar() or 0,
+                "value": db.session.query(func.sum(Opportunity.value)).filter_by(stage="closing",
+                                                                                 status="active").scalar() or 0,
                 "percentage": self.calculate_stage_percentage("closing"),
             },
         ]
 
-    def get_overall_statistics(self):
-        """Get high-level statistics about opportunities."""
+    def get_statistics(self):
+        """Get comprehensive statistics for the statistics page."""
         return {
             "total": Opportunity.query.count(),
             "active": Opportunity.query.filter_by(status="active").count(),
             "won": Opportunity.query.filter_by(status="won").count(),
             "lost": Opportunity.query.filter_by(status="lost").count(),
+            "total_value": db.session.query(func.sum(Opportunity.value)).filter_by(status="active").scalar() or 0,
+            "avg_deal_size": self.calculate_avg_deal_size(),
+            "win_rate": self.calculate_win_rate(),
+            "stale_count": self.calculate_stale_opportunities()
         }
 
     def get_pipeline_by_stage(self):
@@ -94,14 +107,14 @@ class OpportunityAnalyticsService(ServiceBase):
             ).count()
 
             won_value = (
-                db.session.query(func.sum(Opportunity.value))
-                .filter(
-                    Opportunity.status == "won",
-                    extract("month", Opportunity.close_date) == month,
-                    extract("year", Opportunity.close_date) == year,
-                )
-                .scalar()
-                or 0
+                    db.session.query(func.sum(Opportunity.value))
+                    .filter(
+                        Opportunity.status == "won",
+                        extract("month", Opportunity.close_date) == month,
+                        extract("year", Opportunity.close_date) == year,
+                    )
+                    .scalar()
+                    or 0
             )
 
             monthly_data.append({"month": month_name, "won_count": won_count, "won_value": won_value})
@@ -129,7 +142,8 @@ class OpportunityAnalyticsService(ServiceBase):
     def calculate_stale_opportunities(self):
         """Calculate the number of stale opportunities."""
         two_weeks_ago = datetime.now() - timedelta(days=14)
-        return Opportunity.query.filter(Opportunity.status == "active", Opportunity.last_activity_date <= two_weeks_ago).count()
+        return Opportunity.query.filter(Opportunity.status == "active",
+                                        Opportunity.last_activity_date <= two_weeks_ago).count()
 
     def calculate_stage_percentage(self, stage):
         """Calculate the percentage of opportunities in a given stage."""
@@ -138,3 +152,9 @@ class OpportunityAnalyticsService(ServiceBase):
             return 0
         stage_count = Opportunity.query.filter_by(stage=stage, status="active").count()
         return round((stage_count / total_count) * 100)
+
+    def _calculate_percentage(self, count, total):
+        """Calculate percentage with safety check for division by zero."""
+        if total == 0:
+            return 0
+        return round((count / total) * 100)

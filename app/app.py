@@ -111,14 +111,18 @@ def create_app(config_class: Type[Config] = Config) -> Flask:
     @app.template_filter("currencyfmt")
     def currencyfmt_filter(value):
         """Format the value as currency."""
-        if value is None:
+        if value is None or hasattr(value, '__html__'):  # __html__ identifies Jinja2's Undefined
             return "N/A"
 
-        # Get currency symbol from app config or use default
-        currency_symbol = app.config.get("CURRENCY_SYMBOL", "$")
+        try:
+            # Get currency symbol from app config or use default
+            currency_symbol = app.config.get("CURRENCY_SYMBOL", "$")
 
-        # Format with thousand separators and 2 decimal places
-        return f"{currency_symbol}{value:,.2f}"
+            # Format with thousand separators and 2 decimal places
+            return f"{currency_symbol}{float(value):,.2f}"
+        except (ValueError, TypeError):
+            # Handle any conversion errors
+            return f"{value}"
 
     @app.errorhandler(TypeError)
     def handle_type_error(e: TypeError):
