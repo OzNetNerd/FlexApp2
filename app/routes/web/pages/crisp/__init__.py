@@ -22,7 +22,55 @@ dashboard_view = ViewConfig(
     endpoint="dashboard"
 )
 
-# [Rest of the view configurations]
+scores_view = ViewConfig(
+    view_class=CrispScoresView,
+    kwargs={
+        "template_path": "pages/crisp/scores.html",
+        "title": "CRISP Scores",
+        "service": crisp_service
+    },
+    endpoint="scores"
+)
+
+detail_view = ViewConfig(
+    view_class=CrispDetailView,
+    kwargs={
+        "template_path": "pages/crisp/detail.html",
+        "title": "CRISP Score Detail",
+        "service": crisp_service
+    },
+    endpoint="detail"
+)
+
+create_view = ViewConfig(
+    view_class=CrispFormView,
+    kwargs={
+        "template_path": "pages/crisp/form.html",
+        "title": "Create CRISP Score",
+        "service": crisp_service
+    },
+    endpoint="create"
+)
+
+edit_view = ViewConfig(
+    view_class=CrispFormView,
+    kwargs={
+        "template_path": "pages/crisp/form.html",
+        "title": "Edit CRISP Score",
+        "service": crisp_service
+    },
+    endpoint="edit"
+)
+
+comparison_view = ViewConfig(
+    view_class=CrispComparisonView,
+    kwargs={
+        "template_path": "pages/crisp/comparison.html",
+        "title": "CRISP Score Comparison",
+        "service": crisp_service
+    },
+    endpoint="comparison"
+)
 
 # Create blueprint with all views
 crisp_bp = create_crud_blueprint(
@@ -34,8 +82,6 @@ crisp_bp = create_crud_blueprint(
             "dashboard": dashboard_view,
             "scores": scores_view,
             "detail": detail_view,
-            "create": create_view,
-            "edit": edit_view,
             "comparison": comparison_view
         }
     )
