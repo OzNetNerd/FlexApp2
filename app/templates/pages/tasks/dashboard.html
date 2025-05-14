@@ -23,7 +23,7 @@
         "color": "text-warning",
         "title": "Pending Tasks",
         "description": "Tasks awaiting action",
-        "url": url_for('tasks_bp.filtered_tasks', status='pending'),
+        "url": url_for('tasks_bp.filtered', status='pending'),
         "badge": stats.pending_tasks
     },
     {
@@ -39,7 +39,7 @@
         "color": "text-danger",
         "title": "High Priority",
         "description": "View urgent tasks",
-        "url": url_for('tasks_bp.filtered_tasks', priority='high'),
+        "url": url_for('tasks_bp.filtered', priority='high'),
         "badge": None
     },
     {
@@ -65,7 +65,7 @@
         'icon': 'fas fa-tasks',
         'color_class': 'primary',
         'button_label': 'View All Tasks',
-        'button_url': url_for('tasks_bp.filtered_tasks')
+        'button_url': url_for('tasks_bp.filtered')
     },
     {
         'title': 'Completed Tasks',
@@ -76,7 +76,7 @@
         'icon': 'fas fa-check-circle',
         'color_class': 'success',
         'button_label': 'View Completed',
-        'button_url': url_for('tasks_bp.filtered_tasks', status='completed')
+        'button_url': url_for('tasks_bp.filtered', status='completed')
     },
     {
         'title': 'Pending Tasks',
@@ -87,7 +87,7 @@
         'icon': 'fas fa-hourglass-half',
         'color_class': 'warning',
         'button_label': 'View Pending',
-        'button_url': url_for('tasks_bp.filtered_tasks', status='pending')
+        'button_url': url_for('tasks_bp.filtered', status='pending')
     },
     {
         'title': 'Overdue Tasks',
@@ -98,7 +98,7 @@
         'icon': 'fas fa-exclamation-circle',
         'color_class': 'danger',
         'button_label': 'View Overdue',
-        'button_url': url_for('tasks_bp.filtered_tasks', status='overdue')
+        'button_url': url_for('tasks_bp.filtered', status='overdue')
     },
     {
         'title': 'Due Today',
@@ -109,14 +109,14 @@
         'icon': 'fas fa-calendar-day',
         'color_class': 'primary',
         'button_label': 'View Today\'s Tasks',
-        'button_url': url_for('tasks_bp.filtered_tasks', due='today')
+        'button_url': url_for('tasks_bp.filtered', due='today')
     }
 ] %}
 
 
 {{ sections.progress_bar_section(
     heading='Tasks Summary',
-    href=url_for('tasks_bp.filtered_tasks'),
+    href=url_for('tasks_bp.filtered'),
     button_text='View All Tasks',
     card_data=tasks_card_data
 ) }}
@@ -129,7 +129,7 @@
         <h2 class="section-card-heading">Upcoming Tasks</h2>
         <div>
           {{ buttons.transparent_button(
-            href=url_for('tasks_bp.filtered_tasks'),
+            href=url_for('tasks_bp.filtered'),
             label='<i class="bi bi-funnel"></i> Filter Tasks'
           ) }}
           {{ buttons.transparent_button(
@@ -215,7 +215,7 @@
         </div>
       </div>
       <div class="card-footer bg-white text-center">
-        <a href="{{ url_for('tasks_bp.filtered_tasks') }}" class="text-decoration-none">
+        <a href="{{ url_for('tasks_bp.filtered') }}" class="text-decoration-none">
           View all {{ stats.total_tasks }} tasks
         </a>
       </div>

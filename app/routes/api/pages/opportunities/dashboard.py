@@ -9,9 +9,9 @@ opportunity_service = OpportunityService()
 
 
 @opportunities_api_bp.route("/dashboard/stats", methods=["GET"])
-def get_dashboard_stats():
+def get_dashboard_statistics():
     """Get statistics for the opportunities dashboard."""
-    stats = opportunity_service.get_dashboard_stats()
+    stats = opportunity_service.get_dashboard_statistics()
     return jsonify(stats)
 
 

@@ -35,9 +35,9 @@ class TaskService(ServiceBase):
         return self.core.get_upcoming_tasks(limit)
 
     # Analytics methods
-    def get_dashboard_stats(self):
+    def get_dashboard_statistics(self):
         """Get basic statistics for the dashboard."""
-        return self.analytics.get_dashboard_stats()
+        return self.analytics.get_dashboard_statistics()
 
     def get_engagement_segments(self):
         """Get task status segments with percentages."""

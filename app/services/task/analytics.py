@@ -13,7 +13,7 @@ class TaskAnalyticsService(ServiceBase):
         """Initialize the Task analytics service."""
         super().__init__()
 
-    def get_dashboard_stats(self):
+    def get_dashboard_statistics(self):
         """Get basic statistics for the dashboard."""
         total_tasks = Task.query.count()
         completed_count = db.session.query(Task).filter(Task.status == "completed").count()

@@ -17,7 +17,7 @@ class OpportunityAnalyticsService(ServiceBase):
         """Get the total number of opportunities."""
         return Opportunity.query.count()
 
-    def get_dashboard_stats(self):
+    def get_dashboard_statistics(self):
         """Get statistics for the opportunities dashboard."""
         return {
             "active_count": Opportunity.query.filter_by(status="active").count(),

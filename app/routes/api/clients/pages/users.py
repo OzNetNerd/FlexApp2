@@ -31,7 +31,7 @@ class UserApiClient(ApiClient):
         return self.delete(f"{self.base_path}/{user_id}")
 
     # Dashboard operations
-    def get_dashboard_stats(self):
+    def get_dashboard_statistics(self):
         """Get statistics for the users dashboard."""
         return self.get(f"{self.base_path}/dashboard/stats")
 

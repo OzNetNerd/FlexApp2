@@ -17,7 +17,7 @@ class ContactAnalyticsService(ServiceBase):
         """Get the total number of contacts."""
         return Contact.query.count()
 
-    def get_dashboard_stats(self):
+    def get_dashboard_statistics(self):
         """Get statistics for the contacts dashboard."""
         total_contacts = self.get_total_contacts()
 

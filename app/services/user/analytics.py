@@ -14,7 +14,7 @@ class UserAnalyticsService(ServiceBase):
         """Initialize the User analytics service."""
         super().__init__()
 
-    def get_dashboard_stats(self):
+    def get_dashboard_statistics(self):
         """Get statistics for the dashboard."""
 
         from app.models.pages.user import User

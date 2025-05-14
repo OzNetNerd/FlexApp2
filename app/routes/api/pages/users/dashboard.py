@@ -9,9 +9,9 @@ user_service = UserService()
 
 
 @users_api_bp.route("/dashboard/stats", methods=["GET"])
-def get_dashboard_stats():
+def get_dashboard_statistics():
     """Get statistics for the users dashboard."""
-    stats = user_service.get_dashboard_stats()
+    stats = user_service.get_dashboard_statistics()
     return jsonify(stats)
 
 

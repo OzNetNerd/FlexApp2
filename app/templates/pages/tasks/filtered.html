@@ -55,7 +55,7 @@
         <h2 class="section-card-heading">Filter Tasks</h2>
       </div>
       <div class="card-body">
-        <form action="{{ url_for('tasks_bp.filtered_tasks') }}" method="GET" class="row g-3">
+        <form action="{{ url_for('tasks_bp.filtered') }}" method="GET" class="row g-3">
           <div class="col-md-3">
             <label for="status" class="form-label">Status</label>
             <select class="form-select" id="status" name="status">
@@ -95,7 +95,7 @@
             </select>
           </div>
           <div class="col-12 text-end">
-            <a href="{{ url_for('tasks_bp.filtered_tasks') }}" class="btn btn-outline-secondary me-2">Clear Filters</a>
+            <a href="{{ url_for('tasks_bp.filtered') }}" class="btn btn-outline-secondary me-2">Clear Filters</a>
             <button type="submit" class="btn btn-primary">Apply Filters</button>
           </div>
         </form>

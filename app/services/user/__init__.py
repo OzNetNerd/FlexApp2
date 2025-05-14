@@ -38,9 +38,9 @@ class UserService(ServiceBase):
         return self.core.get_filtered_users(filters)
 
     # Analytics methods
-    def get_dashboard_stats(self):
+    def get_dashboard_statistics(self):
         """Get statistics for the dashboard."""
-        return self.analytics.get_dashboard_stats()
+        return self.analytics.get_dashboard_statistics()
 
     def get_user_categories(self):
         """Get user categories with statistics."""

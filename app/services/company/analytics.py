@@ -18,7 +18,7 @@ class CompanyAnalyticsService(ServiceBase):
         """Get the total number of companies."""
         return Company.query.count()
 
-    def get_dashboard_stats(self):
+    def get_dashboard_statistics(self):
         """Get statistics for the companies dashboard."""
         total_companies = self.get_total_companies()
 
