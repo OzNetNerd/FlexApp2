@@ -4,6 +4,7 @@ from typing import Dict, List, Any, Optional, Union
 from datetime import datetime
 from app.models.pages.srs import SRS, ReviewHistory
 from app.services.service_base import ServiceBase, ServiceRegistry
+from app.services.crud_service import CRUDService
 from app.services.srs.core import SRSCoreService
 from app.services.srs.algorithm import SRSAlgorithmService
 from app.services.srs.filters import SRSFilterService
@@ -12,7 +13,7 @@ from app.services.srs.navigation import SRSNavigationService
 from app.services.srs.categories import SRSCategoryService
 
 
-class SRSService(ServiceBase):
+class SRSService(CRUDService):
     """
     Service for managing SRS items and scheduling reviews based on spaced repetition principles.
 
@@ -27,7 +28,7 @@ class SRSService(ServiceBase):
 
     def __init__(self):
         """Initialize the SRS service."""
-        super().__init__()
+        super().__init__(SRS, ["title", "content"])  # Pass model class and required fields
         self.logger.info("SRSService: Initializing SRS service")
 
         # Initialize specialized subservices using the registry for dependency sharing
@@ -38,17 +39,19 @@ class SRSService(ServiceBase):
         self.navigation = ServiceRegistry.get(SRSNavigationService)
         self.categories = ServiceRegistry.get(SRSCategoryService)
 
-    # All of your original methods remain the same, delegating to the appropriate subservice
-    # I'm not including all of them for brevity, but your implementation should remain unchanged
+    # Override inherited methods to use core service
 
-    # Core operations
     def get_by_id(self, item_id: int) -> Optional[SRS]:
         """Get an SRS item by ID."""
         return self.core.get_by_id(item_id)
 
-    def get_all(self) -> List[SRS]:
-        """Get all SRS items."""
-        return self.core.get_all()
+    def get_all(self, page=1, per_page=15, sort_column="id", sort_direction="asc", filters=None) -> Union[List[SRS], Any]:
+        """Get all SRS items with optional pagination."""
+        if page == 1 and per_page == 15 and sort_column == "id" and not filters:
+            # Use simple get_all for default parameters
+            return self.core.get_all()
+        # Otherwise use the inherited pagination method
+        return super().get_all(page, per_page, sort_column, sort_direction, filters)
 
     def create(self, data: Dict[str, Any]) -> SRS:
         """Create a new SRS item."""
@@ -57,6 +60,8 @@ class SRSService(ServiceBase):
     def update(self, item_id_or_obj: Union[int, SRS], update_data: Dict[str, Any]) -> SRS:
         """Update an SRS item."""
         return self.core.update(item_id_or_obj, update_data)
+
+    # Rest of the class remains unchanged
 
     # Algorithm operations
     def preview_ratings(self, item_id: int) -> Dict[int, float]:
@@ -74,7 +79,7 @@ class SRSService(ServiceBase):
         """
         item = self.core.get_by_id(item_id)
         if not item:
-            logger.error(f"SRSService: SRS item with ID {item_id} not found during preview_ratings")
+            self.logger.error(f"SRSService: SRS item with ID {item_id} not found during preview_ratings")
             raise ValueError(f"SRS item with ID {item_id} not found")
 
         return self.algorithm.preview_ratings(item)
@@ -94,11 +99,11 @@ class SRSService(ServiceBase):
         Raises:
             ValueError: If the SRS item doesn't exist
         """
-        logger.info(f"SRSService: Scheduling review for item {item_id} with rating {rating}")
+        self.logger.info(f"SRSService: Scheduling review for item {item_id} with rating {rating}")
 
         item = self.core.get_by_id(item_id)
         if not item:
-            logger.error(f"SRSService: SRS item with ID {item_id} not found during schedule_review")
+            self.logger.error(f"SRSService: SRS item with ID {item_id} not found during schedule_review")
             raise ValueError(f"SRS item with ID {item_id} not found")
 
         # Calculate updated values for scheduling
