@@ -51,6 +51,7 @@ users_bp = create_crud_blueprint(
         model_class=User,
         form_class=UserForm,
         service=user_service,
+        url_prefix="/users",
         views={
             "dashboard": dashboard_view,
             "filtered": filtered_view,

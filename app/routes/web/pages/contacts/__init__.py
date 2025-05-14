@@ -51,6 +51,7 @@ contacts_bp = create_crud_blueprint(
         model_class=Contact,
         form_class=ContactForm,
         service=contact_service,
+        url_prefix="/contacts",
         views={
             "dashboard": dashboard_view,
             "filtered": filtered_view,

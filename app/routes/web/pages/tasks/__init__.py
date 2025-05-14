@@ -51,6 +51,7 @@ tasks_bp = create_crud_blueprint(
         model_class=Task,
         form_class=TaskForm,
         service=task_service,
+        url_prefix="/tasks",
         views={
             "dashboard": dashboard_view,
             "filtered": filtered_view,

@@ -24,9 +24,9 @@ class SessionService:
         next_page = request.args.get("next")
         if not next_page or not next_page.startswith("/"):
             try:
-                next_page = url_for("home.index")
+                next_page = url_for("home_bp.index")
                 logger.info(f"Redirecting to home page at '{next_page}'")
             except Exception as e:
-                logger.error(f"Failed to build URL for 'home.index': {e}")
+                logger.error(f"Failed to build URL for 'home_bp.index': {e}")
                 next_page = "/"  # Fallback to root
         return next_page

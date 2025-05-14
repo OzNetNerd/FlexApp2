@@ -51,6 +51,7 @@ opportunities_bp = create_crud_blueprint(
         model_class=Opportunity,
         form_class=OpportunityForm,
         service=opportunity_service,
+        url_prefix="/opportunities",
         views={
             "dashboard": dashboard_view,
             "filtered": filtered_view,

@@ -3,7 +3,7 @@ from app.forms.srs import SRSForm
 from app.services.srs import SRSService
 from app.routes.web.utils.blueprint_factory import BlueprintConfig, ViewConfig, create_crud_blueprint
 from app.routes.web.views.base_view import DashboardView, FilteredView, StatisticsView, RecordsView
-from app.routes.web.views.srs import (
+from app.routes.web.pages.srs.views import (
     SRSReviewView, SRSBatchActionView, SRSAddCardView, SRSCategoryView,
     SRSLearningStageView, SRSDifficultyView, SRSPerformanceView, SRSReviewStrategyView
 )
@@ -140,6 +140,7 @@ srs_bp = create_crud_blueprint(
         model_class=SRS,
         form_class=SRSForm,
         service=srs_service,
+        url_prefix="/srs",
         views={
             "dashboard": dashboard_view,
             "filtered": filtered_view,

@@ -5,69 +5,64 @@
 
 {% block title %}CRM Dashboard - Contacts{% endblock %}
 
-{% block head_extra %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
-
 {% block content %}
+<!-- Define default empty stats if stats is not provided -->
+{% set stats = stats|default({}) %}
+
 <!-- Heading & subtext section -->
 {{ sections.heading_section(
   heading_text='Contact Management',
-  subtext='Track and manage all of your professional contacts'
+  subtext='Track and manage your customer relationships efficiently'
 ) }}
 
-<!-- Summary Section: Data -->
+<!-- Quick Actions Cards -->
 {% set large_card_data = [
-    {
-        "icon": "bi bi-person-check",
-        "color": "text-primary",
-        "title": "Active Contacts",
-        "description": "With opportunities",
-        "url": url_for('contacts_bp.filtered_contacts', has_opportunities='yes'),
-        "badge": stats.with_opportunities
-    },
-    {
-        "icon": "bi bi-person-plus",
-        "color": "text-success",
-        "title": "Add Contact",
-        "description": "Create new contact",
-        "url": url_for('contacts_bp.create'),
-        "badge": None
-    },
-    {
-        "icon": "bi bi-building",
-        "color": "text-warning",
-        "title": "Company Linked",
-        "description": "View contacts with companies",
-        "url": url_for('contacts_bp.filtered_contacts', has_company='yes'),
-        "badge": None
-    },
-    {
-        "icon": "bi bi-bar-chart",
-        "color": "text-info",
-        "title": "Analytics",
-        "description": "Contact insights",
-        "url": url_for('contacts_bp.statistics'),
-        "badge": None
-    }
+  {
+    'icon': 'bi bi-people',
+    'color': 'text-primary',
+    'title': 'All Contacts',
+    'description': 'View your contact list',
+    'url': url_for('contacts_bp.filtered', status='active')
+  },
+  {
+    'icon': 'bi bi-person-plus',
+    'color': 'text-success',
+    'title': 'Add Contact',
+    'description': 'Create new contact',
+    'url': url_for('contacts_bp.create')
+  },
+  {
+    'icon': 'bi bi-star',
+    'color': 'text-warning',
+    'title': 'Key Accounts',
+    'description': 'View important contacts',
+    'url': url_for('contacts_bp.filtered', status='key')
+  },
+  {
+    'icon': 'bi bi-bar-chart',
+    'color': 'text-info',
+    'title': 'Analytics',
+    'description': 'Contact insights',
+    'url': url_for('contacts_bp.statistics')
+  }
 ] %}
 
-<!-- Summary Section -->
 {{ sections.large_cards_section(large_card_data) }}
 
+<!-- Summary Section with safe access -->
 {% set contacts_summary = {
   'title': 'Contacts Summary',
   'stats_data': [
-    {'value': stats.total_contacts, 'label': 'Total Contacts', 'color': 'text-primary'},
-    {'value': stats.with_opportunities, 'label': 'With Opportunities', 'color': 'text-danger'},
-    {'value': stats.with_skills, 'label': 'With Skills', 'color': 'text-success'},
-    {'value': stats.with_companies, 'label': 'Company Associated', 'color': 'text-info'}
+    {'value': stats.total_contacts if stats is defined and stats.total_contacts is defined else 0, 'label': 'Total Contacts', 'color': 'text-primary'},
+    {'value': stats.new_contacts if stats is defined and stats.new_contacts is defined else 0, 'label': 'New This Month', 'color': 'text-success'},
+    {'value': stats.key_accounts if stats is defined and stats.key_accounts is defined else 0, 'label': 'Key Accounts', 'color': 'text-warning'},
+    {'value': stats.engagement_rate if stats is defined and stats.engagement_rate is defined else '0%', 'label': 'Engagement Rate', 'color': 'text-info'}
   ],
   'highlights_data': [
-    {'icon': 'fas fa-briefcase', 'icon_color': 'text-success', 'content': '<span class="fw-bold">'+stats.with_opportunities|string+'</span> contacts linked to opportunities'},
-    {'icon': 'fas fa-building', 'icon_color': 'text-warning', 'content': '<span class="fw-bold">'+stats.with_companies|string+'</span> contacts associated with companies'},
-    {'icon': 'fas fa-certificate', 'icon_color': 'text-primary', 'content': '<span class="fw-bold">'+skill_segments[0].count|string+'</span> expert-level contacts'},
-    {'icon': 'fas fa-exclamation-triangle', 'icon_color': 'text-danger', 'content': '<span class="fw-bold">'+(stats.total_contacts - stats.with_companies)|string+'</span> contacts without companies'}
+    {'icon': 'fas fa-calendar', 'icon_color': 'text-success', 'content': '<span class="fw-bold">'+(stats.upcoming_meetings|string if stats is defined and stats.upcoming_meetings is defined else '0')+'</span> meetings scheduled in next 7 days'},
+    {'icon': 'fas fa-envelope', 'icon_color': 'text-warning', 'content': '<span class="fw-bold">'+(stats.outreach_needed|string if stats is defined and stats.outreach_needed is defined else '0')+'</span> contacts need follow-up'},
+    {'icon': 'fas fa-chart-line', 'icon_color': 'text-primary', 'content': 'Contact growth rate <span class="fw-bold">'+(stats.growth_rate|string if stats is defined and stats.growth_rate is defined else '0')+'%</span> this quarter'},
+    {'icon': 'fas fa-hourglass-half', 'icon_color': 'text-danger', 'content': '<span class="fw-bold">'+(stats.inactive_count|string if stats is defined and stats.inactive_count is defined else '0')+'</span> contacts with no activity for 30+ days'}
   ]
 } %}
 
@@ -77,79 +72,69 @@
     highlights_data=contacts_summary.highlights_data
 ) }}
 
-<!-- Contact Skill Segments Section -->
-{% set skill_level_data = [
+<!-- Define default empty segments if not provided -->
+{% set segments = segments|default([
+  {'count': 0, 'percentage': 0},
+  {'count': 0, 'percentage': 0},
+  {'count': 0, 'percentage': 0}
+]) %}
+
+<!-- Contact Segments Section -->
+{% set contact_segments = [
     {
-        'title': 'Expert',
-        'count': skill_segments[0].count,
-        'activity_count': null,
-        'activity_label': 'Master level skills',
-        'percentage': skill_segments[0].percentage,
-        'icon': 'bi bi-star-fill',
-        'color_class': 'info',
-        'button_label': 'View Contacts',
-        'button_url': url_for('contacts_bp.filtered_contacts', skill_level='Expert')
-    },
-    {
-        'title': 'Advanced',
-        'count': skill_segments[1].count,
-        'activity_count': null,
-        'activity_label': 'High level skills',
-        'percentage': skill_segments[1].percentage,
-        'icon': 'bi bi-star',
-        'color_class': 'primary',
-        'button_label': 'View Contacts',
-        'button_url': url_for('contacts_bp.filtered_contacts', skill_level='Advanced')
-    },
-    {
-        'title': 'Intermediate',
-        'count': skill_segments[2].count,
-        'activity_count': null,
-        'activity_label': 'Solid skills',
-        'percentage': skill_segments[2].percentage,
+        'title': 'Customers',
+        'count': segments[0].count if segments|length > 0 and segments[0] is defined and segments[0].count is defined else 0,
+        'activity_count': segments[0].value if segments|length > 0 and segments[0] is defined and segments[0].value is defined else 0,
+        'activity_label': 'contacts',
+        'percentage': segments[0].percentage if segments|length > 0 and segments[0] is defined and segments[0].percentage is defined else 0,
         'icon': 'bi bi-person-check',
         'color_class': 'success',
         'button_label': 'View Contacts',
-        'button_url': url_for('contacts_bp.filtered_contacts', skill_level='Intermediate')
+        'button_url': url_for('contacts_bp.filtered', segment='customer')
     },
     {
-        'title': 'Beginner',
-        'count': skill_segments[3].count,
-        'activity_count': null,
-        'activity_label': 'Entry level',
-        'percentage': skill_segments[3].percentage,
+        'title': 'Prospects',
+        'count': segments[1].count if segments|length > 1 and segments[1] is defined and segments[1].count is defined else 0,
+        'activity_count': segments[1].value if segments|length > 1 and segments[1] is defined and segments[1].value is defined else 0,
+        'activity_label': 'contacts',
+        'percentage': segments[1].percentage if segments|length > 1 and segments[1] is defined and segments[1].percentage is defined else 0,
         'icon': 'bi bi-person',
+        'color_class': 'primary',
+        'button_label': 'View Contacts',
+        'button_url': url_for('contacts_bp.filtered', segment='prospect')
+    },
+    {
+        'title': 'Partners',
+        'count': segments[2].count if segments|length > 2 and segments[2] is defined and segments[2].count is defined else 0,
+        'activity_count': segments[2].value if segments|length > 2 and segments[2] is defined and segments[2].value is defined else 0,
+        'activity_label': 'contacts',
+        'percentage': segments[2].percentage if segments|length > 2 and segments[2] is defined and segments[2].percentage is defined else 0,
+        'icon': 'bi bi-people',
         'color_class': 'warning',
         'button_label': 'View Contacts',
-        'button_url': url_for('contacts_bp.filtered_contacts', skill_level='Beginner')
+        'button_url': url_for('contacts_bp.filtered', segment='partner')
     }
 ] %}
 
 {{ sections.progress_bar_section(
-    heading='Skill Level Distribution',
-    href=url_for('contacts_bp.filtered_contacts'),
+    heading='Contact Segments',
+    href=url_for('contacts_bp.filtered'),
     button_text='View All Contacts',
-    card_data=skill_level_data
+    card_data=contact_segments
 ) }}
 
-
-<!-- Top Contacts Section -->
+<!-- Recent Contacts Section -->
 <div class="row mb-4">
   <div class="col-12">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h2 class="section-card-heading">Top Contacts</h2>
-            <div>
-              {{ buttons.transparent_button(
-                href=url_for('contacts_bp.filtered_contacts', has_opportunities='yes'),
-                label='<i class="bi bi-funnel"></i> Filter Contacts'
-              ) }}
-              {{ buttons.transparent_button(
-                href=url_for('contacts_bp.create'),
-                label='Add Contact',
-                color_class='primary'
-              ) }}
-            </div>
+        <h2 class="section-card-heading">Recent Contacts</h2>
+        <div>
+          <a href="{{ url_for('contacts_bp.filtered') }}" class="transparent-button me-2">
+            <i class="bi bi-funnel"></i> Filter Contacts
+          </a>
+          <a href="{{ url_for('contacts_bp.create') }}" class="btn btn-sm btn-primary">Add Contact</a>
+        </div>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
@@ -158,50 +143,44 @@
               <tr>
                 <th scope="col" class="ps-4">Name</th>
                 <th scope="col">Company</th>
-                <th scope="col">Role</th>
-                <th scope="col">Skill Level</th>
-                <th scope="col">Opportunities</th>
+                <th scope="col">Title</th>
                 <th scope="col">Email</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Status</th>
                 <th scope="col" class="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {% for contact, opportunity_count in top_contacts %}
+              {% for contact in recent_contacts|default([]) %}
               <tr>
-                <td class="ps-4">{{ contact.full_name }}</td>
-                <td>{{ contact.company.name if contact.company else "-" }}</td>
-                <td>{{ contact.role or "-" }}</td>
+                <td class="ps-4">{{ contact.first_name }} {{ contact.last_name }}</td>
+                <td>{{ contact.company_name }}</td>
+                <td>{{ contact.job_title }}</td>
+                <td>{{ contact.email }}</td>
+                <td>{{ contact.phone }}</td>
                 <td>
-                  {% if contact.skill_level == 'Expert' %}
-                    <span class="badge bg-info">Expert</span>
-                  {% elif contact.skill_level == 'Advanced' %}
-                    <span class="badge bg-primary">Advanced</span>
-                  {% elif contact.skill_level == 'Intermediate' %}
-                    <span class="badge bg-success">Intermediate</span>
-                  {% elif contact.skill_level == 'Beginner' %}
-                    <span class="badge bg-warning">Beginner</span>
+                  {% if contact.segment == 'customer' %}
+                    <span class="badge bg-success">Customer</span>
+                  {% elif contact.segment == 'prospect' %}
+                    <span class="badge bg-primary">Prospect</span>
+                  {% elif contact.segment == 'partner' %}
+                    <span class="badge bg-warning">Partner</span>
                   {% else %}
-                    <span class="badge bg-secondary">Not Set</span>
+                    <span class="badge bg-secondary">{{ contact.segment }}</span>
                   {% endif %}
                 </td>
-                <td>
-                  <span class="badge bg-primary">{{ opportunity_count }}</span>
-                </td>
-                <td>
-                  <a href="mailto:{{ contact.email }}" class="text-decoration-none">{{ contact.email }}</a>
-                </td>
                 <td class="text-center">
-                  <a href="{{ url_for('contacts_bp.view', entity_id=contact.id) }}" class=" transparent-button me-1">View</a>
-                  <a href="{{ url_for('contacts_bp.edit', entity_id=contact.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                  <a href="{{ url_for('contacts_bp.view', contact_id=contact.id) }}" class="transparent-button me-1">View</a>
+                  <a href="{{ url_for('contacts_bp.edit', contact_id=contact.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
                 </td>
               </tr>
               {% endfor %}
-              {% if not top_contacts %}
+              {% if not recent_contacts|default([]) %}
               <tr>
                 <td colspan="7" class="text-center py-4">
                   <div class="text-muted">
                     <i class="bi bi-info-circle-fill fs-4 mb-2"></i>
-                    <p>No contacts with opportunities yet. Add a contact?</p>
+                    <p>No contacts added recently. Add a new contact?</p>
                   </div>
                 </td>
               </tr>
@@ -211,8 +190,8 @@
         </div>
       </div>
       <div class="card-footer bg-white text-center">
-        <a href="{{ url_for('contacts_bp.filtered_contacts') }}" class="text-decoration-none">
-          View all {{ stats.total_contacts }} contacts
+        <a href="{{ url_for('contacts_bp.filtered') }}" class="text-decoration-none">
+          View all {{ stats.recent_contacts_count if stats is defined and stats.recent_contacts_count is defined else 0 }} recent contacts
         </a>
       </div>
     </div>
@@ -236,26 +215,22 @@
 </div>
 {% endblock %}
 
-
 {% block scripts_extra %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module">
   // Sample data for testing
-  const forecastData = {
+  const growthData = {
     labels: ['Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025'],
-    closed_won: [15000, 22000, 18000, 25000, 30000, 28000],
-    forecast: [10000, 12000, 15000, 14000, 16000, 20000],
-    pipeline: [25000, 30000, 35000, 28000, 32000, 40000]
+    customers: [45, 52, 58, 64, 70, 75],
+    prospects: [80, 85, 90, 92, 95, 100],
+    partners: [15, 18, 20, 22, 25, 28]
   };
 
   // Initialize the chart when DOM is loaded
   document.addEventListener('DOMContentLoaded', function() {
     import('{{ url_for("static", filename="js/visuals/barGraph.js") }}')
       .then(module => {
-        module.initSalesForecastChart('salesForecastChart', forecastData, '€');
-
-        // You can also use the more generic function for any bar chart:
-        // module.initBarChart('anotherChartId', customData, customOptions);
+        module.initContactGrowthChart('contactGrowthChart', growthData, '');
       })
       .catch(err => console.error('Failed to load barGraph.js:', err));
   });

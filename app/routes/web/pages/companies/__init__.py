@@ -51,6 +51,7 @@ companies_bp = create_crud_blueprint(
         model_class=Company,
         form_class=CompanyForm,
         service=company_service,
+        url_prefix="/companies",
         views={
             "dashboard": dashboard_view,
             "filtered": filtered_view,

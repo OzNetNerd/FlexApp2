@@ -47,7 +47,7 @@
         <h2 class="section-card-heading">Filter Contacts</h2>
       </div>
       <div class="card-body">
-        <form action="{{ url_for('contacts_bp.filtered_contacts') }}" method="GET" class="row g-3">
+        <form action="{{ url_for('contacts_bp.filtered') }}" method="GET" class="row g-3">
           <div class="col-md-4">
             <label for="has_opportunities" class="form-label">Opportunities</label>
             <select class="form-select" id="has_opportunities" name="has_opportunities">
@@ -75,7 +75,7 @@
             </select>
           </div>
           <div class="col-12 text-end">
-            <a href="{{ url_for('contacts_bp.filtered_contacts') }}" class="btn btn-outline-secondary me-2">Clear Filters</a>
+            <a href="{{ url_for('contacts_bp.filtered') }}" class="btn btn-outline-secondary me-2">Clear Filters</a>
             <button type="submit" class="btn btn-primary">Apply Filters</button>
           </div>
         </form>
