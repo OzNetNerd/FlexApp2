@@ -39,7 +39,8 @@ class BlueprintConfig:
 
 def create_crud_blueprint(config):
     """Create a blueprint with CRUD routes based on configuration."""
-    blueprint = Blueprint(f"{config.model_class.__name__.lower()}_bp", __name__)
+    blueprint_name = f"{config.model_class.__tablename__}_bp"
+    blueprint = Blueprint(blueprint_name, __name__)
 
     # Register views
     for endpoint, view_config in config.views.items():
