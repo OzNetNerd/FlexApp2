@@ -25,15 +25,7 @@ class BaseView(MethodView):
     """
 
     def __init__(self, **kwargs):
-        """Initialize the base view with service and template information.
-
-        Args:
-            **kwargs: Additional configuration options, including:
-                - service: The service instance to use for data operations
-                - template_path: The path to the template to render
-                - title: The title for the page
-                - model_class: The model class for the view
-        """
+        """Initialize the base view with service and template information."""
         self.service = kwargs.get('service')
         self.template_path = kwargs.get('template_path')
         self.title = kwargs.get('title', 'Application')
@@ -43,14 +35,6 @@ class BaseView(MethodView):
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-
-class DashboardView(BaseView):
-    """View class for dashboard pages.
-
-    This class is used for rendering dashboard pages with summary statistics
-    and overview information.
-    """
-
     @classmethod
     def register(cls, blueprint, url, endpoint, **kwargs):
         """Register this view with the given blueprint."""
@@ -58,6 +42,14 @@ class DashboardView(BaseView):
         view_func = cls.as_view(endpoint, **view_kwargs)
         blueprint.add_url_rule(url, endpoint=endpoint, view_func=view_func)
         return view_func
+
+
+class DashboardView(BaseView):
+    """View class for dashboard pages.
+
+    This class is used for rendering dashboard pages with summary statistics
+    and overview information.
+    """
 
     @login_required
     def get(self):
