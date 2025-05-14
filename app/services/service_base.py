@@ -1,5 +1,6 @@
 """Base service classes for application."""
 
+
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from sqlalchemy.orm import Query
 from app.utils.app_logging import get_logger
@@ -16,7 +17,6 @@ class ServiceBase:
         """Initialize service with optional model class."""
         self._model_class = model_class
         self.logger = get_logger()
-        self.logger.info(f"{self.__class__.__name__}: Initializing service")
 
     @property
     def model_class(self):
@@ -52,42 +52,36 @@ class CRUDService(ServiceBase):
         return item
 
     def get_all(
-        self,
-        page: int = 1,
-        per_page: int = 15,
-        sort_column: str = "id",
-        sort_direction: str = "asc",
-        filters: Optional[Dict[str, Any]] = None,
+            self,
+            page: int = 1,
+            per_page: int = 15,
+            sort_column: str = "id",
+            sort_direction: str = "asc",
+            filters: Optional[Dict[str, Any]] = None,
     ):
-        """
-        Get all items with pagination, sorting and filtering.
-
-        Args:
-            page: Page number (starting from 1)
-            per_page: Number of items per page
-            sort_column: Column to sort by
-            sort_direction: Sort direction ('asc' or 'desc')
-            filters: Dictionary of filter conditions
-
-        Returns:
-            Paginated results
-        """
+        """Get all items with pagination, sorting and filtering."""
         self.logger.info(f"{self.__class__.__name__}: Retrieving items (page={page}, per_page={per_page})")
         query = self.model_class.query
 
-        # Apply any exact‐match filters
+        # Apply filters and sorting
         if filters:
             for attr, val in filters.items():
                 if hasattr(self.model_class, attr):
                     query = query.filter(getattr(self.model_class, attr) == val)
 
-        # Apply sorting
         if hasattr(self.model_class, sort_column):
             col = getattr(self.model_class, sort_column)
             query = query.order_by(col.desc() if sort_direction.lower() == "desc" else col.asc())
 
+        # Get the pagination result
         result = query.paginate(page=page, per_page=per_page)
-        self.logger.info(f"{self.__class__.__name__}: Retrieved {len(result.items)} items (total: {result.total})")
+
+        # Add length support
+        result.__class__.__len__ = lambda self: len(self.items)
+
+        # Convert items to list
+        result.items = list(result.items)
+
         return result
 
     def create(self, data: Dict[str, Any]) -> T:
@@ -213,7 +207,7 @@ class QueryService(ServiceBase):
         if not search_term or not fields:
             return query
 
-        self.logger.info(f"Applying text search filter: '{search_term}' across {len(fields)} fields")
+        # self.logger.info(f"Applying text search filter: '{search_term}' across {len(fields)} fields")
 
         # Format for LIKE query
         formatted_term = f"%{search_term}%"
@@ -358,8 +352,6 @@ class ServiceRegistry:
         return cls._instances[service_class]
 
 
-# Add this class to the end of your existing service_base.py file
-
 class BaseFeatureService(CRUDService):
     """Base service with common feature functionality for dashboard, filters, and statistics."""
 
@@ -372,6 +364,7 @@ class BaseFeatureService(CRUDService):
     def get_filtered_entities(self, filters):
         """Get entities based on filters."""
         query = self.model_class.query
+        self.logger.debug(f"{self.__class__.__name__}: Applying filters to entities: {filters}")
 
         # Apply common filters
         for key, value in filters.items():
@@ -379,13 +372,18 @@ class BaseFeatureService(CRUDService):
                 continue
 
             if value.lower() in ("true", "yes"):
+                self.logger.debug(f"{self.__class__.__name__}: Filter {key} as True")
                 query = query.filter(getattr(self.model_class, key).is_(True))
             elif value.lower() in ("false", "no"):
+                self.logger.debug(f"{self.__class__.__name__}: Filter {key} as False")
                 query = query.filter(getattr(self.model_class, key).is_(False))
             else:
+                self.logger.debug(f"{self.__class__.__name__}: Filter {key}={value}")
                 query = query.filter(getattr(self.model_class, key) == value)
 
-        return query.all()
+        result = query.all()
+        self.logger.debug(f"{self.__class__.__name__}: Retrieved {len(result)} filtered entities")
+        return result
 
     def get_statistics(self):
         """Get common statistics for the entity."""

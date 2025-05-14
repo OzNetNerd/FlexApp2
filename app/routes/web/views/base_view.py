@@ -203,7 +203,7 @@ class RecordsView(BaseView):
         logger.info(f"Retrieved {len(items)} records")
 
         # Convert to dict format for table
-        table_data = [item.to_dict() for item in items]
+        table_data = [item.to_dict() for item in items.items]
 
         # Create table context
         context = TableContext(

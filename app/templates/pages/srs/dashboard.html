@@ -3,6 +3,33 @@
 {% import "macros/sections.html" as sections %}
 {% import "macros/cards.html" as cards %}
 
+{% set progress_data = {
+  'labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+  'datasets': [
+    {
+      'label': 'Cards Created',
+      'data': [5, 8, 12, 15, 20, 25, 30],
+      'borderColor': 'rgba(54, 162, 235, 1)',
+      'backgroundColor': 'rgba(54, 162, 235, 0.2)',
+      'yAxisID': 'y'
+    },
+    {
+      'label': 'Cards Reviewed',
+      'data': [3, 10, 15, 22, 30, 42, 55],
+      'borderColor': 'rgba(255, 99, 132, 1)',
+      'backgroundColor': 'rgba(255, 99, 132, 0.2)',
+      'yAxisID': 'y'
+    },
+    {
+      'label': 'Retention Score',
+      'data': [65, 68, 70, 72, 75, 78, 82],
+      'borderColor': 'rgba(75, 192, 192, 1)',
+      'backgroundColor': 'rgba(75, 192, 192, 0.2)',
+      'yAxisID': 'y1'
+    }
+  ]
+} %}
+
 {% block title %}CRM Dashboard - Flashcards{% endblock %}
 
 {% block head_extra %}
@@ -24,7 +51,7 @@
     'color': 'text-primary',
     'title': 'Due Cards',
     'description': 'Review cards due today',
-    'url': url_for('srs_bp.filtered_cards', due_only=1),
+    'url': url_for('srs_bp.filtered', due_only=1),
     'badge': stats.due_today
   },
   {
@@ -39,7 +66,7 @@
     'color': 'text-info',
     'title': 'All Cards',
     'description': 'View your entire collection',
-    'url': url_for('srs_bp.filtered_cards')
+    'url': url_for('srs_bp.filtered')
   },
   {
     'icon': 'bi bi-bar-chart',
@@ -90,6 +117,24 @@
 
 {{ sections.highlights_section("Summary", stats_data, highlights_data) }}
 
+{% set categories = [
+    {
+        'total': 4,
+        'due': 1,
+        'progress': 75
+    },
+    {
+        'total': 9,
+        'due': 2,
+        'progress': 78
+    },
+    {
+        'total': 7,
+        'due': 3,
+        'progress': 57
+    }
+] %}
+
 {% set card_categories = [
     {
         'title': 'Companies',
@@ -100,7 +145,7 @@
         'icon': 'bi bi-building',
         'color_class': 'primary',
         'button_label': 'View Cards',
-        'button_url': url_for('srs_bp.filtered_cards', category='company')
+        'button_url': url_for('srs_bp.filtered', category='company')
     },
     {
         'title': 'Contacts',
@@ -111,7 +156,7 @@
         'icon': 'bi bi-people',
         'color_class': 'success',
         'button_label': 'View Cards',
-        'button_url': url_for('srs_bp.filtered_cards', category='contact')
+        'button_url': url_for('srs_bp.filtered', category='contact')
     },
     {
         'title': 'Opportunities',
@@ -122,13 +167,13 @@
         'icon': 'bi bi-graph-up-arrow',
         'color_class': 'danger',
         'button_label': 'View Cards',
-        'button_url': url_for('srs_bp.filtered_cards', category='opportunity')
+        'button_url': url_for('srs_bp.filtered', category='opportunity')
     }
 ] %}
 
 {{ sections.progress_bar_section(
     heading='Card Categories',
-    href=url_for('srs_bp.filtered_cards'),
+    href=url_for('srs_bp.filtered'),
     button_text='Browse All Cards',
     card_data=card_categories
 ) }}
@@ -142,7 +187,7 @@
         <h2 class="section-card-heading">Cards Due Today</h2>
         <div>
           {{ buttons.transparent_button(
-            href=url_for('srs_bp.filtered_cards', due_only=1),
+            href=url_for('srs_bp.filtered', due_only=1),
             label='<i class="bi bi-funnel"></i> Filter Cards'
           ) }}
           {{ buttons.transparent_button(
@@ -202,7 +247,7 @@
         </div>
       </div>
       <div class="card-footer bg-white text-center">
-        <a href="{{ url_for('srs_bp.filtered_cards', due_only=1) }}" class="text-decoration-none">
+        <a href="{{ url_for('srs_bp.filtered', due_only=1) }}" class="text-decoration-none">
           View all {{ stats.due_today }} due cards
         </a>
       </div>
