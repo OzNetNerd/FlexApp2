@@ -54,6 +54,8 @@ class TableContext(WebContext):
             logger.error("TableContext initialization failed: Neither 'entity_table_name' nor 'model_class' provided")
             raise ValueError("Either 'entity_table_name' or 'model_class' must be provided")
 
+        super().__init__(title=title, read_only=read_only, entity_table_name=entity_table_name, **kwargs)
+
         self.action = action
         logger.info(f"TableContext: action set to: {action!r}")
         self.table_data = table_data
