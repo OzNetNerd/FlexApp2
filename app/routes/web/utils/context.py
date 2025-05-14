@@ -27,6 +27,7 @@ class WebContext(BaseContext):
         self.title = title or kwargs.get("table_name", entity_table_name)
         logger.info(f"WebContext: final title set to: {self.title!r}")
         self.current_user = current_user
+        self.entity_table_name = entity_table_name
         logger.info(
             f"WebContext: current_user set to: {current_user.username if hasattr(current_user, 'username') else current_user}")
         self.read_only = read_only
