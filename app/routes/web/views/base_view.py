@@ -109,3 +109,25 @@ class RecordsView(BaseView):
             table_data=json_data
         )
         return self.render(context)
+
+class CompanyFilteredView(FilteredView):
+    def get_context(self, **kwargs):
+        context = super().get_context(**kwargs)
+        # Rename entities to match template expectations
+        context.companies = context.entities
+        del context.entities
+        return context
+
+class ContactFilteredView(FilteredView):
+    def get_context(self, **kwargs):
+        context = super().get_context(**kwargs)
+        context.contacts = context.entities
+        del context.entities
+        return context
+
+class OpportunityFilteredView(FilteredView):
+    def get_context(self, **kwargs):
+        context = super().get_context(**kwargs)
+        context.opportunities = context.entities
+        del context.entities
+        return context
