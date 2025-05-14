@@ -21,7 +21,7 @@ def filtered_companies():
     }
 
     # Get filtered companies from service
-    companies = company_service.get_filtered_companies(filters)
+    companies = company_service.get_filtered_entities(filters)
 
     # Create context for the filtered view
     context = WebContext(title="Filtered Companies", read_only=True, companies=companies, filters=filters)

@@ -1,8 +1,8 @@
 from app.models.pages.company import Company
 from app.forms.company import CompanyForm
-from app.services.company import CompanyService
+from app.services.company.core import CompanyService
 from app.routes.web.utils.blueprint_factory import BlueprintConfig, ViewConfig, create_crud_blueprint
-from app.routes.web.views.base_views import DashboardView, FilteredView, StatisticsView, RecordsView
+from app.routes.web.views.base_view import DashboardView, FilteredView, StatisticsView, RecordsView
 
 # Create service
 company_service = CompanyService()

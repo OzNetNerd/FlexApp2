@@ -23,7 +23,7 @@ def records():
 
     # Get data from service
     company_service = CompanyService()
-    companies = company_service.get_filtered_companies(request.args.to_dict())
+    companies = company_service.get_filtered_entities(request.args.to_dict())
 
     # Convert to dict format for table
     table_data = [company.to_dict() for company in companies]
