@@ -4,7 +4,9 @@ from app.services.auth.core import AuthCoreService
 from app.services.auth.session import SessionService
 from app.services.auth.password import PasswordService
 from app.services.auth.view import AuthViewService
+from app.utils.app_logging import get_logger
 
+logger = get_logger()
 
 class AuthService(ServiceBase):
     def __init__(self, model=None):
