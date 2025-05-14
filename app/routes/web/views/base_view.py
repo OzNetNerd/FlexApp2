@@ -1,180 +1,234 @@
-from flask import request
+"""
+Base view classes for the web application.
+
+This module defines the base view classes that other view classes in the application
+can inherit from. These classes provide common functionality and structure
+for handling HTTP requests.
+"""
+
+from flask import request, render_template
+from flask.views import MethodView
 from flask_login import login_required
-from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
+
 from app.routes.web.utils.context import WebContext, TableContext
+from app.routes.web.utils.template_renderer import render_safely, RenderSafelyConfig
 from app.utils.app_logging import get_logger
-from datetime import datetime
-import json
 
 logger = get_logger()
 
 
-class BaseView:
-    """Base class for all views."""
+class BaseView(MethodView):
+    """Base view class for all web views.
 
-    def __init__(self, blueprint, service, template_path, title=None, read_only=True):
-        self.blueprint = blueprint
-        self.service = service
-        self.template_path = template_path
-        self.title = title
-        self.read_only = read_only
+    This class provides a foundation for other view classes to build upon,
+    with common initialization and utility methods.
+    """
 
-    def register(self, url="/", endpoint=None, methods=None):
-        """Register this view with the blueprint."""
-        if methods is None:
-            methods = ["GET"]
-        endpoint = endpoint or self.__class__.__name__.lower()
-        self.blueprint.add_url_rule(
-            url,
-            endpoint=endpoint,
-            view_func=login_required(self.dispatch),
-            methods=methods
-        )
+    def __init__(self, **kwargs):
+        """Initialize the base view with service and template information.
 
-    def get_context(self, **kwargs):
-        """Get context for rendering templates."""
-        return WebContext(title=self.title, read_only=self.read_only, **kwargs)
-
-    def dispatch(self):
-        """Handle the request."""
-        raise NotImplementedError("Subclasses must implement dispatch method")
-
-    def render(self, context, error_message=None):
-        """Render template with context."""
-        config = RenderSafelyConfig(
-            template_path=self.template_path,
-            context=context,
-            error_message=error_message or f"Error rendering {self.title}",
-            endpoint_name=request.endpoint,
-        )
-        return render_safely(config)
+        Args:
+            **kwargs: Additional configuration options, including:
+                - service: The service instance to use for data operations
+                - template_path: The path to the template to render
+                - title: The title for the page
+                - model_class: The model class for the view
+        """
+        self.service = kwargs.get('service')
+        self.template_path = kwargs.get('template_path')
+        self.title = kwargs.get('title', 'Application')
+        self.model_class = kwargs.get('model_class')
+        self.render_config = {}
+        self.context_class = WebContext
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
 
 class DashboardView(BaseView):
-    """View for dashboard pages."""
+    """View class for dashboard pages.
 
-    def dispatch(self):
-        """Handle dashboard requests."""
-        stats = self.service.get_dashboard_statistics()
+    This class is used for rendering dashboard pages with summary statistics
+    and overview information.
+    """
 
-        # Check if the service has the prepare_completion_data method
-        if hasattr(self.service, 'prepare_completion_data'):
-            completion_data = self.service.prepare_completion_data()
-        else:
-            completion_data = None
+    @classmethod
+    def register(cls, blueprint, url, endpoint, **kwargs):
+        """Register this view with the given blueprint."""
+        view_kwargs = kwargs.get('kwargs', {})
+        view_func = cls.as_view(endpoint, **view_kwargs)
+        blueprint.add_url_rule(url, endpoint=endpoint, view_func=view_func)
+        return view_func
 
-        context = self.get_context(stats=stats, completion_data=completion_data)
-        return self.render(context)
+    @login_required
+    def get(self):
+        """Handle GET requests for dashboard pages.
 
-    def get_completion_data(self):
-        """Generate chart data for task completion trends."""
-        from datetime import datetime, timedelta
-        from sqlalchemy import func
+        Returns:
+            HTML for the dashboard
+        """
+        logger.info(f"Rendering dashboard: {self.template_path}")
 
-        completion_data = {
-            'labels': [],
-            'new_tasks': [],
-            'completed_tasks': []
-        }
+        # Common dashboard data preparation
+        stats = self.service.get_stats() if hasattr(self.service, 'get_stats') else {}
 
-        # Get data for the last 7 days
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=6)
+        # Create context with default dashboard data
+        context = WebContext(title=self.title)
+        context.stats = stats
 
-        for i in range(7):
-            current_date = start_date + timedelta(days=i)
-            date_str = current_date.strftime('%b %d')
+        # Add additional data if the service provides it
+        if hasattr(self.service, 'get_dashboard_data'):
+            dashboard_data = self.service.get_dashboard_data()
+            for key, value in dashboard_data.items():
+                setattr(context, key, value)
 
-            # Query tasks created on this date
-            new_count = self.service.model.query.filter(
-                func.date(self.service.model.created_at) == current_date.date()
-            ).count()
+        config = RenderSafelyConfig(
+            template_path=self.template_path,
+            context=context,
+            error_message=f"Failed to render dashboard: {self.title}",
+            endpoint_name=request.endpoint,
+        )
 
-            # Query tasks completed on this date
-            completed_count = self.service.model.query.filter(
-                self.service.model.status == 'completed',
-                func.date(self.service.model.completed_at) == current_date.date()
-            ).count()
+        return render_safely(config)
 
-            completion_data['labels'].append(date_str)
-            completion_data['new_tasks'].append(new_count)
-            completion_data['completed_tasks'].append(completed_count)
-
-        return completion_data
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context(**kwargs)
-        context['completion_data'] = self.get_completion_data()
-        return context
 
 class FilteredView(BaseView):
-    """View for filtered list pages."""
+    """View class for filtered data pages.
 
-    def dispatch(self):
-        """Handle filtered list requests."""
+    This class is used for rendering pages that display filtered lists
+    of records based on query parameters.
+    """
+
+    @login_required
+    def get(self):
+        """Handle GET requests for filtered views.
+
+        Returns:
+            HTML for the filtered data view
+        """
+        logger.info(f"Rendering filtered view: {self.template_path}")
+
+        # Get filter parameters from request args
         filters = request.args.to_dict()
-        entities = self.service.get_filtered_entities(filters)
-        context = self.get_context(entities=entities, filters=filters)
-        return self.render(context)
+        logger.info(f"Applied filters: {filters}")
+
+        # Get filtered data
+        if hasattr(self.service, 'get_filtered'):
+            items = self.service.get_filtered(filters)
+        else:
+            items = self.service.get_all()
+
+        logger.info(f"Retrieved {len(items)} items matching filter criteria")
+
+        # Create context with filtered data
+        context = WebContext(title=self.title)
+        context.items = items
+        context.filters = filters
+
+        # Add additional filter-related data if available
+        if hasattr(self.service, 'get_filter_options'):
+            filter_options = self.service.get_filter_options()
+            for key, value in filter_options.items():
+                setattr(context, key, value)
+
+        config = RenderSafelyConfig(
+            template_path=self.template_path,
+            context=context,
+            error_message=f"Failed to render filtered view: {self.title}",
+            endpoint_name=request.endpoint,
+        )
+
+        return render_safely(config)
 
 
 class StatisticsView(BaseView):
-    """View for statistics pages."""
+    """View class for statistics pages.
 
-    def dispatch(self):
-        """Handle statistics requests."""
-        stats = self.service.get_statistics()
-        context = self.get_context(**stats)
-        return self.render(context)
+    This class is used for rendering pages that display detailed
+    statistics and analytics.
+    """
+
+    @login_required
+    def get(self):
+        """Handle GET requests for statistics pages.
+
+        Returns:
+            HTML for the statistics view
+        """
+        logger.info(f"Rendering statistics view: {self.template_path}")
+
+        # Get detailed statistics
+        stats = {}
+        if hasattr(self.service, 'get_detailed_stats'):
+            stats = self.service.get_detailed_stats()
+        elif hasattr(self.service, 'get_stats'):
+            stats = self.service.get_stats()
+
+        logger.info("Retrieved statistics data")
+
+        # Create context with statistics data
+        context = WebContext(title=self.title)
+        context.stats = stats
+
+        # Add additional statistics-related data if available
+        if hasattr(self.service, 'get_charts_data'):
+            charts_data = self.service.get_charts_data()
+            for key, value in charts_data.items():
+                setattr(context, key, value)
+
+        config = RenderSafelyConfig(
+            template_path=self.template_path,
+            context=context,
+            error_message=f"Failed to render statistics view: {self.title}",
+            endpoint_name=request.endpoint,
+        )
+
+        return render_safely(config)
 
 
 class RecordsView(BaseView):
-    """View for records/table views."""
+    """View class for table-based record views.
 
-    def __init__(self, blueprint, service, model_class, template_path, title=None):
-        super().__init__(blueprint, service, template_path, title)
-        self.model_class = model_class
+    This class is used for rendering pages that display records
+    in a tabular format with sorting and pagination.
+    """
 
-    def json_serial(self, obj):
-        """JSON serializer for objects not serializable by default."""
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        raise TypeError(f"Type {type(obj)} not serializable")
+    @login_required
+    def get(self):
+        """Handle GET requests for record views.
 
-    def dispatch(self):
-        """Handle record list requests."""
-        filters = request.args.to_dict()
-        entities = self.service.get_filtered_entities(filters)
-        table_data = [entity.to_dict() for entity in entities]
-        json_data = json.dumps(table_data, default=self.json_serial)
+        Returns:
+            HTML for the records view
+        """
+        logger.info(f"Rendering records view: {self.template_path}")
 
+        # Get data from service
+        items = []
+        if hasattr(self.service, 'get_filtered_items'):
+            items = self.service.get_filtered_items(request.args.to_dict())
+        else:
+            items = self.service.get_all()
+
+        logger.info(f"Retrieved {len(items)} records")
+
+        # Convert to dict format for table
+        table_data = [item.to_dict() for item in items]
+
+        # Create table context
         context = TableContext(
             model_class=self.model_class,
-            read_only=self.read_only,
+            read_only=True,
             action="view",
             show_heading=True,
-            table_data=json_data
+            table_data=table_data
         )
-        return self.render(context)
 
-class CompanyFilteredView(FilteredView):
-    def get_context(self, **kwargs):
-        context = super().get_context(**kwargs)
-        # Rename entities to match template expectations
-        context.companies = context.entities
-        del context.entities
-        return context
+        # Configure the render_safely call
+        config = RenderSafelyConfig(
+            template_path=self.template_path,
+            context=context,
+            error_message=f"Failed to render records view: {self.title}",
+            endpoint_name=request.endpoint,
+        )
 
-class ContactFilteredView(FilteredView):
-    def get_context(self, **kwargs):
-        context = super().get_context(**kwargs)
-        context.contacts = context.entities
-        del context.entities
-        return context
-
-class OpportunityFilteredView(FilteredView):
-    def get_context(self, **kwargs):
-        context = super().get_context(**kwargs)
-        context.opportunities = context.entities
-        del context.entities
-        return context
+        # Return the safely rendered template
+        return render_safely(config)

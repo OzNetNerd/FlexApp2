@@ -37,41 +37,26 @@ class BlueprintConfig:
             self.views = {}
 
 
-def create_crud_blueprint(config: BlueprintConfig) -> Blueprint:
-    """Creates a Flask Blueprint with CRUD routes and additional views."""
-    model_class = config.model_class
-    blueprint_name = f"{model_class.__tablename__}_bp"
-    prefix = config.url_prefix if config.url_prefix is not None else f"/{model_class.__tablename__}"
-    blueprint = Blueprint(blueprint_name, __name__, url_prefix=prefix)
+def create_crud_blueprint(config):
+    """Create a blueprint with CRUD routes based on configuration."""
+    blueprint = Blueprint(f"{config.model_class.__name__.lower()}_bp", __name__)
 
-    # Create default service if none provided
-    service = config.service
-    if service is None:
-        service = CRUDService(model_class)
+    # Register views
+    for endpoint, view_config in config.views.items():
+        view_class = view_config.view_class
+        url = view_config.url or f"/{endpoint}"
+        endpoint_name = view_config.endpoint or endpoint
 
-    # Register CRUD routes
-    route_config = CrudRouteConfig(
-        blueprint=blueprint,
-        entity_table_name=model_class.__entity_name__,
-        service=service,
-        model_class=model_class,
-        template_config=config.template_config,
-        form_class=config.form_class,
-    )
-    register_crud_routes(route_config)
+        # Pass the service and other kwargs to the view
+        kwargs = view_config.kwargs or {}
+        kwargs['service'] = config.service
 
-    # Register additional views
-    for view_name, view_config in config.views.items():
-        view_instance = view_config.view_class(
+        # Register the view with the blueprint
+        view_class.register(
             blueprint=blueprint,
-            service=service,
-            **view_config.kwargs
+            url=url,
+            endpoint=endpoint_name,
+            kwargs=kwargs
         )
-        view_instance.register(
-            url=view_config.url,
-            endpoint=view_config.endpoint or view_name,
-            methods=view_config.methods
-        )
-        logger.info(f"Registered view {view_name} at {view_config.url}")
 
     return blueprint
