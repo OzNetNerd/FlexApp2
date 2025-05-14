@@ -14,6 +14,7 @@ class SRS(BaseModel, NotableMixin, TimezoneMixin):
     review intervals, ease factors, and success rates.
     """
 
+    __modelname__ = "Srs"
     __tablename__ = "srs"
 
     question = db.Column(db.Text, nullable=False)

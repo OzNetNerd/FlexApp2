@@ -22,14 +22,9 @@ class BaseModel(db.Model):
     @classmethod
     def __tablename__(cls) -> str:
         """
-        Automatically pluralize class names for table names:
-        - If the class name ends with 'y', drop the 'y' and add 'ies' (Company → companies)
-        - Otherwise just add 's' (User → users)
+        Use lowercase class name as table name without pluralization
         """
-        name = cls.__name__.lower()
-        if name.endswith("y"):
-            return name[:-1] + "ies"
-        return name + "s"
+        return cls.__name__.lower()
 
     @declared_attr
     @classmethod
