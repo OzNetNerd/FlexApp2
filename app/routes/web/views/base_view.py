@@ -56,9 +56,50 @@ class DashboardView(BaseView):
     def dispatch(self):
         """Handle dashboard requests."""
         stats = self.service.get_dashboard_statistics()
-        context = self.get_context(stats=stats)
+        completion_data = self.get_completion_data()
+        context = self.get_context(stats=stats, completion_data=completion_data)
         return self.render(context)
 
+    def get_completion_data(self):
+        """Generate chart data for task completion trends."""
+        from datetime import datetime, timedelta
+        from sqlalchemy import func
+
+        completion_data = {
+            'labels': [],
+            'new_tasks': [],
+            'completed_tasks': []
+        }
+
+        # Get data for the last 7 days
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=6)
+
+        for i in range(7):
+            current_date = start_date + timedelta(days=i)
+            date_str = current_date.strftime('%b %d')
+
+            # Query tasks created on this date
+            new_count = self.service.model.query.filter(
+                func.date(self.service.model.created_at) == current_date.date()
+            ).count()
+
+            # Query tasks completed on this date
+            completed_count = self.service.model.query.filter(
+                self.service.model.status == 'completed',
+                func.date(self.service.model.completed_at) == current_date.date()
+            ).count()
+
+            completion_data['labels'].append(date_str)
+            completion_data['new_tasks'].append(new_count)
+            completion_data['completed_tasks'].append(completed_count)
+
+        return completion_data
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context(**kwargs)
+        context['completion_data'] = self.get_completion_data()
+        return context
 
 class FilteredView(BaseView):
     """View for filtered list pages."""
