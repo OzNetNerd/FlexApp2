@@ -1,7 +1,6 @@
 # app/routes/api/pages/users/crud.py
 
-from flask import jsonify, request
-from app.models import User
+from flask import jsonify
 from app.services.user import UserService
 from app.routes.api.pages.users import users_api_bp
 from app.routes.api.route_registration import ApiCrudRouteConfig
@@ -10,7 +9,7 @@ from app.utils.app_logging import get_logger
 logger = get_logger()
 
 # Register CRUD service and config - using specialized UserService
-user_service = UserService(User)
+user_service = UserService()
 user_api_crud_config = ApiCrudRouteConfig(blueprint=users_api_bp, entity_table_name="User", service=user_service)
 
 

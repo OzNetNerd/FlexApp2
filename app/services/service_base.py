@@ -352,18 +352,9 @@ class ServiceRegistry:
     _instances = {}
 
     @classmethod
-    def get(cls, service_class):
-        """
-        Get or create service instance.
-
-        Args:
-            service_class: The service class to retrieve
-
-        Returns:
-            Instance of the service class
-        """
+    def get(cls, service_class, *args, **kwargs):
         if service_class not in cls._instances:
-            cls._instances[service_class] = service_class()
+            cls._instances[service_class] = service_class(*args, **kwargs)
         return cls._instances[service_class]
 
 
